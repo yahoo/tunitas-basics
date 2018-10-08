@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# the full end-to-end build
+#
+#   buildconf
+#   configure
+#   make [all]
+#   make check
+#
+# Usage:
+#
+#   ./maintenance/e2e     (no options)
+#
+#   prefix=/usr/local \
+#   with_hypogeal_twilight=/opt/tunitas \
+#   with_temerarious_flagship=/opt/tunitas \
+#   ./maintenance/e2e
+# 
+# to build without submodules
+#
+#  with_submodules=no ./maintenance/e2e       (this works because --with-THING=no is --without-THING)
+#
+# The scold module "with" variables will naturally default to /opt/scold
+# The tunitas "with" variables would be expected to be in /opt/tunitas
+#
+cd ${0%/*}/.. || exit 255
+: ${prefix:=/exp/tunitas}
+unset with_submodules # nope ..... : ${with_submodules:=${PWD}/submodules} # must be a full path
+: ${with_siblings:=${PWD%/*}}
+: ${with_nearby:=/build/tunitas/nearby}
+: ${with_external:=${with_nearby?}} # [[deprecating]]
+if [[ no == ${with_submodules:-no} ]] ; then
+    __subnearby=${with_nearby?}
+else
+    __subnearby=${with_submodules?}
+fi
+: ${with_hypogeal_twilight:=${__subnearby?}/hypogeal-twilight}
+: ${with_temerarious_flagship:=/build/tunitas/temerarious-flagship}
+: ${with_module_boost:=no}
+: ${with_module_nonstd:=no}
+: ${with_module_options:=${__subnearby?}/module-options}
+: ${with_module_posix:=no}
+: ${with_module_string:=no}
+: ${with_module_std:=${__subnearby?}/module-std}
+: ${with_module_rigging:=${with_nearby?}/module-rigging}
+: ${with_std_tunitas:=/opt/tunitas}
+: ${with_std_scold:=/opt/scold}
+eval \
+    ${prefix:+prefix=$prefix?} \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ${with_temerarious_flagship:+with_temerarious_flagship=$with_temerarious_flagship} \
+    ./buildconf &&
+./configure \
+    --enable-configure-verbose \
+    --disable-mock-build \
+    ${prefix:+--prefix=$prefix} \
+    ${with_nearby:+--with-nearby=$with_nearby} ${with_external:+--with-external=$with_external} \
+    ${with_submodules:+--with-submodules=$with_submodules} \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_temerarious_flagship:+--with-temerarious-flagship=$with_temerarious_flagship} \
+    ${with_module_boost:+--with-module-boost=$with_module_boost} \
+    ${with_nonstd_boost:+--with-nonstd-boost=$with_nonstd_boost} \
+    ${with_module_c:+--with-module-c=$with_module_c} \
+    ${with_module_string:+--with-module-c-string=$with_module_string} \
+    ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \
+    ${with_module_options:+--with-module-options=$with_module_options} \
+    ${with_module_posix:+--with-module-posix=$with_module_posix} \
+    ${with_module_std:+--with-module-sys=$with_module_std} \
+    ${with_module_rigging:+--with-module-rigging=$with_module_rigging} \
+    ${with_std_tunitas:+--with-std-tunitas=$with_std_tunitas} \
+    ${with_std_scold:+--with-std-scold=$with_std_scold} \
+    ${end} &&
+make &&
+make check &&
+echo OK DONE

@@ -1,0 +1,17 @@
+# -*- Makefile -*-
+
+lib_libtunitas_la = lib/libtunitas.la
+lib_libtunitas_la_LIBADD = $(nothing)
+
+lib_libtunitas_la_SOURCES = \
+  obj/src/tunitas/namespace.cpp \
+  $(end)
+
+$(scold_cxxdir)/tunitas/dependencies.mk: Makefile
+	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libtunitas_la_SOURCES))
+	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libtunitas_la_SOURCES))
+include $(scold_cxxdir)/tunitas/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tunitas/dependencies.mk
+mostlyclean-local::
+	rm -f $(lib_libtunitas_la_SOURCES)

@@ -1,0 +1,10 @@
+tests_unit_XFAIL_TESTS = $(none)
+tests_unit_XPASS_TESTS = $(none)
+tests_unit_TESTS = \
+  $(tests_unit_XPASS_TESTS) \
+  $(tests_unit_XFAIL_TESTS) \
+  tests/unit/list.test \
+  tests/unit/all.test \
+  tests/unit/want.test \
+  tests/unit/tunitas.test \
+  $(end)

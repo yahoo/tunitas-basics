@@ -1,0 +1,12 @@
+// -*- c++ -*- in the SCOLDing style
+#divert <cpp>
+#import tests.unit.want.Fixture
+#import tests.unit.tunitas.Fixture
+#import rigging.bench.Main
+auto main(int argc, char *argv[]) -> int {
+  using namespace tests::unit;
+  rigging::bench::Main remain(want::Fixture::suite(),
+                              tunitas::Fixture::suite());
+  return remain(argc, argv);
+}
+#endiv

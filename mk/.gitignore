@@ -1,0 +1,4 @@
+# general configure-time trash
+buildconfed.mk
+configured.mk
+extracted.mk
