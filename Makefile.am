@@ -12,7 +12,7 @@ include @hypogeal_twilight_datarootdir@/am/compile.mk
 # To get submodules to build in place, these go as a pair
 #   configure.ac declares TF_CONFIG_SUBMODULES(directory, ...list...)
 #   Makefile.am  declares SUBDIRS = @subdirs@
-# there are nos submodules
+# there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
   @module_boost_prefix@ \

@@ -52,7 +52,6 @@ o99.*
 
 test-driver
 test-suite.log
-*.log
 
 # --- boilerplate wisdom from Git Enterprise
 
