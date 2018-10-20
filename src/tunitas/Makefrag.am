@@ -15,7 +15,9 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/app/exception.Usage.cpp \
   obj/src/tunitas/app/exception.Version.cpp \
   \
+  obj/src/tunitas/app/options.cpp \
   obj/src/tunitas/app/options.Args.cpp \
+  obj/src/tunitas/app/words.cpp \
   obj/src/tunitas/app/words.Filepaths.cpp \
   obj/src/tunitas/app/words.Strings.cpp \
   $(end)
