@@ -5,11 +5,24 @@ lib_libtunitas_la_LIBADD = $(nothing)
 
 lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/namespace.cpp \
+  \
+  obj/src/tunitas/app/namespace.cpp \
+  obj/src/tunitas/app/Configuration.cpp \
+  obj/src/tunitas/app/Program.cpp \
+  \
+  obj/src/tunitas/app/exception.Generic.cpp \
+  obj/src/tunitas/app/exception.Quitting.cpp \
+  obj/src/tunitas/app/exception.Usage.cpp \
+  obj/src/tunitas/app/exception.Version.cpp \
+  \
+  obj/src/tunitas/app/options.Args.cpp \
+  obj/src/tunitas/app/words.Filepaths.cpp \
+  obj/src/tunitas/app/words.Strings.cpp \
   $(end)
 
 $(scold_cxxdir)/tunitas/dependencies.mk: Makefile
-	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libtunitas_la_SOURCES))
-	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libtunitas_la_SOURCES))
+	$(AM_V_BB1ST) $(call TF_DISAGGREGATE_COMPILE, $(lib_libtunitas_la_SOURCES))
+	$(AM_V_BB2ND) $(call TF_DEPENDENCIES_COMPILE, $(lib_libtunitas_la_SOURCES))
 include $(scold_cxxdir)/tunitas/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tunitas/dependencies.mk

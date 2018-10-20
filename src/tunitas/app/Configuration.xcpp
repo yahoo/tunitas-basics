@@ -1,0 +1,39 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::app {
+  //
+  // The ancestor of (all) app configurations
+  // Descendants only.
+  // Entails te logging the facility.
+  //
+  // Usage:
+  //
+  //   class my::Configuration : public tunitas::app::Configuration {
+  //     using ancestor = tunitas::app::Configuration;
+  //   public:
+  //     using ancestor::Configuration;
+  //     ...fields...
+  //     std::optional<std::uintmax_t> width;
+  //   };
+  //
+  class Configuration;
+}
+#endiv
+#divert <hpp>
+#import tunitas.app.Program
+#import options.config.Generic
+class tunitas::app::Configuration : public ::options::config::Generic {
+  using ancestor = ::options::config::Generic;
+protected:
+  ~Configuration() = default;
+public:
+  inline explicit Configuration(Program);
+};
+#entail options.logging
+#endiv
+#divert <ipp>
+tunitas::app::Configuration::Configuration(Program program)
+  : ancestor{::options::Program{program}} // [[FIXTHIS]] duplicate copy by eliding ::options::Program and tunitas::app::Program with a type alias pun
+{ }
+#endiv
+

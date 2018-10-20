@@ -1,0 +1,6 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace app {
+  namespace options { }
+}
+#endiv

@@ -1,0 +1,40 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::app::exception {
+  //
+  // The "version message" application exception
+  // Descendants only.
+  // Set up as an ancestor to the mixin tree,
+  //     so that STL exceptions can be mixed in as well.
+  //
+  // Usage:
+  //
+  //   class my::Version : public tunitas::app::exception::Version, ::options::throwable::Version {
+  //     using appable = tunitas::app::exception::Version;
+  //     using optable = ::options::throwable::Version;
+  //     explicit Version(Program)
+  //     ...must unify the MI...
+  //     auto what() const noexcept -> char const * final { return optable::what(); }
+  //   };
+  //
+  //   try {
+  //     ...
+  //     throw my::Version{NAME};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Version;
+}
+#endiv
+#divert <hpp>
+#import tunitas.app.exception.Generic
+class tunitas::app::exception::Version : public Generic {
+  using ancestor = Generic;
+protected:
+  ~Version() = default;
+  Version() = default;
+};
+#endiv

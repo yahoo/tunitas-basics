@@ -6,8 +6,7 @@ AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 
 default:
-include @hypogeal_twilight_datarootdir@/am/EXTERNAL-PATHS.mk
-include @hypogeal_twilight_datarootdir@/am/compile.mk
+include @temerarious_flagship_datarootdir@/am/build.mk
 
 # To get submodules to build in place, these go as a pair
 #   configure.ac declares TF_CONFIG_SUBMODULES(directory, ...list...)
@@ -37,11 +36,9 @@ INSTALLATION_AREAS = \
 default: all
 
 module_SOURCE_SET = $(lib_libtunitas_module_la_SOURCES) $(lib_libwant_la_SOURCES)
-include @hypogeal_twilight_datadir@/am/install.mk
 
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::
-include @hypogeal_twilight_datadir@/am/distclean.mk
 
 include src/tunitas/Makefrag.am
 include src/want/Makefrag.am

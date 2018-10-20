@@ -1,0 +1,24 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.deque
+#import std.filesystem.path
+namespace tunitas::app::words {
+  //
+  // The (filepath) words to the program
+  // The "words" are the non-option inputs to the program.
+  // The intent of these is that they are the names of files.
+  //
+  // Concept:
+  //
+  //    a.out [...options...] [...files...]
+  //
+  // Usage:
+  //
+  //   auto prog = Program{argv[0]};
+  //   auto parser = options::Parser{cfg, specification}
+  //   auto parsed = parser.parse(options::Args{argc, argv});
+  //   words::Filepaths remainder = value(parsed);
+  //
+  using Filepaths = std::deque<std::filesystem::path>;
+}
+#endiv

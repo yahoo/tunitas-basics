@@ -1,0 +1,30 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Fixture
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.app.exception.Usage
+#import std.string
+#import sys.exits.Code
+#import sys.exits.constants
+class tests::unit::app::Fixture::Usage : public tunitas::app::exception::Usage, public std::runtime_error {
+  using appware = tunitas::app::exception::Usage;
+  using stdware = std::runtime_error;
+public:
+  inline explicit Usage(std::string NAME, sys::exits::Code = sys::exits::USAGE);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <ipp>
+#import std.move
+tests::unit::app::Fixture::Usage::Usage(std::string NAME, sys::exits::Code code)
+  : appware{code}
+  , stdware{std::move(NAME)}
+{ }
+#endiv
+#divert <cpp>
+auto tests::unit::app::Fixture::Usage::what() const noexcept -> char const * {
+  return stdware::what();
+}
+#endiv

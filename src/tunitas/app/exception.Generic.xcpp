@@ -1,0 +1,76 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::app::exception {
+  //
+  // The generic application exception
+  // Descendants only.
+  // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well
+  //
+  // Usage:
+  //
+  //   class my::Usage : public tunitas::app::exception::Usage { ... };
+  //   class my::Version : public tunitas::app::exception::Version { ... };
+  //   class my::Quitting : public tunitas::app::exception::Quitting { ... };
+  //
+  //   try {
+  //     ...
+  //     throw my::Usage{NAME, sys::exits::FAIL};
+  //     throw my::Version{NAME};
+  //     throw my::Quitting{NAME, "because"};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Generic;
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+namespace tunitas::app::exception {
+  // No wide character support [[HOW?]] how would we change that?
+  inline auto operator<<(std::ostream &, Generic const &) -> std::ostream &;
+}
+#import sys.exits.Code
+class tunitas::app::exception::Generic {
+protected:
+  virtual ~Generic() = default;
+  inline Generic(std::ostream &, sys::exits::Code);
+  inline Generic(sys::exits::Code);
+  inline Generic();
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+  virtual auto stream() const noexcept -> std::ostream &;
+  virtual auto code() const noexcept -> sys::exits::Code;
+protected:
+  std::ostream &offending_stream;
+  sys::exits::Code offending_code;
+};
+#endiv
+#divert <ipp>
+auto tunitas::app::exception::operator<<(std::ostream &o, Generic const &g) -> std::ostream & {
+  return o << g.what();
+}
+#import std.cout
+#import std.cerr
+#import sys.exits.constants
+tunitas::app::exception::Generic::Generic()
+  : Generic(sys::exits::OK)
+{ }
+tunitas::app::exception::Generic::Generic(sys::exits::Code c)
+  : Generic(sys::exits::OK == c ? std::cout : std::cerr, c)
+{ }
+tunitas::app::exception::Generic::Generic(std::ostream &o, sys::exits::Code c)
+  : offending_stream{o}
+  , offending_code{c}
+{ }
+#endiv
+#divert <cpp>
+auto tunitas::app::exception::Generic::stream() const noexcept -> std::ostream & {
+  return offending_stream;
+}
+auto tunitas::app::exception::Generic::code() const noexcept -> sys::exits::Code {
+  return offending_code;
+}
+#endiv

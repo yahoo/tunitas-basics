@@ -1,0 +1,15 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import c.argv
+namespace tunitas::app::options {
+  //
+  // The (pointer-based) argument vector input to the program.
+  // The options system reorders these pointers according to getopt(3)
+  //
+  // Usage:
+  //
+  //   return main(Args{c, v});
+  //
+  using Args = c::argv;
+}
+#endiv

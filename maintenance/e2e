@@ -12,7 +12,7 @@
 #   ./maintenance/e2e     (no options)
 #
 #   prefix=/usr/local \
-#   with_hypogeal_twilight=/opt/tunitas \
+#   with_std_tunitas=/opt/tunitas \
 #   with_temerarious_flagship=/opt/tunitas \
 #   ./maintenance/e2e
 # 
@@ -23,30 +23,49 @@
 # The scold module "with" variables will naturally default to /opt/scold
 # The tunitas "with" variables would be expected to be in /opt/tunitas
 #
-cd ${0%/*}/.. || exit 255
+cd ${0%/*}/.. || exit 70
 : ${prefix:=/exp/tunitas}
-unset with_submodules # nope ..... : ${with_submodules:=${PWD}/submodules} # must be a full path
+: ${with_std_tunitas:=/opt/tunitas}
+: ${with_std_scold:=${with_std_tunitas%/*}/scold}
 : ${with_siblings:=${PWD%/*}}
-: ${with_nearby:=/build/tunitas/nearby}
-: ${with_external:=${with_nearby?}} # [[deprecating]]
-if [[ no == ${with_submodules:-no} ]] ; then
-    __subnearby=${with_nearby?}
+: ${with_temerarious_flagship:=${with_siblings?}/temerarious-flagship}
+if [[ -d ${PWD%/*}/nearby ]] ; then
+    : ${with_nearby:=${PWD%/*}/nearby}
+    : ${with_module_rigging:=${with_nearby?}/module-rigging}
 else
+    : ${with_nearby:=no}
+    : ${with_module_rigging:=no}
+fi
+: ${with_submodules:=no} # nope ..... : ${with_submodules:=${PWD}/submodules} # must be a full path
+declare __subnearby
+if [[ no == ${with_submodules:-no} ]] ; then
+    # could be no
+    __subnearby=${with_nearby?}
+elif [[ yes == ${__subnearby:-no} ]] ; then
+    echo "${0##*/}: error, submodules cannot be merely 'yes'" 1>&2
+    exit 78
+else
+    # [[unchecked]] musn't be merely 'yes' or a non-existent directory 
     __subnearby=${with_submodules?}
 fi
-: ${with_hypogeal_twilight:=${__subnearby?}/hypogeal-twilight}
-: ${with_temerarious_flagship:=/build/tunitas/temerarious-flagship}
+if [[ no == ${__subnearby:-no} ]] ; then
+    : ${with_hypogeal_twilight:=$with_std_scold}
+    : ${with_module_options:=no}
+    : ${with_module_std:=no}
+elif [[ yes == ${__subnearby:-no} ]] ; then
+    echo "${0##*/}: error, submodules or nearby cannot be merely 'yes'" 1>&2
+    exit 78
+else
+    : ${with_hypogeal_twilight:=${__subnearby?}/hypogeal-twilight}
+    : ${with_module_options:=${__subnearby?}/module-options}
+    : ${with_module_std:=${__subnearby?}/module-std}
+fi
 : ${with_module_boost:=no}
 : ${with_module_nonstd:=no}
-: ${with_module_options:=${__subnearby?}/module-options}
 : ${with_module_posix:=no}
 : ${with_module_string:=no}
-: ${with_module_std:=${__subnearby?}/module-std}
-: ${with_module_rigging:=${with_nearby?}/module-rigging}
-: ${with_std_tunitas:=/opt/tunitas}
-: ${with_std_scold:=/opt/scold}
 eval \
-    ${prefix:+prefix=$prefix?} \
+    ${prefix:+prefix=$prefix} \
     ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
     ${with_temerarious_flagship:+with_temerarious_flagship=$with_temerarious_flagship} \
     ./buildconf &&

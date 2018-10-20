@@ -1,0 +1,43 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Fixture
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.app.exception.Quitting
+#import std.string
+#import sys.exits.Code
+#import sys.exits.constants
+class tests::unit::app::Fixture::Quitting : public tunitas::app::exception::Quitting, public std::runtime_error {
+  using appware = tunitas::app::exception::Quitting;
+  using stdware = std::runtime_error;
+public:
+  inline explicit Quitting(std::string NAME, std::string reason, sys::exits::Code);
+  inline explicit Quitting(std::string NAME, sys::exits::Code);
+  inline explicit Quitting(std::string NAME);
+  auto what() const noexcept -> char const * final;
+protected:
+  struct defaults {
+    inline static sys::exits::Code const CODE = sys::exits::FAIL;
+    inline static std::string const REASON = "reasons";
+  };
+};
+#endiv
+#divert <ipp>
+#import std.move
+tests::unit::app::Fixture::Quitting::Quitting(std::string NAME, std::string reason, sys::exits::Code code)
+  : appware{code}
+  , stdware{NAME + " fails because " + reason}
+{ }
+tests::unit::app::Fixture::Quitting::Quitting(std::string NAME, sys::exits::Code code)
+  : Quitting(std::move(NAME), defaults::REASON, code)
+{ }
+tests::unit::app::Fixture::Quitting::Quitting(std::string NAME)
+  : Quitting(std::move(NAME), defaults::REASON, defaults::CODE)
+{ }
+#endiv
+#divert <cpp>
+auto tests::unit::app::Fixture::Quitting::what() const noexcept -> char const * {
+  return stdware::what();
+}
+#endiv

@@ -7,4 +7,5 @@ tests_unit_TESTS = \
   tests/unit/all.test \
   tests/unit/want.test \
   tests/unit/tunitas.test \
+  tests/unit/app.test \
   $(end)

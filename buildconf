@@ -156,9 +156,13 @@ elif [[ -d ${with_hypogeal_twilight?}/m4 ]] ; then
 else
     # assume installed, in production
     hypogeal_twilight_prefix=${with_hypogeal_twilight?}
-    hypogeal_twilight_libexecdir=${with_hypogeal_twilight?}/libexec/hypogeal-twilight
-    hypogeal_twilight_datadir=${with_hypogeal_twilight?}/share/hypogeal-twilight
-    hypogeal_twilight_datadir_ac=${with_hypogeal_twilight?}/ac
+    hypogeal_twilight_libexecdir=${hypogeal_twilight_prefix?}/libexec/hypogeal-twilight
+    hypogeal_twilight_datadir=${hypogeal_twilight_prefix?}/share/hypogeal-twilight
+    if [[ -d ${hypogeal_twilight_datadir?}/ac ]] ; then
+        hypogeal_twilight_datadir_ac=${hypogeal_twilight_datadir?}/ac
+    else
+        hypogeal_twilight_datadir_ac=${hypogeal_twilight_datadir?}/m4
+    fi
 fi
 export PATH="${hypogeal_twilight_libexecdir?}:$PATH"
 

@@ -1,0 +1,49 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::app::exception {
+  //
+  // The "quitting message" application exception
+  // Descendants only.
+  // Set up as an ancestor to the mixin tree,
+  //   so that STL exceptions can be mixed in as well.
+  //
+  // Usage:
+  //
+  //   class my::Quitting : public tunitas::app::exception::Quitting, public ::std::runtime_error {
+  //     using appable = tunitas::app::exception::Quitting;
+  //     using standard = ::std::runtime_error
+  //     explicit (Program, sys::exits::Code = sys::exits::OK);
+  //     ...must unify the MI...
+  //     auto what() const noexcept -> char const * final { return standard::what(); }
+  //   };
+  //
+  //   try {
+  //     ...
+  //     throw my::Quitting{NAME, sys::exits::FAIL};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Quitting;
+}
+#endiv
+#divert <hpp>
+#import tunitas.app.exception.Generic
+class tunitas::app::exception::Quitting : public Generic {
+  using ancestor = Generic;
+protected:
+  ~Quitting() = default;
+  inline Quitting(std::ostream &, sys::exits::Code);
+  inline Quitting(sys::exits::Code);
+};
+#endiv
+#divert <ipp>
+tunitas::app::exception::Quitting::Quitting(std::ostream &o, sys::exits::Code c)
+  : ancestor{o, c}
+{ }
+tunitas::app::exception::Quitting::Quitting(sys::exits::Code c)
+  : ancestor{c}
+{ }
+#endiv

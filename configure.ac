@@ -59,6 +59,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O
 
+TF_PROG_DC
 TF_CHECK_STD_FILESYSTEM
 
 dnl WATCHOUT if AC_OUTPUT is not called (transitively from TF_FINALIZE) then
