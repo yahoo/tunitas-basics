@@ -1,0 +1,69 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::app::exception {
+  //
+  // A mixin to provide stored messaging to an exception descendant.
+  // Descendants only.
+  //
+  // This functionality is "baked into" std::runtime_error, however if it is
+  // inappropriate to use std::runtime_error because the exception is used to
+  // signal a condition that is:
+  //   "not an error at the time of program execution,"
+  //   "not at the time of program running,"
+  // then some other scheme must be used to provide the required invariant.
+  // 
+  // Usage:
+  //
+  //   try {
+  //     throw Descendant{"program"};
+  //     throw std::runtime_error{"that was bad"};
+  //   } catch (Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  // Usage:
+  //
+  //   class my::Descendant : public Generic, public Messaging, public std::exception {
+  //     using ancestor = std::exception;
+  //   public:
+  //     Descendant(std::string const &NAME) : Messaging{format(NAME)} { }
+  //     auto what() const noexcept -> char const * final {
+  //       return Messaging::what();
+  //     }
+  //     static auto format(std::string const &NAME) -> std::string {
+  //       return "usage: " + NAME + " [...options...]";
+  //     }
+  //   };
+  //
+  class Messaging;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.shared_ptr
+class tunitas::app::exception::Messaging {
+protected:
+  virtual ~Messaging() = default;
+  inline Messaging(std::string &&message);
+public:
+  // Same signature as in std::exception::what() but cannot inherit from std::exception
+  virtual auto what() const noexcept -> char const *;
+protected:
+  // An exception must offer the nothrow guarantee on copy
+  using Nothrow_String = std::shared_ptr<std::string>;
+  Nothrow_String stored_message;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+#import std.make_shared
+tunitas::app::exception::Messaging::Messaging(std::string &&message)
+  : stored_message{std::make_shared<std::string>(std::forward<std::string>(message))}
+{ }
+#endiv
+#divert <cpp>
+auto tunitas::app::exception::Messaging::what() const noexcept -> char const * {
+  return stored_message->c_str();
+}
+#endiv

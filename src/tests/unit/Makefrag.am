@@ -15,9 +15,10 @@ bin_unit_SOURCES = \
   obj/src/tests/unit/namespace.cpp \
   obj/src/tests/unit/app.Fixture.cpp \
   obj/src/tests/unit/app.Fixture.Configuration.cpp \
+  obj/src/tests/unit/app.Fixture.Messaging.cpp \
+  obj/src/tests/unit/app.Fixture.Quitting.cpp \
   obj/src/tests/unit/app.Fixture.Usage.cpp \
   obj/src/tests/unit/app.Fixture.Version.cpp \
-  obj/src/tests/unit/app.Fixture.Quitting.cpp \
   obj/src/tests/unit/tunitas.Fixture.cpp \
   obj/src/tests/unit/want.Fixture.cpp \
   $(end)
