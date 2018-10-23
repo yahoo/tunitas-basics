@@ -1,7 +1,7 @@
 // This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
 #divert <fpp>
 #import std.deque
-#import std.filesystem.path
+#import want.std.filesystem.path
 namespace tunitas::app::words {
   //
   // The (filepath) words to the program

@@ -1,0 +1,16 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+// Because this isn't fixed until module-std-devel-0.26; e.g. broken: module-std-devel-0.25.1-3.0
+// With module std.filesystem representing the namespace std::filesystem alone.
+// The complex #ifdefs for experimental features are done but once.
+#if __GNUC__ >= 8
+#include <filesystem>
+#else
+// surely there is a __cpp predefined symbol for this
+// yes ... but the headers define the cpp symbols!
+#include <experimental/filesystem>
+namespace std {
+  namespace filesystem = ::std::experimental::filesystem;
+}
+#endif
+#endiv

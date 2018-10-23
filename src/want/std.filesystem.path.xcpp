@@ -1,0 +1,5 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+// whereas std.filesystem is broken in module-std-devel-0.25; ibidem ... (the hack)
+#import want.std.filesystem
+#endiv

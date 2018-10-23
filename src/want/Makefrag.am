@@ -5,6 +5,8 @@ lib_libwant_la_LIBADD = $(nothing)
 
 lib_libwant_la_SOURCES = \
   obj/src/want/namespace.cpp \
+  obj/src/want/std.filesystem.cpp \
+  obj/src/want/std.filesystem.path.cpp \
   $(end)
 
 $(scold_cxxdir)/want/dependencies.mk: Makefile
@@ -13,5 +15,3 @@ $(scold_cxxdir)/want/dependencies.mk: Makefile
 include $(scold_cxxdir)/want/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/want/dependencies.mk
-mostlyclean-local::
-	rm -f $(lib_libwant_la_SOURCES)
