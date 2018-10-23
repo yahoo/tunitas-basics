@@ -29,5 +29,3 @@ $(scold_cxxdir)/tunitas/dependencies.mk: Makefile
 include $(scold_cxxdir)/tunitas/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tunitas/dependencies.mk
-mostlyclean-local::
-	rm -f $(lib_libtunitas_la_SOURCES)

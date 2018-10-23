@@ -39,6 +39,8 @@ module_SOURCE_SET = $(lib_libtunitas_module_la_SOURCES) $(lib_libwant_la_SOURCES
 
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::
+clean-dependencies::
+clean-local:: clean-dependencies
 
 include src/tunitas/Makefrag.am
 include src/want/Makefrag.am

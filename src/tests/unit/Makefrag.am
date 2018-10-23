@@ -29,5 +29,3 @@ $(scold_cxxdir)/tests/unit/dependencies.mk: Makefile
 include $(scold_cxxdir)/tests/unit/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk
-mostlyclean-local::
-	rm -f $(bin_unit_SOURCES)
