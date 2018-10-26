@@ -9,7 +9,7 @@ bin_unit_LDADD = \
   $(end)
 # reminder: autotools does not put $(AM_LDFLAGS) into bin_unit_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
 bin_unit_LDFLAGS = $(AM_LDFLAGS)
-
+bin_unit_MODULES = $(call TF_SOURCEStoMODULES, $(bin_unit_SOURCES))
 bin_unit_SOURCES = \
   obj/src/tests/unit/main.cpp \
   obj/src/tests/unit/namespace.cpp \
@@ -17,15 +17,18 @@ bin_unit_SOURCES = \
   obj/src/tests/unit/app.Fixture.Configuration.cpp \
   obj/src/tests/unit/app.Fixture.Messaging.cpp \
   obj/src/tests/unit/app.Fixture.Quitting.cpp \
+  obj/src/tests/unit/app.Fixture.Specification.cpp \
   obj/src/tests/unit/app.Fixture.Usage.cpp \
   obj/src/tests/unit/app.Fixture.Version.cpp \
+  obj/src/tests/unit/required.Fixture.cpp \
   obj/src/tests/unit/tunitas.Fixture.cpp \
   obj/src/tests/unit/want.Fixture.cpp \
   $(end)
 
-$(scold_cxxdir)/tests/unit/dependencies.mk: Makefile
+$(scold_cxxdir)/tests/unit/dependencies.mk:
 	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(bin_unit_SOURCES))
 	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(bin_unit_SOURCES))
+	test -e $@
 include $(scold_cxxdir)/tests/unit/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

@@ -55,22 +55,26 @@ auto tunitas::app::exception::operator<<(std::ostream &o, Generic const &g) -> s
 #import std.cout
 #import std.cerr
 #import sys.exits.constants
-tunitas::app::exception::Generic::Generic()
-  : Generic(sys::exits::OK)
-{ }
-tunitas::app::exception::Generic::Generic(sys::exits::Code c)
-  : Generic(sys::exits::OK == c ? std::cout : std::cerr, c)
-{ }
-tunitas::app::exception::Generic::Generic(std::ostream &o, sys::exits::Code c)
-  : offending_stream{o}
-  , offending_code{c}
-{ }
+namespace tunitas::app::exception {
+  Generic::Generic()
+    : Generic(sys::exits::OK)
+  { }
+  Generic::Generic(sys::exits::Code c)
+    : Generic((sys::exits::OK == c ? std::cout : std::cerr), c)
+  { }
+  Generic::Generic(std::ostream &o, sys::exits::Code c)
+    : offending_stream{o}
+    , offending_code{c}
+  { }
+}
 #endiv
 #divert <cpp>
-auto tunitas::app::exception::Generic::stream() const noexcept -> std::ostream & {
-  return offending_stream;
-}
-auto tunitas::app::exception::Generic::code() const noexcept -> sys::exits::Code {
-  return offending_code;
+namespace tunitas::app::exception {
+  auto Generic::stream() const noexcept -> std::ostream & {
+    return offending_stream;
+  }
+  auto Generic::code() const noexcept -> sys::exits::Code {
+    return offending_code;
+  }
 }
 #endiv

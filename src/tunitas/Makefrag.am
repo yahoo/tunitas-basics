@@ -1,10 +1,12 @@
 # -*- Makefile -*-
 
 lib_libtunitas_la = lib/libtunitas.la
-lib_libtunitas_la_LIBADD = $(nothing)
-
+lib_libtunitas_la_LIBADD = -loptions-module -lsys-module
+lib_libtunitas_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_la_SOURCES))
 lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/namespace.cpp \
+  \
+  obj/src/tunitas/required.Iterator_Producing.cpp \
   \
   obj/src/tunitas/app/namespace.cpp \
   obj/src/tunitas/app/Configuration.cpp \
@@ -18,14 +20,16 @@ lib_libtunitas_la_SOURCES = \
   \
   obj/src/tunitas/app/options.cpp \
   obj/src/tunitas/app/options.Args.cpp \
+  obj/src/tunitas/app/options.Specification.cpp \
   obj/src/tunitas/app/words.cpp \
   obj/src/tunitas/app/words.Filepaths.cpp \
   obj/src/tunitas/app/words.Strings.cpp \
   $(end)
 
-$(scold_cxxdir)/tunitas/dependencies.mk: Makefile
+$(scold_cxxdir)/tunitas/dependencies.mk:
 	$(AM_V_BB1ST) $(call TF_DISAGGREGATE_COMPILE, $(lib_libtunitas_la_SOURCES))
 	$(AM_V_BB2ND) $(call TF_DEPENDENCIES_COMPILE, $(lib_libtunitas_la_SOURCES))
+	test -e $@
 include $(scold_cxxdir)/tunitas/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tunitas/dependencies.mk

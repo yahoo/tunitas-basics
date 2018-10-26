@@ -1,0 +1,22 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import std.iterator_traits
+namespace tunitas::required {
+  //
+  // The concept of an Iterator producing a VALUE type
+  //
+  // Usage:
+  //
+  //   template<required::Iterator_Producing<Strings> ITERATOR> Constructor(ITERATOR, ITERATOR);
+  //
+  template<typename ITERATOR, typename VALUE> concept bool Iterator_Producing = requires(ITERATOR iterator) {
+    // it is an iterator
+    typename std::iterator_traits<ITERATOR>::value_type;
+    { iterator++ } -> ITERATOR;
+    { ++iterator } -> ITERATOR;
+    { *iterator } -> typename std::iterator_traits<ITERATOR>::value_type;
+    // is an iterator producing (something convertible to) VALUE
+    { *iterator } -> VALUE;
+  };
+}
+#endiv

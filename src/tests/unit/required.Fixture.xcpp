@@ -1,0 +1,43 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::required { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::required::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_iterator_producing_string() -> void;
+  auto test_iterator_producing_filepath() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tunitas.required.Iterator_Producing
+#import tunitas.app.options.Args
+#import tunitas.app.words.Strings
+#import std.string
+auto tests::unit::required::Fixture::test_iterator_producing_string() -> void {
+  static_assert(::tunitas::required::Iterator_Producing<::tunitas::app::words::Strings::iterator, std::string>);
+  static_assert(::tunitas::required::Iterator_Producing<::tunitas::app::options::Args::iterator, std::string>);
+}
+#import tunitas.app.words.Filepaths
+auto tests::unit::required::Fixture::test_iterator_producing_filepath() -> void {
+  static_assert(::tunitas::required::Iterator_Producing<tunitas::app::words::Filepaths::iterator, std::filesystem::path>);
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::required::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("required");
+  {
+    Stream ite("Iterator_Producing");
+    ite << call("String", &Fixture::test_iterator_producing_string)
+        << call("Filepath", &Fixture::test_iterator_producing_filepath)
+      ;
+    series << add(ite.release());
+  }
+  return series.release();
+}
+#endiv

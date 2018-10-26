@@ -21,6 +21,9 @@ public:
   auto test_exception_throwing_2() -> void;
   auto test_exception_throwing_3() -> void;
   auto test_options_Args() -> void;
+  auto test_options_Specification_constructor() -> void;
+  auto test_options_Specification_longish() -> void;
+  auto test_options_Specification_shortish() -> void;
   auto test_words_Strings() -> void;
   auto test_words_Filepaths() -> void;
   static auto suite() -> cppunit::Test *;
@@ -29,6 +32,7 @@ protected:
   struct Usage;
   struct Version;
   struct Quitting;
+  struct Specification;
   struct Messaging;
 };
 #endiv
@@ -176,6 +180,19 @@ auto tests::unit::app::Fixture::test_options_Args() -> void {
   Args args{n, v};
   CPPUNIT_ASSERT_EQUAL(4lu, args.size());
 }
+#import tests.unit.app.Fixture.Specification
+auto tests::unit::app::Fixture::test_options_Specification_constructor() -> void {
+  Specification spec; // <-------- it constructed (see the constructor definition)
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::app::Fixture::test_options_Specification_longish() -> void {
+  Specification spec;
+  CPPUNIT_ASSERT(0 != spec.longish().size());
+}
+auto tests::unit::app::Fixture::test_options_Specification_shortish() -> void {
+  Specification spec;
+  CPPUNIT_ASSERT(0 != spec.shortish().size());
+}
 #import tunitas.app.words.Strings
 auto tests::unit::app::Fixture::test_words_Strings() -> void {
   using namespace ::tunitas::app::words;
@@ -234,6 +251,13 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
     Stream opt("options");
     opt << call("Args", &Fixture::test_options_Args)
       ;
+    {
+      Stream wor("Specification");
+      wor << call("constructor", &Fixture::test_options_Specification_constructor)
+          << call("longish", &Fixture::test_options_Specification_longish)
+          << call("shortish", &Fixture::test_options_Specification_shortish)
+        ;
+    }
     series << add(opt.release());
   } {
     Stream wor("words");

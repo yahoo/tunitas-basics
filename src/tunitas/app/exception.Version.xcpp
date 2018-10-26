@@ -9,7 +9,7 @@ namespace tunitas::app::exception {
   //
   // Usage:
   //
-  //   class my::Version : public tunitas::app::exception::Version, ::options::throwable::Version {
+  //   class my::Version : public tunitas::app::exception::Version, std::exception {
   //     using appable = tunitas::app::exception::Version;
   //     using optable = ::options::throwable::Version;
   //     explicit Version(Program)

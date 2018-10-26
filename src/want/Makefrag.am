@@ -2,16 +2,17 @@
 
 lib_libwant_la = lib/libwant.la
 lib_libwant_la_LIBADD = $(nothing)
-
+lib_libwant_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libwant_la_SOURCES))
 lib_libwant_la_SOURCES = \
   obj/src/want/namespace.cpp \
   obj/src/want/std.filesystem.cpp \
   obj/src/want/std.filesystem.path.cpp \
   $(end)
 
-$(scold_cxxdir)/want/dependencies.mk: Makefile
+$(scold_cxxdir)/want/dependencies.mk:
 	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libwant_la_SOURCES))
 	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libwant_la_SOURCES))
+	test -e $@
 include $(scold_cxxdir)/want/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/want/dependencies.mk

@@ -1,0 +1,78 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::app::options {
+  //
+  // The long-and-short options specification
+  // Descendants only.  No coping, these things are delicate & heavy.
+  //
+  // The specification captures the long and short options specification.
+  // The descendant's constructor populates.
+  // The lifetime of the Specification must be longer than that of the Parser.
+  //
+  // Usage (defining the descendant)
+  //
+  //   struct my::Specification : public tunitas::app::options::Specification {
+  //     Specification();
+  //   };
+  //   my::Specification::Specification()
+  //     : ancestor{"hV"
+  //                {{"help", options::argument::NO, options::indicator::USAGE_SUBCOMMAND},
+  //                 {"version", options::argument::NO, options::indicator::VERSION_SUBCOMMAND}}}
+  //   { }
+  //
+  // Usage (of the descendant):
+  //
+  //   Configuration cfg{...};
+  //   Specification spec{};
+  //   Parser parser{cfg, spec};
+  //   ...
+  //
+  class Specification;
+}
+#endiv
+#divert <hpp>
+#import options.longish.Specification
+#import options.shortish.Specification
+#import std.initializer_list
+class tunitas::app::options::Specification {
+public:
+  struct Shortish {
+    using Initializer = std::string;
+    using Specification = ::options::shortish::Specification;
+  };
+  struct Longish {
+    using Initializer = std::initializer_list<::options::longish::Specification::modern_code_initializer_type>;
+    using Specification = ::options::longish::Specification;
+  };
+protected:
+  ~Specification() = default;
+  inline Specification(Shortish::Initializer);
+  inline Specification(Longish::Initializer);
+  inline Specification(Shortish::Initializer, Longish::Initializer);
+  Specification(Specification const &) = delete;
+public:
+  inline auto shortish() const -> Shortish::Specification const &;
+  inline auto longish() const -> Longish::Specification const &;
+protected:
+  Shortish::Specification shortspec;
+  Longish::Specification longspec;
+};
+#endiv
+#divert <ipp>
+tunitas::app::options::Specification::Specification(Shortish::Initializer i)
+  : shortspec{i}
+{ }
+tunitas::app::options::Specification::Specification(Longish::Initializer i)
+  : longspec{i}
+{ }
+tunitas::app::options::Specification::Specification(Shortish::Initializer si, Longish::Initializer li)
+  : shortspec{si}
+  , longspec{li}
+{ }
+auto tunitas::app::options::Specification::shortish() const -> Shortish::Specification const & {
+  return shortspec;
+}
+auto tunitas::app::options::Specification::longish() const -> Longish::Specification const & {
+  return longspec;
+}
+#endiv

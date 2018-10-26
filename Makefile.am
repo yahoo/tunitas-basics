@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 
 default:
-include @temerarious_flagship_datarootdir@/am/build.mk
+include @temerarious_flagship_datarootdir@/am/build.am
 
 # To get submodules to build in place, these go as a pair
 #   configure.ac declares TF_CONFIG_SUBMODULES(directory, ...list...)
@@ -64,6 +64,18 @@ $(check_PROGRAMS) : $(bin_PROGRAMS)
 $(check_PROGRAMS) : $(lib_LTLIBRARIES)
 $(check_PROGRAMS) : $(check_LTLIBRARIES)
 
+MODULES = \
+  $(lib_libtunitas_la_MODULES) \
+  $(lib_libwant_la_MODULES) \
+  $(bin_unit_MODULES)  \
+  $(end)
+OBJECTS = \
+  $(lib_libtunitas_la_OBJECTS) \
+  $(lib_libwant_la_OBJECTS) \
+  $(bin_unit_OBJECTS)  \
+  $(end)
+$(OBJECTS) : $(MODULES)
+
 include tests/unit/Makefrag.am
 XFAIL_TESTS = \
   $(tests_unit_XFAIL_TESTS) \
@@ -75,40 +87,31 @@ TESTS = \
   $(tests_unit_TESTS) \
   $(end)
 
-gcc_CPPFLAG_SET = 
-# -Wall      ... the language isn't complete without it
-# -std=c++1y ... as close to C++14 and beyond as we can get
-# -std=c++1z ... as close to C++17 and beyond as we can get
-# -ggdb      ... and recall that -ggdb and -O2 don't play well together
-#
-# src/c/basic_buffer.consty.xcpp:54:35: warning: ‘implicit’ attribute directive ignored [-Wattributes]
-# libstd_filesystem is -lstdc++fs or not
-#
-gcc_CXXFLAG_SET = -Wall -std=c++1z -fconcepts -ggdb -Wno-attributes
-gcc_LDFLAG_SET = @libstd_filesystem@
+# The Makefile_*SET variables are assembled by .../toolflags.mk
+# via @temerarious_flagship_datadir@/am/build.am and its constituents.
 
-# in scoped order
-SEARCHPATH = \
-  $(SEARCHPATH_SCOLD_MODULES) \
-  $(SEARCHPATH_EXTERNAL_MODULES) \
-  $(end)
-LOADPATH = \
-  $(DO NOT LOADPATH_SCOLD_MODULES) \
-  $(LOADPATH_EXTERNAL_MODULES) \
-  $(end)
+# configure.ac:  TF_ENABLE_GCC
+Makefile_COMPILER_CPPFLAGS_SET = @CPPFLAGS_gcc@
+Makefile_COMPILER_CFLAGS_SET   = @CFLAGS_gcc@
+Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gcc@ -Wno-attributes
+Makefile_COMPILER_LDFLAGS_SET  = @LDFLAGS_gcc@  @libstd_filesystem@
 
-AM_CPPFLAGS = \
-  $(SEARCHPATH) \
-  $(gcc_CPPFLAG_SET) \
-  $(end)
-AM_CXXFLAGS = \
-  $(gcc_CXXFLAG_SET) \
-  $(end)
+# configure.ac: TF_WITH_NONSTD([nonstd-libhttpserver])
+Makefile_nonstd_CPPFLAGS_SET = @nonstd_libhttpserver_CPPFLAGS@
+Makefile_nonstd_CFLAGS_SET   = @nonstd_libhttpserver_CFLAGS@
+Makefile_nonstd_CXXLAGS_SET  = @nonstd_libhttpserver_CXXFLAGS@
+Makefile_nonstd_LDFLAGS_SET  = @nonstd_libhttpserver_LDFLAGS@
+
+# extras not otherwise covered by the TF_WITH_MODULE([...]) declarations
+Makefile_PACKAGE_CPPFLAGS_SET = 
+Makefile_PACKAGE_CFLAGS_SET   = 
+Makefile_PACKAGE_CXXLAGS_SET  = 
+Makefile_PACKAGE_LDFLAGS_SET  = 
+
+AM_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
+AM_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
 # WATCHOUT - AM_LDFLAGS is not normally included in libtool final-link lines (whereas AM_CPPFLAGS, AM_CXXFLAGS are)
-AM_LDFLAGS = \
-  $(LOADPATH) \
-  $(gcc_LDFLAG_SET) \
-  $(end)
+AM_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
 AM_LIBTOOLFLAGS = --silent
 
 #end

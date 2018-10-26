@@ -1,0 +1,21 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Fixture
+#endiv
+#divert <hpp>
+#import tunitas.app.options.Specification
+class tests::unit::app::Fixture::Specification : public tunitas::app::options::Specification {
+  using ancestor = tunitas::app::options::Specification;
+public:
+  Specification();
+};
+#endiv
+#divert <cpp>
+#import options.argument.constants
+#import options.indicator.constants
+tests::unit::app::Fixture::Specification::Specification()
+  : ancestor{{"hV"},
+             {{"help", options::argument::NO, options::indicator::USAGE_SUBCOMMAND},
+              {"version", options::argument::NO, options::indicator::VERSION_SUBCOMMAND}}}
+{ }
+#endiv
