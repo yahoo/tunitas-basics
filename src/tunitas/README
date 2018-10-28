@@ -1,0 +1,106 @@
+Because DSO versioning is not well known and thus bears endless repeating.
+
+CURRENT <= CURRENT+1 if any interfaces were added, removed, changed
+        <= CURRENT   if no interface change, but any other (source code) change
+
+REVISION <= 0          if any interfaces were added, removed, changed
+         <= REVISION+1 if no interface change, but any other (source code) change
+
+AGE <= AGE+1 if any interaces were added
+    <= 0     if any interfaces were removed, changed
+    <= AGE   if no interface change, but any other (source code) change
+
+These are not supposed to track PACKAGE_MAJOR, PACKAGE_MINOR, PACKAGE_PATCHLEVEL
+
+References
+https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+https://autotools.io/libtool/version.html
+
+Also from an older culture, Solaris:
+https://blogs.oracle.com/solaris/how-to-name-a-solaris-shared-object-v2
+
+See https://autotools.io/libtool/version.html
+
+    -version-info $CURRENT:$REVISION:$AGE
+
+To set the version of the library, libtool provides the -version-info parameter, which
+accepts three numbers, separated by colons, that are called respectively,
+   CURRENT,
+   REVISION,
+   AGE.
+Both their name and their behavior, nowadays, have to be considered fully arbitrary,
+as the explanation provided in the official documentation is confusing to say the least,
+and can be, in some cases, considered completely wrong. 
+
+dubious----> The rules of thumb, when dealing with these values are:
+dubious---->     Always increase the REVISION value.
+dubious---->     Increase the CURRENT value whenever an interface has been added, removed or changed.
+dubious---->     Increase the AGE value only if the changes made to the ABI are backward compatible. 
+
+Not stated here is that the folloing invariant hold:
+
+    CURRENT >= REVISION
+    0 <= AGE
+    CURRENT - AGE >= 0      therefore: AGE <= CURRENT
+
+Therefore:               88 ---------------------- 99
+let                       ^                        ^
+                          |                        |
+  88 = first interface ---/                        |
+  99 = last interface -----------------------------/
+  98 = current interface
+
+  -version-info 99:98:11
+
+See https://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html#Libtool-versioning
+in plain talk
+
+<snip/> a library as exporting several sets of interfaces, arbitrarily represented by integers.
+When a program is linked against a library, it may use any subset of those interfaces.
+Libtool <snip/> it encodes the least and the greatest interface numbers in the resulting binary
+(first-interface, last-interface). 
+<snip/>libtool library versions are described by three integers:
+
+   current  - the most recent interface number that this library implements.
+   revision - The implementation number of the current interface.
+   age      - The difference between the newest and oldest interfaces that this library implements.
+              <snip/> the library implements all the interface numbers in the range from
+              current - age to current. 
+
+revision is a tie-breaker
+If two libraries have identical current and age numbers, then the dynamic linker chooses the library with the greater revision numbe
+
+See https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html#Updating-version-info
+in plain talk
+
+1. Start with version information of ‘0:0:0’ for each libtool library.
+2. Update the version information only immediately before a public release.
+3. If the library source code has changed at all since the last update,
+   then increment revision
+   so: (‘c:r:a’ becomes ‘c:r+1:a’).
+4. If any interfaces have been added, removed, or changed since the last release,
+   then increment current,
+    and set revision to 0.
+   so: (‘c:r:a’ becomes ‘c+1:0:a’).
+5. If any interfaces have been added since the last release,
+   then increment age.
+   so: (‘c:r:a’ becomes ‘c:r:a+1’).
+6. If any interfaces have been removed or changed since the last release,
+   then set age to 0.
+   so: (‘c:r:a’ becomes ‘c:r:0’).
+
+Restated
+
+   CURRENT <= CURRENT+1 if any interfaces were added, removed, changed
+           <= CURRENT   if no interface change, but any other (source code) change
+
+   REVISION <= 0          if any interfaces were added, removed, changed
+               REVISION+1 if no interface change, but any other (source code) change
+
+   AGE <= AGE+1 if any interaces were added
+       <= 0     if any interfaces were removed, changed
+       <= AGE   if no interface change, but any other (source code) change
+
+

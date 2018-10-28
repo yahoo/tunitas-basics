@@ -10,8 +10,7 @@ lib_libwant_la_SOURCES = \
   $(end)
 
 $(scold_cxxdir)/want/dependencies.mk:
-	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libwant_la_SOURCES))
-	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libwant_la_SOURCES))
+	$(AM_V_TFDC) $(call TF_DISAGGREGATE, $(lib_libwant_la_SOURCES))
 	test -e $@
 include $(scold_cxxdir)/want/dependencies.mk
 clean-dependencies::

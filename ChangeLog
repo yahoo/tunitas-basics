@@ -1,0 +1,4 @@
+2018-10-28  Wendell Craig Baker  <wbaker@oath.com>
+
+	* Version v1.0.0, first released.  C:R:A=2.0.0
+	src/tunitas/Makefrag.am: sets the libtunitas.so C:R:A

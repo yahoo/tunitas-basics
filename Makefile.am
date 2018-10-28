@@ -6,7 +6,9 @@ AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 
 default:
-include @temerarious_flagship_datarootdir@/am/build.am
+include @temerarious_flagship_datadir@/am/build.am
+# [[REMOVEWHEN]] temerarious-1.1.0 provides .../am/build.am
+$(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am was incomplete))
 
 # To get submodules to build in place, these go as a pair
 #   configure.ac declares TF_CONFIG_SUBMODULES(directory, ...list...)
@@ -35,6 +37,8 @@ INSTALLATION_AREAS = \
 
 default: all
 
+# install rules from @temerarious_flagship_datadir@/am/install.am
+$(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_SOURCE_SET)))
 module_SOURCE_SET = $(lib_libtunitas_module_la_SOURCES) $(lib_libwant_la_SOURCES)
 
 .PHONY: clean-local mostlyclean-local distclean-local
@@ -89,12 +93,14 @@ TESTS = \
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
 # via @temerarious_flagship_datadir@/am/build.am and its constituents.
+# [[REMOVEWHEN]] temerarious-flagship supplies this, e.g. 1.1.2
+include $(if $(filter 1,$(hypogeal_twilight_toolflags_mk_included)), /dev/null, @hypogeal_twilight_datadir@/mk/toolflags.mk)
 
 # configure.ac:  TF_ENABLE_GCC
-Makefile_COMPILER_CPPFLAGS_SET = @CPPFLAGS_gcc@
-Makefile_COMPILER_CFLAGS_SET   = @CFLAGS_gcc@
-Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gcc@ -Wno-attributes
-Makefile_COMPILER_LDFLAGS_SET  = @LDFLAGS_gcc@  @libstd_filesystem@
+Makefile_COMPILER_CPPFLAGS_SET =                @CPPFLAGS_gcc@
+Makefile_COMPILER_CFLAGS_SET   = @CFLAGS_gdb@   @CFLAGS_gcc@
+Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gdb@ @CXXFLAGS_gcc@ -Wno-attributes
+Makefile_COMPILER_LDFLAGS_SET  = @LDFLAGS_gdb@  @LDFLAGS_gcc@  @libstd_filesystem@
 
 # configure.ac: TF_WITH_NONSTD([nonstd-libhttpserver])
 Makefile_nonstd_CPPFLAGS_SET = @nonstd_libhttpserver_CPPFLAGS@

@@ -26,8 +26,7 @@ bin_unit_SOURCES = \
   $(end)
 
 $(scold_cxxdir)/tests/unit/dependencies.mk:
-	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(bin_unit_SOURCES))
-	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(bin_unit_SOURCES))
+	$(AM_V_TFDC) $(call TF_DISAGGREGATE, $(bin_unit_SOURCES))
 	test -e $@
 include $(scold_cxxdir)/tests/unit/dependencies.mk
 clean-dependencies::
