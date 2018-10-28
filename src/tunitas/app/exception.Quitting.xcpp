@@ -12,7 +12,7 @@ namespace tunitas::app::exception {
   //   class my::Quitting : public tunitas::app::exception::Quitting, public ::std::runtime_error {
   //     using appable = tunitas::app::exception::Quitting;
   //     using standard = ::std::runtime_error
-  //     explicit (Program, sys::exits::Code = sys::exits::OK);
+  //     explicit Quitting(Program, sys::exits::Code = sys::exits::OK);
   //     ...must unify the MI...
   //     auto what() const noexcept -> char const * final { return standard::what(); }
   //   };
