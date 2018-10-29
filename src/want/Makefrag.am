@@ -10,8 +10,8 @@ lib_libwant_la_SOURCES = \
   $(end)
 
 $(scold_cxxdir)/want/dependencies.mk:
-	$(AM_V_TFDC) $(call TF_DISAGGREGATE, $(lib_libwant_la_SOURCES))
-	test -e $@
+	$(TF_V_DC) $(call TF_DISAGGREGATE, $(lib_libwant_la_SOURCES))
+	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/want/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/want/dependencies.mk

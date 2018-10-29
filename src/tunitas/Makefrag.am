@@ -45,8 +45,8 @@ lib_libtunitas_la_SOURCES = \
   $(end)
 
 $(scold_cxxdir)/tunitas/dependencies.mk:
-	$(AM_V_TFDC) $(call TF_DISAGGREGATE, $(lib_libtunitas_la_SOURCES))
-	test -e $@
+	$(TF_V_DCDIS) $(call TF_DISAGGREGATE, $(lib_libtunitas_la_SOURCES))
+	$(TF_V_DEP) test -e $@
 include $(scold_cxxdir)/tunitas/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tunitas/dependencies.mk
