@@ -60,7 +60,6 @@ else
     : ${with_module_options:=${__subnearby?}/module-options}
     : ${with_module_std:=${__subnearby?}/module-std}
 fi
-: ${with_module_boost:=no}
 : ${with_module_nonstd:=no}
 : ${with_module_posix:=no}
 : ${with_module_string:=no}
@@ -77,8 +76,6 @@ eval \
     ${with_submodules:+--with-submodules=$with_submodules} \
     ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
     ${with_temerarious_flagship:+--with-temerarious-flagship=$with_temerarious_flagship} \
-    ${with_module_boost:+--with-module-boost=$with_module_boost} \
-    ${with_nonstd_boost:+--with-nonstd-boost=$with_nonstd_boost} \
     ${with_module_c:+--with-module-c=$with_module_c} \
     ${with_module_string:+--with-module-c-string=$with_module_string} \
     ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \

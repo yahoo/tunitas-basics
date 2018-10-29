@@ -16,7 +16,6 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
-  @module_boost_prefix@ \
   @module_nonstd_prefix@ \
   @module_options_prefix@ \
   @module_posix_prefix@ \
@@ -28,7 +27,6 @@ TESTING_AREAS = \
   @module_rigging_prefix@ \
   $(end)
 INSTALLATION_AREAS = \
-  @nonstd_boost_prefix@ \
   @nonstd_cppunit_prefix@ \
   @nonstd_gcc_prefix@ \
   @std_scold_prefix@ \
@@ -39,7 +37,7 @@ default: all
 
 # install rules from @temerarious_flagship_datadir@/am/install.am
 $(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_SOURCE_SET)))
-module_SOURCE_SET = $(lib_libtunitas_module_la_SOURCES) $(lib_libwant_la_SOURCES)
+module_SOURCE_SET = $(lib_libtunitas_la_SOURCES) $(lib_libwant_la_SOURCES)
 
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::

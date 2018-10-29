@@ -1,4 +1,10 @@
 2018-10-28  Wendell Craig Baker  <wbaker@oath.com>
 
+	* Version v1.0.1, cleaner packaging, install the tunitas modules, version sync
+	  synchronize versions among ChangeLog, configure.ac, src/tunitas/Makefrag.am
+	  install the modules of libtunitas
+	  removed mention of boost as it is not (yet) used.
+	* src/tunitas/Makefrag.am: ibidem.
+
 	* Version v1.0.0, first released.  C:R:A=2.0.0
-	src/tunitas/Makefrag.am: sets the libtunitas.so C:R:A
+	* src/tunitas/Makefrag.am: sets the libtunitas.so C:R:A
