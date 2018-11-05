@@ -1,0 +1,230 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::outcome { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tunitas.outcome.Success
+class tests::unit::outcome::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Success_worked() -> void;
+  auto test_Success_failed() -> void;
+  auto test_ok() -> void;
+  auto test_error_code_returning() -> void;
+  auto test_error_code_throwing() -> void;
+  auto test_error_condition_returning() -> void;
+  auto test_error_condition_throwing() -> void;
+  auto test_value_consty() -> void;
+  auto test_value_muting() -> void;
+  auto test_value_moving() -> void;
+  auto test_value_throwing() -> void;
+  auto test_constructor_default() -> void;
+  auto test_constructor_Error() -> void;
+  auto test_constructor_Value() -> void;
+  static auto suite() -> cppunit::Test *;
+private:
+  using Success = ::tunitas::outcome::Success;
+  auto compute(bool) -> Success;
+  using Copyable = std::string;
+  struct Uncopyable;
+};
+#endiv
+#divert <cpp>
+#import std.invalid_argument
+#import std.string_literals
+using namespace std::string_literals;
+auto tests::unit::outcome::Fixture::compute(bool which) -> Success {
+  if (which) {
+    return Success{};
+  } else {
+    return Success{std::error_code{}};
+  }
+}
+#import tunitas.outcome.Success
+auto tests::unit::outcome::Fixture::test_Success_worked() -> void {
+  using namespace ::tunitas::outcome;
+  auto worked  = compute(true);
+  CPPUNIT_ASSERT(ok(worked));
+}
+auto tests::unit::outcome::Fixture::test_Success_failed() -> void {
+  using namespace ::tunitas::outcome;
+  auto failed  = compute(false);
+  CPPUNIT_ASSERT(!ok(failed));
+}
+#import tunitas.Outcome
+auto tests::unit::outcome::Fixture::test_ok() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  CPPUNIT_ASSERT(!ok(Subject{}));
+  CPPUNIT_ASSERT(!ok(Subject{std::error_code{}}));
+  CPPUNIT_ASSERT(ok(Subject{std::string{}}));
+}
+#import std.errc
+#import std.generic_category
+auto tests::unit::outcome::Fixture::test_error_code_returning() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s0 = Subject{};
+  auto e0 = error_code(s0);
+  CPPUNIT_ASSERT(0 == e0.value());
+  auto const SOME_VALUE = 99;
+  auto s1 = Subject{std::error_code{SOME_VALUE, std::generic_category()}};
+  auto e1 = error_code(s1);
+  CPPUNIT_ASSERT(SOME_VALUE == e1.value());
+}
+auto tests::unit::outcome::Fixture::test_error_code_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    using Subject = Outcome<std::string>;
+    auto good = Subject{"good"};
+    error_code(good);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::outcome::Fixture::test_error_condition_returning() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s0 = Subject{};
+  auto e0 = error_condition(s0);
+  CPPUNIT_ASSERT(0 == e0.value());
+  auto const SOME_VALUE = 99;
+  auto s1 = Subject{std::error_code{SOME_VALUE, std::generic_category()}};
+  auto e1 = error_condition(s1);
+  CPPUNIT_ASSERT(SOME_VALUE == e1.value());
+}
+auto tests::unit::outcome::Fixture::test_error_condition_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    using Subject = Outcome<std::string>;
+    auto good = Subject{"good"};
+    error_condition(good);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::outcome::Fixture::test_value_consty() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s1 = Subject{"that"};
+  auto const &v1 = value(s1);
+  CPPUNIT_ASSERT_EQUAL("that"s, v1);
+}
+auto tests::unit::outcome::Fixture::test_value_muting() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s1 = Subject{"that"};
+  auto &v1 = value(s1);
+  v1[2] = 'i';
+  v1[3] = 's';
+  CPPUNIT_ASSERT_EQUAL("this"s, v1);
+}
+auto tests::unit::outcome::Fixture::test_value_moving() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s1 = Subject{"that"};
+  auto v1 = value(std::move(s1));
+  CPPUNIT_ASSERT_EQUAL("that"s, v1);
+  CPPUNIT_ASSERT_EQUAL(""s, value(s1));
+}
+auto tests::unit::outcome::Fixture::test_value_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    using Subject = Outcome<std::string>;
+    auto const bad = Subject{};
+    value(bad);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    using namespace ::tunitas;
+    using Subject = Outcome<std::string>;
+    auto bad = Subject{};
+    value(bad);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    using namespace ::tunitas;
+    using Subject = Outcome<std::string>;
+    auto bad = Subject{};
+    value(std::move(bad));
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::outcome::Fixture::test_constructor_default() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto s0 = Subject{};
+  CPPUNIT_ASSERT(!ok(s0));
+}
+auto tests::unit::outcome::Fixture::test_constructor_Error() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto se = Subject{std::error_code{}};
+  CPPUNIT_ASSERT(!ok(se));
+}
+auto tests::unit::outcome::Fixture::test_constructor_Value() -> void {
+  using namespace ::tunitas;
+  using Subject = Outcome<std::string>;
+  auto sg = Subject{"good"};
+  CPPUNIT_ASSERT(ok(sg));
+}
+#import tests.unit.outcome.Fixture.Uncopyable
+#import tests.unit.outcome.Usage
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("outcome");
+  {
+    Stream sin("Success");
+    sin << call("worked", &Fixture::test_Success_worked)
+        << call("failed", &Fixture::test_Success_failed)
+      ;
+    series << add(sin.release());
+  }
+  series << call("ok", &Fixture::test_ok)
+    ;
+  {
+    Stream cod("error_code");
+    cod << call("returning", &Fixture::test_error_code_returning)
+        << call("throwing", &Fixture::test_error_code_throwing)
+      ;
+    series << add(cod.release());
+  } {
+    Stream con("error_condition");
+    con << call("returning", &Fixture::test_error_condition_returning)
+        << call("throwing", &Fixture::test_error_condition_throwing)
+      ;
+    series << add(con.release());
+  } {
+    Stream val("value");
+    val << call("consty", &Fixture::test_value_consty)
+        << call("muting", &Fixture::test_value_muting)
+        << call("moving", &Fixture::test_value_moving)
+        << call("throwing", &Fixture::test_value_throwing)
+      ;
+    series << add(val.release());
+  } {
+    Stream con("constructor");
+    con << call("default", &Fixture::test_constructor_default)
+        << call("Error", &Fixture::test_constructor_Error)
+        << call("Value", &Fixture::test_constructor_Value)
+      ;
+    series << add(con.release());
+  }
+  series << add(Usage<Copyable>::suite())
+         << add(Usage<Uncopyable>::suite())
+    ;
+  return series.release();
+}
+#endiv

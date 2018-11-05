@@ -7,7 +7,7 @@ dnl autoreconf -vfi
 dnl
 dnl recall: $prefix/etc/config.site can hold predefined settings
 dnl
-AC_INIT([tuntias-basics], [1.0.1], [/dev/null@oath.com])
+AC_INIT([tuntias-basics], [1.1.0], [/dev/null@oath.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am

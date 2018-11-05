@@ -1,0 +1,14 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.is_move_constructible
+namespace tunitas::required {
+  //
+  // A type is "movable" if it is move-constructible.
+  //
+  // Usage:
+  //
+  //   template<required::Move_Constructible TYPE> auto function(TYPE) -> TYPE;
+  //
+  template<typename TYPE> concept bool Move_Constructible = std::is_move_constructible<TYPE>::value;
+}
+#endiv

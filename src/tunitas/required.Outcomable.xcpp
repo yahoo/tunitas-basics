@@ -1,0 +1,15 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import tunitas.required.Default_Constructible
+#import tunitas.required.Move_Constructible
+namespace tunitas::required {
+  //
+  // A type can be used in Outcome<...> if it is default- and move- constructible
+  //
+  // Usage:
+  //
+  //   template<required::Outcomable TYPE> auto function(TYPE) -> Outcome<TYPE>;
+  //
+  template<typename TYPE> concept bool Outcomable = Default_Constructible<TYPE> && Move_Constructible<TYPE>;
+}
+#endiv

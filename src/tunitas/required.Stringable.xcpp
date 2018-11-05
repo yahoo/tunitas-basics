@@ -1,0 +1,18 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.string // requires the complete type of std::string
+namespace tunitas::required {
+  //
+  // A type is "stringable" if it can be converted to std::string
+  //
+  // Usage:
+  //
+  //   template<required::Stringable STRINGABLE> struct Something {
+  //     Something(STRINGABLE stringable);
+  //   };
+  //
+  template<typename STRINGABLE> concept bool Stringable = requires(STRINGABLE stringable) {
+    { std::string{stringable} } -> std::string;
+  };
+}
+#endiv
