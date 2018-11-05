@@ -1,0 +1,19 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.outcome.Fixture
+#endiv
+#divert <hpp>
+#import std.string
+//
+// We need an uncopyable data type that is otherwise "easy to work with"
+//
+class tests::unit::outcome::Fixture::Uncopyable : public std::string {
+  using ancestor = std::string;
+public:
+  using ancestor::basic_string;
+  Uncopyable(Uncopyable const &) = delete;
+  auto operator=(Uncopyable const &) -> Uncopyable & = delete;
+  Uncopyable(Uncopyable &&) = default;
+  auto operator=(Uncopyable &&) -> Uncopyable & = default;
+};
+#endiv

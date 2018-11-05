@@ -7,6 +7,13 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/namespace.cpp \
   \
   obj/src/tunitas/required.Iterator_Producing.cpp \
+  obj/src/tunitas/required.Stringable.cpp \
+  obj/src/tunitas/required.Move_Constructible.cpp \
+  obj/src/tunitas/required.Default_Constructible.cpp \
+  obj/src/tunitas/required.Outcomable.cpp \
+  \
+  obj/src/tunitas/Outcome.cpp \
+  obj/src/tunitas/outcome.Success.cpp \
   \
   obj/src/tunitas/app/namespace.cpp \
   obj/src/tunitas/app/Configuration.cpp \

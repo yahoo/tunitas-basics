@@ -7,8 +7,10 @@ namespace tests::unit::required { class Fixture; }
 #import cppunit.test.Fixture
 class tests::unit::required::Fixture : public cppunit::test::Fixture {
 public:
-  auto test_iterator_producing_string() -> void;
-  auto test_iterator_producing_filepath() -> void;
+  auto test_Iterator_Producing_filepath() -> void;
+  auto test_Iterator_Producing_string() -> void;
+  auto test_Movable() -> void;
+  auto test_Stringable() -> void;
   static auto suite() -> cppunit::Test *;
 };
 #endiv
@@ -17,13 +19,22 @@ public:
 #import tunitas.app.options.Args
 #import tunitas.app.words.Strings
 #import std.string
-auto tests::unit::required::Fixture::test_iterator_producing_string() -> void {
+auto tests::unit::required::Fixture::test_Iterator_Producing_string() -> void {
   static_assert(::tunitas::required::Iterator_Producing<::tunitas::app::words::Strings::iterator, std::string>);
   static_assert(::tunitas::required::Iterator_Producing<::tunitas::app::options::Args::iterator, std::string>);
 }
 #import tunitas.app.words.Filepaths
-auto tests::unit::required::Fixture::test_iterator_producing_filepath() -> void {
-  static_assert(::tunitas::required::Iterator_Producing<tunitas::app::words::Filepaths::iterator, std::filesystem::path>);
+auto tests::unit::required::Fixture::test_Iterator_Producing_filepath() -> void {
+  static_assert(::tunitas::required::Iterator_Producing<::tunitas::app::words::Filepaths::iterator, std::filesystem::path>);
+}
+#import tunitas.required.Movable
+auto tests::unit::required::Fixture::test_Movable() -> void {
+  static_assert(::tunitas::required::Movable<std::string>);
+}
+#import tunitas.required.Stringable
+auto tests::unit::required::Fixture::test_Stringable() -> void {
+  static_assert(::tunitas::required::Stringable<std::string>);
+  static_assert(::tunitas::required::Stringable<char const *>);
 }
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
@@ -31,10 +42,13 @@ auto tests::unit::required::Fixture::test_iterator_producing_filepath() -> void 
 auto tests::unit::required::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream series("required");
+  series << call("Stringable", &Fixture::test_Stringable)
+         << call("Movable", &Fixture::test_Movable)
+    ;
   {
     Stream ite("Iterator_Producing");
-    ite << call("String", &Fixture::test_iterator_producing_string)
-        << call("Filepath", &Fixture::test_iterator_producing_filepath)
+    ite << call("String", &Fixture::test_Iterator_Producing_string)
+        << call("Filepath", &Fixture::test_Iterator_Producing_filepath)
       ;
     series << add(ite.release());
   }

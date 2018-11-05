@@ -1,0 +1,38 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.Outcome
+namespace tunitas::outcome {
+  //
+  // An outcome when nothing helpful is returned on success
+  // but there are many ways to exhibit a failure.
+  // This is not Outcome<bool> because there is never 'false' on the success path.
+  //
+  // Unlike the underlying Outcome<TYPE> the default constructor computes success.
+  //
+  // Usage:
+  //
+  //   auto compute() -> outcome::Success;
+  //   auto computed  = compute();
+  //   if (ok(computed)) {
+  //     ...it worked, carry on...
+  //   } else {
+  //     auto ec = error_code(computed);
+  //     std::cerr << "of the many ways to fail" << ec.message() << '\n';
+  //   }
+  //
+  namespace detail { enum Success { SUCCESS }; }
+  class Success;
+}
+#endiv
+#divert <hpp>
+class tunitas::outcome::Success : public tunitas::Outcome<detail::Success> {
+  using ancestor = tunitas::Outcome<detail::Success>;
+public:
+  inline Success(); // n.b. computes to success
+  using ancestor::Outcome;
+};
+#endiv
+#divert <ipp>
+tunitas::outcome::Success::Success()
+  : ancestor{detail::SUCCESS} { }
+#endiv

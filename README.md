@@ -1,3 +1,5 @@
+[comment]: <> (this is really -*- markdown -*-)
+
 The basic data structures and utilities used throughout the Tunitas family of projects.
 
 # Language: C++
@@ -9,23 +11,35 @@ See [C++ Experimental Features](https://en.cppreference.com/w/cpp/experimental).
 
 Where the language is "not ready" then polyfill with script kiddies or other tooling crutches are used.
 
-# The Classes
+# The Basics
 
-## namespace tunitas
+## `namespace tunitas`
 
+   * `tunitas.Outcome' provides function outcome
+   * `tunitas::outcome::Success` where success is signle and the concept of a type that be used with `tunitas::Outcome`
 
-
-## namespace tunitas.exception
+## `namespace tunitas::exception`
 
    * ```tunitas.exception.Quitting''' leave the application.
 
 Namespace naming convention: singular (as in "an exception")
 
-## namespace tunitas.option
+## `namespace tunitas::option`
 
    * ```tunitas.option.Args''' the analog of ```argv'''
    
 Namespace naming convention: singular (as in "an option")
+
+## `namespace tunitas::required`
+
+Contains concepts
+
+   * `tunitas::required::Default_Constructible` the concept of a type which is default constructible.
+   * `tunitas::required::Move_Constructible` the concept of a type which is move constructible.
+   * `tunitas::required::Outcome` the concept of a type that be used with `tunitas::Outcome`.
+   * `tunitas::required::Stringable` the concept of a type convertible into `std::string`.
+
+Namespace naming convention: past tense (so it is distinct from the `requires` keyword)
 
 # The Libraries
 

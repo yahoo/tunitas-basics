@@ -1,0 +1,185 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::outcome {
+  template<typename BASE> class Usage;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tunitas.Outcome
+template<typename BASE> class tests::unit::outcome::Usage : public cppunit::test::Fixture {
+public:
+  using Base = BASE;
+  using Subject = ::tunitas::Outcome<Base>;
+  auto test_ok() -> void;
+  auto test_error_code_returning() -> void;
+  auto test_error_code_throwing() -> void;
+  auto test_error_condition_returning() -> void;
+  auto test_error_condition_throwing() -> void;
+  auto test_value_consty() -> void;
+  auto test_value_muting() -> void;
+  auto test_value_moving() -> void;
+  auto test_value_throwing() -> void;
+  auto test_constructor_default() -> void;
+  auto test_constructor_Error() -> void;
+  auto test_constructor_Value() -> void;
+  static auto suite() -> cppunit::Test *;
+private:
+  struct Uncopyable;
+};
+#endiv
+#divert <tpp>
+#import std.invalid_argument
+#import std.string_literals
+using namespace std::string_literals;
+#import tunitas.Outcome
+template<typename _> auto tests::unit::outcome::Usage<_>::test_ok() -> void {
+  using namespace ::tunitas;
+  CPPUNIT_ASSERT(!ok(Subject{}));
+  CPPUNIT_ASSERT(!ok(Subject{std::error_code{}}));
+  CPPUNIT_ASSERT(ok(Subject{Base{}}));
+}
+#import std.errc
+#import std.generic_category
+template<typename _> auto tests::unit::outcome::Usage<_>::test_error_code_returning() -> void {
+  using namespace ::tunitas;
+  auto s0 = Subject{};
+  auto e0 = error_code(s0);
+  CPPUNIT_ASSERT(0 == e0.value());
+  auto const SOME_VALUE = 99;
+  auto s1 = Subject{std::error_code{SOME_VALUE, std::generic_category()}};
+  auto e1 = error_code(s1);
+  CPPUNIT_ASSERT(SOME_VALUE == e1.value());
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_error_code_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    auto good = Subject{"good"};
+    error_code(good);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_error_condition_returning() -> void {
+  using namespace ::tunitas;
+  auto s0 = Subject{};
+  auto e0 = error_condition(s0);
+  CPPUNIT_ASSERT(0 == e0.value());
+  auto const SOME_VALUE = 99;
+  auto s1 = Subject{std::error_code{SOME_VALUE, std::generic_category()}};
+  auto e1 = error_condition(s1);
+  CPPUNIT_ASSERT(SOME_VALUE == e1.value());
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_error_condition_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    auto good = Subject{"good"};
+    error_condition(good);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_value_consty() -> void {
+  using namespace ::tunitas;
+  auto s1 = Subject{"that"};
+  auto const &v1 = value(s1);
+  CPPUNIT_ASSERT("that"s == v1);
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_value_muting() -> void {
+  using namespace ::tunitas;
+  auto s1 = Subject{"that"};
+  auto &v1 = value(s1);
+  v1[2] = 'i';
+  v1[3] = 's';
+  CPPUNIT_ASSERT("this"s == v1);
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_value_moving() -> void {
+  using namespace ::tunitas;
+  auto s1 = Subject{"that"};
+  auto v1 = value(std::move(s1));
+  CPPUNIT_ASSERT("that"s == v1);
+  CPPUNIT_ASSERT(""s == value(s1));
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_value_throwing() -> void {
+  try {
+    using namespace ::tunitas;
+    auto const bad = Subject{};
+    value(bad);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    using namespace ::tunitas;
+    auto bad = Subject{};
+    value(bad);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    using namespace ::tunitas;
+    auto bad = Subject{};
+    value(std::move(bad));
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_default() -> void {
+  using namespace ::tunitas;
+  auto s0 = Subject{};
+  CPPUNIT_ASSERT(!ok(s0));
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_Error() -> void {
+  using namespace ::tunitas;
+  auto se = Subject{std::error_code{}};
+  CPPUNIT_ASSERT(!ok(se));
+}
+template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_Value() -> void {
+  using namespace ::tunitas;
+  auto sg = Subject{"good"};
+  CPPUNIT_ASSERT(ok(sg));
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("outcome");
+  series << call("ok", &Usage::test_ok)
+    ;
+  {
+    Stream cod("error_code");
+    cod << call("returning", &Usage::test_error_code_returning)
+        << call("throwing", &Usage::test_error_code_throwing)
+      ;
+    series << add(cod.release());
+  } {
+    Stream con("error_condition");
+    con << call("returning", &Usage::test_error_condition_returning)
+        << call("throwing", &Usage::test_error_condition_throwing)
+      ;
+    series << add(con.release());
+  } {
+    Stream val("value");
+    val << call("consty", &Usage::test_value_consty)
+        << call("muting", &Usage::test_value_muting)
+        << call("moving", &Usage::test_value_moving)
+        << call("throwing", &Usage::test_value_throwing)
+      ;
+    series << add(val.release());
+  } {
+    Stream con("constructor");
+    con << call("default", &Usage::test_constructor_default)
+        << call("Error", &Usage::test_constructor_Error)
+        << call("Value", &Usage::test_constructor_Value)
+      ;
+    series << add(con.release());
+  }
+  return series.release();
+}
+#endiv
