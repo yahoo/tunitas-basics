@@ -1,0 +1,59 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.string
+namespace tunitas::server::constants {
+  namespace detail {
+    using namespace std::literals;
+    //
+    // The HTTP verbs (that we admit)
+    //
+    namespace http {
+      inline auto const CONNECT = "CONNECT"s;
+      inline auto const DELEET = "DELETE"s;
+      inline auto const GET = "GET"s;
+      inline auto const HEAD = "HEAD"s;
+      inline auto const OPTIONS = "OPTIONS"s;
+      inline auto const POST = "POST"s;
+      inline auto const PUT = "PUT"s;
+      inline auto const TRACE = "TRACE"s;
+      // https://www.w3.org/Protocols/HTTP/HTRESP.html
+      inline auto const R200_OK = 200;
+      inline auto const R201_CREATED = 201;
+      inline auto const R202_ACCEPTED = 202;
+      inline auto const R203_NON_AUTHORITATIVE_INFORMATION = 203;
+      inline auto const R204_NO_CONTENT = 204;
+      inline auto const R205_RESET_CONTENT = 205;
+      inline auto const R206_PARTIAL_CONTENT = 206;
+      inline auto const R301_MOVED_PERMANENTLY = 301;
+      inline auto const R302_FOUND = 302;
+      inline auto const R302_MOVED_TEMPORARILY = R302_FOUND;
+      inline auto const R303_SEE_OTHER = 303;
+      inline auto const R307_TEMPORARY_REDIRECT = 307;
+      inline auto const R308_PERMANENT_REDIRECT = 308;
+      inline auto const R304_NOT_MODIFIED = 304;
+      inline auto const R400_BAD_REQUEST = 400;
+      inline auto const R401_UNAUTHORIZED = 401;
+      inline auto const R402_PAYMENT_REQUIRED = 402;
+      inline auto const R403_FORBIDDEN = 403;
+      inline auto const R404_NOT_FOUND = 404;
+      inline auto const R500_INTERNAL_SERVER_ERROR = 500;
+      inline auto const R501_NOT_IMPLEMENTED = 501;
+      inline auto const R502_SERVICE_TEMPORARILY_OVERLOADED = 502;
+    }
+    //
+    // The MIME media type for JSON text is "application/json".
+    // The default encoding is UTF-8.
+    // https://www.ietf.org/rfc/rfc4627.txt
+    // https://www.iana.org/assignments/media-types/media-types.xhtml
+    // 
+    namespace mime {
+      inline auto const APPLICATION_JSON = "application/json"s;
+      inline auto const APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded"s;
+      inline auto const MULTIPART_FORM_DATA = "multipart/form-data"s;
+      inline auto const TEXT_PLAIN = "text/plain"s;
+      inline auto const TEXT_HTTP = "text/http"s;
+    }
+  }
+  using namespace detail;
+}
+#endiv

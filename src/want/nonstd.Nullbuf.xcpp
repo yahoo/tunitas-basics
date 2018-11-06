@@ -1,0 +1,42 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.char_traits
+namespace want::nonstd {
+  //
+  // Usage: install this nullbuf as the rdbuf of some nonstd.
+  // Caveats: the caller still own the object, the ononstd does not.
+  //
+  // std::cerr << "hi there";
+  // std::cerr.rdbuf(new Nullbuf<char>());
+  // std::cerr << "shout as loud as you want";
+  // 
+  template<typename CHAR, typename TRAITS = std::char_traits<CHAR>> class Nullbuf;
+}
+#endiv
+#divert <hpp>
+#import std.streambuf
+#import std.streamsize
+template<typename CHAR, typename TRAITS> class want::nonstd::Nullbuf : public std::basic_streambuf<CHAR, TRAITS> {
+  using ancestor = std::basic_streambuf<CHAR, TRAITS>;
+public:
+  Nullbuf() = default;
+  Nullbuf(Nullbuf const &) = delete;
+  auto operator=(Nullbuf const &) -> Nullbuf & = delete;
+  // See Langer & Kreft, or [27.5.2.4.5]/3-7.
+  // See http://www.cplusplus.com/reference/streambuf/basic_streambuf/
+  // Else see /usr/include/c++/4.8.3/streambuf 
+  auto xsputn(typename ancestor::char_type const *s, std::streamsize n) -> std::streamsize final;
+  auto overflow(typename ancestor::int_type c = typename ancestor::traits_type::eof()) -> typename ancestor::int_type final;
+};
+#endiv
+#divert <tpp>
+#import std.char_traits
+template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::xsputn(typename ancestor::char_type const *buffer, std::streamsize buffer_size) -> std::streamsize {
+  // It's a "sink" like /dev/null.  So we prevaricate that we wrote it all safely.
+  return buffer_size;
+}
+template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::overflow(typename ancestor::int_type c) -> typename ancestor::int_type {
+  // give it back (whatever it was)
+  return c;
+}
+#endiv

@@ -1,0 +1,22 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <hpp>
+#import std.ostream
+namespace tunitas::server::log {
+  //
+  // A rudimentary logging facility
+  //
+  // Did I mention it was rudimentary?
+  //
+  extern std::ostream &err;
+  extern std::ostream &nul;
+}
+#endiv
+#divert <cpp>
+#import std.cerr
+std::ostream &tunitas::server::log::err{std::cerr};
+#import want.nonstd.null
+namespace {
+  want::nonstd::null sinkhole;
+}
+std::ostream &tunitas::server::log::nul{sinkhole};
+#endiv

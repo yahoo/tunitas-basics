@@ -3,6 +3,7 @@
 #import tests.unit.app.Fixture
 #import tests.unit.outcome.Fixture
 #import tests.unit.required.Fixture
+#import tests.unit.server.Fixture
 #import tests.unit.tunitas.Fixture
 #import tests.unit.want.Fixture
 #import rigging.bench.Main
@@ -11,6 +12,7 @@ auto main(int argc, char *argv[]) -> int {
   rigging::bench::Main remain(tu::app::Fixture::suite(),
                               tu::outcome::Fixture::suite(),
                               tu::required::Fixture::suite(),
+                              tu::server::Fixture::suite(),
                               tu::tunitas::Fixture::suite(),
 			      tu::want::Fixture::suite());
   return remain(argc, argv);

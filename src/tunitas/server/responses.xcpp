@@ -1,0 +1,57 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <hpp>
+#import tunitas.server.service
+namespace tunitas::server::responses {
+  using namespace service;
+  //
+  // Standardized (server) responses
+  //
+  // If there was another response already set up then it is destroyed.
+  // This standardized (emergency) response replaces it.
+  //
+  // Usage:
+  //
+  //   try {
+  //     ...try to establiesh the response...
+  //   } catch (std::exception const &) {
+  //     internal_server_error(*fill);
+  //   }
+  //
+  inline auto internal_server_error(Response *&fill) -> void;
+  inline auto internal_server_error(Response *&fill, std::string const &reason) -> void;
+  //
+  // There was some problem with the input data
+  //
+  inline auto bad_request(Response *&fill) -> void;
+  inline auto bad_request(Response *&fill, std::string const &reason) -> void;
+}
+#endiv
+#divert <ipp>
+#import httpserver.response.Builder
+#import std.unique_ptr
+#import tunitas.server.constants
+auto tunitas::server::responses::internal_server_error(Response *&fill) -> void {
+  internal_server_error(fill, "internal server error");
+}
+auto tunitas::server::responses::internal_server_error(Response *&fill, std::string const &reason) -> void {
+  using namespace constants;
+  auto const &content_body = reason;
+  auto const code = http::R500_INTERNAL_SERVER_ERROR;
+  auto const &content_type = mime::TEXT_PLAIN;
+  httpserver::response::Builder bob{content_body, code, content_type};
+  std::unique_ptr<Response> doomed(fill);
+  fill = new Response{bob};
+}
+auto tunitas::server::responses::bad_request(Response *&fill) -> void {
+  bad_request(fill, "bad request");
+}
+auto tunitas::server::responses::bad_request(Response *&fill, std::string const &reason) -> void {
+  using namespace constants;
+  auto const &content_body = reason;
+  auto const code = http::R400_BAD_REQUEST;
+  auto const &content_type = mime::TEXT_PLAIN;
+  httpserver::response::Builder bob{content_body, code, content_type};
+  std::unique_ptr<Response> doomed(fill);
+  fill = new Response{bob};
+}
+#endiv

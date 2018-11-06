@@ -7,7 +7,7 @@ dnl autoreconf -vfi
 dnl
 dnl recall: $prefix/etc/config.site can hold predefined settings
 dnl
-AC_INIT([tuntias-basics], [1.1.0], [/dev/null@oath.com])
+AC_INIT([tuntias-basics], [1.2.0], [/dev/null@oath.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am
@@ -34,6 +34,7 @@ TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])
 
 # minimize these
+TF_WITH_MODULE([httpserver])
 TF_WITH_MODULE([nonstd])
 TF_WITH_MODULE([options])
 TF_WITH_MODULE([posix])
@@ -46,6 +47,7 @@ TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([cppunit])
 TF_WITH_NONSTD([gcc])
+TF_WITH_NONSTD([libhttpserver])
 
 TF_WITH_STD([scold])
 TF_WITH_STD([tunitas])

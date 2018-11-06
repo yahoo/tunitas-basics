@@ -205,6 +205,7 @@ auto tests::unit::app::Fixture::test_words_Filepaths() -> void {
   Filepaths paths{".", "..", "file.c", "file.h"};
   CPPUNIT_ASSERT_EQUAL(4lu, paths.size());
 }
+#import tests.unit.app.options.Fixture
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
 #import unit.rigging.suite.add
@@ -265,6 +266,8 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
 	<< call("Filepaths", &Fixture::test_words_Filepaths)
       ;
   }
+  series << add(options::Fixture::suite())
+    ;
   return series.release();
 }
 #endiv

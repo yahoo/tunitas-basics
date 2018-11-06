@@ -1,30 +1,29 @@
-// -*- c++ -*- with SCOLD stylings
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
 #divert <fpp>
-namespace tests::unit::want { class Fixture; }
+namespace tests::unit::server { class Fixture; }
 #endiv
 #divert <hpp>
 #import cppunit.Test
 #import cppunit.test.Fixture
-class tests::unit::want::Fixture : public cppunit::test::Fixture {
+class tests::unit::server::Fixture : public cppunit::test::Fixture {
 public:
   auto test_something() -> void;
   static auto suite() -> cppunit::Test *;
 };
 #endiv
 #divert <cpp>
-#import want
-auto tests::unit::want::Fixture::test_something() -> void {
+#import std.literals
+using namespace std::literals;
+auto tests::unit::server::Fixture::test_something() -> void {
   CPPUNIT_ASSERT(true);
 }
-#import tests.unit.want.nonstd.Fixture
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
 #import unit.rigging.suite.add
-auto tests::unit::want::Fixture::suite() -> cppunit::Test * {
+auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
-  Stream series("want");
+  Stream series("server");
   series << call("something", &Fixture::test_something)
-	 << add(nonstd::Fixture::suite())
     ;
   return series.release();
 }

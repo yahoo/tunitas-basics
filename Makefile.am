@@ -45,12 +45,14 @@ clean-dependencies::
 clean-local:: clean-dependencies
 
 include src/tunitas/Makefrag.am
+include src/tunitas/server/Makefrag.am
 include src/want/Makefrag.am
 include src/tests/unit/Makefrag.am
 
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
   $(lib_libtunitas_la) \
+  $(lib_libtunitas_server_la) \
   $(end)
 noinst_LTLIBRARIES = \
   $(lib_libwant_la) \
@@ -60,6 +62,8 @@ check_PROGRAMS = \
   $(end)
 check_LTLIBRARIES =
 
+$(lib_libtunitas_server_la) : $(lib_libtunitas_la)
+
 $(bin_PROGRAMS) : $(lib_LTLIBRARIES)
 $(lib_LTLIBRARIES) : $(noinst_LTLIBRARIES)
 $(check_PROGRAMS) : $(bin_PROGRAMS)
@@ -68,11 +72,13 @@ $(check_PROGRAMS) : $(check_LTLIBRARIES)
 
 MODULES = \
   $(lib_libtunitas_la_MODULES) \
+  $(lib_libtunitas_server_la_MODULES) \
   $(lib_libwant_la_MODULES) \
   $(bin_unit_MODULES)  \
   $(end)
 OBJECTS = \
   $(lib_libtunitas_la_OBJECTS) \
+  $(lib_libtunitas_server_la_OBJECTS) \
   $(lib_libwant_la_OBJECTS) \
   $(bin_unit_OBJECTS)  \
   $(end)

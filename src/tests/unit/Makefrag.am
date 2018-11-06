@@ -20,12 +20,15 @@ bin_unit_SOURCES = \
   obj/src/tests/unit/app.Fixture.Specification.cpp \
   obj/src/tests/unit/app.Fixture.Usage.cpp \
   obj/src/tests/unit/app.Fixture.Version.cpp \
+  obj/src/tests/unit/app.options.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   obj/src/tests/unit/outcome.Usage.cpp \
   obj/src/tests/unit/required.Fixture.cpp \
+  obj/src/tests/unit/server.Fixture.cpp \
   obj/src/tests/unit/tunitas.Fixture.cpp \
   obj/src/tests/unit/want.Fixture.cpp \
+  obj/src/tests/unit/want.nonstd.Fixture.cpp \
   $(end)
 
 $(scold_cxxdir)/tests/unit/dependencies.mk:

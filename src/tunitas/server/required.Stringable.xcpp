@@ -1,0 +1,8 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import tunitas.required.Stringable
+namespace tunitas::server::required {
+  // Cascading the declaration.
+  using tunitas::required::Stringable;
+}
+#endiv

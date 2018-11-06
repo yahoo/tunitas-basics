@@ -7,6 +7,8 @@ lib_libwant_la_SOURCES = \
   obj/src/want/namespace.cpp \
   obj/src/want/std.filesystem.cpp \
   obj/src/want/std.filesystem.path.cpp \
+  obj/src/want/nonstd.Nullbuf.cpp \
+  obj/src/want/nonstd.null.cpp \
   $(end)
 
 $(scold_cxxdir)/want/dependencies.mk:

@@ -1,0 +1,29 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.char_traits
+namespace want::nonstd {
+  template<typename CHAR, typename TRAITS = std::char_traits<CHAR>> class basic_null;
+  // following std::ostream as std::basic_ostream<char>
+  using null = basic_null<char>;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import std.unique_ptr
+#import want.nonstd.Nullbuf
+template<typename CHAR, typename TRAITS> class want::nonstd::basic_null : public std::basic_ostream<CHAR, TRAITS> {
+  using ancestor = std::basic_ostream<CHAR, TRAITS>;
+public:
+  inline basic_null();
+  // No capability for copy or move because of the ancestry
+protected:
+  std::unique_ptr<::want::nonstd::Nullbuf<CHAR, TRAITS>> buf;
+};
+#endiv
+#divert <ipp>
+template<typename _1, typename _2> want::nonstd::basic_null<_1, _2>::basic_null()
+  : ancestor()
+  , buf(new Nullbuf<_1, _2>()) {
+  this->rdbuf(buf.get());
+}
+#endiv

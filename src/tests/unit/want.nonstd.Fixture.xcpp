@@ -1,0 +1,50 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tests::unit::want::nonstd { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::want::nonstd::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_nonstd_Nullbuf() -> void;
+  auto test_nonstd_null() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string_literals
+using namespace std::string_literals;
+#import std.string
+#import std.ostringstream
+#import std.unique_ptr
+#import want.nonstd.Nullbuf
+auto tests::unit::want::nonstd::Fixture::test_nonstd_Nullbuf() -> void {
+  std::ostringstream buf;
+  std::unique_ptr<::want::nonstd::Nullbuf<char>> n( new ::want::nonstd::Nullbuf<char>());
+  buf << "[see this]";
+  static_cast<std::ios&>(buf).rdbuf(n.get()); // <----- tricky. reach up into the ios and modify the streambuf pointer of the stringstream
+  buf << "[NOT SEE THIS]";
+  std::string const expected("[see this]");
+  std::string const actual(buf.str());
+  CPPUNIT_ASSERT(expected == actual);
+}
+#import want.nonstd.null
+auto tests::unit::want::nonstd::Fixture::test_nonstd_null() -> void {
+  ::want::nonstd::null buf;
+  buf << "[NOT SEE THIS]";
+  // and no coredumps(!)
+  CPPUNIT_ASSERT(true);
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::want::nonstd::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("nonstd");
+  series << call("Nullbuf", &Fixture::test_nonstd_Nullbuf)
+	 << call("null", &Fixture::test_nonstd_null)
+    ;
+  return series.release();
+}
+#endiv

@@ -1,0 +1,22 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import httpserver.Request
+#import httpserver.Resource
+#import httpserver.Response
+#import httpserver.response.Builder
+namespace tunitas::server::service {
+  //
+  // A namespace package.
+  //
+  // Usage:
+  //
+  //   namespace something::this::that {
+  //     using namespace tunitas::server::service;
+  //   }
+  //
+  using httpserver::Resource;
+  using httpserver::Request;
+  using httpserver::Response;
+  namespace response = httpserver::response;
+}
+#endiv

@@ -1,0 +1,61 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <hpp>
+#import tunitas.server.service
+namespace tunitas::server::filters {
+  using namespace service;
+  //
+  // Enforce that there are no query parameters.
+  // fill in the response and return code, fil
+  //
+  // Usage:
+  //
+  //   enforce_no_query_parameters(request, fill);
+  //   if (nullptr == *fill) {
+  //      ...compute the success response...
+  //      response::Builder bob{content_body, code, content_type};
+  //      *fill = new Response{bob}
+  //   }
+  //
+  inline auto enforce_no_query_parameters(Request const &request, Response *&fill) -> void;
+  //
+  // Enforce that the content type is "application/json"
+  //
+  // Usage:
+  //
+  //   enforce_application_json(request, fill)
+  //   if (nullptr == *fill) {
+  //      ...compute the success response...
+  //   }
+  //   
+  inline auto enforce_application_json(Request const &request, Response *&fill) -> void;
+}
+#endiv
+#divert <ipp>
+#import tunitas.server.constants
+#import std.string_literals
+auto tunitas::server::filters::enforce_no_query_parameters(Request const &request, Response *&fill) -> void {
+  using namespace constants;
+  using namespace std::literals;
+  auto const &query = request.get_querystring();
+  if (!query.empty()) {
+    auto const &content_body = R"text(query parameters are disallowed here)text"s;
+    auto const code = http::R400_BAD_REQUEST;
+    auto const &content_type = mime::TEXT_PLAIN;
+    httpserver::response::Builder bob{content_body, code, content_type};
+    fill = new Response{bob};
+  }
+}
+#import httpserver.http.utils
+auto tunitas::server::filters::enforce_application_json(Request const &request, Response *&fill) -> void {
+  using namespace constants;
+  using namespace std::literals;
+  auto const &content = request.get_header(httpserver::http::utils::http_header_content_type);
+  if (content != mime::APPLICATION_JSON) {
+    auto const &content_body = R"text(content-type must be JSON)text"s;
+    auto const code = http::R400_BAD_REQUEST;
+    auto const &content_type = mime::TEXT_PLAIN;
+    httpserver::response::Builder bob{content_body, code, content_type};
+    fill = new Response{bob};
+  }
+}
+#endiv
