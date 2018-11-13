@@ -1,0 +1,31 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import std.string
+namespace tunitas::base64 {
+  //
+  //
+  // Decode the base64 in the source, returning the result in a container.
+  //
+  // Usage:
+  //
+  //   try {
+  //     auto encoded = encode("plaintext");
+  //     ...do something with it...
+  //   } catch (Exception const &e) {
+  //     std::string why = e.what();
+  //     ...explain...
+  //   }
+  //
+  inline auto encode(std::string const &source) -> std::string;
+}
+#endiv
+#divert <ipp>
+#import std.string
+#import tunitas.base64.Encoder
+auto tunitas::base64::encode(std::string const &source) -> std::string {
+  Encoder enc;
+  enc.put(source);
+  enc.put(Encoder::PAD8);
+  return enc.finalize();
+}
+#endiv

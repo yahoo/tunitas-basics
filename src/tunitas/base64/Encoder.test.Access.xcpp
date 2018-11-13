@@ -1,0 +1,35 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.base64.Encoder
+#endiv
+#divert <hpp>
+#import std.uintmax_t
+struct tunitas::base64::Encoder::test::Access {
+  Encoder &subject;
+  explicit Access(Encoder &);
+  // More Keys Under Doormats.  
+  static auto encode(std::uintmax_t) -> char;
+  auto dump() -> void;
+};
+#endiv
+#divert <cpp>
+#import std.cerr
+#import std.boolalpha
+namespace tunitas::base64 {
+  Encoder::test::Access::Access(Encoder &subject)
+    : subject(subject) { }
+
+  auto Encoder::test::Access::encode(std::uintmax_t value) -> char {
+    return Encoder::encode(value);
+  };
+  auto Encoder::test::Access::dump() -> void {
+    std::ostream &outbound{std::cerr};
+    outbound << "state: (" << subject.buffer.size() << " bits) ";
+    outbound << std::noboolalpha;
+    for (auto b : subject.buffer) {
+      outbound << b;
+    }
+    outbound << '\n';
+  }
+}
+#endiv

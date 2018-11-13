@@ -1,0 +1,36 @@
+# -*- Makefile -*-
+
+check_lib_libtests_base64_la = check/lib/libtests-base64.la
+check_lib_libtests_base64_la_LIBADD = $(lib_libtunitas_la)
+check_lib_libtests_base64_la_MODULES = $(call TF_SOURCEStoMODULES, $(check_lib_libtests_base64_la_SOURCES))
+check_lib_libtests_base64_la_SOURCES = \
+  obj/src/tests/base64/namespace.cpp \
+  obj/src/tests/base64/remain.cpp \
+  $(end)
+
+check_bin_base64_decode = check/bin/base64-decode
+check_bin_base64_decode_LDADD = $(check_lib_libtests_base64_la)
+# reminder: autotools does not put $(AM_LDFLAGS) into check_bin_base64_decode_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
+check_bin_base64_decode_LDFLAGS = $(AM_LDFLAGS)
+check_bin_base64_decode_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_base64_decode_SOURCES))
+check_bin_base64_decode_SOURCES = \
+  obj/src/tests/base64/decode.cpp \
+  $(end)
+
+check_bin_base64_encode = check/bin/base64-encode
+check_bin_base64_encode_LDADD = $(check_lib_libtests_base64_la)
+# reminder: autotools does not put $(AM_LDFLAGS) into check_bin_base64_encode_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
+check_bin_base64_encode_LDFLAGS = $(AM_LDFLAGS)
+check_bin_base64_encode_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_base64_encode_SOURCES))
+check_bin_base64_encode_SOURCES = \
+  obj/src/tests/base64/encode.cpp \
+  $(end)
+
+$(scold_cxxdir)/tests/base64/dependencies.mk:
+	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_bin_base64_decode_SOURCES))
+	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_bin_base64_encode_SOURCES))
+	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_lib_libtests_base64_la_SOURCES))
+	$(TF_V_DONE) test -e $@
+include $(scold_cxxdir)/tests/base64/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/base64/dependencies.mk

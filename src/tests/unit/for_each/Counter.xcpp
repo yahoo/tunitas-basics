@@ -1,0 +1,63 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.required.Integral
+namespace tests::unit::for_each {
+  //
+  // A range basis for counting in a for loop
+  // See the convenience function, nearby: count(...)
+  //
+  // Usage:
+  //
+  //   for (auto i : count(1u, 10u, 3u)) {
+  //     ...do stuff...
+  //   }
+  //   for (auto e : count<Some_Enum>(Enum::LOW, Enum::HIGH)) {
+  //     ...do stuff...
+  //   }
+  //
+  template<tunitas::required::Integral INTEGRAL, tunitas::required::Integral FINISH = INTEGRAL> struct Counter;
+}
+#endiv
+#divert <hpp>
+#import std.is_integral
+#import tests.unit.for_each.counter.Iterator
+#import std.intmax_t
+#import std.common_type
+#import std.is_integral
+#import tests.unit.for_each.counter.Iterator
+template<tunitas::required::Integral INTEGRAL, tunitas::required::Integral FINISH> struct tests::unit::for_each::Counter {
+  static_assert(std::is_integral<INTEGRAL>::value);
+  static_assert(std::is_integral<FINISH>::value);
+  static_assert(std::is_integral<typename std::common_type<INTEGRAL, FINISH>::type>::value);
+  using Integer = std::intmax_t;
+public:
+  using Value = INTEGRAL;
+  inline Counter();
+  inline Counter(Value start, Value finish, Integer stride);
+  using iterator = counter::Iterator<INTEGRAL>;
+  inline auto begin() const -> iterator;
+  inline auto end() const -> iterator;
+protected:
+  Integer start, finish, stride;
+};
+#endiv
+#divert <ipp>
+#import std.invalid_argument
+namespace tests::unit::for_each {
+  template<tunitas::required::Integral I, tunitas::required::Integral F> Counter<I,F>::Counter()
+    : start(0), finish(0), stride(1)
+  { }
+  template<tunitas::required::Integral I, tunitas::required::Integral F> Counter<I,F>::Counter(Value start, Value finish, Integer stride)
+    : start((Integer)start), finish((Integer)finish), stride(stride) {
+    if (0 == stride) {
+      throw std::invalid_argument("zero stride");
+    }
+  }
+  template<tunitas::required::Integral I, tunitas::required::Integral F> auto Counter<I,F>::begin() const -> iterator {
+    return iterator(start, finish, stride);
+  }
+  template<tunitas::required::Integral I, tunitas::required::Integral F> auto Counter<I,F>::end() const -> iterator {
+    return iterator(finish, finish, stride);
+  }
+}
+#endiv

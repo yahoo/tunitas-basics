@@ -1,0 +1,99 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.required.Integral
+namespace tests::unit::for_each::counter {
+  //
+  // The iterator of the counter.
+  // See Counter, nearby
+  //
+  // Usage:
+  //
+  //   for (auto i : count(1u, 10u, 3u)) {
+  //     ...do stuff...
+  //   }
+  //   for (auto e : count<Some_Enum>(Enum::LOW, Enum::HIGH)) {
+  //     ...do stuff...
+  //   }
+  //
+  template<tunitas::required::Integral> class Iterator;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::for_each::counter {
+  template<tunitas::required::Integral INTEGRAL> inline auto equivalent(Iterator<INTEGRAL> const &, Iterator<INTEGRAL> const &) -> bool;
+  template<tunitas::required::Integral INTEGRAL> inline auto equal(Iterator<INTEGRAL> const &, Iterator<INTEGRAL> const &) -> bool;
+  template<tunitas::required::Integral INTEGRAL> inline auto not_equal(Iterator<INTEGRAL> const &a, Iterator<INTEGRAL> const &b) -> bool  { return !equal(a, b); }
+  template<tunitas::required::Integral INTEGRAL> inline auto operator==(Iterator<INTEGRAL> const &a, Iterator<INTEGRAL> const &b) -> bool { return equivalent(a, b); }
+  template<tunitas::required::Integral INTEGRAL> inline auto operator!=(Iterator<INTEGRAL> const &a, Iterator<INTEGRAL> const &b) -> bool { return !operator==(a, b); }
+}
+#import std.intmax_t
+#include <stdexcept>
+template<tunitas::required::Integral INTEGRAL> class tests::unit::for_each::counter::Iterator {
+  static_assert(std::is_integral<INTEGRAL>::value);
+  using Integer = std::intmax_t;
+public:
+  inline Iterator();
+  using Value = INTEGRAL;
+  inline Iterator(Integer position, Integer finish, Integer stride);
+  inline auto operator*() const -> Value;
+  inline auto operator++() -> Iterator &;
+  inline auto operator++(int) -> Iterator;
+protected:
+  Integer position, finish, stride;
+  // Because the stride can take the position past the finish, the concept of "exhausted" is not operator==
+  // All "exhausted" iterators are "the same."
+  inline auto exhausted() const -> bool;
+  friend auto counter::equivalent<>(Iterator const &, Iterator const &) -> bool;
+  friend auto counter::equal<>(Iterator const &a, Iterator const &b) -> bool;
+};
+#import std.iterator_traits
+namespace std {
+  template<tunitas::required::Integral INTEGRAL> struct iterator_traits<tests::unit::for_each::counter::Iterator<INTEGRAL>> {
+    using value_type = INTEGRAL;
+    using reference = value_type &;
+    using const_reference = value_type const &;
+  };
+}
+#endiv
+#divert <ipp>
+namespace tests::unit::for_each {
+  template<tunitas::required::Integral I> auto counter::equivalent(Iterator<I> const &a, Iterator<I> const &b) -> bool {
+    return a.exhausted() == b.exhausted() || equal(a, b);
+  }
+  template<tunitas::required::Integral I> auto counter::equal(Iterator<I> const &a, Iterator<I> const &b) -> bool {
+    return a.position == b.position && a.finish == b.finish && a.stride == b.stride;
+  }
+}
+#import std.is_integral
+#import std.intmax_t
+#import std.invalid_argument
+namespace tests::unit::for_each::counter {
+  template<tunitas::required::Integral _> Iterator<_>::Iterator()
+    : position(0), finish(0), stride()
+  { }
+  template<tunitas::required::Integral _> Iterator<_>::Iterator(Integer position, Integer finish, Integer stride)
+    : position(position), finish(finish), stride(stride)
+  { }
+  template<tunitas::required::Integral _> auto Iterator<_>::operator*() const -> Value {
+    // Observe: here, right here, is where the truncation takes place.
+    // e.g. Value is char, short, (normal) int.
+    return Value(position);
+  }
+  template<tunitas::required::Integral _> auto Iterator<_>::operator++() -> Iterator & {
+    if (exhausted()) {
+      throw std::invalid_argument("exhausted");
+    }
+    Integer old = position++;
+    if (old == position) {
+      throw std::runtime_error("zero progress"); // perhaps an unchecked zero stride?
+    }
+    return *this;
+  }
+  template<tunitas::required::Integral _> auto Iterator<_>::operator++(int) -> Iterator {
+    Iterator old(*this);
+    operator++();
+    return old;
+  }
+  template<tunitas::required::Integral _> auto Iterator<_>::exhausted() const -> bool { return position >= finish; }
+}
+#endiv

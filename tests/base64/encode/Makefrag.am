@@ -1,0 +1,7 @@
+tests_base64_encode_XFAIL_TESTS = $(none)
+tests_base64_encode_XPASS_TESTS = $(none)
+tests_base64_encode_TESTS = \
+  $(tests_base64_encode_XPASS_TESTS) \
+  $(tests_base64_encode_XFAIL_TESTS) \
+  tests/base64/encode/01.test \
+  $(end)

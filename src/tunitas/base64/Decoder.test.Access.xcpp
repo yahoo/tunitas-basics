@@ -1,0 +1,34 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+//
+// This is test code and should not be in the production library biuld
+//
+#import tunitas.base64.Decoder
+#endiv
+#divert <hpp>
+#import std.uint32_t
+struct tunitas::base64::Decoder::test::Access {
+  Decoder &subject;
+  explicit Access(Decoder &);
+  static auto decode(char) -> std::uint32_t;
+  auto dump() -> void;
+};
+#endiv
+#divert <cpp>
+#import std.cerr
+namespace tunitas::base64 {
+  Decoder::test::Access::Access(Decoder &subject)
+    : subject(subject) { }
+  auto Decoder::test::Access::decode(char value) -> std::uint32_t {
+    return Decoder::decode(value);
+  };
+  auto Decoder::test::Access::dump() -> void {
+    std::ostream &outbound{std::cerr};
+    outbound << "state: (" << subject.size() << " bits) ";
+    for (auto b : subject.decoded_state) {
+      outbound << b;
+    }
+    outbound << '\n';
+  }
+}
+#endiv

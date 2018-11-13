@@ -1,0 +1,4 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64::exception { }
+#endiv

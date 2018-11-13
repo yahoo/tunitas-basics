@@ -1,0 +1,38 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.required.Integral
+namespace tunitas::base64::sized {
+  //
+  // Represent a sized integer (with odd bitwidth), in dataspace.
+  // for use in the Encoder
+  //
+  // Consistency and reasonableness checks(assertions) are done elsewhere.
+  // e.g. within the Encoder.
+  // n.b. don't try to write a zero-bitwidth object.
+  //
+  // Usage:
+  //
+  //   Encoder enc;
+  //   enc.put(sized::Value<int>(99, 3));      put the low 3 bits of the constant 99
+  //   enc.put(sized::Value<int>(12345, 7));   put the low 7 bits of the constant 12345
+  //
+  template<required::Integral INTEGRAL> struct ByValue;
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+namespace tunitas::base64 {
+  template<required::Integral INTEGRAL> struct sized::ByValue {
+  public:
+    using Value = INTEGRAL;
+    inline ByValue(Value value, std::size_t width) : stored_value(value), bit_width(width) { }
+    // Get a Concept!  std::is_convertible<OTHER>, Value>::value
+    template<typename OTHER> inline /*implicit*/ ByValue(OTHER other) : stored_value(other) { }
+    inline auto value() const -> Value { return stored_value; }
+    inline auto width() const -> std::size_t { return bit_width; }
+  protected:
+    Value stored_value;
+    std::size_t bit_width;
+  };
+}
+#endiv

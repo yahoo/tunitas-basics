@@ -1,0 +1,98 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64::exception { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::base64::exception::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Code() -> void;
+  auto test_Exception() -> void;
+  auto test_decoder_Get() -> void;
+  auto test_decoder_Invalid() -> void;
+  auto test_decoder_Seek() -> void;
+  auto test_decoder_Underflow() -> void;
+  auto test_encoder_Finalized() -> void;
+  auto test_encoder_Invalid() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  template<typename EXCEPTION> auto throwcatch() -> void;
+};
+#endiv
+#divert <tpp>
+#import std.string
+#import std.string_literals
+#import tunitas.base64.Exception
+namespace tests::unit::base64::exception {
+  template<typename EXCEPTION> auto Fixture::throwcatch() -> void {
+    using namespace std::literals;
+    try {
+      throw EXCEPTION{"wow"};
+      CPPUNIT_ASSERT(false);
+    } catch (::tunitas::base64::Exception const &e) {
+      CPPUNIT_ASSERT("wow"s == e.what());
+    }
+  }
+}
+#divert <cpp>
+using namespace tests::unit::base64::exception;
+#import tunitas.base64.Code
+auto Fixture::test_Code() -> void {
+  throwcatch<::tunitas::base64::Code>();
+}
+#import tunitas.base64.Exception
+auto Fixture::test_Exception() -> void {
+  // ::tunitas::base64::Exception is tested in throwcatch<...>(...)
+}
+#import tunitas.base64.decoder.Get
+auto Fixture::test_decoder_Get() -> void {
+  throwcatch<::tunitas::base64::decoder::Get>();
+}
+#import tunitas.base64.decoder.Invalid
+auto Fixture::test_decoder_Invalid() -> void {
+  throwcatch<::tunitas::base64::decoder::Invalid>();
+}
+#import tunitas.base64.decoder.Seek
+auto Fixture::test_decoder_Seek() -> void {
+  throwcatch<::tunitas::base64::decoder::Seek>();
+}
+#import tunitas.base64.decoder.Underflow
+auto Fixture::test_decoder_Underflow() -> void {
+  throwcatch<::tunitas::base64::decoder::Underflow>();
+}
+#import tunitas.base64.encoder.Finalized
+auto Fixture::test_encoder_Finalized() -> void {
+  throwcatch<::tunitas::base64::encoder::Finalized>();
+}
+#import tunitas.base64.encoder.Invalid
+auto Fixture::test_encoder_Invalid() -> void {
+  throwcatch<::tunitas::base64::decoder::Invalid>();
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("exception");
+  series << call("Code", &Fixture::test_Code)
+	 << call("Exception", &Fixture::test_Exception)
+    ;
+  {
+    Stream dec("decoder");
+    dec << call("Get", &Fixture::test_decoder_Get)
+	<< call("Invalid", &Fixture::test_decoder_Invalid)
+	<< call("Seek", &Fixture::test_decoder_Seek)
+	<< call("Underflow", &Fixture::test_decoder_Underflow)
+      ;
+    series << add(dec.release());
+  } {
+    Stream enc("encoder");
+    enc << call("Finalized", &Fixture::test_encoder_Finalized)
+	<< call("Invalid", &Fixture::test_encoder_Invalid)
+      ;
+    series << add(enc.release());
+  }
+  return series.release();
+}
+#endiv

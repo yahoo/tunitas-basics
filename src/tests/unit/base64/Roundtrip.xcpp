@@ -1,0 +1,184 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64 { class Roundtrip; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.intmax_t
+#import std.string
+#import tests.unit.for_each.Counter
+class tests::unit::base64::Roundtrip : public cppunit::test::Fixture {
+public:
+  auto test_01() -> void;
+  auto test_02() -> void;
+  auto test_03() -> void;
+  auto test_04() -> void;
+  auto test_05() -> void;
+  auto test_06() -> void;
+  auto test_07() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto count(std::intmax_t stride) -> for_each::Counter<char, int>;
+  auto roundtrip_encdec(std::string const &specimen) -> void;
+  struct stride {
+    inline static auto const A = 1;
+    inline static auto const B = 1;
+    inline static auto const C = 17;
+    inline static auto const D = 85;
+    inline static auto const E = 255;
+    inline static auto const F = 255;
+    inline static auto const G = 255;
+  };
+};
+#endiv
+#divert <cpp>
+#import tunitas.base64.encode
+#import tunitas.base64.decode
+#import std.string
+#import std.string_literals
+using namespace std::literals;
+#import tests.unit.for_each.count
+using namespace tests::unit::base64;
+auto Roundtrip::count(std::intmax_t stride) -> for_each::Counter<char, int> {
+  return unit::for_each::count<char>(0, 256, stride);
+}
+//
+// Factors of 255 are 17, 5, 3     (85 == 17 * 5)
+// Strides: 17, 85
+//
+auto Roundtrip::roundtrip_encdec(std::string const &specimen) -> void {
+  using namespace ::tunitas::base64;
+  auto const enc = encode(specimen);
+  auto const dec = decode(enc);
+  CPPUNIT_ASSERT(dec == specimen);
+  auto const renc = encode(dec);
+  auto const rdec = decode(renc);
+  CPPUNIT_ASSERT(rdec == dec);
+  CPPUNIT_ASSERT(renc == enc);
+  CPPUNIT_ASSERT(dec == specimen);
+}
+//
+// These can get a little long in the tooth with the multiplicative factors.
+// Careful what you code here...
+// 
+// Factors of 255 are 17, 5, 3     (85 == 17 * 5)
+// Strides: 17, 85
+//
+auto Roundtrip::test_01() -> void {
+  for (char a : count(stride::A)) {
+    // 2^8^1 = 2^8
+    std::string specimen{a};
+    roundtrip_encdec(specimen);
+  }
+}
+auto Roundtrip::test_02() -> void {
+  for (char b : count(stride::B)) {
+    for (char a : count(stride::A)) {
+      // thin: 65535
+      // full: 2^8^2 = 2^16
+      std::string specimen{b,a};
+      roundtrip_encdec(specimen);
+    }
+  }
+}
+auto Roundtrip::test_03() -> void {
+  for (char c : count(stride::C)) {
+    for (char b : count(stride::B)) {
+      for (char a : count(stride::A)) {
+        // thin: 15*256*256 = 983,040
+        // full: 2^8^3 = 2^24
+        std::string specimen{c,b,a};
+        roundtrip_encdec(specimen);
+      }
+    }
+  }
+}
+auto Roundtrip::test_04() -> void {
+  for (char d : count(stride::D)) {
+    for (char c : count(stride::C)) {
+      for (char b : count(stride::B)) {
+        for (char a : count(stride::A)) {
+          // thin: 3*15*256*256 = 2,949,120
+          // full: 2^8^4 = 2^32
+          std::string specimen{d,c,b,a};
+          roundtrip_encdec(specimen);
+        }
+      }
+    }
+  }
+}
+auto Roundtrip::test_05() -> void {
+  for (char e : count(stride::E)) {
+    for (char d : count(stride::D)) {
+      for (char c : count(stride::C)) {
+        for (char b : count(stride::B)) {
+          for (char a : count(stride::A)) {
+            // safe: 3*15*256*256 = 2,949,120
+            // thin: 3*3*15*256*256 = 8,847,360
+            // full: 2^8^5 = 2^40
+            std::string specimen{e,d,c,b,a};
+            roundtrip_encdec(specimen);
+          }
+        }
+      }
+    }
+  }
+}
+auto Roundtrip::test_06() -> void {
+  for (char f : count(stride::F)) {
+    for (char e : count(stride::E)) {
+      for (char d : count(stride::D)) {
+        for (char c : count(stride::C)) {
+          for (char b : count(stride::B)) {
+            for (char a : count(stride::A)) {
+              // safe: 3*15*256*256 = 2,949,120
+              // thin: 3*3*3*15*256*256 = 26,542,080
+              // full: 2^8^6 = 2^48
+              std::string specimen{f,e,d,c,b,a};
+              roundtrip_encdec(specimen);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+auto Roundtrip::test_07() -> void {
+  for (char g : count(stride::G)) {
+    for (char f : count(stride::F)) {
+      for (char e : count(stride::E)) {
+        for (char d : count(stride::D)) {
+          for (char c : count(stride::C)) {
+            for (char b : count(stride::B)) {
+              for (char a : count(stride::A)) {
+                // safe: 3*15*256*256 = 2,949,120
+                // thin: 3^4 * 15^1 * 256^2 = 79,626,240
+                // full: 2^8^7 = 2^56
+                std::string specimen{g,f,e,d,c,b,a};
+                roundtrip_encdec(specimen);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::base64::Roundtrip::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("roundtrip");
+  series << call("01", &Roundtrip::test_01)
+	 << call("02", &Roundtrip::test_02)
+	 << call("03", &Roundtrip::test_03)
+	 << call("04", &Roundtrip::test_04)
+	 << call("05", &Roundtrip::test_05)
+	 << call("06", &Roundtrip::test_06)
+	 << call("07", &Roundtrip::test_07)
+      ;
+  return series.release();
+}
+#endiv

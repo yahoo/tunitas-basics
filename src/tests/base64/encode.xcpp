@@ -1,0 +1,9 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <cpp>
+#import tests.base64.remain
+#import tunitas.base64.encode
+auto main(int c, char *v[]) -> int {
+  using namespace tests::base64;
+  return remain(Function{&tunitas::base64::encode}, Args{&v[0], &v[c]});
+}
+#endiv

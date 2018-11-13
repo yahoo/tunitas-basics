@@ -1,0 +1,41 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64 {
+  //
+  // A mixin for the base64 encoder exceptions.
+  // Descendants only.
+  //
+  // This allows catching the base64 exceptions by ancestry
+  // but also allows each exception to be implemented by a different <stdexcept> exception.
+  //
+  // Usage:
+  //
+  //   class tunitas::base64::decoder::UnwelcomeSurprise : public std::out_of_range, public base64::Exception {
+  //     using ancestor = std::out_of_range;
+  //   public:
+  //     using ancestor::out_of_range;
+  //     auto what() const noexcept -> char const * { return ancestor::what(); }
+  //   };
+  //
+  //   try {
+  //     ...
+  //     ...encode or decode...
+  //     ...
+  //   } catch (base64::Exception const &e) {
+  //     ...something base64...
+  //   } catch (std::exception const &e) {
+  //     ...something else...
+  //   }
+  //   throw encoder::Invalid("that was bad");
+  //
+  class Exception;
+}
+#endiv
+#divert <hpp>
+class tunitas::base64::Exception {
+protected:
+  virtual ~Exception() { }
+public:
+  virtual auto what() const noexcept -> char const * = 0; // the MI must be unified in the descendant.
+};
+#endiv

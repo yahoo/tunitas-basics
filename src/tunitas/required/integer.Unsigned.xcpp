@@ -1,0 +1,14 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import std.is_unsigned
+namespace tunitas::required::integer {
+  //
+  // The concept of a signed integer type
+  //
+  // Usage:
+  //
+  //   template<required::integer::Signed INTEGER> Constructor(INTEGER, INTEGER);
+  //
+  template<typename INTEGER> concept bool Unsigned = std::is_unsigned<INTEGER>::value;
+}
+#endiv

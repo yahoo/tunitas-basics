@@ -1,0 +1,26 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64 {
+  //
+  // An invalid aspect of an individual base64 (value or alphabet)
+  // i.e. a code was too big or too small
+  // i.e. a value was not in the range 0..63
+  //
+  // Usage:
+  //
+  //   throw base64::Code("encode");
+  //
+  class Code;
+}
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.base64.Exception
+class tunitas::base64::Code : public std::runtime_error, public base64::Exception {
+  using ancestor = std::runtime_error;
+public:
+  Code() : ancestor("base64") { }
+  using ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

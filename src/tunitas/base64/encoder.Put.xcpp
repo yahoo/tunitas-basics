@@ -1,0 +1,25 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64::encoder {
+  //
+  // An invalid put<...>(...) operation out of the base64 encoder bitstream.
+  //
+  // Usage:
+  //
+  //   throw encoder::Put("zero size");
+  //   throw encoder::Put("too big");
+  //
+  class Put;
+}
+#endiv
+#divert <hpp>
+#import std.invalid_argument
+#import tunitas.base64.Exception
+class tunitas::base64::encoder::Put : public std::invalid_argument, public base64::Exception {
+  using ancestor = std::invalid_argument;
+public:
+  Put() : ancestor("put") { }
+  using ancestor::invalid_argument;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

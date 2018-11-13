@@ -1,0 +1,3 @@
+#!/bin/sh
+export PATH="${0%/*}/../../../check/bin:${0%/*}/../../../bin:$PATH"
+base64-decode $(for s in '' a ab abc abcd abcdef ; do echo -n "$s" | base64 ; done) < /dev/null

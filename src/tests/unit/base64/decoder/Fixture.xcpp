@@ -1,0 +1,376 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64::decoder { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::base64::decoder::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_01() -> void;
+  auto test_02() -> void;
+  auto test_03() -> void;
+  auto test_04() -> void;
+  auto test_05() -> void;
+  auto test_06() -> void;
+  auto test_07() -> void;
+  auto test_08() -> void;
+  auto test_09() -> void;
+  auto test_10() -> void;
+  auto test_11() -> void;
+  auto test_12() -> void;
+  auto test_13() -> void;
+  auto test_14() -> void;
+  auto test_15() -> void;
+  auto test_16() -> void;
+  auto test_17() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.UNREACHABLE // __UNREACHABLE__ et al.
+#import std.cerr
+#import tunitas.base64.Decoder
+#import std.string
+#import std.string_literals
+using namespace std::literals;
+#import tunitas.base64.Decoder.test.Access
+using namespace tests::unit::base64;
+using tunitas::base64::Decoder;
+using Access = Decoder::test::Access;
+using namespace tests::unit::base64::decoder;
+auto Fixture::test_01() -> void {
+  // https://tools.ietf.org/html/rfc4648#page-7
+  CPPUNIT_ASSERT(0 == Access::decode('A'));
+  CPPUNIT_ASSERT(1 == Access::decode('B'));
+  CPPUNIT_ASSERT(2 == Access::decode('C'));
+  CPPUNIT_ASSERT(3 == Access::decode('D'));
+  CPPUNIT_ASSERT(4 == Access::decode('E'));
+  CPPUNIT_ASSERT(5 == Access::decode('F'));
+  CPPUNIT_ASSERT(6 == Access::decode('G'));
+  CPPUNIT_ASSERT(7 == Access::decode('H'));
+  CPPUNIT_ASSERT(8 == Access::decode('I'));
+  CPPUNIT_ASSERT(9 == Access::decode('J'));
+  CPPUNIT_ASSERT(10 == Access::decode('K'));
+  CPPUNIT_ASSERT(11 == Access::decode('L'));
+  CPPUNIT_ASSERT(12 == Access::decode('M'));
+  CPPUNIT_ASSERT(13 == Access::decode('N'));
+  CPPUNIT_ASSERT(14 == Access::decode('O'));
+  CPPUNIT_ASSERT(15 == Access::decode('P'));
+  CPPUNIT_ASSERT(16 == Access::decode('Q'));
+  CPPUNIT_ASSERT(17 == Access::decode('R'));
+  CPPUNIT_ASSERT(18 == Access::decode('S'));
+  CPPUNIT_ASSERT(19 == Access::decode('T'));
+  CPPUNIT_ASSERT(20 == Access::decode('U'));
+  CPPUNIT_ASSERT(21 == Access::decode('V'));
+  CPPUNIT_ASSERT(22 == Access::decode('W'));
+  CPPUNIT_ASSERT(23 == Access::decode('X'));
+  CPPUNIT_ASSERT(24 == Access::decode('Y'));
+  CPPUNIT_ASSERT(25 == Access::decode('Z'));
+  CPPUNIT_ASSERT(26 == Access::decode('a'));
+  CPPUNIT_ASSERT(27 == Access::decode('b'));
+  CPPUNIT_ASSERT(28 == Access::decode('c'));
+  CPPUNIT_ASSERT(29 == Access::decode('d'));
+  CPPUNIT_ASSERT(30 == Access::decode('e'));
+  CPPUNIT_ASSERT(31 == Access::decode('f'));
+  CPPUNIT_ASSERT(32 == Access::decode('g'));
+  CPPUNIT_ASSERT(33 == Access::decode('h'));
+  CPPUNIT_ASSERT(34 == Access::decode('i'));
+  CPPUNIT_ASSERT(35 == Access::decode('j'));
+  CPPUNIT_ASSERT(36 == Access::decode('k'));
+  CPPUNIT_ASSERT(37 == Access::decode('l'));
+  CPPUNIT_ASSERT(38 == Access::decode('m'));
+  CPPUNIT_ASSERT(39 == Access::decode('n'));
+  CPPUNIT_ASSERT(40 == Access::decode('o'));
+  CPPUNIT_ASSERT(41 == Access::decode('p'));
+  CPPUNIT_ASSERT(42 == Access::decode('q'));
+  CPPUNIT_ASSERT(43 == Access::decode('r'));
+  CPPUNIT_ASSERT(44 == Access::decode('s'));
+  CPPUNIT_ASSERT(45 == Access::decode('t'));
+  CPPUNIT_ASSERT(46 == Access::decode('u'));
+  CPPUNIT_ASSERT(47 == Access::decode('v'));
+  CPPUNIT_ASSERT(48 == Access::decode('w'));
+  CPPUNIT_ASSERT(49 == Access::decode('x'));
+  CPPUNIT_ASSERT(50 == Access::decode('y'));
+  CPPUNIT_ASSERT(51 == Access::decode('z'));
+  CPPUNIT_ASSERT(52 == Access::decode('0'));
+  CPPUNIT_ASSERT(53 == Access::decode('1'));
+  CPPUNIT_ASSERT(54 == Access::decode('2'));
+  CPPUNIT_ASSERT(55 == Access::decode('3'));
+  CPPUNIT_ASSERT(56 == Access::decode('4'));
+  CPPUNIT_ASSERT(57 == Access::decode('5'));
+  CPPUNIT_ASSERT(58 == Access::decode('6'));
+  CPPUNIT_ASSERT(59 == Access::decode('7'));
+  CPPUNIT_ASSERT(60 == Access::decode('8'));
+  CPPUNIT_ASSERT(61 == Access::decode('9'));
+  //
+  CPPUNIT_ASSERT(62 == Access::decode('-'));
+  CPPUNIT_ASSERT(63 == Access::decode('_'));
+  //
+  CPPUNIT_ASSERT(62 == Access::decode('+'));
+  CPPUNIT_ASSERT(63 == Access::decode('/'));
+}
+#import tests.unit.UNREACHABLE
+#import tunitas.base64.Exception
+#import cppunit.Exception
+auto Fixture::test_02() -> void {
+  // https://tools.ietf.org/html/rfc4648#page-7
+  try {
+    Access::decode('\0');
+    __UNREACHABLE__;
+  } catch (cppunit::Exception const &) {
+    throw;
+  } catch (std::exception const &) {
+    __REACHABLE__;
+  }
+}
+#import std.isupper
+#import std.islower
+#import std.isdigit
+#import std.exception
+#import cppunit.Exception
+auto Fixture::test_03() -> void {
+  // https://tools.ietf.org/html/rfc4648#page-7
+  for (int i(-512), e(512); e != i; ++i) {
+    auto const ch = i & 0xff;
+    if (std::islower(ch) || std::isupper(ch) || std::isdigit(ch) || '+' == ch || '-' == ch || '_' == ch || '/' == ch) {
+      continue;
+    }
+    try {
+      Access::decode(i);
+      __UNREACHABLE__;
+    } catch (cppunit::Exception const &) {
+      throw;
+    } catch (std::exception const &) {
+      __REACHABLE__;
+    }
+  }
+}
+auto Fixture::test_04() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  auto const specimen = "";
+  Decoder subject(specimen);
+  CPPUNIT_ASSERT(subject.empty());
+}
+auto Fixture::test_05() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zg==";
+  std::string const expected = "f";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_06() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zm8=";
+  std::string const expected = "fo";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  char const actual1 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  actual.push_back(actual1);
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_07() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zm9v";
+  std::string const expected = "foo";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  char const actual1 = subject.get<char>();
+  char const actual2 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  actual.push_back(actual1);
+  actual.push_back(actual2);
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_08() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zm9vYg==";
+  std::string const expected = "foob";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  char const actual1 = subject.get<char>();
+  char const actual2 = subject.get<char>();
+  char const actual3 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  actual.push_back(actual1);
+  actual.push_back(actual2);
+  actual.push_back(actual3);
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_09() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zm9vYmE=";
+  std::string const expected = "fooba";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  char const actual1 = subject.get<char>();
+  char const actual2 = subject.get<char>();
+  char const actual3 = subject.get<char>();
+  char const actual4 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  actual.push_back(actual1);
+  actual.push_back(actual2);
+  actual.push_back(actual3);
+  actual.push_back(actual4);
+  CPPUNIT_ASSERT(expected == actual);
+}  
+auto Fixture::test_10() -> void {
+  // as listed in https://tools.ietf.org/html/rfc4648#page-12
+  std::string const specimen = "Zm9vYmFy";
+  std::string const expected = "foobar";
+  Decoder subject(specimen);
+  char const actual0 = subject.get<char>();
+  char const actual1 = subject.get<char>();
+  char const actual2 = subject.get<char>();
+  char const actual3 = subject.get<char>();
+  char const actual4 = subject.get<char>();
+  char const actual5 = subject.get<char>();
+  std::string actual;
+  actual.push_back(actual0);
+  actual.push_back(actual1);
+  actual.push_back(actual2);
+  actual.push_back(actual3);
+  actual.push_back(actual4);
+  actual.push_back(actual5);
+  std::cerr << "expected=" << expected << ", actual=<<" << actual << ">>\n";
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_11() -> void {
+  std::string const specimen = "B";
+  std::uint8_t const expected = 1;
+  Decoder subject(specimen);
+  std::uint8_t const actual = subject.get<std::uint8_t>(6);
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_12() -> void {
+  std::string const specimen = "a";
+  std::uint8_t const expected = 26;
+  Decoder subject(specimen);
+  std::uint8_t const actual = subject.get<std::uint8_t>(6);
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+auto Fixture::test_13() -> void {
+  std::string const specimen = "BQ";
+  std::uint8_t const expected = 5;
+  Decoder subject(specimen);
+  std::uint8_t const actual = subject.get<std::uint8_t>(); // <---------- extract 8 bits
+  CPPUNIT_ASSERT(expected == actual);
+}
+auto Fixture::test_14() -> void {
+  std::string const specimen = "Gg";
+  std::uint8_t const expected = 26;
+  Decoder subject(specimen);
+  std::uint8_t const actual = subject.get<std::uint8_t>(); // <--------------- extract 8 bits
+  CPPUNIT_ASSERT(expected == actual);
+}
+#import tests.unit.UNREACHABLE
+#import cppunit.Exception
+#import tunitas.base64.decoder.Underflow
+auto Fixture::test_15() -> void {
+  try {
+    // n.b. this is 2 characters == 12 bits
+    std::string const specimen = "AB";
+    Decoder subject(specimen);
+    subject.get<std::uint16_t>();
+    __UNREACHABLE__
+  } catch (cppunit::Exception const &) {
+    throw;
+  } catch (::tunitas::base64::decoder::Underflow const &) {
+    __REACHABLE__;
+  }
+}
+auto Fixture::test_16() -> void {
+  try {
+    // n.b. this is 3 characters == 18 bits
+    //        Access = 000000
+    //        B = 000001
+    //        C = 000010
+    // specimen = 0000000000010000
+    //            0123456789abcdef
+    // specimen = 
+    std::string const specimen = "ABC";
+    Decoder subject(specimen);
+    auto const actual = subject.get<std::uint16_t>();
+    auto const expected = 16;
+    CPPUNIT_ASSERT(expected == actual);
+  } catch (cppunit::Exception const &) {
+    throw;
+  } catch (tunitas::base64::decoder::Underflow const &) {
+    __UNREACHABLE__;
+  }
+  __REACHABLE__;
+}
+auto Fixture::test_17() -> void {
+  try {
+    // n.b. this is 8 characters == 48 bits
+    //        Access = 000000
+    //        B = 000001
+    //        C = 000010
+    //        D = 000011
+    //        E = 000100
+    //        F = 000101
+    //        G = 000110
+    //        H = 000111
+    // specimen = 000000000001000010000011000100000101000110000111
+    //            0123456789abcdef
+    //                            0123456789abcdef
+    //                                            0123456789abcdef
+    //
+    std::string const specimen = "ABCDEFGH";
+    Decoder subject(specimen);
+    {
+      auto const actual = subject.get<std::uint16_t>();
+      auto const expected = 0b0000000000010000;
+      CPPUNIT_ASSERT(expected == actual);
+    } {
+      auto const actual = subject.get<std::uint16_t>();
+      auto const expected = 0b1000001100010000;
+      CPPUNIT_ASSERT(expected == actual);
+    } {
+      auto const actual = subject.get<std::uint16_t>();
+      auto const expected = 0b0101000110000111;
+      CPPUNIT_ASSERT(expected == actual);
+    }
+    __REACHABLE__;
+  } catch (cppunit::Exception const &) {
+    throw;
+  } catch (tunitas::base64::decoder::Underflow const &) {
+    __UNREACHABLE__;
+  }
+  __REACHABLE__;
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::base64::decoder::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("Decoder");
+  series << call("01", &Fixture::test_01)
+	 << call("02", &Fixture::test_02)
+	 << call("03", &Fixture::test_03)
+	 << call("04", &Fixture::test_04)
+	 << call("05", &Fixture::test_05)
+	 << call("06", &Fixture::test_06)
+	 << call("07", &Fixture::test_07)
+	 << call("08", &Fixture::test_08)
+	 << call("09", &Fixture::test_09)
+	 << call("10", &Fixture::test_10)
+	 << call("12", &Fixture::test_12)
+	 << call("13", &Fixture::test_13)
+	 << call("14", &Fixture::test_14)
+	 << call("15", &Fixture::test_15)
+	 << call("16", &Fixture::test_16)
+	 << call("17", &Fixture::test_17)
+      ;
+  return series.release();
+}
+#endiv

@@ -1,0 +1,14 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import std.is_integral
+namespace tunitas::required {
+  //
+  // The concept of an integral type
+  //
+  // Usage:
+  //
+  //   template<required::Integral INTEGRAL> Constructor(INTEGRAL, INTEGRAL);
+  //
+  template<typename INTEGRAL> concept bool Integral = std::is_integral<INTEGRAL>::value;
+}
+#endiv

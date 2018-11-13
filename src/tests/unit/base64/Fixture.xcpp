@@ -1,0 +1,154 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64 { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.string
+class tests::unit::base64::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_roundtrip_one() -> void;
+  auto test_roundtrip_two() -> void;
+  auto test_roundtrip_three() -> void;
+  //
+  auto test_sized_by_ByType_one() -> void;
+  auto test_sized_by_ByType_two() -> void;
+  auto test_sized_by_ByValue_one() -> void;
+  auto test_sized_by_ByValue_two() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto roundtrip_encdec(std::string const &specimen) -> void;
+};
+#endiv
+#divert <cpp>
+#import tunitas.base64.encode
+#import tunitas.base64.decode
+#import std.string
+#import std.string_literals
+using namespace std::literals;
+//
+// Factors of 255 are 17, 5, 3     (85 == 17 * 5)
+// Strides: 17, 85
+//
+auto tests::unit::base64::Fixture::roundtrip_encdec(std::string const &specimen) -> void {
+  using namespace ::tunitas::base64;
+  auto const enc = encode(specimen);
+  auto const dec = decode(enc);
+  CPPUNIT_ASSERT(dec == specimen);
+  auto const renc = encode(dec);
+  auto const rdec = decode(renc);
+  CPPUNIT_ASSERT(rdec == dec);
+  CPPUNIT_ASSERT(renc == enc);
+  CPPUNIT_ASSERT(dec == specimen);
+}
+#import tests.unit.for_each.count
+auto tests::unit::base64::Fixture::test_roundtrip_one() -> void {
+  for (char a : for_each::count(0, 256)) {
+    // 2^8^1 = 2^8
+    std::string specimen{a};
+    roundtrip_encdec(specimen);
+  }
+}
+auto tests::unit::base64::Fixture::test_roundtrip_two() -> void {
+  for (char a : for_each::count(0, 256)) {
+    for (char b : for_each::count(0, 256)) {
+      // thin: 65535
+      // full: 2^8^2 = 2^16
+      std::string specimen{a,b};
+      roundtrip_encdec(specimen);
+    }
+  }
+}
+auto tests::unit::base64::Fixture::test_roundtrip_three() -> void {
+  for (char a : for_each::count(0, 256)) {
+    // 2^8^1 = 2^8
+    std::string specimen{a};
+    roundtrip_encdec(specimen);
+  }
+}
+#import tunitas.base64.sized.ByType
+auto tests::unit::base64::Fixture::test_sized_by_ByType_one() -> void {
+  using namespace ::tunitas::base64::sized;
+  ByType<int, 1> i0(0);
+  CPPUNIT_ASSERT(0 == i0.value());
+  CPPUNIT_ASSERT(1 == i0.width());
+  ByType<int, 1> i1(1);
+  CPPUNIT_ASSERT(1 == i1.value());
+  CPPUNIT_ASSERT(1 == i1.width());
+}
+auto tests::unit::base64::Fixture::test_sized_by_ByType_two() -> void {
+  using namespace ::tunitas::base64::sized;
+  ByType<int, 3> i0(0);
+  CPPUNIT_ASSERT(0 == i0.value());
+  CPPUNIT_ASSERT(3 == i0.width());
+  ByType<int, 3> i1(2);
+  CPPUNIT_ASSERT(2 == i1.value());
+  CPPUNIT_ASSERT(3 == i1.width());
+}
+#import tunitas.base64.sized.ByValue
+auto tests::unit::base64::Fixture::test_sized_by_ByValue_one() -> void {
+  using namespace ::tunitas::base64::sized;
+  ByValue<int> i0(0, 1u);
+  CPPUNIT_ASSERT(0 == i0.value());
+  CPPUNIT_ASSERT(1 == i0.width());
+  ByValue<int> i1(1, 1u);
+  CPPUNIT_ASSERT(1 == i1.value());
+  CPPUNIT_ASSERT(1 == i1.width());
+}
+auto tests::unit::base64::Fixture::test_sized_by_ByValue_two() -> void {
+  using namespace ::tunitas::base64::sized;
+  ByValue<int> i0(0, 3u);
+  CPPUNIT_ASSERT(0 == i0.value());
+  CPPUNIT_ASSERT(3 == i0.width());
+  ByValue<int> i1(2, 3u);
+  CPPUNIT_ASSERT(2 == i1.value());
+  CPPUNIT_ASSERT(3 == i1.width());
+}
+#import tests.unit.base64.Decode
+#import tests.unit.base64.Encode
+#import tests.unit.base64.Roundtrip
+#import tests.unit.base64.decoder.Fixture
+#import tests.unit.base64.encoder.Fixture
+#import tests.unit.base64.exception.Fixture
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::base64::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("base64");
+  {
+    Stream rou("roundtrip");
+    rou << call("one", &Fixture::test_roundtrip_one)
+	<< call("two", &Fixture::test_roundtrip_two)
+	<< call("three", &Fixture::test_roundtrip_three)
+      ;
+    series << add(rou.release());
+  } {
+    Stream sby("sized_by");
+    {
+      Stream byt("ByType");
+      byt << call("one", &Fixture::test_sized_by_ByType_one)
+	  << call("two", &Fixture::test_sized_by_ByType_two)
+	;
+      series << add(byt.release());
+    } {
+      Stream byv("ByValue");
+      byv << call("one", &Fixture::test_sized_by_ByValue_one)
+	  << call("two", &Fixture::test_sized_by_ByValue_two)
+	;
+      series << add(byv.release());
+    }
+    series << add(sby.release());
+  }
+  series << add(exception::Fixture::suite())
+	 << add(Encode::suite())
+	 << add(Decode::suite())
+	 << add(Roundtrip::suite())
+	 << add(encoder::Fixture::suite())
+	 << add(decoder::Fixture::suite())
+    ;
+  return series.release();
+}
+#endiv

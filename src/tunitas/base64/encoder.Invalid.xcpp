@@ -1,0 +1,26 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64::encoder {
+  //
+  // An invalid argument to the base64 encoder job itself.
+  // Or an invalid date of the Encoder,
+  //    (ahem) the Encoder being an argument operations upon itself.
+  //
+  // Usage:
+  //
+  //   throw encoder::Invalid("cannot");
+  //
+  class Invalid;
+}
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.base64.Exception
+class tunitas::base64::encoder::Invalid : public std::runtime_error, public base64::Exception {
+  using ancestor = std::runtime_error;
+public:
+  Invalid() : ancestor("invalid") { }
+  using ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

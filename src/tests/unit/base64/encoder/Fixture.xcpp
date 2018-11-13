@@ -1,0 +1,340 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64::encoder { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.string
+class tests::unit::base64::encoder::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_01() -> void;
+  auto test_02() -> void;
+  auto test_03() -> void;
+  auto test_04() -> void;
+  auto test_05() -> void;
+  auto test_06() -> void;
+  auto test_07() -> void;
+  auto test_08() -> void;
+  auto test_09() -> void;
+  auto test_10() -> void;
+  auto test_11() -> void;
+  auto test_12() -> void;
+  auto test_13() -> void;
+  auto test_14() -> void;
+  auto test_15() -> void;
+  auto test_16() -> void;
+  auto test_17() -> void;
+  auto test_18() -> void;
+  auto test_19() -> void;
+  auto test_20() -> void;
+  auto test_21() -> void;
+  auto test_22() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto BASE64(std::string value) -> std::string;
+  inline static auto const SOME_VECTOR_LIMIT = 72u;  // needs to be a multiple of 8 (the octet)
+  template<typename FUNCTION> auto fill(FUNCTION function) -> void;
+};
+#endiv
+#divert <tpp>
+#import std.vector
+#import std.cerr
+#import tunitas.base64.Encoder
+template<typename FUNCTION> auto tests::unit::base64::encoder::Fixture::fill(FUNCTION function) -> void {
+  ::tunitas::base64::Encoder enc;
+  std::vector<bool> specimen;
+  for (auto e(SOME_VECTOR_LIMIT), i(e-e); e != i; ++i) {
+    specimen.push_back(function());
+  }
+  enc.put(specimen);
+  auto s = enc.finalize();
+  std::cerr << "some other sentence " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+#endiv
+#divert <cpp>
+#import tests.unit // __UNREACHABLE__ et al.
+#import tunitas.base64.Decoder
+#import std.string
+#import std.string_literals
+using namespace std::literals;
+#import tunitas.base64.Encoder.test.Access
+using namespace tests::unit::base64::encoder;
+using tunitas::base64::Encoder;
+using Access = Encoder::test::Access;
+auto Fixture::BASE64(std::string value) -> std::string {
+  Encoder enc;
+  enc.put(value);
+  return enc.finalize();
+}
+auto Fixture::test_01() -> void {
+  // https://tools.ietf.org/html/rfc4648#page-7
+  CPPUNIT_ASSERT('A' == Access::encode(0));
+  CPPUNIT_ASSERT('B' == Access::encode(1));
+  CPPUNIT_ASSERT('C' == Access::encode(2));
+  CPPUNIT_ASSERT('D' == Access::encode(3));
+  CPPUNIT_ASSERT('E' == Access::encode(4));
+  CPPUNIT_ASSERT('F' == Access::encode(5));
+  CPPUNIT_ASSERT('G' == Access::encode(6));
+  CPPUNIT_ASSERT('H' == Access::encode(7));
+  CPPUNIT_ASSERT('I' == Access::encode(8));
+  CPPUNIT_ASSERT('J' == Access::encode(9));
+  CPPUNIT_ASSERT('K' ==  Access::encode(10));
+  CPPUNIT_ASSERT('L' ==  Access::encode(11));
+  CPPUNIT_ASSERT('M' ==  Access::encode(12));
+  CPPUNIT_ASSERT('N' ==  Access::encode(13));
+  CPPUNIT_ASSERT('O' ==  Access::encode(14));
+  CPPUNIT_ASSERT('P' ==  Access::encode(15));
+  CPPUNIT_ASSERT('Q' ==  Access::encode(16));
+  CPPUNIT_ASSERT('R' ==  Access::encode(17));
+  CPPUNIT_ASSERT('S' ==  Access::encode(18));
+  CPPUNIT_ASSERT('T' ==  Access::encode(19));
+  CPPUNIT_ASSERT('U' ==  Access::encode(20));
+  CPPUNIT_ASSERT('V' ==  Access::encode(21));
+  CPPUNIT_ASSERT('W' ==  Access::encode(22));
+  CPPUNIT_ASSERT('X' ==  Access::encode(23));
+  CPPUNIT_ASSERT('Y' ==  Access::encode(24));
+  CPPUNIT_ASSERT('Z' ==  Access::encode(25));
+  CPPUNIT_ASSERT('a' ==  Access::encode(26));
+  CPPUNIT_ASSERT('b' ==  Access::encode(27));
+  CPPUNIT_ASSERT('c' ==  Access::encode(28));
+  CPPUNIT_ASSERT('d' ==  Access::encode(29));
+  CPPUNIT_ASSERT('e' ==  Access::encode(30));
+  CPPUNIT_ASSERT('f' ==  Access::encode(31));
+  CPPUNIT_ASSERT('g' ==  Access::encode(32));
+  CPPUNIT_ASSERT('h' ==  Access::encode(33));
+  CPPUNIT_ASSERT('i' ==  Access::encode(34));
+  CPPUNIT_ASSERT('j' ==  Access::encode(35));
+  CPPUNIT_ASSERT('k' ==  Access::encode(36));
+  CPPUNIT_ASSERT('l' ==  Access::encode(37));
+  CPPUNIT_ASSERT('m' ==  Access::encode(38));
+  CPPUNIT_ASSERT('n' ==  Access::encode(39));
+  CPPUNIT_ASSERT('o' ==  Access::encode(40));
+  CPPUNIT_ASSERT('p' ==  Access::encode(41));
+  CPPUNIT_ASSERT('q' ==  Access::encode(42));
+  CPPUNIT_ASSERT('r' ==  Access::encode(43));
+  CPPUNIT_ASSERT('s' ==  Access::encode(44));
+  CPPUNIT_ASSERT('t' ==  Access::encode(45));
+  CPPUNIT_ASSERT('u' ==  Access::encode(46));
+  CPPUNIT_ASSERT('v' ==  Access::encode(47));
+  CPPUNIT_ASSERT('w' ==  Access::encode(48));
+  CPPUNIT_ASSERT('x' ==  Access::encode(49));
+  CPPUNIT_ASSERT('y' ==  Access::encode(50));
+  CPPUNIT_ASSERT('z' ==  Access::encode(51));
+  CPPUNIT_ASSERT('0' ==  Access::encode(52));
+  CPPUNIT_ASSERT('1' ==  Access::encode(53));
+  CPPUNIT_ASSERT('2' ==  Access::encode(54));
+  CPPUNIT_ASSERT('3' ==  Access::encode(55));
+  CPPUNIT_ASSERT('4' ==  Access::encode(56));
+  CPPUNIT_ASSERT('5' ==  Access::encode(57));
+  CPPUNIT_ASSERT('6' ==  Access::encode(58));
+  CPPUNIT_ASSERT('7' ==  Access::encode(59));
+  CPPUNIT_ASSERT('8' ==  Access::encode(60));
+  CPPUNIT_ASSERT('9' ==  Access::encode(61));
+  //
+  CPPUNIT_ASSERT('-' == Access::encode(62));
+  CPPUNIT_ASSERT('_' == Access::encode(63));
+}
+auto Fixture::test_02() -> void {
+  // https://tools.ietf.org/html/rfc4648#section-10
+  CPPUNIT_ASSERT(BASE64("") == "");
+}
+auto Fixture::test_03() -> void {
+  //
+  // ascii 'f' = 102 = 0x66 = 0b1100110
+  // specimen "f" = 01100110
+  //                01100110 0000 (pad to 12)
+  //
+  // subject      = 011001100000
+  //                012345        -> 25 -> 'Z'
+  //                      012345  -> 32 -> 'g'
+  //
+  CPPUNIT_ASSERT(BASE64("f") == "Zg==");
+}
+auto Fixture::test_04() -> void {
+  CPPUNIT_ASSERT(BASE64("fo") == "Zm8=");
+}
+auto Fixture::test_05() -> void {
+  CPPUNIT_ASSERT(BASE64("foo") == "Zm9v");
+}
+auto Fixture::test_06() -> void {
+  CPPUNIT_ASSERT(BASE64("foob") == "Zm9vYg==");
+}
+auto Fixture::test_07() -> void {
+  CPPUNIT_ASSERT(BASE64("fooba") == "Zm9vYmE=");
+}
+auto Fixture::test_08() -> void {
+  CPPUNIT_ASSERT(BASE64("foobar") == "Zm9vYmFy");
+}
+#import tests.unit.UNREACHABLE
+#import tunitas.base64.Exception
+auto Fixture::test_09() -> void {
+  try {
+    Encoder enc;
+    enc.put(bool(false));
+    enc.finalize(); // <---- after the put, not an octet
+    __UNREACHABLE__;
+  } catch (::tunitas::base64::Exception const &e) {
+    __REACHABLE__;
+    std::cerr << "expected exception says " << e.what() << '\n';
+  }
+}
+auto Fixture::test_10() -> void {
+  try {
+    Encoder enc;
+    enc.put('a');
+    enc.finalize(); // <---- OK
+    enc.finalize(); // <---- OK, can finalize multiply, just can't add any more
+    enc.finalize();
+    enc.finalize();
+    enc.finalize();
+    enc.finalize();
+    enc.finalize();
+    enc.finalize();
+    __UNREACHABLE__;
+  } catch (::tunitas::base64::Exception const &e) {
+    __REACHABLE__;
+    std::cerr << "expected exception says " << e.what() << '\n';
+  }
+}
+auto Fixture::test_11() -> void {
+  try {
+    Encoder enc;
+    enc.put('a');
+    enc.finalize(); // <---- OK
+    enc.put('b'); // <---- can't add more after the put.
+    enc.finalize();
+    __UNREACHABLE__;
+  } catch (::tunitas::base64::Exception const &e) {
+    __REACHABLE__;
+    std::cerr << "expected exception says " << e.what() << '\n';
+  }
+}
+auto Fixture::test_12() -> void {
+  Encoder enc;
+  enc.put(bool(false));
+  enc.put(bool(true));
+  for (auto i(0), e(6); e != i; ++i) {
+    enc.put(bool(false)); // <----------- make an octet
+  }
+  auto s = enc.finalize();
+  std::cerr << "bools " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_13() -> void {
+  Encoder enc;
+  for (auto i(0u), e(1u<<8); e != i; ++i) {
+    enc.put<char>(i);
+  }
+  auto s = enc.finalize();
+  std::cerr << "chars " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_14() -> void {
+  Encoder enc;
+  for (auto i(0u), e(1u<<16); e != i; ++i) {
+    enc.put<short>(i);
+  }
+  auto s = enc.finalize();
+  std::cerr << "not printing out 64K worth of short integers\n";
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_15() -> void {
+  Encoder enc;
+  char const specimen[] = "the lazy brown fox went over the jumping horse in a quail suit";
+  enc.put(specimen);
+  auto s = enc.finalize();
+  std::cerr << "some sentence " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_16() -> void {
+  Encoder enc;
+  char const precursor[] = "again, the lazy brown fox went over the jumping horse in a quail suit";
+  std::vector<char> specimen(&precursor[0], &precursor[sizeof (precursor)]);
+  enc.put(specimen);
+  auto s = enc.finalize();
+  std::cerr << "some other sentence " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_17() -> void {
+  fill([]() { return true; });
+}
+auto Fixture::test_18() -> void {
+  fill([]() { return false; });
+}
+auto Fixture::test_19() -> void {
+  bool state = true;
+  auto alternating = [&state]() {
+    state = !state;
+    return state;
+  };
+  fill(alternating);
+}
+auto Fixture::test_20() -> void {
+  Encoder enc;
+  std::vector<bool> specimen;
+  bool current = false;
+  for (auto e(SOME_VECTOR_LIMIT), i(e-e); e != i; ++i, current=!current) {
+    specimen.push_back(current);
+  }
+  enc.put(specimen);
+  auto s = enc.finalize();
+  std::cerr << "some other sentence " << s << '\n';
+  CPPUNIT_ASSERT(!s.empty());
+}
+auto Fixture::test_21() -> void {
+  try {
+    Encoder enc;
+    enc.put(bool(true)); // <---------------- because of this
+    enc.put(std::uint8_t(2));
+    enc.put(std::uint16_t(3));
+    enc.put(std::uint32_t(4));
+    enc.put(std::uint64_t(5));
+    enc.finalize(); // <------------- this will throw on not-an-Octet
+    __UNREACHABLE__;
+  } catch (::tunitas::base64::Exception const &) {
+    __REACHABLE__;
+  }
+}
+auto Fixture::test_22() -> void {
+    Encoder enc;
+    enc.put(std::uint8_t(2)); // pure octets from here on out
+    enc.put(std::uint16_t(3));
+    enc.put(std::uint32_t(4));
+    enc.put(std::uint64_t(5));
+    auto s = enc.finalize();
+    std::cerr << "unsigned numbers in a string " << s << '\n';
+    CPPUNIT_ASSERT(!s.empty());
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::base64::encoder::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("Encoder");
+  series << call("01", &Fixture::test_01)
+	 << call("02", &Fixture::test_02)
+	 << call("03", &Fixture::test_03)
+	 << call("04", &Fixture::test_04)
+	 << call("05", &Fixture::test_05)
+	 << call("06", &Fixture::test_06)
+	 << call("07", &Fixture::test_07)
+	 << call("08", &Fixture::test_08)
+	 << call("09", &Fixture::test_09)
+	 << call("10", &Fixture::test_10)
+	 << call("12", &Fixture::test_12)
+	 << call("13", &Fixture::test_13)
+	 << call("14", &Fixture::test_14)
+	 << call("15", &Fixture::test_15)
+	 << call("16", &Fixture::test_16)
+	 << call("17", &Fixture::test_17)
+	 << call("18", &Fixture::test_18)
+	 << call("19", &Fixture::test_19)
+	 << call("20", &Fixture::test_20)
+	 << call("21", &Fixture::test_21)
+	 << call("22", &Fixture::test_22)
+      ;
+  return series.release();
+}
+#endiv

@@ -1,0 +1,9 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <cpp>
+#import tests.outcome.remain
+#import std.error_code
+auto main(int c, char *v[]) -> int {
+  using namespace tests::outcome;
+  return remain<std::error_code>(Args{&v[0], &v[c]});
+}
+#endiv

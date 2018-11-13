@@ -1,0 +1,223 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64 {
+  //
+  // Encode RFC4648 (base64)
+  // per https://tools.ietf.org/html/rfc4648
+  //
+  // Usage
+  //
+  //   Encoder enc;
+  //   enc.put<bool>(true);
+  //   enc.put<std::uint8_t>(99);
+  //   enc.put<std::uint64_t>(99);
+  //   enc.put<std:size_t>(vec.size());      you lay down the size explicitly
+  //   enc.put<std::vector<bool>>(vec);      does not lay down the size, just the data
+  //   auto result = enc.finalize();
+  //
+  class Encoder;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.vector
+#import tunitas.base64.sized.ByType
+#import tunitas.base64.sized.ByValue
+#import tunitas.required.Integral
+class tunitas::base64::Encoder {
+public:
+  inline Encoder();
+  inline auto clear() -> void;
+  enum Pad8 { PAD8 }; // pad to the next octet boundary
+  inline auto put(Pad8) -> void;
+  inline auto put(bool value) -> void;
+  inline auto put(char const *pointer) -> void;
+  inline auto put(std::string const &in) -> void;
+  inline auto put(std::vector<char> const &in) -> void;
+  inline auto put(std::vector<bool> const &in) -> void;
+  template<required::Integral INTEGRAL> inline auto put(INTEGRAL) -> void;
+  template<required::Integral INTEGRAL> inline auto put(INTEGRAL, std::size_t) -> void;
+  template<required::Integral INTEGRAL> inline auto put(sized::ByValue<INTEGRAL>) -> void;
+  template<required::Integral INTEGRAL, std::size_t N> inline auto put(sized::ByType<INTEGRAL, N>) -> void;
+  auto finalize() -> std::string;
+  struct test { struct Access; };
+protected:
+  friend class test::Access;
+  std::vector<bool> buffer;
+  inline auto validate_available() -> void;
+  bool has_been_finalized; // i.e. don't do the padding again
+  // https://tools.ietf.org/html/rfc4648#section-5 defines  "base64". contra  "base64url".
+  // https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/URL-based%20Consent%20Passing_%20Framework%20Guidance.md
+  enum Encoding { BASE64, BASE64URL };
+  inline static constexpr auto ENCODING = Encoding::BASE64URL;
+  inline static constexpr auto VALUE62 = ENCODING == Encoding::BASE64URL ? '-' : '+';
+  inline static constexpr auto VALUE63 = ENCODING == Encoding::BASE64URL ? '_' : '/';
+  inline auto accrete(std::string &lhs, std::size_t at) -> void;
+  inline static auto encode(std::uintmax_t value) -> char;
+};
+#endiv
+#divert <ipp>
+#import std.copy
+#import std.for_each
+#import std.size_t
+namespace tunitas::base64 {
+  Encoder::Encoder() : has_been_finalized(false) { }
+  auto Encoder::clear() -> void {
+    has_been_finalized = false;
+    buffer.clear();
+  }
+  auto Encoder::put(bool value) -> void {
+    validate_available();
+    buffer.push_back(value);
+  }
+  auto Encoder::put(char const *pointer) -> void {
+    validate_available();
+    while (*pointer--) { put(*pointer); }
+  }
+  auto Encoder::put(std::string const &in) -> void {
+    validate_available();
+    std::for_each(in.begin(), in.end(), [this](char c) { this->put(c); });
+  }
+  auto Encoder::put(std::vector<char> const &in) -> void {
+    validate_available();
+    std::for_each(in.begin(), in.end(), [this](char c) { this->put(c); });
+  }
+  auto Encoder::put(std::vector<bool> const &in) -> void {
+    validate_available();
+    std::copy(in.begin(), in.end(), std::back_inserter(buffer));
+  }
+  template<required::Integral INTEGRAL> auto Encoder::put(INTEGRAL value) -> void {
+    static_assert(std::is_integral<INTEGRAL>::value);
+    put(value, 8*sizeof(INTEGRAL));
+  }
+  template<required::Integral INTEGRAL, std::size_t N> auto Encoder::put(sized::ByType<INTEGRAL, N> carried) -> void {
+    put(carried.value(), carried.width());
+  }
+  template<required::Integral INTEGRAL> auto Encoder::put(sized::ByValue<INTEGRAL> carried) -> void {
+    put(carried.value(), carried.width());
+  }
+}
+#import tunitas.base64.encoder.Finalized
+namespace tunitas::base64 {
+  auto Encoder::accrete(std::string &lhs, std::size_t at) -> void {
+    bool const b[6] = {buffer[at+0], buffer[at+1], buffer[at+2], buffer[at+3], buffer[at+4], buffer[at+5]};
+    // octets are big endian.
+    auto const icode = (b[0]<<5 | b[1]<<4 | b[2]<<3 | b[3]<<2 | b[4]<<1 | b[5]<<0);
+    lhs.push_back(encode(icode));
+  }
+  auto Encoder::put(Pad8) -> void {
+    validate_available();
+    auto const ee = buffer.size();
+    auto const n8 = ((7+ee) >> 3) << 3;
+    for (auto i(ee), e(n8); e != i; ++i) {
+      buffer.push_back(false);
+    }
+  }
+  auto Encoder::validate_available() -> void {
+    if (has_been_finalized) {
+      throw encoder::Finalized();
+    }
+  }
+}
+#import tunitas.base64.Code
+namespace tunitas::base64 {
+  auto Encoder::encode(std::uintmax_t value) -> char {
+    // See https://tools.ietf.org/html/rfc4648#page-7
+    if (false) {
+    } else if (value < 26) {
+      return char(value-0 + 'A');
+    } else if (value < 52) {
+      return char(value-26 + 'a');
+    } else if (value < 62) {
+      return char(value-52 + '0');
+    } else if (value < 63) {
+      return VALUE62;
+    } else if (value < 64) {
+      return VALUE63;
+    } else {
+      throw base64::Code("code");
+    }
+  }
+}
+#endiv
+#divert <tpp>
+#import std.uintmax_t
+#import tunitas.base64.encoder.Put
+namespace tunitas::base64 {
+  template<required::Integral INTEGRAL> auto Encoder::put(INTEGRAL _value, std::size_t subsize) -> void {
+    validate_available();
+    if (0 == subsize) {
+      throw encoder::Put("zero size");
+    }
+    if (8*sizeof (INTEGRAL) < subsize) {
+      throw encoder::Put("too big");
+    }
+    std::uintmax_t const hibit_mask = 1lu<<(subsize-1);
+    std::uintmax_t value = _value;
+    // network order is big endian, intel is little endian.
+    for (auto e(subsize), i(e-e); e != i; ++i, value <<= 1) {
+      bool const bit = hibit_mask == (hibit_mask & value);
+      buffer.push_back(bit);
+    }
+  }
+}
+#endiv
+#divert <cpp>
+using namespace tunitas::base64;
+#import std.move
+#import tunitas.base64.encoder.Finalized
+#import tunitas.base64.encoder.Invalid
+#import tunitas.base64.encoder.Put
+#include <cassert>
+auto Encoder::finalize() -> std::string {
+  std::size_t const ee = buffer.size();
+  std::string ret;
+  if (ee) {
+    std::size_t const e8 = (ee >> 3) << 3;
+    if (ee != e8) {
+      // Should have called this->put(Encoder::PADDING);
+      throw encoder::Invalid("octets");
+    }
+    auto const pad = [=]() {
+      auto const full = ee;
+      auto const truncated = 24*(ee/24);
+      auto const residual = full - truncated;
+      auto const invert = [](auto argument) {
+	  auto const inverted = 24 - argument;
+	  auto const reduced = inverted / 8;
+	  return reduced; // a.k.a. 3 - argument/8
+      };
+      return residual ? invert(residual) : residual;
+    }();
+    if (pad > 2) {
+      throw encoder::Invalid("pad");
+    }
+    if (!has_been_finalized) {
+      has_been_finalized = true;
+      auto const more = [=]() {
+	auto const full = ee;
+	auto const truncated = 6*(ee/6);
+	auto const residual = full - truncated;
+	auto const invert = [](auto argument) {
+	  auto const inverted = 6 - argument;
+	  return inverted;
+	};
+	return residual ? invert(residual) : residual;
+      }();
+      for (auto e(more), i(e-e); e != i; ++i) {
+	buffer.push_back(false);
+      }
+    }
+    // BASE64 is defined on 24-bit stanzas, with padding.
+    auto const eee = buffer.size();
+    assert(0 == eee % 6);
+    for (auto e(eee), i(e-e); e != i; i+=6) {
+      accrete(ret, i);
+    }
+    for (auto p(pad); p; --p) {
+      ret.push_back('=');
+    }
+  }
+  return std::move(ret);
+}
+#endiv

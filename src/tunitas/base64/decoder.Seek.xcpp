@@ -1,0 +1,24 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64::decoder {
+  //
+  // An invalid seek(...) in the base64 decoder.
+  //
+  // Usage:
+  //
+  //   throw decoder::Seek("past end");
+  //
+  class Seek;
+}
+#endiv
+#divert <hpp>
+#import std.out_of_range
+#import tunitas.base64.Exception
+class tunitas::base64::decoder::Seek : public std::out_of_range, public base64::Exception {
+  using ancestor = std::out_of_range;
+public:
+  inline Seek() : ancestor("seek") { }
+  using ancestor::out_of_range;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

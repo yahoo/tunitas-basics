@@ -1,0 +1,47 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::base64 { class Encode; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::base64::Encode : public cppunit::test::Fixture {
+public:
+  auto test_01() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.cerr
+#import tunitas.base64.encode
+auto tests::unit::base64::Encode::test_01() -> void {
+  // These have no real provenance; they came from log files.
+  static char const *const pantheon[] = {
+    "",
+    "apple",
+    "apple, banana, cherry",
+    "1234",
+    "the lazy brown fox did something something something.",
+  };
+  for (auto specimen : pantheon) {
+    try {
+      std::cerr << "encode specimen: " << specimen << ' ';
+      auto str = tunitas::base64::encode(specimen);
+      std::cerr << " recovers |" << str << "|\n";
+    } catch (...) {
+      std::cerr << '\n';
+      throw;
+    }
+  }
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::base64::Encode::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("encode");
+  series << call("01", &Encode::test_01)
+    ;
+  return series.release();
+}
+#endiv

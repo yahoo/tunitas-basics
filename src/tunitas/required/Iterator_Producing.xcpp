@@ -3,7 +3,7 @@
 #import std.iterator_traits
 namespace tunitas::required {
   //
-  // The concept of an Iterator producing a VALUE type
+  // The concept of an iterator producing a VALUE type
   //
   // Usage:
   //

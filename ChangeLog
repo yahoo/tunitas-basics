@@ -1,3 +1,8 @@
+2018-11-13  Wendell Baker  <wbaker@oath.com>
+
+	* Version v1.3.0-0.devel, tunitas::base64::encode, tunitas::base64::decode
+	- rachet libtunitas C:R:A=4.0.0
+
 2018-10-28  Wendell Craig Baker  <wbaker@oath.com>
 
 	* Version v1.0.1, cleaner packaging, install the tunitas modules, version sync

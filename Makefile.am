@@ -48,6 +48,8 @@ include src/tunitas/Makefrag.am
 include src/tunitas/server/Makefrag.am
 include src/want/Makefrag.am
 include src/tests/unit/Makefrag.am
+include src/tests/base64/Makefrag.am
+include src/tests/outcome/Makefrag.am
 
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
@@ -59,8 +61,15 @@ noinst_LTLIBRARIES = \
   $(end)
 check_PROGRAMS = \
   $(bin_unit) \
+  $(check_bin_base64_decode) \
+  $(check_bin_base64_encode) \
+  $(check_bin_outcome_error_code) \
+  $(check_bin_outcome_error_condition) \
   $(end)
-check_LTLIBRARIES =
+check_LTLIBRARIES = \
+  $(check_lib_libtests_base64_la) \
+  $(check_lib_libtests_outcome_la) \
+  $(end)
 
 $(lib_libtunitas_server_la) : $(lib_libtunitas_la)
 
@@ -85,6 +94,10 @@ OBJECTS = \
 $(OBJECTS) : $(MODULES)
 
 include tests/unit/Makefrag.am
+include tests/base64/decode/Makefrag.am
+include tests/base64/encode/Makefrag.am
+include tests/outcome/error_code/Makefrag.am
+include tests/outcome/error_condition/Makefrag.am
 XFAIL_TESTS = \
   $(tests_unit_XFAIL_TESTS) \
   $(end)
@@ -93,6 +106,10 @@ XPASS_TESTS = \
   $(end)
 TESTS = \
   $(tests_unit_TESTS) \
+  $(tests_base64_decode_TESTS) \
+  $(tests_base64_encode_TESTS) \
+  $(tests_outcome_error_code_TESTS) \
+  $(tests_outcome_error_condition_TESTS) \
   $(end)
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk

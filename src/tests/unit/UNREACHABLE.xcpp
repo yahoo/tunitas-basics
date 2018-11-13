@@ -1,0 +1,8 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import cppunit.test.Assert
+#import cppunit.Exception
+// blik ... preprocessor hacks
+#define __UNREACHABLE__ CPPUNIT_ASSERT(false);
+#define __REACHABLE__   CPPUNIT_ASSERT(true);
+#endiv

@@ -1,0 +1,38 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.base64.Decoder
+#endiv
+#divert <hpp>
+#import tunitas.required.integer.Unsigned
+namespace tunitas::base64 {
+  //
+  // Shave out the bits, little endian out first.
+  //
+  template<required::integer::Unsigned UNSIGNED> struct Decoder::Shaver {
+    using Value = UNSIGNED;
+    Value value;
+    inline explicit Shaver(Value);
+    inline auto operator*() const -> bool;
+    inline auto operator++() -> Shaver &;
+    inline auto operator++(int) -> Shaver;
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::base64 {
+  template<required::integer::Unsigned _> Decoder::Shaver<_>::Shaver(Value value)
+    : value(value) { }
+  template<required::integer::Unsigned _> auto Decoder::Shaver<_>::operator*() const -> bool {
+    return value & 01;
+  }
+  template<required::integer::Unsigned _> auto Decoder::Shaver<_>::operator++() -> Shaver & {
+    value >>= 1;
+    return *this;
+  }
+  template<required::integer::Unsigned _> auto Decoder::Shaver<_>::operator++(int) -> Shaver {
+    Shaver old(*this);
+    operator++();
+    return old;
+  }
+}
+#endiv

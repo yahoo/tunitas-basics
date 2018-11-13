@@ -1,0 +1,48 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import tunitas.required.Integral
+#import tests.unit.for_each.Counter
+namespace tests::unit::for_each {
+  //
+  // The counter helps you bigly iterating over enums.
+  // The stride ... there are few safety checks, just like in a regular for loop
+  //            ... so don't do stupid things with the stride (e.g. stride zero).
+  //
+  // The counter supports negative values and negative strides.
+  //
+  // Whereas the iterator method requires the representation of "one beyond" the data type
+  // it is necessary to have a separate FINISH data type that cah hold a value 1+max()
+  // which therefor meay be one rank larger than the INTEGRAL data type.
+  //
+  // Usage:
+  //
+  //   for (auto i : counter(1u, 10u, 3)) { ...do stuff... }
+  //   for (auto e : counter<Some_Enum>(Enum::LOW, Enum::HIGH)) {
+  //     ...do stuff...
+  //   }
+  //
+  // Special
+  //
+  //   for (char  _ : counter(0, 1<<8))  { ...do stuff... }
+  //   for (short _ : counter(0, 1<<16)) { ...do stuff... }
+  //   for (int _   : counter(0, 1<<32)) { ...do stuff... }
+  //   for (long _  : counter(0, 1<<62)) { ...do stuff... } ...... OK
+  //   for (long _  : counter(0, 1<<63)) { ...do stuff... } ...... this will not work as 1<<64 is not representable in std::intmax_t
+  //   for (long _  : counter(0, 1<<64)) { ...do stuff... } ...... ibidem.
+  //
+  template<tunitas::required::Integral INTEGRAL, tunitas::required::Integral FINISH> inline auto count(INTEGRAL start, FINISH finish, std::intmax_t stride = 1) -> Counter<INTEGRAL, FINISH>;
+}
+#endiv
+#divert <ipp>
+#import std.intmax_t
+#import std.is_integral
+#import std.common_type
+namespace tests::unit {
+  template<tunitas::required::Integral INTEGRAL, tunitas::required::Integral FINISH> auto for_each::count(INTEGRAL start, FINISH finish, std::intmax_t stride) -> Counter<INTEGRAL, FINISH> {
+    static_assert(std::is_integral<INTEGRAL>::value);
+    static_assert(std::is_integral<FINISH>::value);
+    static_assert(std::is_integral<typename std::common_type<INTEGRAL, FINISH>::type>::value);
+    return Counter<INTEGRAL, FINISH>(start, finish, stride);
+  }
+}
+#endiv

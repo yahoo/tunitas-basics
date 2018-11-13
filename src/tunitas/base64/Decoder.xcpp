@@ -1,0 +1,199 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64 {
+  //
+  // Decode RFC4648 (base64)
+  // per https://tools.ietf.org/html/rfc4648
+  //
+  // Usage:
+  // 
+  //   Decoder dec(specimen);
+  //   dec.size();
+  //   dec.empty();
+  //   dec.get<bool>();
+  //   dec.get<char>();
+  //   dec.get<int>();
+  //   dec.get<uint128_t>();
+  //   dec.get<char>(3);    ... 3 bits
+  //   dec.get<int>(12);    ... 12 bits
+  //   dec.seek(99)    ........ some position with the bits of the specimen
+  //   dec.rewind()
+  //
+  class Decoder;
+}
+#endiv
+#divert <hpp>
+#import tunitas.required.Iterator_Producing
+#import tunitas.required.Integral
+#import tunitas.required.integer.Unsigned
+#import std.uint8_t
+#import std.string
+#import std.vector
+#import std.size_t
+#import std.uintmax_t
+class tunitas::base64::Decoder {
+public:
+  template<required::Iterator_Producing<std::uint8_t> ITERATOR> inline Decoder(ITERATOR start, ITERATOR finish);
+  inline explicit Decoder(std::string const &s);
+  inline auto rewind() -> void;
+  inline auto seek(std::size_t proposed_position) -> void;
+  // "get" is big endian
+  template<required::Integral INTEGRAL> inline auto get(std::size_t size_in_bits) -> INTEGRAL;
+  template<required::Integral INTEGRAL> inline auto get() -> INTEGRAL;
+  inline auto eof() const -> bool;
+  inline auto empty() const -> bool;
+  inline auto size() const -> std::size_t;
+  // use dec.disgorge() to access the reference.
+  inline auto disgorge() const -> std::vector<bool> const &;
+  // use std::move(dec.disgorge()) to move the vector out.
+  inline auto disgorge() -> std::vector<bool> &;
+  struct test { struct Access; }; 
+protected:
+  friend class test::Access;
+  inline auto validate(std::size_t carrier_size_in_bits, std::size_t request_size_in_bits) -> void;
+  inline auto trimback(unsigned equals) -> void;
+  template<required::Iterator_Producing<std::uint8_t> ITERATOR> inline auto emplace(ITERATOR start, ITERATOR finish, unsigned &equals) -> void;
+  template<required::integer::Unsigned UNSIGNED> struct Shaver;
+  inline static auto decode(char value) -> std::uintmax_t;
+  inline auto emplace(char value, unsigned &equals) -> void;
+  std::vector<bool> decoded_state;
+  std::vector<bool>::iterator get_position;
+};
+namespace tunitas::base64 {
+  template<> inline auto Decoder::get<bool>() -> bool;
+  template<> inline auto Decoder::get<bool>(std::size_t size_in_bits) -> bool;
+}
+#endiv
+#divert <ipp>
+#import std.for_each
+#import std.isdigit
+#import std.islower
+#import std.isupper
+#include <cassert>
+#import tunitas.base64.Code
+#import tunitas.base64.decoder.Invalid
+#import tunitas.base64.decoder.Seek
+#import tunitas.base64.decoder.Get
+#import tunitas.base64.decoder.Underflow
+#import tunitas.base64.Decoder.Shaver
+namespace tunitas::base64 {
+  template<required::Iterator_Producing<std::uint8_t> ITERATOR> Decoder::Decoder(ITERATOR start, ITERATOR finish) {
+    unsigned equals(0);
+    emplace(start, finish, equals);
+    trimback(equals);
+    get_position = decoded_state.begin();
+  }
+  Decoder::Decoder(std::string const &s) {
+    unsigned equals(0);
+    emplace(s.begin(), s.end(), equals);
+    trimback(equals);
+    get_position = decoded_state.begin();
+  }
+  auto Decoder::rewind() -> void {
+    seek(0u);
+  }
+  auto Decoder::seek(std::size_t proposed_position) -> void {
+    if (decoded_state.size() < proposed_position) {
+      throw decoder::Seek("past end");
+    }
+    get_position = decoded_state.begin() + proposed_position;
+  }
+  // "get" is big endian
+  template<required::Integral INTEGRAL> auto Decoder::get(std::size_t size_in_bits) -> INTEGRAL {
+    validate(8*sizeof(INTEGRAL), size_in_bits);
+    auto ret = INTEGRAL();
+    for (int i(0), e(size_in_bits); e != i; ++i) {
+      assert(decoded_state.end() != get_position); // [[FIXTHIS]] if you feel strongly that this might not be true, throw something
+      ret <<= 1;
+      ret |= *get_position++; // throws out_of_range on off-the-end, but validate should have thrown prior
+    }
+    return ret;
+  }
+  template<required::Integral INTEGRAL> auto Decoder::get() -> INTEGRAL {
+    return get<INTEGRAL>(8*sizeof (INTEGRAL));
+  }
+  auto Decoder::eof() const -> bool { return decoded_state.end() == get_position; }
+  auto Decoder::empty() const -> bool { return decoded_state.empty(); }
+  auto Decoder::size() const -> std::size_t { return decoded_state.size(); }
+  // use dec.disgorge() to access the reference.
+  auto Decoder::disgorge() const -> std::vector<bool> const & { return decoded_state; }
+  // use std::move(dec.disgorge()) to move the vector out.
+  auto Decoder::disgorge() -> std::vector<bool> & { return decoded_state; }
+  auto Decoder::validate(std::size_t carrier_size_in_bits, std::size_t request_size_in_bits) -> void {
+    if (0 == request_size_in_bits) {
+      throw decoder::Get("zero sized get");
+    }
+    if (carrier_size_in_bits < request_size_in_bits) {
+      // This is the arguably programmer's fault for asking for too much baloney to be returned in too small a sack.
+      throw decoder::Get("carrier too small, request too big");
+    }
+    if (decoded_state.end() < get_position + request_size_in_bits) {
+      // Underflow ... ran out of bits to return.
+      throw decoder::Underflow("no bits left");
+    }
+  }
+  auto Decoder::trimback(unsigned equals) -> void {
+    if (equals) {
+      if (equals > 2) {
+        throw decoder::Invalid("too many =");
+      }
+      auto const howmany = 2 * equals;
+      if (decoded_state.size() < howmany) {
+        throw decoder::Underflow("too much trim");
+      }
+      auto const bad = decoded_state.begin() + (decoded_state.size() - howmany);
+      auto const end = decoded_state.end();
+      decoded_state.erase(bad, end);
+    }
+  }
+  template<required::Iterator_Producing<std::uint8_t> ITERATOR> auto Decoder::emplace(ITERATOR start, ITERATOR finish, unsigned &equals) -> void {
+    std::for_each(start, finish, [this, &equals](char c) { this->emplace(c, equals); });
+  }
+  auto Decoder::decode(char value) -> std::uintmax_t {
+    // See https://tools.ietf.org/html/rfc4648#page-7
+    std::uintmax_t const prep(value);
+    if (false) {
+    } else if (std::isupper(value)) {
+      return prep - 'A' + 0;
+    } else if (std::islower(value)) {
+      return prep - 'a' + 26;
+    } else if (std::isdigit(value)) {
+      return prep - '0' + 52;
+    } else if ('-' == value || '+' == value) {
+      return 62;
+    } else if ('_' == value || '/' == value) {
+      return 63;
+    } else {
+      throw base64::Code("base64");
+    }
+  }
+  auto Decoder::emplace(char value, unsigned &equals) -> void {
+    if ('=' == value) {
+      // These are basically "delete" operators, count them for later
+      equals++;
+    } else {
+      Shaver<std::uintmax_t> shaver(decode(value));
+      auto const b0 = *shaver++;
+      auto const b1 = *shaver++;
+      auto const b2 = *shaver++;
+      auto const b3 = *shaver++;
+      auto const b4 = *shaver++;
+      auto const b5 = *shaver++;
+      decoded_state.push_back(b5);
+      decoded_state.push_back(b4);
+      decoded_state.push_back(b3);
+      decoded_state.push_back(b2);
+      decoded_state.push_back(b1);
+      decoded_state.push_back(b0);
+    }
+  }
+  template<> auto Decoder::get<bool>() -> bool {
+    validate(1, 1);
+    return *get_position++; // throws out_of_range on off-the-end, but validate should have thrown prior
+  }
+  template<> auto Decoder::get<bool>(std::size_t size_in_bits) -> bool {
+    validate(1, size_in_bits); // size had better be exactly 1
+    return *get_position++; // ibidem.
+  }
+}
+#endiv

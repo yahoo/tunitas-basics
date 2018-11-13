@@ -1,0 +1,57 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <fpp>
+#import std.error_code
+#import std.error_condition
+#import std.is_same
+#import std.string
+#import std.deque
+namespace tests::outcome {
+  using Args = std::deque<std::string>;
+  namespace required {
+    template<typename ERROR> concept bool Error = (std::is_same<ERROR, std::error_code>::value ||
+						   std::is_same<ERROR, std::error_condition>::value);
+  }
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.deque
+namespace tests::outcome {
+  // This is a tester so it doesn't have to have a great UX
+  //
+  // Usage:
+  //
+  //   auto main(int c, char *v[]) -> int {
+  //     using namespace tests::outcome;
+  //     return remain<std::error_code>(Args{&v[0], &v[c]});
+  //   }
+  //
+  template<required::Error ERROR> auto remain(Args) -> int;
+}
+#endiv
+#divert <tpp>
+#import std.cout
+#import std.size_t
+#import std.stoi
+#import std.string_literals
+namespace tests {
+  template<outcome::required::Error ERROR> auto outcome::remain(Args args) -> int {
+    using namespace std::literals;
+    auto const NAME = args.front();
+    args.pop_front();
+    if (args.empty()) {
+      args.push_front("0");
+    }
+    for (auto &word : args) {
+      if ("-h"s == word || "--usage" == word || "--help" == word) {
+	std::cout << "usage: " << NAME << " [ --help | --usage ] {  integer } ...\n";
+	return 0;
+      } else {
+	ERROR object{std::stoi(word), std::generic_category()};
+	std::cout << object.value() << " -> q(" << object.message() << ")\n";
+      }
+    }
+    return 0;
+  }
+}
+#endiv

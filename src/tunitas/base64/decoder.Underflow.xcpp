@@ -1,0 +1,24 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64::decoder {
+  //
+  // An underflow condition (out of bits) in the decoder
+  //
+  // Usage:
+  //
+  //   throw decoder::Underflow("off the end");
+  //
+  class Underflow;
+}
+#endiv
+#divert <hpp>
+#import std.underflow_error
+#import tunitas.base64.Exception
+class tunitas::base64::decoder::Underflow : public std::underflow_error, public base64::Exception {
+  using ancestor = std::underflow_error;
+public:
+  inline Underflow() : ancestor("underflow") { }
+  using ancestor::underflow_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

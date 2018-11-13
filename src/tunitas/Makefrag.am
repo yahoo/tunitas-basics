@@ -12,8 +12,8 @@
 #       <= 0     if any interfaces were removed, changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 2
-lib_libtunitas_la_REVISION = 2
+lib_libtunitas_la_CURRENT = 4
+lib_libtunitas_la_REVISION = 0
 lib_libtunitas_la_AGE = 0
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
@@ -24,14 +24,17 @@ lib_libtunitas_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_la_SOUR
 lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/namespace.cpp \
   \
-  obj/src/tunitas/required.Iterator_Producing.cpp \
-  obj/src/tunitas/required.Stringable.cpp \
-  obj/src/tunitas/required.Move_Constructible.cpp \
-  obj/src/tunitas/required.Default_Constructible.cpp \
-  obj/src/tunitas/required.Outcomable.cpp \
-  \
-  obj/src/tunitas/Outcome.cpp \
-  obj/src/tunitas/outcome.Success.cpp \
+  obj/src/tunitas/required/namespace.cpp \
+  obj/src/tunitas/required/Integral.cpp \
+  obj/src/tunitas/required/Integer.cpp \
+  obj/src/tunitas/required/integer.Signed.cpp \
+  obj/src/tunitas/required/integer.Unsigned.cpp \
+  obj/src/tunitas/required/Iterator_Producing.cpp \
+  obj/src/tunitas/required/Container_Push_Back_Char.cpp \
+  obj/src/tunitas/required/Stringable.cpp \
+  obj/src/tunitas/required/Move_Constructible.cpp \
+  obj/src/tunitas/required/Default_Constructible.cpp \
+  obj/src/tunitas/required/Outcomable.cpp \
   \
   obj/src/tunitas/app/namespace.cpp \
   obj/src/tunitas/app/Configuration.cpp \
@@ -51,6 +54,30 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/app/words.cpp \
   obj/src/tunitas/app/words.Filepaths.cpp \
   obj/src/tunitas/app/words.Strings.cpp \
+  \
+  obj/src/tunitas/base64/namespace.cpp \
+  obj/src/tunitas/base64/Code.cpp \
+  obj/src/tunitas/base64/Exception.cpp \
+  \
+  obj/src/tunitas/base64/decode.cpp \
+  obj/src/tunitas/base64/Decoder.cpp \
+  obj/src/tunitas/base64/Decoder.Shaver.cpp \
+  obj/src/tunitas/base64/decoder.Get.cpp \
+  obj/src/tunitas/base64/decoder.Invalid.cpp \
+  obj/src/tunitas/base64/decoder.Seek.cpp \
+  obj/src/tunitas/base64/decoder.Underflow.cpp \
+  \
+  obj/src/tunitas/base64/encode.cpp \
+  obj/src/tunitas/base64/Encoder.cpp \
+  obj/src/tunitas/base64/encoder.Finalized.cpp \
+  obj/src/tunitas/base64/encoder.Invalid.cpp \
+  obj/src/tunitas/base64/encoder.Put.cpp \
+  \
+  obj/src/tunitas/base64/sized.ByType.cpp \
+  obj/src/tunitas/base64/sized.ByValue.cpp \
+  \
+  obj/src/tunitas/Outcome.cpp \
+  obj/src/tunitas/outcome.Success.cpp \
   $(end)
 
 $(scold_cxxdir)/tunitas/dependencies.mk:

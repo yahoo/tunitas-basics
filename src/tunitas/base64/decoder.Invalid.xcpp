@@ -1,0 +1,27 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::base64::decoder {
+  //
+  // An invalid aspect of the base64 decoder job itself.
+  // Or an invalid date of the Decoder,
+  //    (ahem) the Decoder being an argument operations upon itself.
+  //
+  // Usage:
+  //
+  //   throw decoder::Invalid("cannot");
+  //
+  class Invalid;
+}
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.base64.Exception
+#include <stdexcept>
+class tunitas::base64::decoder::Invalid : public std::runtime_error, public base64::Exception {
+  using ancestor = std::runtime_error;
+public:
+  inline Invalid() : ancestor("seek") { }
+  using ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

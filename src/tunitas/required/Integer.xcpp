@@ -1,0 +1,16 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import std.is_enum
+#import std.is_integral
+namespace tunitas::required {
+  //
+  // The concept of an integer type
+  //
+  // Usage:
+  //
+  //   template<required::Integer INTEGER> Constructor(INTEGER, INTEGER);
+  //
+  template<typename INTEGER> concept bool Integer = (std::is_integral<INTEGER>::value &&
+						     ! std::is_enum<INTEGER>::value);
+}
+#endiv

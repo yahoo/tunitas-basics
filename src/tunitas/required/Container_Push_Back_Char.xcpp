@@ -1,0 +1,18 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+#import std.string // requires the complete type of std::string
+namespace tunitas::required {
+  //
+  // A type is "push_back" if it can accept a character as push_(char)
+  //
+  // Usage:
+  //
+  //   template<required::Character_Push_Back CONTAINER> struct Something {
+  //     Something(CONTAINER &container);
+  //   };
+  //
+  template<typename CONTAINER> concept bool Container_Push_Back_Char = requires(CONTAINER container, char c) {
+													      { container.push_back(c) } -> void;
+  };
+}
+#endiv

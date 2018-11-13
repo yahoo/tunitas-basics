@@ -1,0 +1,7 @@
+tests_outcome_error_condition_XFAIL_TESTS = $(none)
+tests_outcome_error_condition_XPASS_TESTS = $(none)
+tests_outcome_error_condition_TESTS = \
+  $(tests_outcome_error_condition_XPASS_TESTS) \
+  $(tests_outcome_error_condition_XFAIL_TESTS) \
+  tests/outcome/error_condition/01.test \
+  $(end)

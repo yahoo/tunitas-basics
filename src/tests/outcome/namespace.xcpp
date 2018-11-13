@@ -1,0 +1,4 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <fpp>
+namespace tests::outcome { }
+#endiv
