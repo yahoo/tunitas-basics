@@ -20,7 +20,7 @@ namespace tunitas::base64::decoder {
 class tunitas::base64::decoder::Invalid : public std::runtime_error, public base64::Exception {
   using ancestor = std::runtime_error;
 public:
-  inline Invalid() : ancestor("seek") { }
+  inline Invalid() : ancestor("invalid") { }
   using ancestor::runtime_error;
   auto what() const noexcept -> char const * { return ancestor::what(); }
 };

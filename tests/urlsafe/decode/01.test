@@ -1,0 +1,4 @@
+#!/bin/sh
+export PATH="${0%/*}/../../../check/bin:${0%/*}/../../../bin:$PATH"
+urlsafe-decode https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FPercent-encoding
+

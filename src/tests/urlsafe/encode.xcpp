@@ -1,0 +1,9 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <cpp>
+#import tests.urlsafe.remain
+#import tunitas.urlsafe.encode
+auto main(int c, char *v[]) -> int {
+  using namespace tests::urlsafe;
+  return remain(Function{&tunitas::urlsafe::encode}, Args{&v[0], &v[c]});
+}
+#endiv

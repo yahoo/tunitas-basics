@@ -1,0 +1,7 @@
+tests_urlsafe_decode_XFAIL_TESTS = $(none)
+tests_urlsafe_decode_XPASS_TESTS = $(none)
+tests_urlsafe_decode_TESTS = \
+  $(tests_urlsafe_decode_XPASS_TESTS) \
+  $(tests_urlsafe_decode_XFAIL_TESTS) \
+  tests/urlsafe/decode/01.test \
+  $(end)

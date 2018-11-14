@@ -1,0 +1,81 @@
+// This is -*- c++ -*- around C++2a in the S.C.O.L.D. stylings that are so popular these days
+#divert <fpp>
+#import std.deque
+#import std.function
+#import std.string
+namespace tests::urlsafe {
+  using Args = std::deque<std::string>;
+  //
+  // Matches the sense of tunitas::urlsafe::decode(...) & encode(...) with the const reference argument
+  //
+  using Function = std::function<std::string (std::string const &)>;
+}
+#endiv
+#divert <hpp>
+namespace tests::urlsafe {
+  //
+  // This is a tester so it doesn't have to have a great UX
+  //
+  // Usage:
+  //
+  //   auto main(int c, char *v[]) -> int {
+  //     using namespace tests::urlsafe;
+  //     return remain(Function{&tunitas::urlsafe::decode}, Args{&v[0], &v[c]});
+  //   }
+  //
+  auto remain(Function, Args) -> int;
+}
+#endiv
+#divert <cpp>
+#import std.copy
+#import std.cout
+#import std.cerr
+#import std.exception
+#import std.istream_iterator
+#import std.move
+#import std.ostream_iterator
+#import std.ostringstream
+#import std.string_literals
+#import tunitas.urlsafe.Exception
+using namespace std::literals;
+auto tests::urlsafe::remain(Function function, Args args) -> int {
+  int exit_code{0};
+  auto const NAME = args.front();
+  args.pop_front();
+  if (args.empty()) {
+    args.push_front("-");
+  }
+  for (auto &word : args) {
+    std::string plaintext;
+    if ("-h"s == word || "--usage" == word || "--help" == word) {
+      std::cout << "usage: " << NAME << " [ --help | --usage ] {  - | word | @filename } ...\n";
+      return 0;
+    } else if ("-"s == word) {
+      std::ostringstream out;
+      std::istream_iterator<char> eof, inbound{std::cin};
+      std::ostream_iterator<char> outbound{out};
+      std::copy(inbound, eof, outbound);
+      plaintext = out.str();
+    } else if (word.empty()) {
+      // Special case this so we don't have to check for empty many times in other clauses
+      plaintext = std::move(word);
+    } else if ('-' == word.front()) {
+      std::cerr << NAME << ": error, unknown argument " << word << '\n';
+      return 1;
+    } else {
+      plaintext = std::move(word);
+    }
+    try {
+      auto const cryptext = function(plaintext);
+      std::cout << cryptext;
+    } catch (tunitas::urlsafe::Exception const &e) {
+      std::cout << "FAIL (urlsafe) " << e.what() << '\n';
+      exit_code = 1;
+    } catch (std::exception const &e) {
+      std::cout << "FAIL (unexpected) " << e.what() << '\n';
+      exit_code = 1;
+    }
+  }
+  return exit_code;
+}
+#endiv

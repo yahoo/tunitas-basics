@@ -1,0 +1,43 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import std.string
+namespace tunitas::urlsafe {
+  //
+  // Encode the string using the "URL-Safe" convention of RFC 2396.
+  // The string is always copied.
+  //
+  // The concept is that encode(...) reserves the possibility to throw something,
+  // namely an urlsafe::Exception descendant.  In practice there is no excuse to do so.
+  //
+  // Usage:
+  //
+  //   try {
+  //     auto unsafe = std::string{...};
+  //     auto safe = encode(unsafe);
+  //     ...use safe...
+  //   } catch (Exception const &) {
+  //     ...deal with it...
+  //   }
+  //
+  inline auto encode(std::string const &) -> std::string;
+}
+#endiv
+#divert <ipp>
+#import tunitas.urlsafe.detail
+#import std.move
+auto tunitas::urlsafe::encode(std::string const &s) -> std::string {
+  using namespace detail;
+  std::string r;
+  for (auto c : s) {
+    if (issafe(c)) {
+      r.push_back(c);
+    } else {
+      auto p = hexpair(c);
+      r.push_back('%');
+      r.push_back(p.first);
+      r.push_back(p.second);
+    }
+  }
+  return std::move(r);
+}
+#endiv

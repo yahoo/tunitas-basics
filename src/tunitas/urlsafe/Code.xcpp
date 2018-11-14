@@ -1,0 +1,25 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::urlsafe {
+  //
+  // An invalid aspect of an individual urlsafe (value or alphabet)
+  // Something is wrong with some code.  Is distinct from decoder::Invalid;
+  //
+  // Usage:
+  //
+  //   throw urlsafe::Code{"because"};
+  //
+  class Code;
+}
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.urlsafe.Exception
+class tunitas::urlsafe::Code : public std::runtime_error, public urlsafe::Exception {
+  using ancestor = std::runtime_error;
+public:
+  Code() : ancestor("urlsafe") { }
+  using ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

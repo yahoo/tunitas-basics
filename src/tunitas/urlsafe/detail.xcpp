@@ -1,0 +1,63 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import std.pair
+#import std.string
+#import std.isxdigit
+namespace tunitas::urlsafe::detail {
+  //
+  // The implementation details of the urlsafe encdec.
+  //
+  // Usage: figure it out
+  //
+  inline auto issafe(unsigned char uc) -> bool;
+  using std::isxdigit;
+  inline auto hexchar(unsigned char uc) -> char;
+  namespace packaging::hexpair_function {
+    using Result = std::pair<unsigned char, unsigned char>;
+    inline auto hexpair(unsigned char c) -> Result;
+  }
+  using packaging::hexpair_function::hexpair;
+  inline auto dehex(unsigned char hex) -> char;
+  inline auto rehex(unsigned char hi, unsigned char lo) -> char;
+}
+#endiv
+#divert <ipp>
+auto tunitas::urlsafe::detail::issafe(unsigned char uc) -> bool {
+  // Standards
+  // https://www.w3.org/Addressing/URL/4_URI_Recommentations.html
+  // https://www.ietf.org/rfc/rfc2396.txt
+  return (('0' <= uc && uc <= '9') ||
+	  ('a' <= uc && uc <= 'z') ||
+	  ('A' <= uc && uc <= 'Z') ||
+	  uc == '-' || uc == '_' ||
+	  uc == '.' || uc == '!' ||
+	  uc == '~' || uc == '*' || uc == '\'' ||
+	  uc == '(' || uc == ')');
+}
+auto tunitas::urlsafe::detail::hexchar(unsigned char uc) -> char {
+  auto offset = uc <= 9 ? '0' : 'a' - 10;
+  return char(uc + offset);
+}
+auto tunitas::urlsafe::detail::packaging::hexpair_function::hexpair(unsigned char uc) -> Result {
+  auto hi = uc / 16;
+  auto lo = uc % 16;
+  return Result{hexchar(hi), hexchar(lo)};
+}
+#import tunitas.urlsafe.decoder.Invalid
+#import std.tolower
+auto tunitas::urlsafe::detail::dehex(unsigned char uc) -> char {
+  if (!isxdigit(uc)) {
+    throw decoder::Invalid{};
+  }
+  if ('0' <= uc && uc <= '9') {
+    return uc - '0';
+  } else {
+    return std::tolower(uc) - 'a' + 10;
+  }
+}
+auto tunitas::urlsafe::detail::rehex(unsigned char hi, unsigned char lo) -> char {
+  hi &= 0xf;
+  lo &= 0xf;
+  return char((hi << 4) | (lo << 0));
+}
+#endiv

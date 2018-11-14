@@ -5,11 +5,12 @@ tests_unit_TESTS = \
   $(tests_unit_XFAIL_TESTS) \
   tests/unit/list.test \
   tests/unit/all.test \
-  tests/unit/want.test \
-  tests/unit/outcome.test \
+  tests/unit/app.test \
   tests/unit/base64.test \
+  tests/unit/outcome.test \
   tests/unit/required.test \
   tests/unit/server.test \
   tests/unit/tunitas.test \
-  tests/unit/app.test \
+  tests/unit/urlsafe.test \
+  tests/unit/want.test \
   $(end)

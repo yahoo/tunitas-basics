@@ -1,7 +1,12 @@
 2018-11-13  Wendell Baker  <wbaker@oath.com>
 
+	* Version v1.4.0-0.devel, tunitas::urlsafe::encode, tunitas::urlsafe::decode
+	- rachet libtunitas C:R:A=5.0.2, pretending that the previous was 4.0.1
+	- new unit testers go in check/bin and check/lib
+	- bin/unit moves to check/bin/unit
+
 	* Version v1.3.0-0.devel, tunitas::base64::encode, tunitas::base64::decode
-	- rachet libtunitas C:R:A=4.0.0
+	- rachet libtunitas C:R:A=4.0.0 but could reasonably have been 4.0.1
 
 2018-10-28  Wendell Craig Baker  <wbaker@oath.com>
 

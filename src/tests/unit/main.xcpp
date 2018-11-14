@@ -6,6 +6,7 @@
 #import tests.unit.required.Fixture
 #import tests.unit.server.Fixture
 #import tests.unit.tunitas.Fixture
+#import tests.unit.urlsafe.Fixture
 #import tests.unit.want.Fixture
 #import rigging.bench.Main
 auto main(int argc, char *argv[]) -> int {
@@ -16,6 +17,7 @@ auto main(int argc, char *argv[]) -> int {
                               tu::required::Fixture::suite(),
                               tu::server::Fixture::suite(),
                               tu::tunitas::Fixture::suite(),
+                              tu::urlsafe::Fixture::suite(),
 			      tu::want::Fixture::suite());
   return remain(argc, argv);
 }

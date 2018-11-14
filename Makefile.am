@@ -50,6 +50,7 @@ include src/want/Makefrag.am
 include src/tests/unit/Makefrag.am
 include src/tests/base64/Makefrag.am
 include src/tests/outcome/Makefrag.am
+include src/tests/urlsafe/Makefrag.am
 
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
@@ -60,15 +61,18 @@ noinst_LTLIBRARIES = \
   $(lib_libwant_la) \
   $(end)
 check_PROGRAMS = \
-  $(bin_unit) \
+  $(check_bin_unit) \
   $(check_bin_base64_decode) \
   $(check_bin_base64_encode) \
   $(check_bin_outcome_error_code) \
   $(check_bin_outcome_error_condition) \
+  $(check_bin_urlsafe_decode) \
+  $(check_bin_urlsafe_encode) \
   $(end)
 check_LTLIBRARIES = \
   $(check_lib_libtests_base64_la) \
   $(check_lib_libtests_outcome_la) \
+  $(check_lib_libtests_urlsafe_la) \
   $(end)
 
 $(lib_libtunitas_server_la) : $(lib_libtunitas_la)
@@ -83,13 +87,31 @@ MODULES = \
   $(lib_libtunitas_la_MODULES) \
   $(lib_libtunitas_server_la_MODULES) \
   $(lib_libwant_la_MODULES) \
-  $(bin_unit_MODULES)  \
+  $(check_bin_unit_MODULES)  \
+  $(check_bin_base64_decode_MODULES) \
+  $(check_bin_base64_encode_MODULES) \
+  $(check_bin_outcome_error_code_MODULES) \
+  $(check_bin_outcome_error_condition_MODULES) \
+  $(check_bin_urlsafe_decode_MODULES) \
+  $(check_bin_urlsafe_encode_MODULES) \
+  $(check_lib_libtests_base64_la_MODULES) \
+  $(check_lib_libtests_outcome_la_MODULES) \
+  $(check_lib_libtests_urlsafe_la_MODULES) \
   $(end)
 OBJECTS = \
   $(lib_libtunitas_la_OBJECTS) \
   $(lib_libtunitas_server_la_OBJECTS) \
   $(lib_libwant_la_OBJECTS) \
-  $(bin_unit_OBJECTS)  \
+  $(check_bin_unit_OBJECTS)  \
+  $(check_bin_base64_decode_OBJECTS) \
+  $(check_bin_base64_encode_OBJECTS) \
+  $(check_bin_outcome_error_code_OBJECTS) \
+  $(check_bin_outcome_error_condition_OBJECTS) \
+  $(check_bin_urlsafe_decode_OBJECTS) \
+  $(check_bin_urlsafe_encode_OBJECTS) \
+  $(check_lib_libtests_base64_la_OBJECTS) \
+  $(check_lib_libtests_outcome_la_OBJECTS) \
+  $(check_lib_libtests_urlsafe_la_OBJECTS) \
   $(end)
 $(OBJECTS) : $(MODULES)
 
@@ -98,11 +120,25 @@ include tests/base64/decode/Makefrag.am
 include tests/base64/encode/Makefrag.am
 include tests/outcome/error_code/Makefrag.am
 include tests/outcome/error_condition/Makefrag.am
+include tests/urlsafe/decode/Makefrag.am
+include tests/urlsafe/encode/Makefrag.am
 XFAIL_TESTS = \
   $(tests_unit_XFAIL_TESTS) \
+  $(tests_base64_decode_XFAIL_TESTS) \
+  $(tests_base64_encode_XFAIL_TESTS) \
+  $(tests_outcome_error_code_XFAIL_TESTS) \
+  $(tests_outcome_error_condition_XFAIL_TESTS) \
+  $(tests_urlsafe_error_code_XFAIL_TESTS) \
+  $(tests_urlsafe_error_condition_XFAIL_TESTS) \
   $(end)
 XPASS_TESTS = \
   $(tests_unit_XPASS_TESTS) \
+  $(tests_base64_decode_XPASS_TESTS) \
+  $(tests_base64_encode_XPASS_TESTS) \
+  $(tests_outcome_error_code_XPASS_TESTS) \
+  $(tests_outcome_error_condition_XPASS_TESTS) \
+  $(tests_urlsafe_error_code_XPASS_TESTS) \
+  $(tests_urlsafe_error_condition_XPASS_TESTS) \
   $(end)
 TESTS = \
   $(tests_unit_TESTS) \
@@ -110,6 +146,8 @@ TESTS = \
   $(tests_base64_encode_TESTS) \
   $(tests_outcome_error_code_TESTS) \
   $(tests_outcome_error_condition_TESTS) \
+  $(tests_urlsafe_error_code_TESTS) \
+  $(tests_urlsafe_error_condition_TESTS) \
   $(end)
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk

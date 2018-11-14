@@ -1,16 +1,16 @@
 # -*- Makefile -*-
 
-bin_unit = bin/unit
-bin_unit_LDADD = \
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
   $(lib_libtunitas_la) \
   $(lib_libwant_la) \
   -lrigging-bench-module \
   -lcppunit \
   $(end)
-# reminder: autotools does not put $(AM_LDFLAGS) into bin_unit_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-bin_unit_LDFLAGS = $(AM_LDFLAGS)
-bin_unit_MODULES = $(call TF_SOURCEStoMODULES, $(bin_unit_SOURCES))
-bin_unit_SOURCES = \
+# reminder: autotools does not put $(AM_LDFLAGS) into check_bin_unit_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
+check_bin_unit_LDFLAGS = $(AM_LDFLAGS)
+check_bin_unit_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
   obj/src/tunitas/base64/Encoder.test.Access.cpp \
   obj/src/tunitas/base64/Decoder.test.Access.cpp \
   \
@@ -54,10 +54,12 @@ bin_unit_SOURCES = \
   \
   obj/src/tests/unit/want.Fixture.cpp \
   obj/src/tests/unit/want.nonstd.Fixture.cpp \
+  \
+  obj/src/tests/unit/urlsafe.Fixture.cpp \
   $(end)
 
 $(scold_cxxdir)/tests/unit/dependencies.mk:
-	$(TF_V_DIS) $(call TF_DISAGGREGATE, $(bin_unit_SOURCES))
+	$(TF_V_DIS) $(call TF_DISAGGREGATE, $(check_bin_unit_SOURCES))
 	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/tests/unit/dependencies.mk
 clean-dependencies::

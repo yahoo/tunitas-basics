@@ -1,0 +1,27 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::urlsafe::decoder {
+  //
+  // An invalid argument to the urlsafe decoder job itself.
+  // The only way this can plausibliy happen is if the hex coding is bogus.
+  // See the hex syntax documented nearby around decode(...)
+  // or https://www.ietf.org/rfc/rfc2396.txt
+  //
+  // Usage:
+  //
+  //   throw decoder::Invalid("cannot");
+  //
+  class Invalid;
+}
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.urlsafe.Exception
+class tunitas::urlsafe::decoder::Invalid : public std::runtime_error, public urlsafe::Exception {
+  using ancestor = std::runtime_error;
+public:
+  Invalid() : ancestor("invalid") { }
+  using ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return ancestor::what(); }
+};
+#endiv

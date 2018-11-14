@@ -1,0 +1,49 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import std.string
+namespace tunitas::urlsafe {
+  //
+  // Decode the string using the "URL-Safe" convention of RFC 2396.
+  // The string is always copied.
+  //
+  // Because the hex coding syntax may be incorrect in the wild, decode(...)
+  // can throw the urlsafe::Exception descendant decoder::Invalid.
+  //
+  // https://www.ietf.org/rfc/rfc2396.txt
+  //
+  //   escaped     = "%" hex hex
+  //   hex         = digit | "A" | "B" | "C" | "D" | "E" | "F" |
+  //                        "a" | "b" | "c" | "d" | "e" | "f"
+  //
+  // Usage:
+  //
+  //   try {
+  //     auto safe = std::string{...};
+  //     auto unsafe = decode(safe);
+  //     ...use unsafe...
+  //   } catch (Exception const &) {
+  //     ...deal with it...
+  //   }
+  //
+  inline auto decode(std::string const &) -> std::string;
+}
+#endiv
+#divert <ipp>
+#import tunitas.urlsafe.detail
+auto tunitas::urlsafe::decode(std::string const &s) -> std::string {
+  std::string r;
+  for (auto i(s.begin()), e(s.end()); e != i; ++i) {
+    if ('%' != *i) {
+      r.push_back(*i);
+    } else {
+      if (auto ihi = ++i; e != ihi) {
+	if (auto ilo = ++i; e != ilo) {
+	  using namespace detail;
+	  r.push_back(rehex(dehex(*ihi), dehex(*ilo)));
+	}
+      }
+    }
+  }
+  return std::move(r);
+}
+#endiv

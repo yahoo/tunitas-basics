@@ -9,6 +9,8 @@ class tests::unit::app::options::Fixture : public cppunit::test::Fixture {
 public:
   auto test_get_port() -> void;
   static auto suite() -> cppunit::Test *;
+protected:
+  class Quitting;
 };
 #endiv
 #divert <cpp>
@@ -18,6 +20,15 @@ using namespace std::literals;
 #import tunitas.app.options.get_port
 auto tests::unit::app::options::Fixture::test_get_port() -> void {
 #warning WRITETHIS auto tests::unit::app::options::Fixture::get_port() -> void
+#if 0
+  try {
+    using ::tunitas::app::options;
+    auto port = get_port<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(8080u == port;
+  } catch (std::exception const &e) {
+      CPPUNIT_ASSERT(false);
+  }
+#endif
 }
 #import tests.unit.app.Fixture.Configuration
 #import unit.rigging.suite.Stream

@@ -1,0 +1,165 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::urlsafe { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::urlsafe::Fixture : public cppunit::test::Fixture {
+public:
+  // exceptions
+  auto test_exception_Exception() -> void;
+  auto test_exception_Code() -> void;
+  auto test_exception_decoder_Invalid() -> void;
+  //
+  auto test_decode_01() -> void;
+  auto test_decode_02() -> void;
+  //
+  auto test_encode_01() -> void;
+  auto test_encode_02() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  // turn the nibble ito a hex character
+  static auto hexit(unsigned char) -> char;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.string_literals
+#import std.runtime_error
+#import std.to_string
+auto tests::unit::urlsafe::Fixture::hexit(unsigned char uc) -> char {
+  if (uc <= 9) {
+    return char(uc + '0');
+  } else if (uc <= 16) {
+    return char(uc - 10 + 'a');
+  }
+  throw std::runtime_error{"too large for a hex digit " + std::to_string((unsigned)uc)};
+}
+#import tunitas.urlsafe.Exception
+#import tunitas.urlsafe.Code
+using namespace std::literals;
+auto tests::unit::urlsafe::Fixture::test_exception_Exception() -> void {
+  using namespace ::tunitas::urlsafe;
+  try {
+    throw Code{"badness"};
+  } catch (Exception const &e) {
+    std::string const reason = e.what();
+    CPPUNIT_ASSERT("badness"s == reason);
+  }
+}
+#import tunitas.urlsafe.Code
+auto tests::unit::urlsafe::Fixture::test_exception_Code() -> void {
+  using namespace ::tunitas::urlsafe;
+  try {
+    throw Code{"badness"};
+  } catch (Exception const &e) {
+    std::string const reason = e.what();
+    CPPUNIT_ASSERT("badness"s == reason);
+  }
+}
+#import tunitas.urlsafe.Exception
+#import tunitas.urlsafe.decoder.Invalid
+auto tests::unit::urlsafe::Fixture::test_exception_decoder_Invalid() -> void {
+  using namespace ::tunitas::urlsafe;
+  try {
+    throw decoder::Invalid{"badness"};
+  } catch (Exception const &e) {
+    std::string const reason = e.what();
+    CPPUNIT_ASSERT("badness"s == reason);
+  }
+}
+#import tunitas.urlsafe.decode
+#import tunitas.urlsafe.encode
+auto tests::unit::urlsafe::Fixture::test_decode_01() -> void {
+  for (int x1i{0}, x1e{16}; x1i != x1e; ++x1i) {
+    for (int x2i{0}, x2e{16}; x2i != x2e; ++x2i) {
+      for (int x3i{0}, x3e{16}; x3i != x3e; ++x3i) {
+	for (int x4i{0}, x4e{16}; x4i != x4e; ++x4i) {
+	  std::string enc{'%', hexit(x1i), hexit(x2i), '%', hexit(x3i), hexit(x4i)};
+	  std::string dec{::tunitas::urlsafe::decode(enc)};
+	  CPPUNIT_ASSERT(2 == dec.size());
+	  unsigned char expected0 = (x1i<<4) | (x2i<<0);
+	  unsigned char actual0 = dec[0];
+	  CPPUNIT_ASSERT(actual0 == expected0);
+	  unsigned char expected1 = (x3i<<4) | (x4i<<0);
+	  unsigned char actual1 = dec[1];
+	  CPPUNIT_ASSERT(actual1 == expected1);
+	}
+      }
+    }
+  }
+}
+auto tests::unit::urlsafe::Fixture::test_decode_02() -> void {
+  for (int x1i{0}, x1e{16}; x1i != x1e; ++x1i) {
+    for (int x2i{0}, x2e{16}; x2i != x2e; ++x2i) {
+      for (int x3i{0}, x3e{16}; x3i != x3e; ++x3i) {
+	for (int x4i{0}, x4e{16}; x4i != x4e; ++x4i) {
+	  std::string pre{'%', hexit(x1i), hexit(x2i), '%', hexit(x3i), hexit(x4i)};
+	  using namespace ::tunitas::urlsafe;
+	  std::string raw{encode(decode(pre))}; // because pre is always encoded, raw may not be
+	  std::string dec{decode(raw)};
+	  std::string enc{encode(dec)};
+	  CPPUNIT_ASSERT(enc == raw);
+	}
+      }
+    }
+  }
+}
+auto tests::unit::urlsafe::Fixture::test_encode_01() -> void {
+  for (int c1i{0}, c1e{256}; c1i != c1e; ++c1i) {
+    for (int c2i{0}, c2e{256}; c2i != c2e; ++c2i) {
+      std::string unsafe{(char)c1i, (char)c2i,(char)c1i, (char)c2i};
+      std::string safe(::tunitas::urlsafe::encode(unsafe));
+      // 4 chars means none were %-encoded; 12 chars means all four were %-encoded.
+      CPPUNIT_ASSERT(4 <= safe.size() && safe.size() <= 3*4);
+    }
+  }
+}
+#import std.cerr
+auto tests::unit::urlsafe::Fixture::test_encode_02() -> void {
+  for (int c1i{0}, c1e{256}; c1i != c1e; ++c1i) {
+    for (int c2i{0}, c2e{256}; c2i != c2e; ++c2i) {
+      std::string raw{(char)c1i, (char)c2i, (char)c1i, (char)c2i, (char)c1i, (char)c2i};
+      std::string enc(tunitas::urlsafe::encode(raw));
+      std::cerr << "raw=" << raw << " enc=" << enc << '\n';
+      std::string dec(tunitas::urlsafe::decode(enc));
+      std::cerr << "raw=" << raw << " enc=" << enc << " dec=" << dec << '\n';
+      CPPUNIT_ASSERT(dec == raw);
+    }
+  }
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::urlsafe::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("urlsafe");
+  {
+    Stream exc("exception");
+    exc << call("Exception", &Fixture::test_exception_Exception)
+	<< call("Code", &Fixture::test_exception_Code)
+      ;
+    {
+      Stream dec("decoder");
+      dec << call("Invalid", &Fixture::test_exception_decoder_Invalid)
+	;
+      exc << add(dec.release());
+    }
+    series << add(exc.release());
+  } {
+    Stream dec("decode");
+    dec << call("01", &Fixture::test_decode_01)
+	<< call("02", &Fixture::test_decode_02)
+      ;
+    series << add(dec.release());
+  } {
+    Stream enc("encode");
+    enc << call("01", &Fixture::test_encode_01)
+	<< call("02", &Fixture::test_encode_02)
+      ;
+    series << add(enc.release());
+  }
+  return series.release();
+}
+#endiv
