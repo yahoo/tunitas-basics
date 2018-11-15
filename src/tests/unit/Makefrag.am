@@ -50,6 +50,7 @@ check_bin_unit_SOURCES = \
   \
   obj/src/tests/unit/required.Fixture.cpp \
   obj/src/tests/unit/server.Fixture.cpp \
+  obj/src/tests/unit/server.Fixture.exception.Example.cpp \
   obj/src/tests/unit/tunitas.Fixture.cpp \
   \
   obj/src/tests/unit/want.Fixture.cpp \

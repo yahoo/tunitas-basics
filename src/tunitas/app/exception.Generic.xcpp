@@ -4,7 +4,7 @@ namespace tunitas::app::exception {
   //
   // The generic application exception
   // Descendants only.
-  // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well
+  // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well.
   //
   // Usage:
   //

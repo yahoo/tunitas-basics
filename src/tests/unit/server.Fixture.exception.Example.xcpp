@@ -1,0 +1,28 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.server.Fixture
+#endiv
+#divert <hpp>
+#import tunitas.server.exception.Generic
+#import std.runtime_error
+#import std.string
+class tests::unit::server::Fixture::exception::Example : public tunitas::server::exception::Generic, public std::runtime_error {
+  struct ancestors {
+    using Tunitas = tunitas::server::exception::Generic;
+    using Exception = std::runtime_error;
+  };
+public:
+  inline explicit Example(std::string const &reason);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <ipp>
+tests::unit::server::Fixture::exception::Example::Example(std::string const &reason)
+  : ancestors::Exception{reason}
+{ }
+#endiv
+#divert <cpp>
+auto tests::unit::server::Fixture::exception::Example::what() const noexcept -> char const * {
+  return ancestors::Exception::what();
+}
+#endiv

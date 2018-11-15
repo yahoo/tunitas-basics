@@ -34,7 +34,7 @@ namespace tunitas::base64 {
 class tunitas::base64::Decoder {
 public:
   template<required::Iterator_Producing<std::uint8_t> ITERATOR> inline Decoder(ITERATOR start, ITERATOR finish);
-  inline explicit Decoder(std::string const &s);
+  inline explicit Decoder(std::string const &);
   inline auto rewind() -> void;
   inline auto seek(std::size_t proposed_position) -> void;
   // "get" is big endian

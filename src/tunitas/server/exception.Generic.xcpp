@@ -1,0 +1,46 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <fpp>
+namespace tunitas::server::exception {
+  //
+  // The generic server exception.
+  // Descendants only.
+  // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well.
+  //
+  // These are wholly distinct from the tunitas::app::exceptions which have a
+  // text user interface aspect to them. The server exceptions are not expected
+  // to escape from the thread whence they came.  These are expected to have terse,
+  // rudimentary expressions in 'what()'
+  //
+  // Usage:
+  //
+  //   class my::server::Problem : public tunitas::server::exception::Generic,
+  //                               public std::runtime_error {
+  //     ...
+  //   };
+  //   class my::server::Difficulty : public tunitas::server::exception::Generic,
+  //                                  public std::logic_error {
+  //     ...
+  //   };
+  //
+  //   try {
+  //     ...
+  //     throw my::Problem{...};
+  //     throw my::Difficulty{...};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     ... fix it...
+  //   }
+  //
+  class Generic;
+}
+#endiv
+#divert <hpp>
+class tunitas::server::exception::Generic {
+protected:
+  virtual ~Generic() = default;
+  Generic() = default;
+  // The other side of the mixin must provide the messaging
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv
