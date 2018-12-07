@@ -2,19 +2,24 @@
 
 # DSO API versioning; see the README which is nearby.
 #
-#   CURRENT <= CURRENT+1 if any interfaces were added, removed, changed
+#   CURRENT <= CURRENT+1 if any interfaces were added
+#           <= CURRENT+1 if any interfaces were removed
+#           <= CURRENT+1 if any interfaces were changed
 #           <= CURRENT   if no interface change, but any other (source code) change
 #
-#   REVISION <= 0          if any interfaces were added, removed, changed
-#               REVISION+1 if no interface change, but any other (source code) change
+#   REVISION <= 0          if any interfaces were added
+#            <= 0          if any interfaces were removed
+#            <= 0          if any interfaces were changed
+#            <= REVISION+1 if no interface change, but any other (source code) change
 #
 #   AGE <= AGE+1 if any interaces were added
-#       <= 0     if any interfaces were removed, changed
+#       <= 0     if any interfaces were removed
+#       <= 0     if any interfaces were changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 5
+lib_libtunitas_la_CURRENT = 6
 lib_libtunitas_la_REVISION = 0
-lib_libtunitas_la_AGE = 2
+lib_libtunitas_la_AGE = 3
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
 lib_libtunitas_la = lib/libtunitas.la
@@ -77,7 +82,11 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/base64/sized.ByValue.cpp \
   \
   obj/src/tunitas/Outcome.cpp \
-  obj/src/tunitas/outcome.Success.cpp \
+  obj/src/tunitas/outcome/namespace.cpp \
+  obj/src/tunitas/outcome/Success.cpp \
+  obj/src/tunitas/outcome/Variant.cpp \
+  obj/src/tunitas/outcome/Visitor.cpp \
+  obj/src/tunitas/outcome/visit.cpp \
   \
   obj/src/tunitas/urlsafe/namespace.cpp \
   obj/src/tunitas/urlsafe/detail.cpp \

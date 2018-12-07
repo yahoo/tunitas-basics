@@ -1,3 +1,21 @@
+2018-12-06  Wendell Baker  <wbaker@oath.com>
+
+	* Version v1.6.0-0.devel, urlsafe encoding should prefer upper case
+	- See https://tools.ietf.org/html/rfc3986
+	-- <quote>For consistency, URI producers and normalizers should use uppercase hexadecimal digits for all percent-encodings.</quote>
+	* src/tunitas/urlsafe/detail.xcpp: ibidem.
+
+2018-11-15  Wendell Craig Baker  <wbaker@oath.com>
+
+	* Version v1.6.0-0.devel, tunitas::Outcome constructor accepts and ancestor
+	- and tunitas::Outcome leaves private the ancestry in std::variant; "not is-a variant"
+	* src/tunitas/Outcome.xcpp: four new constructors in lieu of Outcome(Value)
+	- tunitas::Outcome(Value &&), Outcome(Value const &), Outcome(ancestor &&), Outcome(ancestor const &)
+	* src/tunitas/outcome.Success.xcpp -> src/tunitas/outcome/Success.xcpp
+	* src/tunitas/Outcome.xcpp -> src/tunitas/outcome/Variant.xcpp: in support of.
+	* src/tunitas/outcome/Visitor.xcpp: oibidem.
+	* src/tunitas/outcome/visit.xcpp: ibidem.
+
 2018-11-14  Wendell Baker  <wbaker@oath.com>
 
 	* Version v1.5.0-0.devel, tunitas::server::exception::Generic

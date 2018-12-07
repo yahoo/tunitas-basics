@@ -1,6 +1,6 @@
 // -*- c++ -*- with SCOLD stylings
 #divert <fpp>
-#import tunitas.Outcome
+#import tunitas.outcome.Variant
 namespace tunitas::outcome {
   //
   // An outcome when nothing helpful is returned on success
@@ -8,6 +8,8 @@ namespace tunitas::outcome {
   // This is not Outcome<bool> because there is never 'false' on the success path.
   //
   // Unlike the underlying Outcome<TYPE> the default constructor computes success.
+  //
+  // The default constructor is indeterminate.
   //
   // Usage:
   //
@@ -20,19 +22,13 @@ namespace tunitas::outcome {
   //     std::cerr << "of the many ways to fail" << ec.message() << '\n';
   //   }
   //
-  namespace detail { enum Success { SUCCESS }; }
-  class Success;
+  //   auto good = Success{SUCCESS};   ... only one way to succeed: with SUCCESS.
+  //   auto failure = Success{std::error_code{error::Code::THAT_HURT}};
+  //   auto failure = Success{std::error_code{error::Code::THAT_WAS_BAD}};
+  //   auto failure = Success{std::error_code{error::Code::OH_MY_STARS}};
+  //
+  namespace detail { class Success { }; }
+  constexpr auto SUCCESS = detail::Success{};
+  using Success = Variant<detail::Success>;
 }
-#endiv
-#divert <hpp>
-class tunitas::outcome::Success : public tunitas::Outcome<detail::Success> {
-  using ancestor = tunitas::Outcome<detail::Success>;
-public:
-  inline Success(); // n.b. computes to success
-  using ancestor::Outcome;
-};
-#endiv
-#divert <ipp>
-tunitas::outcome::Success::Success()
-  : ancestor{detail::SUCCESS} { }
 #endiv

@@ -1,0 +1,30 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#forward tunitas.outcome.Visitor
+#forward tunitas.outcome.Variant
+namespace tunitas::outcome {
+  //
+  // The visitor pattern for variants.
+  //
+  // See the 2-liner definition:
+  // https://en.cppreference.com/w/cpp/utility/variant/visit
+  //
+  // Usage:
+  //
+  //   auto v = outcome::Visitor{[](Error const &) { return false; },
+  //                             [](Value const &) { return true; }};
+  //   return std::visit(v, a);
+  // 
+  template<typename VISITOR, typename VARIANT> inline constexpr decltype(auto) visit(VISITOR &&, VARIANT &&);
+}
+#endiv
+#divert <ipp>
+#import std.forward
+#include <functional> // #import std.invoke [[FIXTHIS]] with module-std-0.27
+#import std.visit
+namespace tunitas {
+  template<typename VISITOR, typename VARIANT> inline constexpr decltype(auto) outcome::visit(VISITOR &&vis, VARIANT &&var) {
+    return std::visit(std::forward<VISITOR>(vis), std::forward<VARIANT>(var));
+  }
+}
+#endiv

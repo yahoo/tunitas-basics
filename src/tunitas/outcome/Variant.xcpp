@@ -1,0 +1,137 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.required.Outcomable
+namespace tunitas::outcome {
+  //
+  // An outcome is a function's result,
+  // which may legitimately signal an error or success.
+  // error is an in-band error which can commonly occur,
+  // success the value that was desired.
+  //
+  // In the theme and spirit of
+  // P0709 R0, Zero overhad deterministic exceptions: Throwing Values, Herb Sutter, 2018-05-02.
+  // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf
+  //
+  // and also
+  // https://ned14.github.io/outcome/, https://github.com/ned14/outcome, 
+  // destined for Boost 1.69 https://www.boost.org/doc/libs/develop/doc/html/container/release_notes.html
+  // but not yet available 2018-11-03.
+  //
+  // Preversely, the default Outcome{} indicates failure with 0 == error_code(Outcome{}).value()
+  // This prevents the default-construction of VALUE{} on every Outcome{}
+  //
+  // Usage:
+  //
+  //   auto function() -> Outcome<int>
+  //   auto r = function();
+  //   if (ok(r)) {
+  //     auto v = value(r);
+  //     ...use the value...
+  //   } else {
+  //     auto e = error_code(r);
+  //     ...report the error...
+  //   }
+  //
+  template<required::Outcomable VALUE> class Variant;
+}
+#endiv
+#divert <hpp>
+#import std.error_code
+#import std.error_condition
+namespace tunitas::outcome {
+  template<required::Outcomable VALUE> inline auto ok(Variant<VALUE> const &) -> bool;
+  template<required::Outcomable VALUE> inline auto error_code(Variant<VALUE> const &) -> std::error_code;
+  template<required::Outcomable VALUE> inline auto error_condition(Variant<VALUE> const &) -> std::error_condition;
+  // these are casts, like std::move or std::forward
+  template<required::Outcomable VALUE> inline auto value(Variant<VALUE> const &) -> VALUE const &;
+  template<required::Outcomable VALUE> inline auto value(Variant<VALUE> &) -> VALUE &;
+  template<required::Outcomable VALUE> inline auto value(Variant<VALUE> &&) -> VALUE &&;
+}
+#import std.variant
+#import tunitas.outcome.visit
+template<tunitas::required::Outcomable VALUE> class tunitas::outcome::Variant : /*private?*/ public std::variant<std::error_code, VALUE> {
+  using ancestor = std::variant<std::error_code, VALUE>;
+public:
+  using Error = std::error_code;
+  using Value = VALUE;
+  inline Variant();
+  inline Variant(Error);
+  inline Variant(Value &&);
+  inline Variant(Value const &);
+  friend auto outcome::ok<>(Variant<VALUE> const &) -> bool;
+  friend auto outcome::error_code<>(Variant<VALUE> const &) -> std::error_code;
+  friend auto outcome::error_condition<>(Variant<VALUE> const &) -> std::error_condition;
+  // these are casts, like std::move or std::forward
+  friend auto outcome::value<>(Variant<VALUE> const &) -> VALUE const &;
+  friend auto outcome::value<>(Variant<VALUE> &) -> VALUE &;
+  friend auto outcome::value<>(Variant<VALUE> &&) -> VALUE &&;
+  template<typename VISITOR, typename VARIANT> friend constexpr decltype(auto) outcome::visit(VISITOR &&, VARIANT &&);
+};
+namespace std {
+  template<tunitas::required::Outcomable VALUE> class variant_size<tunitas::outcome::Variant<VALUE>> : public std::variant_size<std::variant<std::error_code, VALUE>> { };
+  template<tunitas::required::Outcomable VALUE> struct variant_alternative<0lu, tunitas::outcome::Variant<VALUE>> : public variant_alternative<0lu, std::variant<std::error_code, VALUE>> { };
+  template<tunitas::required::Outcomable VALUE> struct variant_alternative<1lu, tunitas::outcome::Variant<VALUE>> : public variant_alternative<1lu, std::variant<std::error_code, VALUE>> { };
+}
+#endiv
+#divert <ipp>
+#import std.invalid_argument
+#import tunitas.outcome.Visitor
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::ok(Variant<VALUE> const &r) -> bool {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto const &a = static_cast<typename Variant<VALUE>::ancestor const &>(r);
+  auto v = Visitor{[](Error const &) { return false; }, // even if 0 == e.value; the type signals failure
+                   [](Value const &) { return true; }};
+  return visit(v, a);
+}
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::error_code(Variant<VALUE> const &r) -> std::error_code {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto const &a = static_cast<typename Variant<VALUE>::ancestor const &>(r);
+  auto v = Visitor{[](Error const &e) { return e; },
+                   [](Value const &v) -> std::error_code { throw std::invalid_argument{"Result::Value"}; }};
+  return visit(v, a);
+}
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::error_condition(Variant<VALUE> const &r) -> std::error_condition {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto const &a = static_cast<typename Variant<VALUE>::ancestor const &>(r);
+  auto v = Visitor{[](Error const &e) { return e.category().default_error_condition(e.value()); },
+                   [](Value const &v) -> std::error_condition { throw std::invalid_argument{"Result::Value"}; }};
+  return visit(v, a);
+}
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Variant<VALUE> const &r) -> VALUE const & {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto const &a = static_cast<typename Variant<VALUE>::ancestor const &>(r);
+  auto v = Visitor{[](Error const &e) -> Value const & { throw std::invalid_argument{"Variant::Error"}; },
+                   [](Value const &v) -> Value const & { return v; }};
+  return visit(v, a);
+}
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Variant<VALUE> &r) -> VALUE & {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto &a = static_cast<typename Variant<VALUE>::ancestor &>(r);
+  auto v = Visitor{[](Error &e) -> Value & { throw std::invalid_argument{"Variant::Error"}; },
+                   [](Value &v) -> Value & { return v; }};
+  return visit(v, a);
+}
+#import std.forward
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Variant<VALUE> &&r) -> VALUE && {
+  using Error = typename Variant<VALUE>::Error;
+  using Value = typename Variant<VALUE>::Value;
+  auto &a = static_cast<typename Variant<VALUE>::ancestor &>(r);
+  auto v = Visitor{[](Error &e) -> Value && { throw std::invalid_argument{"Variant::Error"}; },
+                   [](Value &v) -> Value && { return std::move(v); }};
+  return visit(v, a);
+}
+template<tunitas::required::Outcomable _> tunitas::outcome::Variant<_>::Variant()
+  : ancestor{std::error_code{}} { }
+template<tunitas::required::Outcomable _> tunitas::outcome::Variant<_>::Variant(Error e)
+  : ancestor{e} { }
+template<tunitas::required::Outcomable _> tunitas::outcome::Variant<_>::Variant(Value const &v)
+  : ancestor{v} { }
+#import std.forward
+template<tunitas::required::Outcomable _> tunitas::outcome::Variant<_>::Variant(Value &&v)
+  : ancestor{std::forward<Value>(v)} { }
+#endiv

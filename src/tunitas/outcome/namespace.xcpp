@@ -1,0 +1,4 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tunitas::outcome { }
+#endiv

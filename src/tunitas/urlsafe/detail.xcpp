@@ -6,18 +6,28 @@
 namespace tunitas::urlsafe::detail {
   //
   // The implementation details of the urlsafe encdec.
+  // Codefrags towards hexidecimal character-tofrom-nibble conversion. 
   //
-  // Usage: figure it out
+  // Usage: figure it out, there's not that much code here.
   //
-  inline auto issafe(unsigned char uc) -> bool;
+  // https://tools.ietf.org/html/rfc3986
+  // <quote>
+  //   The uppercase hexadecimal digits 'A' through 'F' are equivalent to the lowercase digits 'a' through 'f', respectively.
+  //   If two URIs differ only in the case of hexadecimal digits used in percent-encoded octets, they are equivalent.
+  //   For consistency, URI producers and normalizers should use uppercase hexadecimal digits for all percent-encodings.
+  // </quote>
+  //
+  inline auto issafe(unsigned char) -> bool;
   using std::isxdigit;
-  inline auto hexchar(unsigned char uc) -> char;
+  inline auto hexchar(unsigned char) -> char;
   namespace packaging::hexpair_function {
     using Result = std::pair<unsigned char, unsigned char>;
-    inline auto hexpair(unsigned char c) -> Result;
+    inline auto hexpair(unsigned char) -> Result;
   }
   using packaging::hexpair_function::hexpair;
+  // hex must be a hexidecimal character: std::isxdigit
   inline auto dehex(unsigned char hex) -> char;
+  // only the low 4 bits of lo and hi are preserved.
   inline auto rehex(unsigned char hi, unsigned char lo) -> char;
 }
 #endiv
@@ -45,6 +55,7 @@ auto tunitas::urlsafe::detail::packaging::hexpair_function::hexpair(unsigned cha
 }
 #import tunitas.urlsafe.decoder.Invalid
 #import std.tolower
+#import std.toupper
 auto tunitas::urlsafe::detail::dehex(unsigned char uc) -> char {
   if (!isxdigit(uc)) {
     throw decoder::Invalid{};
@@ -52,7 +63,8 @@ auto tunitas::urlsafe::detail::dehex(unsigned char uc) -> char {
   if ('0' <= uc && uc <= '9') {
     return uc - '0';
   } else {
-    return std::tolower(uc) - 'a' + 10;
+    // See the note in the interface from RFC 3986 about the use of upper case.
+    return std::toupper(uc) - 'A' + 10;
   }
 }
 auto tunitas::urlsafe::detail::rehex(unsigned char hi, unsigned char lo) -> char {
