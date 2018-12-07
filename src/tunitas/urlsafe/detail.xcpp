@@ -45,7 +45,7 @@ auto tunitas::urlsafe::detail::issafe(unsigned char uc) -> bool {
 	  uc == '(' || uc == ')');
 }
 auto tunitas::urlsafe::detail::hexchar(unsigned char uc) -> char {
-  auto offset = uc <= 9 ? '0' : 'a' - 10;
+  auto offset = uc <= 9 ? '0' : 'A' - 10;
   return char(uc + offset);
 }
 auto tunitas::urlsafe::detail::packaging::hexpair_function::hexpair(unsigned char uc) -> Result {
