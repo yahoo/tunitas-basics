@@ -1,3 +1,20 @@
+2019-01-04  Wendell Baker  <wbaker@oath.com>
+
+	* Version v1.7.0-0.devel, add tunitas::app::options::get_word, get_identifier, get_filepath
+	- The "word" cannot be empty and is returned as a std::string
+	  any string of characters not containing whitespace
+	- The "filepath" cannot be empty, and is returned as a std::filesystem:;path
+	  any string of characters not containing whitespace
+	- The "identifier" must be shaped like an identifer, but will allow leading number and is returned as a std::string
+	  e.g. that certain package named "0ad", which is a multiplayer game set in the days of the Roman Empire.
+	- Whereas this is a pure addition, rachet the C:R:A=7.0.4 ~ O.F.A=3.0.0
+	* src/tunitas/app/options.get_identifier.xcpp: ibidem.
+	* src/tunitas/app/options.get_filepath.xcpp: ibidem.
+	* src/tunitas/app/options.get_port.xcpp: commentariat.
+	* src/tunitas/app/options.get_word.xcpp: ibidem.
+	* src/tunitas/Makefrag.am: C:R:A
+	* configure.ac: rachet the version
+
 2018-12-06  Wendell Baker  <wbaker@oath.com>
 
 	* Version v1.6.0-0.devel, urlsafe encoding should prefer upper case

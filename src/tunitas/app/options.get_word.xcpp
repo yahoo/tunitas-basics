@@ -1,0 +1,63 @@
+// This is -*- c++ -*- in the S.C.O.L.D. stylings that are so popular these days.
+#divert <hpp>
+#import c.const_stringz
+#import options.longish.Step
+#import re.string
+#import std.string
+#import tunitas.app.Configuration
+namespace tunitas::app::options {
+  //
+  // Acquire a word from the longish Step
+  //
+  // The word is returned, not an outcome.
+  // The word value is checked to ensure that it is not empty.
+  // But the word may be whitespace or contain anything else at all.
+  //
+  // Scheme:
+  //
+  //   --word=WORD
+  //
+  // Example:
+  //
+  //   --user=jdoe
+  //   --commalist=apple,banana,cherry
+  //
+  // Usage:
+  //
+  //   Configuration cfg{...somehow...}
+  //   options::longish::Step step{...somehow...};
+  //   std::string word = get_word(cfg, step);
+  //
+  namespace packaging::get_word_function {
+    using Step = ::options::longish::Step;
+    using Word = std::string;
+    using Field_Name = re::string<c::const_stringz>;
+    // [[FIXTHIS]] build a concept for an throwable Quitting exception
+    template<typename QUITTING> inline auto get_word(Configuration const &, Step const &) -> Word;
+    template<typename QUITTING> auto get_word(Configuration const &, Step const &, Field_Name field_name) -> Word;
+  }
+  using packaging::get_word_function::get_word;
+}
+#endiv
+#divert <ipp>
+template<typename QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step) -> Word { 
+  return get_word<QUITTING>(cfg, step, "word");
+}
+#endiv
+#divert <tpp>
+#import std.string
+#import std.invalid_argument
+#import sys.exits.constants
+template<typename QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step, Field_Name field_name) -> Word {
+  std::string const candidate = ::options::shortish::required(step);
+  if (field_name.empty()) {
+    // A "logic error" because the programmer controlls this
+    throw std::invalid_argument{"field_name is empty"};
+  }
+  if (candidate.empty()) {
+    error(cfg) << "the " << field_name << " cannot be empty\n";
+    throw QUITTING{cfg.NAME, sys::exits::CONFIG};
+  }
+  return std::move(candidate);;
+}
+#endiv

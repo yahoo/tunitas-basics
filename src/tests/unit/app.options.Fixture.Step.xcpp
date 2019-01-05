@@ -1,0 +1,34 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.options.Fixture
+#endiv
+#divert <hpp>
+#import options.longish.Step
+#import options.shortish.Step
+#import std.string
+class tests::unit::app::options::Fixture::Step : public ::options::longish::Step {
+  using ancestor = ::options::longish::Step;
+  struct ancestors {
+    using Longish = ::options::longish::Step;
+    using Shortish = ::options::shortish::Step;
+  };
+public:
+  using Code = ::options::indicator::Code;
+  using Value = std::string;
+  Step(Code, Value);
+protected:
+  Value value;
+  using Option_Line = ::options::longish::detail::Option;
+  Option_Line const dummy_option_line;
+};
+#endiv
+#divert <cpp>
+#import options.argument.constants
+tests::unit::app::options::Fixture::Step::Step(Code c, Value v)
+  : ancestor{c, c::const_stringz{}, dummy_option_line} // seed with the success case
+  , value{v}
+  , dummy_option_line{"force", (int) ::options::argument::REQUIRED, nullptr, (char) Code::CHR_f}
+{
+  this->ancestors::Shortish::value = this->value.data(); // <----- and make the ancestor point to our stored storage
+}
+#endiv

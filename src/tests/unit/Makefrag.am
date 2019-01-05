@@ -30,7 +30,11 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/app.Fixture.Specification.cpp \
   obj/src/tests/unit/app.Fixture.Usage.cpp \
   obj/src/tests/unit/app.Fixture.Version.cpp \
+  \
   obj/src/tests/unit/app.options.Fixture.cpp \
+  obj/src/tests/unit/app.options.Fixture.Configuration.cpp \
+  obj/src/tests/unit/app.options.Fixture.Quitting.cpp \
+  obj/src/tests/unit/app.options.Fixture.Step.cpp \
   \
   obj/src/tests/unit/base64/namespace.cpp \
   obj/src/tests/unit/base64/Fixture.cpp \
