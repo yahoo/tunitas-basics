@@ -1,6 +1,7 @@
 2019-01-23  Wendell Baker  <wbaker@verizonmedia>
 
 	* Version v1.7.0-0.devel, add tunitas.app.exception becomes a module
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=8.0.5 ~ O.F.A=3.5.0
 	- to allow applications to cascade the namespace (easily)
 	- Whereas this is a pure organizational change, rachet the C:R:A=7.1.4 ~ O.F.A=3.4.1
 	* src/tunitas/app/exception/namespace.xcpp: ibidem
