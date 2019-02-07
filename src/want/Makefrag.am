@@ -5,10 +5,33 @@ lib_libwant_la_LIBADD = $(nothing)
 lib_libwant_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libwant_la_SOURCES))
 lib_libwant_la_SOURCES = \
   obj/src/want/namespace.cpp \
-  obj/src/want/std.filesystem.cpp \
-  obj/src/want/std.filesystem.path.cpp \
+  \
+  obj/src/want/nonstd.cpp \
   obj/src/want/nonstd.Nullbuf.cpp \
   obj/src/want/nonstd.null.cpp \
+  obj/src/want/nonstd.uninitialized_zero.cpp \
+  \
+  obj/src/want/std.filesystem.cpp \
+  obj/src/want/std.filesystem.path.cpp \
+  \
+  obj/src/want/sys.cpp \
+  obj/src/want/sys.posix.cpp \
+  obj/src/want/sys.posix.daemon.cpp \
+  obj/src/want/sys.posix.Endent.cpp \
+  obj/src/want/sys.posix.endpwent.cpp \
+  obj/src/want/sys.posix.entry.cpp \
+  obj/src/want/sys.posix.entry.Buffer.cpp \
+  obj/src/want/sys.posix.entry.Pointer.cpp \
+  obj/src/want/sys.posix.entry.required.Entry.cpp \
+  obj/src/want/sys.posix.geteuid.cpp \
+  obj/src/want/sys.posix.getpwname.cpp \
+  obj/src/want/sys.posix.getpwnam.cpp \
+  obj/src/want/sys.posix.getpwuid.cpp \
+  obj/src/want/sys.posix.getuid.cpp \
+  obj/src/want/sys.posix.packaging.getpw.cpp \
+  obj/src/want/sys.posix.seteuid.cpp \
+  obj/src/want/sys.posix.setresuid.cpp \
+  obj/src/want/sys.posix.setreuid.cpp \
   $(end)
 
 $(scold_cxxdir)/want/dependencies.mk:

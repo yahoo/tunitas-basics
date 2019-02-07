@@ -17,6 +17,7 @@ auto tests::unit::want::Fixture::test_something() -> void {
   CPPUNIT_ASSERT(true);
 }
 #import tests.unit.want.nonstd.Fixture
+#import tests.unit.want.sys.Fixture
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
 #import unit.rigging.suite.add
@@ -25,6 +26,7 @@ auto tests::unit::want::Fixture::suite() -> cppunit::Test * {
   Stream series("want");
   series << call("something", &Fixture::test_something)
 	 << add(nonstd::Fixture::suite())
+	 << add(sys::Fixture::suite())
     ;
   return series.release();
 }

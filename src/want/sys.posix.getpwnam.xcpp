@@ -1,0 +1,17 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#import c.const_stringz
+#import re.string
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import uid_t
+#import want.sys.posix
+#import want.sys.posix.getpwname
+namespace want::sys::posix {
+  //
+  // Buy A Vowel!
+  //
+  // getpwnam == getpwname
+  inline auto getpwnam(re::string<c::const_stringz> name) -> decltype(getpwname(name)) {
+    return getpwname(name);
+  }
+}
+#endiv

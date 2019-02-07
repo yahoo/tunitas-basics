@@ -1,0 +1,30 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::want::sys { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#include <pwd.h> // [[FIXTHIS]] with module-posix-os #import uid_t
+class tests::unit::want::sys::Fixture : public cppunit::test::Fixture {
+public:
+  // nothing?
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.string_literals
+using namespace std::string_literals;
+#import tests.unit.want.sys.posix.Fixture
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::want::sys::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("sys");
+  series << add(posix::Fixture::suite())
+    ;
+  return series.release();
+}
+#endiv

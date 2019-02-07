@@ -1,0 +1,119 @@
+>// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::want::sys::posix { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#include <pwd.h> // [[FIXTHIS]] with module-posix-os #import uid_t
+class tests::unit::want::sys::posix::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_sys_posix_getuid() -> void;
+  auto test_sys_posix_geteuid() -> void;
+  auto test_sys_posix_seteuid() -> void;
+  auto test_sys_posix_setreuid() -> void;
+  auto test_sys_posix_setresuid() -> void;
+  auto test_sys_posix_getpwuid() -> void;
+  auto test_sys_posix_getpwname() -> void;
+  auto test_sys_posix_endpwent() -> void;
+  auto test_sys_posix_Endent() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto const BOGUS_EUID = ::uid_t(99999u); 
+  static auto const BOGUS_RUID = 1+BOGUS_EUID;
+  static auto const BOGUS_SUID = 1+BOGUS_RUID;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.string_literals
+using namespace std::string_literals;
+#import want.sys.posix.getuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_getuid() -> void {
+  auto u = ::want::sys::posix::getuid();
+  // What, are you stupid?  Don't run unit tests as root.
+  CPPUNIT_ASSERT(0 != u);
+}
+#import want.sys.posix.geteuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_geteuid() -> void {
+  auto u = ::want::sys::posix::geteuid();
+  CPPUNIT_ASSERT(0 != u); // Ibidem.
+}
+#import want.sys.posix.seteuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_seteuid() -> void {
+  auto r = ::want::sys::posix::seteuid(BOGUS_EUID);
+  // Of course this will fail, you are not root; that is the success
+  CPPUNIT_ASSERT(!ok(r));
+}
+#import want.sys.posix.setreuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_setreuid() -> void {
+  auto r = ::want::sys::posix::setreuid(BOGUS_RUID, BOGUS_EUID);
+  // Of course this will fail, you are not root; that is the success
+  CPPUNIT_ASSERT(!ok(r));
+}
+#import want.sys.posix.setresuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_setresuid() -> void {
+  auto r = ::want::sys::posix::setresuid(BOGUS_RUID, BOGUS_EUID, BOGUS_SUID);
+  // Of course this will fail, you are not root; that is the success
+  CPPUNIT_ASSERT(!ok(r));
+}
+#import want.sys.posix.getpwuid
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_getpwuid() -> void {
+  auto got = ::want::sys::posix::getpwuid(0);
+  CPPUNIT_ASSERT(ok(got));
+  CPPUNIT_ASSERT_EQUAL(0u, value(got)->pw_uid);
+  CPPUNIT_ASSERT_EQUAL("root"s, std::string{value(got)->pw_name});
+}
+#import want.sys.posix.getpwname
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_getpwname() -> void {
+  auto got = ::want::sys::posix::getpwuid(0);
+  CPPUNIT_ASSERT(ok(got));
+  auto const &ptr = value(got);
+  auto const &pwd = *ptr;
+  std::cerr << "name=" << pwd.pw_name << '\n';
+  std::cerr << "uid=" << pwd.pw_uid << '\n';
+  std::cerr << "gecos=" << pwd.pw_gecos << '\n';
+  CPPUNIT_ASSERT_EQUAL(0u, pwd.pw_uid);
+  CPPUNIT_ASSERT_EQUAL("root"s, std::string{pwd.pw_name});
+}
+#import want.sys.posix.endpwent
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_endpwent() -> void {
+  ::want::sys::posix::endpwent();
+}
+#import std.exception
+#import want.sys.posix.Endent
+auto tests::unit::want::sys::posix::Fixture::test_sys_posix_Endent() -> void {
+  try {
+    ::want::sys::posix::Endent<::passwd> guard;
+    auto got = ::want::sys::posix::getpwuid(0);
+    CPPUNIT_ASSERT(ok(got));
+    CPPUNIT_ASSERT_EQUAL(0u, value(got)->pw_uid);
+    CPPUNIT_ASSERT_EQUAL("root"s, std::string{value(got)->pw_name});
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::want::sys::posix::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("posix");
+  series << call("getuid", &Fixture::test_sys_posix_getuid)
+	 << call("geteuid", &Fixture::test_sys_posix_geteuid)
+	 << call("seteuid", &Fixture::test_sys_posix_seteuid)
+	 << call("setreuid", &Fixture::test_sys_posix_setreuid)
+	 << call("setresuid", &Fixture::test_sys_posix_setresuid)
+	 << call("getpwuid", &Fixture::test_sys_posix_getpwuid)
+	 << call("getpwname", &Fixture::test_sys_posix_getpwname)
+    ;
+  {
+    Stream last{"last"};
+    last << call("endpwent", &Fixture::test_sys_posix_endpwent)
+	 << call("Endent", &Fixture::test_sys_posix_Endent)
+      ;
+    series << add(last.release());
+  }
+  return series.release();
+}
+#endiv

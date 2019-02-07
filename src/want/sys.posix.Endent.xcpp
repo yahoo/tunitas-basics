@@ -1,0 +1,46 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+#import want.sys.posix
+#import want.sys.posix.entry.required.Entry
+namespace want::sys::posix {
+  //
+  // The guard template against the various "entries" databases
+  // These are keyed by the struct types that they manage
+  //
+  // Usage:
+  //
+  //   try {
+  //     Endent<::passwd> guard;
+  //     auto got = getpwuid(3);
+  //     ...
+  //     if (...condition...) {
+  //       throw ...something...
+  //     }
+  //     ...
+  //   } catch (...) {
+  //     ... endpwent() has already been called ...
+  //   }
+  //   ... endpwent() has been called ...
+  //
+  template<entry::required::Entry KEY> struct Endent; // specializations only
+}
+#endiv
+#divert <hpp>
+namespace want::sys {
+  template<posix::entry::required::Entry KEY> struct posix::Endent {
+    ~Endent() noexcept(false);
+  };
+}
+#include <pwd.h> // [[FIXTHIS]] module-posix-os #import passwd
+namespace want::sys::posix {
+  template<> inline Endent<::passwd>::~Endent() noexcept(false);
+}
+#endiv
+#divert <ipp>
+#import want.sys.posix.endpwent
+namespace want::sys::posix {
+  template<> Endent<::passwd>::~Endent() noexcept(false) {
+    endpwent();
+  }
+}
+#endiv

@@ -1,0 +1,26 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import uid_t
+#import want.sys.posix
+namespace want::sys::posix {
+  //
+  // Get the (real) user id (UID)
+  //
+  // Specification: see getuid(2)
+  //
+  //   #include <sys/types.h>
+  //   #include <unistd.h>
+  //   uid_t getuid();
+  //
+  // Usage:  really?
+  //
+  inline auto getuid() -> uid_t;
+}
+#endiv
+#divert <ipp>
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import getuid
+auto want::sys::posix::getuid() -> uid_t {
+  // Yup, this can't fail.
+  return ::getuid();
+}
+#endiv

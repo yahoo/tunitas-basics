@@ -4,7 +4,7 @@ tests_unit_TESTS = \
   $(tests_unit_XPASS_TESTS) \
   $(tests_unit_XFAIL_TESTS) \
   tests/unit/list.test \
-  tests/unit/all.test \
+ \
   tests/unit/app.test \
   tests/unit/base64.test \
   tests/unit/outcome.test \
@@ -13,4 +13,6 @@ tests_unit_TESTS = \
   tests/unit/tunitas.test \
   tests/unit/urlsafe.test \
   tests/unit/want.test \
+  \
+  tests/unit/all.test \
   $(end)

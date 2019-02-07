@@ -1,0 +1,23 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+#import want.sys.posix.entry
+#include <pwd.h> // [[FIXTHIS]] module-posix-os #import passwd
+#include <grp.h> // [[FIXTHIS]] module-posix-os #import group
+#import std.is_same
+namespace want::sys::posix::entry::required {
+  //
+  // The Buffer for the reentrant family of "entries" databases.
+  // e.g. getpwnam_r(...),
+  //      getgrnam_r(...),
+  //      etc.
+  //
+  // Usage:
+  //
+  //   entry::Pointer<::passwd> ptr{new entry::Buffer<::passwd>{}};
+  //   ::passwd *result{nullptr};
+  //   int got = ::getpwuid_r(...some_uid..., ptr->entry(), ptr->data(), ptr->size(), &result);
+  //
+  template<typename ENTRY> concept bool Entry = (std::is_same<ENTRY, ::passwd>::value ||
+						 std::is_same<ENTRY, ::group>::value);
+}
+#endiv

@@ -1,0 +1,15 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#include <pwd.h> // [[FIXTHIS]] with module-posix-os, use #import endpwent
+namespace want::sys::posix {
+  //
+  // Close the password entry database
+  //
+  // Usage:
+  //
+  //   auto got = sys::posix::getpwname("root");
+  //   sys::posix::endpwent();
+  //
+  using ::endpwent;
+}
+#endiv

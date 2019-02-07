@@ -1,0 +1,31 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#import sys.call.Result
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import uid_t
+#import want.sys.posix
+namespace want::sys::posix {
+  //
+  // Set the effective user id (UID)
+  //
+  // Specification: see setesuid(2)
+  //
+  //   #include <sys/types.h>
+  //   #include <unistd.h>
+  //   int seteuid(uid_t effective saved);
+  //
+  // Usage:  really?
+  //
+  inline auto seteuid(uid_t effective) -> call::Result;
+}
+#endiv
+#divert <ipp>
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import seteuid
+#include <cerrno>
+auto want::sys::posix::seteuid(uid_t euid) -> call::Result {
+  using Result = call::Result;
+  auto r = ::seteuid(euid);
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r;
+  return Result{b, errnum, r};
+}
+#endiv

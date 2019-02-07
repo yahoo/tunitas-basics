@@ -1,0 +1,4 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+namespace want::nonstd { }
+#endiv

@@ -59,6 +59,8 @@ check_bin_unit_SOURCES = \
   \
   obj/src/tests/unit/want.Fixture.cpp \
   obj/src/tests/unit/want.nonstd.Fixture.cpp \
+  obj/src/tests/unit/want.sys.Fixture.cpp \
+  obj/src/tests/unit/want.sys.posix.Fixture.cpp \
   \
   obj/src/tests/unit/urlsafe.Fixture.cpp \
   $(end)

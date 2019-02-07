@@ -1,0 +1,8 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+#import sys
+namespace want::sys {
+  // cascade the namespaces
+  using namespace ::sys;
+}
+#endiv

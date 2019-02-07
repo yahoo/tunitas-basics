@@ -1,0 +1,20 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#import sys.call.result.Value
+#import want.sys.posix
+#import want.sys.posix.entry.Pointer
+#import want.sys.posix.entry.Buffer
+#include <pwd.h> // [[FIXTHIS]] module-posix-os #import passwd
+namespace want::sys::posix::packaging::getpw {
+  //
+  // The buffer management and result for the 'getpw'-sphere of functions.
+  // Is common amongst them all.
+  // Establishes the thread safety by managing per-stack, per-thread buffers.
+  //
+  // Usage: see getpwname(...), getpwuid(...)
+  //
+  using Buffer = entry::Buffer<::passwd>;
+  using Pointer = entry::Pointer<::passwd>;
+  using Result = call::result::Value<Pointer, /*raw result*/ ::passwd *, /*raw result*/ int>;
+}
+#endiv

@@ -1,0 +1,10 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+#import sys.posix
+#import want.sys
+namespace want::sys::posix {
+  // cascade the namespaces
+  using namespace ::sys::posix;
+}
+#endiv
+

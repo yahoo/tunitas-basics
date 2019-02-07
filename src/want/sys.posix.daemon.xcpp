@@ -1,0 +1,46 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <fpp>
+#import want.sys.posix
+namespace want::sys::posix {
+  //
+  // Supplied in sys::posix::daemonize in later versions
+  // Whereas POSIX uses unadorned 'int' and a double negative.
+  // We clean up with the enum classes of C++2a.
+  //
+  enum class Chdir { NO, YES };
+  enum class Close { NO, YES };
+}
+#endiv
+#divert <hpp>
+#import sys.call.Result
+namespace want::sys::posix {
+  //
+  // Run in the background
+  //
+  // Specification: see daemon(3)
+  //
+  //   #include <unistd.h>
+  //   int daemon(int nochdir, int noclose);
+  //
+  // Usage:
+  //
+  //   auto chdir = sys::posix::Chdir::NO;
+  //   auto close = sys::posix::Close::NO;
+  //   auto r = daemon(chdir, close); <---------- found by ADL
+  //
+  inline auto daemon(Chdir, Close) -> call::Result;
+}
+#endiv
+#divert <ipp>
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import daemon
+#include <cerrno>
+auto want::sys::posix::daemon(Chdir chdir, Close close) -> call::Result {
+  using Result = call::Result;
+  auto const nochdir = Chdir::NO == chdir;
+  auto const noclose = Close::NO == close;
+  auto r = ::daemon(nochdir, noclose);
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r;
+  return Result{b, errnum, r};
+}
+#endiv

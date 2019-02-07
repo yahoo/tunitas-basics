@@ -1,0 +1,24 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#import want.nonstd
+namespace want::nonstd {
+  //
+  // Zero the otherwise uninitialized area
+  // The type should be pod.  Or you don't care what you're destroying.
+  //
+  // Same as memset(...)
+  //
+  // Usage:
+  //
+  //   Pod_Thing thing;
+  //   uninitialized_zero(thing);        ... memset(&thing, sizeof (thing), '\0');)
+  //
+  template<typename TYPE> inline auto uninitialized_zero(TYPE &lhs) -> void;
+}
+#endiv
+#divert <ipp>
+#import std.uninitialized_fill_n
+template<typename TYPE> auto want::nonstd::uninitialized_zero(TYPE &lhs) -> void {
+  std::uninitialized_fill_n(reinterpret_cast<char *>(&lhs), sizeof (lhs), '\0');
+}
+#endiv

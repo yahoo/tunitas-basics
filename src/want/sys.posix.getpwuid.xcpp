@@ -1,0 +1,49 @@
+// This is -*- c++ -*- (as close to C++2a as possible)
+#divert <hpp>
+#import want.sys.posix.packaging.getpw
+#include <unistd.h> // [[FIXTHIS]] module-posix-os #import uid_t
+#import want.sys.posix
+namespace want::sys::posix {
+  //
+  // Get a password file entry, by uid
+  // Is thread safe.
+  //
+  // Usage:
+  //
+  //   uid_t some_uid{...somehow...};
+  //   auto got = getpwuid(some_uid);
+  //   if (ok(got)) {
+  //      auto ptr = value(std::move(got));
+  //      ...use ptr->pw_uid...
+  //      ...etc...
+  //   } else {
+  //      std::cerr << "could not get " << some_uid << " because " << error_code(got).message() << '\n';
+  //   }
+  //
+  inline auto getpwuid(uid_t) -> packaging::getpw::Result;
+}
+#endiv
+#divert <ipp>
+#import std.move
+#include <cerrno>
+#import std.cerr
+auto want::sys::posix::getpwuid(uid_t uid) -> packaging::getpw::Result {
+  using namespace packaging::getpw;
+  Pointer ptr{new Buffer{}};
+  ::passwd *result{nullptr};  
+  auto r = [&ptr, uid, &result]() {
+	     auto g = ptr.get();
+	     return ::getpwuid_r(uid, g->entry(), g->data(), g->size(), &result);
+	   }();
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r && nullptr != result;
+  std::cerr << "b=" << b << ",r=" << r << '.' << (0 != result)
+	    << ",name=" << ptr->pw_name << ",uid=" << ptr->pw_uid << '\n'
+	    << ",name=" << result->pw_name << ",uid=" << result->pw_uid << '\n'
+    ;
+  if (!b) {
+    ptr.reset();
+  }
+  return Result{std::move(b), std::move(errnum), std::move(ptr), std::move(result), std::move(r)};
+}
+#endiv
