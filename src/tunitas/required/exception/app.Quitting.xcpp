@@ -1,0 +1,35 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tunitas.app.exception.Generic
+#import std.exception
+#import std.is_base_of
+#import std.ostream
+#import std.string
+#import sys.exits.Code
+// Need the complete definition for these types.
+#include <hpp/tunitas.app.exception.Generic>
+// NO NEED #include <hpp/std.exception>
+// NO NEED #include <hpp/std.string>
+namespace tunitas::required::exception::app {
+  //
+  // Is this a possible Quitting exception?
+  //
+  // Must be a descendant of tunitas::app::exception::Generic
+  // Must be a descendant of nonstd::exception::Quitting (where available)
+  //
+  // Usage:
+  //
+  //   template<required::exception::app::Quitting QUITTING> auto drop(Configuration const &) -> void;
+  //
+  template<typename QUITTING> concept bool Quitting =
+    std::is_base_of<tunitas::app::exception::Generic, QUITTING>::value
+    && std::is_base_of<std::exception, QUITTING>::value
+    && true // [[FIXTHIS]] in a later release -- std::is_base_of<nonstd::exception::Quitting, QUITTING>::value
+    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+      { QUITTING{name, code} };
+      { quitting.what() } -> char const *;
+      { quitting.code() } -> sys::exits::Code;
+      { quitting.stream() } -> std::ostream &;
+  };
+}
+#endiv

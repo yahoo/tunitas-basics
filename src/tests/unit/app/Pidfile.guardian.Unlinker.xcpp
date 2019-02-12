@@ -1,0 +1,47 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Pidfile
+#endiv
+#divert <hpp>
+#import std.filesystem.path
+class tests::unit::app::Pidfile::guardian::Unlinker {
+public:
+  inline explicit Unlinker(std::filesystem::path doomed);
+  inline ~Unlinker() noexcept(false);
+  Unlinker(Unlinker const &) = delete;
+  auto operator=(Unlinker const &) -> Unlinker & = delete;
+private:
+  std::filesystem::path doomed;
+};
+#endiv
+#divert <ipp>
+tests::unit::app::Pidfile::guardian::Unlinker::Unlinker(std::filesystem::path doomed)
+  : doomed{std::move(doomed)}
+{ }
+#import sys.posix.unlink
+#import std.system_error
+#import std.errc
+#import std.cerr
+#import std.boolalpha
+tests::unit::app::Pidfile::guardian::Unlinker::~Unlinker() noexcept(false) {
+  auto un = sys::posix::unlink((std::string)doomed); // [[FIXTHIS]] the cast is not needed in later module-sys
+  if ( !ok(un) ) {
+    // WATCHOUT module-sys-devel-0.24.14 installs std::system_category() in the error_code, error_condition
+    // It should not.  Applications (libraries) are supposed to use std::generic_category().
+    // std::system_category is largely useless because "the operating system" will never give you one.
+    // So we have to clean it up before using operator== (operator!=) on it.
+    auto const clean_condition = std::error_condition{error_condition(un).value(), std::generic_category()};
+    std::cerr << "error_condition " << error_condition(un).value() << '\n';
+    std::cerr << "no_such = " << (int)std::errc::no_such_file_or_directory << '\n';
+    std::cerr << std::boolalpha;
+    std::cerr << "EQUAL1 = " << (std::errc::no_such_file_or_directory == error_condition(un)) << '\n';
+    std::cerr << "EQUAL2 = " << (std::errc::no_such_file_or_directory == clean_condition) << '\n';
+    std::cerr << "errno = " << error_num(un) << '\n';
+    std::cerr << "ENOENT = " << ENOENT << '\n';
+    if (std::errc::no_such_file_or_directory != clean_condition) {
+      std::cerr << "throwing anyway\n";
+      throw std::system_error{error_code(un), "unlink"};
+    }
+  }
+}
+#endiv

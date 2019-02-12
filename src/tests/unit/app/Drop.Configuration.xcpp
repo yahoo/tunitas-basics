@@ -1,0 +1,12 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Drop
+#endiv
+#divert <hpp>
+#import tunitas.app.Configuration
+class tests::unit::app::Drop::Configuration : public tunitas::app::Configuration {
+  using ancestor = tunitas::app::Configuration;
+public:
+  using ancestor::Configuration;
+};
+#endiv

@@ -23,18 +23,24 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/for_each/counter.Iterator.cpp \
   obj/src/tests/unit/for_each/count.cpp \
   \
-  obj/src/tests/unit/app.Fixture.cpp \
-  obj/src/tests/unit/app.Fixture.Configuration.cpp \
-  obj/src/tests/unit/app.Fixture.Messaging.cpp \
-  obj/src/tests/unit/app.Fixture.Quitting.cpp \
-  obj/src/tests/unit/app.Fixture.Specification.cpp \
-  obj/src/tests/unit/app.Fixture.Usage.cpp \
-  obj/src/tests/unit/app.Fixture.Version.cpp \
+  obj/src/tests/unit/app/namespace.cpp \
+  obj/src/tests/unit/app/Fixture.cpp \
+  obj/src/tests/unit/app/Fixture.Configuration.cpp \
+  obj/src/tests/unit/app/Fixture.Messaging.cpp \
+  obj/src/tests/unit/app/Fixture.Quitting.cpp \
+  obj/src/tests/unit/app/Fixture.Specification.cpp \
+  obj/src/tests/unit/app/Fixture.Usage.cpp \
+  obj/src/tests/unit/app/Fixture.Version.cpp \
+  obj/src/tests/unit/app/Pidfile.cpp \
+  obj/src/tests/unit/app/Pidfile.guardian.Unlinker.cpp \
+  obj/src/tests/unit/app/Drop.cpp \
+  obj/src/tests/unit/app/Drop.Configuration.cpp \
+  obj/src/tests/unit/app/Drop.Quitting.cpp \
   \
-  obj/src/tests/unit/app.options.Fixture.cpp \
-  obj/src/tests/unit/app.options.Fixture.Configuration.cpp \
-  obj/src/tests/unit/app.options.Fixture.Quitting.cpp \
-  obj/src/tests/unit/app.options.Fixture.Step.cpp \
+  obj/src/tests/unit/app/options.Fixture.cpp \
+  obj/src/tests/unit/app/options.Fixture.Configuration.cpp \
+  obj/src/tests/unit/app/options.Fixture.Quitting.cpp \
+  obj/src/tests/unit/app/options.Fixture.Step.cpp \
   \
   obj/src/tests/unit/base64/namespace.cpp \
   obj/src/tests/unit/base64/Fixture.cpp \

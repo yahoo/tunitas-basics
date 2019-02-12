@@ -1,0 +1,30 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+#import tests.unit.app.Drop
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.app.exception.Quitting
+#import std.string
+#import sys.exits.Code
+class tests::unit::app::Drop::Quitting : public tunitas::app::exception::Quitting, public std::runtime_error {
+  using appware = tunitas::app::exception::Quitting;
+  using stdware = std::runtime_error;
+public:
+  inline explicit Quitting(std::string NAME, sys::exits::Code);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <ipp>
+#import std.move
+#import sys.exits.constants
+tests::unit::app::Drop::Quitting::Quitting(std::string reason, sys::exits::Code code)
+  : appware{sys::exits::FAIL}
+  , stdware{"because"} // And 'cause never was the reason for the evening, or the Tropic of Sir Gallahad
+{ }
+#endiv
+#divert <cpp>
+auto tests::unit::app::Drop::Quitting::what() const noexcept -> char const * {
+  return stdware::what();
+}
+#endiv

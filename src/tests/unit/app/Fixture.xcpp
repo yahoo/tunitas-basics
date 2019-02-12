@@ -205,6 +205,8 @@ auto tests::unit::app::Fixture::test_words_Filepaths() -> void {
   Filepaths paths{".", "..", "file.c", "file.h"};
   CPPUNIT_ASSERT_EQUAL(4lu, paths.size());
 }
+#import tests.unit.app.Pidfile
+#import tests.unit.app.Drop
 #import tests.unit.app.options.Fixture
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
@@ -214,6 +216,8 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
   Stream series("app");
   series << call("Configuration", &Fixture::test_Configuration)
 	 << call("Program", &Fixture::test_Program)
+	 << add(Pidfile::suite())
+	 << add(Drop::suite())
     ;
   {
     Stream exc("exception");
