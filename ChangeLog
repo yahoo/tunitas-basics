@@ -1,3 +1,8 @@
+2019-03-06  Wendell Craig Baker  <wbaker@verizonmedia.com>
+
+	* Version v1.7.0-0.devel, configure and build against --with-nonstd-libhttpserver if necessary
+	* Makefile.am: use the configuration produced in configure.ac
+
 2019-02-11  Wendell Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, tunitas::app::drop(...) privileges; the concept of Quitting

@@ -16,6 +16,7 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
+  @module_httpserver_prefix@ \
   @module_nonstd_prefix@ \
   @module_options_prefix@ \
   @module_posix_prefix@ \
@@ -29,6 +30,7 @@ TESTING_AREAS = \
 INSTALLATION_AREAS = \
   @nonstd_cppunit_prefix@ \
   @nonstd_gcc_prefix@ \
+  @nonstd_libhttpserver_prefix@ \
   @std_scold_prefix@ \
   @std_tunitas_prefix@ \
   $(end)
