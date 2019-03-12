@@ -16,21 +16,24 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
-  @module_nonstd_prefix@ \
-  @module_options_prefix@ \
-  @module_posix_prefix@ \
-  @module_std_prefix@ \
-  @module_string_prefix@ \
+  $(module_httpserver_prefix) \
+  $(module_nonstd_prefix) \
+  $(module_options_prefix) \
+  $(module_posix_prefix) \
+  $(module_std_prefix) \
+  $(module_string_prefix) \
   $(end)
 TESTING_AREAS = \
-  @module_cppunit_prefix@ \
-  @module_rigging_prefix@ \
+  $(module_cppunit_prefix) \
+  $(module_rigging_prefix) \
   $(end)
 INSTALLATION_AREAS = \
-  @nonstd_cppunit_prefix@ \
-  @nonstd_gcc_prefix@ \
-  @std_scold_prefix@ \
-  @std_tunitas_prefix@ \
+  $(nonstd_cppunit_prefix) \
+  $(nonstd_half_prefix) \
+  $(nonstd_libhttpserver_prefix) \
+  $(nonstd_gcc_prefix) \
+  $(std_scold_prefix) \
+  $(std_tunitas_prefix) \
   $(end)
 
 default: all

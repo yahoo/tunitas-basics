@@ -22,7 +22,7 @@ AC_CONFIG_FILES([Makefile])
 # To get submodules to build in place, these go as a pair
 #   configure.ac declares TF_CONFIG_SUBMODULES(directory, ...list...)
 #   Makefile.am  declares SUBDIRS = @subdirs@
-# there are nos submodules
+# there are no submodules
 
 TF_COMPONENT_METADIRECTORY_TIERS
 TF_ENABLE_GNU
@@ -34,7 +34,7 @@ TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])
 
 # minimize these
-TF_WITH_MODULE([httpserver])
+TF_WITH_MODULE([httpserver]) dnl indeed --with-module-httpserver=DIR  but --with-nonstd-libhttpserver=DIR (the extra "lib" prefix)
 TF_WITH_MODULE([nonstd])
 TF_WITH_MODULE([options])
 TF_WITH_MODULE([posix])
@@ -47,7 +47,7 @@ TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([cppunit])
 TF_WITH_NONSTD([gcc])
-TF_WITH_NONSTD([libhttpserver])
+TF_WITH_NONSTD([libhttpserver]) dnl (from above) the extra "lib" prefix here but not there
 
 TF_WITH_STD([scold])
 TF_WITH_STD([tunitas])

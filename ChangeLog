@@ -1,3 +1,10 @@
+2019-03-12  Wendell Craig Baker  <wbaker@verizonmedia.com>
+
+	* Version v1.7.0-0.devel, the time via a simplified idiomatic usage of std::chrono
+	- namespace tunitas::time with Clock, Duration, Point, put(Point, format)
+	* src/tunitas/Makefrag.am
+	* src/tunitas/time with Clock.xcpp, Duration.xcpp, Point.xcpp, put.xcpp
+
 2019-01-04  Wendell Baker  <wbaker@oath.com>
 
 	* Version v1.7.0-0.devel, add tunitas::app::options::get_word, get_identifier, get_filepath
