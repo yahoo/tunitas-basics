@@ -10,6 +10,7 @@ tests_unit_TESTS = \
   tests/unit/outcome.test \
   tests/unit/required.test \
   tests/unit/server.test \
+  tests/unit/time.test \
   tests/unit/tunitas.test \
   tests/unit/urlsafe.test \
   tests/unit/want.test \

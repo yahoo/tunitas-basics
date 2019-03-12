@@ -1,0 +1,5 @@
+// Not so obviously, this is a GNU -*- Makefile -*- which is included by automake, not by GNU make
+// Copyright (c) 2019 Verizon Media, Inc.  See the LICENSE statement nearby.
+#divert <fpp>
+namespace tunitas::time { }
+#endiv

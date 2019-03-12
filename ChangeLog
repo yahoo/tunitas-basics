@@ -1,3 +1,11 @@
+2019-03-12  Wendell Craig Baker  <wbaker@verizonmedia.com>
+
+	* Version v1.7.0-0.devel, the time via a simplified idiomatic usage of std::chrono
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=10.0.7 ~ O.F.A=3.7.0
+	- namespace tunitas::time with Clock, Duration, Point, put(Point, format)
+	* src/tunitas/Makefrag.am
+	* src/tunitas/time with Clock.xcpp, Duration.xcpp, Point.xcpp, put.xcpp
+
 2019-03-06  Wendell Craig Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, configure and build against --with-nonstd-libhttpserver if necessary

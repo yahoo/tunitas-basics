@@ -1,0 +1,106 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <fpp>
+namespace tests::unit::time { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::time::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Clock() -> void;
+  auto test_Duration() -> void;
+  auto test_Point() -> void;
+  auto test_put_string() -> void;
+  template<typename TIME, typename FORMAT> auto test_put() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#import tunitas.time.Point
+#import std.string
+#import sys.time.tm
+namespace tests::unit::time {
+  template<> auto Fixture::test_put<tunitas::time::Point, std::string>() -> void;
+  template<> auto Fixture::test_put<tunitas::time::Point, char const *>() -> void;
+  template<> auto Fixture::test_put<sys::time::tm, std::string>() -> void;
+  template<> auto Fixture::test_put<sys::time::tm, char const *>() -> void;
+}
+#endiv
+#divert <cpp>
+#import tunitas.time.Clock
+auto tests::unit::time::Fixture::test_Clock() -> void {
+  auto here_and = tunitas::time::Clock::now();
+  CPPUNIT_ASSERT(0 != here_and.time_since_epoch().count());
+}
+#import tunitas.time.Duration
+#import std.chrono.duration_cast
+#import std.literals.chrono_literals
+auto tests::unit::time::Fixture::test_Duration() -> void {
+  using namespace std::literals::chrono_literals;
+  auto const shorter_ns = 10ns;
+  auto const longer_sec = tunitas::time::Duration(11);
+  auto const longer_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(longer_sec);
+  CPPUNIT_ASSERT(longer_ns > shorter_ns);
+}
+#import tunitas.time.Point
+auto tests::unit::time::Fixture::test_Point() -> void {
+  using namespace std::literals::chrono_literals;
+  auto here_and = tunitas::time::Clock::now();
+  tunitas::time::Point there_and = here_and + 10ns;
+  CPPUNIT_ASSERT(there_and > here_and);
+}
+#import tunitas.time.put
+#import std.ostream
+template<> auto tests::unit::time::Fixture::test_put<tunitas::time::Point, std::string>() -> void {
+  auto here_and = tunitas::time::Clock::now();
+  std::ostringstream buf;
+  buf << tunitas::time::put(here_and, std::string{"%s"});
+  CPPUNIT_ASSERT(0 != buf.str().size());
+}
+template<> auto tests::unit::time::Fixture::test_put<tunitas::time::Point, char const *>() -> void {
+  auto here_and = tunitas::time::Clock::now();
+  std::ostringstream buf;
+  buf << tunitas::time::put(here_and, "%s");
+  CPPUNIT_ASSERT(0 != buf.str().size());
+}
+#import sys.time.as
+template<> auto tests::unit::time::Fixture::test_put<sys::time::tm, std::string>() -> void {
+  auto here_and = sys::time::as<sys::time::tm>(tunitas::time::Clock::now());
+  std::ostringstream buf;
+  buf << tunitas::time::put(here_and, std::string{"%s"});
+  CPPUNIT_ASSERT(0 != buf.str().size());
+}
+template<> auto tests::unit::time::Fixture::test_put<sys::time::tm, char const *>() -> void {
+  auto here_and = sys::time::as<sys::time::tm>(tunitas::time::Clock::now());
+  std::ostringstream buf;
+  buf << tunitas::time::put(here_and, "%s");
+  CPPUNIT_ASSERT(0 != buf.str().size());
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("time");
+  series << call("Clock", &Fixture::test_Clock)
+         << call("Duration", &Fixture::test_Duration)
+         << call("Point", &Fixture::test_Point)
+    ;
+  {
+    Stream put("put");
+    {
+      Stream poi("Point");
+      poi << call("std::string", &Fixture::test_put<tunitas::time::Point, std::string>)
+          << call("char const *", &Fixture::test_put<tunitas::time::Point, char const *>)
+        ;
+      put << add(poi.release());
+    } {
+      Stream ccp("sys::time::tm");
+      ccp << call("std::string", &Fixture::test_put<sys::time::tm, std::string>)
+          << call("char const *", &Fixture::test_put<sys::time::tm, char const *>)
+        ;
+      put << add(ccp.release());
+    }
+    series << add(put.release());
+  }
+  return series.release();
+}
+#endiv
