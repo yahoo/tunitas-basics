@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2019, Oath Inc.
+# Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #
 # the full end-to-end build using the "nearby" development trees
 #
@@ -64,7 +66,7 @@ fi
 # you can always override the defaults from the command line, but that can be onerous
 #
 function set_all_defaults_no() {
-    : ${with_hypogeal_twilight:=no} # ${with_hypogeal_twilight:=$with_std_scold}
+    : ${with_hypogeal_twilight:=${with_std_scold?}} # not needed in after hypogeal-twilight >= 0.43 or 0.44 or so
     : ${with_module_half:=no}
     : ${with_module_httpserver:=no}
     : ${with_module_nonstd:=no}

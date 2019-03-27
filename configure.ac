@@ -1,3 +1,5 @@
+dnl Copyright 2019, Oath Inc.
+dnl Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 dnl
 dnl ./buildconf && ./configure --prefix=$(dirname $(pwd)) && make check
 dnl also see ${prefix}/etc/config.site
