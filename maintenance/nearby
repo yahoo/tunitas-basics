@@ -1,6 +1,7 @@
 #!/bin/bash
-# Copyright 2019, Oath Inc.
-# Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+# Copyright 2018-2019, Oath Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #
 # the full end-to-end build using the "nearby" development trees
 #
@@ -27,8 +28,24 @@
 #
 cd ${0%/*}/.. || exit 70
 : ${prefix:=/exp/tunitas}
-: ${with_std_tunitas:=/opt/tunitas}
-: ${with_std_scold:=/opt/scold}
+if ! [[ -d ${prefix} ]] ; then
+    # no /exp/tunitas, maybe no /opt/tunitas either, we'll take that risk
+    : ${with_std_tunitas:=/opt/tunitas}
+elif [[ -z ${with_std_tunitas} ]] ; then
+    # no /opt/tunitas, but yes /exp/tunitas
+    if [[ -d /opt/tunitas ]] ; then
+        : ${with_std_tunitas:=/opt/tunitas}
+    else
+        : ${with_std_tunitas:=${prefix}}
+    fi
+fi
+if [[ -z ${with_std_scold} ]] ; then
+    if [[ -d /opt/scold ]] ; then
+        : ${with_std_scold:=/opt/scold}
+    else
+        : ${with_std_scold:=${with_std_tunitas%/*}/scold}
+    fi
+fi
 : ${with_siblings:=${PWD%/*}}
 #
 # What is in the "nearby" area?
@@ -100,8 +117,9 @@ elif [[ no != ${with_scold_nearby} ]] ; then
 else
     set_all_defaults_no
 fi
-: ${with_nonstd_libhttpserver:=/opt/nonstd/libhttpserver} # required: at least nonstd-libhttpserver-0.9.0-8.1.ipv6+poll+regex
-: ${with_nonstd_libhalf:=/opt/nonstd/half}
+: ${with_nonstd_libhttpserver:=/opt/nonstd/libhttpserver} # ... REQUIRED: at least nonstd-libhttpserver-0.9.0-8.1.ipv6+poll+regex
+: ${with_nonstd_half:=/opt/nonstd/half} # ..................... REQUIRED because there is no "standard half"
+# ${with_nonstd_jsoncpp:=/opt/nonstd/jsoncpp} # ............... OPTIONAL
 : ${with_temerarious_flagship:=${with_siblings?}/temerarious-flagship}
 eval \
     ${prefix:+prefix=$prefix} \
@@ -109,7 +127,9 @@ eval \
     ${with_temerarious_flagship:+with_temerarious_flagship=$with_temerarious_flagship} \
     ./buildconf &&
 ./configure \
-    --enable-configure-verbose \
+    ${enable_dependency_tracking:+--enable-dependency-tracking=$enable_dependency_tracking} \
+    ${enable_configure_verbose:+--enable-configure-verbose=$enable_configure_verbose} \
+    ${enable_configure_debug:+--enable-configure-debug=$enable_configure_debug} \
     --disable-mock-build \
     ${prefix:+--prefix=$prefix} \
     ${with_nearby:+--with-nearby=$with_nearby} ${with_external:+--with-external=$with_external} \
@@ -117,6 +137,8 @@ eval \
     ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
     ${with_temerarious_flagship:+--with-temerarious-flagship=$with_temerarious_flagship} \
     ${with_module_c:+--with-module-c=$with_module_c} \
+    ${with_module_half:+--with-module-half=$with_module_half} \
+    ${with_nonstd_half:+--with-nonstd-half=$with_nonstd_half} \
     ${with_module_httpserver:+--with-module-httpserver=$with_module_httpserver} \
     ${with_nonstd_libhttpserver:+--with-nonstd-libhttpserver=$with_nonstd_libhttpserver} \
     ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \

@@ -1,6 +1,7 @@
 # -*- Makefile -*-
 
 # DSO API versioning; see the README which is nearby.
+# else https://wiki.scold-lang.org/page/DSO
 #
 #   CURRENT <= CURRENT+1 if any interfaces were added
 #           <= CURRENT+1 if any interfaces were removed

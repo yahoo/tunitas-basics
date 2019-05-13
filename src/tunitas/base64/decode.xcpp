@@ -31,7 +31,7 @@ namespace tunitas {
   template<required::Container_Push_Back_Char RESULT> inline auto base64::decode(std::string const &source) -> RESULT {
     RESULT ret;
     Decoder dec(source);
-    // Because base64 is "made of" quads of 6-bit quantities., we not may have octets.
+    // Because base64 is "made of" quads of 6-bit quantities., we may not have octets.
     // We may wind up being short (i.e. this will throw on underflow)
     while ( !dec.eof() ) {
       ret.push_back(dec.get<char>());
