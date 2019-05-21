@@ -1,5 +1,11 @@
-dnl Copyright 2019, Oath Inc.
-dnl Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+dnl This is a GNU -*- autoconf -*- specification that is processed by Autoconf.
+dnl Copyright 2018-2019, Oath Inc.
+dnl Licensed under the terms of the Apache-2.0 license.
+dnl See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+dnl
+dnl Build Instructions are in the nearby README.md
+dnl
+dnl ./maintenance/nearby is a developer-centric build recipe; it guesses about nearby source trees
 dnl
 dnl ./buildconf && ./configure --prefix=$(dirname $(pwd)) && make check
 dnl also see ${prefix}/etc/config.site
@@ -7,9 +13,15 @@ dnl
 dnl autoreconf --force --verbose --install
 dnl autoreconf -vfi
 dnl
-dnl recall: $prefix/etc/config.site can hold predefined settings
-dnl
-AC_INIT([tuntias-basics], [1.7.0], [/dev/null@verizonmedia.com])
+dnl Reminder: this package is the only one of the tunitas series where the configure.ac has a "tunitas-" prefix.
+dnl For example, the other packages are direct place names: butano, grabtown, lobitos, montara, pescadero, rockaway, tarwater.
+dnl That not withstanding, the rpm packages all have a "tunitas-" prefix so they can be seen together.
+dnl      ^
+dnl      |
+dnl      \prefix\
+dnl      ||||||||
+dnl      vvvvvvvv
+AC_INIT([tunitas-basics], [1.7.0], [tunitas@verizonmedia.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am
@@ -56,7 +68,7 @@ TF_WITH_STD([tunitas])
 
 LT_PREREQ([2.4.2])
 AM_PROG_AR dnl must be first
-LT_INIT    dnl mut be second
+LT_INIT    dnl must be second
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O

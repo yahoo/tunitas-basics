@@ -1,6 +1,7 @@
 # This is a GNU -*- Makefile -*- which is managed by automake.
-# Copyright 2019, Oath Inc.
-# Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+# Copyright 2018-2019, Oath Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 
 # silent-rules has no effect, see configure.ac
 # cannot -Wall -Werror

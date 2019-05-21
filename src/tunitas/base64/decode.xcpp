@@ -1,4 +1,6 @@
-// -*- c++ -*- with SCOLD stylings
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <hpp>
 #import std.string
 #import tunitas.required.Container_Push_Back_Char
@@ -31,7 +33,7 @@ namespace tunitas {
   template<required::Container_Push_Back_Char RESULT> inline auto base64::decode(std::string const &source) -> RESULT {
     RESULT ret;
     Decoder dec(source);
-    // Because base64 is "made of" quads of 6-bit quantities., we not may have octets.
+    // Because base64 is "made of" quads of 6-bit quantities., we may not have octets.
     // We may wind up being short (i.e. this will throw on underflow)
     while ( !dec.eof() ) {
       ret.push_back(dec.get<char>());
