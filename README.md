@@ -1,24 +1,68 @@
 # Tunitas Basics
 
-The basic data structures and utilities used throughout the Tunitas family of projects.
+This repository contains the basic data structures and utilities used throughout the Tunitas family of projects.
+
+The main body of documentation for the Tunitas family of components and services can be found with the [packaging](https://github.com/yahoo/tunitas-packaging) and with [build system](https://github.com/yahoo/temerarious-flagship]).  The overview and administrative declarations herein are necessarily summary in nature. The declarations and definitions in the packaging and build system areas are complete and should be interpreted as superceding these when the two are in conflict.
+
+![banner](logo.png)
 
 ## Table of Contents
 
 - [Background](#background)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [Configuration](#configuration)
 - [Build](#build)
 - [Usage](#usage)
-- [C++](#c++)
-- [Contents](#contents)
+- [Security](#security)
 - [Contribute](#contribute)
 - [License](#license)
+- [Origin of the Name](#Origin_of_the_name)
+
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
 ## Background
 
 The basics package provides common code which is used in client side (command-line or batch operations) as well as common server-side code.  The components are organized according to namespace and segregated into separate libraries 
 
-### C++ and C++20
+## Dependencies
 
-The Tunitas projects use C++2a, C++2b and experimental extensions which are as close to the limit of the language as the tooling will allow.  Especially of interest are the extensions supporting on Concepts, Ranges and Modules TS. These are described in published language documentations such as [C++ Experimental Features](https://en.cppreference.com/w/cpp/experimental). Where the language elements are "not ready" then polyfill has occurred with "script kiddies" or other tooling crutches supplied as used.
+The [configuration](#configuration) step will check for many but not all required packages and operating system features.  There is a list of known [package-dependencies](https://github.com/yahoo/tunitas-basics/blob/master/PACKAGES.md) which you will need to install beyond your base operating system.
+
+Generally, the dependencies are among:
+- Certain other components of the Tunitas system; <em>e.g.</em> the [Temerarious Flagship](https://github.com/yahoo/temerarious-flagship).
+- A modern (C++2a) development environment.
+- A recent Fedora, but any recent Linux distro should suffice.
+
+The Tunitas project was developed on Fedora 27 through Fedora 30 using GCC 7 and GCC 8 with `-fconcepts` and at least `-std=c++1z`.  More details on the development environment and the build system can be found in [temerarious-flagship](https://github.com/yahoo/temerarious-flagship/blob/master/README.md).
+
+## Installation
+
+You may install this repo and its dependents by running the following command:
+
+``` bash
+git clone https://github.com/yahoo/tunitas-basics.git
+```
+
+This will create a directory called `tunitas-basics` and download the contents of this repo to it.
+
+Alternatively, if your organization already has made available the packaged version, then the following recipe will install the service:
+
+``` bash
+sudo dnf install tunitas-basics
+```
+
+## Configuration
+
+The build system is based upon [GNU Autotools](https://www.gnu.org/software/automake/manual/html_node/index.html).
+
+The configuration of the repo consists of two steps which must be done once.
+1. `./buildconf`
+2. `./configure`
+
+The first step performs some crude assessments of the build environment and creates the site-specific `configure'. Of course `configure --help` will explain the build options.  The general options to `configure` are widely [documented](https://www.gnu.org/prep/standards/html_node/Configuration.html).
+
+The `buildconf` component is boilerplate and can be updated from [temerarious-flagship](https://github.com/yahoo/temerarious-flagship/blob/master/bc/template.autotools-buildconf) as needed.  The [Tunitas Build System](https://github.com/yahoo/temerarious-flagship) should be available in `/opt/tunitas` and the template at `/opt/tunitas/share/temerarious-flagship/bc/template.autotools-buildconf`
 
 ## Build
 
@@ -43,109 +87,40 @@ To compile with the Tunitas components the relevant compiler options are expecte
 | CXXFLAGS | -std=c++1z -fconcepts |
 | LDFLAGS | -L/opt/tunitas/lib64 -ltunitas |
 
-## Contents
+### Catalog of Components
 
-The basics package contains core components which are used across all the Tunitas projects.  The package supplies library components.
-
-A short survey of the components is provided here. You should consult the interface definitions for a complete enumeration
-
-### `namespace tunitas`
-
-   * `tunitas.Outcome` provides function outcome
-   * `tunitas.Success` where success is a singleton
-   * `tunitas.Variant` a type-safe discriminated untion, following `std::variant`
-   * `tunitas.Visitor` a visitor for the `Variant`
-
-### `namespace tunitas::app`
-
-This namespace contains classes and functions useful for processing program command line options.
-
-   * `tunitas.app.Configuration` capture program configuration variables
-   * `tunitas.app.drop` drop (root) privileges
-   * `tunitas.app.Pidfile` manage a daemon's _pidfile_, frequently found in `/run`
-   * `tunitas.app.Program` capture the program's name
-
-### `namespace tunitas::app::exception`
-
-   * `tunitas.app.exception.Quitting` leave the application.
-   * `tunitas.app.exception.Usage` the common ancestor of _usage_ exception.
-   * `tunitas.app.exception.Version` the common ancestor of the _version_ exception.
-
-Namespace naming convention: singular (as in "an exception")
-
-### `namespace tunitas::app::options`
-
-   * `tunitas.app.options.Args` the analog of `argv'
-   * `tunitas.app.options.get_filepath` acquire a _filepath_ during options processing.
-   * `tunitas.app.options.get_identifier` acquire an _identifier_ during options processing.
-   * `tunitas.app.options.get_port` acquire an internet protocol _port_ number during options processing.
-   * `tunitas.app.options.get_word` acquire an uninterpreted word during options processing.
-   * `tunitas.app.options.Specification` a base class with the specification of common options.
-   
-Namespace naming convention for historical reasons is the pluralsingular (as in "the options")
-
-### `namespace tunitas::app::words`
-
-   * `tunitas.app.words.Filepath` process command line argument container for filesystem paths.
-   * `tunitas.app.words.Strings` process command line argument container for uninterpreted words.
-
-### `namespace tunitas::base64`
-
-   * `tunitas.base64.decode` a base64 decoder
-   * `tunitas.base64.encode` a base64 encoder
-
-### `namespace tunitas::required`
-
-Contains concepts, at least:
-
-   * `tunitas::required::Container_Push_Back_Char` the concept of a container with a `push_back(char)` capability.
-   * `tunitas::required::Default_Constructible` the concept of a type which is default constructible.
-   * `tunitas::required::exception.app.Quitting` matches the `Quitting` exception.
-   * `tunitas::required::Integer` 
-   * `tunitas::required::Integral` 
-   * `tunitas::required::Iterator_Producing` 
-   * `tunitas::required::Move_Constructible` the concept of a type which is move constructible.
-   * `tunitas::required::Outcomeable` the concept of a type that be used with `tunitas::Outcome`.
-   * `tunitas::required::Stringable` the concept of a type convertible into `std::string`.
-
-The namespace naming convention is that the past tense is used for `required` whic is is distinct from the `requires` language keyword.
-
-### `namespace tunitas::server`
-
-These interfaces relate to the use of Tunitas in server contexts.  They provide support for `module-httpserver`, the S.C.O.L.D. interface to [libhttpserver](https://github.com/etr/libhttpserver).
-
-   * `tunitas.server.constants` some constants.
-   * `tunitas.server.filters` common URL filters.
-   * `tunitas.server.logs` common logging.
-   * `tunitas.server.resources` the namespace around _resources_.
-   * `tunitas.server.responses` the namespace around _responses.
-   * `tunitas.server.service` the namespace around the _services_.
-
-### `namespace tunitas::time`
-
-   * `tunitas.urlsafe.Clock` the system clock
-   * `tunitas.urlsafe.Duration` a time duration following `std::chrono::duration`
-   * `tunitas.urlsafe.Point` a time point following `std::chrono::time_point`
-   * `tunitas.urlsafe.put` is a picture-based time formatter accepting `Point`
-
-### `namespace tunitas::urlsafe`
-
-   * `tunitas.urlsafe.decode` a URL-safe decoder.
-   * `tunitas.urlsafe.encode` a URL-safe encoder.
+A summary [catalog of components](https://github.com/yahoo/tunitas-basics/Catalog-of-Components.md) is provided separately.
 
 ### The Libraries
 
 Static and DSO forms are supplied.  
 
-Especially following the best practices defined in Ulrich Drepper's opus [How To Write Shared Libraries](https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf), 2011-12-10 (47 pages).
+Their construction especially follows the best practices defined in Ulrich Drepper's opus [How To Write Shared Libraries](https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf), 2011-12-10 (47 pages).
+
+### C++ and C++20
+
+The Tunitas projects use C++2a, C++2b and experimental extensions which are as close to the limit of the language as the tooling will allow.  Especially of interest are the extensions supporting on Concepts, Ranges and Modules TS. These are described in published language documentations such as [C++ Experimental Features](https://en.cppreference.com/w/cpp/experimental). Where the language elements are "not ready" then polyfill has occurred with "script kiddies" or other tooling crutches supplied as used.
+
+More details can be found in the documentation for the build system, [temerarious-flagship](https://github.com/yahoo/temerarious-flagship).
 
 ## Contribute
 
 Please refer to [the contributing.md file](Contributing.md) for information about how to get involved. We welcome issues, questions, and pull requests. Pull Requests are welcome.
 
 ## Maintainers
-Wendell Baker <wbaker@verizonmedia.com>
+- Wendell Baker <wbaker@verizonmedia.com>
+- The Tunitas Team at Verizon Media.
+
+You may contact us at least at <tunitas@verizonmedia.com>
+
+## Security
+
+There are no special security concerns in the components of this repository.
 
 ## License
 
 This project is licensed under the terms of the [Apache 2.0](LICENSE-Apache-2.0) open source license. Please refer to [LICENSE](LICENSE) for the full terms.
+
+## Origin Of The Name
+
+Tunitas is a [Creek](https://en.wikipedia.org/wiki/Tunitas_Creek) and also a small [unincorporated portion ](https://en.wikipedia.org/wiki/Tunitas,_California) of San Mateo County, California.
