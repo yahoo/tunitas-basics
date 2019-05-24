@@ -2,11 +2,11 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import tunitas.required.Outcomable
-#import tunitas.outcome.Variant
 #import tunitas.outcome.Success
 namespace tunitas {
-  template<required::Outcomable VALUE> using Outcome = outcome::Variant<VALUE>;
+  // Continue the convenience, rhymes with Outcome in hoisting
+  using outcome::Success;
+  using outcome::SUCCESS;
 }
 #endiv
 #divert <hpp>

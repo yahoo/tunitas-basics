@@ -7,16 +7,45 @@ namespace tests::unit::tunitas { class Fixture; }
 #divert <hpp>
 #import cppunit.Test
 #import cppunit.test.Fixture
+#import std.error_code
 class tests::unit::tunitas::Fixture : public cppunit::test::Fixture {
 public:
-  auto test_something() -> void;
+  auto test_Success() -> void;
+  auto test_SUCCESS() -> void;
+  auto test_Outcome() -> void;
   static auto suite() -> cppunit::Test *;
+protected:
+  auto generate_some_error_code() -> std::error_code;
 };
 #endiv
 #divert <cpp>
+#import std.errc
+#import std.error_code
+#import std.error_condition
+#import std.system_category
+auto tests::unit::tunitas::Fixture::generate_some_error_code() -> std::error_code {
+  // Too cute.  We just need an error code number; any number will do.
+  auto recondition = std::error_condition{std::errc::no_such_file_or_directory};
+  return std::error_code{recondition.value(), std::system_category()};
+}
 #import tunitas
-auto tests::unit::tunitas::Fixture::test_something() -> void {
+#import tunitas.Success
+auto tests::unit::tunitas::Fixture::test_Success() -> void {
+  auto good = ::tunitas::Success{::tunitas::SUCCESS};
+  CPPUNIT_ASSERT(ok(good));
+  auto bad = ::tunitas::Success{generate_some_error_code()};
+  CPPUNIT_ASSERT(!ok(bad));
+}
+auto tests::unit::tunitas::Fixture::test_SUCCESS() -> void {
+  // We just tested the SUCCESS literal in the previous test
   CPPUNIT_ASSERT(true);
+}
+#import tunitas.Outcome
+auto tests::unit::tunitas::Fixture::test_Outcome() -> void {
+  auto good = ::tunitas::Outcome<int>{3};
+  CPPUNIT_ASSERT(ok(good));
+  auto bad = ::tunitas::Outcome<int>{generate_some_error_code()};
+  CPPUNIT_ASSERT(!ok(bad));
 }
 #import unit.rigging.suite.Stream
 #import unit.rigging.suite.call
@@ -24,7 +53,9 @@ auto tests::unit::tunitas::Fixture::test_something() -> void {
 auto tests::unit::tunitas::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream series("tunitas");
-  series << call("something", &Fixture::test_something)
+  series << call("Success", &Fixture::test_Success)
+         << call("SUCCESS", &Fixture::test_SUCCESS)
+         << call("Success", &Fixture::test_Outcome)
     ;
   return series.release();
 }

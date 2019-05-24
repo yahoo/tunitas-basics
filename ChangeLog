@@ -1,3 +1,11 @@
+2019-05-24  Wendell Craig Baker  <wbaker@verizonmedia.com>
+
+	* Version v1.7.0-0.devel, tunitas.Success, tunitas::SUCCESS
+	- split out of tunitas.Outcome, which had incomplete hoisting
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=11.0.8 ~ O.F.A=3.8.0
+	* src/tunitas/Outcome.xcpp: remove hoisting of Success
+	* src/tunitas/Success.xcpp: separate hoist
+
 2019-03-12  Wendell Craig Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, the time via a simplified idiomatic usage of std::chrono
