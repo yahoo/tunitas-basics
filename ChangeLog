@@ -1,15 +1,40 @@
+2019-05-31  Wendell Craig Baker  <wbaker@verizonmedia.com>
+
+	* Version v1.8.0-0.devel, merge from upstream gives
+	* src/tunitas/Makefrag.am: library, announced at C:R:A=12:0:1 ~ O.F.A=11.1.0
+	- updated mentions of C:R:A to use the colon syntax; but O.F.A to use dot syntax
+
+	* Version v1.8.0-0.devel, libtunitas-app.la with namespace tunitas::app::exception::aspect with exception::Aspect
+	- this follows the natural S.C.O.L.D. methodology of using mixins near the standard exception hierarchy
+	- this is an ABI-breaking change but with API compatibility
+	* src/tunitas/Makefrag.am: library, announced at C:R:A=11:0:0 ~ O.F.A=11.0.0 with the removal of libtunitas-app.la
+	* src/tunitas/app/Makefrag.am: new library, announced at C:R:A=1:0:0 ~ O.F.A=1.0.0
+	* src/tunitas/Outcome.xcpp: compatibility, entail the tunitas.Success
+	* src/tunitas/Success.xcpp: new, separate out the tunitas.Success
+	* src/tunitas/app/Configuration.xcpp: add a type alias of nearby Program for the convenience of descendants
+	* src/tunitas/app/exception/Generic.xcpp: compatibility with a deprecation warning
+	* src/tunitas/app/exception/Messaging.xcpp: ibidem.
+	* src/tunitas/app/exception/Quitting.xcpp: ibidem.
+	* src/tunitas/app/exception/Usage.xcpp: ibidem.
+	* src/tunitas/app/exception/Version.xcpp; ibidem.
+	* src/tunitas/app/exception/Generic.xcpp -> src/tunitas/app/exception/Aspect.xcpp: renamed.
+	* src/tunitas/app/exception/Messaging.xcpp -> src/tunitas/app/exception/aspect.Messaging.xcpp: ibidem.
+	* src/tunitas/app/exception/Quitting.xcpp -> src/tunitas/app/exception/aspect.Quitting.xcpp: ibidem.
+	* src/tunitas/app/exception/Usage.xcpp -> src/tunitas/app/exception/aspect.Usage.xcpp: ibidem.
+	* src/tunitas/app/exception/Version.xcpp -> src/tunitas/app/exception/aspect.Version.xcpp: ibidem.
+
 2019-05-24  Wendell Craig Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, tunitas.Success, tunitas::SUCCESS
 	- split out of tunitas.Outcome, which had incomplete hoisting
-	- whereas these are "additions only" the C:R:A rachets to C:R:A=11.0.8 ~ O.F.A=3.8.0
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=11:0:8 ~ O.F.A=3.8.0
 	* src/tunitas/Outcome.xcpp: remove hoisting of Success
 	* src/tunitas/Success.xcpp: separate hoist
 
 2019-03-12  Wendell Craig Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, the time via a simplified idiomatic usage of std::chrono
-	- whereas these are "additions only" the C:R:A rachets to C:R:A=10.0.7 ~ O.F.A=3.7.0
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=10:0:7 ~ O.F.A=3.7.0
 	- namespace tunitas::time with Clock, Duration, Point, put(Point, format)
 	* src/tunitas/Makefrag.am
 	* src/tunitas/time with Clock.xcpp, Duration.xcpp, Point.xcpp, put.xcpp
@@ -34,7 +59,7 @@
 2019-02-07  Wendell Baker  <wbaker@verizonmedia.com>
 
 	* Version v1.7.0-0.devel, add tunitas.app.exception becomes a module
-	- whereas these are "additions only" the C:R:A rachets to C:R:A=8.0.5 ~ O.F.A=3.5.0
+	- whereas these are "additions only" the C:R:A rachets to C:R:A=8:0:5 ~ O.F.A=3.5.0
 	* add onstd.uninitialized_zero
 	* add sys.posix Endent, daemon, endpwent, geteuid, getpwnam, getpwname, getpwuid, getuid, geteuid, getresuid, setreuid
 	- sys.posix.entry Buffer, Pointer
@@ -43,7 +68,7 @@
 
 	* Version v1.7.0-0.devel, add tunitas.app.exception becomes a module
 	- to allow applications to cascade the namespace (easily)
-	- Whereas this is a pure organizational change, rachet the C:R:A=7.1.4 ~ O.F.A=3.4.1
+	- Whereas this is a pure organizational change, rachet the C:R:A=7:1:4 ~ O.F.A=3.4.1
 	* src/tunitas/app/exception/namespace.xcpp: ibidem
 
 2019-01-04  Wendell Baker  <wbaker@oath.com>
@@ -55,7 +80,7 @@
 	  any string of characters not containing whitespace
 	- The "identifier" must be shaped like an identifer, but will allow leading number and is returned as a std::string
 	  e.g. that certain package named "0ad", which is a multiplayer game set in the days of the Roman Empire.
-	- Whereas this is a pure addition, rachet the C:R:A=7.0.4 ~ O.F.A=3.4.0
+	- Whereas this is a pure addition, rachet the C:R:A=7:0:4 ~ O.F.A=3.4.0
 	* src/tunitas/app/options.get_identifier.xcpp: ibidem.
 	* src/tunitas/app/options.get_filepath.xcpp: ibidem.
 	* src/tunitas/app/options.get_port.xcpp: commentariat.
@@ -84,18 +109,18 @@
 2018-11-14  Wendell Baker  <wbaker@oath.com>
 
 	* Version v1.5.0-0.devel, tunitas::server::exception::Generic
-	- libtunitas-server C:R:A=2.0.1, reflecting the addition
+	- libtunitas-server C:R:A=2:0:1, reflecting the addition
 	* src/tunitas/server/exception.Generic.xcpp: ibidem.
 
 2018-11-13  Wendell Baker  <wbaker@oath.com>
 
 	* Version v1.4.0-0.devel, tunitas::urlsafe::encode, tunitas::urlsafe::decode
-	- rachet libtunitas C:R:A=5.0.2, pretending that the previous was 4.0.1
+	- rachet libtunitas C:R:A=5:0:2, pretending that the previous was 4.0.1
 	- new unit testers go in check/bin and check/lib
 	- bin/unit moves to check/bin/unit
 
 	* Version v1.3.0-0.devel, tunitas::base64::encode, tunitas::base64::decode
-	- rachet libtunitas C:R:A=4.0.0 but could reasonably have been 4.0.1
+	- rachet libtunitas C:R:A=4:0:0 but could reasonably have been 4.0.1
 
 2018-10-28  Wendell Craig Baker  <wbaker@oath.com>
 
@@ -105,5 +130,5 @@
 	  removed mention of boost as it is not (yet) used.
 	* src/tunitas/Makefrag.am: ibidem.
 
-	* Version v1.0.0, first released.  C:R:A=2.0.0
+	* Version v1.0.0, first released.  C:R:A=2:0:0
 	* src/tunitas/Makefrag.am: sets the libtunitas.so C:R:A

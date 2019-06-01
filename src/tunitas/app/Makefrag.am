@@ -1,0 +1,71 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright 2019-2019, Oath Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+
+# DSO API versioning; see the README which is nearby.
+# else https://wiki.scold-lang.org/page/DSO
+#
+#   CURRENT <= CURRENT+1 if any interfaces were added
+#           <= CURRENT+1 if any interfaces were removed
+#           <= CURRENT+1 if any interfaces were changed
+#           <= CURRENT   if no interface change, but any other (source code) change
+#
+#   REVISION <= 0          if any interfaces were added
+#            <= 0          if any interfaces were removed
+#            <= 0          if any interfaces were changed
+#            <= REVISION+1 if no interface change, but any other (source code) change
+#
+#   AGE <= AGE+1 if any interaces were added
+#       <= 0     if any interfaces were removed
+#       <= 0     if any interfaces were changed
+#       <= AGE   if no interface change, but any other (source code) change
+#
+lib_libtunitas_app_la_CURRENT = 1
+lib_libtunitas_app_la_REVISION = 0
+lib_libtunitas_app_la_AGE = 0
+lib_libtunitas_app_la_CRA = $(lib_libtunitas_app_la_CURRENT):$(lib_libtunitas_app_la_REVISION):$(lib_libtunitas_app_la_AGE)
+
+lib_libtunitas_app_la = lib/libtunitas-app.la
+lib_libtunitas_app_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) -version-info $(lib_libtunitas_app_la_CRA)
+lib_libtunitas_app_la_LIBADD = -loptions-module -lsys-module $(lib_libtunitas_la) $(lib_libwant_la)
+lib_libtunitas_app_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_app_la_SOURCES))
+lib_libtunitas_app_la_SOURCES = \
+  obj/src/tunitas/app/namespace.cpp \
+  obj/src/tunitas/app/Configuration.cpp \
+  obj/src/tunitas/app/Program.cpp \
+  obj/src/tunitas/app/Pidfile.cpp \
+  obj/src/tunitas/app/drop.cpp \
+  \
+  obj/src/tunitas/app/exception/namespace.cpp \
+  obj/src/tunitas/app/exception/Aspect.cpp \
+  obj/src/tunitas/app/exception/aspect.Messaging.cpp \
+  obj/src/tunitas/app/exception/aspect.Quitting.cpp \
+  obj/src/tunitas/app/exception/aspect.Usage.cpp \
+  obj/src/tunitas/app/exception/aspect.Version.cpp \
+  \
+  obj/src/tunitas/app/exception/Generic.cpp \
+  obj/src/tunitas/app/exception/Messaging.cpp \
+  obj/src/tunitas/app/exception/Quitting.cpp \
+  obj/src/tunitas/app/exception/Usage.cpp \
+  obj/src/tunitas/app/exception/Version.cpp \
+  \
+  obj/src/tunitas/app/options.cpp \
+  obj/src/tunitas/app/options.Args.cpp \
+  obj/src/tunitas/app/options.Specification.cpp \
+  obj/src/tunitas/app/options.get_filepath.cpp \
+  obj/src/tunitas/app/options.get_identifier.cpp \
+  obj/src/tunitas/app/options.get_port.cpp \
+  obj/src/tunitas/app/options.get_word.cpp \
+  \
+  obj/src/tunitas/app/words.cpp \
+  obj/src/tunitas/app/words.Filepaths.cpp \
+  obj/src/tunitas/app/words.Strings.cpp \
+  $(end)
+
+$(scold_cxxdir)/tunitas/app/dependencies.mk:
+	$(TF_V_DCDIS) $(call TF_DISAGGREGATE, $(lib_libtunitas_app_la_SOURCES))
+	$(TF_V_DEP) test -e $@
+include $(scold_cxxdir)/tunitas/app/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tunitas/app/dependencies.mk

@@ -42,8 +42,13 @@ INSTALLATION_AREAS = \
 default: all
 
 # install rules from @temerarious_flagship_datadir@/am/install.am
+module_SOURCE_SET = \
+  $(lib_libtunitas_app_la_SOURCES) \
+  $(lib_libtunitas_server_la_SOURCES) \
+  $(lib_libtunitas_la_SOURCES) \
+ $(lib_libwant_la_SOURCES) \
+  $(end)
 $(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_SOURCE_SET)))
-module_SOURCE_SET = $(lib_libtunitas_la_SOURCES) $(lib_libwant_la_SOURCES)
 
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::
@@ -51,6 +56,7 @@ clean-dependencies::
 clean-local:: clean-dependencies
 
 include src/tunitas/Makefrag.am
+include src/tunitas/app/Makefrag.am
 include src/tunitas/server/Makefrag.am
 include src/want/Makefrag.am
 include src/tests/unit/Makefrag.am
@@ -58,9 +64,13 @@ include src/tests/base64/Makefrag.am
 include src/tests/outcome/Makefrag.am
 include src/tests/urlsafe/Makefrag.am
 
+$(lib_libtunitas_app_la) : $(lib_libtunitas_la) 
+$(lib_libtunitas_server_la) : $(lib_libtunitas_la) 
+
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
   $(lib_libtunitas_la) \
+  $(lib_libtunitas_app_la) \
   $(lib_libtunitas_server_la) \
   $(end)
 noinst_LTLIBRARIES = \

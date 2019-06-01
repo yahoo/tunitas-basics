@@ -21,9 +21,9 @@
 #       <= 0     if any interfaces were changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 11
+lib_libtunitas_la_CURRENT = 12
 lib_libtunitas_la_REVISION = 0
-lib_libtunitas_la_AGE = 8
+lib_libtunitas_la_AGE = 1
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
 lib_libtunitas_la = lib/libtunitas.la
@@ -47,31 +47,6 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/required/exception/namespace.cpp \
   obj/src/tunitas/required/exception/app.Quitting.cpp \
   \
-  obj/src/tunitas/app/namespace.cpp \
-  obj/src/tunitas/app/Configuration.cpp \
-  obj/src/tunitas/app/Program.cpp \
-  obj/src/tunitas/app/Pidfile.cpp \
-  obj/src/tunitas/app/drop.cpp \
-  \
-  obj/src/tunitas/app/exception/namespace.cpp \
-  obj/src/tunitas/app/exception/Generic.cpp \
-  obj/src/tunitas/app/exception/Messaging.cpp \
-  obj/src/tunitas/app/exception/Quitting.cpp \
-  obj/src/tunitas/app/exception/Usage.cpp \
-  obj/src/tunitas/app/exception/Version.cpp \
-  \
-  obj/src/tunitas/app/options.cpp \
-  obj/src/tunitas/app/options.Args.cpp \
-  obj/src/tunitas/app/options.Specification.cpp \
-  obj/src/tunitas/app/options.get_filepath.cpp \
-  obj/src/tunitas/app/options.get_identifier.cpp \
-  obj/src/tunitas/app/options.get_port.cpp \
-  obj/src/tunitas/app/options.get_word.cpp \
-  \
-  obj/src/tunitas/app/words.cpp \
-  obj/src/tunitas/app/words.Filepaths.cpp \
-  obj/src/tunitas/app/words.Strings.cpp \
-  \
   obj/src/tunitas/base64/namespace.cpp \
   obj/src/tunitas/base64/Code.cpp \
   obj/src/tunitas/base64/Exception.cpp \
@@ -93,6 +68,7 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/base64/sized.ByType.cpp \
   obj/src/tunitas/base64/sized.ByValue.cpp \
   \
+  obj/src/tunitas/Success.cpp \
   obj/src/tunitas/Outcome.cpp \
   obj/src/tunitas/Success.cpp \
   obj/src/tunitas/outcome/namespace.cpp \

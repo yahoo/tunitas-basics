@@ -4,39 +4,17 @@
 #divert <fpp>
 namespace tunitas::app::exception {
   //
-  // The "version message" application exception
-  // Descendants only.
-  // Set up as an ancestor to the mixin tree,
-  //     so that STL exceptions can be mixed in as well.
+  // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
+  // s/Version/aspect::Version/g
   //
-  // Usage:
-  //
-  //   class my::Version : public tunitas::app::exception::Version, std::exception {
-  //     using appable = tunitas::app::exception::Version;
-  //     using optable = ::options::throwable::Version;
-  //     explicit Version(Program)
-  //     ...must unify the MI...
-  //     auto what() const noexcept -> char const * final { return optable::what(); }
-  //   };
-  //
-  //   try {
-  //     ...
-  //     throw my::Version{NAME};
-  //     ...
-  //   } catch (exception::Generic const &g) {
-  //     g.stream() << g << '\n';
-  //     return g.code();
-  //   }
-  //
-  class Version;
+  [[deprecated("instead use tunitas::app::exception::aspect::Version")]] class Version;
 }
 #endiv
 #divert <hpp>
-#import tunitas.app.exception.Generic
-class tunitas::app::exception::Version : public Generic {
-  using ancestor = Generic;
+#import tunitas.app.exception.aspect.Version
+class tunitas::app::exception::Version : public aspect::Version {
+  using ancestor = aspect::Version;
 protected:
-  ~Version() = default;
-  Version() = default;
+  using ancestor::Version;
 };
 #endiv

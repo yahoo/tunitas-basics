@@ -8,6 +8,10 @@ namespace tunitas::app {
   // Descendants only.
   // Entails te logging the facility.
   //
+  // [[DOCUMENT]] the Configuration constructor accepts Program as pass-by-value because ... why?
+  // The Program is copied anyway as it is passed back up into the ancestor.
+  // The ancestor likely has the capability to accept the Args (c::argv) but that is not exposed.
+  //
   // Usage:
   //
   //   class my::Configuration : public tunitas::app::Configuration {
@@ -29,6 +33,7 @@ class tunitas::app::Configuration : public ::options::config::Generic {
 protected:
   ~Configuration() = default;
 public:
+  using Program = app::Program;
   inline explicit Configuration(Program);
 };
 #entail options.logging

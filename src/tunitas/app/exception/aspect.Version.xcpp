@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tunitas::app::exception::aspect {
+  //
+  // The "version message" application exception
+  // Descendants only.
+  // Set up as an ancestor to the mixin tree,
+  //     so that STL exceptions can be mixed in as well.
+  //
+  // Usage:
+  //
+  //   class my::Version : public tunitas::app::exception::aspect::Version, std::exception {
+  //     using appable = tunitas::app::exception::aspect::Version;
+  //     using optable = ::options::throwable::Version;
+  //     explicit Version(Program)
+  //     ...must unify the MI...
+  //     auto what() const noexcept -> char const * final { return optable::what(); }
+  //   };
+  //
+  //   try {
+  //     ...
+  //     throw my::Version{NAME};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Version;
+}
+#endiv
+#divert <hpp>
+#import tunitas.app.exception.Generic
+class tunitas::app::exception::aspect::Version : public Generic {
+  using ancestor = Generic;
+protected:
+  ~Version() = default;
+  Version() = default;
+};
+#endiv

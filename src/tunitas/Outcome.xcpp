@@ -4,10 +4,10 @@
 #divert <fpp>
 #import tunitas.required.Outcomable
 #import tunitas.outcome.Variant
-#import tunitas.outcome.Success
 namespace tunitas {
   template<required::Outcomable VALUE> using Outcome = outcome::Variant<VALUE>;
 }
+#import tunitas.Success // [[REMOVEWHEN]] at some unspecified future date when everhone knows to use tunitas.Success directly
 #endiv
 #divert <hpp>
 namespace tunitas {
