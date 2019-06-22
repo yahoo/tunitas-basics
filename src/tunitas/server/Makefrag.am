@@ -22,7 +22,7 @@ lib_libtunitas_server_la_CRA = $(lib_libtunitas_server_la_CURRENT):$(lib_libtuni
 
 lib_libtunitas_server_la = lib/libtunitas-server.la
 lib_libtunitas_server_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) -version-info $(lib_libtunitas_server_la_CRA)
-lib_libtunitas_server_la_LIBADD = -lhttpserver -ltunitas $(lib_libwant_la)
+lib_libtunitas_server_la_LIBADD = -lhttpserver $(lib_libtunitas_la) $(lib_libwant_la)
 lib_libtunitas_server_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_server_la_SOURCES))
 lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/namespace.cpp \
