@@ -42,13 +42,13 @@ INSTALLATION_AREAS = \
 default: all
 
 # install rules from @temerarious_flagship_datadir@/am/install.am
-module_SOURCE_SET = \
+module_BB_SOURCE_SET = \
   $(lib_libtunitas_app_la_SOURCES) \
   $(lib_libtunitas_server_la_SOURCES) \
   $(lib_libtunitas_la_SOURCES) \
  $(lib_libwant_la_SOURCES) \
   $(end)
-$(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_SOURCE_SET)))
+$(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_BB_SOURCE_SET)))
 
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::
