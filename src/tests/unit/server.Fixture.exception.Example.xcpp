@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import tests.unit.server.Fixture
+#include <hpp/tests.unit.server.Fixture>
 #endiv
 #divert <hpp>
 #import tunitas.server.exception.Generic
