@@ -14,7 +14,7 @@ check_lib_libtests_urlsafe_la_SOURCES = \
 check_bin_urlsafe_decode = check/bin/urlsafe-decode
 check_bin_urlsafe_decode_LDADD = $(check_lib_libtests_urlsafe_la)
 # reminder: autotools does not put $(AM_LDFLAGS) into check_bin_urlsafe_decode_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-check_bin_urlsafe_decode_LDFLAGS = $(AM_LDFLAGS)
+check_bin_urlsafe_decode_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_urlsafe_decode_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_urlsafe_decode_SOURCES))
 check_bin_urlsafe_decode_SOURCES = \
   obj/src/tests/urlsafe/decode.cpp \
@@ -23,7 +23,7 @@ check_bin_urlsafe_decode_SOURCES = \
 check_bin_urlsafe_encode = check/bin/urlsafe-encode
 check_bin_urlsafe_encode_LDADD = $(check_lib_libtests_urlsafe_la)
 # reminder: autotools does not put $(AM_LDFLAGS) into check_bin_urlsafe_encode_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-check_bin_urlsafe_encode_LDFLAGS = $(AM_LDFLAGS)
+check_bin_urlsafe_encode_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_urlsafe_encode_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_urlsafe_encode_SOURCES))
 check_bin_urlsafe_encode_SOURCES = \
   obj/src/tests/urlsafe/encode.cpp \

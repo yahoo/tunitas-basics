@@ -1,0 +1,24 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#import tunitas.required
+#import nonstd.required.Octet
+#import tunitas.required.Integral
+namespace tunitas::base64::decoder::required {
+  using namespace nonstd::required; // cascade the namespaces [[FIXTHIS]] put this in its own module, tunitas.base64.decoder.required
+  using namespace tunitas::required; // ibidem.
+  //
+  // What is gettable?
+  // Octets (8-bit things) and Integral (integer shaped math-capable things)
+  //
+  // But each must be dealt with on its own terms.
+  // However, get always handles its bits in big endian format.  Network order is always big endian.
+  //
+  // Usage:
+  //
+  //   template<required::Gettable RESULT> auto get() -> RESULT;
+  //
+  template<typename TYPE> concept bool Gettable = Octet<TYPE> || Integral<TYPE>;
+}
+#endiv

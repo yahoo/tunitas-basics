@@ -2,19 +2,33 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import std.string // requires the complete type of std::string
+#import std.is_same
+#import tunitas.required.Container_Push_Back
 namespace tunitas::required {
   //
-  // A type is "push_back" if it can accept a character as push_(char)
+  // A type is "push_back"-char if it can (uh) push back a char
   //
   // Usage:
   //
-  //   template<required::Character_Push_Back CONTAINER> struct Something {
+  //   template<required::Container_Push_Back_Char CONTAINER> struct Something {
   //     Something(CONTAINER &container);
   //   };
   //
-  template<typename CONTAINER> concept bool Container_Push_Back_Char = requires(CONTAINER container, char c) {
-													      { container.push_back(c) } -> void;
+  template<typename CONTAINER> concept bool Container_Push_Back_Char = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
+    typename CONTAINER::value_type;
+    requires std::is_same_v<char, typename CONTAINER::value_type>;
   };
+}
+#endiv
+#divert <cpp>
+// Of course this is test code
+#import std.byte
+#import std.vector
+#import std.string
+namespace tunitas::required {
+  static_assert(Container_Push_Back_Char<std::string>);
+  static_assert(Container_Push_Back_Char<std::vector<char>>);
+  static_assert(!Container_Push_Back_Char<std::vector<std::byte>>);
+  static_assert(!Container_Push_Back_Char<std::vector<int>>);
 }
 #endiv

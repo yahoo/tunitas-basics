@@ -25,7 +25,9 @@ namespace tunitas::base64 {
 #import std.vector
 #import tunitas.base64.sized.ByType
 #import tunitas.base64.sized.ByValue
+#import tunitas.required.Container_Push_Back
 #import tunitas.required.Integral
+#import tunitas.required.Octet
 class tunitas::base64::Encoder {
 public:
   inline Encoder();
@@ -41,7 +43,8 @@ public:
   template<required::Integral INTEGRAL> inline auto put(INTEGRAL, std::size_t) -> void;
   template<required::Integral INTEGRAL> inline auto put(sized::ByValue<INTEGRAL>) -> void;
   template<required::Integral INTEGRAL, std::size_t N> inline auto put(sized::ByType<INTEGRAL, N>) -> void;
-  auto finalize() -> std::string;
+  inline auto finalize() -> std::string;
+  template<typename RESULT> auto finalize() -> RESULT requires required::Container_Push_Back<RESULT> && required::Octet<typename RESULT::value_type>;
   struct test { struct Access; };
 protected:
   friend class test::Access;
@@ -54,7 +57,8 @@ protected:
   inline static constexpr auto ENCODING = Encoding::BASE64URL;
   inline static constexpr auto VALUE62 = ENCODING == Encoding::BASE64URL ? '-' : '+';
   inline static constexpr auto VALUE63 = ENCODING == Encoding::BASE64URL ? '_' : '/';
-  inline auto accrete(std::string &lhs, std::size_t at) -> void;
+  template<typename CONTAINER> inline auto accrete(CONTAINER &lhs, std::size_t at) -> void
+    requires required::Container_Push_Back<CONTAINER> && required::Octet<typename CONTAINER::value_type>;
   inline static auto encode(std::uintmax_t value) -> char;
 };
 #endiv
@@ -101,7 +105,7 @@ namespace tunitas::base64 {
 }
 #import tunitas.base64.encoder.Finalized
 namespace tunitas::base64 {
-  auto Encoder::accrete(std::string &lhs, std::size_t at) -> void {
+  template<typename CONTAINER> auto Encoder::accrete(CONTAINER &lhs, std::size_t at) -> void requires required::Container_Push_Back<CONTAINER> && required::Octet<typename CONTAINER::value_type> {
     bool const b[6] = {buffer[at+0], buffer[at+1], buffer[at+2], buffer[at+3], buffer[at+4], buffer[at+5]};
     // octets are big endian.
     auto const icode = (b[0]<<5 | b[1]<<4 | b[2]<<3 | b[3]<<2 | b[4]<<1 | b[5]<<0);
@@ -140,6 +144,9 @@ namespace tunitas::base64 {
       throw base64::Code("code");
     }
   }
+  auto Encoder::finalize() -> std::string {
+    return finalize<std::string>();
+  }
 }
 #endiv
 #divert <tpp>
@@ -163,17 +170,14 @@ namespace tunitas::base64 {
     }
   }
 }
-#endiv
-#divert <cpp>
-using namespace tunitas::base64;
+#import std.logic_error
 #import std.move
 #import tunitas.base64.encoder.Finalized
 #import tunitas.base64.encoder.Invalid
 #import tunitas.base64.encoder.Put
-#include <cassert>
-auto Encoder::finalize() -> std::string {
+template<typename RESULT> auto tunitas::base64::Encoder::finalize() -> RESULT requires required::Container_Push_Back<RESULT> && required::Octet<typename RESULT::value_type> {
   std::size_t const ee = buffer.size();
-  std::string ret;
+  RESULT ret;
   if (ee) {
     std::size_t const e8 = (ee >> 3) << 3;
     if (ee != e8) {
@@ -212,7 +216,7 @@ auto Encoder::finalize() -> std::string {
     }
     // BASE64 is defined on 24-bit stanzas, with padding.
     auto const eee = buffer.size();
-    assert(0 == eee % 6);
+    if (0 != eee % 6) { throw std::logic_error{"eee is not a multiple of 6"}; }
     for (auto e(eee), i(e-e); e != i; i+=6) {
       accrete(ret, i);
     }

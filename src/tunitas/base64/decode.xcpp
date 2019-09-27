@@ -3,7 +3,10 @@
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <hpp>
 #import std.string
-#import tunitas.required.Container_Push_Back_Char
+#import std.string_view
+#import tunitas.required.Container_Push_Back
+#import std.is_same
+#import std.vector
 namespace tunitas::base64 {
   //
   // Decode the base64 in the source, returning the result in a container.
@@ -18,31 +21,39 @@ namespace tunitas::base64 {
   //     ...explain...
   //   }
   //
-  template<required::Container_Push_Back_Char RESULT> inline auto decode(std::string const &source) -> RESULT;
+  template<required::Container_Push_Back RESULT> inline auto decode(std::string_view source) -> RESULT;
+  inline auto decode(std::string_view source) -> std::string;
+  template<> inline auto decode<std::vector<bool>>(std::string_view) -> std::vector<bool>;
+  //
+  template<required::Container_Push_Back RESULT> inline auto decode(std::string const &source) -> RESULT;
   inline auto decode(std::string const &source) -> std::string;
+  template<> inline auto decode<std::vector<bool>>(std::string const &) -> std::vector<bool>;
 }
 #endiv
 #divert <ipp>
 #import std.move
-#import std.vector
 #import tunitas.base64.Decoder
+#import tunitas.base64.decode.detail
+namespace tunitas {
+  template<required::Container_Push_Back RESULT> inline auto base64::decode(std::string_view source) -> RESULT {
+    return detail::decode_Nbit<RESULT>(source);
+  }
+  auto base64::decode(std::string_view source) -> std::string {
+    return detail::decode_Nbit<std::string>(source);
+  }
+  template<> auto base64::decode<std::vector<bool>>(std::string_view source) -> std::vector<bool> {
+    return detail::decode_1bit<std::vector<bool>>(source);
+  }
+}
 namespace tunitas {
   auto base64::decode(std::string const &source) -> std::string {
-    return decode<std::string>(source);
+    return decode<std::string>(std::string_view{source.data(), source.size()});
   }
-  template<required::Container_Push_Back_Char RESULT> inline auto base64::decode(std::string const &source) -> RESULT {
-    RESULT ret;
-    Decoder dec(source);
-    // Because base64 is "made of" quads of 6-bit quantities., we may not have octets.
-    // We may wind up being short (i.e. this will throw on underflow)
-    while ( !dec.eof() ) {
-      ret.push_back(dec.get<char>());
-    }
-    return std::move(ret);
+  template<required::Container_Push_Back RESULT> auto base64::decode(std::string const &source) -> RESULT {
+    return detail::decode_Nbit<RESULT>(std::string_view{source.data(), source.size()});
   }
-  template<> inline auto base64::decode<std::vector<bool>>(std::string const &source) -> std::vector<bool> {
-    Decoder dec(source);
-    return std::move(dec.disgorge());
+  template<>  auto base64::decode<std::vector<bool>>(std::string const &source) -> std::vector<bool> {
+    return detail::decode_1bit<std::vector<bool>>(std::string_view{source.data(), source.size()});
   }
 }
 #endiv

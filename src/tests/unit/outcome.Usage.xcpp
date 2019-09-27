@@ -151,7 +151,7 @@ template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_Value
 #import unit.rigging.suite.add
 template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
-  Stream series("outcome");
+  Stream series("usage.Outcome<"s + typeid(Base).name() + ">"s);
   series << call("ok", &Usage::test_ok)
     ;
   {

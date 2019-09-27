@@ -1,0 +1,35 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#import nonstd.required.Octet
+#import tunitas.required.Container_Push_Back
+namespace tunitas::required {
+  //
+  // A type is "push_back"-octet if it can (uh) push back an octet
+  //
+  // Usage:
+  //
+  //   template<required::Container_Push_Back_Octet CONTAINER> struct Something {
+  //     Something(CONTAINER &container);
+  //   };
+  //
+  template<typename CONTAINER> concept bool Container_Push_Back_Octet = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
+    typename CONTAINER::value_type;
+    requires nonstd::required::Octet<typename CONTAINER::value_type>;
+  };
+}
+#endiv
+#divert <cpp>
+// Of course this is test code
+#import std.byte
+#import std.vector
+#import std.string
+namespace tunitas::required {
+  static_assert(Container_Push_Back_Octet<std::string>);
+  static_assert(Container_Push_Back_Octet<std::vector<char>>);
+  static_assert(Container_Push_Back_Octet<std::vector<std::byte>>);
+  static_assert(!Container_Push_Back_Octet<std::vector<std::string>>);
+  static_assert(!Container_Push_Back_Octet<std::vector<int>>);
+}
+#endiv

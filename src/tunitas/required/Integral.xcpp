@@ -14,3 +14,15 @@ namespace tunitas::required {
   template<typename INTEGRAL> concept bool Integral = std::is_integral<INTEGRAL>::value;
 }
 #endiv
+#divert <cpp>
+// Of course this is test code
+#import std.byte
+namespace tunitas::required {
+  static_assert(Integral<char signed>);
+  static_assert(Integral<char unsigned>);
+  static_assert(Integral<int short signed>);
+  static_assert(Integral<int short unsigned>);
+  static_assert(Integral<char>);
+  static_assert(!Integral<std::byte>); // ... and rightly so ... there is no math on these, maybe you wanted Octet<std::byte>
+}
+#endiv

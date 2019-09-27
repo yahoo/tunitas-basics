@@ -5,12 +5,21 @@
 #import std.deque
 #import std.function
 #import std.string
+#import std.byte
+#import std.vector
+#import nonstd.required.Octet
 namespace tests::base64 {
+  //
+  // Just what you think it should be
+  //
   using Args = std::deque<std::string>;
   //
-  // Matches the sense of tunitas::base64::decode(...) & encode(...) with the const reference argument
+  // Function<OCTET> Matches the sense of encode & decode with the const reference argument.
+  // To wit:
+  //   tunitas::base64::decode(std::string const &) -> vector<byte>    ... encode into some bytes (may be dangerously unprintable)
+  //   tunitas::base64::encode(std::string const &) -> vector<char>    ... encode into a "safe" string
   //
-  using Function = std::function<std::string (std::string const &)>;
+  template<nonstd::required::Octet OCTET> using Function = std::function<std::vector<OCTET> (std::string const &)>;
 }
 #endiv
 #divert <hpp>
@@ -25,10 +34,10 @@ namespace tests::base64 {
   //     return remain(Function{&tunitas::base64::decode}, Args{&v[0], &v[c]});
   //   }
   //
-  auto remain(Function, Args) -> int;
+  template<nonstd::required::Octet OCTET> auto remain(Function<OCTET>, Args) -> int;
 }
 #endiv
-#divert <cpp>
+#divert <tpp>
 #import std.copy
 #import std.cout
 #import std.cerr
@@ -39,9 +48,13 @@ namespace tests::base64 {
 #import std.ostream_iterator
 #import std.ostringstream
 #import std.string_literals
+#import std.setw
+#import std.setfill
+#import std.is_same
+#import std.isprint
 #import tunitas.base64.Exception
 using namespace std::literals;
-auto tests::base64::remain(Function function, Args args) -> int {
+template<nonstd::required::Octet OCTET> auto tests::base64::remain(Function<OCTET> function, Args args) -> int {
   int exit_code{0};
   auto const NAME = args.front();
   args.pop_front();
@@ -76,8 +89,16 @@ auto tests::base64::remain(Function function, Args args) -> int {
       plaintext = std::move(word);
     }
     try {
-      auto const cryptext = function(plaintext);
-      std::cout << cryptext;
+      auto &outbound{std::cout};
+      for (auto b : function(plaintext)) {
+        auto c = char(b);
+        if (std::isprint(c)) {
+          outbound << c;
+        } else {
+          // blik ... there is no easier way to do this?
+          outbound << '\\' << 'x' << std::setw(2) << std::setfill('0') << (unsigned) b;
+        }
+      }
     } catch (tunitas::base64::Exception const &e) {
       std::cout << "FAIL (base64) " << e.what() << '\n';
       exit_code = 1;

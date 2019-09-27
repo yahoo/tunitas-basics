@@ -1,0 +1,54 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <hpp>
+#import std.string
+#import std.string_view
+#import tunitas.required.Container_Push_Back
+#import std.vector
+namespace tunitas::base64::detail {
+  //
+  // These are implementation details. You are not to use them directly
+  //
+  // Where 1 < N, the expectation being is that 8 == N is the sweet spot.
+  template<required::Container_Push_Back RESULT> inline auto decode_Nbit(std::string_view source) -> RESULT;
+  template<required::Container_Push_Back RESULT> inline auto decode_Nbit(std::string const &source) -> RESULT;
+  //
+  // There are only specializations here, and there is only one expected specialization
+  template<required::Container_Push_Back RESULT> inline auto decode_1bit(std::string_view source) -> RESULT = delete;
+  template<required::Container_Push_Back RESULT> inline auto decode_1bit(std::string const &source) -> RESULT = delete;
+  template<> inline auto decode_1bit<std::vector<bool>>(std::string_view) -> std::vector<bool>;
+  template<> inline auto decode_1bit<std::vector<bool>>(std::string const &) -> std::vector<bool>;
+}
+#endiv
+#divert <ipp>
+#import std.move
+#import tunitas.base64.Decoder
+namespace tunitas::base64 {
+  template<required::Container_Push_Back RESULT> auto detail::decode_Nbit(std::string const &source) -> RESULT {
+    return decode_Nbit<RESULT>(std::string_view{source.data(), source.size()});
+  }
+  template<required::Container_Push_Back RESULT> auto detail::decode_Nbit(std::string_view source) -> RESULT {
+    using Value = typename RESULT::value_type; // old_school only
+    static_assert(0 != sizeof (Value));
+    RESULT ret;
+    Decoder dec(source);
+    // Because base64 is "made of" quads of 6-bit quantities; we may not have octets.
+    // We may wind up being short (i.e. this will throw on underflow)
+    // WATCHOUT =- sizeof (Value) may be anything  positive
+    while ( !dec.eof() ) {
+      ret.push_back(dec.get<Value>());
+    }
+    return std::move(ret);
+  }
+}
+namespace tunitas::base64::detail {
+  template<> auto decode_1bit<std::vector<bool>>(std::string_view source) -> std::vector<bool> {
+    Decoder dec(source);
+    return dec.disgorge();
+  }
+  template<> auto decode_1bit<std::vector<bool>>(std::string const &source) -> std::vector<bool> {
+    return decode_1bit<std::vector<bool>>(std::string_view{source.data(), source.size()});
+  }
+}
+#endiv

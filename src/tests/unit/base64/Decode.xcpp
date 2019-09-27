@@ -11,8 +11,41 @@ class tests::unit::base64::Decode : public cppunit::test::Fixture {
 public:
   auto test_01() -> void;
   auto test_02() -> void;
+  template<typename CONTAINER> auto test_returning_safe8() -> void;
+  template<typename CONTAINER> auto test_returning_unsafe_not8() -> void;
   static auto suite() -> cppunit::Test *;
 };
+#endiv
+#divert <tpp>
+#import std.type_info
+#import tunitas.base64.decode
+#import tests.unit.base64.printable
+namespace tests::unit::base64 {
+  template<typename CONTAINER> auto Decode::test_returning_safe8() -> void {
+    using Subject = CONTAINER;
+    try {
+      auto const specimen = "BOKU6XeOKU6XeAAABAENAAAAAAAAoIA=="sv;
+      std::cerr << "tunitas::base64::decode<" << typeid(Subject).name() << ">(...), specimen: " << specimen << ' ';
+      auto subject = tunitas::base64::decode<Subject>(specimen);
+      std::cerr << " recovers |" << printable(subject) << "|\n";
+    } catch (::tunitas::base64::decoder::Invalid const &e) {
+      CPPUNIT_ASSERT(false);
+    }
+  }
+  template<typename CONTAINER> auto Decode::test_returning_unsafe_not8() -> void {
+    using Subject = CONTAINER;
+    try {
+      auto const specimen = "BOKU6XeOKU6XeAAABAENAAAAAAAAoIA=="sv;
+      std::cerr << "tunitas::base64::decode<" << typeid(Subject).name() << ">(...), specimen: " << specimen << ' ';
+      auto subject = tunitas::base64::decode<Subject>(specimen);
+      // SHOULD NOT be reached because Underflow should have been thrown
+      CPPUNIT_ASSERT(false);
+    } catch (::tunitas::base64::decoder::Underflow const &e) {
+      // MUST be reached because Underflow has to be thrown when asking for decode into a multiple of 8 bits
+      CPPUNIT_ASSERT(true);
+    }
+  }
+}
 #endiv
 #divert <cpp>
 #import std.string
@@ -26,7 +59,8 @@ auto tests::unit::base64::Decode::test_01() -> void {
   // These have no real provenance; they came from log files.
   static std::string const pantheon[] = {
     "BOKU6XeOKU6XeAAABAENAAAAAAAAoIA==",
-    // ... these are not known-proven good, they may be missing equals signs.
+    // WATCHOUT ... these are not known-proven good, they may be missing equals signs.
+    // WATCHOUT ... they may not be multiples of 8 bytes either, so only decode<std::vector<bool>(...) is "safe"
     "BOKkT2tOKkT2tAAABAENAAAAAAAArABAAAA",
     "BOKkT2tOKkT2tAAABAENAAAAAAAArABgAAAAAA",
     "BOKU6XeOKU6XeAAABAENAAAAAAAArABAAAA",
@@ -100,10 +134,27 @@ auto tests::unit::base64::Decode::test_02() -> void {
 #import unit.rigging.suite.add
 auto tests::unit::base64::Decode::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
-  Stream series("encode");
+  Stream series("decode");
   series << call("01", &Decode::test_01)
 	 << call("02", &Decode::test_02)
     ;
+  {
+    Stream saf("returning");
+    saf << call("std::vector<bool>", &Decode::test_returning_safe8<std::vector<bool>>)
+      ;
+    {
+      // These are unsafe (a.k.a. not known safe) because they try to extract multiples of 8 bits
+      // and the string may not contain that many bits in it.  The decoder will underflow because
+      // the encoded string denotes not-a-multiple of 8 bits.
+      Stream uns("unsafe");
+      uns << call("std::string", &Decode::test_returning_unsafe_not8<std::string>)
+          << call("std::vector<char>", &Decode::test_returning_unsafe_not8<std::vector<char>>)
+          << call("std::vector:byte>", &Decode::test_returning_unsafe_not8<std::vector<std::byte>>)
+        ;
+      saf << move(uns);
+    }
+    series << move(saf);
+  }
   return series.release();
 }
 #endiv

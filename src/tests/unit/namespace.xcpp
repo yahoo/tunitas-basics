@@ -2,5 +2,15 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
+#import std.string
+#import std.string_view
 namespace tests::unit { }
+#endiv
+#divert <hpp>
+#import std.string_literals
+#import std.string_view_literals
+namespace tests::unit {
+  using namespace std::string_literals;
+  using namespace std::string_view_literals;
+}
 #endiv

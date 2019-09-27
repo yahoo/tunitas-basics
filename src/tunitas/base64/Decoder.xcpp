@@ -28,20 +28,31 @@ namespace tunitas::base64 {
 #import tunitas.required.Iterator_Producing
 #import tunitas.required.Integral
 #import tunitas.required.integer.Unsigned
+#import tunitas.required.Octet
+#import tunitas.base64.decoder.required.Gettable
 #import std.uint8_t
 #import std.string
+#import std.string_view
 #import std.vector
 #import std.size_t
 #import std.uintmax_t
 class tunitas::base64::Decoder {
 public:
   template<required::Iterator_Producing<std::uint8_t> ITERATOR> inline Decoder(ITERATOR start, ITERATOR finish);
+  inline explicit Decoder(char const *); // avoid the ambiguity between the other two
   inline explicit Decoder(std::string const &);
+  inline explicit Decoder(std::string_view const &);
   inline auto rewind() -> void;
   inline auto seek(std::size_t proposed_position) -> void;
   // "get" is big endian
-  template<required::Integral INTEGRAL> inline auto get(std::size_t size_in_bits) -> INTEGRAL;
-  template<required::Integral INTEGRAL> inline auto get() -> INTEGRAL;
+  template<decoder::required::Gettable RESULT> inline auto get(std::size_t size_in_bits) -> RESULT;
+  template<decoder::required::Gettable RESULT> inline auto get() -> RESULT;
+private:
+  template<required::Integral RESULT> inline auto get_integral(std::size_t size_in_bits) -> RESULT;
+  template<required::Integral RESULT> inline auto get_integral() -> RESULT;
+  template<required::Octet RESULT> inline auto get_octet(std::size_t size_in_bits) -> RESULT;
+  template<required::Octet RESULT> inline auto get_octet() -> RESULT;
+public:
   inline auto eof() const -> bool;
   inline auto empty() const -> bool;
   inline auto size() const -> std::size_t;
@@ -85,7 +96,13 @@ namespace tunitas::base64 {
     trimback(equals);
     get_position = decoded_state.begin();
   }
-  Decoder::Decoder(std::string const &s) {
+  Decoder::Decoder(char const *s)
+    : Decoder{std::string_view{s}}
+  { }
+  Decoder::Decoder(std::string const &s)
+    : Decoder{std::string_view{s.data(), s.size()}}
+  { }
+  Decoder::Decoder(std::string_view const &s) {
     unsigned equals(0);
     emplace(s.begin(), s.end(), equals);
     trimback(equals);
@@ -101,18 +118,39 @@ namespace tunitas::base64 {
     get_position = decoded_state.begin() + proposed_position;
   }
   // "get" is big endian
-  template<required::Integral INTEGRAL> auto Decoder::get(std::size_t size_in_bits) -> INTEGRAL {
-    validate(8*sizeof(INTEGRAL), size_in_bits);
-    auto ret = INTEGRAL();
+  template<decoder::required::Gettable RESULT> auto Decoder::get() -> RESULT {
+    if constexpr (required::Octet<RESULT>) {
+      return get_octet<RESULT>();
+    } else {
+      return get_integral<RESULT>();
+    }
+  }
+  template<decoder::required::Gettable RESULT> auto Decoder::get(std::size_t size_in_bits) -> RESULT {
+    if constexpr (required::Octet<RESULT>) {
+      return get_octet<RESULT>(size_in_bits);
+    } else {
+      return get_integral<RESULT>(size_in_bits);
+    }
+  }
+  template<required::Octet RESULT> auto Decoder::get_octet() -> RESULT {
+    static_assert(1 == sizeof (RESULT));
+    return RESULT(get_integral<std::uint8_t>(8*sizeof (RESULT)));
+  }
+  template<required::Octet RESULT> auto Decoder::get_octet(std::size_t size_in_bits) -> RESULT {
+    return RESULT(get_integral<std::uint8_t>(size_in_bits));
+  }
+  template<required::Integral RESULT> auto Decoder::get_integral(std::size_t size_in_bits) -> RESULT {
+    validate(8*sizeof(RESULT), size_in_bits);
+    auto ret = RESULT();
     for (int i(0), e(size_in_bits); e != i; ++i) {
-      assert(decoded_state.end() != get_position); // [[FIXTHIS]] if you feel strongly that this might not be true, throw something
       ret <<= 1;
+      // ....................... if (decoded_state.end() == get_position) { throw decoder::Get("at end"); }
       ret |= *get_position++; // throws out_of_range on off-the-end, but validate should have thrown prior
     }
     return ret;
   }
-  template<required::Integral INTEGRAL> auto Decoder::get() -> INTEGRAL {
-    return get<INTEGRAL>(8*sizeof (INTEGRAL));
+  template<required::Integral RESULT> auto Decoder::get_integral() -> RESULT {
+    return get_integral<RESULT>(8*sizeof (RESULT));
   }
   auto Decoder::eof() const -> bool { return decoded_state.end() == get_position; }
   auto Decoder::empty() const -> bool { return decoded_state.empty(); }

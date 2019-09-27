@@ -3,6 +3,8 @@
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <hpp>
 #import std.string
+#import tunitas.required.Container_Push_Back
+#import tunitas.required.Octet
 namespace tunitas::base64 {
   //
   //
@@ -19,15 +21,19 @@ namespace tunitas::base64 {
   //   }
   //
   inline auto encode(std::string const &source) -> std::string;
+  template<typename RESULT> inline auto encode(std::string const &source) -> RESULT requires required::Container_Push_Back<RESULT> && required::Octet<typename RESULT::value_type>;
 }
 #endiv
 #divert <ipp>
 #import std.string
 #import tunitas.base64.Encoder
 auto tunitas::base64::encode(std::string const &source) -> std::string {
+  return encode<std::string>(source);
+}
+template<typename RESULT> auto tunitas::base64::encode(std::string const &source) -> RESULT requires required::Container_Push_Back<RESULT> && required::Octet<typename RESULT::value_type> {
   Encoder enc;
   enc.put(source);
   enc.put(Encoder::PAD8);
-  return enc.finalize();
+  return enc.finalize<RESULT>();
 }
 #endiv

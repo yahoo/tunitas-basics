@@ -189,6 +189,11 @@ Makefile_PACKAGE_CFLAGS_SET   =
 Makefile_PACKAGE_CXXLAGS_SET  = 
 Makefile_PACKAGE_LDFLAGS_SET  = 
 
+Makefile_CHECK_CPPFLAGS_SET = 
+Makefile_CHECK_CFLAGS_SET   = 
+Makefile_CHECK_CXXLAGS_SET  = 
+Makefile_CHECK_LDFLAGS_SET  = -no-install
+
 AM_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
 AM_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
 # WATCHOUT - AM_LDFLAGS is not normally included in libtool final-link lines (whereas AM_CPPFLAGS, AM_CXXFLAGS are)

@@ -1,0 +1,45 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tunitas::required {
+  //
+  // A type is "push_back" if it can (uh) push back.
+  // Not specialized to octet or char or anything.
+  // If you want such (octets) then combine with nonstd::requires::Octet<...>
+  //              ... (character) then combine with nonstd::requires::Character<...>
+  //
+  // Usage:
+  //
+  //   template<required::Container_Push_Back CONTAINER> struct Something {
+  //     Something(CONTAINER &container);
+  //   };
+  //
+  template<typename CONTAINER> concept bool Container_Push_Back = requires(CONTAINER container) {
+    typename CONTAINER::value_type;
+    requires requires(typename CONTAINER::value_type value) { requires true; };
+    //
+    // gcc-c++-8.2.1-5.fc28.x86_64
+    // src/tunitas/required/Container_Push_Back_Char.xcpp:21:19: internal compiler error: in tsubst_copy, at cp/pt.c:15347
+    // Occurs when an inner 'requires' references a outer scoped variable.
+    // e.g. requires(CONTAINER container) { requires requires(char c) { container.push_back(c); } };
+    //
+    requires requires(CONTAINER container, typename CONTAINER::value_type value) {
+      { container.push_back(value) } -> void;
+    };
+  };
+}
+#endiv
+#divert <cpp>
+// Of course this is test code
+#import std.byte
+#import std.vector
+#import std.string
+namespace tunitas::required {
+  static_assert(Container_Push_Back<std::vector<char>>);
+  static_assert(Container_Push_Back<std::vector<std::byte>>);
+  static_assert(Container_Push_Back<std::vector<int>>);
+  static_assert(Container_Push_Back<std::vector<std::string>>);
+  static_assert(Container_Push_Back<std::string>);
+}
+#endiv

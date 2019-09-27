@@ -1,0 +1,62 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::base64::printability {
+  //
+  // The formatter of the 
+  // The lifetime of the container must be longer than that of the Printable
+  //
+  // All the magic happens in the operator<<
+  // All the octet container types get printed as character strings with a \x%02x encoding for unprintables.
+  // The bool vectors (bit vectors) are printed as such.
+  //
+  // Usage:
+  //
+  //   see printable(...) nearby
+  //
+  template<typename CONTAINER> class Formatter;
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+#import std.vector
+namespace tests::unit::base64::printability {
+  template<typename CONTAINER> inline auto operator<<(std::ostream &, Formatter<CONTAINER> const &) -> std::ostream &;
+  template<> inline auto operator<<(std::ostream &, Formatter<std::vector<bool>> const &) -> std::ostream &;
+}
+namespace tests::unit::base64 {
+  template<typename CONTAINER> struct printability::Formatter {
+    using Value = CONTAINER;
+    inline explicit Formatter(Value const &value) : value{value} { }
+    Value const &value;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.hex
+#import std.isprint
+#import std.noboolalpha
+#import std.setfill
+#import std.setw
+namespace tests::unit::base64 {
+  template<typename CONTAINER> inline auto printability::operator<<(std::ostream &o, Formatter<CONTAINER> const &f) -> std::ostream & {
+    for (auto b : f.value) {
+      auto const c = char(b);
+      if (std::isprint(c)) {
+        o << c;
+      } else {
+        o << '\\' << std::hex << std::setfill('0') << std::setw(2) << (unsigned) b;
+      }
+    }
+    return o;
+  }
+  template<> inline auto printability::operator<<(std::ostream &o, Formatter<std::vector<bool>> const &f) -> std::ostream & {
+    o << std::noboolalpha;
+    for (auto b : f.value) {
+      o << b;
+    }
+    return o;
+  }
+}
+#endiv

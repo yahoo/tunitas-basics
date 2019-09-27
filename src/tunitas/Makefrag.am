@@ -21,9 +21,9 @@
 #       <= 0     if any interfaces were changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 12
+lib_libtunitas_la_CURRENT = 14
 lib_libtunitas_la_REVISION = 0
-lib_libtunitas_la_AGE = 1
+lib_libtunitas_la_AGE = 3
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
 lib_libtunitas_la = lib/libtunitas.la
@@ -39,10 +39,13 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/required/integer.Signed.cpp \
   obj/src/tunitas/required/integer.Unsigned.cpp \
   obj/src/tunitas/required/Iterator_Producing.cpp \
+  obj/src/tunitas/required/Container_Push_Back.cpp \
   obj/src/tunitas/required/Container_Push_Back_Char.cpp \
+  obj/src/tunitas/required/Container_Push_Back_Octet.cpp \
   obj/src/tunitas/required/Stringable.cpp \
   obj/src/tunitas/required/Move_Constructible.cpp \
   obj/src/tunitas/required/Default_Constructible.cpp \
+  obj/src/tunitas/required/Octet.cpp \
   obj/src/tunitas/required/Outcomable.cpp \
   obj/src/tunitas/required/exception/namespace.cpp \
   obj/src/tunitas/required/exception/app.Quitting.cpp \
@@ -52,12 +55,14 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/base64/Exception.cpp \
   \
   obj/src/tunitas/base64/decode.cpp \
+  obj/src/tunitas/base64/decode.detail.cpp \
   obj/src/tunitas/base64/Decoder.cpp \
   obj/src/tunitas/base64/Decoder.Shaver.cpp \
   obj/src/tunitas/base64/decoder.Get.cpp \
   obj/src/tunitas/base64/decoder.Invalid.cpp \
   obj/src/tunitas/base64/decoder.Seek.cpp \
   obj/src/tunitas/base64/decoder.Underflow.cpp \
+  obj/src/tunitas/base64/decoder.required.Gettable.cpp \
   \
   obj/src/tunitas/base64/encode.cpp \
   obj/src/tunitas/base64/Encoder.cpp \
@@ -68,7 +73,6 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/base64/sized.ByType.cpp \
   obj/src/tunitas/base64/sized.ByValue.cpp \
   \
-  obj/src/tunitas/Success.cpp \
   obj/src/tunitas/Outcome.cpp \
   obj/src/tunitas/Success.cpp \
   obj/src/tunitas/outcome/namespace.cpp \

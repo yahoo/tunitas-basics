@@ -74,7 +74,7 @@ auto tests::unit::app::Drop::test_success() -> void {
 #import unit.rigging.suite.add
 auto tests::unit::app::Drop::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
-  Stream series("app");
+  Stream series("drop");
   series << call("nouser", &Drop::test_nouser)
 	 << call("still_privileged", &Drop::test_still_privileged)
 	 << call("unable_to_seteuid", &Drop::test_unable_to_seteuid)

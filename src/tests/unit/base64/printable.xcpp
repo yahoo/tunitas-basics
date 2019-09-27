@@ -1,0 +1,24 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <hpp>
+#import tests.unit.base64.printability.Formatter
+namespace tests::unit::base64 {
+  //
+  // The lifetime of the container must be longer than that of the Printable
+  //
+  // Usage:
+  //
+  //   auto container = ...somehow...
+  //   cerr << printable(container);
+  //
+  template<typename CONTAINER> inline auto printable(CONTAINER const &) -> printability::Formatter<CONTAINER>;
+}
+#endiv
+#divert <ipp>
+namespace tests::unit {
+  template<typename CONTAINER> auto base64::printable(CONTAINER const &container) -> printability::Formatter<CONTAINER> {
+    return printability::Formatter<CONTAINER>{container};
+  }
+}
+#endiv

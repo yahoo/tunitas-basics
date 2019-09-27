@@ -14,7 +14,7 @@ check_lib_libtests_outcome_la_SOURCES = \
 check_bin_outcome_error_condition = check/bin/outcome-error_condition
 check_bin_outcome_error_condition_LDADD = $(check_lib_libtests_outcome_la)
 # reminder: autotools does not put $(AM_LDFLAGS) into check_bin_outcome_error_condition_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-check_bin_outcome_error_condition_LDFLAGS = $(AM_LDFLAGS)
+check_bin_outcome_error_condition_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_outcome_error_condition_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_outcome_error_condition_SOURCES))
 check_bin_outcome_error_condition_SOURCES = \
   obj/src/tests/outcome/error_condition.cpp \
@@ -23,7 +23,7 @@ check_bin_outcome_error_condition_SOURCES = \
 check_bin_outcome_error_code = check/bin/outcome-error_code
 check_bin_outcome_error_code_LDADD = $(check_lib_libtests_outcome_la)
 # reminder: autotools does not put $(AM_LDFLAGS) into check_bin_outcome_error_code_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-check_bin_outcome_error_code_LDFLAGS = $(AM_LDFLAGS)
+check_bin_outcome_error_code_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_outcome_error_code_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_outcome_error_code_SOURCES))
 check_bin_outcome_error_code_SOURCES = \
   obj/src/tests/outcome/error_code.cpp \

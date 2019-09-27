@@ -5,7 +5,13 @@
 #import tests.base64.remain
 #import tunitas.base64.encode
 auto main(int c, char *v[]) -> int {
-  using namespace tests::base64;
-  return remain(Function{&tunitas::base64::encode}, Args{&v[0], &v[c]});
+  // [[FIXTHIS]] ... just import the namespace (again)
+  using tests::base64::Function;
+  using tests::base64::Args;
+  using tests::base64::remain;
+  using Octet = char;
+  using Result = std::vector<Octet>;
+  Result (*resolved)(std::string const &) = tunitas::base64::encode<Result>;
+  return remain<Octet>(Function<Octet>{resolved}, Args{&v[0], &v[c]});
 }
 #endiv
