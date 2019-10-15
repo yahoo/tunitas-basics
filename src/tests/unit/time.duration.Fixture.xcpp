@@ -1,0 +1,77 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::time::duration { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::time::duration::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_second() -> void;
+  auto test_minute() -> void;
+  auto test_hour() -> void;
+  auto test_day() -> void;
+  auto test_week() -> void;
+  auto test_month() -> void;
+  auto test_year() -> void;
+  auto test_millenium() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tunitas.time.duration
+namespace tests::unit::time::duration {
+  using namespace tunitas::time::duration;
+}
+auto tests::unit::time::duration::Fixture::test_second() -> void {
+  auto v1 = Second{1};
+  auto v2 = Second{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_minute() -> void {
+  auto v1 = Minute{1};
+  auto v2 = Minute{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_hour() -> void {
+  auto v1 = Hour{1};
+  auto v2 = Hour{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_day() -> void {
+  auto v1 = Day{1};
+  auto v2 = Day{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_week() -> void {
+  auto v1 = Week{1};
+  auto v2 = Week{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_month() -> void {
+  auto v1 = Month{1};
+  auto v2 = Month{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+auto tests::unit::time::duration::Fixture::test_year() -> void {
+  auto v1 = Year{1};
+  auto v2 = Year{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
+#import rigging.suite.io
+auto tests::unit::time::duration::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("duration");
+  series << call("second", &Fixture::test_second)
+         << call("minute", &Fixture::test_minute)
+         << call("hour", &Fixture::test_hour)
+         << call("day", &Fixture::test_day)
+         << call("week", &Fixture::test_week)
+         << call("month", &Fixture::test_month)
+         << call("year", &Fixture::test_year)
+    ;
+  return finalize(series);
+}
+#endiv

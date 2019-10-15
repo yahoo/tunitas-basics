@@ -1,0 +1,25 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#import std.ratio
+#import std.ratio_multiply
+namespace tunitas::time::duration {
+  //
+  // There are many ratios that we care about.
+  // All of these ar daypart and calendar-level quantities.
+  // Of course there is an error term in the multi-year durations which span leap year.
+  // And the unforseen and unannounced leap seconds, or the arrival of aliens who tell us of new time lines altogether.
+  //
+  using Second = std::ratio<1, 1>;
+  using Minute = std::ratio_multiply<60, Second>::type;
+  using Hour = std::ratio_multiply<60, Minute>::type;
+  using Day = std::ratio_multiply<24, Hour>::type;
+  using Week = std::ratio_multiply<7, Day>::type;
+  // It becomes controversial and cultural after here ... with some embedded error terms.
+  using Month = std::ratio_multiply<30, Day>::type;
+  using Year = std::ratio_multiply<365, Day>::type;
+  using Century = std::ratio_multiply<100*365+25, Year>::type;
+  using Millenium = std::ratio_multiply<10, Century>::type; // [[FIXTHIS]] correct for the "if divisible by 400" rule ... but who would use this (for a consent?)
+}
+#endiv
