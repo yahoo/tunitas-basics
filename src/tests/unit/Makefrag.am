@@ -70,6 +70,9 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/server.Fixture.cpp \
   obj/src/tests/unit/server.Fixture.exception.Example.cpp \
   obj/src/tests/unit/time.Fixture.cpp \
+  obj/src/tests/unit/time.literals.Fixture.cpp \
+  obj/src/tests/unit/time.duration.Fixture.cpp \
+  obj/src/tests/unit/time.ratio.Fixture.cpp \
   obj/src/tests/unit/tunitas.Fixture.cpp \
   obj/src/tests/unit/urlsafe.Fixture.cpp \
   obj/src/tests/unit/want.Fixture.cpp \

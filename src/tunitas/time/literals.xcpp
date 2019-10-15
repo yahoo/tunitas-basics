@@ -9,36 +9,43 @@ namespace tunitas::time::literals { }
 #import tunitas.time.duration
 namespace tunitas::time::literals {
   //
+  // Following the pattern of std::chrono::literals (std::literals::chrono_literals)
+  // We define the time units that are meaningful here.
+  // Generally subsecond is not interesting; instead we are interested in human experience units and regulatory conformance units.
+  // So that would be, variously, into the hours, days, weeks, months and years.
+  // We are happy with the error term induced by the ragged length of months and the leap days and seconds in the years.
+  // What is relevant is expressive sense of "duration of consent"
+  // If you need second or subsecond precision across month or (leap) year boundaries then use std::chrono directly.
+  //
   // singular (because that is what we expect)
-  inline constexpr auto operator""_second(int unsigned long) -> Duration;
-  inline constexpr auto operator""_minute(int unsigned long) -> Duration;
-  inline constexpr auto operator""_hour(int unsigned long) -> Duration;
-  inline constexpr auto operator""_day(int unsigned long) -> Duration;
-  inline constexpr auto operator""_week(int unsigned long) -> Duration;
-  inline constexpr auto operator""_month(int unsigned long) -> Duration;
-  inline constexpr auto operator""_year(int unsigned long) -> Duration;
-  inline constexpr auto operator""_millenium(int unsigned long) -> Duration;
+  inline constexpr auto operator""_second(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_minute(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_hour(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_day(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_week(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_fortnight(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_month(int unsigned long long) -> Duration;
+  inline constexpr auto operator""_year(int unsigned long long) -> Duration;
   //
   // plural (because grammar must be obeyed ... because it sounds wrong)
-  inline constexpr auto operator""_seconds(int unsigned long value) -> Duration { return operator""_second(value); }
-  inline constexpr auto operator""_minutes(int unsigned long value) -> Duration { return operator""_minute(value); }
-  inline constexpr auto operator""_hours(int unsigned long value) -> Duration { return operator""_hour(value); }
-  inline constexpr auto operator""_days(int unsigned long value) -> Duration { return operator""_day(value); }
-  inline constexpr auto operator""_weeks(int unsigned long value) -> Duration { return operator""_week(value); }
-  inline constexpr auto operator""_months(int unsigned long value) -> Duration { return operator""_month(value); }
-  inline constexpr auto operator""_years(int unsigned long value) -> Duration { return operator""_year(value); }
-  inline constexpr auto operator""_milleniums(int unsigned long value) -> Duration { return operator""_millenium(value); }
-  inline constexpr auto operator""_millenia(int unsigned long value) -> Duration { return operator""_millenium(value); }
+  inline constexpr auto operator""_seconds(int unsigned long long value) -> Duration    { return operator""_second(value); }
+  inline constexpr auto operator""_minutes(int unsigned long long value) -> Duration    { return operator""_minute(value); }
+  inline constexpr auto operator""_hours(int unsigned long long value) -> Duration      { return operator""_hour(value); }
+  inline constexpr auto operator""_days(int unsigned long long value) -> Duration       { return operator""_day(value); }
+  inline constexpr auto operator""_weeks(int unsigned long long value) -> Duration      { return operator""_week(value); }
+  inline constexpr auto operator""_fortnights(int unsigned long long value) -> Duration { return operator""_fortnight(value); }
+  inline constexpr auto operator""_months(int unsigned long long value) -> Duration     { return operator""_month(value); }
+  inline constexpr auto operator""_years(int unsigned long long value) -> Duration      { return operator""_year(value); }
 }
 #import tunitas.time.duration_cast
 namespace tunitas::time {
-  constexpr auto literals::operator""_second(int unsigned long value) -> Duration    { return duration_cast<Duration>(duration::Second{value}); }
-  constexpr auto literals::operator""_minute(int unsigned long value) -> Duration    { return duration_cast<Duration>(duration::Minute{value}); }
-  constexpr auto literals::operator""_hour(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Hour{value}); }
-  constexpr auto literals::operator""_day(int unsigned long value) -> Duration       { return duration_cast<Duration>(duration::Day{value}); }
-  constexpr auto literals::operator""_week(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Week{value}); }
-  constexpr auto literals::operator""_month(int unsigned long value) -> Duration     { return duration_cast<Duration>(duration::Month{value}); }
-  constexpr auto literals::operator""_year(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Year{value}); }
-  constexpr auto literals::operator""_millenium(int unsigned long value) -> Duration { return duration_cast<Duration>(duration::Millenium{value}); }
+  constexpr auto literals::operator""_second(int unsigned long long value) -> Duration    { return duration_cast<Duration>(duration::Second{value}); }
+  constexpr auto literals::operator""_minute(int unsigned long long value) -> Duration    { return duration_cast<Duration>(duration::Minute{value}); }
+  constexpr auto literals::operator""_hour(int unsigned long long value) -> Duration      { return duration_cast<Duration>(duration::Hour{value}); }
+  constexpr auto literals::operator""_day(int unsigned long long value) -> Duration       { return duration_cast<Duration>(duration::Day{value}); }
+  constexpr auto literals::operator""_week(int unsigned long long value) -> Duration      { return duration_cast<Duration>(duration::Week{value}); }
+  constexpr auto literals::operator""_fortnight(int unsigned long long value) -> Duration { return duration_cast<Duration>(duration::Fortnight{value}); }
+  constexpr auto literals::operator""_month(int unsigned long long value) -> Duration     { return duration_cast<Duration>(duration::Month{value}); }
+  constexpr auto literals::operator""_year(int unsigned long long value) -> Duration      { return duration_cast<Duration>(duration::Year{value}); }
 }
 #endiv

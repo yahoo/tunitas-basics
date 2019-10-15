@@ -99,38 +99,6 @@ $(check_PROGRAMS) : $(bin_PROGRAMS)
 $(check_PROGRAMS) : $(lib_LTLIBRARIES)
 $(check_PROGRAMS) : $(check_LTLIBRARIES)
 
-MODULES = \
-  $(lib_libtunitas_la_MODULES) \
-  $(lib_libtunitas_server_la_MODULES) \
-  $(lib_libwant_la_MODULES) \
-  $(check_bin_unit_MODULES)  \
-  $(check_bin_base64_decode_MODULES) \
-  $(check_bin_base64_encode_MODULES) \
-  $(check_bin_outcome_error_code_MODULES) \
-  $(check_bin_outcome_error_condition_MODULES) \
-  $(check_bin_urlsafe_decode_MODULES) \
-  $(check_bin_urlsafe_encode_MODULES) \
-  $(check_lib_libtests_base64_la_MODULES) \
-  $(check_lib_libtests_outcome_la_MODULES) \
-  $(check_lib_libtests_urlsafe_la_MODULES) \
-  $(end)
-OBJECTS = \
-  $(lib_libtunitas_la_OBJECTS) \
-  $(lib_libtunitas_server_la_OBJECTS) \
-  $(lib_libwant_la_OBJECTS) \
-  $(check_bin_unit_OBJECTS)  \
-  $(check_bin_base64_decode_OBJECTS) \
-  $(check_bin_base64_encode_OBJECTS) \
-  $(check_bin_outcome_error_code_OBJECTS) \
-  $(check_bin_outcome_error_condition_OBJECTS) \
-  $(check_bin_urlsafe_decode_OBJECTS) \
-  $(check_bin_urlsafe_encode_OBJECTS) \
-  $(check_lib_libtests_base64_la_OBJECTS) \
-  $(check_lib_libtests_outcome_la_OBJECTS) \
-  $(check_lib_libtests_urlsafe_la_OBJECTS) \
-  $(end)
-$(OBJECTS) : $(MODULES)
-
 include tests/unit/Makefrag.am
 include tests/base64/decode/Makefrag.am
 include tests/base64/encode/Makefrag.am

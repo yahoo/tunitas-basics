@@ -8,9 +8,15 @@ namespace tunitas::time {
   // The clock.
   // You will use the system clock, which is calendar time
   //
+  // Interface
+  //   The simple interface of now, to_time_t, from_time_t.
+  //   https://en.cppreference.com/w/cpp/chrono/system_clock
+  //
   // Usage:
   //
   //   auto here_and = Clock::now()
+  //   auto then = Clock::from_time_t(some_integer);
+  //   auto and_back = Clock::to_time_t(then);
   //
   using Clock = std::chrono::system_clock;
 }
