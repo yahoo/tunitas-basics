@@ -2,21 +2,21 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tests::unit::time::literal { class Fixture; }
+namespace tests::unit::time::literals { class Fixture; }
 #endiv
 #divert <hpp>
 #import cppunit.Test
 #import cppunit.test.Fixture
-class tests::unit::time::literal::Fixture : public cppunit::test::Fixture {
+class tests::unit::time::literals::Fixture : public cppunit::test::Fixture {
 public:
   auto test_second() -> void;
   auto test_minute() -> void;
   auto test_hour() -> void;
   auto test_day() -> void;
   auto test_week() -> void;
+  auto test_fortnight() -> void;
   auto test_month() -> void;
   auto test_year() -> void;
-  auto test_millenium() -> void;
   static auto suite() -> cppunit::Test *;
 };
 #endiv
@@ -25,60 +25,75 @@ public:
 namespace tests::unit::time::literals {
   using namespace tunitas::time::literals;
 }
-auto tests::unit::time::literal::Fixture::test_second() -> void {
+auto tests::unit::time::literals::Fixture::test_second() -> void {
+  using tunitas::time::literals::operator""_second;
   auto v1 = 1_second;
   auto v2 = 2_seconds;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_second == 3_seconds);
 }
-auto tests::unit::time::literal::Fixture::test_minute() -> void {
+auto tests::unit::time::literals::Fixture::test_minute() -> void {
+  using namespace tunitas::time::literals;
   auto v1 = 1_minute;
   auto v2 = 2_minutes;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_minute == 3_minutes);
+  CPPUNIT_ASSERT(1_minute == 60_seconds);
 }
-auto tests::unit::time::literal::Fixture::test_hour() -> void {
+auto tests::unit::time::literals::Fixture::test_hour() -> void {
   auto v1 = 1_hour;
   auto v2 = 2_hours;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_hour == 3_hours);
+  CPPUNIT_ASSERT(60_minutes == 1_hour);
 }
-auto tests::unit::time::literal::Fixture::test_day() -> void {
+auto tests::unit::time::literals::Fixture::test_day() -> void {
   auto v1 = 1_day;
   auto v2 = 2_days;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_day == 3_days);
+  CPPUNIT_ASSERT(24_hours == 1_day);
 }
-auto tests::unit::time::literal::Fixture::test_week() -> void {
+auto tests::unit::time::literals::Fixture::test_week() -> void {
   auto v1 = 1_week;
   auto v2 = 2_weeks;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_week == 3_weeks);
+  CPPUNIT_ASSERT(7_days == 1_week);
 }
-auto tests::unit::time::literal::Fixture::test_month() -> void {
+auto tests::unit::time::literals::Fixture::test_fortnight() -> void {
+  auto v1 = 1_fortnight;
+  auto v2 = 2_fortnights;
+  CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_fortnight == 3_fortnights);
+  CPPUNIT_ASSERT(14_days == 1_fortnight);
+}
+auto tests::unit::time::literals::Fixture::test_month() -> void {
   auto v1 = 1_month;
   auto v2 = 2_months;
   CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_month == 3_months);
+  CPPUNIT_ASSERT(30_days == 1_month);
 }
-auto tests::unit::time::literal::Fixture::test_year() -> void {
+auto tests::unit::time::literals::Fixture::test_year() -> void {
   auto v1 = 1_year;
   auto v2 = 2_years;
   CPPUNIT_ASSERT(v1 < v2);
-}
-auto tests::unit::time::literal::Fixture::test_millenium() -> void {
-  auto v1 = 1_millenium;
-  auto v2 = 2_milleniums;
-  auto v2a = 2_millenia;
-  CPPUNIT_ASSERT(v1 < v2);
-  CPPUNIT_ASSERT(v2a == v2);
+  CPPUNIT_ASSERT(3_year == 3_years);
+  CPPUNIT_ASSERT(365_days <= 1_year && 1_year < 366_days);
 }
 #import rigging.suite.io
-auto tests::unit::time::literal::Fixture::suite() -> cppunit::Test * {
+auto tests::unit::time::literals::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
   Stream series("literals");
   series << call("second", &Fixture::test_second)
          << call("minute", &Fixture::test_minute)
          << call("hour", &Fixture::test_hour)
-         << call("week", &Fixture::test_day)
-         << call("month", &Fixture::test_week)
-         << call("year", &Fixture::test_month)
-         << call("millenium", &Fixture::test_year)
-         << call("hour", &Fixture::test_millenium)
+         << call("day", &Fixture::test_day)
+         << call("week", &Fixture::test_week)
+         << call("fortnight", &Fixture::test_fortnight)
+         << call("month", &Fixture::test_month)
+         << call("year", &Fixture::test_year)
     ;
   return finalize(series);
 }

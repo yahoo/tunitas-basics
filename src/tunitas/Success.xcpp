@@ -6,11 +6,11 @@
 namespace tunitas {
   // Continue the convenience, rhymes with Outcome in hoisting
   using outcome::Success;
-  using outcome::SUCCESS;
 }
 #endiv
 #divert <hpp>
 namespace tunitas {
+  using outcome::SUCCESS;
   using outcome::ok;
   using outcome::value;
   using outcome::error_code;

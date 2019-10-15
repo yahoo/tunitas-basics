@@ -30,7 +30,11 @@ namespace tunitas::outcome {
   //   auto failure = Success{std::error_code{error::Code::OH_MY_STARS}};
   //
   namespace detail { class Success { }; }
-  constexpr auto SUCCESS = detail::Success{};
   using Success = Variant<detail::Success>;
+}
+#endiv
+#divert<hpp>
+namespace tunitas::outcome {
+  constexpr auto SUCCESS = detail::Success{};
 }
 #endiv

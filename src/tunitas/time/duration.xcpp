@@ -14,9 +14,11 @@ namespace tunitas::time::duration {
   using Hour = std::chrono::duration<Duration::rep, ratio::Hour>;
   using Day = std::chrono::duration<Duration::rep, ratio::Day>;
   using Week = std::chrono::duration<Duration::rep, ratio::Week>;
+  using Fortnight = std::chrono::duration<Duration::rep, ratio::Fortnight>;
   using Month = std::chrono::duration<Duration::rep, ratio::Month>;
   using Year = std::chrono::duration<Duration::rep, ratio::Year>;
-  using Century = std::chrono::duration<Duration::rep, ratio::Century>;
-  using Millenium = std::chrono::duration<Duration::rep, ratio::Millenium>;
+}
+namespace tunitas::time {
+  namespace [[deprecated("tunitas::time::duration (plural) never was a namespace name; use tunitas::time::duration (singular)")]] durations { using namespace duration; }
 }
 #endiv

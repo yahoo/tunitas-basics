@@ -14,9 +14,9 @@ public:
   auto test_hour() -> void;
   auto test_day() -> void;
   auto test_week() -> void;
+  auto test_fortnight() -> void;
   auto test_month() -> void;
   auto test_year() -> void;
-  auto test_millenium() -> void;
   static auto suite() -> cppunit::Test *;
 };
 #endiv
@@ -50,6 +50,11 @@ auto tests::unit::time::duration::Fixture::test_week() -> void {
   auto v2 = Week{2};
   CPPUNIT_ASSERT(v1 < v2);
 }
+auto tests::unit::time::duration::Fixture::test_fortnight() -> void {
+  auto v1 = Fortnight{1};
+  auto v2 = Fortnight{2};
+  CPPUNIT_ASSERT(v1 < v2);
+}
 auto tests::unit::time::duration::Fixture::test_month() -> void {
   auto v1 = Month{1};
   auto v2 = Month{2};
@@ -69,6 +74,7 @@ auto tests::unit::time::duration::Fixture::suite() -> cppunit::Test * {
          << call("hour", &Fixture::test_hour)
          << call("day", &Fixture::test_day)
          << call("week", &Fixture::test_week)
+         << call("fortnight", &Fixture::test_fortnight)
          << call("month", &Fixture::test_month)
          << call("year", &Fixture::test_year)
     ;
