@@ -1,0 +1,44 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tunitas::time::literals { }
+#endiv
+#divert <hpp>
+#import tunitas.time.Duration
+#import tunitas.time.duration
+namespace tunitas::time::literals {
+  //
+  // singular (because that is what we expect)
+  inline constexpr auto operator""_second(int unsigned long) -> Duration;
+  inline constexpr auto operator""_minute(int unsigned long) -> Duration;
+  inline constexpr auto operator""_hour(int unsigned long) -> Duration;
+  inline constexpr auto operator""_day(int unsigned long) -> Duration;
+  inline constexpr auto operator""_week(int unsigned long) -> Duration;
+  inline constexpr auto operator""_month(int unsigned long) -> Duration;
+  inline constexpr auto operator""_year(int unsigned long) -> Duration;
+  inline constexpr auto operator""_millenium(int unsigned long) -> Duration;
+  //
+  // plural (because grammar must be obeyed ... because it sounds wrong)
+  inline constexpr auto operator""_seconds(int unsigned long value) -> Duration { return operator""_second(value); }
+  inline constexpr auto operator""_minutes(int unsigned long value) -> Duration { return operator""_minute(value); }
+  inline constexpr auto operator""_hours(int unsigned long value) -> Duration { return operator""_hour(value); }
+  inline constexpr auto operator""_days(int unsigned long value) -> Duration { return operator""_day(value); }
+  inline constexpr auto operator""_weeks(int unsigned long value) -> Duration { return operator""_week(value); }
+  inline constexpr auto operator""_months(int unsigned long value) -> Duration { return operator""_month(value); }
+  inline constexpr auto operator""_years(int unsigned long value) -> Duration { return operator""_year(value); }
+  inline constexpr auto operator""_milleniums(int unsigned long value) -> Duration { return operator""_millenium(value); }
+  inline constexpr auto operator""_millenia(int unsigned long value) -> Duration { return operator""_millenium(value); }
+}
+#import tunitas.time.duration_cast
+namespace tunitas::time {
+  constexpr auto literals::operator""_second(int unsigned long value) -> Duration    { return duration_cast<Duration>(duration::Second{value}); }
+  constexpr auto literals::operator""_minute(int unsigned long value) -> Duration    { return duration_cast<Duration>(duration::Minute{value}); }
+  constexpr auto literals::operator""_hour(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Hour{value}); }
+  constexpr auto literals::operator""_day(int unsigned long value) -> Duration       { return duration_cast<Duration>(duration::Day{value}); }
+  constexpr auto literals::operator""_week(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Week{value}); }
+  constexpr auto literals::operator""_month(int unsigned long value) -> Duration     { return duration_cast<Duration>(duration::Month{value}); }
+  constexpr auto literals::operator""_year(int unsigned long value) -> Duration      { return duration_cast<Duration>(duration::Year{value}); }
+  constexpr auto literals::operator""_millenium(int unsigned long value) -> Duration { return duration_cast<Duration>(duration::Millenium{value}); }
+}
+#endiv
