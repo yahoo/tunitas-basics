@@ -1,0 +1,33 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#import tunitas.exception.Aspect
+#import std.exception
+#import std.is_base_of
+#import sys.exits.Code
+// Need the complete definition for these types.
+#include <hpp/tunitas.exception.Aspect>
+// NO NEED #include <hpp/std.exception>
+namespace tunitas::required::exception {
+  //
+  // Is this a possible Quitting exception?
+  //
+  // MUST be a descendant of tunitas::exception::Aspect
+  // MAY be a descendant of nonstd::exception::Quitting (where available)
+  //
+  // Usage:
+  //
+  //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
+  //
+  template<typename QUITTING> concept bool Quitting =
+    std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
+    && std::is_base_of<std::exception, QUITTING>::value
+    && requires(QUITTING quitting, sys::exits::Code code) {
+      // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
+      { QUITTING{code} };
+      { quitting.what() } -> char const *;
+      { quitting.code() } -> sys::exits::Code;
+  };
+}
+#endiv

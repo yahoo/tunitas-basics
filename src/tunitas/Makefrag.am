@@ -48,6 +48,7 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/required/Octet.cpp \
   obj/src/tunitas/required/Outcomable.cpp \
   obj/src/tunitas/required/exception/namespace.cpp \
+  obj/src/tunitas/required/exception/Quitting.cpp \
   obj/src/tunitas/required/exception/app.Quitting.cpp \
   \
   obj/src/tunitas/base64/namespace.cpp \
@@ -72,6 +73,11 @@ lib_libtunitas_la_SOURCES = \
   \
   obj/src/tunitas/base64/sized.ByType.cpp \
   obj/src/tunitas/base64/sized.ByValue.cpp \
+  \
+  obj/src/tunitas/exception/namespace.cpp \
+  obj/src/tunitas/exception/Aspect.cpp \
+  obj/src/tunitas/exception/aspect.Messaging.cpp \
+  obj/src/tunitas/exception/aspect.Quitting.cpp \
   \
   obj/src/tunitas/Outcome.cpp \
   obj/src/tunitas/Success.cpp \

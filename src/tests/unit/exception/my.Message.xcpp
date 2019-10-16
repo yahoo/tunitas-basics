@@ -1,0 +1,41 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::exception::my {
+  //
+  // This is the example from the preamble of tunitas.exception.aspect.Messaging
+  //
+  class Message;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.aspect.Messaging
+#import std.exception
+#import std.string
+class tests::unit::exception::my::Message
+  : public ::tunitas::exception::Aspect,
+    public ::tunitas::exception::aspect::Messaging,
+    public std::exception {
+  using Messaging = ::tunitas::exception::aspect::Messaging;
+  using Exception = std::exception;
+public:
+  explicit Message(std::string const &NAME);
+  auto what() const noexcept -> char const * final;
+  static auto format(std::string const &NAME) -> std::string;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::exception::my {
+  Message::Message(std::string const &NAME)
+    : Messaging{format(NAME)}
+  { }
+  auto Message::what() const noexcept -> char const * {
+    return Messaging::what();
+  }
+  auto Message::format(std::string const &NAME) -> std::string {
+    return "usage: " + NAME + " [...options...]";
+  }
+}
+#endiv

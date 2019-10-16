@@ -1,0 +1,181 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::exception { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::exception::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_aspect_Messaging() -> void;
+  auto test_aspect_Quitting() -> void;
+  auto test_Aspect_1() -> void;
+  auto test_Aspect_2() -> void;
+  auto test_operator_insert_1() -> void;
+  auto test_operator_insert_2() -> void;
+  auto test_my_Message() -> void;
+  auto test_my_Quitting_1() -> void;
+  auto test_my_Quitting_2() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct Message;
+  struct Quitting;
+  struct Aspic; // e.g. tomato aspic
+  struct Balsam; // ... balsamic vinegar
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import sys.exits.constants
+#import tests.unit.exception.Fixture.Message
+#import tests.unit.exception.Fixture.Quitting
+namespace tests::unit::exception {
+  auto Fixture::test_aspect_Messaging() -> void {
+    Message subject{"text me maybe"};
+    CPPUNIT_ASSERT(nullptr != subject.what());
+  }
+  auto Fixture::test_aspect_Quitting() -> void {
+    Quitting subject{sys::exits::CONFIG};
+    CPPUNIT_ASSERT(nullptr != subject.what());
+    CPPUNIT_ASSERT(sys::exits::CONFIG == subject.code());
+  }
+}
+#import tests.unit.exception.Fixture.Aspic
+#import tests.unit.exception.Fixture.Balsam
+namespace tests::unit::exception {
+  auto Fixture::test_Aspect_1() -> void {
+    try {
+      Aspic aaa;
+      Balsam bbb;
+      throw aaa;
+    } catch (::tunitas::exception::Aspect const &) {
+      CPPUNIT_ASSERT(true);
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(false);
+    }
+  }
+  auto Fixture::test_Aspect_2() -> void {
+    try {
+      Aspic const aaa;
+      Balsam const bbb;
+      throw bbb;
+    } catch (::tunitas::exception::Aspect const &) {
+      CPPUNIT_ASSERT(false);
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(true);
+    }
+  }
+}
+#import tests.unit.exception.my.Message
+#import tests.unit.exception.my.Quitting
+#import sys.exits.constants
+namespace tests::unit::exception {
+  auto Fixture::test_operator_insert_1() -> void {
+    try {
+      throw my::Message{"Mail Me"};
+    } catch (::tunitas::exception::Aspect const &a) {
+      std::ostringstream buf;
+      buf << a; // <------------------------------ testing this
+      auto const actual = buf.str();
+      auto const expected = "usage: Mail Me [...options...]"s; 
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    }
+  }
+  auto Fixture::test_operator_insert_2() -> void {
+    try {
+      throw my::Quitting{sys::exits::USAGE};
+    } catch (::tunitas::exception::Aspect const &a) {
+      std::ostringstream buf;
+      buf << a; // <------------------------------ testing this
+      auto const actual = buf.str();
+      auto const expected = "I QUIT!"s;
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    }
+  }
+}
+#import tunitas.exception.Aspect
+#import tunitas.exception.aspect.Quitting
+#import std.ostringstream
+#import std.cerr
+namespace tests::unit::exception {
+  auto Fixture::test_my_Message() -> void {
+  //
+  //   try {
+  //     throw Message{"program"};
+  //     throw std::runtime_error{"that was bad"};
+  //   } catch (Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+
+  }
+  auto Fixture::test_my_Quitting_1() -> void {
+    std::ostringstream err;
+    try {
+      throw my::Quitting{sys::exits::FAIL};
+    } catch (::tunitas::exception::aspect::Quitting const &q) {
+      err << q.what() << '\n';
+    } catch (::tunitas::exception::Aspect const &a) {
+      err << a << '\n';
+    }
+    auto const actual = err.str();
+    std::cerr << actual;
+  }
+  auto Fixture::test_my_Quitting_2() -> void {
+    std::ostringstream err;
+    try {
+      throw my::Quitting{sys::exits::FAIL};
+    } catch (::tunitas::exception::Aspect const &a) {
+      err << a << '\n';
+      try {
+        throw;
+      } catch (::tunitas::exception::aspect::Quitting const &q) {
+        err << "with exit code " << (int) q.code() << '\n';
+      }
+    }
+    auto const actual = err.str();
+    std::cerr << actual;    
+  }
+}
+#import rigging.suite.io
+auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("exception");
+  {
+    Stream asp("aspect");
+    asp << call("Messaging", &Fixture::test_aspect_Messaging)
+        << call("Quitting", &Fixture::test_aspect_Quitting)
+      ;
+    series << move(asp);
+  } {
+    Stream asp("Aspect");
+    asp << call("1", &Fixture::test_Aspect_1)
+        << call("2", &Fixture::test_Aspect_2)
+      ;
+    series << move(asp);
+  } {
+    Stream ins("operator<<");
+    ins << call("1", &Fixture::test_operator_insert_1)
+        << call("2", &Fixture::test_operator_insert_2)
+      ;
+    series << move(ins);
+  } {
+    Stream my("my");
+    my << call("Message", &Fixture::test_my_Message)
+      ;
+    {
+      Stream qui("Quitting");
+       qui << call("1", &Fixture::test_my_Quitting_1)
+         << call("2", &Fixture::test_my_Quitting_2)
+         ;
+       my << move(qui);
+    }
+    series << move(my);
+  }
+  return finalize(series);
+}
+#endiv

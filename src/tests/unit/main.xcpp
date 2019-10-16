@@ -4,6 +4,7 @@
 #divert <cpp>
 #import tests.unit.app.Fixture
 #import tests.unit.base64.Fixture
+#import tests.unit.exception.Fixture
 #import tests.unit.outcome.Fixture
 #import tests.unit.required.Fixture
 #import tests.unit.server.Fixture
@@ -16,6 +17,7 @@ auto main(int argc, char *argv[]) -> int {
   namespace tu = tests::unit;
   rigging::bench::Main remain(tu::app::Fixture::suite(),
 			      tu::base64::Fixture::suite(),
+                              tu::exception::Fixture::suite(),
                               tu::outcome::Fixture::suite(),
                               tu::required::Fixture::suite(),
                               tu::server::Fixture::suite(),

@@ -1,0 +1,32 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#include <tests.unit.exception.Fixture>
+#endiv
+#divert <hpp>
+#import tunitas.exception.aspect.Messaging
+#import std.exception
+class tests::unit::exception::Fixture::Message : public ::tunitas::exception::aspect::Messaging, public std::exception {
+  // To use the Messaging mixin, we inherit from std::exception instead of std::runtime_error.
+  struct Ancestors {
+    using Aspect = ::tunitas::exception::aspect::Messaging;
+    using Exception = std::exception;
+  };
+public:
+  Message(std::string);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <cpp>
+#import std.move
+namespace tests::unit::exception {
+  Fixture::Message::Message(std::string text)
+    : Ancestors::Aspect{std::move(text)}
+    , Ancestors::Exception{}
+  { }
+  auto Fixture::Message::what() const noexcept -> char const * {
+    return Ancestors::Aspect::what();
+  }
+}
+#endiv

@@ -1,0 +1,27 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#include <tests.unit.exception.Fixture>
+#endiv
+#divert <hpp>
+#import std.runtime_error
+class tests::unit::exception::Fixture::Balsam : /*NOT Aspect*/ public std::runtime_error {
+public:
+  using Ancestor = std::runtime_error;
+  using Exception = Ancestor;
+public:
+  Balsam();
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::exception {
+  Fixture::Balsam::Balsam()
+    : Ancestor{"balsamic (vinegar)"}
+  { }
+  auto Fixture::Balsam::what() const noexcept -> char const * {
+    return Exception::what();
+  }
+}
+#endiv

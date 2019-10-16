@@ -2,12 +2,6 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import tunitas.app.exception.aspect.Version
-namespace tunitas::app::exception {
-  //
-  // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
-  // s/Version/aspect::Version/g
-  //
-  using Version = [[deprecated("instead use tunitas::app::exception::aspect::Version")]] aspect::Version;
-}
+#import tests.unit // matryoshka
+namespace tests::unit::exception { }
 #endiv

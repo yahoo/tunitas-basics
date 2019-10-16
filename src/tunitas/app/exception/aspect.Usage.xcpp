@@ -34,9 +34,9 @@ namespace tunitas::app::exception::aspect {
 }
 #endiv
 #divert <hpp>
-#import tunitas.app.exception.Generic
-class tunitas::app::exception::aspect::Usage : public Generic {
-  using ancestor = Generic;
+#import tunitas.app.exception.aspect.Quitting
+class tunitas::app::exception::aspect::Usage : public Quitting {
+  using Ancestor = Quitting;
 protected:
   ~Usage() = default;
   inline Usage(std::ostream &, sys::exits::Code);
@@ -45,10 +45,12 @@ protected:
 };
 #endiv
 #divert <ipp>
-tunitas::app::exception::aspect::Usage::Usage(std::ostream &o, sys::exits::Code c)
-  : ancestor{o, c}
-{ }
-tunitas::app::exception::aspect::Usage::Usage(sys::exits::Code c)
-  : ancestor{c}
-{ }
+namespace tunitas::app::exception::aspect {
+  Usage::Usage(std::ostream &o, sys::exits::Code c)
+    : Ancestor{o, c}
+  { }
+  Usage::Usage(sys::exits::Code c)
+    : Ancestor{c}
+  { }
+}
 #endiv

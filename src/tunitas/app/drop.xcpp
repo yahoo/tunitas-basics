@@ -41,6 +41,7 @@ namespace tunitas::app {
 #import want.sys.posix.getpwname
 #import want.sys.posix.seteuid
 #include <pwd.h> // [[FIXTHIS]] module-posix-os #import passwd
+#import sys.exits.constants
 template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::drop(Configuration const &cfg, std::string const &unprivileged_user) -> void {
   namespace sys = want::sys;
   debug(cfg) << "before uid=" << sys::posix::geteuid() << '\n';

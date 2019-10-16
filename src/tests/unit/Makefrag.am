@@ -63,6 +63,15 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/base64/exception/namespace.cpp \
   obj/src/tests/unit/base64/exception/Fixture.cpp \
   \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  obj/src/tests/unit/exception/Fixture.Message.cpp \
+  obj/src/tests/unit/exception/Fixture.Quitting.cpp \
+  obj/src/tests/unit/exception/Fixture.Aspic.cpp \
+  obj/src/tests/unit/exception/Fixture.Balsam.cpp \
+  obj/src/tests/unit/exception/my.Quitting.cpp \
+  obj/src/tests/unit/exception/my.Message.cpp \
+  \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   obj/src/tests/unit/outcome.Usage.cpp \

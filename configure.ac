@@ -21,7 +21,7 @@ dnl      |
 dnl      \prefix\
 dnl      ||||||||
 dnl      vvvvvvvv
-AC_INIT([tunitas-basics], [1.8.4], [tunitas@verizonmedia.com])
+AC_INIT([tunitas-basics], [1.9.0], [tunitas@verizonmedia.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am
@@ -43,6 +43,7 @@ TF_ENABLE_GNU
 TF_ENABLE_GDB
 TF_ENABLE_GCC
 TF_ENABLE_MOCK_BUILD
+TF_ENABLE_LIBTOOL_NO_INSTALL
 
 TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])

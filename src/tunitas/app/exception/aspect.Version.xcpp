@@ -11,19 +11,21 @@ namespace tunitas::app::exception::aspect {
   //
   // Usage:
   //
-  //   class my::Version : public tunitas::app::exception::aspect::Version, std::exception {
-  //     using appable = tunitas::app::exception::aspect::Version;
-  //     using optable = ::options::throwable::Version;
+  //   using namespace tunitas::app::exception;
+  //   class my::Version : public Aspect, public aspect::Version, public aspect::Messaging, public std::exception {
+  //     using Quittable = tunitas::app::exception::aspect::Version;
+  //     using Messaging = tunitas::exception::aspect::Messaging
+  //     using Ancestor = std::exception
   //     explicit Version(Program)
   //     ...must unify the MI...
-  //     auto what() const noexcept -> char const * final { return optable::what(); }
+  //     auto what() const noexcept -> char const * final { return Messaging::what(); }
   //   };
   //
   //   try {
   //     ...
   //     throw my::Version{NAME};
   //     ...
-  //   } catch (exception::Generic const &g) {
+  //   } catch (exception::Aspect const &g) {
   //     g.stream() << g << '\n';
   //     return g.code();
   //   }
@@ -32,9 +34,9 @@ namespace tunitas::app::exception::aspect {
 }
 #endiv
 #divert <hpp>
-#import tunitas.app.exception.Generic
-class tunitas::app::exception::aspect::Version : public Generic {
-  using ancestor = Generic;
+#import tunitas.app.exception.aspect.Quitting
+class tunitas::app::exception::aspect::Version : public Quitting {
+  using Ancestor = Quitting;
 protected:
   ~Version() = default;
   Version() = default;

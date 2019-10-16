@@ -29,7 +29,7 @@ public:
   auto test_words_Strings() -> void;
   auto test_words_Filepaths() -> void;
   static auto suite() -> cppunit::Test *;
-protected:
+public:
   struct Configuration;
   struct Usage;
   struct Version;
@@ -72,7 +72,7 @@ auto tests::unit::app::Fixture::test_exception_Messaging_1() -> void {
   CPPUNIT_ASSERT(!what.empty());
   CPPUNIT_ASSERT("[wow, neat]"s == what);
   CPPUNIT_ASSERT(&std::cout == &mes.stream()); 
-  CPPUNIT_ASSERT(sys::exits::OK == mes.code()); 
+  CPPUNIT_ASSERT(sys::exits::FAIL == mes.code()); 
 }
 auto tests::unit::app::Fixture::test_exception_Messaging_2() -> void {
   using namespace ::tunitas::app::exception;
@@ -83,7 +83,7 @@ auto tests::unit::app::Fixture::test_exception_Messaging_2() -> void {
     CPPUNIT_ASSERT(!what.empty());
     CPPUNIT_ASSERT("[wow, neat]"s == what);
     CPPUNIT_ASSERT(&std::cout == &gen.stream()); 
-    CPPUNIT_ASSERT(sys::exits::OK == gen.code()); 
+    CPPUNIT_ASSERT(sys::exits::FAIL == gen.code()); 
   }
 }
 #import tests.unit.app.Fixture.Quitting
