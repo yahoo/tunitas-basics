@@ -20,25 +20,34 @@ public:
   auto test_get_word_bad() -> void;
   static auto suite() -> cppunit::Test *;
 protected:
+  auto prove_quitting() -> void;
   using Program = std::string;
   class Configuration;
   class Quitting;
   class Step;
 };
-#entail tests.unit.app.options.Fixture.Configuration
-#entail tests.unit.app.options.Fixture.Step
-#entail tests.unit.app.options.Fixture.Quitting
+#import tests.unit.app.options.Fixture.Configuration
+#import tests.unit.app.options.Fixture.Step
+#import tests.unit.app.options.Fixture.Quitting
 #endiv
 #divert <cpp>
 #import std.move
 #import std.literals
 using namespace std::literals;
 #import tunitas.app.options.get_filepath
+auto tests::unit::app::options::Fixture::prove_quitting() -> void {
+  // doesn't matter if this is ever called
+  Quitting quitting{"a.out", sys::exits::OK};
+  ::tunitas::exception::Aspect const &teA{quitting};
+  ::tunitas::app::exception::Aspect const &taeA{quitting};
+  CPPUNIT_ASSERT(&teA == &taeA || &teA != &taeA); // gratuitously use the variables to shut up the compiler
+}
 auto tests::unit::app::options::Fixture::test_get_filepath_good() -> void {
   try {
     using namespace ::tunitas::app::options;
     Configuration cfg;
     Step step{Step::Code::CHR_f, "./o.file.out"};
+    prove_quitting();
     auto filepath = get_filepath<Quitting>(cfg, step);
     CPPUNIT_ASSERT("./o.file.out" == filepath);
   } catch (std::exception const &e) {

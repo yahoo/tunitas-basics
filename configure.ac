@@ -21,7 +21,7 @@ dnl      |
 dnl      \prefix\
 dnl      ||||||||
 dnl      vvvvvvvv
-AC_INIT([tunitas-basics], [1.8.4], [tunitas@verizonmedia.com])
+AC_INIT([tunitas-basics], [1.9.0], [tunitas@verizonmedia.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am

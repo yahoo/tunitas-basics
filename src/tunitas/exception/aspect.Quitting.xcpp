@@ -1,0 +1,93 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tunitas::exception::aspect {
+  //
+  // The "quitting" exception which is suitable for application (command-line, text ui)  and also server (headless) usage.
+  // Descendants only.
+  //
+  // This abstraction does not commit to an outbound message (no ostream).
+  // Descendants may provide an outbound message or message stream; e.g.  tunitas::app::exception::aspect::Quitting
+  //
+  // The abstration is set up to be an ancestor to the mixin tree,
+  // so that STL exceptions can be mixed in as well.
+  //
+  // Instead, depending upon your use case, you may want to use a more committed aspect:
+  //
+  //   tunitas::app::exception::aspect::Quitting
+  //   tunitas::server::exception::aspect::Quitting
+  //
+  // Usage:
+  //
+  //   using namespace tunitas::exception;
+  //   class my::Quitting : public Aspect, public aspect::Quitting, public std::runtime_error {
+  //     using Quitting = tunitas::exception::aspect::Quitting;
+  //     using Exception = ::std::runtime_error
+  //     explicit Quitting(Program, sys::exits::Code = sys::exits::OK);
+  //     ...must unify the MI...
+  //     auto what() const noexcept -> char const * final { return Exception::what(); }
+  //   };
+  //
+  // two ways to catch this abstraction
+  //
+  //   try {
+  //     ...
+  //     throw my::Quitting{NAME, sys::exits::FAIL};
+  //     ...
+  //   } catch (exception::aspect::Quitting const &q) {
+  //     cerr << q.what() << '\n';
+  //   } catch (exception::Aspect const &a) {
+  //     cerr << a << '\n';
+  //   }
+  //
+  // or more laboriously
+  //
+  //   try {
+  //     ...
+  //     throw my::Quitting{NAME, sys::exits::FAIL};
+  //     ...
+  //   } catch (exception::Aspect const &a) {
+  //     cerr << a << '\n';
+  //     try {
+  //       throw;
+  //     } catch (aspect::Quitting const &q) {
+  //       return q.code();
+  //     }
+  //   }
+  //
+  class Quitting;
+}
+#endiv
+#divert <hpp>
+#import sys.exits.Code
+class tunitas::exception::aspect::Quitting {
+protected:
+  virtual ~Quitting() = default;
+  inline explicit Quitting(sys::exits::Code);
+  inline Quitting();
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+  virtual auto code() const noexcept -> sys::exits::Code;
+protected:
+  sys::exits::Code offending_code;
+};
+#endiv
+#divert <ipp>
+#import sys.exits.constants
+namespace tunitas::exception::aspect {
+  Quitting::Quitting()
+    : Quitting(sys::exits::OK)
+  { }
+  Quitting::Quitting(sys::exits::Code c)
+    : offending_code{c}
+  { }
+}
+#endiv
+#divert <cpp>
+namespace tunitas::exception::aspect {
+  auto Quitting::code() const noexcept -> sys::exits::Code {
+    return offending_code;
+  }
+}
+#endiv

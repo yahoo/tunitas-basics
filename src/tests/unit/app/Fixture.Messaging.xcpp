@@ -18,6 +18,8 @@ class tests::unit::app::Fixture::Messaging : public ::tunitas::app::exception::G
 public:
   explicit Messaging(std::string const &message);
   auto what() const noexcept -> char const * final;
+  auto stream() const noexcept -> std::ostream & final;
+  auto code() const noexcept -> sys::exits::Code final;
 private:
   static auto format(std::string const &NAME) -> std::string;
 };
@@ -28,6 +30,14 @@ tests::unit::app::Fixture::Messaging::Messaging(std::string const &message)
 { }
 auto tests::unit::app::Fixture::Messaging::what() const noexcept -> char const * {
   return ancestors::Messaging::what();
+}
+#import std.cout
+auto tests::unit::app::Fixture::Messaging::stream() const noexcept -> std::ostream & {
+  return std::cout;
+}
+#import sys.exits.constants
+auto tests::unit::app::Fixture::Messaging::code() const noexcept -> sys::exits::Code {
+  return sys::exits::FAIL;
 }
 auto tests::unit::app::Fixture::Messaging::format(std::string const &message) -> std::string {
   // Keep this simple so that app.Fixture.xcpp

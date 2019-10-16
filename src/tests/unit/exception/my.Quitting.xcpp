@@ -1,0 +1,45 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::exception::my {
+  //
+  // This is the example from the preamble of tunitas.exception.aspect.Quitting
+  //
+  class Quitting;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import sys.exits.Code
+#import sys.exits.constants
+#import tunitas.exception.Aspect
+#import tunitas.exception.aspect.Quitting
+#import std.runtime_error
+class tests::unit::exception::my::Quitting
+  : public ::tunitas::exception::Aspect,
+    public ::tunitas::exception::aspect::Quitting,
+    public std::runtime_error {
+  using Aspect = ::tunitas::exception::Aspect;
+  using Flavor = ::tunitas::exception::aspect::Quitting;
+  using Exception = ::std::runtime_error;
+public:
+  Quitting();
+  explicit Quitting(sys::exits::Code = sys::exits::OK);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import sys.exits.constants
+namespace tests::unit::exception::my {
+  Quitting::Quitting()
+    : Quitting{sys::exits::FAIL}
+  { }
+  Quitting::Quitting(sys::exits::Code code)
+    : Flavor{code}
+    , Exception{"I QUIT!"}
+  { }
+  auto Quitting::what() const noexcept -> char const * { return Exception::what(); }
+}
+#endiv

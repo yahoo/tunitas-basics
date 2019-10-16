@@ -6,27 +6,39 @@
 #endiv
 #divert <hpp>
 #import std.runtime_error
-#import tunitas.app.exception.Usage
+#import tunitas.app.exception.Aspect
+#import tunitas.app.exception.aspect.Usage
 #import std.string
 #import sys.exits.Code
 #import sys.exits.constants
-class tests::unit::app::Fixture::Usage : public tunitas::app::exception::Usage, public std::runtime_error {
-  using appware = tunitas::app::exception::Usage;
-  using stdware = std::runtime_error;
+class tests::unit::app::Fixture::Usage : public tunitas::app::exception::Aspect, public tunitas::app::exception::aspect::Usage, public std::runtime_error {
+  struct Ancestors {
+    using Aspect = tunitas::app::exception::Aspect;
+    using Feature = tunitas::app::exception::aspect::Usage;
+    using Exception = std::runtime_error;
+  };
 public:
   inline explicit Usage(std::string NAME, sys::exits::Code = sys::exits::USAGE);
   auto what() const noexcept -> char const * final;
+  auto stream() const noexcept -> std::ostream & final;
+  auto code() const noexcept -> sys::exits::Code final;
 };
 #endiv
 #divert <ipp>
 #import std.move
 tests::unit::app::Fixture::Usage::Usage(std::string NAME, sys::exits::Code code)
-  : appware{code}
-  , stdware{std::move(NAME)}
+  : Ancestors::Feature{code}
+  , Ancestors::Exception{std::move(NAME)}
 { }
 #endiv
 #divert <cpp>
 auto tests::unit::app::Fixture::Usage::what() const noexcept -> char const * {
-  return stdware::what();
+  return Ancestors::Exception::what();
+}
+auto tests::unit::app::Fixture::Usage::stream() const noexcept -> std::ostream & {
+  return Ancestors::Feature::stream();
+}
+auto tests::unit::app::Fixture::Usage::code() const noexcept -> sys::exits::Code {
+  return Ancestors::Feature::code();
 }
 #endiv

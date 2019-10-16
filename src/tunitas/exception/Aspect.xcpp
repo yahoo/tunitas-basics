@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tunitas::app::exception {
+namespace tunitas::exception {
   //
   // The aspect of generic application exception
   // This is a mixin, hence the name.
@@ -12,15 +12,14 @@ namespace tunitas::app::exception {
   // The descendants of Aspect give some of the flavorings that are expected
   // e.g. Quitting, Usage, Version.
   //
-  // WATCHOUT - the constructor signature of the Tunitas exception hierarchy is subtly different
+  // WATCHOUT - the constructor signature of the Tunitas exceptio hierarchy is subtly different
   // than that used by the traditional applications of S.C.O.L.D.  That is convention, not a requirement.
   //
   // Usage:
   //
-  //   using namespace tunitas::app::exception;
-  //   class my::Usage : public Aspect, public aspect::Usage, public std::runtime_error { ... };
-  //   class my::Version : public Aspect, public aspect::Version, public std::runtime_error { ... };
-  //   class my::Quitting : public Aspect public aspect::Quitting, public std::runtime_error { ... };
+  //   class my::Usage : public tunitas::exception::aspect::Usage, public std::runtime_error { ... };
+  //   class my::Version : public tunitas::exception::aspect::Version, public std::runtime_error { ... };
+  //   class my::Quitting : public tunitas::exception::aspect::Quitting, public std::runtime_error { ... };
   //
   //   try {
   //     ...
@@ -38,16 +37,21 @@ namespace tunitas::app::exception {
 #endiv
 #divert <hpp>
 #import std.ostream
+namespace tunitas::exception {
+  // No wide character support [[HOW?]] how would we change that?
+  inline auto operator<<(std::ostream &, Aspect const &) -> std::ostream &;
+}
 #import sys.exits.Code
-#import tunitas.exception.Aspect
-class tunitas::app::exception::Aspect : public tunitas::exception::Aspect {
-  using Ancestor = tunitas::exception::Aspect;
+class tunitas::exception::Aspect {
 protected:
   virtual ~Aspect() = default;
   Aspect() = default;
 public:
   virtual auto what() const noexcept -> char const * = 0;
-  virtual auto stream() const noexcept -> std::ostream & = 0;
-  virtual auto code() const noexcept -> sys::exits::Code = 0;
 };
+#endiv
+#divert <ipp>
+auto tunitas::exception::operator<<(std::ostream &o, Aspect const &a) -> std::ostream & {
+  return o << a.what(); // [[FIXTHIS]] decide whether a '\n' is expected here or not.  Document.
+}
 #endiv

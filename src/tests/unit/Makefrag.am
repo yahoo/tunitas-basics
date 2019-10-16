@@ -14,9 +14,8 @@ check_bin_unit_LDADD = \
   $(end)
 $(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
 $(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
-$(check_bin_unit_OBJECTS): AM_LDFLAGS+=$(AND_CHECK_LDFLAGS_SET)
 # reminder: autotools does not put $(AM_LDFLAGS) into check_bin_unit_LDFLAGS, like it does with CPPFLAGS and CXXFLAGS
-check_bin_unit_LDFLAGS = $(AM_LDFLAGS)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_unit_MODULES = $(call TF_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
 check_bin_unit_SOURCES = \
   obj/src/tunitas/base64/Encoder.test.Access.cpp \
@@ -61,6 +60,15 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/base64/encoder/Fixture.cpp \
   obj/src/tests/unit/base64/exception/namespace.cpp \
   obj/src/tests/unit/base64/exception/Fixture.cpp \
+  \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  obj/src/tests/unit/exception/Fixture.Message.cpp \
+  obj/src/tests/unit/exception/Fixture.Quitting.cpp \
+  obj/src/tests/unit/exception/Fixture.Aspic.cpp \
+  obj/src/tests/unit/exception/Fixture.Balsam.cpp \
+  obj/src/tests/unit/exception/my.Quitting.cpp \
+  obj/src/tests/unit/exception/my.Message.cpp \
   \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \

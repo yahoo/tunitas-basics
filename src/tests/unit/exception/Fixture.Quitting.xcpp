@@ -1,0 +1,31 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+#include <tests.unit.exception.Fixture>
+#endiv
+#divert <hpp>
+#import tunitas.exception.aspect.Quitting
+#import std.exception
+#import sys.exits.Code
+#import sys.exits.constants
+class tests::unit::exception::Fixture::Quitting : public ::tunitas::exception::aspect::Quitting, public std::exception {
+  struct Ancestors {
+    using Aspect = ::tunitas::exception::aspect::Quitting;
+    using Exception = std::exception;
+  };
+public:
+  explicit Quitting(sys::exits::Code = sys::exits::FAIL);
+  auto what() const noexcept -> char const * final;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::exception {
+  Fixture::Quitting::Quitting(sys::exits::Code code)
+    : Ancestors::Aspect{code}
+  { }
+  auto Fixture::Quitting::what() const noexcept -> char const * {
+    return "I Quit!";
+  }
+}
+#endiv

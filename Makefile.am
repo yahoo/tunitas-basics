@@ -136,10 +136,10 @@ TESTS = \
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
 # via @temerarious_flagship_datadir@/am/build.am and its constituents.
-# [[REMOVEWHEN]] temerarious-flagship supplies this, e.g. 1.1.2
+# [[REMOVEWHEN]] temerarious-flagship supplies this, e.g. temerarious-flagship >= 1.1.2
 include $(if $(filter 1,$(hypogeal_twilight_toolflags_mk_included)), /dev/null, @hypogeal_twilight_datadir@/mk/toolflags.mk)
 
-# configure.ac:  TF_ENABLE_GCC
+# configure.ac: TF_ENABLE_GCC enables these @-variables
 Makefile_COMPILER_CPPFLAGS_SET =                @CPPFLAGS_gcc@
 Makefile_COMPILER_CFLAGS_SET   = @CFLAGS_gdb@   @CFLAGS_gcc@
 Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gdb@ @CXXFLAGS_gcc@ -Wno-attributes
@@ -156,6 +156,12 @@ Makefile_PACKAGE_CPPFLAGS_SET =
 Makefile_PACKAGE_CFLAGS_SET   = 
 Makefile_PACKAGE_CXXLAGS_SET  = 
 Makefile_PACKAGE_LDFLAGS_SET  = 
+
+# [[FIXTHIS]] ... hypogeal-twilight >= 0:0.45-series (mainline) has -no-install as a default, but tunitas' "ahead" 2:0.45-series does not
+Makefile_CHECK_CPPFLAGS_SET = 
+Makefile_CHECK_CFLAGS_SET   = 
+Makefile_CHECK_CXXLAGS_SET  = 
+Makefile_CHECK_LDFLAGS_SET  = -no-install
 
 AM_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
 AM_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)

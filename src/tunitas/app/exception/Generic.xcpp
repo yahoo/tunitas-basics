@@ -2,6 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
+#import tunitas.app.exception.Aspect
 namespace tunitas::app::exception {
   //
   // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
@@ -15,14 +16,6 @@ namespace tunitas::app::exception {
   // This is a mixin; descendants only.
   // It is a mixin tree so that STL exceptions can be mixed in as well.
   //
-  [[deprecated("instead use tunitas::app::exception::Aspect")]] class Generic;
+  using Generic [[deprecated("instead use tunitas::app::exception::Aspect")]] = Aspect;
 }
-#endiv
-#divert <hpp>
-#import tunitas.app.exception.Aspect
-class tunitas::app::exception::Generic : public Aspect {
-  using ancestor = Aspect;
-protected:
-  using ancestor::Aspect;
-};
 #endiv

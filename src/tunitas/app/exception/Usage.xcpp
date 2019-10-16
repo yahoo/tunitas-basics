@@ -2,19 +2,12 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
+#import tunitas.app.exception.aspect.Usage
 namespace tunitas::app::exception {
   //
   // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
   // s/Usage/aspect::Usage/g
   //
-  [[deprecated("instead use tunitas::app::exception::aspect::Usage")]] class Usage;
+  using Usage [[deprecated("instead use tunitas::app::exception::aspect::Usage")]] = aspect::Usage;
 }
-#endiv
-#divert <hpp>
-#import tunitas.app.exception.aspect.Usage
-class tunitas::app::exception::Usage : public aspect::Usage {
-  using ancestor = aspect::Usage;
-protected:
-  using ancestor::Usage;
-};
 #endiv
