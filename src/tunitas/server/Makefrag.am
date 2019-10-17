@@ -37,8 +37,9 @@ lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/exception/Aspect.cpp \
   obj/src/tunitas/server/exception/Generic.cpp \
   \
-  obj/src/tunitas/server/required.Stringable.cpp \
-  obj/src/tunitas/server/required.Resourceful.cpp \
+  obj/src/tunitas/server/required/namespace.cpp \
+  obj/src/tunitas/server/required/Stringable.cpp \
+  obj/src/tunitas/server/required/Resourceful.cpp \
   $(end)
 
 $(scold_cxxdir)/tunitas/server/dependencies.mk:

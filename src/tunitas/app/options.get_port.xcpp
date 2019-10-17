@@ -7,7 +7,7 @@
 #import re.string
 #import std.uint16_t
 #import tunitas.app.Configuration
-#import tunitas.required.exception.app.Quitting
+#import tunitas.app.required.exception.Quitting
 namespace tunitas::app::options {
   //
   // Acquire a port number from the longish Step
@@ -35,14 +35,14 @@ namespace tunitas::app::options {
     using Port = std::uint16_t;
     using Field_Name = re::string<c::const_stringz>;
     // [[FIXTHIS]] build a concept for an throwable Quitting exception
-    template<required::exception::app::Quitting QUITTING> auto get_port(Configuration const &, Step const &) -> Port;
-    template<required::exception::app::Quitting QUITTING> auto get_port(Configuration const &, Step const &, Field_Name field_name) -> Port;
+    template<required::exception::Quitting QUITTING> auto get_port(Configuration const &, Step const &) -> Port;
+    template<required::exception::Quitting QUITTING> auto get_port(Configuration const &, Step const &, Field_Name field_name) -> Port;
   }
   using packaging::get_port_function::get_port;
 }
 #endiv
 #divert <ipp>
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step) -> Port { 
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step) -> Port { 
   return get_port<QUITTING>(cfg, step, "port");
 }
 #endiv
@@ -54,7 +54,7 @@ template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app
 #import std.stoi
 #import std.string
 #import sys.exits.constants
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step, Field_Name field_name) -> Port {
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step, Field_Name field_name) -> Port {
   // Whereas std::stoi signals failure both via exception and also via its 2nd inout parameter
   // we have to put a lot of machinery around it to make it safe and obvious what is occurring.
   try {

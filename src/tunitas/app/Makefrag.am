@@ -62,6 +62,9 @@ lib_libtunitas_app_la_SOURCES = \
   obj/src/tunitas/app/options.get_port.cpp \
   obj/src/tunitas/app/options.get_word.cpp \
   \
+  obj/src/tunitas/app/required/namespace.cpp \
+  obj/src/tunitas/app/required/exception.Quitting.cpp \
+  \
   obj/src/tunitas/app/words.cpp \
   obj/src/tunitas/app/words.Filepaths.cpp \
   obj/src/tunitas/app/words.Strings.cpp \

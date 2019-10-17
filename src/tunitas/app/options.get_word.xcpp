@@ -7,7 +7,7 @@
 #import re.string
 #import std.string
 #import tunitas.app.Configuration
-#import tunitas.required.exception.app.Quitting
+#import tunitas.app.required.exception.Quitting
 namespace tunitas::app::options {
   //
   // Acquire a word from the longish Step
@@ -36,14 +36,14 @@ namespace tunitas::app::options {
     using Word = std::string;
     using Field_Name = re::string<c::const_stringz>;
     // [[FIXTHIS]] build a concept for an throwable Quitting exception
-    template<required::exception::app::Quitting QUITTING> inline auto get_word(Configuration const &, Step const &) -> Word;
-    template<required::exception::app::Quitting QUITTING> auto get_word(Configuration const &, Step const &, Field_Name field_name) -> Word;
+    template<required::exception::Quitting QUITTING> inline auto get_word(Configuration const &, Step const &) -> Word;
+    template<required::exception::Quitting QUITTING> auto get_word(Configuration const &, Step const &, Field_Name field_name) -> Word;
   }
   using packaging::get_word_function::get_word;
 }
 #endiv
 #divert <ipp>
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step) -> Word { 
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step) -> Word { 
   return get_word<QUITTING>(cfg, step, "word");
 }
 #endiv
@@ -51,7 +51,7 @@ template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app
 #import std.string
 #import std.invalid_argument
 #import sys.exits.constants
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step, Field_Name field_name) -> Word {
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_word_function::get_word(Configuration const &cfg, Step const &step, Field_Name field_name) -> Word {
   std::string const candidate = ::options::shortish::required(step);
   if (field_name.empty()) {
     // A "logic error" because the programmer controlls this

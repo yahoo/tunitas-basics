@@ -2,54 +2,25 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import nonstd.exception.Quitting
-#import std.exception
-#import std.is_base_of
-#import std.ostream
-#import std.string
-#import sys.exits.Code
-#import tunitas.app.exception.Aspect
-// Need the complete definition for these types.
-#include <hpp/tunitas.app.exception.Aspect>
-// NO NEED #include <hpp/std.exception>
-// NO NEED #include <hpp/std.string>
-#import tunitas.required.exception.Quitting
+#import tunitas.app.required.exception.Quitting.
 namespace tunitas::required::exception::app {
   //
-  // Is this a possible Quitting exception?
+  // Whereas there was a general name rationalization in tunitas-basics >= 1.9.0
+  // compatibility is provided for old code that still uses the old organization.
   //
-  // MUST be a descendant of tunitas::app::exception::Aspect
-  // MUST be a descendant of nonstd::exception::Quitting (where available)
+  // WATCHOUT - you cannot make a type alias out of a concept
+  //   src/tunitas/required/exception/app.Quitting.xcpp:11:140: error: typedef declared ‘auto’
+  //   using Quitting [[deprecated("instead prefer tunitas::app::required::exception::Quitting")]] = tunitas::app::required::exception::Quitting;
   //
-  // WATCHOUT - for maintenance, the use of is_base_of in a concept definition at <fpp> is fraught.
-  // 1) It requires that you get the complete definition of the class type so it complicates with #include <hpp/...>
-  // 2) And makes the header dependency order of S.C.O.L.D. ersatz "modules" even more tightly coupled unto impossible
-  // 3) If the class at issue has internal problems anyway then the concept check at the point of use in some other interface
-  //    will fail and the error messages will misidirect you.  Forewarned is forearmed on this, the most difficult to mitigate.
-  //    3.a) the complete type of tunitas::app::excetpion:Aspect must appear
-  //    3.b) the complete type of QUITTING must ALSO appear; typically this is a more difficult dependency to master
+  using tunitas::app::required::exception::Quitting;
+#if 0
+  // WATCHOUT - you cannot import a concept from another namespace
+  // Witness: gcc-c++-8.2.1-5.fc29.x86_64
+  //   CXX      obj/src/tests/unit/server/Fixture.exception.Example.o
+  //   g++: internal compiler error: Segmentation fault signal terminated program cc1plus
+  //   using tunitas::app::required::exception::Quitting;
   //
-  // Usage:
-  //
-  //   template<required::exception::app::Quitting QUITTING> auto drop(Configuration const &) -> void;
-  //
-  template<typename QUITTING> concept bool Quitting =
-    true
-    && requires(QUITTING quitting) {
-      { quitting } -> std::exception const &;
-      { quitting } -> tunitas::app::exception::Aspect const &;
-#warning [[FIXTHIS]] in a later release -- std::is_base_of<nonstd::exception::Quitting, QUITTING>::value
-      // [[FIXTHIS]] ------> { quitting } -> nonstd::exception::Quitting const &;
-    }
-    && ! exception::Quitting<QUITTING> // because we specify a different constructor signature (see below)
-    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
-        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
-    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
-      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
-      { QUITTING{name, code} };
-      { quitting.what() } -> char const *;
-      { quitting.code() } -> sys::exits::Code;
-      { quitting.stream() } -> std::ostream &;
-  };
+  template<typename QUITTING> concept bool Quitting = tunitas::app::required::exception::Quitting<QUITTING>;
+#endif
 }
 #endiv

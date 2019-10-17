@@ -7,7 +7,7 @@
 #import re.string
 #import std.filesystem.path
 #import tunitas.app.Configuration
-#import tunitas.required.exception.app.Quitting
+#import tunitas.app.required.exception.Quitting
 namespace tunitas::app::options {
   //
   // Acquire a file path from the longish Step
@@ -35,18 +35,18 @@ namespace tunitas::app::options {
     using Filepath = std::filesystem::path;
     using Field_Name = re::string<c::const_stringz>;
     // [[FIXTHIS]] build a concept for an throwable Quitting exception
-    template<required::exception::app::Quitting QUITTING> inline auto get_filepath(Configuration const &, Step const &) -> Filepath;
-    template<required::exception::app::Quitting QUITTING> auto get_filepath(Configuration const &, Step const &, Field_Name field_name) -> Filepath;
+    template<required::exception::Quitting QUITTING> inline auto get_filepath(Configuration const &, Step const &) -> Filepath;
+    template<required::exception::Quitting QUITTING> auto get_filepath(Configuration const &, Step const &, Field_Name field_name) -> Filepath;
   }
   using packaging::get_filepath_function::get_filepath;
 }
 #endiv
 #divert <ipp>
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step) -> Filepath { 
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step) -> Filepath { 
   return get_filepath<QUITTING>(cfg, step, "filepath");
 }
 #import tunitas.app.options.get_word
-template<tunitas::required::exception::app::Quitting QUITTING> auto tunitas::app::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step, Field_Name field_name) -> Filepath {
+template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step, Field_Name field_name) -> Filepath {
   return Filepath{get_word<QUITTING>(cfg, step, field_name)};
 }
 #endiv
