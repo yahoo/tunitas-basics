@@ -30,12 +30,12 @@ public:
   auto test_words_Filepaths() -> void;
   static auto suite() -> cppunit::Test *;
 public:
-  struct Configuration;
-  struct Usage;
-  struct Version;
-  struct Quitting;
-  struct Specification;
-  struct Messaging;
+  struct [[nodiscard]] Configuration;
+  struct [[nodiscard]] Usage;
+  struct [[nodiscard]] Version;
+  struct [[nodiscard]] Quitting;
+  struct [[nodiscard]] Specification;
+  struct [[nodiscard]] Messaging;
 };
 #endiv
 #divert <cpp>

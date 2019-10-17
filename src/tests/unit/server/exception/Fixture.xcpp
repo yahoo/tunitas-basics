@@ -1,0 +1,87 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::server::exception { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::server::exception::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Simple() -> void;
+  auto test_my_Problem() -> void;
+  auto test_my_Difficulty() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct [[nodiscard]] Simple;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.server.exception.Fixture.Simple
+auto tests::unit::server::exception::Fixture::test_Simple() -> void {
+  try {
+    // Show the MI scheme works by in the constructor
+    throw Simple{"badness"};
+  } catch (tunitas::server::exception::Aspect const &g) {
+    // Show that catching by one of the MI personas works
+    std::string reason = g.what();
+    CPPUNIT_ASSERT_EQUAL("badness"s, reason);
+  }
+}
+#import tunitas.server.exception.Aspect
+#import tunitas.exception.Aspect
+#import tests.unit.server.exception.my.Problem
+auto tests::unit::server::exception::Fixture::test_my_Problem() -> void {
+  //
+  // This is an example from the documentariat at the top of tunitas::server::exception::Aspect
+  //
+  try {
+    // Show the MI scheme works by in the constructor
+    throw my::Problem{};
+  } catch (std::exception const &e) {
+    std::string reason = e.what();
+    CPPUNIT_ASSERT_EQUAL("problem"s, reason);
+    try {
+      throw;
+    } catch (tunitas::server::exception::Aspect const &g) {
+      // Show that catching by one of the MI personas works
+      CPPUNIT_ASSERT(true);
+    }
+    try {
+      throw;
+    } catch (tunitas::exception::Aspect const &g) {
+      // Show that catching by one of the MI personas works
+      CPPUNIT_ASSERT(true);
+    }
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import tests.unit.server.exception.my.Difficulty
+auto tests::unit::server::exception::Fixture::test_my_Difficulty() -> void {
+  //
+  // This is an example from the documentariat at the top of tunitas::server::exception::Aspect
+  //
+  try {
+    throw my::Difficulty{};
+  } catch (tunitas::server::exception::Aspect const &g) {
+    // Show that catching by one of the MI personas works
+    std::string reason = g.what();
+    CPPUNIT_ASSERT_EQUAL("difficulty"s, reason);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::server::exception::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"exception"};
+  series << call("Simple", &Fixture::test_Simple)
+    ;
+  series << []() {
+              Stream my{"my"};
+              my << call("Problem", &Fixture::test_my_Problem)
+                 << call("Difficulty", &Fixture::test_my_Difficulty);
+              return move(my);
+            }();
+  return finalize(series);
+}
+#endiv

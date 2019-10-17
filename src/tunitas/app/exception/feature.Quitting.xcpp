@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   //
   // The "quitting message" exception, with a committed message stream.
   // This abstraction is suitable for application (command-line, text ui) usage where ostreams are helpful.
@@ -13,15 +13,15 @@ namespace tunitas::app::exception::aspect {
   //
   // There are other descendants that give a more nuanced sense of the type of text UX quitting
   // that is being attempted;
-  //   tunitas:;app::exception::aspect::Quitting .... normal ... get out of the application, with message.
-  //   tunitas:;app::exception::aspect::Usage ....... graceful exit with a usage message, and any exit code
-  //   tunitas:;app::exception::aspect::Version ..... special to emit the version message and exit with success.
+  //   tunitas:;app::exception::feature::Quitting .... normal ... get out of the application, with message.
+  //   tunitas:;app::exception::feature::Usage ....... graceful exit with a usage message, and any exit code
+  //   tunitas:;app::exception::feature::Version ..... special to emit the version message and exit with success.
   //
   // Usage:
   //
   //   using namespace tunitas::app::exception;
-  //   class my::Quitting : public Aspect, public aspect::Quitting, public std::runtime_error {
-  //     using Quitting = tunitas::app::exception::aspect::Quitting;
+  //   class my::Quitting : public Aspect, public feature::Quitting, public std::runtime_error {
+  //     using Feature = tunitas::app::exception::feature::Quitting;
   //     using Exception = ::std::runtime_error
   //     explicit Quitting(Program, sys::exits::Code = sys::exits::OK);
   //     ...must unify the MI...
@@ -43,9 +43,9 @@ namespace tunitas::app::exception::aspect {
 #divert <hpp>
 #import std.ostream
 #import sys.exits.Code
-#import tunitas.exception.aspect.Quitting
-class tunitas::app::exception::aspect::Quitting : public tunitas::exception::aspect::Quitting {
-  using Ancestor = tunitas::exception::aspect::Quitting;
+#import tunitas.exception.feature.Quitting
+class tunitas::app::exception::feature::Quitting : public tunitas::exception::feature::Quitting {
+  using Ancestor = tunitas::exception::feature::Quitting;
 protected:
   virtual ~Quitting() = default;
   inline Quitting(std::ostream &, sys::exits::Code);
@@ -61,7 +61,7 @@ protected:
 #import std.cout
 #import std.cerr
 #import sys.exits.constants
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   Quitting::Quitting()
     : Quitting(sys::exits::OK)
   { }
@@ -75,7 +75,7 @@ namespace tunitas::app::exception::aspect {
 }
 #endiv
 #divert <cpp>
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   auto Quitting::stream() const noexcept -> std::ostream & {
     return offending_stream;
   }

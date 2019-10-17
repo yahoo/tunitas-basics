@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tunitas::exception::aspect {
+namespace tunitas::exception::feature {
   //
   // A mixin to provide stored messaging to an exception descendant.
   // Descendants only.
@@ -16,8 +16,8 @@ namespace tunitas::exception::aspect {
   // 
   // Usage:
   //
-  //   class my::Message : public Aspect, public aspect::Messaging, public std::exception {
-  //     using Messaging = aspect::Messaging;
+  //   class my::Message : public Aspect, public feature::Messaging, public std::exception {
+  //     using Messaging = feature::Messaging;
   //     using Exception = std::exception;
   //   public:
   //     Message(std::string const &NAME) : Messaging{format(NAME)} { }
@@ -43,7 +43,7 @@ namespace tunitas::exception::aspect {
 #divert <hpp>
 #import std.string
 #import std.shared_ptr
-class tunitas::exception::aspect::Messaging {
+class tunitas::exception::feature::Messaging {
 protected:
   virtual ~Messaging() = default;
   inline explicit Messaging(std::string message);
@@ -59,12 +59,12 @@ protected:
 #divert <ipp>
 #import std.move
 #import std.make_shared
-tunitas::exception::aspect::Messaging::Messaging(std::string message)
+tunitas::exception::feature::Messaging::Messaging(std::string message)
   : stored_message{std::make_shared<std::string>(std::move(message))}
 { }
 #endiv
 #divert <cpp>
-auto tunitas::exception::aspect::Messaging::what() const noexcept -> char const * {
+auto tunitas::exception::feature::Messaging::what() const noexcept -> char const * {
   return stored_message->c_str();
 }
 #endiv

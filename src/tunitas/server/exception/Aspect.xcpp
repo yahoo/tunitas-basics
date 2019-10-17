@@ -4,7 +4,7 @@
 #divert <fpp>
 namespace tunitas::server::exception {
   //
-  // The generic server exception.
+  // The generic server exception aspect
   // Descendants only.
   // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well.
   //
@@ -15,11 +15,11 @@ namespace tunitas::server::exception {
   //
   // Usage:
   //
-  //   class my::server::Problem : public tunitas::server::exception::Generic,
+  //   class my::server::Problem : public tunitas::server::exception::Aspect,
   //                               public std::runtime_error {
   //     ...
   //   };
-  //   class my::server::Difficulty : public tunitas::server::exception::Generic,
+  //   class my::server::Difficulty : public tunitas::server::exception::Aspect,
   //                                  public std::logic_error {
   //     ...
   //   };
@@ -29,19 +29,20 @@ namespace tunitas::server::exception {
   //     throw my::Problem{...};
   //     throw my::Difficulty{...};
   //     ...
-  //   } catch (exception::Generic const &g) {
+  //   } catch (exception::Aspect const &g) {
   //     ... fix it...
   //   }
   //
-  class Generic;
+  class Aspect;
 }
 #endiv
 #divert <hpp>
-class tunitas::server::exception::Generic {
+class tunitas::server::exception::Aspect {
 protected:
-  virtual ~Generic() = default;
-  Generic() = default;
+  virtual ~Aspect() = default;
+  Aspect() = default;
   // The other side of the mixin must provide the messaging
+  // c.f. tunitas::exception::feature::Messaging if you want to throw string messages
 public:
   virtual auto what() const noexcept -> char const * = 0;
 };

@@ -39,10 +39,14 @@ lib_libtunitas_app_la_SOURCES = \
   \
   obj/src/tunitas/app/exception/namespace.cpp \
   obj/src/tunitas/app/exception/Aspect.cpp \
-  obj/src/tunitas/app/exception/aspect.Messaging.cpp \
-  obj/src/tunitas/app/exception/aspect.Quitting.cpp \
-  obj/src/tunitas/app/exception/aspect.Usage.cpp \
-  obj/src/tunitas/app/exception/aspect.Version.cpp \
+  obj/src/tunitas/app/exception/feature.Quitting.cpp \
+  obj/src/tunitas/app/exception/feature.Usage.cpp \
+  obj/src/tunitas/app/exception/feature.Version.cpp \
+  obj/src/tunitas/app/exception/aspect/namespace.cpp \
+  obj/src/tunitas/app/exception/aspect/Messaging.cpp \
+  obj/src/tunitas/app/exception/aspect/Quitting.cpp \
+  obj/src/tunitas/app/exception/aspect/Usage.cpp \
+  obj/src/tunitas/app/exception/aspect/Version.cpp \
   \
   obj/src/tunitas/app/exception/Generic.cpp \
   obj/src/tunitas/app/exception/Messaging.cpp \

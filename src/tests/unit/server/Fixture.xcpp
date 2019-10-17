@@ -1,0 +1,76 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
+#divert <fpp>
+namespace tests::unit::server { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::server::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_constants() -> void;
+  auto test_filters() -> void;
+  auto test_log() -> void;
+  auto test_resources() -> void;
+  auto test_responses() -> void;
+  auto test_service() -> void;
+  auto test_usage_Example() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  // [[LAZY]] this test has moved to exception::Fixture
+  struct exception {
+    class [[nodiscard]] Example;
+  };
+};
+#endiv
+#divert <cpp>
+auto tests::unit::server::Fixture::test_constants() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_constants() -> void
+}
+auto tests::unit::server::Fixture::test_filters() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_filters() -> void
+}
+auto tests::unit::server::Fixture::test_log() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_log() -> void
+}
+auto tests::unit::server::Fixture::test_resources() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_resources() -> void
+}
+auto tests::unit::server::Fixture::test_responses() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_responses() -> void
+}
+auto tests::unit::server::Fixture::test_service() -> void {
+#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_service() -> void
+}
+#import tests.unit.server.Fixture.exception.Example
+auto tests::unit::server::Fixture::test_usage_Example() -> void {
+  try {
+    // Show the MI scheme works by in the constructor
+    throw exception::Example{"badness"};
+  } catch (tunitas::server::exception::Generic const &g) {
+    // Show that catching by one of the MI personas works
+    std::string reason = g.what();
+    CPPUNIT_ASSERT_EQUAL("badness"s, reason);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"server"};
+  series << call("constants", &Fixture::test_constants)
+         << call("filters", &Fixture::test_filters)
+         << call("log", &Fixture::test_log)
+         << call("resources", &Fixture::test_resources)
+         << call("responses", &Fixture::test_responses)
+         << call("service", &Fixture::test_service)
+    ;
+  {
+    Stream exc("usage");
+    exc << call("Example", &Fixture::test_usage_Example)
+      ;
+    series << move(exc);
+  }
+  return finalize(series);
+}
+#endiv

@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   //
   // The "version message" application exception
   // Descendants only.
@@ -12,13 +12,18 @@ namespace tunitas::app::exception::aspect {
   // Usage:
   //
   //   using namespace tunitas::app::exception;
-  //   class my::Version : public Aspect, public aspect::Version, public aspect::Messaging, public std::exception {
-  //     using Quittable = tunitas::app::exception::aspect::Version;
-  //     using Messaging = tunitas::exception::aspect::Messaging
-  //     using Ancestor = std::exception
+  //   struct my::Version : public Aspect, public feature::Version, public feature::Messaging, public std::exception {
+  //     struct Ancestors {
+  //       using Messaging = tunitas::app::exception::feature::Messaging;
+  //       using Feature = tunitas::app::exception::feature::Version;
+  //       using Exception = std::exception;
+  //     }
+  //     using Program = ...something...;
   //     explicit Version(Program)
   //     ...must unify the MI...
-  //     auto what() const noexcept -> char const * final { return Messaging::what(); }
+  //     auto what() const noexcept -> char const * final    { return Ancestors::Messaging::what(); }
+  //     auto stream() const noexcept -> std::stream & final { return Ancestors::Version::stream(); }
+  //     auto code() const noexcept -> sys::exit::Code final { return Ancestors::Version::code(); }
   //   };
   //
   //   try {
@@ -34,8 +39,8 @@ namespace tunitas::app::exception::aspect {
 }
 #endiv
 #divert <hpp>
-#import tunitas.app.exception.aspect.Quitting
-class tunitas::app::exception::aspect::Version : public Quitting {
+#import tunitas.app.exception.feature.Quitting
+class tunitas::app::exception::feature::Version : public Quitting {
   using Ancestor = Quitting;
 protected:
   ~Version() = default;
