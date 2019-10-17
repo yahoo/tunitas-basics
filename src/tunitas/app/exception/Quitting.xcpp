@@ -2,12 +2,13 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import tunitas.app.exception.aspect.Quitting
+#import tunitas.app.exception.feature.Quitting
 namespace tunitas::app::exception {
   //
-  // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
-  // s/Quitting/aspect::Quitting/g
+  // WATCHOUT - the naming convention changed at tunitas-basics 1.8.0 and again at 1.9.0
+  // s/tunitas::app::exception::Quitting/tunitas::exception::aspect::Quitting/g
+  // s/tunitas::app::exception::aspect::Quitting/tunitas::exception::feature::Quitting/g
   //
-  using Quitting [[deprecated("instead use tunitas::app::exception::aspect::Quitting")]] = aspect::Quitting;
+  using Quitting [[deprecated("instead use tunitas::app::exception::feature::Quitting")]] = tunitas::app::exception::feature::Quitting;
 }
 #endiv

@@ -2,12 +2,13 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import tunitas.app.exception.aspect.Messaging
+#import tunitas.exception.feature.Messaging
 namespace tunitas::app::exception {
   //
-  // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
+  // WATCHOUT - the naming convention changed at tunitas-basics 1.8.0 and again at 1.9.0
   // s/Message/aspect::Message/g
+  // s/aspecct::Message/tuntias::exception::feature::Message/g (it was hoisted out into namespace tunitas::exception)
   //
-  using Messaging = [[deprecated("instead use tunitas::app::exception::aspect::Messaging")]] aspect::Messaging;
+  using Messaging = [[deprecated("instead use tunitas::app::exception::aspect::Messaging")]] tunitas::exception::feature::Messaging;
 }
 #endiv

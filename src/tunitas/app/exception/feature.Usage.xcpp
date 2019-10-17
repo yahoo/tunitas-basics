@@ -2,7 +2,7 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   //
   // The "usage message" application exception
   // Descendants only.
@@ -11,14 +11,15 @@ namespace tunitas::app::exception::aspect {
   //
   // Usage:
   //
-  //   class my::Usage : public tunitas::app::exception::aspect::Usage, ::options::throwable::Usage {
-  //     using appable = tunitas::app::exception::aspect::Usage;
-  //     using optable = ::options::throwable::Usage;
+  //   using namespace tunitas::app::exception
+  //   struct my::Usage : public Aspect, public feature::Usage, ::options::throwable::Usage {
+  //     using Feature = tunitas::app::exception::feature::Usage;
+  //     using Exception = ::options::throwable::Usage;
   //     explicit Usage(Program, sys::exits::Code = sys::exits::OK);
   //     ...must unify the MI...
-  //     auto what() const noexcept -> char const * final { return optable::what(); }
-  //     auto stream() const noexcept -> std::ostream & final { return optable::stream(); }
-  //     auto code() const noexcept -> sys::exits::Code final { return optable::code(); }
+  //     auto what() const noexcept -> char const * final     { return Exception::what(); }
+  //     auto stream() const noexcept -> std::ostream & final { return Feature::stream(); }
+  //     auto code() const noexcept -> sys::exits::Code final { return Feature::code(); }
   //   };
   //
   //   try {
@@ -34,8 +35,8 @@ namespace tunitas::app::exception::aspect {
 }
 #endiv
 #divert <hpp>
-#import tunitas.app.exception.aspect.Quitting
-class tunitas::app::exception::aspect::Usage : public Quitting {
+#import tunitas.app.exception.feature.Quitting
+class tunitas::app::exception::feature::Usage : public Quitting {
   using Ancestor = Quitting;
 protected:
   ~Usage() = default;
@@ -45,7 +46,7 @@ protected:
 };
 #endiv
 #divert <ipp>
-namespace tunitas::app::exception::aspect {
+namespace tunitas::app::exception::feature {
   Usage::Usage(std::ostream &o, sys::exits::Code c)
     : Ancestor{o, c}
   { }

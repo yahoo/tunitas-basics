@@ -26,15 +26,19 @@ lib_libtunitas_server_la_LIBADD = -lhttpserver $(lib_libtunitas_la) $(lib_libwan
 lib_libtunitas_server_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_server_la_SOURCES))
 lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/namespace.cpp \
-  obj/src/tunitas/server/exception.Generic.cpp \
-  obj/src/tunitas/server/required.Stringable.cpp \
-  obj/src/tunitas/server/required.Resourceful.cpp \
   obj/src/tunitas/server/constants.cpp \
   obj/src/tunitas/server/filters.cpp \
   obj/src/tunitas/server/log.cpp \
   obj/src/tunitas/server/resources.cpp \
   obj/src/tunitas/server/responses.cpp \
   obj/src/tunitas/server/service.cpp \
+  \
+  obj/src/tunitas/server/exception/namespace.cpp \
+  obj/src/tunitas/server/exception/Aspect.cpp \
+  obj/src/tunitas/server/exception/Generic.cpp \
+  \
+  obj/src/tunitas/server/required.Stringable.cpp \
+  obj/src/tunitas/server/required.Resourceful.cpp \
   $(end)
 
 $(scold_cxxdir)/tunitas/server/dependencies.mk:

@@ -21,10 +21,10 @@ public:
   //
   static auto suite() -> cppunit::Test *;
 protected:
-  struct Message;
-  struct Quitting;
-  struct Aspic; // e.g. tomato aspic
-  struct Balsam; // ... balsamic vinegar
+  struct [[nodiscard]] Message;
+  struct [[nodiscard]] Quitting;
+  struct [[nodiscard]] Aspic; // e.g. tomato aspic
+  struct [[nodiscard]] Balsam; // ... balsamic vinegar
 };
 #endiv
 #divert <cpp>

@@ -2,13 +2,8 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import std.string
-#import std.string_view
-namespace tests::unit { }
-#endiv
-#divert <hpp>
-#import std.literals
-namespace tests::unit {
-  using namespace std::literals;
+#import tunitas.exception
+namespace tunitas::server::exception {
+  using namespace tunitas::exception;
 }
 #endiv

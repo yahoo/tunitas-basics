@@ -2,13 +2,10 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import std.string
-#import std.string_view
-namespace tests::unit { }
-#endiv
-#divert <hpp>
-#import std.literals
-namespace tests::unit {
-  using namespace std::literals;
+#import tunitas.exception.feature.Messaging
+namespace tunitas::exception::aspect {
+  using Messaging [[deprecated("instead use namespace tunitas::exception::feature"
+                               "; "
+                               "instead use tunitas::exception::feature::Messaging")]] = feature::Messaging;
 }
 #endiv

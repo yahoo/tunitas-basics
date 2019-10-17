@@ -31,6 +31,7 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/for_each/count.cpp \
   \
   obj/src/tests/unit/app/namespace.cpp \
+  obj/src/tests/unit/app/exception.compatibility.cpp \
   obj/src/tests/unit/app/Fixture.cpp \
   obj/src/tests/unit/app/Fixture.Configuration.cpp \
   obj/src/tests/unit/app/Fixture.Messaging.cpp \
@@ -69,14 +70,23 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/exception/Fixture.Balsam.cpp \
   obj/src/tests/unit/exception/my.Quitting.cpp \
   obj/src/tests/unit/exception/my.Message.cpp \
+  obj/src/tests/unit/exception/compatibility.cpp \
   \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   obj/src/tests/unit/outcome.Usage.cpp \
   \
   obj/src/tests/unit/required.Fixture.cpp \
-  obj/src/tests/unit/server.Fixture.cpp \
-  obj/src/tests/unit/server.Fixture.exception.Example.cpp \
+  \
+  obj/src/tests/unit/server/namespace.cpp \
+  obj/src/tests/unit/server/Fixture.cpp \
+  obj/src/tests/unit/server/Fixture.exception.Example.cpp \
+  obj/src/tests/unit/server/exception/namespace.cpp \
+  obj/src/tests/unit/server/exception/Fixture.cpp \
+  obj/src/tests/unit/server/exception/Fixture.Simple.cpp \
+  obj/src/tests/unit/server/exception/my.Problem.cpp \
+  obj/src/tests/unit/server/exception/my.Difficulty.cpp \
+  \
   obj/src/tests/unit/time.Fixture.cpp \
   obj/src/tests/unit/time.literals.Fixture.cpp \
   obj/src/tests/unit/time.duration.Fixture.cpp \
