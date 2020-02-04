@@ -9,6 +9,6 @@ namespace tunitas::app::exception {
   // s/Version/aspect::Version/g
   // s/aspect::Version/feature::Version/g
   //
-  using Version = [[deprecated("instead use tunitas::app::exception::aspect::Version")]] feature::Version;
+  using Version = [[deprecated("for new work, directly use tunitas::app::exception::aspect::Version")]] feature::Version;
 }
 #endiv
