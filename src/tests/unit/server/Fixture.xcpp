@@ -7,13 +7,20 @@ namespace tests::unit::server { class Fixture; }
 #divert <hpp>
 #import cppunit.Test
 #import cppunit.test.Fixture
+#import std.unique_ptr
+#import tunitas.server.service // Request
 class tests::unit::server::Fixture : public cppunit::test::Fixture {
 public:
   auto test_constants() -> void;
-  auto test_filters() -> void;
+  auto test_filters_enforce_no_query_parameters() -> void;
+  auto test_filters_enforce_application_json() -> void;
   auto test_log() -> void;
   auto test_resources() -> void;
-  auto test_responses() -> void;
+  auto test_response() -> void;
+  auto test_response_internal_server_error_default() -> void;
+  auto test_response_internal_server_error_reason() -> void;
+  auto test_response_bad_request_default() -> void;
+  auto test_response_bad_request_reason() -> void;
   auto test_service() -> void;
   auto test_usage_Example() -> void;
   static auto suite() -> cppunit::Test *;
@@ -22,26 +29,156 @@ protected:
   struct exception {
     class [[nodiscard]] Example;
   };
+  static auto make_request() -> std::unique_ptr<::tunitas::server::service::Request>;
+  struct Request;
+  struct Resource;
+  template<typename TYPE> struct Deleter;
 };
 #endiv
 #divert <cpp>
+#import std.is_same
+#import tests.unit.server.Fixture.Request
+auto tests::unit::server::Fixture::make_request() -> std::unique_ptr<::tunitas::server::service::Request> {
+  static_assert(std::is_same_v<httpserver::http_request, ::tunitas::server::service::Request>);
+  using Result = std::unique_ptr<::tunitas::server::service::Request>;
+  return Result{new Fixture::Request{}};
+}
+#import tunitas.server.constants
 auto tests::unit::server::Fixture::test_constants() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_constants() -> void
+  // Show that the constants are defined.
+  // That they have an appropriate value is a separate test
+  using namespace ::tunitas::server::constants;
+  CPPUNIT_ASSERT(sizeof (http::CONNECT));
+  CPPUNIT_ASSERT(sizeof (http::DELEET));
+  CPPUNIT_ASSERT(sizeof (http::GET));
+  CPPUNIT_ASSERT(sizeof (http::HEAD));
+  CPPUNIT_ASSERT(sizeof (http::OPTIONS));
+  CPPUNIT_ASSERT(sizeof (http::POST));
+  CPPUNIT_ASSERT(sizeof (http::PUT));
+  CPPUNIT_ASSERT(sizeof (http::TRACE));
+  //
+  CPPUNIT_ASSERT(sizeof(http::R200_OK));
+  CPPUNIT_ASSERT(sizeof(http::R201_CREATED));
+  CPPUNIT_ASSERT(sizeof(http::R202_ACCEPTED));
+  CPPUNIT_ASSERT(sizeof(http::R203_NON_AUTHORITATIVE_INFORMATION));
+  CPPUNIT_ASSERT(sizeof(http::R204_NO_CONTENT));
+  CPPUNIT_ASSERT(sizeof(http::R205_RESET_CONTENT));
+  CPPUNIT_ASSERT(sizeof(http::R206_PARTIAL_CONTENT));
+  CPPUNIT_ASSERT(sizeof(http::R301_MOVED_PERMANENTLY));
+  CPPUNIT_ASSERT(sizeof(http::R302_FOUND));
+  CPPUNIT_ASSERT(sizeof(http::R302_MOVED_TEMPORARILY));
+  CPPUNIT_ASSERT(sizeof(http::R303_SEE_OTHER));
+  CPPUNIT_ASSERT(sizeof(http::R307_TEMPORARY_REDIRECT));
+  CPPUNIT_ASSERT(sizeof(http::R308_PERMANENT_REDIRECT));
+  CPPUNIT_ASSERT(sizeof(http::R304_NOT_MODIFIED));
+  CPPUNIT_ASSERT(sizeof(http::R400_BAD_REQUEST));
+  CPPUNIT_ASSERT(sizeof(http::R401_UNAUTHORIZED));
+  CPPUNIT_ASSERT(sizeof(http::R402_PAYMENT_REQUIRED));
+  CPPUNIT_ASSERT(sizeof(http::R403_FORBIDDEN));
+  CPPUNIT_ASSERT(sizeof(http::R404_NOT_FOUND));
+  CPPUNIT_ASSERT(sizeof(http::R500_INTERNAL_SERVER_ERROR));
+  CPPUNIT_ASSERT(sizeof(http::R501_NOT_IMPLEMENTED));
+  CPPUNIT_ASSERT(sizeof(http::R502_SERVICE_TEMPORARILY_OVERLOADED));
+  //
+  CPPUNIT_ASSERT(sizeof (mime::APPLICATION_JSON));
+  CPPUNIT_ASSERT(sizeof (mime::APPLICATION_X_WWW_FORM_URLENCODED));
+  CPPUNIT_ASSERT(sizeof (mime::MULTIPART_FORM_DATA));
+  CPPUNIT_ASSERT(sizeof (mime::TEXT_PLAIN));
+  CPPUNIT_ASSERT(sizeof (mime::TEXT_HTTP));
 }
-auto tests::unit::server::Fixture::test_filters() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_filters() -> void
+#import tunitas.server.service // Request, Resource, Response, response::Builder
+#import tunitas.server.filters
+#import std.exception
+auto tests::unit::server::Fixture::test_filters_enforce_no_query_parameters() -> void {
+  try {
+    using namespace ::tunitas::server::filters;
+    auto const request = make_request();
+    Response *response{nullptr};
+    enforce_no_query_parameters(*request, response); // <------------------------------ test this
+    CPPUNIT_ASSERT(nullptr == response || nullptr != response); // don't care
+    delete response;
+  } catch (std::exception const &e) {
+    CPPUNIT_ASSERT(true); // this is fine too
+  }
 }
+auto tests::unit::server::Fixture::test_filters_enforce_application_json() -> void {
+  try {
+    using namespace ::tunitas::server::filters;
+    auto const request = make_request();
+    Response *response{nullptr};
+    enforce_application_json(*request, response); // <----------------------------- test this
+    CPPUNIT_ASSERT(nullptr == response || nullptr != response); // don't care
+    delete response;
+  } catch (std::exception const &e) {
+    CPPUNIT_ASSERT(true); // this is fine too
+  }
+}
+#import tunitas.server.log
 auto tests::unit::server::Fixture::test_log() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_log() -> void
+  using namespace ::tunitas::server::log;
+  err << "ERROR STREAM (you will see this)\n";
+  nul << "NULL STREAM (you will not see this)\n";
 }
+#import tests.unit.server.Fixture.Resource
+#import tunitas.server.resources // all those initialization functions
 auto tests::unit::server::Fixture::test_resources() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_resources() -> void
+  Resource specimen;
+  using namespace ::tunitas::server::resources;
+  // Call them all ... show it can be done.
+  initialize(specimen, true);
+  initialize(specimen, false);
+  initialize_only_get(specimen);
+  initialize_only_post(specimen);
+  initialize_getputpost(specimen);
+  initialize_getpost(specimen);
+  initialize_getput(specimen);
+  initialize_getdelete(specimen);
+  initialize_putpost(specimen);
 }
-auto tests::unit::server::Fixture::test_responses() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_responses() -> void
+#import tunitas.server.responses
+#import tunitas.server.service // tunitas::server::service::Response [[FIXTHAT]] -- too hard to remember
+#import tests.unit.server.Fixture.Deleter
+auto tests::unit::server::Fixture::test_response_internal_server_error_default() -> void {
+  using namespace ::tunitas::server::responses;
+  using tunitas::server::service::Response;
+  Response *specimen{nullptr};
+  Deleter<Response> guardian{specimen};
+  internal_server_error(specimen);  // <---------------------------------- test this
 }
+auto tests::unit::server::Fixture::test_response_internal_server_error_reason() -> void {
+  using namespace ::tunitas::server::responses;
+  using tunitas::server::service::Response;
+  Response *specimen{nullptr};
+  Deleter<Response> guardian{specimen};
+  internal_server_error(specimen, "because ... reasons...");  // <---------------------------------- test this
+}
+auto tests::unit::server::Fixture::test_response_bad_request_default() -> void {
+  using namespace ::tunitas::server::responses;
+  using tunitas::server::service::Response;
+  Response *specimen{nullptr};
+  Deleter<Response> guardian{specimen};
+  bad_request(specimen);  // <---------------------------------- test this
+}
+auto tests::unit::server::Fixture::test_response_bad_request_reason() -> void {
+  using namespace ::tunitas::server::responses;
+  using tunitas::server::service::Response;
+  Response *specimen{nullptr};
+  Deleter<Response> guardian{specimen};
+  bad_request(specimen, "because ... reasons...");  // <---------------------------------- test this
+}
+#import tunitas.server.service // Resource<CHILD>, Request, Response, request::Builder
+#import tests.unit.server.Fixture.Request
+#import tests.unit.server.Fixture.Resource
 auto tests::unit::server::Fixture::test_service() -> void {
-#warning WRITETHIS auto tests::unit::server::Fixture::test_exception_service() -> void
+  namespace tss = ::tunitas::server::service;
+  struct Somehow : public tss::Resource<Somehow> {
+    auto render(tss::Request const &, tss::Response **) -> void;
+  };
+  Somehow somehow;
+  Request request;
+  tss::response::Builder bob{"<html></html>", 200};
+  tss::Response response{bob};
+  CPPUNIT_ASSERT(sizeof (somehow) + sizeof (request) + sizeof (response) + sizeof (bob)); // that was pointless.
 }
 #import tests.unit.server.Fixture.exception.Example
 auto tests::unit::server::Fixture::test_usage_Example() -> void {
@@ -59,18 +196,47 @@ auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
   Stream series{"server"};
   series << call("constants", &Fixture::test_constants)
-         << call("filters", &Fixture::test_filters)
+         << []() {
+              Stream fil("filters");
+              fil << []() {
+                       Stream enf("enforce");
+                       enf << call("query", &Fixture::test_filters_enforce_no_query_parameters)
+                           << call("json", &Fixture::test_filters_enforce_application_json)
+                         ;
+                       return move(enf);
+                     }()
+                ;
+              return move(fil);
+            }()
          << call("log", &Fixture::test_log)
          << call("resources", &Fixture::test_resources)
-         << call("responses", &Fixture::test_responses)
+         << []() {
+              Stream res("responses");
+              res << []() {
+                       Stream ise("internal_server_error");
+                       ise << call("default", &Fixture::test_response_internal_server_error_default)
+                           << call("reason", &Fixture::test_response_internal_server_error_reason)
+                         ;
+                       return move(ise);
+                     }()
+                  << []() {
+                       Stream bad("bad_request");
+                       bad << call("default", &Fixture::test_response_bad_request_default)
+                           << call("reason", &Fixture::test_response_bad_request_reason)
+                         ;
+                       return move(bad);
+                     }()
+                ;
+              return move(res);
+            }()
          << call("service", &Fixture::test_service)
+         << []() {
+              Stream exc("usage");
+              exc << call("Example", &Fixture::test_usage_Example)
+                ;
+              return move(exc);
+            }()
     ;
-  {
-    Stream exc("usage");
-    exc << call("Example", &Fixture::test_usage_Example)
-      ;
-    series << move(exc);
-  }
   return finalize(series);
 }
 #endiv

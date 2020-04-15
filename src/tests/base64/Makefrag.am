@@ -29,10 +29,15 @@ check_bin_base64_encode_SOURCES = \
   obj/src/tests/base64/encode.cpp \
   $(end)
 
+$(check_bin_base64_decode_SOURCES) \
+$(check_bin_base64_encode_SOURCES) \
+$(check_lib_libtests_base64_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(TF_V_DIS) $(call TF_DISAGGREGATE_COMPILE, $(check_bin_base64_decode_SOURCES))
+	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tests/base64/dependencies.mk:
-	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_bin_base64_decode_SOURCES))
-	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_bin_base64_encode_SOURCES))
-	$(TF_V_DC) $(call TF_DISAGGREGATE, $(check_lib_libtests_base64_la_SOURCES))
+	$(TF_V_COM) $(call TF_COMPILE, $(check_bin_base64_decode_SOURCES))
+	$(TF_V_COM) $(call TF_COMPILE, $(check_bin_base64_encode_SOURCES))
+	$(TF_V_COM) $(call TF_COMPILE, $(check_lib_libtests_base64_la_SOURCES))
 	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/tests/base64/dependencies.mk
 clean-dependencies::

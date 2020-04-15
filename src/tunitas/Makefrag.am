@@ -104,8 +104,11 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/urlsafe/encode.cpp \
   $(end)
 
+$(lib_libtunitas_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(TF_V_DIS) $(call TF_DISAGGREGATE_COMPILE, $@)
+	$(TF_V_DEP) test -e $@
 $(scold_cxxdir)/tunitas/dependencies.mk:
-	$(TF_V_DCDIS) $(call TF_DISAGGREGATE, $(lib_libtunitas_la_SOURCES))
+	$(TF_V_DIS) $(call TF_COMPILE, $(lib_libtunitas_la_SOURCES))
 	$(TF_V_DEP) test -e $@
 include $(scold_cxxdir)/tunitas/dependencies.mk
 clean-dependencies::

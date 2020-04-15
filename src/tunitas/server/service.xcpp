@@ -16,9 +16,24 @@ namespace tunitas::server::service {
   //     using namespace tunitas::server::service;
   //   }
   //
-  using httpserver::Resource;
+  using httpserver::Resource; // a template, Resource<Descendant>
   using httpserver::Request;
   using httpserver::Response;
   namespace response = httpserver::response;
+}
+#endiv
+#divert <cpp>
+// Of course, this is test code
+namespace {
+  namespace tests {
+    using namespace tunitas::server::service;
+    struct Resourceful : public Resource<Resourceful> {
+      auto render(Request const &, Response **) -> void;
+    };
+    static_assert(sizeof (Resourceful));
+    static_assert(sizeof (Request));
+    static_assert(sizeof (Response));
+    static_assert(sizeof (response::Builder));
+  }
 }
 #endiv

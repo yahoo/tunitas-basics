@@ -2,15 +2,16 @@
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
-#import nonstd.exception.Quitting
 #import std.exception
 #import std.is_base_of
 #import std.ostream
 #import std.string
 #import sys.exits.Code
 #import tunitas.app.exception.Aspect
+#import tunitas.app.exception.feature.Quitting
 // Need the complete definition for these types.
 #include <hpp/tunitas.app.exception.Aspect>
+#include <hpp/tunitas.app.exception.feature.Quitting>
 // NO NEED #include <hpp/std.exception>
 // NO NEED #include <hpp/std.string>
 #import tunitas.required.exception.Quitting
@@ -38,8 +39,7 @@ namespace tunitas::app::required::exception {
     && requires(QUITTING quitting) {
       { quitting } -> std::exception const &;
       { quitting } -> tunitas::app::exception::Aspect const &;
-#warning [[FIXTHIS]] in a later release -- std::is_base_of<nonstd::exception::Quitting, QUITTING>::value
-      // [[FIXTHIS]] ------> { quitting } -> nonstd::exception::Quitting const &;
+      { quitting } -> tunitas::app::exception::feature::Quitting const &;
     }
     && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
     && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
