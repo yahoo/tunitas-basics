@@ -41,10 +41,13 @@ lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/required/Stringable.cpp \
   obj/src/tunitas/server/required/Resourceful.cpp \
   $(end)
-
+$(scold_cxxdir)/tunitas/server/dependencies.mk: $(lib_libtunitas_server_la_SOURCES)
+$(lib_libtunitas_server_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
+	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tunitas/server/dependencies.mk:
-	$(TF_V_DCDIS) $(call TF_DEPENDENCIES, $(lib_libtunitas_server_la_SOURCES))
-	$(TF_V_DEP) test -e $@
+	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)
+	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/tunitas/server/dependencies.mk
 clean-dependencies::
 	rm -f $(scold_cxxdir)/tunitas/server/dependencies.mk

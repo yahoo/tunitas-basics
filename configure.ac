@@ -62,6 +62,10 @@ TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([cppunit])
 TF_WITH_NONSTD([gcc])
+#
+# [[FIXTHIS]] find a way to detect this at configure time rather than just admonishing for it
+# WATCHOUT - you MUST have ... nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd or else the unit tests will not compile
+#            the use of ...... nonstd-libhttpserver-devel-2:0.9.0-9.3.ipv6+poll+regex+api is no longer sufficient
 TF_WITH_NONSTD([libhttpserver]) dnl (from above) the extra "lib" prefix here but not there
 
 TF_WITH_STD([scold])

@@ -55,7 +55,7 @@ namespace tunitas::server::resources {
 #divert <ipp>
 #import tunitas.server.constants
 namespace tunitas::server {
-  template<required::Resourceful CHILD> inline auto resources::initialize(CHILD &, bool) -> void { /* the base case is a no op */ }
+  template<required::Resourceful CHILD> auto resources::initialize(CHILD &, bool) -> void { /* the base case is a no op */ }
   template<required::Resourceful CHILD, required::Stringable VERB, typename... REST> auto resources::initialize(CHILD &subject, bool value, VERB const &verb, REST const &...rest) -> void {
     subject.set_allowing(verb, value);
     initialize(subject, value, rest...);

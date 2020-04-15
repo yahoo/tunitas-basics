@@ -7,7 +7,7 @@ namespace tunitas::server::filters {
   using namespace service;
   //
   // Enforce that there are no query parameters.
-  // fill in the response and return code, fil
+  // fill in the response and return code, fill
   //
   // Usage:
   //

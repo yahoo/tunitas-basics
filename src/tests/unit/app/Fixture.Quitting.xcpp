@@ -11,7 +11,9 @@
 #import std.string
 #import sys.exits.Code
 #import sys.exits.constants
-class tests::unit::app::Fixture::Quitting : public ::tunitas::app::exception::Aspect, public ::tunitas::app::exception::aspect::Quitting, public std::runtime_error {
+class tests::unit::app::Fixture::Quitting : public ::tunitas::app::exception::Aspect,
+                                            public ::tunitas::app::exception::aspect::Quitting,
+                                            public std::runtime_error {
   struct Ancestors {
     using Aspect = ::tunitas::app::exception::Aspect;
     using Flavor = ::tunitas::app::exception::aspect::Quitting;
@@ -57,32 +59,32 @@ auto tests::unit::app::Fixture::Quitting::stream() const noexcept -> std::ostrea
 #import std.exception
 #import std.is_base_of
 #import tunitas.app.required.exception.Quitting
-namespace tests::unit::app {
-  static_assert(sizeof(Fixture::Quitting));
-  static_assert(std::is_base_of_v<tunitas::app::exception::Aspect, Fixture::Quitting>);
-  static_assert(std::is_base_of_v<std::exception, Fixture::Quitting>);
-#warning ENABLE THIS
-#if 0
-  static_assert(tunitas::app::required::exception::Quitting<Fixture::Quitting>);
-#endif
-  template<typename QUITTING> concept bool Quitting =
-    true
-    && requires(QUITTING quitting) {
-      { quitting } -> std::exception const &;
-      { quitting } -> tunitas::app::exception::Aspect const &;
-#warning [[FIXTHIS]] in a later release -- std::is_base_of<nonstd::exception::Quitting, QUITTING>::value
-      // [[FIXTHIS]] ------> { quitting } -> nonstd::exception::Quitting const &;
-    }
-    && ! tunitas::required::exception::Quitting<QUITTING> // because we specify a different constructor signature (see below)
-    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
-        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
-    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
-      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
-      { QUITTING{name, code} };
-      { quitting.what() } -> char const *;
-      { quitting.code() } -> sys::exits::Code;
-      { quitting.stream() } -> std::ostream &;
-  };
-  static_assert(Quitting<Fixture::Quitting>);
+// Of course, this is test code
+namespace {
+  namespace tests {
+    using Subject = ::tests::unit::app::Fixture;
+    static_assert(sizeof(Subject::Quitting));
+    static_assert(std::is_base_of_v<tunitas::app::exception::Aspect, Subject::Quitting>);
+    static_assert(std::is_base_of_v<std::exception, Subject::Quitting>);
+    static_assert(tunitas::app::required::exception::Quitting<Subject::Quitting>);
+    template<typename QUITTING> concept bool Belabor_The_Point_Quitting =
+      true
+      && requires(QUITTING quitting) {
+        { quitting } -> std::exception const &;
+        { quitting } -> tunitas::app::exception::Aspect const &;
+        { quitting } -> tunitas::app::exception::feature::Quitting const &;
+      }
+      && ! tunitas::required::exception::Quitting<QUITTING> // because we specify a different constructor signature (see below)
+      && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
+          requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
+      && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+        // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
+        { QUITTING{name, code} };
+        { quitting.what() } -> char const *;
+        { quitting.code() } -> sys::exits::Code;
+        { quitting.stream() } -> std::ostream &;
+    };
+    static_assert(Belabor_The_Point_Quitting<Subject::Quitting>);
+  }
 }
 #endiv

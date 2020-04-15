@@ -82,6 +82,9 @@ check_bin_unit_SOURCES = \
   \
   obj/src/tests/unit/server/namespace.cpp \
   obj/src/tests/unit/server/Fixture.cpp \
+  obj/src/tests/unit/server/Fixture.Deleter.cpp \
+  obj/src/tests/unit/server/Fixture.Request.cpp \
+  obj/src/tests/unit/server/Fixture.Resource.cpp \
   obj/src/tests/unit/server/Fixture.exception.Example.cpp \
   obj/src/tests/unit/server/exception/namespace.cpp \
   obj/src/tests/unit/server/exception/Fixture.cpp \
@@ -93,15 +96,22 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/time.literals.Fixture.cpp \
   obj/src/tests/unit/time.duration.Fixture.cpp \
   obj/src/tests/unit/time.ratio.Fixture.cpp \
+  \
   obj/src/tests/unit/tunitas.Fixture.cpp \
+  \
   obj/src/tests/unit/urlsafe.Fixture.cpp \
+  \
   obj/src/tests/unit/want.Fixture.cpp \
   obj/src/tests/unit/want.nonstd.Fixture.cpp \
   obj/src/tests/unit/want.sys.Fixture.cpp \
   obj/src/tests/unit/want.sys.posix.Fixture.cpp \
   $(end)
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
+	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tests/unit/dependencies.mk:
-	$(TF_V_DIS) $(call TF_DEPENDENCIES, $(check_bin_unit_SOURCES))
+	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)
 	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/tests/unit/dependencies.mk
 clean-dependencies::
