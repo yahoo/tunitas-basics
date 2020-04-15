@@ -74,7 +74,6 @@ lib_libtunitas_app_la_SOURCES = \
   obj/src/tunitas/app/words.Filepaths.cpp \
   obj/src/tunitas/app/words.Strings.cpp \
   $(end)
-
 $(scold_cxxdir)/tunitas/app/dependencies.mk: $(lib_libtunitas_app_la_SOURCES)
 $(lib_libtunitas_app_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
 	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
