@@ -130,8 +130,6 @@ if type -p gcc 2>/dev/null ; then
             echo "${0}: warning, the explicit setting with_nonstd_gcc=${with_nonstd_gcc} is not consistent with $exe from PATH"
         done
         echo "${0}: notice, permanently fix this as -- PATH=${with_nonstd_gcc}/bin:\$PATH with_nonstd_gcc=${with_nonstd_gcc} $0"
-        echo "${0}: notice, instead temporarily fixing as export PATH==${with_nonstd_gcc}/bin"
-        export PATH==${with_nonstd_gcc}/bin
     fi 1>&2
 fi
 : ${with_nonstd_libhttpserver:=/opt/nonstd/libhttpserver} # ... REQUIRED at least nonstd-libhttpserver-0.9.0-8.1.ipv6+poll+regex
