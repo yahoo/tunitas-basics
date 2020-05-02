@@ -1,8 +1,6 @@
 // This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
-// Licensed under the terms of the Apache-2.0 license.
-// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
-// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// Copyright 2019, Oath Inc.
+// Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
 #divert <fpp>
 namespace tunitas::app::exception {
   // Commentariat on the namespace arabesque circa v1.8.0 and v1.9.0 is elsewhere and nearby.
