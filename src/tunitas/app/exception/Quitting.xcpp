@@ -14,6 +14,6 @@ namespace tunitas::app::exception {
   //     src/app/exception.Quitting.xcpp:26:45: warning: ‘using Quitting = class tunitas::app::exception::feature::Quitting’ is deprecated: instead use tunitas::app::exception::feature::Quitting [-Wdeprecated-declarations]
   //      using Aspect = tunitas::app::exception::Quitting;
   //
-  using Quitting [[deprecated("for new work, directly use tunitas::app::exception::feature::Quitting")]] = tunitas::app::exception::feature::Quitting;
+  using Quitting [[deprecated("since v1.9.0; for new work, use tunitas::app::exception::feature::Quitting")]] = tunitas::app::exception::feature::Quitting;
 }
 #endiv

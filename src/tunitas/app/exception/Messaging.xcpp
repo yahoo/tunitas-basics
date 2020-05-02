@@ -9,6 +9,6 @@ namespace tunitas::app::exception {
   // s/Message/aspect::Message/g
   // s/aspecct::Message/tuntias::exception::feature::Message/g (it was hoisted out into namespace tunitas::exception)
   //
-  using Messaging = [[deprecated("instead use tunitas::app::exception::aspect::Messaging")]] tunitas::exception::feature::Messaging;
+  using Messaging = [[deprecated("since v1.9.0; for new work, use tunitas::exception::feature::Messaging")]] tunitas::exception::feature::Messaging;
 }
 #endiv

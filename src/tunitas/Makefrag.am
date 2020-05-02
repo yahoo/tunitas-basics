@@ -87,6 +87,7 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/outcome/namespace.cpp \
   obj/src/tunitas/outcome/Success.cpp \
   obj/src/tunitas/outcome/Variant.cpp \
+  obj/src/tunitas/outcome/variant.Ancestor.cpp \
   obj/src/tunitas/outcome/Visitor.cpp \
   obj/src/tunitas/outcome/visit.cpp \
   \

@@ -6,6 +6,6 @@
 namespace tunitas::app::exception::aspect {
   // Whereas the namespaces are NOT cascaded (but, by policy, they could be [[DOTHIS, MAYBE]]) 
   // As of tunitas-basics >= 1.9.0 the actual class definition was hoisted out to tunitas::exception::feature
-  using Messaging [[deprecated("instead, prefer tunitas::exception::feature::Messaging for new work")]] = tunitas::exception::feature::Messaging;
+  using Messaging [[deprecated("since v1.9.0; for new work, use tunitas::exception::feature::Messaging")]] = tunitas::exception::feature::Messaging;
 }
 #endiv

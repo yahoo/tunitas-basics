@@ -224,6 +224,6 @@ template<typename RESULT> auto tunitas::base64::Encoder::finalize() -> RESULT re
       ret.push_back('=');
     }
   }
-  return std::move(ret);
+  return ret;
 }
 #endiv

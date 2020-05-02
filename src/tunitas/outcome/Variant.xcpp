@@ -52,7 +52,8 @@ namespace tunitas::outcome {
 #import std.variant
 #import tunitas.outcome.visit
 template<tunitas::required::Outcomable VALUE> class tunitas::outcome::Variant : /*private?*/ public std::variant<std::error_code, VALUE> {
-  using ancestor = std::variant<std::error_code, VALUE>;
+  using Ancestor = std::variant<std::error_code, VALUE>;
+  using ancestor [[deprecated("instead, use Ancestor")]] = Ancestor;
 public:
   using Error = std::error_code;
   using Value = VALUE;

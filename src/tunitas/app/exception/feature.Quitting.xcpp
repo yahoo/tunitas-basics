@@ -8,6 +8,8 @@ namespace tunitas::app::exception::feature {
   // This abstraction is suitable for application (command-line, text ui) usage where ostreams are helpful.
   // Descendants only.
   //
+  // Current since 1.9.0.
+  //
   // As usual for this genre, it is set up as an ancestor to the mixin tree,
   // so that STL exceptions can be mixed in as well.
   //

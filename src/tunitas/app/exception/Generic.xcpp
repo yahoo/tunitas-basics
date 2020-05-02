@@ -16,6 +16,6 @@ namespace tunitas::app::exception {
   // This is a mixin; descendants only.
   // It is a mixin tree so that STL exceptions can be mixed in as well.
   //
-  using Generic [[deprecated("instead use tunitas::app::exception::Aspect")]] = Aspect;
+  using Generic [[deprecated("since v1.8.0; for new work, use tunitas::app::exception::Aspect")]] = Aspect;
 }
 #endiv

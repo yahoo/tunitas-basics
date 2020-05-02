@@ -39,7 +39,7 @@ namespace tunitas::base64 {
     while ( !dec.eof() ) {
       ret.push_back(dec.get<Value>());
     }
-    return std::move(ret);
+    return ret;
   }
 }
 namespace tunitas::base64::detail {

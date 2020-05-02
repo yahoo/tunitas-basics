@@ -6,16 +6,21 @@
 #endiv
 #divert <hpp>
 #import std.runtime_error
+#import tunitas.exception.Aspect
 #import tunitas.app.exception.Aspect
 #import tunitas.app.exception.aspect.Quitting
 #import std.string
 #import sys.exits.Code
 #import sys.exits.constants
-class tests::unit::app::Fixture::Quitting : public ::tunitas::app::exception::Aspect,
+class tests::unit::app::Fixture::Quitting : public ::tunitas::exception::Aspect,
+                                            public ::tunitas::app::exception::Aspect,
                                             public ::tunitas::app::exception::aspect::Quitting,
                                             public std::runtime_error {
   struct Ancestors {
-    using Aspect = ::tunitas::app::exception::Aspect;
+    struct Aspects {
+      using Core = ::tunitas::exception::Aspect;
+      using App = ::tunitas::app::exception::Aspect;
+    };
     using Flavor = ::tunitas::app::exception::aspect::Quitting;
     using Exception = std::runtime_error;
   };
