@@ -40,6 +40,6 @@ auto tunitas::urlsafe::encode(std::string const &s) -> std::string {
       r.push_back(p.second);
     }
   }
-  return std::move(r);
+  return r;
 }
 #endiv

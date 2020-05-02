@@ -46,6 +46,6 @@ auto tunitas::urlsafe::decode(std::string const &s) -> std::string {
       }
     }
   }
-  return std::move(r);
+  return r;
 }
 #endiv

@@ -38,7 +38,7 @@ namespace tunitas {
     while ( !dec.eof() ) {
       ret.push_back(dec.get<char>());
     }
-    return std::move(ret);
+    return ret;
   }
   template<> inline auto base64::decode<std::vector<bool>>(std::string const &source) -> std::vector<bool> {
     Decoder dec(source);

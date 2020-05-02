@@ -38,8 +38,15 @@ namespace tunitas::exception {
 #divert <hpp>
 #import std.ostream
 namespace tunitas::exception {
+  //
   // No wide character support [[HOW?]] how would we change that?
-  inline auto operator<<(std::ostream &, Aspect const &) -> std::ostream &;
+  // No newline is supplied; the Aspect::what() should NOT have its own terminating newline.
+  //
+  // [[deprecated]] This interface is deprecated with v1.9-series.
+  // [[deprecated]] There iis too much potential for ambiguity and disutility.
+  // [[deprecated]] To avoid, one calls a.what() directly.
+  //
+  [[deprecated("call a.what() directly")]] inline auto operator<<(std::ostream &, Aspect const &) -> std::ostream &;
 }
 #import sys.exits.Code
 class tunitas::exception::Aspect {
@@ -52,6 +59,6 @@ public:
 #endiv
 #divert <ipp>
 auto tunitas::exception::operator<<(std::ostream &o, Aspect const &a) -> std::ostream & {
-  return o << a.what(); // [[FIXTHIS]] decide whether a '\n' is expected here or not.  Document.
+  return o << a.what();
 }
 #endiv

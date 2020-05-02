@@ -4,6 +4,7 @@
 #divert <hpp>
 #forward tunitas.outcome.Visitor
 #forward tunitas.outcome.Variant
+#import std.variant
 namespace tunitas::outcome {
   //
   // The visitor pattern for variants.
@@ -13,6 +14,7 @@ namespace tunitas::outcome {
   //
   // Usage:
   //
+  //   auto a = ...somehow...
   //   auto v = outcome::Visitor{[](Error const &) { return false; },
   //                             [](Value const &) { return true; }};
   //   return std::visit(v, a);
@@ -24,9 +26,23 @@ namespace tunitas::outcome {
 #import std.forward
 #include <functional> // #import std.invoke [[FIXTHIS]] with module-std-0.27
 #import std.visit
+#import std.remove_const
+#import std.remove_reference
+#import std.add_const
+#import std.add_rvalue_reference
+#import std.conditional
+#import tunitas.outcome.variant.Ancestor
 namespace tunitas {
   template<typename VISITOR, typename VARIANT> inline constexpr decltype(auto) outcome::visit(VISITOR &&vis, VARIANT &&var) {
-    return std::visit(std::forward<VISITOR>(vis), std::forward<VARIANT>(var));
+    // Whereas this is a template and whereas std::visit is idiosyncratically implemented in each compiler and in each compiler release it advances
+    // and whereas the C++ 20 standard does not define customization points for that algorithm ... we have to do this ourselves.
+    using Ancestor = typename variant::Ancestor<std::remove_const_t<std::remove_reference_t<VARIANT>>>::Type;
+    using Conjugate = typename std::conditional<std::is_const_v<std::remove_reference_t<VARIANT>>, std::add_const_t<Ancestor>, Ancestor>::type;
+    if constexpr (std::is_lvalue_reference_v<VARIANT>) {
+      return std::visit(std::forward<VISITOR>(vis), static_cast<Conjugate &>(var));
+    } else {
+      return std::visit(std::forward<VISITOR>(vis), std::forward<Conjugate>(var));
+    }
   }
 }
 #endiv

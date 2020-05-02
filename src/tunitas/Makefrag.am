@@ -21,9 +21,9 @@
 #       <= 0     if any interfaces were changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 13
-lib_libtunitas_la_REVISION = 1
-glib_libtunitas_la_AGE = 2
+lib_libtunitas_la_CURRENT = 14
+lib_libtunitas_la_REVISION = 0
+glib_libtunitas_la_AGE = 3
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
 lib_libtunitas_la = lib/libtunitas.la
@@ -82,6 +82,7 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/outcome/namespace.cpp \
   obj/src/tunitas/outcome/Success.cpp \
   obj/src/tunitas/outcome/Variant.cpp \
+  obj/src/tunitas/outcome/variant.Ancestor.cpp \
   obj/src/tunitas/outcome/Visitor.cpp \
   obj/src/tunitas/outcome/visit.cpp \
   \

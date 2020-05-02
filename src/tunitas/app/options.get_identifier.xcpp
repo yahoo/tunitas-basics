@@ -68,6 +68,6 @@ template<tunitas::app::required::exception::Quitting QUITTING> auto tunitas::app
     error(cfg) << "the " << field_name << " is is not an identifier - '" << candidate << "'\n";
     throw QUITTING{cfg.NAME, sys::exits::CONFIG};
   }
-  return std::move(candidate);;
+  return candidate;
 }
 #endiv

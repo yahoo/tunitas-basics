@@ -9,6 +9,6 @@ namespace tunitas::app::exception {
   // s/Usage/aspect::Usage/g
   // s/aspect::Usage/feature::Usage/g
   //
-  using Usage [[deprecated("for new work, directly use tunitas::app::exception::aspect::Usage")]] = feature::Usage;
+  using Usage [[deprecated("since v1.8.0; for new work, use tunitas::app::exception::feature::Usage")]] = feature::Usage;
 }
 #endiv

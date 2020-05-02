@@ -90,7 +90,7 @@ auto tunitas::app::Pidfile::open_stream(std::optional<std::filesystem::path> con
     if (!*ptr) {
       throw std::system_error{errno, std::generic_category()};
     }
-    return std::move(ptr);
+    return ptr;
   }
 }
 #import std.flush

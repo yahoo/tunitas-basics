@@ -40,7 +40,7 @@ auto tests::unit::app::options::Fixture::prove_quitting() -> void {
   Quitting quitting{"a.out", sys::exits::OK};
   ::tunitas::exception::Aspect const &teA{quitting};
   ::tunitas::app::exception::Aspect const &taeA{quitting};
-  CPPUNIT_ASSERT(&teA == &taeA || &teA != &taeA); // gratuitously use the variables to shut up the compiler
+  CPPUNIT_ASSERT(teA.what() == taeA.what());
 }
 auto tests::unit::app::options::Fixture::test_get_filepath_good() -> void {
   try {

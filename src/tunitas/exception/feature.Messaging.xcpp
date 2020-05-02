@@ -7,6 +7,8 @@ namespace tunitas::exception::feature {
   // A mixin to provide stored messaging to an exception descendant.
   // Descendants only.
   //
+  // Current since v1.9.0
+  //
   // This functionality is "baked into" std::runtime_error,
   // however when it is inappropriate to use std::runtime_error because the exception
   // is used to signal a condition that is:
