@@ -4,13 +4,16 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import tunitas.app.exception.feature.Version
-namespace tunitas::app::exception::aspect {
+#import c.argv
+namespace tunitas::app::options {
   //
-  // WATCHOUT - the naming convention changed at tunitas-basics >= 1.8.0 and again at 1.9.0
-  // s/Version/aspect::Version/g
-  // s/aspect::Version/feature::Version/g
+  // The (pointer-based) argument vector input to the program.
+  // The options system reorders these pointers according to getopt(3)
   //
-  using Version = [[deprecated("since v1.8.0; for new work, use tunitas::app::exception::feature::Version")]] feature::Version;
+  // Usage:
+  //
+  //   return main(Args{c, v});
+  //
+  using Args = c::argv;
 }
 #endiv
