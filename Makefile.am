@@ -158,11 +158,16 @@ Makefile_PACKAGE_CFLAGS_SET   =
 Makefile_PACKAGE_CXXLAGS_SET  = 
 Makefile_PACKAGE_LDFLAGS_SET  = 
 
-# [[FIXTHIS]] ... hypogeal-twilight >= 0:0.45-series (mainline) has -no-install as a default, but tunitas' "ahead" 2:0.45-series does not
-Makefile_CHECK_CPPFLAGS_SET = 
-Makefile_CHECK_CFLAGS_SET   = 
-Makefile_CHECK_CXXLAGS_SET  = 
-Makefile_CHECK_LDFLAGS_SET  = -no-install
+#                                                  if    did not substitute away                      then use this
+#                                                  |           |                                      |            else use the substitution
+#                                                  |           |              @CPPFLAGS_no_install@   |            |
+#                                                  |           |              |                       |            |
+#                                                  |           |              |                       |            |
+#                                                  v           v              v                       v            v
+Makefile_CHECK_CPPFLAGS_SET = @CPPFLAGS_cppunit@ $(if $(filter %_no_install@, @CPPFLAGS_no_install@), $(empty),    @CPPFLAGS_no_install@)
+Makefile_CHECK_CFLAGS_SET   =   @CFLAGS_cppunit@ $(if $(filter %_no_install@, @CFLAGS_no_install@),   $(empty),    @CFLAGS_no_install@)
+Makefile_CHECK_CXXFLAGS_SET = @CXXFLAGS_cppunit@ $(if $(filter %_no_install@, @CXXFLAGS_no_install@), $(empty),    @CXXFLAGS_no_install@)
+Makefile_CHECK_LDFLAGS_SET  =  @LDFLAGS_cppunit@ $(if $(filter %_no_install@, @LDFLAGS_no_install@),  -no-install, @LDFLAGS_no_install@)
 
 AM_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
 AM_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
