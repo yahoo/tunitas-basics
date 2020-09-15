@@ -6,8 +6,9 @@
 #divert <fpp>
 namespace tunitas::app::exception::feature {
   //
-  // The "quitting message" exception, with a committed message stream.
+  // The "quitting message" feature, with a committed message stream.
   // This abstraction is suitable for application (command-line, text ui) usage where ostreams are helpful.
+  // Expects to be paired in MI with an Aspect that provides the obligation for what() and code() and stream()
   // Descendants only.
   //
   // Current since 1.9.0.

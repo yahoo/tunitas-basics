@@ -6,7 +6,8 @@
 #divert <fpp>
 namespace tunitas::exception::feature {
   //
-  // The "quitting" exception which is suitable for application (command-line, text ui)  and also server (headless) usage.
+  // The "quitting" feature which is suitable for application (command-line, text ui)  and also server (headless) usage.
+  // Expects to be paired in MI with an Aspect that provides the obligation for what() and code()
   // Descendants only.
   //
   // This abstraction does not commit to an outbound message (no ostream).

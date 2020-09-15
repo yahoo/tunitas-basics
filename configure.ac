@@ -43,6 +43,7 @@ TF_COMPONENT_METADIRECTORY_TIERS
 TF_ENABLE_GNU
 TF_ENABLE_GDB
 TF_ENABLE_GCC
+TF_ENABLE_LIBTOOL_NO_INSTALL dnl gives @LDFLAGS_no_install@
 TF_ENABLE_MOCK_BUILD
 
 TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
@@ -55,6 +56,7 @@ TF_WITH_MODULE([options])
 TF_WITH_MODULE([posix])
 TF_WITH_MODULE([std])
 TF_WITH_MODULE([string])
+TF_WITH_MODULE([sys]) dnl mostly sys.exits, sys.exits.constants and such
 
 TF_WITH_MODULE([cppunit])
 TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
@@ -78,8 +80,9 @@ AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O
 
-TF_PROG_DC
-TF_CHECK_STD_FILESYSTEM
+TF_PROG_DC dnl the S.C.O.L.D. disaggregation compiler
+TF_CHECK_STD_FILESYSTEM dnl defines @libstd_filesystem@
+TF_CHECK_CPPUNIT dnl defines toolflags of cppunit, @CPPFLAGS_cppunit@, @CXXFLAGS_cppunit@, @LDFLAGS_cppunit@, etc.
 
 dnl WATCHOUT if AC_OUTPUT is not called (transitively from TF_FINALIZE) then
 dnl you will see the fantastically cryptic error
