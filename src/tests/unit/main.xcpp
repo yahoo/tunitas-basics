@@ -3,10 +3,12 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository
 #divert <cpp>
 #import tests.unit.app.Fixture
 #import tests.unit.base64.Fixture
 #import tests.unit.exception.Fixture
+#import tests.unit.exits.Fixture
 #import tests.unit.outcome.Fixture
 #import tests.unit.required.Fixture
 #import tests.unit.server.Fixture
@@ -20,6 +22,7 @@ auto main(int argc, char *argv[]) -> int {
   rigging::bench::Main remain(tu::app::Fixture::suite(),
 			      tu::base64::Fixture::suite(),
                               tu::exception::Fixture::suite(),
+                              tu::exits::Fixture::suite(),
                               tu::outcome::Fixture::suite(),
                               tu::required::Fixture::suite(),
                               tu::server::Fixture::suite(),

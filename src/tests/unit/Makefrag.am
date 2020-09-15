@@ -75,6 +75,8 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/exception/my.Message.cpp \
   obj/src/tests/unit/exception/compatibility.cpp \
   \
+  obj/src/tests/unit/exits.Fixture.cpp \
+  \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   obj/src/tests/unit/outcome.Usage.cpp \

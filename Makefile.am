@@ -26,6 +26,7 @@ DEVELOPMENT_AREAS = \
   $(module_posix_prefix) \
   $(module_std_prefix) \
   $(module_string_prefix) \
+  $(module_sys_prefix) \
   $(end)
 TESTING_AREAS = \
   $(module_cppunit_prefix) \
@@ -55,6 +56,22 @@ $(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_BB_SOURCE_SE
 clean-local mostlyclean-local distclean-local::
 clean-dependencies::
 clean-local:: clean-dependencies
+
+#
+# WATCHOUT - module-sys >= 0.28.0-0.devel has an affectation on a module named 'sys.o'
+#
+#   #import sys.o         (problems occureven imported transitively by something you an't see)
+#
+# WATCHOUT - the following is needed to prevent make from trying to rebuild sys.o
+#
+#   gcc   /build/scold/module-sys/obj/modules/sys.o   -o /build/scold/module-sys/obj/modules/sys
+#   /usr/bin/ld:/build/scold/module-sys/obj/modules/sys.o: file format not recognized; treating as linker script
+#   /usr/bin/ld:/build/scold/module-sys/obj/modules/sys.o:1: syntax error
+#
+sys_o_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module_sys_prefix)$(obj)modules$(ppp)sys.o))
+.PHONY: $(sys_o_DUMMIES)
+sys_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module_sys_prefix)$(obj)modules$(ppp)sys))
+.PHONY: $(sys_DUMMIES)
 
 include src/tunitas/Makefrag.am
 include src/tunitas/app/Makefrag.am
