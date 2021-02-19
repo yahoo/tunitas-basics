@@ -1,8 +1,7 @@
 // This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
 // Copyright 2019, Oath Inc.
 // Licensed under the terms of the Apache-2.0 license. See the LICENSE file in https://github.com/yahoo/tunitas-basics/blob/master/LICENSE for terms.
-#divert <hpp>
-#import tunitas.outcome.Variant
+#divert <fpp>
 namespace tunitas::outcome {
   //
   // The visitor pattern for variants.
@@ -16,7 +15,14 @@ namespace tunitas::outcome {
   //                             [](Value const &) { return true; }};
   //   return std::visit(v, a);
   // 
-  template<typename... TYPES> struct Visitor : TYPES... { using TYPES::operator()...; };
-  template<typename... TYPES> Visitor(TYPES...) -> Visitor<TYPES...>;
+  template<typename... TYPES> struct Visitor;
+}
+#divert <hpp>
+#import tunitas.outcome.Variant
+namespace tunitas {
+  template<typename... TYPES> struct outcome::Visitor : TYPES... { using TYPES::operator()...; };
+  namespace outcome {
+    template<typename... TYPES> Visitor(TYPES...) -> Visitor<TYPES...>;
+  }
 }
 #endiv

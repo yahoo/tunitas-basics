@@ -36,7 +36,7 @@ src_tests_base64_SOURCES_SET = \
   $(end)
 $(info DEBUG $(src_tests_base64_SOURCES_SET))
 $(scold_cxxdir)/tests/base64/dependencies.mk:
-	$(TF_V_DC) $(call TF_DISAGGREGATE, $(src_tests_base64_SOURCES_SET))
+	$(TF_V_DC) $(call TF_DEPENDENCIES, $(src_tests_base64_SOURCES_SET))
 	$(TF_V_DONE) test -e $@
 include $(scold_cxxdir)/tests/base64/dependencies.mk
 clean-dependencies::
