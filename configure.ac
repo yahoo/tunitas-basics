@@ -22,7 +22,7 @@ dnl      |
 dnl      \prefix\
 dnl      ||||||||
 dnl      vvvvvvvv
-AC_INIT([tunitas-basics], [1.9.0], [tunitas@verizonmedia.com])
+AC_INIT([tunitas-basics], [1.10.0], [tunitas@verizonmedia.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 
 dnl See the AUTOMAKE_OPTIONS in the Makefile.am
@@ -67,8 +67,11 @@ TF_WITH_NONSTD([cppunit])
 TF_WITH_NONSTD([gcc])
 #
 # [[FIXTHIS]] find a way to detect this at configure time rather than just admonishing for it
-# WATCHOUT - you MUST have ... nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd or else the unit tests will not compile
-#            the use of ...... nonstd-libhttpserver-devel-2:0.9.0-9.3.ipv6+poll+regex+api is no longer sufficient
+# [[FIXTHIS]] WATCHOUT - you MUST have ... nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd or else the unit tests will not compile
+# [[FIXTHIS]]            the use of ...... nonstd-libhttpserver-devel-2:0.9.0-9.3.ipv6+poll+regex+api is no longer sufficient
+# [[FIXTHIS]]
+# [[FIXTHIS]] instead prefer microhttpd++ which is a ground-up rebuild of a server (service) on (lib)microhttpd
+#
 TF_WITH_NONSTD([libhttpserver]) dnl (from above) the extra "lib" prefix here but not there
 
 TF_WITH_STD([scold])
@@ -82,6 +85,7 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 
 TF_PROG_DC dnl the S.C.O.L.D. disaggregation compiler
+TF_PROG_GCC dnl the correct enfreshend gcc ... we want the one closest to C++23 ...   gcc11 or gcc12 or gcc13
 TF_CHECK_STD_FILESYSTEM dnl defines @libstd_filesystem@
 TF_CHECK_CPPUNIT dnl defines toolflags of cppunit, @CPPFLAGS_cppunit@, @CXXFLAGS_cppunit@, @LDFLAGS_cppunit@, etc.
 
