@@ -6,21 +6,21 @@
 #divert <fpp>
 namespace tests::unit::exception::my {
   //
-  // This is the example from the preamble of tunitas.exception.aspect.Messaging
+  // This is the example from the preamble of tunitas.exception.feature.Messaging
   //
   class Message;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.aspect.Messaging
+#import tunitas.exception.feature.Messaging
 #import std.exception
 #import std.string
 class tests::unit::exception::my::Message
   : public ::tunitas::exception::Aspect,
-    public ::tunitas::exception::aspect::Messaging,
+    public ::tunitas::exception::feature::Messaging,
     public std::exception {
-  using Messaging = ::tunitas::exception::aspect::Messaging;
+  using Messaging = ::tunitas::exception::feature::Messaging;
   using Exception = std::exception;
 public:
   explicit Message(std::string const &NAME);

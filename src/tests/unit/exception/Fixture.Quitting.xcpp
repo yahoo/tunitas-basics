@@ -7,13 +7,13 @@
 #include <tests.unit.exception.Fixture>
 #endiv
 #divert <hpp>
-#import tunitas.exception.aspect.Quitting
+#import tunitas.exception.feature.Quitting
 #import std.exception
 #import sys.exits.Code
 #import sys.exits.constants
-class tests::unit::exception::Fixture::Quitting : public ::tunitas::exception::aspect::Quitting, public std::exception {
+class tests::unit::exception::Fixture::Quitting : public ::tunitas::exception::feature::Quitting, public std::exception {
   struct Ancestors {
-    using Aspect = ::tunitas::exception::aspect::Quitting;
+    using Aspect = ::tunitas::exception::feature::Quitting;
     using Exception = std::exception;
   };
 public:

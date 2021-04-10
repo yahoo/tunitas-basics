@@ -7,12 +7,12 @@
 #include <tests.unit.exception.Fixture>
 #endiv
 #divert <hpp>
-#import tunitas.exception.aspect.Messaging
+#import tunitas.exception.feature.Messaging
 #import std.exception
-class tests::unit::exception::Fixture::Message : public ::tunitas::exception::aspect::Messaging, public std::exception {
+class tests::unit::exception::Fixture::Message : public ::tunitas::exception::feature::Messaging, public std::exception {
   // To use the Messaging mixin, we inherit from std::exception instead of std::runtime_error.
   struct Ancestors {
-    using Aspect = ::tunitas::exception::aspect::Messaging;
+    using Aspect = ::tunitas::exception::feature::Messaging;
     using Exception = std::exception;
   };
 public:

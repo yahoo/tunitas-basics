@@ -80,8 +80,8 @@ lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/exception/feature.Messaging.cpp \
   obj/src/tunitas/exception/feature.Quitting.cpp \
   obj/src/tunitas/exception/aspect/namespace.cpp \
-  obj/src/tunitas/exception/aspect/Messaging.cpp \
   obj/src/tunitas/exception/aspect/Quitting.cpp \
+  obj/src/tunitas/exception/aspect/Messaging.cpp \
   \
   obj/src/tunitas/Outcome.cpp \
   obj/src/tunitas/Success.cpp \

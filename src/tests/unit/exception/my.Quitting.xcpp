@@ -16,14 +16,14 @@ namespace tests::unit::exception::my {
 #import sys.exits.Code
 #import sys.exits.constants
 #import tunitas.exception.Aspect
-#import tunitas.exception.aspect.Quitting
+#import tunitas.exception.feature.Quitting
 #import std.runtime_error
 class tests::unit::exception::my::Quitting
   : public ::tunitas::exception::Aspect,
-    public ::tunitas::exception::aspect::Quitting,
+    public ::tunitas::exception::feature::Quitting,
     public std::runtime_error {
   using Aspect = ::tunitas::exception::Aspect;
-  using Flavor = ::tunitas::exception::aspect::Quitting;
+  using Flavor = ::tunitas::exception::feature::Quitting;
   using Exception = ::std::runtime_error;
 public:
   Quitting();
