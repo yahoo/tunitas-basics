@@ -1,0 +1,3 @@
+// -*- c++ -*- 7d79cd42-a86a-4044-a207-eaf31b944caf
+#pragma once
+#include <algorithm>

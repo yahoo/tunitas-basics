@@ -1,0 +1,10 @@
+// -*- c++ -*- 630adfb2-4e7d-4b46-a355-b179b8630532
+#pragma once
+#include <ostream>
+namespace mysqlpp {
+  class SsqlsBase;
+  // Because it is defined in the header file, but declared outline,
+  // we have to declare it inline herein.  Else we get duplicate definitions.
+  inline auto operator<<(std::ostream &, SsqlsBase const &) -> std::ostream &;
+}
+#include "mysql++/ssqls2.h"

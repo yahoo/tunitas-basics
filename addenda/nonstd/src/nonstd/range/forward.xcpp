@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.range.detail.Forward
+#import nonstd.required.Container
+#import nonstd.required.iterator.Input
+namespace nonstd::range {
+  //
+  // Forward a container
+  // Also, recontain a pair of iterators, reversing them
+  //
+  // Usage:
+  //
+  //    auto container = ...somehow...   
+  //    for (auto const &value : forward(container)) {
+  //        ...use...
+  //    }
+  //
+  template<required::Container CONTAINER> inline auto forward(CONTAINER const &) -> detail::Forward<typename CONTAINER::const_iterator>;
+  template<required::Container CONTAINER> inline auto forward(CONTAINER &) -> detail::Forward<typename CONTAINER::iterator>;
+  template<required::Container CONTAINER> auto forward(CONTAINER &&) -> detail::Forward<typename CONTAINER::const_iterator> = delete;
+  //
+  // Usage:
+  //
+  //    ITERATOR start = ...somehow...
+  //    ITERATOR finish = ...somehow...
+  //    for (auto const &value : forward(start, finish)) {
+  //        ...use...
+  //    }
+  //
+  template<required::iterator::Input ITERATOR> inline auto forward(ITERATOR start, ITERATOR finish) -> detail::Forward<ITERATOR>;
+}
+#endiv
+#divert <ipp>
+namespace nonstd {
+  template<required::Container CONTAINER> auto range::forward(CONTAINER const &container) -> detail::Forward<typename CONTAINER::const_iterator> {
+    return detail::Forward<typename CONTAINER::const_iterator>{container.begin(), container.end()};
+  }
+  template<required::Container CONTAINER> auto range::forward(CONTAINER &container) -> detail::Forward<typename CONTAINER::iterator> {
+    return detail::Forward<typename CONTAINER::iterator>{container.begin(), container.end()};
+  }
+  template<required::iterator::Input ITERATOR> auto range::forward(ITERATOR start, ITERATOR finish) -> detail::Forward<ITERATOR> {
+    return detail::Forward<ITERATOR>(start, finish);
+  }
+}
+#endiv

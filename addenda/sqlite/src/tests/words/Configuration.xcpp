@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace words {
+    class Configuration;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.string
+class tests::words::Configuration {
+public:
+  Configuration();
+
+  std::string NAME;
+
+  bool verbose_mode;
+  bool dry_run;
+  bool ignore_invalid_words;
+  std::string output_database;
+
+  std::string table_name;
+  std::string column_name;
+
+  std::string pragmas_sql;
+  // should be idempotent "create table if not exists"
+  std::string initialization_sql;
+  std::string drop_sql;
+  std::string dump_sql;
+  std::string insert_sql;
+};
+#endiv
+#divert <cpp>
+#import tests.words.finalize
+#import tests.words.formatter
+tests::words::Configuration::Configuration()
+  : NAME("words")
+  , verbose_mode(false)
+  , dry_run(false)
+  , ignore_invalid_words(false) {
+  table_name = "words";
+  column_name = "word";
+  // https://sqlite.org/pragma.html
+  // To go fast in SQLite, you need synchronous=OFF; journal_mode=MEMORY;
+  // Otherwise SQLite does an fsync on every transaction (every statement).
+  // The use of in-memory journaling is (um) pointless for recovery.
+  // Equivalent: PRAGMA synchronous=OFF; PRAGMA journal_mode=OFF;
+  pragmas_sql = "PRAGMA synchronous = OFF; PRAGMA journal_mode = MEMORY;";
+  initialization_sql = finalize(formatter() << R"sql(create table if not exists )sql" << table_name << R"sql(()sql" << column_name << R"sql( text unique);)sql");
+  drop_sql = finalize(formatter() << R"sql(drop table )sql" << table_name << R"sql(;)sql");
+  dump_sql = finalize(formatter() << R"sql(select rowid, * from )sql" << table_name << R"sql(;)sql");
+  insert_sql = finalize(formatter() << R"sql(insert into )sql" << table_name << R"sql(()sql" << column_name << R"sql() values (?);)sql");
+}
+#endiv

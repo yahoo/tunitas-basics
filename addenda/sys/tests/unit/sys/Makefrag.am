@@ -1,0 +1,3 @@
+tests_unit_sys_TESTS = \
+  tests/unit/sys/cases.test \
+  $(end)

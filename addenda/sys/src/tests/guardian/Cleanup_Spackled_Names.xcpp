@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::guardian {
+  //
+  // Remove zero or more filenames upon destruction.
+  // Else ... abandon it in place.  Someone else can clean it up.
+  //
+  // Usage:
+  //
+  //   Cleanup_Spackled_Names cleanup{"/tmp/this", "/tmp/that"};
+  //   ...use names /tmp/this, /tmp/that
+  //
+  class Cleanup_Spackled_Names;
+}
+#endiv
+#divert <hpp>
+#import std.initializer_list
+#import std.string
+#import std.vector
+struct tests::guardian::Cleanup_Spackled_Names {
+  inline explicit Cleanup_Spackled_Names(std::initializer_list<std::string>);
+  inline ~Cleanup_Spackled_Names();
+  Cleanup_Spackled_Names(Cleanup_Spackled_Names const &) = delete;
+  auto operator=(Cleanup_Spackled_Names const &) -> Cleanup_Spackled_Names & = delete;
+  inline auto operator+=(std::string name) -> Cleanup_Spackled_Names &;
+protected:
+  std::vector<std::string> unlink_these;
+};
+#endiv
+#divert <ipp>
+#import sys.posix.unlink
+namespace tests::guardian {
+  Cleanup_Spackled_Names::Cleanup_Spackled_Names(std::initializer_list<std::string> il)
+    : unlink_these(il.begin(), il.end())
+  { }
+  Cleanup_Spackled_Names::~Cleanup_Spackled_Names() {
+    for (auto const &that : unlink_these) {
+      // We're not going to bother checking return codes.
+      // This is a tester.
+      // And if they don't remove then someone else with less subtle methods can remove them.
+      (void) six::unlink(that);
+    }
+  }
+  auto Cleanup_Spackled_Names::operator+=(std::string name) -> Cleanup_Spackled_Names & {
+    unlink_these.push_back(move(name));
+    return *this;
+  }
+}
+#endiv

@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::stack {
+  //
+  // The prototype of an Lhs or Rhs
+  // Descendants only.
+  //
+  // Usage: see Rhs<STACK>
+  //        see Lhs<STACK>
+  //
+  template<typename STACK> class Xhs;
+}
+#endiv
+#divert <hpp>
+#import openssl.required.Stacklike
+#import std.size_t
+namespace openssl {
+  template<typename OWNER> class stack::Xhs {
+    static_assert(required::Stacklike<OWNER>); // requires very late binding
+  public:
+    using Owner = OWNER;
+    using Index = std::size_t;
+    using Value = typename Owner::Value;
+  protected:
+    Owner &owner;
+    Index index;
+    inline Xhs(Owner &, Index);
+    ~Xhs() = default;
+  public:
+    inline operator Value() const;
+  };
+}
+#endiv
+#divert <ipp>
+#import openssl.exception.Range
+#import openssl.Stack
+#import openssl.functions
+namespace openssl::stack {
+  template<typename _> Xhs<_>::Xhs(Owner &owner, Index index)
+    : owner{owner}
+    , index{index}
+  { }
+  template<typename _> Xhs<_>::operator Value() const {
+    auto valued = OPENSSL_sk_value(owner.get(), index);
+    if (nullptr == valued) {
+      throw exception::Range{};
+    }
+    return Owner::Traits::revalorize(valued);
+  }
+}
+#endiv

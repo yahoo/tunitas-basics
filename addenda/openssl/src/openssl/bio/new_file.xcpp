@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.bio.File
+#forward openssl.bio.Mode
+#import sys.call.argument.Stringface
+namespace openssl::bio {
+  //
+  // A BIO File, opened or not
+  //
+  // Usage:
+  //
+  //   {
+  //     bio::File guard{bio::new_file(filepath, "w")};
+  //     ...use the guard...
+  //   }
+  // 
+  namespace packaging::new_file::function {
+    using Result = File;
+    using Filepath = sys::call::argument::Stringface;
+    inline auto new_file() -> File; // ......................... not opened
+    inline auto new_file(Filepath, Mode const &) -> File; // ... opened as per Mode
+  }
+  using packaging::new_file::function::new_file;
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import errno
+#import openssl.functions
+#import openssl.bio.File
+#import openssl.bio.Mode
+#import std.system_category
+#import std.system_error
+#import openssl.exception.System
+auto openssl::bio::packaging::new_file::function::new_file() -> Result {
+  return Result{BIO_new(BIO_s_file())};
+}
+auto openssl::bio::packaging::new_file::function::new_file(Filepath filepath, Mode const &modality) -> Result {
+  auto f = BIO_new_file(c::str(filepath), modality.mode());
+  if (nullptr == f) {
+    throw exception::System{errno, std::system_category(), "new_file"};
+  }
+  return Result{f};
+}
+#endiv

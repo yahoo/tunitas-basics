@@ -1,0 +1,4 @@
+// -*- c++ -*- f1b6de84-32a9-4cca-a7eb-88668a6d1f24
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/filters.h>

@@ -1,0 +1,76 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::library { class Library; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.library.Library
+class tests::unit::library::Library : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::library::Library;
+  auto test_usage_initialization() -> void;
+  auto test_constructor_default() -> void;
+  auto test_constructor_features() -> void;
+  auto test_constructor_features_allocator() -> void;
+  auto test_destructor() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ares.library.initialized
+auto tests::unit::library::Library::test_usage_initialization() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(::ares::library::is_initialized());
+  {
+    Subject subject;
+    CPPUNIT_ASSERT(::ares::library::is_initialized());
+    {
+      Subject subject;
+      CPPUNIT_ASSERT(::ares::library::is_initialized());
+      {
+        Subject subject;
+        CPPUNIT_ASSERT(::ares::library::is_initialized());
+      }
+    }
+  }
+}
+auto tests::unit::library::Library::test_constructor_default() -> void {
+  // Already tested that in initialization()
+  Subject subject;
+  CPPUNIT_ASSERT(::ares::library::is_initialized());
+}
+#import ares.library.features.constants
+auto tests::unit::library::Library::test_constructor_features() -> void {
+  Subject subject{::ares::library::features::ALL};
+  CPPUNIT_ASSERT(::ares::library::is_initialized());
+}
+#import malloc
+#import free
+#import realloc
+auto tests::unit::library::Library::test_constructor_features_allocator() -> void {
+  ::ares::library::Allocator allocator{::malloc, ::free, ::realloc};
+  Subject subject{::ares::library::features::ALL};
+  CPPUNIT_ASSERT(::ares::library::is_initialized());
+}
+#import rigging.suite.io
+auto tests::unit::library::Library::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"ares"};
+  {
+    Stream use{"usage"};
+    use << call("initialization", &Library::test_usage_initialization)
+      ;
+    series << move(use);
+  } {
+    Stream con{"constructor"};
+    con << call("default", &Library::test_constructor_default)
+        << call("features", &Library::test_constructor_features)
+        << call("features+allocator", &Library::test_constructor_features_allocator)
+      ;
+    series << move(con);
+  }
+  return finalize(series);
+}
+#endiv

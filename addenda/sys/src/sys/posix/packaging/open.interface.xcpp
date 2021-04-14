@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.at.position.Position
+#import sys.call.argument.Pathname
+#import sys.call.argument.Permissions
+#import sys.call.result.Value
+#import sys.call.result.pipe.Value
+#import sys.fd.required.Unmanaged
+#import sys.id.File
+#import sys.o.Flags
+#import sys.posix.packaging.required // cascade namespace required
+#import sys.posix.required.rebundled
+namespace sys::posix::packaging::open::interface {
+  inline namespace argument {
+    using call::argument::Pathname;
+    using call::argument::Permissions;
+  }
+  using id::File;
+  inline namespace o {
+    using Opening = sys::o::Flags;
+    using Flags [[deprecated("prefer the precise form Opening")]] = Opening;
+  }
+  using Mode [[deprecated("prefer the precise form Permissions")]] = Permissions;
+  namespace result {
+    // expect 'int' or id::File
+    template<required::fd::Unmanaged RESULT> using Single = call::result::Value<RESULT>;
+    template<required::fd::Unmanaged RESULT> using Pair = call::result::pipe::Value<RESULT>;
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.O
+namespace sys::posix::packaging::open::interface {
+  using sys::posix::O;
+}
+#endiv

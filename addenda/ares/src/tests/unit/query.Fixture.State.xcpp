@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.query.Fixture>
+#endiv
+#divert <hpp>
+#import std.string
+#import std.move
+#import std.optional
+#import ip.in6 // in6::addr;
+struct tests::unit::query::Fixture::State {
+  explicit State(std::string query_fqdn);
+  std::string query_fqdn;
+  std::optional<ip::in6::addr> result;
+};
+#endiv
+#divert <cpp>
+#import std.move
+namespace tests::unit::query {
+  Fixture::State::State(std::string query_fqdn)
+    : query_fqdn{std::move(query_fqdn)}
+  { }
+}
+#endiv

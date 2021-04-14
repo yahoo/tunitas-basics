@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in4 // ip::in4::sockaddr
+#import ip.in6 // ip::in6::sockaddr
+namespace ip {
+  namespace inet {
+    namespace sockaddr {
+      // Helpers for the manipulation of the sockaddr structures.
+    }
+  }
+}
+#endiv

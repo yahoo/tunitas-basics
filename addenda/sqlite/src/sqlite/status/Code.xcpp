@@ -1,0 +1,299 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace status {
+    enum class Code
+    { OK = SQLITE_OK,                   // 0   - Successful result
+      //beginning-of-error-codes; the not-successful codes
+      ERROR = SQLITE_ERROR,             // 1   - SQL error or missing database
+      INTERNAL = SQLITE_INTERNAL,       // 2   - Internal logic error in SQLite
+      PERM = SQLITE_PERM,               // 3   - Access permission denied
+      ABORT = SQLITE_ABORT,             // 4   - Callback routine requested an abort
+      BUSY = SQLITE_BUSY,               // 5   - The database file is locked
+      LOCKED = SQLITE_LOCKED,           // 6   - A table in the database is locked
+      NOMEM = SQLITE_NOMEM,             // 7   - A malloc() failed
+      READONLY = SQLITE_READONLY,       // 8   - Attempt to write a readonly database
+      INTERRUPT = SQLITE_INTERRUPT,     // 9   - Operation terminated by sqlite3_interrupt()*/
+      IOERR = SQLITE_IOERR,             // 10  - Some kind of disk I/O error occurred
+      CORRUPT = SQLITE_CORRUPT,         // 11  - The database disk image is malformed
+      NOTFOUND = SQLITE_NOTFOUND,       // 12  - Unknown opcode in sqlite3_file_control()
+      FULL = SQLITE_FULL,               // 13  - Insertion failed because database is full
+      CANTOPEN = SQLITE_CANTOPEN,       // 14  - Unable to open the database file
+      PROTOCOL = SQLITE_PROTOCOL,       // 15  - Database lock protocol error
+      EMPTY = SQLITE_EMPTY,             // 16  - Database is empty
+      SCHEMA = SQLITE_SCHEMA,           // 17  - The database schema changed
+      TOOBIG = SQLITE_TOOBIG,           // 18  - String or BLOB exceeds size limit
+      CONSTRAINT = SQLITE_CONSTRAINT,   // 19  - Abort due to constraint violation
+      MISMATCH = SQLITE_MISMATCH,       // 20  - Data type mismatch
+      MISUSE = SQLITE_MISUSE,           // 21  - Library used incorrectly
+      NOLFS = SQLITE_NOLFS,             // 22  - Uses OS features not supported on host
+      AUTH = SQLITE_AUTH,               // 23  - Authorization denied
+      FORMAT = SQLITE_FORMAT,           // 24  - Auxiliary database format error
+      RANGE = SQLITE_RANGE,             // 25  - 2nd parameter to sqlite3_bind out of range
+      NOTADB = SQLITE_NOTADB,           // 26  - File opened that is not a database file
+      NOTICE = SQLITE_NOTICE,           // 27  - Notifications from sqlite3_log()
+      WARNING = SQLITE_WARNING,         // 28  - Warnings from sqlite3_log()
+      // end-of-error-codes; the not-successful codes
+      // dubious ... signalling non-failure and completion (but not "ok")
+      ROW = SQLITE_ROW,                 // 100 - sqlite3_step() has another row ready
+      DONE = SQLITE_DONE,               // 101 - sqlite3_step() has finished executing
+      //
+      // The extended result codes are returned with result codes.
+      //     auto sqlite::extended_result_codes(connection::Shell &, bool onoff) -> something;
+      //
+      IOERR_READ = SQLITE_IOERR_READ,
+      IOERR_SHORT_READ = SQLITE_IOERR_SHORT_READ, 
+      IOERR_WRITE = SQLITE_IOERR_WRITE, 
+      IOERR_FSYNC = SQLITE_IOERR_FSYNC, 
+      IOERR_DIR_FSYNC = SQLITE_IOERR_DIR_FSYNC, 
+      IOERR_TRUNCATE = SQLITE_IOERR_TRUNCATE, 
+      IOERR_FSTAT = SQLITE_IOERR_FSTAT, 
+      IOERR_UNLOCK = SQLITE_IOERR_UNLOCK, 
+      IOERR_RDLOCK = SQLITE_IOERR_RDLOCK, 
+      IOERR_DELETE = SQLITE_IOERR_DELETE, 
+      IOERR_BLOCKED = SQLITE_IOERR_BLOCKED, 
+      IOERR_NOMEM = SQLITE_IOERR_NOMEM, 
+      IOERR_ACCESS = SQLITE_IOERR_ACCESS, 
+      IOERR_CHECKRESERVEDLOCK = SQLITE_IOERR_CHECKRESERVEDLOCK, 
+      IOERR_LOCK = SQLITE_IOERR_LOCK, 
+      IOERR_CLOSE = SQLITE_IOERR_CLOSE, 
+      IOERR_DIR_CLOSE = SQLITE_IOERR_DIR_CLOSE, 
+      IOERR_SHMOPEN = SQLITE_IOERR_SHMOPEN, 
+      IOERR_SHMSIZE = SQLITE_IOERR_SHMSIZE, 
+      IOERR_SHMLOCK = SQLITE_IOERR_SHMLOCK, 
+      IOERR_SHMMAP = SQLITE_IOERR_SHMMAP, 
+      IOERR_SEEK = SQLITE_IOERR_SEEK, 
+      IOERR_DELETE_NOENT = SQLITE_IOERR_DELETE_NOENT, 
+      IOERR_MMAP = SQLITE_IOERR_MMAP, 
+      IOERR_GETTEMPPATH = SQLITE_IOERR_GETTEMPPATH, 
+      IOERR_CONVPATH = SQLITE_IOERR_CONVPATH, 
+      LOCKED_SHAREDCACHE = SQLITE_LOCKED_SHAREDCACHE, 
+      BUSY_RECOVERY = SQLITE_BUSY_RECOVERY, 
+      BUSY_SNAPSHOT = SQLITE_BUSY_SNAPSHOT, 
+      CANTOPEN_NOTEMPDIR = SQLITE_CANTOPEN_NOTEMPDIR, 
+      CANTOPEN_ISDIR = SQLITE_CANTOPEN_ISDIR, 
+      CANTOPEN_FULLPATH = SQLITE_CANTOPEN_FULLPATH, 
+      CANTOPEN_CONVPATH = SQLITE_CANTOPEN_CONVPATH, 
+      CORRUPT_VTAB = SQLITE_CORRUPT_VTAB, 
+      READONLY_RECOVERY = SQLITE_READONLY_RECOVERY, 
+      READONLY_CANTLOCK = SQLITE_READONLY_CANTLOCK, 
+      READONLY_ROLLBACK = SQLITE_READONLY_ROLLBACK, 
+      READONLY_DBMOVED = SQLITE_READONLY_DBMOVED, 
+      ABORT_ROLLBACK = SQLITE_ABORT_ROLLBACK, 
+      CONSTRAINT_CHECK = SQLITE_CONSTRAINT_CHECK, 
+      CONSTRAINT_COMMITHOOK = SQLITE_CONSTRAINT_COMMITHOOK, 
+      CONSTRAINT_FOREIGNKEY = SQLITE_CONSTRAINT_FOREIGNKEY, 
+      CONSTRAINT_FUNCTION = SQLITE_CONSTRAINT_FUNCTION, 
+      CONSTRAINT_NOTNULL = SQLITE_CONSTRAINT_NOTNULL, 
+      CONSTRAINT_PRIMARYKEY = SQLITE_CONSTRAINT_PRIMARYKEY, 
+      CONSTRAINT_TRIGGER = SQLITE_CONSTRAINT_TRIGGER, 
+      CONSTRAINT_UNIQUE = SQLITE_CONSTRAINT_UNIQUE, 
+      CONSTRAINT_VTAB = SQLITE_CONSTRAINT_VTAB, 
+      CONSTRAINT_ROWID = SQLITE_CONSTRAINT_ROWID, 
+      NOTICE_RECOVER_WAL = SQLITE_NOTICE_RECOVER_WAL, 
+      NOTICE_RECOVER_ROLLBACK = SQLITE_NOTICE_RECOVER_ROLLBACK, 
+      WARNING_AUTOINDEX = SQLITE_WARNING_AUTOINDEX };
+  }
+}
+#endiv
+#divert <hpp>
+#import std.string
+namespace sqlite {
+  namespace status {
+    inline auto ok(Code) -> bool;
+
+    // not OK and not DONE (DONE is not a failure indication)
+    inline auto failure(Code) -> bool;
+
+    // OK or DONE (which is also OK)
+    inline auto okdone(Code) -> bool;
+    // map s/DONE/OK/ .... so you get OK if the argument is OK or DONE
+    inline auto ok_if_done(Code) -> Code;
+
+    // Throws the code if not OK or DONE
+    inline auto check(Code) -> void;
+    inline auto check(Code, std::string const &explanation) -> void;
+
+    //
+    // Useful for interacting with step
+    //
+    //   while (row(statement.step())) {
+    //       ...process...
+    //   }
+    //   if (!done(statement.step())){
+    //       ...some error...
+    //   }
+    //
+    inline auto row(Code) -> bool;
+    inline auto done(Code) -> bool;
+
+    // Like std::min, std::max, but on Code
+    // wherein OK is lower than every other code
+    inline auto max(Code, Code) -> Code;
+    inline auto min(Code, Code) -> Code;
+  }
+}
+
+#import std.min
+#import std.max
+namespace std {
+  using sqlite::status::min;
+  using sqlite::status::max;
+}  
+
+namespace sqlite::status {
+  constexpr auto const OK = Code::OK;
+  constexpr auto const ERROR = Code::ERROR;
+  constexpr auto const INTERNAL = Code::INTERNAL;
+  constexpr auto const PERM = Code::PERM;
+  constexpr auto const ABORT = Code::ABORT;
+  constexpr auto const BUSY = Code::BUSY;
+  constexpr auto const LOCKED = Code::LOCKED;
+  constexpr auto const NOMEM = Code::NOMEM;
+  constexpr auto const READONLY = Code::READONLY;
+  constexpr auto const INTERRUPT = Code::INTERRUPT;
+  constexpr auto const IOERR = Code::IOERR;
+  constexpr auto const CORRUPT = Code::CORRUPT;
+  constexpr auto const NOTFOUND = Code::NOTFOUND;
+  constexpr auto const FULL = Code::FULL;
+  constexpr auto const CANTOPEN = Code::CANTOPEN;
+  constexpr auto const PROTOCOL = Code::PROTOCOL;
+  constexpr auto const EMPTY = Code::EMPTY;
+  constexpr auto const SCHEMA = Code::SCHEMA;
+  constexpr auto const TOOBIG = Code::TOOBIG;
+  constexpr auto const CONSTRAINT = Code::CONSTRAINT;
+  constexpr auto const MISMATCH = Code::MISMATCH;
+  constexpr auto const MISUSE = Code::MISUSE;
+  constexpr auto const NOLFS = Code::NOLFS;
+  constexpr auto const AUTH = Code::AUTH;
+  constexpr auto const FORMAT = Code::FORMAT;
+  constexpr auto const RANGE = Code::RANGE;
+  constexpr auto const NOTADB = Code::NOTADB;
+  constexpr auto const NOTICE = Code::NOTICE;
+  constexpr auto const WARNING = Code::WARNING;
+  constexpr auto const ROW = Code::ROW;
+  constexpr auto const DONE = Code::DONE;
+  //
+  // Reminder... the extended result codes are returned with result codes.
+  //     auto sqlite::extended_result_codes(connection::Shell &, bool onoff) -> something;
+  //
+  namespace ioerr {
+    constexpr auto const READ = Code::IOERR_READ;
+    constexpr auto const SHORT_READ = Code::IOERR_SHORT_READ;
+    constexpr auto const WRITE = Code::IOERR_WRITE;
+    constexpr auto const FSYNC = Code::IOERR_FSYNC;
+    constexpr auto const DIR_FSYNC = Code::IOERR_DIR_FSYNC;
+    constexpr auto const TRUNCATE = Code::IOERR_TRUNCATE;
+    constexpr auto const FSTAT = Code::IOERR_FSTAT;
+    constexpr auto const UNLOCK = Code::IOERR_UNLOCK;
+    constexpr auto const RDLOCK = Code::IOERR_RDLOCK;
+    constexpr auto const DELETE = Code::IOERR_DELETE;
+    constexpr auto const BLOCKED = Code::IOERR_BLOCKED;
+    constexpr auto const NOMEM = Code::IOERR_NOMEM;
+    constexpr auto const ACCESS = Code::IOERR_ACCESS;
+    constexpr auto const CHECKRESERVEDLOCK = Code::IOERR_CHECKRESERVEDLOCK;
+    constexpr auto const LOCK = Code::IOERR_LOCK;
+    constexpr auto const CLOSE = Code::IOERR_CLOSE;
+    constexpr auto const DIR_CLOSE = Code::IOERR_DIR_CLOSE;
+    constexpr auto const SHMOPEN = Code::IOERR_SHMOPEN;
+    constexpr auto const SHMSIZE = Code::IOERR_SHMSIZE;
+    constexpr auto const SHMLOCK = Code::IOERR_SHMLOCK;
+    constexpr auto const SHMMAP = Code::IOERR_SHMMAP;
+    constexpr auto const SEEK = Code::IOERR_SEEK;
+    constexpr auto const DELETE_NOENT = Code::IOERR_DELETE_NOENT;
+    constexpr auto const MMAP = Code::IOERR_MMAP;
+    constexpr auto const GETTEMPPATH = Code::IOERR_GETTEMPPATH;
+    constexpr auto const CONVPATH = Code::IOERR_CONVPATH;
+  }
+  namespace locked {
+    constexpr auto const SHAREDCACHE = Code::LOCKED_SHAREDCACHE;
+  }
+  namespace busy {
+    constexpr auto const RECOVERY = Code::BUSY_RECOVERY;
+    constexpr auto const SNAPSHOT = Code::BUSY_SNAPSHOT;
+  }
+  namespace cantopen {
+    constexpr auto const NOTEMPDIR = Code::CANTOPEN_NOTEMPDIR;
+    constexpr auto const ISDIR = Code::CANTOPEN_ISDIR;
+    constexpr auto const FULLPATH = Code::CANTOPEN_FULLPATH;
+    constexpr auto const CONVPATH = Code::CANTOPEN_CONVPATH;
+  }
+  namespace corrupt {
+    constexpr auto const VTAB = Code::CORRUPT_VTAB;
+  }
+  namespace readonly {
+    constexpr auto const RECOVERY = Code::READONLY_RECOVERY;
+    constexpr auto const CANTLOCK = Code::READONLY_CANTLOCK;
+    constexpr auto const ROLLBACK = Code::READONLY_ROLLBACK;
+    constexpr auto const DBMOVED = Code::READONLY_DBMOVED;
+  }
+  namespace abort {
+    constexpr auto const ROLLBACK = Code::ABORT_ROLLBACK;
+  }
+  namespace constraint {
+    constexpr auto const CHECK = Code::CONSTRAINT_CHECK;
+    constexpr auto const COMMITHOOK = Code::CONSTRAINT_COMMITHOOK;
+    constexpr auto const FOREIGNKEY = Code::CONSTRAINT_FOREIGNKEY;
+    constexpr auto const FUNCTION = Code::CONSTRAINT_FUNCTION;
+    constexpr auto const NOTNULL = Code::CONSTRAINT_NOTNULL;
+    constexpr auto const PRIMARYKEY = Code::CONSTRAINT_PRIMARYKEY;
+    constexpr auto const TRIGGER = Code::CONSTRAINT_TRIGGER;
+    constexpr auto const UNIQUE = Code::CONSTRAINT_UNIQUE;
+    constexpr auto const VTAB = Code::CONSTRAINT_VTAB;
+    constexpr auto const ROWID = Code::CONSTRAINT_ROWID;
+  }
+  namespace notice::recover {
+    constexpr auto const WAL = Code::NOTICE_RECOVER_WAL;
+    constexpr auto const ROLLBACK = Code::NOTICE_RECOVER_ROLLBACK;
+  }
+  namespace warning {
+    constexpr auto const AUTOINDEX = Code::WARNING_AUTOINDEX;
+  }
+}
+#endiv
+#divert <ipp>
+auto sqlite::status::ok(Code c) -> bool {
+  return Code::OK == c;
+}
+
+auto sqlite::status::failure(Code c) -> bool {
+  return !ok(c) && !done(c);
+}
+
+auto sqlite::status::okdone(Code c) -> bool {
+  return Code::OK == c || Code::DONE == c;
+}
+
+auto sqlite::status::ok_if_done(Code c) -> Code {
+  return Code::DONE == c ? Code::OK : c;
+}
+
+auto sqlite::status::row(Code c) -> bool {
+  return Code::ROW == c;
+}
+
+auto sqlite::status::done(Code c) -> bool {
+  return Code::DONE == c;
+}
+
+auto sqlite::status::check(Code c) -> void {
+  // What else can we say here, but "failed"?
+  check(c, "failed");
+}
+
+#import sqlite.exception.Status
+auto sqlite::status::check(Code c, std::string const &explanation) -> void {
+  if (!ok(c) && !done(c)) {
+    throw exception::Status(c, explanation);
+  }
+}
+
+auto sqlite::status::max(Code a, Code b) -> Code {
+  return (int)(a) > (int)(b) ? a : b;
+}
+
+auto sqlite::status::min(Code a, Code b) -> Code {
+  return (int)(a) < (int)(b) ? a : b;
+}
+#endiv

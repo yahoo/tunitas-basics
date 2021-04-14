@@ -1,0 +1,60 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace want {
+  template<typename CONTAINER> class append_iterator;
+}
+#endiv
+#divert <hpp>
+#import std.iterator
+#import std.iterator_traits
+#import std.output_iterator_tag
+template<typename CONTAINER> class want::append_iterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
+  using ancestor = std::iterator<std::output_iterator_tag, void, void, void, void>;
+public:
+  using container_type = CONTAINER;
+  using iterator = typename container_type::iterator;
+  using value_type = typename std::iterator_traits<iterator>::value_type;
+  inline explicit append_iterator(container_type &);
+  template<typename VALUE> inline auto operator=(VALUE const &) -> append_iterator &;
+  template<typename VALUE> inline auto operator=(VALUE &&) -> append_iterator &;
+  inline auto operator*() -> append_iterator &;
+  inline auto operator++() -> append_iterator &;
+  inline auto operator++(int) -> append_iterator &;
+protected:
+  container_type &subject;
+};
+#endiv
+#divert <ipp>
+template<typename CONTAINER> want::append_iterator<CONTAINER>::append_iterator(container_type &arg_subject)
+  : ancestor()
+  , subject(arg_subject) {
+}
+
+#import std.forward
+template<typename CONTAINER> template<typename VALUE> auto want::append_iterator<CONTAINER>::operator=(VALUE &&anon) -> append_iterator & {
+  subject.append(std::forward<container_type>(anon));
+  return *this;
+}
+
+template<typename CONTAINER> template<typename VALUE> auto want::append_iterator<CONTAINER>::operator=(VALUE const &more) -> append_iterator & {
+  subject.append(more);
+  return *this;
+}
+
+template<typename CONTAINER> auto want::append_iterator<CONTAINER>::operator*() -> append_iterator & {
+  return *this;
+}
+
+template<typename CONTAINER> auto want::append_iterator<CONTAINER>::operator++() -> append_iterator & {
+  return *this;
+}
+
+template<typename CONTAINER> auto want::append_iterator<CONTAINER>::operator++(int) -> append_iterator & {
+  return *this;
+}
+#endiv

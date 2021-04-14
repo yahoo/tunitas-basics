@@ -1,0 +1,5 @@
+tests_unit_slurp_named_directory_TESTS = \
+  tests/unit/slurp/named/directory/all.test \
+  tests/unit/slurp/named/directory/Result.test \
+  tests/unit/slurp/named/directory/Result_syscall.test \
+  $(end)

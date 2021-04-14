@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time // the matryoshka of the enclosing namespace
+#endiv
+#divert <hpp>
+// Just the "unix" data types
+// require clock
+// require time
+// require gettimeofday
+#include <time.h>
+#include <sys/time.h>
+
+namespace sys {
+  namespace time {
+    namespace unix {
+      using ::clock;
+      using ::time;
+      using ::gettimeofday;
+      using ::gmtime_r;
+      using ::localtime_r;
+      using ::timegm;
+      using ::strftime;
+      using ::strptime;
+    }
+  }
+}
+#endiv

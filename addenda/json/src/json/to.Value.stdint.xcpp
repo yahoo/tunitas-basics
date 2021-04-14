@@ -1,0 +1,60 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.Value
+#import json.to.Value.ARGUMENT
+namespace json {
+  //
+  // NASTY!    the constructors for json::Value do not support all three large integer rypes
+  //
+  //     32-bit  -> Int, Uint        'int'
+  //     64-bit  -> Int64, Uint64    'int long long'
+  //
+  // Yet on 64-bit machines
+  //     std::int64_t is 'int signed long'
+  //     std::uint64_t is 'int unsigned long'
+  //
+  // To Wit:
+  //
+  //     Value(Int value);
+  //     Value(UInt value);
+  //     #if defined(JSON_HAS_INT64)
+  //     Value(Int64 value);
+  //     Value(UInt64 value);
+  //     #endif // if defined(JSON_HAS_INT64)
+  //
+  // So without reference to the typedef systems, we remediate, we provide all three levels here.
+  // There is no need for 'int short' variants because they are unambiguously promoted to 'int'
+  //
+  inline auto to(VALUE, int signed) -> Value;
+  inline auto to(VALUE, int unsigned) -> Value;
+  inline auto to(VALUE, int long signed) -> Value;
+  inline auto to(VALUE, int long unsigned) -> Value;
+  inline auto to(VALUE, int long long signed) -> Value;
+  inline auto to(VALUE, int long long unsigned) -> Value;
+}
+#endiv
+#divert <ipp>
+auto json::to(VALUE, int signed source) -> Value {
+  return json::Value((Json::Int)source);
+}
+
+auto json::to(VALUE, int unsigned source) -> Value {
+  return json::Value((Json::UInt)source);
+}
+
+auto json::to(VALUE, int long signed source) -> Value {
+  return json::Value((Json::Int64)source);
+}
+
+auto json::to(VALUE, int long unsigned source) -> Value {
+  return json::Value((Json::UInt64)source);
+}
+
+auto json::to(VALUE, int long long signed source) -> Value {
+  return json::Value((Json::Int64)source);
+}
+
+auto json::to(VALUE, int long long unsigned source) -> Value {
+  return json::Value((Json::UInt64)source);
+}
+#endiv

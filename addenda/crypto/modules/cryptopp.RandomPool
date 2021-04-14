@@ -1,0 +1,4 @@
+// -*- c++ -*- 9d47721d-f83e-439a-829b-1f8ddeee43cb
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/randpool.h>

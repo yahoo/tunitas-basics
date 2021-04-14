@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.make_tuple
+#import std.forward
+#import ish.tuple.Bundle
+namespace ish::tuple {
+  template<typename... TYPES> inline constexpr auto make(TYPES &&...values) -> decltype(std::make_tuple(std::forward<TYPES>(values)...));
+}
+
+template<typename... TYPES> constexpr auto ish::tuple::make(TYPES &&...values) -> decltype(std::make_tuple(std::forward<TYPES>(values)...)) {
+  return std::make_tuple(std::forward<TYPES>(values)...);
+}
+#endiv

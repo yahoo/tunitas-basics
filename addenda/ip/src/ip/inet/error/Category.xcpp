@@ -1,0 +1,84 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip::inet::error {
+  //
+  // The network error category
+  //
+  // Usage:
+  //
+  //   auto const &c = network_category();
+  //   c.name();
+  //   c.message(99);
+  //
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import ip.inet.error.network_category
+#import std.error_category
+#import std.error_condition
+#import std.string
+class ip::inet::error::Category : public std::error_category {
+  using Ancestor = std::error_category;
+public:
+  auto name() const noexcept -> char const * override final;
+  auto default_error_condition(int code_value) const noexcept  -> std::error_condition override final;
+  auto equivalent(std::error_code const &, int condition_value) const noexcept -> bool override final;
+  auto message(int code_value) const -> std::string override final;
+private:
+  // reminder ... the (negated) eai error and the errno are packed into a 32-bit 'int'
+  static_assert(32 <= 8*sizeof (int), "not a 32-bit architecture!");
+  friend auto error::network_category() -> Category const &;
+  Category() = default;
+  Category(Category const &) = delete;
+  auto operator=(Category const &) -> Category & = delete;
+};
+#endiv
+#divert <cpp>
+auto ip::inet::error::Category::name() const noexcept -> char const * {
+  // Reminder: the EAI and system (errno) codes share single (32-bit?) int.
+  return "eai+sys";
+}
+
+#import ip.inet.error.Code
+#import ip.inet.error.Condition
+auto ip::inet::error::Category::default_error_condition(int code_value) const noexcept -> std::error_condition {
+  Code code(code_value);
+  Condition condition = eai(code);
+  return std::error_condition(condition);
+}
+
+#import ip.inet.error.Condition
+auto ip::inet::error::Category::equivalent(std::error_code const &lhs_code, int rhs_condition_value) const noexcept -> bool {
+  if (*this != lhs_code.category()) {
+    return false;
+  }
+  auto lhs_code_value = lhs_code.value();
+  auto lhs_condition = default_error_condition(lhs_code_value);
+  auto lhs_condition_value = lhs_condition.value();
+  Condition lhs = Condition(lhs_condition_value);
+  Condition rhs = Condition(rhs_condition_value);
+  return lhs == rhs;
+}
+
+#import ip.inet.EAI.Code
+#import ip.inet.error.Code
+#import std.error_code
+#import std.system_category
+#import sys.error.e.Code
+#import gai_strerror
+auto ip::inet::error::Category::message(int code_value) const -> std::string {
+  Code code(code_value);
+  auto e = eai(code);
+  auto s = sys(code);
+  if (EAI::SYSTEM == e) {
+    int si = (int) s;
+    std::error_code ec(si, std::system_category());
+    return ec.message();
+  } else {
+    int ei = (int)(e);
+    return ::gai_strerror(ei);
+  }
+}
+#endiv

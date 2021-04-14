@@ -1,0 +1,200 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip {
+  namespace inet  {
+    namespace NI {
+      // A bitmask of the (singular) flag::Feature
+      // Constructed with operators and casts
+      enum class Features { NONE = 0 };
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import ip.inet.NI.Features
+#import ip.inet.NI.flag.Feature
+namespace ip {
+  namespace inet  {
+    namespace NI {
+      inline constexpr auto operator+(Features) -> Features;
+      namespace flag {
+        // So that ADL will find it
+        inline constexpr auto operator+(Feature) -> Features;
+      }
+
+      // composition
+      inline constexpr auto operator|(Features, Features) -> Features;
+      inline constexpr auto operator|(flag::Feature, Features) -> Features;
+      inline constexpr auto operator|(Features, flag::Feature) -> Features;
+      namespace flag {
+        // So that ADL will find it
+        constexpr auto operator|(Feature, Feature) -> Features;
+      }
+      inline auto operator|=(Features &, Features) -> Features &;
+      inline auto operator|=(Features &, flag::Feature) -> Features &;
+
+      // extraction
+      inline constexpr auto operator&(Features, Features) -> Features;
+      inline constexpr auto operator&(flag::Feature, Features) -> Features;
+      inline constexpr auto operator&(Features, flag::Feature) -> Features;
+      namespace flag {
+        // So that ADL will find it
+        constexpr auto operator&(Feature, Feature) -> Features;
+      }
+      inline auto operator&=(Features &, Features) -> Features &;
+      inline auto operator&=(Features &, flag::Feature) -> Features &;
+
+      // inversion
+      inline constexpr auto operator~(Features) -> Features;
+      namespace flag {
+        // So that ADL will find it
+        constexpr auto operator~(Feature) -> Features;
+      }
+
+      inline constexpr auto contains(Features, Features) -> bool;
+      inline constexpr auto contains(Features, flag::Feature) -> bool;
+
+      // see as<...>(...)
+
+      // test whether it contains a single value (any value)
+      auto is_flag(Features) -> bool;
+      using flag::is_flag;
+    }
+  }
+}
+
+constexpr auto ip::inet::NI::operator+(Features s) -> Features {
+  return s;
+}
+
+constexpr auto ip::inet::NI::flag::operator+(Feature f) -> Features {
+  return Features((int)(f));
+}
+
+constexpr auto ip::inet::NI::operator|(Features a, Features b) -> Features {
+  return Features((int)(a) | (int)(b));
+}
+
+constexpr auto ip::inet::NI::operator|(Features a, flag::Feature b) -> Features {
+  return Features((int)(a) | (int)(b));
+}
+
+constexpr auto ip::inet::NI::operator|(flag::Feature a, Features b) -> Features {
+  return Features((int)(a) | (int)(b));
+}
+
+constexpr auto ip::inet::NI::flag::operator|(Feature a, Feature b) -> Features {
+  return Features((int)(a) | (int)(b));
+}
+
+constexpr auto ip::inet::NI::operator&(Features a, Features b) -> Features {
+  return Features((int)(a) & (int)(b));
+}
+
+constexpr auto ip::inet::NI::operator&(Features a, flag::Feature b) -> Features {
+  return Features((int)(a) & (int)(b));
+}
+
+constexpr auto ip::inet::NI::operator&(flag::Feature a, Features b) -> Features {
+  return Features((int)(a) & (int)(b));
+}
+
+constexpr auto ip::inet::NI::flag::operator&(Feature a, Feature b) -> Features {
+  return Features((int)(a) & (int)(b));
+}
+
+
+constexpr auto ip::inet::NI::contains(Features s, Features f) -> bool {
+  return f == (f & s);
+}
+
+constexpr auto ip::inet::NI::contains(Features s, flag::Feature u) -> bool {
+  return (Features)u == (u & s);
+}
+
+namespace ip {
+  namespace inet {
+    namespace NI {
+      // For convenience, they are exposed as constants
+      constexpr auto const NONE                     = +flag::NONE;
+      constexpr auto const NAMEREQD                 = +flag::NAMEREQD;
+      constexpr auto const DGRAM                    = +flag::DGRAM;
+      constexpr auto const NOFQDN                   = +flag::NOFQDN;
+      constexpr auto const NUMERICHOST              = +flag::NUMERICHOST;
+      constexpr auto const NUMERICSERV              = +flag::NUMERICSERV;
+      constexpr auto const IDN                      = +flag::IDN;
+      constexpr auto const IDN_ALLOW_UNASSIGNED     = +flag::IDN_ALLOW_UNASSIGNED;
+      constexpr auto const IDN_USE_STD3_ASCII_RULES = +flag::IDN_USE_STD3_ASCII_RULES;
+      namespace no {
+        constexpr auto const Features = NI::Features();
+      }
+      namespace all {
+#ifdef __glibc_macro_warning // [[FIXTHIS]] ugly ... netdb.h uses GCC CPP warning messages from cdefs.h
+#define __glibc_macro_warning_restore__
+#undef __glibc_macro_warning
+#define __glibc_macro_warning(msg)
+#endif
+        constexpr auto const Features = (NI_NAMEREQD |
+                                         NI_DGRAM |
+                                         NI_NOFQDN |
+                                         NI_NUMERICHOST |
+                                         NI_NUMERICSERV |
+                                         NI_IDN |
+                                         NI_IDN_ALLOW_UNASSIGNED |
+                                         NI_IDN_USE_STD3_ASCII_RULES);
+#ifdef __glibc_macro_warning_restore__
+#undef __glibc_macro_warning_restore__
+#undef  __glibc_macro_warning
+#define __glibc_macro_warning(message) __glibc_macro_warning1 (GCC warning message)
+#endif
+      }
+    }
+  }
+}
+
+constexpr auto ip::inet::NI::operator~(Features s) -> Features {
+  return Features(all::Features & ~(int)s);
+}
+
+constexpr auto ip::inet::NI::flag::operator~(Feature f) -> Features {
+  return Features(all::Features & ~(int)(f));
+}
+#endiv
+#divert <ipp>
+auto ip::inet::NI::operator|=(Features &lhs, Features rhs) -> Features & {
+  lhs = lhs | rhs;
+  return lhs;
+}
+
+auto ip::inet::NI::operator|=(Features &lhs, flag::Feature rhs) -> Features & {
+  lhs = lhs | rhs;
+  return lhs;
+}
+
+auto ip::inet::NI::operator&=(Features &lhs, Features rhs) -> Features & {
+  lhs = lhs & rhs;
+  return lhs;
+}
+
+auto ip::inet::NI::operator&=(Features &lhs, flag::Feature rhs) -> Features & {
+  lhs = lhs & rhs;
+  return lhs;
+}
+#endiv
+#divert <cpp>
+auto ip::inet::NI::is_flag(Features s) -> bool {
+  unsigned count = 0;
+  for (unsigned i(0), e(sizeof (Features)); e != i; ++i) {
+    Features mask = (Features)(1<<i);
+    if (s == (mask & s)) {
+      count++;     
+    }
+    if (1 < count) {
+      return false;
+    }
+  }
+  // exactly one bit was on.
+  return 1 == count;
+}
+#endiv

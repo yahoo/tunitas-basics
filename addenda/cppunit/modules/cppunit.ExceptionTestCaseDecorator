@@ -1,0 +1,6 @@
+// -*- c++ -*- 7e0007f1-c81e-4d55-9b50-c17e4c554f3b
+#pragma once
+#include <cppunit/extensions/ExceptionTestCaseDecorator.h>
+namespace cppunit {
+  using CppUnit::ExceptionTestCaseDecorator;
+}

@@ -1,0 +1,3 @@
+// -*- c++ -*- ac5836f7-cda2-463d-9209-86dbf3da01b3
+#pragma once
+#include "mysql++/sql_buffer.h"

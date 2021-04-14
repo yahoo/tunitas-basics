@@ -1,0 +1,5 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 1
+set -e
+${exe?} .
+${exe?} $(pwd)

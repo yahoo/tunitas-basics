@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd
+namespace tests::unit::nonstd::half {
+  namespace fixture {
+    class Fixture;
+    namespace library = ::nonstd;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.float16_t
+#import nonstd.float32_t
+#import nonstd.float64_t
+#import tests.unit.nonstd.float16.Palette
+namespace tests::unit::nonstd::half {
+  struct fixture::Fixture : public cppunit::test::Fixture, private float16::Palette {
+    template<typename FLOATING> auto test_half_cast() -> void;
+    static auto suite() -> cppunit::Test *;
+  };
+  namespace fixture {
+    template<> auto Fixture::test_half_cast<library::float16_t>() -> void;
+    template<> auto Fixture::test_half_cast<library::float32_t>() -> void;
+    template<> auto Fixture::test_half_cast<library::float64_t>() -> void;
+  }
+}
+#endiv
+#divert <ipp>
+#import nonstd.floats
+#import nonstd.float16.half_cast
+namespace tests::unit::nonstd::half::fixture {
+  using namespace library::floats;
+  using library::float16::half_cast;
+}
+#endiv
+#divert <cpp>
+#import nonstd.floats
+namespace tests::unit::nonstd::half::fixture {
+  template<> auto Fixture::test_half_cast<float16_t>() -> void {
+    float16_t const specimen(65535);
+    auto h1 = half_cast<float16_t>(specimen);
+    auto h2 = half_cast<float32_t>(specimen);
+    auto h3 = half_cast<float64_t>(specimen);
+    auto h123 = h1 + h2 + h3;
+    auto rel = h123/(3*specimen);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, rel, SMIDGEN);
+  }
+  template<> auto Fixture::test_half_cast<float32_t>() -> void {
+    float32_t const specimen(65535);
+    auto h1 = half_cast<float16_t>(specimen);
+    auto h2 = half_cast<float16_t>(specimen);
+    auto h3 = half_cast<float16_t>(specimen);
+    auto h123 = h1 + h2 + h3;
+    auto rel = h123/(3*specimen);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, rel, SMIDGEN);
+  }
+  template<> auto Fixture::test_half_cast<float64_t>() -> void {
+    float64_t const specimen(65535);
+    auto h1 = half_cast<float16_t>(specimen);
+    auto h2 = half_cast<float16_t>(specimen);
+    auto h3 = half_cast<float16_t>(specimen);
+    auto h123 = h1 + h2 + h3;
+    auto rel = h123/(3*specimen);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, rel, SMIDGEN);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::nonstd::half::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using rigging::suite::move; // because we have an occluding 'namespace move'
+  auto series = Stream{"half"};
+  series << []() {
+              auto hc = Stream{"cast"};
+              hc << call("float16_t", &Fixture::test_half_cast<library::float16_t>)
+                 << call("float32_t", &Fixture::test_half_cast<library::float32_t>)
+                 << call("float64_t", &Fixture::test_half_cast<library::float64_t>)
+                 << END;
+              return move(hc);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

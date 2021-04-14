@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.s.Bit
+#import sys.s.Bits
+#import std.is_same
+namespace sys::s::required {
+  //
+  // Either the singleton or the (bitset) flags variant of s::Bits
+  // Normally you'd use overloading to express this.
+  // But when overloading on the return type, a template must be used.
+  //
+  // Usage:
+  //
+  //   template<required::Bits RESULT> inline auto function(...somehow...) -> RESULT;
+  //
+  template<typename BITS> concept bool Bits = std::is_same_v<BITS, s::Bits> || std::is_same_v<BITS, s::Bit>;
+}
+#endiv

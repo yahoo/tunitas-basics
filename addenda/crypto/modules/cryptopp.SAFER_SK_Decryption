@@ -1,0 +1,4 @@
+// -*- c++ -*- 00dab393-249d-48aa-8579-20eac3d7c31d
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/safer.h>

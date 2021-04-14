@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::dn { class Notify; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import sys.dn.Notify
+class tests::unit::dn::Notify : public cppunit::test::Fixture {
+public:
+  using Subject = ::sys::dn::Notify;
+  auto test_literals() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::dn {
+  auto Notify::test_literals() -> void {
+    Subject d;
+    d = Subject::ACCESS;
+    d = Subject::MODIFY;
+    d = Subject::CREATE;
+    d = Subject::DELETE;
+    d = Subject::RENAME;
+    d = Subject::ATTRIBUTE;
+    d = Subject::ATTRIB;
+    d = Subject::MULTISHOT;
+    CPPUNIT_ASSERT(d != Subject::ACCESS);
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::dn {
+  auto Notify::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    Stream series{"Notify"};
+    series << call("literals", &Notify::test_literals)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

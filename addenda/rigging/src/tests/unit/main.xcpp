@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import unit.rigging.Exit
+#import unit.rigging.exit.constants
+#import unit.rigging.test.Bench
+#import unit.rigging.exit.constants
+
+#import std.string
+#import std.clog
+#import std.out_of_range
+#import std.exception
+#import std.distance
+#import std.ostream
+
+#import tests.unit.Buffer
+#import tests.unit.Exit
+#import tests.unit.Lhs
+#import tests.unit.Map
+#import tests.unit.Stringz
+#import tests.unit.Arabesque
+#import tests.unit.bench.Fixture
+#import tests.unit.suite.Fixture
+#import tests.unit.test.Fixture
+#import tests.unit.want.Fixture
+
+namespace ur = unit::rigging;
+namespace urt = ur::test;
+namespace ex = ur::exit;
+
+namespace {
+  auto emit_usage(std::ostream &) -> void;
+}
+
+auto main(int argc, char **argv) -> int {
+  try {
+    std::string test_name;
+    if (1 == argc) {
+      test_name = "";
+    } else if (2 == argc) {
+      test_name = argv[1];
+    } else {
+      std::cerr << "Error: only a single test name can be indicated\n";
+      throw ex::USAGE;
+    }
+
+    urt::Bench bench(std::clog);
+    bench.addTest(tests::unit::Arabesque::suite());
+    bench.addTest(tests::unit::bench::Fixture::suite());
+    bench.addTest(tests::unit::Buffer::suite());
+    bench.addTest(tests::unit::Exit::suite());
+    bench.addTest(tests::unit::Lhs::suite());
+    bench.addTest(tests::unit::Map::suite());
+    bench.addTest(tests::unit::Stringz::suite());
+    bench.addTest(tests::unit::test::Fixture::suite());
+    bench.addTest(tests::unit::suite::Fixture::suite());
+    bench.addTest(tests::unit::want::Fixture::suite());
+
+    ur::Exit exit;
+    exit &= bench.run(test_name);
+    std::clog << exit << '\n';
+    return exit;
+  } catch (unit::rigging::Exit const &exit) {
+    // This was expected
+    if (ex::USAGE == exit) {
+      emit_usage(std::clog);
+    }
+    return exit;
+  } catch (std::exception const &e) {
+    // This was not expected
+    std::cerr << "Error: " << e.what() << '\n';
+    return ex::SOFTWARE;
+  }
+}
+
+namespace {
+
+  auto emit_usage(std::ostream &out) -> void {
+    out << ("usage: unit [ test_name ]\n"
+            "\n"
+            "... if no arguments is indicated then all tests are run\n");
+  }
+
+}
+#endiv

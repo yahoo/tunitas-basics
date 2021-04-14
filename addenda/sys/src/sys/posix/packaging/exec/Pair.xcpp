@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix::packaging::exec {
+  template<typename DECLARED> class Pair;
+}
+#endiv
+#divert <hpp>
+#import std.function
+#import std.pair
+// Capture, pariwise, the 'execl' and 'execlp'
+// See the constants defined out in the namespace.xcpp
+template<typename DECLARED> class sys::posix::packaging::exec::Pair : public std::pair<DECLARED *, DECLARED *> {
+  using ancestor = std::pair<DECLARED *, DECLARED *>;
+public:
+  using declared_type = DECLARED;
+  using call_type = declared_type *;
+  inline constexpr Pair(call_type path, call_type file);
+  inline auto exec() const -> call_type;
+  inline auto execp() const -> call_type;
+protected:
+  // throws if the call is null
+  inline static auto validate(call_type) -> void;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+
+template<typename DECLARED> constexpr sys::posix::packaging::exec::Pair<DECLARED>::Pair(call_type the_path, call_type the_file)
+  : ancestor(the_path, the_file) {
+  ;
+}
+
+#endiv
+#divert <ipp>
+template<typename DECLARED> auto sys::posix::packaging::exec::Pair<DECLARED>::exec() const -> call_type {
+  validate(ancestor::first);
+  return ancestor::first;
+}
+
+template<typename DECLARED> auto sys::posix::packaging::exec::Pair<DECLARED>::execp() const -> call_type {
+  validate(ancestor::first);
+  return ancestor::second;
+}
+
+#import std.logic_error
+template<typename DECLARED> auto sys::posix::packaging::exec::Pair<DECLARED>::validate(call_type call) -> void {
+  if (nullptr == call) {
+    throw std::logic_error("null exec function");
+  }
+}
+#endiv
+

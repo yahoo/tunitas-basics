@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.getenv.interface
+namespace sys::posix {
+  // 
+  // Whereas secure_getenv(3) is a GNU extension, offering basically the same interface,
+  // getenv(3) conforming, as stated in getenv(3) to SVr4, POSIX.1-2001, 4.3BSD, C89, C99.
+  //
+  namespace packaging::getenv {
+    using namespace packaging::getenv::interface;
+    namespace function {
+      inline auto getenv(Name) -> Result<std::string>;
+      template<required::Stringz RESULT> inline auto getenv(Name) -> Result<RESULT>;
+    }
+  }
+  using packaging::getenv::function::getenv;
+}
+// DO NOT ---> using sys::posix::getenv; <--- DO NOT (become ambiguous with the POSIX C API)
+#endiv
+#divert <ipp>
+#import getenv
+#import sys.posix.packaging.getenv.perform
+namespace sys::posix::packaging::getenv {
+  auto function::getenv(Name name) -> Result<std::string>                               { return perform<std::string>(name, ::getenv); }
+  template<required::Stringz RESULT> auto function::getenv(Name name) -> Result<RESULT> { return perform<RESULT>(name, ::getenv); }
+}
+#endiv

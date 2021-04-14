@@ -1,0 +1,152 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::as {
+  class Stringn;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.as.Palette
+class tests::unit::c::as::Stringn : public cppunit::test::Fixture, Palette<STRING> { 
+public: 
+  Stringn() = default;
+
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+public:
+  auto test_stringn_from_array_char() -> void;
+  auto test_stringn_from_basic_string() -> void;
+  auto test_stringn_from_basic_stringn_consty() -> void;
+  auto test_stringn_from_basic_stringn_muting() -> void;
+  auto test_stringn_from_basic_stringz_consty() -> void;
+  auto test_stringn_from_basic_stringz_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import c.as
+#import c.stringz
+#import c.const_stringz
+#import c.stringn
+#import c.const_stringn
+
+
+auto tests::unit::c::as::Stringn::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::as::Stringn::tearDown() -> void {
+  Palette::tearDown();
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_array_char() -> void {
+  // This will copy the ::std::array<...>::size() exactly, so use prove_is_same (not prove_is_same_MOSTLY)
+  ::c::stringn sn = ::c::as<::c::stringn>(ac);
+  CPPUNIT_ASSERT_EQUAL(sn.size()+1, ac.size());
+  prove_is_same_MOSTLY(sn, ac);
+  // This will copy the ::std::array<...>::size() exactly, but the size will be off by one to account for the final '\0'
+  ::c::const_stringn csn = ::c::as<::c::const_stringn>(ac);
+  CPPUNIT_ASSERT_EQUAL(csn.size()+1, ac.size());
+  prove_is_same_MOSTLY(csn, ac);
+  prove_is_same(csn, sn);
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_basic_string() -> void {
+  //
+  // Interface:
+  //   template<typename RESULT, typename CHAR> auto as(basic_string<CHAR> const &) -> RESULT;
+  //
+  // Concept:
+  //   as<basic_stringn<char const>>(basic_string<char>)
+  //
+  using consty_type = ::c::basic_stringz<char const>; // <-------- consty
+  consty_type again = ::c::as<consty_type>(bsc); // <--- identity
+  prove_is_same(again, bsc);
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_basic_stringn_consty() -> void {
+  //
+  // Interface:
+  //   template<typename RESULT, typename CHAR> auto as(basic_stringn<CHAR const> const &) -> RESULT;
+  //   template<typename RESULT, typename CHAR> auto as(basic_stringn<CHAR> const &) -> RESULT;
+  //
+  // Concept:
+  //   as<basic_stringn<char const>>(basic_stringn<char>) ..... cast to const
+  //   as<basic_stringn<char>>(basic_stringn<char>) ........... identity transform
+  //
+  using consty_type = ::c::basic_stringn<char const>; // <-------- consty
+  {
+    consty_type again = ::c::as<consty_type>(bsncc); // <--- identity (consty->consty)
+    prove_is_same(bsc, bsncc);
+    prove_is_same(again, bsncc);
+    prove_is_same(again, bsc);
+  } {
+    consty_type again = ::c::as<consty_type>(bsnc); // <--- identity (muting->consty)
+    prove_is_same(bsc, bsncc);
+    prove_is_same(again, bsncc);
+    prove_is_same(again, bsc);
+  }
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_basic_stringn_muting() -> void {
+  using muting_type = ::c::basic_stringn<char>; // <-------------- muting
+  muting_type again = ::c::as<muting_type>(bsnc); // <--- identity (muting->muting)
+  prove_is_same(bsc, bszc);
+  prove_is_same(again, bszc);
+  prove_is_same(again, bsc);
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_basic_stringz_consty() -> void {
+  //
+  // Interface:
+  //   template<typename RESULT, typename CHAR> auto as(basic_stringz<CHAR const> const &) -> RESULT;
+  //   template<typename RESULT, typename CHAR> auto as(basic_stringz<CHAR> const &) -> RESULT;
+  //
+  // Concept:
+  //   as<basic_stringn<char const>>(basic_stringz<char>) ..... cast to const
+  //   as<basic_stringn<char>>(basic_stringz<char>) ........... identity transform
+  //
+  using consty_type = ::c::basic_stringn<char const>; // <-------- consty
+  {
+    consty_type again = ::c::as<consty_type>(bszcc); // <--- identity (consty->consty)
+    prove_is_same(bsc, bszcc);
+    prove_is_same(again, bszcc);
+    prove_is_same(again, bsc);
+  } {
+    consty_type again = ::c::as<consty_type>(bszc); // <--- identity (muting->consty)
+    prove_is_same(bsc, bszcc);
+    prove_is_same(again, bszcc);
+    prove_is_same(again, bsc);
+  }
+}
+
+auto tests::unit::c::as::Stringn::test_stringn_from_basic_stringz_muting() -> void {
+  using muting_type = ::c::basic_stringn<char>; // <-------------- muting
+  muting_type again = ::c::as<muting_type>(bszc); // <--- identity (muting->muting)
+  prove_is_same(bsc, bszc);
+  prove_is_same(again, bszc);
+  prove_is_same(again, bsc);
+}
+
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+auto tests::unit::c::as::Stringn::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("stringn");
+  series << call("stringz_from_array_char", &Stringn::test_stringn_from_array_char)
+         << call("stringz_from_basic_string", &Stringn::test_stringn_from_basic_string)
+         << call("stringz_from_basic_stringn_consty", &Stringn::test_stringn_from_basic_stringn_consty)
+         << call("stringz_from_basic_stringn_muting", &Stringn::test_stringn_from_basic_stringn_muting)
+         << call("stringz_from_basic_stringz_consty", &Stringn::test_stringn_from_basic_stringz_consty)
+         << call("stringz_from_basic_stringz_muting", &Stringn::test_stringn_from_basic_stringz_muting)
+    ;
+  return series.release();
+}
+#divert </cpp>

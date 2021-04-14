@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ish.cxx.detail.rest.Container
+namespace ish::cxx {
+  template<typename CONTAINER> inline auto rest(CONTAINER &) -> detail::rest::Container<CONTAINER>;
+}
+#endiv
+#divert <ipp>
+template<typename CONTAINER> auto ish::cxx::rest(CONTAINER &base) -> detail::rest::Container<CONTAINER> {
+  return detail::rest::Container<CONTAINER>(base);
+}
+#endiv
+

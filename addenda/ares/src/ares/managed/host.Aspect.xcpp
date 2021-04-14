@@ -1,0 +1,81 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.host.Names
+#forward ares.managed.host.Addresses
+#forward ares.managed.Host
+#import std.is_same
+namespace ares::managed::host {
+  //
+  // An aspect of a complete host
+  // just the Aliases as a list of QDN; e.g. fo reply::Record<NS> or reply::Record<PTR>
+  // just the Addresses as a list of ADDR4, ADDR6
+  //
+  // Usage: see reply::Record<NS>, reply::Record<PTR>
+  //
+  namespace allowed {
+    template<typename ASPECT> concept bool Aspect = (std::is_same<ASPECT, Names>::value ||
+                                                     std::is_same<ASPECT, Addresses<IN4>>::value ||
+                                                     std::is_same<ASPECT, Addresses<IN6>>::value);
+  }
+  //
+  // The default argument "works" when ASPECT is Address<IN4> or Address<IN6>
+  // The default argument does NOT work for Names; in that case you have to make up something.
+  //   A good choice is Host<IN6> ... becasue IN6 is nice.
+  //
+  template<allowed::Aspect ASPECT, typename HOST = Host<ASPECT::GENRE>> class Aspect;
+}
+#endiv
+#divert <hpp>
+#import ares.unmanaged.Host
+namespace ares::managed::host {
+  template<allowed::Aspect ASPECT> inline auto ancestor_extractor_constructor(unmanaged::Host const *) -> ASPECT = delete;
+  template<> inline auto ancestor_extractor_constructor<Names>(unmanaged::Host const *) -> Names;
+  template<> inline auto ancestor_extractor_constructor<Addresses<IN4>>(unmanaged::Host const *) -> Addresses<IN4>;
+  template<> inline auto ancestor_extractor_constructor<Addresses<IN6>>(unmanaged::Host const *) -> Addresses<IN6>;
+}
+#import std.is_default_constructible
+#import std.is_move_constructible
+#import std.is_move_assignable
+#import ares.managed.Host
+namespace ares::managed {
+  template<host::allowed::Aspect ASPECT, typename HOST> class host::Aspect : public ASPECT {
+    using ancestor = ASPECT;
+    using Unmanaged = unmanaged::Host;
+  public:
+    static_assert(std::is_default_constructible<ASPECT>::value);
+    Aspect() = default;
+    inline explicit Aspect(Unmanaged const *);
+    Aspect(Aspect const &) = delete;
+    auto operator=(Aspect const &) -> Aspect & = delete;
+    static_assert(std::is_move_constructible<ASPECT>::value);
+    static_assert(std::is_move_assignable<ASPECT>::value);
+    Aspect(Aspect &&) = default;
+    auto operator=(Aspect &&) -> Aspect & = default;
+  private:
+    HOST anchor; // the memory management anchor is here
+  };
+}
+#endiv
+#divert <ipp>
+#import ares.managed.host.Names
+#import ares.managed.host.Addresses
+namespace ares::managed {
+  template<> auto host::ancestor_extractor_constructor<host::Names>(unmanaged::Host const *un) -> Names {
+    return Names{un->h_name, un->h_aliases};
+  }
+  template<> auto host::ancestor_extractor_constructor<host::Addresses<IN4>>(unmanaged::Host const *un) -> Addresses<IN4> {
+    static_assert(std::is_same<int signed, decltype(un->h_length)>::value);
+    return Addresses<IN4>{(unsigned)un->h_length, un->h_addr_list};
+  }
+  template<> auto host::ancestor_extractor_constructor<host::Addresses<IN6>>(unmanaged::Host const *un) -> Addresses<IN6> {
+    return Addresses<IN6>{(unsigned)un->h_length, un->h_addr_list};
+  }
+}
+namespace ares::managed::host {
+  template<host::allowed::Aspect _, typename H> Aspect<_,H>::Aspect(Unmanaged const *un)
+    : ancestor{ancestor_extractor_constructor<ancestor>(un)}
+    , anchor{un}
+  { }
+}
+#endiv

@@ -1,0 +1,162 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::semver { class String; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import org.semver.String
+#import tests.unit.semver.Operations
+class tests::unit::semver::String : public cppunit::test::Fixture, public Operations {
+  using ancestor = cppunit::test::Fixture;
+public:
+  //
+  // This always tests the "latest" version
+  // Thus the reference to ::org::semver which is (inlined) ::org::semver::v2.
+  //
+  using Subject = ::org::semver::String;
+  auto setUp() -> void;
+  auto tearDown() -> void;
+  Subject one;
+  Subject two;
+  Subject three;
+  Subject four;
+  auto test_constructor_default() -> void;
+  auto test_constructor_initializer_list() -> void;
+  // Actually all the vector constructors work here .. and there are a lot of those
+  //
+  // REMINDER - this is String in org::semver::v2
+  //            so there are no accessor member functions majore(), minore(), patche()
+  //
+  auto test_operator_insert() -> void;
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+  auto test_operator_lt() -> void;
+  auto test_operator_le() -> void;
+  auto test_operator_gt() -> void;
+  auto test_operator_ge() -> void;
+  // pesky
+  auto test_lexicographic_prefixing() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.string_literals
+#import std.ostringstream
+using namespace std::string_literals;
+using namespace tests::unit::semver;
+auto String::setUp() -> void {
+  one = Subject{'\3', '\4', '\5'};
+  two = Subject{'\0', '\7', '\7'};
+  three = Subject{'\0', '\x8', '\x9'};
+  CPPUNIT_ASSERT(two < three); // this will be used later
+  four = one;
+}
+auto String::tearDown() -> void {
+  one.clear();
+  two.clear();
+  three.clear();
+  four.clear();
+}
+auto String::test_constructor_default() -> void {
+  Subject specimen;
+  CPPUNIT_ASSERT(0 == specimen.size());
+}
+auto String::test_constructor_initializer_list() -> void {
+  Subject specimen{'\x9','\x8', '\0'};
+  CPPUNIT_ASSERT(3 == specimen.size());
+  CPPUNIT_ASSERT(9 == specimen[0]);
+  CPPUNIT_ASSERT(8 == specimen[1]);
+  CPPUNIT_ASSERT(0 == specimen[2]);
+}
+#import std.ostringstream
+auto String::test_operator_insert() -> void {
+  Subject specimen{'\1','\2', '\0'};
+  std::ostringstream buf;
+  buf << specimen;
+  CPPUNIT_ASSERT("v1.2.0" == buf.str()); 
+}
+auto String::test_operator_eq() -> void {
+  CPPUNIT_ASSERT(  (one == one) );
+  CPPUNIT_ASSERT( !(one == two) );
+  CPPUNIT_ASSERT( !(one == three) );
+  CPPUNIT_ASSERT(  (one == four) );
+}
+auto String::test_operator_ne() -> void {
+  CPPUNIT_ASSERT( !(one != one) );
+  CPPUNIT_ASSERT(  (one != two) );
+  CPPUNIT_ASSERT(  (one != three) );
+  CPPUNIT_ASSERT( !(one != four) );
+}
+auto String::test_operator_lt() -> void {
+  CPPUNIT_ASSERT( !(one < one) );
+  CPPUNIT_ASSERT( !(two < two) );
+  CPPUNIT_ASSERT(  (two < three) );
+}
+auto String::test_operator_le() -> void {
+  CPPUNIT_ASSERT(  (one <= one) );
+  CPPUNIT_ASSERT(  (two <= two) );
+  CPPUNIT_ASSERT(  (two <= three) );
+  CPPUNIT_ASSERT( !(one <= three) );
+}
+auto String::test_operator_gt() -> void {
+  CPPUNIT_ASSERT( !(one > one) );
+  CPPUNIT_ASSERT( !(two > two) );
+  CPPUNIT_ASSERT( !(two > three) );
+}
+auto String::test_operator_ge() -> void {
+  CPPUNIT_ASSERT(  (one >= one) );
+  CPPUNIT_ASSERT(  (two >= two) );
+  CPPUNIT_ASSERT( !(two >= three) );
+}
+#import std.boolalpha
+#import std.cout
+auto String::test_lexicographic_prefixing() -> void {
+  std::cout << std::boolalpha
+            << "\ntwo=" << two
+            << "\nthree=" << three
+            << "\nlc(two, three) " << lc(two.begin(), two.end(), three.begin(), three.end())
+            << "\nlc(three, two) " << lc(three.begin(), three.end(), two.begin(), two.end())
+            << "\noperator== " << operator==(two, three)
+            << "\noperator!= " << operator!=(two, three)
+            << "\noperator<  " << operator<(two, three)
+            << "\noperator<= " << operator<=(two, three)
+            << "\noperator>  " << operator>(two, three)
+            << "\noperator>= " << operator>=(two, three)
+            << "\n";
+  CPPUNIT_ASSERT( (s(two) < s(three)) );
+  CPPUNIT_ASSERT( (two < three) );
+  CPPUNIT_ASSERT( (s(two) <= s(three)) );
+  CPPUNIT_ASSERT( (two <= three) );
+  CPPUNIT_ASSERT(s(two) != s(three));
+  CPPUNIT_ASSERT(two != three);
+  CPPUNIT_ASSERT( !(s(two) > s(three)) );
+  CPPUNIT_ASSERT( !(two > three) );
+  CPPUNIT_ASSERT( !(s(two) >= s(three)) );
+  CPPUNIT_ASSERT( !(two >= three) );
+}
+#import rigging.suite.io
+auto String::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("String");
+  {
+    Stream con("constructor");
+    con << call("default", &String::test_constructor_default)
+        << call("initializer", &String::test_constructor_initializer_list)
+      ;
+    series << move(con);
+  }
+  series << call("operator<<", &String::test_operator_insert)
+         << call("operator==", &String::test_operator_eq)
+         << call("operator!=", &String::test_operator_ne)
+         << call("operator<", &String::test_operator_lt)
+         << call("operator<=", &String::test_operator_le)
+         << call("operator>", &String::test_operator_gt)
+         << call("operator>=", &String::test_operator_ge)
+         << call("lexicographic-prefixing", &String::test_lexicographic_prefixing)
+    ;
+  return finalize(series);
+}
+#endiv

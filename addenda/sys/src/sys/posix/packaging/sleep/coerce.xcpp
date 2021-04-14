@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.required.Integer
+#import nonstd.required.Ratio
+#import sys.call.result.Value
+#import sys.posix.packaging.sleep.required.Coercible
+#import sys.posix.packaging.sleep.time // ....... time::Val, Spec, etc.
+#import sys.posix.packaging.sleep.duration // ... duration::Duration
+namespace sys::posix::packaging::sleep {
+  //
+  // Convenient coercion among all the durations in use here
+  //   time::Old
+  //   time::Val
+  //   time::Spec
+  //   duration::Duration<REP,RATIO> a.k.a. std::chrono::duration<REP,RATIO>
+  //
+  // Design:
+  //
+  //   auto coerce<OUT>(IN const &) -> OUT;
+  //
+  //   for OUT being a time::Duration<REP,RATIO> or wrapping thereof
+  //   for IN being among the various time representations { Old, Val, Spec, Duration<REP,RATIO> }  
+  //   
+  template<required::Coercible OUT, required::Integer REP, required::Ratio RATIO> inline auto coerce(duration::Duration<REP, RATIO> const &) -> OUT;
+  template<required::Coercible OUT>                                               inline auto coerce(time::Val const &) -> OUT;
+  template<required::Coercible OUT>                                               inline auto coerce(time::Spec const &) -> OUT;
+  template<required::Coercible OUT, required::Coercible IN>                       inline auto coerce(call::result::Value<IN> const &) -> call::result::Value<OUT>;
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging {
+  template<sleep::required::Coercible OUT, sleep::required::Coercible IN> auto sleep::coerce(call::result::Value<IN> const &result) -> call::result::Value<OUT> { return {good(result), error_num(result), coerce<OUT>(value(result))}; }
+  template<sleep::required::Coercible OUT, sleep::required::Integer REP, sleep::required::Ratio RATIO> auto sleep::coerce(duration::Duration<REP, RATIO> const &interval) -> OUT {
+    if constexpr (required::POSIX_Time_Structure<OUT>) {
+      // Convert to system clock precision, then convert ot the oldline POSIX Time Structure
+      return time::cast<OUT>(time::duration_cast<time::Duration>(interval));
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // Thus: Just change the precision and we're all set!
+      return time::duration_cast<OUT>(interval);
+    }
+  }
+  template<sleep::required::Coercible OUT> auto sleep::coerce(time::Val const &interval) -> OUT  {
+    if constexpr (required::same_as<OUT,time::Val>) {
+      return interval;
+    } else if constexpr (required::POSIX_Time_Structure<OUT>) {
+      return time::cast<OUT>(interval);
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // Thus: get to system clock precision and the move to the desired return
+      return coerce<OUT>(time::cast<time::Duration>(interval));
+    }
+  }
+  template<sleep::required::Coercible OUT> auto sleep::coerce(time::Spec const &interval) -> OUT {
+    if constexpr (required::same_as<OUT,time::Spec>) {
+      return interval;
+    } else if constexpr (required::POSIX_Time_Structure<OUT>) {
+      return time::cast<OUT>(interval);
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // Thus: get to system clock precision and the move to the desired return
+      return coerce<OUT>(time::cast<time::Duration>(interval));
+    }
+  }
+}
+#endiv

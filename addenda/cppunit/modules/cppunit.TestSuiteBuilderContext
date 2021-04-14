@@ -1,0 +1,6 @@
+// -*- c++ -*- 3b0c58be-5666-48d4-bc37-815492ab09f5
+#pragma once
+#include <cppunit.TestSuiteBuilderContextBase> // because TestSuiteBuilderContext.h has issues
+namespace cppunit {
+  using CppUnit::TestSuiteBuilderContext;
+}

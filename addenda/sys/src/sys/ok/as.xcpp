@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.ok.Axis
+#import sys.ok.Access
+#import sys.ok.required.Access
+namespace sys::ok {
+  template<required::Access RESULT> auto as(Access) -> RESULT = delete;
+  template<required::Access RESULT> auto as(Axis) -> RESULT = delete;
+  template<> inline auto as<Axis>(Access) -> Axis;  // ...... demotion can throw because the demotion of multi-flag values is ambiguous.
+  template<> inline auto as<Axis>(Axis) -> Axis;  // ........ nothrow (identity)
+  template<> inline auto as<Access>(Axis) -> Access; // ..... nothrow (simple promotion)
+  template<> inline auto as<Access>(Access) -> Access; // ... nothrow (identity)
+}
+#endiv
+#divert <ipp>
+#import sys.flags.maskof
+namespace sys {
+  template<> auto ok::as<ok::Axis>(Axis a) -> Axis       { return a; }
+  template<> auto ok::as<ok::Axis>(Access a) -> Axis     { return sys::flags::maskof<Axis>(a, Access::Limits::begin(), Access::Limits::end()); }
+  template<> auto ok::as<ok::Access>(Axis a) -> Access   { return Access{a}; }
+  template<> auto ok::as<ok::Access>(Access a) -> Access { return a; }
+}
+#endiv

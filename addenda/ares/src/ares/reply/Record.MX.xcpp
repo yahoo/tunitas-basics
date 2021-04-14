@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.reply.Record.declaration
+namespace ares::reply {
+  //
+  // The MX RR (Mail Exchanger)
+  // Comprises a list of such RR.
+  //
+  // Usage:
+  //
+  //   fill = FILL{raw} ..................... in reply::detail::parse(...)
+  //
+  // Construction:
+  //
+  //   Record<MX> duhfault; ........................... trivial
+  //   Record<MX> capture{reply_list}; ................ from ares_parse_mx_reply(...)
+  //
+  template<> class Record<MX>;
+}
+#endiv
+#divert <hpp>
+#import ares.reply.List
+namespace ares::reply {
+  template<> class Record<MX> : public List<MX> {
+    using ancestor = reply::List<MX>;
+  public:
+    Record() = default;
+    using ancestor::List;
+ };
+}
+#endiv

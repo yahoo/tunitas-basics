@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.inet.ipproto.Type
+namespace ip::inet {
+  //
+  // This is the preferred (and only) form herein.
+  // In sys::posix there is IPPROTO (with constants) and ipproto::Type (an enum class)
+  //
+  // Usage:
+  //
+  //   ...oh come on...
+  //   Protocol{}, Protocol::IP, Protocol::TCP, Protocol::UDP, etc.
+  //
+  using Protocol = ip::inet::ipproto::Type;
+}
+#endiv

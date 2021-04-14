@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import sys.af.Type
+#import sys.un.addr.Type
+namespace sys::un::lhs::required {
+  //
+  // Is this type an address family specialization (enumeration)
+  //
+  // Usage:
+  //
+  //   template<required::Address RESULT> auto Family::get() const -> RESULT;
+  //
+  //   auto fam = family(...somehow...)
+  //   auto ttt = fam.get<af::Type>();
+  //   auto ttt = fam.get<un::addr::Type>();
+  //
+  template<typename ADDRESS> concept bool Address = std::is_same_v<ADDRESS, af::Type>  || std::is_same_v<ADDRESS, addr::Type>;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::un::lhs::required;
+    static_assert(Address<sys::af::Type>);
+    static_assert(Address<sys::un::addr::Type>);
+  }
+}
+#endiv

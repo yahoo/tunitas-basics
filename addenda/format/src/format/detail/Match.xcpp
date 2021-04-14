@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import format.required.Character
+namespace format::detail {
+  //
+  // Format the subject surrounded by the matching characters
+  // Note how the VALUE is captured by reference in the default instantiation.
+  // If you are nesting these structures, then you need capture-by-value.
+  //
+  // Usage
+  //     std::cout << format::detail::Match<std::string>('<', "some string"s, '>');
+  //
+  // Normall the class template is instantiated by an overloaded function.
+  template<required::Character CHAR, typename VALUE, typename CAPTURE = VALUE const &> class Match;
+}
+#entail format.detail.Match.optional
+#entail format.detail.Match_Match
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail {
+  template<required::Character CHAR, typename TRAITS, typename VALUE, typename CAPTURE> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Match<CHAR, VALUE, CAPTURE> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import format.detail.Formatter
+#import format.detail.Fore_Aft_Boundary
+template<format::required::Character CHAR, typename VALUE, typename CAPTURE> class format::detail::Match : public Formatter<VALUE, CAPTURE>, public Fore_Aft_Boundary<CHAR> {
+using ancestor = Formatter<VALUE, CAPTURE>;
+  using fab = Fore_Aft_Boundary<CHAR>;
+public:
+  inline Match(typename fab::char_type fore, typename ancestor::value_type const &value, typename fab::char_type aft);
+};
+#endiv
+#divert <ipp>
+template<format::required::Character CHAR, typename TRAITS, typename VALUE, typename CAPTURE> auto format::detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Match<CHAR, VALUE, CAPTURE> const &d) -> std::basic_ostream<CHAR, TRAITS> & {
+  // WITHOUT the extra spaces
+  // If you want embedded spaces for & aft, then use a nested Match<Match<...>> structure
+  return o << d.fore << d.value << d.aft;
+}
+
+template<format::required::Character CHAR, typename VALUE, typename CAPTURE> format::detail::Match<CHAR, VALUE, CAPTURE>::Match(typename fab::char_type arg_fore, typename ancestor::value_type const &arg_value, typename fab::char_type arg_aft)
+  : ancestor(arg_value)
+  , fab(arg_fore, arg_aft) {
+  ;
+}
+#endiv

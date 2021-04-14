@@ -1,0 +1,21 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+//
+// Conversion "to" something else
+// to std::string
+// to json::Value
+//
+// Overloading on the return type of the function
+//
+//         json.to.String.ARGUMENT
+//                 |      |
+//                 v      v
+// #import json.to.String.ARGUMENT <------ return a String given an ARGUMENT
+//                                         i.e. a conversion-construction activity
+// #import json.to.String <--------------- all the String-returning overloads
+// #import json.to.Value <---------------- all the Value-returning overloads
+//
+//
+#entail json.to.String
+#entail json.to.Value
+#endiv

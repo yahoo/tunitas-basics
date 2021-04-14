@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.regex.Traits
+#import nonstd.regex.required.ALL
+#import std.regex_iterator
+#import std.iterator_traits
+#import std.string
+namespace nonstd::regex {
+  //
+  // The Regular Expression on (narrow) characters
+  //
+  template<required::iterator::Bidirectional BI,
+	   required::Char CHAR = typename std::iterator_traits<BI>::value_type,
+	   required::Traits TRAITS = Traits<CHAR>>
+  using Iterator = std::regex_iterator<BI, CHAR, TRAITS>;
+  using CIterator = Iterator<char const *>;
+  using SIterator = Iterator<std::string::const_iterator>;
+}
+#endiv

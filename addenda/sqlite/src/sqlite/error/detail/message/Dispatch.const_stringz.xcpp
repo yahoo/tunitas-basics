@@ -1,0 +1,22 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.error.detail.message.Dispatch
+#import c.const_stringz
+namespace sqlite {
+  namespace error {
+    namespace detail {
+      namespace message {
+        template<> inline auto Dispatch<c::const_stringz>::operator()(connection::Shell &) -> Result<c::const_stringz>::result_type;
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+template<> auto sqlite::error::detail::message::Dispatch<c::const_stringz>::operator()(connection::Shell &connection) -> Result<c::const_stringz>::result_type {
+  auto message = ::sqlite3_errmsg(connection.safe());
+  c::const_stringz ret(nullptr == message ? message : "no message");
+  return ret;
+}
+#endiv

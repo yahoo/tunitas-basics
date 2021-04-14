@@ -1,0 +1,106 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class Select; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::posix::Select : public cppunit::test::Fixture {
+public:
+  //
+  auto test_r() -> void;
+  auto test_rt() -> void;
+  //
+  auto test_rw() -> void;
+  auto test_rwt() -> void;
+  //
+  auto test_rwx() -> void;
+  auto test_rwxt() -> void;
+  //
+  auto test_mr() -> void;
+  auto test_mrt() -> void;
+  //
+  auto test_mrw() -> void;
+  auto test_mrwt() -> void;
+  //
+  auto test_mrwx() -> void;
+  auto test_mrwxt() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.posix.select
+#import sys.fd.Set
+#import sys.fd.read
+#import sys.fd.write
+#import sys.fd.except
+auto tests::unit::posix::Select::test_r() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_r() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_rt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_rt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_rw() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_rw() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_rwt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_rwt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_rwx() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_rwx() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_rwxt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_rwxt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mr() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mr() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mrt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mrt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mrw() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mrw() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mrwt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mrwt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mrwx() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mrwx() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::Select::test_mrwxt() -> void {
+#warning WRITETHIS auto tests::unit::posix::Select::test_mrwxt() -> void
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+auto tests::unit::posix::Select::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Select");
+  series << call("read", &Select::test_r)
+         << call("read,timeout", &Select::test_rt)
+         << call("read,write", &Select::test_rw)
+         << call("read,write,timeout", &Select::test_rwt)
+         << call("read,write,except", &Select::test_rwx)
+         << call("read,write,except,timeout", &Select::test_rwxt)
+         << call("max,read", &Select::test_mr)
+         << call("max,read,timeout", &Select::test_mrt)
+         << call("max,read,write", &Select::test_mrw)
+         << call("max,read,write,timeout", &Select::test_mrwt)
+         << call("max,read,write,except", &Select::test_mrwx)
+         << call("max,read,write,except,timeout", &Select::test_mrwxt)
+    ;
+  return finalize(series);
+}
+#endiv

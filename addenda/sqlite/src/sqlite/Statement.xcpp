@@ -1,0 +1,83 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  class Statement;
+}
+#endiv
+#divert <hpp>
+#import sqlite.status.Code
+#import sqlite.statement.Shell
+class sqlite::Statement : public sqlite::statement::Shell {
+  using Ancestor = sqlite::statement::Shell;
+public:
+  // This gives us the constructors and assigns which take the unguarded pointer
+  // But does not give us the synthetic constructors & assignments because of the existence of ~Statement()
+  using Ancestor::Shell;
+  using Ancestor::operator=;
+  Statement() = default;
+  inline Statement(statement::Shell &&) throw();
+  inline auto operator=(statement::Shell &&) throw() -> Statement &;
+  // n.b. because of the explicit destructor, the synthetic move constructor disappears
+  inline Statement(Statement &&) throw();
+  inline auto operator=(Statement &&) throw() -> Statement &;
+  ~Statement();
+};
+#import want.is_movable_butnot_copyable
+namespace sqlite {
+  namespace tests {
+    namespace Statement {
+      // Merely mentioning the inappropriate type in a type alias does not trigger the evaluation of the assertion
+      // But using the type within another type does.
+      using some_important_assertion = want::is_movable_butnot_copyable<sqlite::Statement>::assertion;
+      struct require { want::is_movable_butnot_copyable<sqlite::Statement>::assertion a; };
+      static_assert(!std::is_copy_constructible<sqlite::Statement>::value, "has become copy constructible (but must not be so constructible)");
+      static_assert(std::is_move_constructible<sqlite::Statement>::value, "not move constructible (but must be so constructible)");
+      static_assert(!std::is_copy_assignable<sqlite::Statement>::value, "has become copy constructible (but must not be constructible as such)");
+      static_assert(std::is_move_assignable<sqlite::Statement>::value, "not move constructible (but must be constructible as such)");
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.api.statement
+#import std.forward
+
+sqlite::Statement::Statement(Statement &&anon) throw()
+  : Ancestor(std::forward<Ancestor>(anon)) {
+  ;
+}
+
+sqlite::Statement::Statement(statement::Shell &&anon) throw()
+  : Ancestor(std::forward<Ancestor>(anon)) {
+  ;
+}
+
+auto sqlite::Statement::operator=(Statement &&anon) throw() -> Statement & {
+  Ancestor::operator=(std::forward<Ancestor>(anon));
+  return *this;
+}
+
+auto sqlite::Statement::operator=(statement::Shell &&anon) throw() -> Statement & {
+  Ancestor::operator=(std::forward<Ancestor>(anon));
+  return *this;
+}
+#endiv
+#divert <cpp>
+#import std.swap
+#import sqlite.api.unguarded
+#import std.cerr
+sqlite::Statement::~Statement() {
+  try {
+    decltype(this->unguarded_subject) tmp = nullptr;
+    std::swap(tmp, this->unguarded_subject);
+    // assumes that api::finalize is nullptr-safe
+    if (nullptr != tmp) {
+      api::unguarded::finalize(tmp);
+    }
+  } catch (...) {
+    // Have to suppress the exception or else we'll end in std::terminate
+    // If you wanted to see the errors, then call Statement::close(...) explicitly
+  }
+}
+#endiv

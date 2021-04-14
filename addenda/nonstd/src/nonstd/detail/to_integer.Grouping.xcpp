@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+namespace nonstd::detail::to_integer {
+  //
+  // The cursor on the grouping separator
+  //
+  // The operator++ saturates in that if the specification is short then the last separator
+  // is used for the remainder of the presentation.
+  //
+  // Usage:
+  //
+  //   grouping_sizes = "";                   No grouping separator at all
+  //   grouping_sizes = "\3\2\2";             Some style hundreds  1,00,00,00,00,000
+  //   grouping_sizes = "\3";                 U.S. style thousands 1,000,000,000,000
+  //   Grouping cursor{grouping_sizes};
+  //
+  template<required::Character CHAR> class Grouping;
+}
+#endiv
+#divert <hpp>
+#import std.reverse_iterator
+template<nonstd::required::Character CHAR> class nonstd::detail::to_integer::Grouping {
+public:
+  using Char = CHAR;
+  using Iterator = Char const *;
+  inline Grouping(Iterator curr);
+  inline auto no_rule() const -> bool;
+  inline auto operator*() const -> unsigned;   // 1 .. 127
+  inline auto operator++() -> Grouping &;
+  inline auto operator++(int) -> Grouping;
+protected:
+  inline auto exhausted() const -> bool;
+  Iterator curr;
+};
+#endiv
+#divert <ipp>
+namespace nonstd::detail::to_integer {
+  template<nonstd::required::Character _> Grouping<_>::Grouping(Iterator curr)
+    : curr{curr}
+  { }
+  template<nonstd::required::Character _> auto Grouping<_>::exhausted() const -> bool {
+    return '\0' == *curr;
+  }
+  template<nonstd::required::Character _> auto Grouping<_>::no_rule() const -> bool {
+    // This can only happen "externally" if Grouping was constructed as Grouping{""}
+    // meaning that there are not now and never were any grouping separators.
+    return exhausted();
+  }
+  template<nonstd::required::Character _> auto Grouping<_>::operator*() const -> unsigned {
+    return *curr;
+  }
+  template<nonstd::required::Character _> auto Grouping<_>::operator++() -> Grouping & {
+    // These can never be exhausted; they saturate at the end
+    ++curr;
+    if (exhausted()) {
+      --curr;
+    }
+    return *this;
+  }
+  template<nonstd::required::Character _> auto Grouping<_>::operator++(int) -> Grouping {
+    Grouping old{*this};
+    operator++();
+    return old;
+  }
+}
+#endiv

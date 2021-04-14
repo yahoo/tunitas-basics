@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.format.detail.Formatter
+#import ip.format.required.in // Address
+#import std.basic_ostream
+namespace ip::format::detail {
+  //
+  // An ADDRESS is insertable with operator<<
+  //
+  // This operator<< is parameterized around in::Address (not in::Either)
+  // There is a nearby version parameterized around in::Optional
+  //
+  template<typename CHAR, typename TRAITS, required::in::Address ADDRESS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Formatter<ADDRESS> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+#import ip.as
+#import std.string
+namespace ip::format {
+  template<typename CHAR, typename TRAITS, required::in::Address ADDRESS> auto detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Formatter<ADDRESS> const &d) -> std::basic_ostream<CHAR, TRAITS> & {
+    return o << ip::as<std::string>(d.value);
+  }
+}
+#endiv

@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.required.Enumeration
+namespace sys::sock::required {
+  //
+  // A Type is an enumeration with an UNSPECIFIED member.
+  // [[FIXTHIS?]] maybe Type{} =?= Type::UNSPECIFIED
+  //
+  // Usage:
+  //
+  //   template<required::Type RESULT> inline auto function(...somehow...) -> RESULT;
+  //
+  template<typename TYPE> concept bool Type = requires(TYPE) {
+    requires Enumeration<TYPE>;
+    // TOO-RESTRICTIVE { TYPE::UNSPECIFIED } -> TYPE; <--- TOO RESTRICTIVE
+    // Use static_assert(Type{} == Type::UNSPECIFIED), if appropriate
+  };
+}
+#endiv

@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.seals.interface
+namespace sys::posix {
+  namespace packaging::add_seals {
+    using namespace packaging::seals::interface;
+    using namespace bundle::add_seals;
+    namespace function {
+      inline auto add_seals(File, Argument) -> Status;
+    } 
+    namespace native {
+      inline auto add_seals(int fd, Argument) -> Status;
+    } 
+  }
+  using packaging::add_seals::function::add_seals;
+  namespace native { using packaging::add_seals::native::add_seals; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::add_seals {
+  auto function::add_seals(File fd, Argument arg) -> Status { return native::add_seals((int)fd, arg); }
+  auto native::add_seals(int fd, Argument arg) -> Status    { return posix::native::fcntl(fd, F::ADD_SEALS, arg); }
+}
+#endiv

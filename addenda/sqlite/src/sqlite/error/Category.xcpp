@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite::error {
+  //
+  // With the "category" distinguish between the (detailed) error "code" and the (coarse) "category")
+  //
+  // category -> simple error status
+  // code     -> extended_result_code
+  //
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import sqlite.error.category
+#import sqlite.error.Condition
+#import sqlite.error.Code
+#import std.error_category
+#import std.error_condition
+#import std.error_code
+#import std.string
+class sqlite::error::Category : public std::error_category {
+  using Ancestor = std::error_category;
+protected:
+  friend auto error::category() -> Category const &;
+  Category() = default;
+  Category(Category const &) = delete;
+  auto operator=(Category const &) -> Category & = delete;
+public:
+  // See http://www.cplusplus.com/reference/system_error/error_category/
+  auto name() const noexcept -> char const * override final;
+  auto default_error_condition(int ev) const noexcept -> std::error_condition override final;
+  auto equivalent(std::error_code const &code, int condition) const noexcept -> bool override final;
+  auto message(int ev) const noexcept -> std::string override final;
+};
+#endiv
+#divert <cpp>
+auto sqlite::error::Category::name() const noexcept -> char const * {
+  return "sqlite";
+}
+
+auto sqlite::error::Category::default_error_condition(int extended_result_code) const noexcept -> std::error_condition {
+  // see sqlite3.h
+  // The low 8 bits are the "error condition" in abstract
+  // the upper bits are the "error code" in detail
+  auto reduced = extended_result_code & 0xff;
+  return std::error_condition(reduced, category());
+}
+
+auto sqlite::error::Category::equivalent(std::error_code const &lhs_code, int rhs_condition_value) const noexcept -> bool {
+  auto *that = &lhs_code.category();
+  if (this == that) {
+    auto lhs_code_value = lhs_code.value();
+    auto lhs_condition = default_error_condition(lhs_code_value);
+    auto lhs_condition_value = lhs_condition.value();
+    return lhs_condition_value == rhs_condition_value;
+  }
+  return false;
+}
+
+#import sqlite.error.string
+auto sqlite::error::Category::message(int value) const noexcept -> std::string {
+  status::Code recode = status::Code(value);
+  // n.b. sqlite::message::string(...) is expected to protect itself against bogus values
+  return string(recode);
+}
+#endiv

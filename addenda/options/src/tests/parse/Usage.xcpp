@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace parse {
+    class Usage;
+  }
+}
+#endiv
+#divert <hpp>
+#import options.throwable.Usage
+#import std.string
+class tests::parse::Usage : public options::throwable::Usage {
+  using Ancestor = options::throwable::Usage;
+public:
+  using Ancestor::Usage;
+  auto unformatted() const -> std::string override final;
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import std.ostream
+#import std.function
+
+namespace std {
+  // Otherwise the use of lambda-as-iomanip does not resolve the overload
+  //
+  // WATCHOUT - this has to be in 'namespace std' it cannot be in namespace { } or it will not be found
+  using iomanip = std::function<std::ostream &(std::ostream &)>;
+  inline auto operator<<(std::ostream &o, std::function<std::ostream &(std::ostream &)> const &f) -> std::ostream & {
+    f(o);
+    return o;
+  }
+}
+
+#import tests.parse.Configuration
+auto tests::parse::Usage::unformatted() const -> std::string {
+  auto const &NAME = Configuration::SINGLETON.NAME;
+  auto u0 = [NAME](std::ostream &o) -> std::ostream & {
+    return o << "usage " << NAME;
+  };
+  std::size_t padding = ([u0]() {
+      std::ostringstream buf;
+      buf << u0;
+      return buf.str().size();
+    })();
+  auto u1 = [padding](std::ostream &o) -> std::ostream & {
+    using type = decltype(padding);
+    for (auto i=(type)(0); i<padding; ++i) {
+      o << ' ';
+    }
+    return o;
+  };
+  std::ostringstream buf;
+  buf << u0 << " [ -E | --either  ]\n"
+      << u1 << " [ -L | --long-only ]\n"
+      << u1 << " [ -S | --short-only ]\n"
+      << u1 << " [ -a | --apple ]\n"
+      << u1 << " [ -b | --banana ]\n"
+      << u1 << " [ -c | --cherry ]\n"
+      << u1 << " [ { -d | --dog } value ]       (--dog requires a value)\n"
+      << u1 << " [ { -e | --eagle } value ]     (--eagle requires a value)\n"
+      << u1 << " [ { -f | --frog } [ value ] ]  (--frog accepts an optional value)\n"
+      << u1 << " [ { -g | --goat } [ value ] ]  (--goat accepts an optional value)\n"
+      << u1 << " [ ...query... ]\n"
+      << "\n"
+      << "query ::= { apple | banana | cherry | dog | eagle | frog | goat }\n"
+    ;
+  return buf.str();
+}
+#endiv

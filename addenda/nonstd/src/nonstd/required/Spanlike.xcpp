@@ -1,0 +1,76 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+#import std.basic_string_view
+namespace nonstd {
+  //
+  // Its is it like a std::span?  nonstd::span?
+  // The Spanlike is a superset of the Dopelike
+  //
+  // Whereas std::span<T, E> is C++2a, it is supported.
+  //
+  // Quirk
+  //   std::basic_string_view<C,T>::data() returns a pointer-to-const
+  //   so the definition of the concept must admit data() returning pointer-const
+  //
+  // Spanlike uses old_school names and does not acknowledge new New_School names
+  //      it may have static or dynamic extents.
+  //
+  namespace spanning {
+    // These need to appear at <fpp> because they are mentioned in the required concept.
+    template<typename ELEMENT> struct Traits {
+      using value_type = ELEMENT;
+      using pointer = ELEMENT *;
+      using reference = ELEMENT &;
+      using size_type = std::size_t;
+    };
+    template<typename ELEMENT> struct Traits<ELEMENT const> {
+      using value_type = ELEMENT;
+      using pointer = ELEMENT const *;
+      using reference = ELEMENT const &;
+      using size_type = std::size_t;
+    };
+    template<typename SPAN> concept bool Quirkable = requires(SPAN) { typename SPAN::value_type; };
+    template<Quirkable SPAN> struct Quirk { using type = typename SPAN::value_type; };
+    template<typename CHAR, typename TRAITS> struct Quirk<std::basic_string_view<CHAR, TRAITS>> { 
+      // The basic_string_view::data() only has a const form; unlike std::basic_string::data() which [now] has a mutable form
+      using type = typename std::basic_string_view<CHAR, TRAITS>::value_type const; // bik ...
+    };
+  }
+  template<typename SPAN> struct span_traits; // specialized in nonstd.array, nonstd.basic_string, nonstd.basic_string_view, nonstd.basic_vector
+  namespace required {
+    template<typename SPANLIKE> concept bool Spanlike = requires(SPANLIKE like) {
+      typename SPANLIKE::value_type;
+      typename spanning::Quirk<SPANLIKE>::type;
+      typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::pointer;
+      typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::reference;
+      typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::size_type;
+      // An indexing operator is not supplied on the span, just the rudimentary base+bound scheme.
+      { like.size() } -> typename span_traits<SPANLIKE>::size_type;
+      { like.empty() } -> bool;
+      { like.data() } -> typename span_traits<SPANLIKE>::pointer;
+    };
+  }
+}
+#endiv
+#divert <cpp>
+#import std.byte
+#import nonstd.basic_string // <------------------------------ supplies specializations of nonstd::span_traits
+#import nonstd.basic_string_view
+#import nonstd.vector
+namespace nonstd::required {
+  // Testify!
+  //
+  // OK: uses "old school" type names value_type, size_type, pointer, reference
+  static_assert(Spanlike<std::string>);
+  static_assert(Spanlike<std::string_view>);
+  static_assert(Spanlike<std::vector<char>>);
+  static_assert(Spanlike<std::vector<std::byte>>);
+  // never ok
+  static_assert(!Spanlike<std::byte>);
+  static_assert(!Spanlike<int>);
+  struct Thing { };
+  static_assert(!Spanlike<Thing>);
+}
+#endiv

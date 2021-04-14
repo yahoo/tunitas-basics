@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Basic_String
+#import std.is_same
+namespace nonstd::required {
+  //
+  // Is this type sufficiently like a (narrow-character) string?
+  // Not just constructible into a string, but functionally the same.
+  // It must supply its own storage management; it cannot just return a pointer.
+  //
+  // Usage:
+  //
+  //   auto function(...) -> Something;
+  //   template<required::String STRING> auto function(...) -> STRING;
+  //
+  template<typename STRING> concept bool String = requires(STRING string) {
+    typename STRING::value_type;
+    requires Basic_String<STRING>;
+    requires std::is_same<char, typename STRING::value_type>::value;
+  };
+}
+#endiv
+#divert <cpp>
+// Of course, this is test code
+#import std.filesystem.path
+#import std.string
+#import std.wstring
+#import std.string_view
+#import c.const_stringz
+namespace nonstd::required {
+  static_assert(String<std::string>);
+  static_assert(!String<std::filesystem::path>);
+  static_assert(!String<std::wstring>);
+  static_assert(!String<std::string_view>);
+  static_assert(!String<c::const_stringz>);
+  static_assert(!String<char const *>);
+  static_assert(!String<int>);
+}
+#endiv

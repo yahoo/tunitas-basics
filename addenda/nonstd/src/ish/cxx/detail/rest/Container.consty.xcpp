@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ish.cxx.detail.rest.Container
+namespace ish::cxx::detail::rest {
+  template<required::Loopable CONTAINER> class Container<CONTAINER const>;
+}
+#endiv
+#divert <hpp>
+#import ish.cxx.detail.rest.Core
+namespace ish::cxx::detail::rest {
+  template<required::Loopable CONTAINER> class Container<CONTAINER const> : public Core<CONTAINER const, typename CONTAINER::const_iterator, typename CONTAINER::const_iterator> {
+    using ancestor = Core<CONTAINER const, typename CONTAINER::const_iterator, typename CONTAINER::const_iterator>;
+  public:
+    using ancestor::Core;
+  };
+}
+#endiv

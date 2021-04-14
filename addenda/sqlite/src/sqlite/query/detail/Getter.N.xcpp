@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sqlite.query.detail.Getter
+namespace sqlite {
+  namespace query {
+    namespace detail {
+      template<::sqlite::column_index N> struct Getter<N>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.statement.Shell
+#import std.tuple
+template<::sqlite::column_index N> struct sqlite::query::detail::Getter<N> {
+  inline auto operator()(::sqlite::statement::Shell &) -> std::tuple<>;
+};
+#endiv
+#divert <ipp>
+template<::sqlite::column_index N> auto sqlite::query::detail::Getter<N>::operator()(::sqlite::statement::Shell &) -> std::tuple<> {
+  return std::tuple<>();
+}
+#endiv

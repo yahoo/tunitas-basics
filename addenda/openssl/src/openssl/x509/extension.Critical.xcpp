@@ -1,0 +1,73 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509::extension {
+  //
+  // https://tools.ietf.org/html/rfc5280#section-4.2
+  //   <quote>
+  //     Each extension in a certificate is designated as either critical or non-critical.
+  //     A certificate-using system MUST reject the certificate if it encounters a critical extension it does not recognize or a critical extension that contains information that it cannot process.
+  //     A non-critical extension MAY be ignored if it is not recognized, but MUST be processed if it is recognized.
+  //   </quote>
+  //
+  // Folklore:
+  //   https://security.stackexchange.com/questions/30974/which-properties-of-a-x-509-certificate-should-be-critical-and-which-not
+  //
+  // Example:
+  //   x = X509V3_EXT_conf_nid(NULL, NULL, NID_basic_constraints,"critical,CA:TRUE,pathlen:10");
+  //
+  // This has to be a class, not an enum because we want UNDEFINED to be the default value
+  // AND we also want Critical::NO to be equivalent to a false (zero) value.
+  // AND we also want Critical::YES to be equivalent to a true (unit) value.
+  class Critical;
+}
+#endiv
+#divert <hpp>
+namespace openssl::x509::extension {
+  inline auto operator==(Critical const &, Critical const &) -> bool;
+  inline auto operator!=(Critical const &, Critical const &) -> bool;
+}
+class openssl::x509::extension::Critical {
+  enum class Value { UNDEFINED=-1, NO=0, YES=1 };
+  inline explicit Critical(Value);
+  friend auto operator==(Critical const &, Critical const &) -> bool;
+  Value value;
+public:
+  inline Critical();
+  inline operator bool() const; // throws on undefined
+  static Critical const UNDEFINED;
+  static Critical const NO;
+  static Critical const YES;
+  static Critical const FALSE;
+  static Critical const TRUE;
+};
+namespace openssl::x509::extension {
+  inline Critical const Critical::UNDEFINED{Value::UNDEFINED};
+  inline Critical const Critical::NO{Value::NO};
+  inline Critical const Critical::YES{Value::YES};
+  inline Critical const Critical::FALSE{Value::NO};
+  inline Critical const Critical::TRUE{Value::YES};
+}
+#endiv
+#divert <ipp>
+namespace openssl::x509 {
+  auto extension::operator==(Critical const &a, Critical const &b) -> bool {
+    return a.value == b.value;
+  }
+  auto extension::operator!=(Critical const &b, Critical const &a) -> bool {
+    return !operator==(a, b);
+  }
+}
+#import std.error_code
+#import openssl.error.Code
+namespace openssl::x509::extension {
+  Critical::Critical(Value value) : value{value} { }
+  Critical::Critical() : value{Value::UNDEFINED} { }
+  Critical::operator bool() const {
+    if (Value::UNDEFINED == value) {
+      throw std::error_code{error::Code::X509};
+    }
+    return bool(value);
+  }
+}
+#endiv

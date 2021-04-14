@@ -1,0 +1,80 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  $(lib_libopenssl_module_la) \
+  -lrigging-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET) -lslurp-module
+$(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET) -Wno-deprecated-declarations
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+check_bin_unit_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
+  obj/src/openssl/bio/Mode.tests.Access.cpp \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  obj/src/tests/unit/asn1.Fixture.cpp \
+  obj/src/tests/unit/asn1.Integer0.cpp \
+  obj/src/tests/unit/asn1.Integer.cpp \
+  obj/src/tests/unit/asn1.Time0.cpp \
+  obj/src/tests/unit/asn1.Time.cpp \
+  obj/src/tests/unit/big.Fixture.cpp \
+  obj/src/tests/unit/big.Num.cpp \
+  obj/src/tests/unit/big.bin.Preparator.cpp \
+  obj/src/tests/unit/bio.generate.cpp \
+  obj/src/tests/unit/bio.Fixture.cpp \
+  obj/src/tests/unit/bio.File.cpp \
+  obj/src/tests/unit/bio.String.cpp \
+  obj/src/tests/unit/easy.Fixture.cpp \
+  obj/src/tests/unit/ec.Fixture.cpp \
+  obj/src/tests/unit/ec.Key.cpp \
+  obj/src/tests/unit/ec.Group.cpp \
+  obj/src/tests/unit/error.Fixture.cpp \
+  obj/src/tests/unit/evp.Fixture.cpp \
+  obj/src/tests/unit/evp.PKey0.cpp \
+  obj/src/tests/unit/evp.PKey_ec.cpp \
+  obj/src/tests/unit/evp.PKey_rsa.cpp \
+  obj/src/tests/unit/exception.Fixture.cpp \
+  obj/src/tests/unit/managed.Fixture.cpp \
+  obj/src/tests/unit/managed.Fixture.Maker.cpp \
+  obj/src/tests/unit/managed.Fixture.Something.cpp \
+  obj/src/tests/unit/openssl.Fixture.cpp \
+  obj/src/tests/unit/pem.Fixture.cpp \
+  obj/src/tests/unit/pem.Maker.cpp \
+  obj/src/tests/unit/pem.Maker.evp.PKey.cpp \
+  obj/src/tests/unit/pem.Maker.x509.Crt.cpp \
+  obj/src/tests/unit/pem.Maker.x509.Req.cpp \
+  obj/src/tests/unit/pem.constants.Slurpfile.cpp \
+  obj/src/tests/unit/pem.Load.cpp \
+  obj/src/tests/unit/pem.Convert.cpp \
+  obj/src/tests/unit/pem.To_String.cpp \
+  obj/src/tests/unit/pem.pub.To_String.cpp \
+  obj/src/tests/unit/pem.From_String.cpp \
+  obj/src/tests/unit/pem.From_String_View.cpp \
+  obj/src/tests/unit/pem.From_String_View.Slurped.cpp \
+  obj/src/tests/unit/rsa.Fixture.cpp \
+  obj/src/tests/unit/rsa.Pair.cpp \
+  obj/src/tests/unit/stack.Fixture.cpp \
+  obj/src/tests/unit/stack.Stack0.cpp \
+  obj/src/tests/unit/stack.Stack.cpp \
+  obj/src/tests/unit/time.Fixture.cpp \
+  obj/src/tests/unit/want.Fixture.cpp \
+  obj/src/tests/unit/x509.Fixture.cpp \
+  obj/src/tests/unit/x509.Crl.cpp \
+  obj/src/tests/unit/x509.Crt.cpp \
+  obj/src/tests/unit/x509.Extension.cpp \
+  obj/src/tests/unit/x509.Name.cpp \
+  obj/src/tests/unit/x509.Req.cpp \
+  obj/src/tests/unit/x509.Revoked.cpp \
+  $(end)
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk #       automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/tests/unit/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

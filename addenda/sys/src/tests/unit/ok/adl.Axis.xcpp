@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ok::adl { class Axis; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.OK
+struct tests::unit::ok::adl::Axis : public cppunit::test::Fixture {
+  using OK = ::sys::posix::OK;
+  auto test_contains() -> void;
+  auto test_operator_bitand() -> void;
+  auto test_operator_bitor() -> void;
+  auto test_operator_compl() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::ok::adl {
+  auto Axis::test_contains() -> void {
+    contains(OK::R, OK::Axis::R);
+    contains(OK::W, OK::Axis::W);
+    contains(OK::X, OK::Axis::X);
+    contains(OK::RWX, OK::RWX);
+    contains(OK::F, OK::F); // ............. ibidem.
+    contains(OK::EXISTS, OK::EXISTS); // ... but this would always be false because there is no "exists" bit
+    contains(OK::Axis::R | OK::Axis::W, OK::Axis::X);
+    contains(OK::Axis::R | OK::Axis::W | OK::Axis::X, OK::Axis::R);
+  }
+  auto Axis::test_operator_bitand() -> void {
+    OK::Access x_anded = OK::Axis::R & OK::Axis::R;
+    CPPUNIT_ASSERT(x_anded == x_anded);
+  }
+  auto Axis::test_operator_bitor() -> void {
+    OK::Access x_bitor = OK::Axis::R | OK::Axis::W | OK::Axis::X;
+    CPPUNIT_ASSERT(x_bitor == x_bitor);
+  }
+  auto Axis::test_operator_compl() -> void {
+    OK::Access x_compled = ~OK::Axis::R;
+    CPPUNIT_ASSERT(x_compled == x_compled);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::ok::adl::Axis::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series{"Axis"};
+  series << call("contains", &Axis::test_contains)
+         << []() {
+              Stream op{"operator"};
+              op << call("operator&", &Axis::test_operator_bitand)
+                 << call("operator|", &Axis::test_operator_bitor)
+                 << call("operator~", &Axis::test_operator_compl)
+                ;
+              return move(op);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

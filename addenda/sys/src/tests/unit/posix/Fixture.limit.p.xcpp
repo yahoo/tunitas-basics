@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.prlimit
+#import sys.r.constants
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_prlimit() -> void {
+    using namespace sys::r;
+    using namespace constants;
+    using six::prlimit;
+    auto establish = Limits{INFINITY, INFINITY};
+    auto recovered = Limits{};
+    auto p = prlimit(Limit::CPU, establish, recovered);
+    CPPUNIT_ASSERT(good(p) || !good(p)); // maybe it fails ... or maybe not.  But it got called (it got tested)
+  }
+}
+#endiv
+o

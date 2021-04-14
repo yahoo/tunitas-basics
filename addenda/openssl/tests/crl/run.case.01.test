@@ -1,0 +1,5 @@
+#!/bin/sh
+source ${0%/*}/rigging.sh || exit 70
+if [[ -f ./ca.key.pem ]] ; then dir=.; else dir=tests/crl; fi
+# all files are infiles; the crl is spewed onto the stdout
+${exe?} ${dir}/ca.key.pem ${dir}/ca.crt.pem # zero certificates are revoked

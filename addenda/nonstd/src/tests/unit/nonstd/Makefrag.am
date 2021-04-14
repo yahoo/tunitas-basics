@@ -1,0 +1,25 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_nonstd_SUBSOURCES = \
+  obj/src/tests/unit/nonstd/namespace.cpp \
+  obj/src/tests/unit/nonstd/Fixture.to_underlying.cpp \
+  obj/src/tests/unit/nonstd/Fixture.to_signed.cpp \
+  obj/src/tests/unit/nonstd/Fixture.to_unsigned.cpp \
+  obj/src/tests/unit/nonstd/Fixture.cpp \
+  obj/src/tests/unit/nonstd/copy.Thing.cpp \
+  obj/src/tests/unit/nonstd/copy.Fixture.cpp \
+  obj/src/tests/unit/nonstd/half.Fixture.cpp \
+  obj/src/tests/unit/nonstd/lock.Fixture.cpp \
+  obj/src/tests/unit/nonstd/move.Thing.cpp \
+  obj/src/tests/unit/nonstd/move.Fixture.cpp \
+  obj/src/tests/unit/nonstd/numeric_limits.Fixture.cpp \
+  \
+  obj/src/tests/unit/nonstd/float16/namespace.cpp \
+  obj/src/tests/unit/nonstd/float16/Fixture.cpp \
+  obj/src/tests/unit/nonstd/float16/Palette.cpp \
+  \
+  obj/src/tests/unit/nonstd/int128/namespace.cpp \
+  obj/src/tests/unit/nonstd/int128/Fixture.cpp \
+  obj/src/tests/unit/nonstd/int128/Integer.cpp \
+  obj/src/tests/unit/nonstd/int128/Traits.cpp \
+  $(end)

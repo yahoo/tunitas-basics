@@ -1,0 +1,73 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.at.Flags
+#import sys.at.position.Position
+#import sys.call.Result
+#import sys.call.argument.Pathname
+#import sys.call.argument.Permissions
+#import sys.call.argument.Permissions
+#import sys.fd.required.Unmanaged
+#import sys.id.File
+#import sys.o.Flags
+#import sys.ok.Access
+#import sys.posix.packaging.required // cascade the namespaces
+#import sys.posix.required.rebundled // map in required::fd, required::id and all those
+#import sys.required.Descriptor
+namespace sys::posix::packaging::at::interface {
+  //
+  // Scope:
+  //
+  //   any of the "at" syscalls
+  //   being: faccessat, fchmodat, fchownat, fstatat, linkat, lstat, mkdirat, openat, readlinkat, renameat, rmdirat, symlinkat, unlinkat
+  //
+  // Usage:
+  //
+  //   namespace sys::posix {
+  //     namespace packaging::something {
+  //       using namespace packaging::at::interface;
+  //       namespace function {
+  //         ...declare... auto somethingat(Position<File>, Pathname, ...others...) -> Result;
+  //       }
+  //       namespace native {
+  //         ...declare... auto somethingat(Position<int>, Pathname, ...others...) -> Result;
+  //       }
+  //     }
+  //   }
+  //
+  inline namespace argument {
+    // The extra namespace packaging is needed so that the names herein can be referenced conveniently on-site; c.f. fchownat(...)
+    // Also, the 'Flags' word is generic and multiply used; reserve it for the namepace at flags
+    using sys::at::Flags;
+    using Opening = sys::o::Flags;
+    template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
+    using call::argument::Pathname;
+    using call::argument::Permissions;
+  }
+  using sys::ok::Access;
+  using oMode [[deprecated("prefer the precise form Opening")]] = Opening;
+  using pMode [[deprecated("prefer the precise form Permissions")]] = Permissions;
+  using aMode [[deprecated("prefer the precise form Access")]] = Access;
+  using id::File;
+  namespace result {
+    // expect 'int' or id::File
+    template<required::fd::Unmanaged RESULT> using Single = call::result::Value<RESULT>;
+    using Status = call::Result;
+  }
+}
+#endiv
+#divert <hpp>
+#import sys.at.constants
+namespace sys::posix::packaging::at::interface {
+  using namespace sys::at::constants;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::posix::packaging::at::interface;
+    // Prove that those constants (focus on the ones we care about) are actually visible by namespace cascade
+    static_assert(sizeof (REMOVE_DIRECTORY));
+  }
+}
+#endiv

@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.required.Set
+#forward sys.fd.set.Set
+#import sys.fd.set.Reference
+#import std.optional
+namespace sys::fd::set {
+  //
+  // Find the first} bit set in the Set
+  // The return value is 'int' so that -1 can be used as "no bit is set"
+  // It is a 32- bit signed integer value because that is what select(2) and pselect(2) accept for the 1st argument
+  //
+  // Returns int because select(2), pselect(2) are defined to accept that.
+  //
+  //   SIZE          no bit is set at all (signalled as such by both and ffs and fls)
+  //   0 .. SIZE-1   the index of the first bit is set
+  //
+  // Historical:
+  //   ffs is Find First Set
+  //   fls is Find Last Set
+  //
+  // Usage:
+  //
+  //   suto min = ffs(reads, writes, excepts);
+  //   auto max = fls(reads, writes, excepts);
+  //
+  inline auto find_first_set(Set const &) -> int;
+  template<Purpose PURPOSE> inline auto find_first_set(Reference<PURPOSE> const &) -> int;
+  template<Purpose PURPOSE> inline auto find_first_set(std::optional<Reference<PURPOSE>> const &) -> int;
+  template<required::Set FIRST, typename... REST> inline auto find_first_set(FIRST const &first, REST const &...rest) -> int
+    requires (true && ... && required::set::Any<REST>);
+  template<typename... THEM> inline auto ffs(THEM const &...them) -> int
+    requires (true && ... && required::set::Any<THEM>)
+  { return find_first_set(them...); }
+}
+#endiv
+#divert <ipp>
+#import std.min
+#import sys.fd.set.Set
+#import sys.fd.set.Reference
+namespace sys::fd {
+  template<set::Purpose PURPOSE> auto set::find_first_set(std::optional<Reference<PURPOSE>> const &specimen) -> int {
+    return !specimen ? -1 : find_first_set(**specimen);
+  }
+  template<set::Purpose PURPOSE> auto set::find_first_set(Reference<PURPOSE> const &specimen) -> int {
+    return find_first_set(*specimen);
+  }
+  auto set::find_first_set(Set const &specimen) -> int {
+    for (auto rhs : specimen) {
+      if (rhs) { return rhs.index(); }
+    }
+    return SIZE;
+  }
+  template<required::Set FIRST, typename... REST> auto set::find_first_set(FIRST const &first, REST const &...rest) -> int
+    requires (true && ... && required::set::Any<REST>) {
+    return std::min(find_first_set(first), find_first_set_of(rest...));
+  }
+}
+#endiv

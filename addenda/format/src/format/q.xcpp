@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.detail.Match
+namespace format {
+  //
+  // usage:
+  //
+  //     std::cout << q("quote this");
+  //
+  // Of course, the reference to the VALUE must last for the lifetime of the formatter object
+  template<typename VALUE> inline auto q(VALUE const &) -> detail::Match<char, VALUE>;
+}
+#endiv
+#divert <ipp>
+template<typename VALUE> auto format::q(VALUE const &value) -> detail::Match<char, VALUE> {
+  return detail::Match<char, VALUE>('\'', value, '\'');
+}
+#endiv

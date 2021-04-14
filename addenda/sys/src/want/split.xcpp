@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+namespace want {
+  //
+  // Split a string on a single-character separator
+  // e.g. split on '/'
+  //
+  // Usage:
+  //     auto words = want::split<std::vector<std::string>>("/apple/banana/cherry/dog/eagle/frog/goat", '/');
+  //
+  // Note: as such, the full path reads out as a leading emptiness, which is suppressed.
+  // It is up ot the caller to handle the "fullpath" case.
+  //
+  // "/apple/banana/cherry/dog/eagle/frog/goat" -> { "", "apple", "banana", "cherry", "dog", "eagle", "frog", "goat" }
+  //                                                 ^
+  //                                                 |
+  // OBSERVE ----------------------------------------/ (emptiness)
+  //
+  template<typename CONTAINER> inline auto split(std::string const &subject, char separator, bool elide_emptiness = true) -> CONTAINER;
+}
+#endiv
+#divert <ipp>
+#import std.istringstream
+#import std.getline
+#import std.move
+template<typename CONTAINER> auto want::split(std::string const &subject, char separator, bool elide_emptiness) -> CONTAINER {
+  CONTAINER ret;
+  std::istringstream in(subject);
+  std::string component;
+  while (std::getline(in, component, separator)) {
+    if (component.empty()) {
+      if (elide_emptiness) {
+        continue;
+      }
+    }
+    ret.push_back(component);
+  }
+  return ret;
+}
+#endiv

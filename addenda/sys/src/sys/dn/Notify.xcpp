@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// Acquire the primitive #define values
+#include <fcntl.h>
+namespace sys::dn {
+  //
+  // Suitable for use as the 3rd argument to fcntl(2) under the lock setters: F:NOTIFY
+  // Also available in sys::posix::F as manifest constants.
+  //
+  //   auto cntled = fcntl(fd, F::NOTIFY, Notify::ACCESS);
+  //   auto cntled = fcntl(fd, F::NOTIFY, Notify::ACCESS | Notify::MODIFY);
+  //   auto cntled = fcntl(fd, F::NOTIFY, Notify::ACCESS | Notify::CREATE | Notify::MODIFY
+  //
+  enum class Notify : unsigned {
+    ACCESS = DN_ACCESS,
+    MODIFY = DN_MODIFY,
+    CREATE = DN_CREATE,
+    DELETE = DN_DELETE,
+    RENAME = DN_RENAME,
+    ATTRIBUTE = DN_ATTRIB, // oh come on, spell it out.
+    ATTRIB [[deprecated("buy a vowel.  instead prefer ATTRIBUTE")]] = ATTRIBUTE,
+    MULTISHOT = DN_MULTISHOT, // requires unsignedness
+  };
+}
+#endiv

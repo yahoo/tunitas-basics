@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.reply.parse.declaration
+#import ares.reply.Record.AAAA
+#import ares.reply.parse.A // HOWMANY_ADDRESS_RECORDS
+namespace ares::reply {
+  //
+  // Specialization to parse an AAAA record.
+  // Usage: see parse.declaration.xcpp
+  //
+  template<> inline auto parse<AAAA>(std::nothrow_t, Buffer<std::byte const>, [[fill, inout]] Record<AAAA> &) noexcept -> Success;
+}
+#endiv
+#divert <ipp>
+#import std.placeholders
+#import std.bind
+namespace ares::reply {
+  template<> auto parse<AAAA>(std::nothrow_t no, Buffer<std::byte const> buffer, Record<AAAA> &record) noexcept -> Success try {
+    using namespace std::placeholders;
+    record.addresses.resize(REASONABLE_COUNT_OF_ADDRESS_RECORDS_RETURNED);
+    int fill_size(record.addresses.size()); // [[sloppy]], signed integer for a size
+    detail::Function<AAAA> parser{std::bind(::ares_parse_aaaa_reply, _1, _2, _3, record.addresses.data(), &fill_size)};
+    auto parsed = detail::parse<AAAA>(buffer, record.hosts, parser);
+    if (ok(parsed)) {
+      record.addresses.resize(fill_size);
+    }
+    return parsed;
+  } catch (...) {
+    // This is the least worst-fitting error code that covers what just happened (an unexpected exception while parsing a response)
+    return Success{std::error_code{error::Code::BAD_RESPONSE}};
+  }
+}
+#endiv

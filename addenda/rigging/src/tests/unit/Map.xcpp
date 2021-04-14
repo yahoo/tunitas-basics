@@ -1,0 +1,79 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    class Map;
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.size_t
+class tests::unit::Map : public cppunit::test::Fixture {
+  using ancestor = cppunit::test::Fixture;
+public:
+  auto test_initializer_list_construction() -> void;
+  auto test_usage_item() -> void;
+  auto test_duplicate_item_throws() -> void;
+
+
+  static auto suite() -> cppunit::Test *;
+  static auto empty_suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import unit.rigging.test.Map
+
+#import cppunit.test.Suite
+auto tests::unit::Map::empty_suite() -> cppunit::Test * {
+  return new cppunit::test::Suite("empty");
+}
+
+namespace ur = ::unit::rigging;
+namespace urt = ur::test;
+
+#import std.ostream
+#import std.clog
+#import std.cout
+auto tests::unit::Map::test_initializer_list_construction() -> void {
+  urt::Map TESTS{{"this", &empty_suite}, {"that", &empty_suite}};
+  // --help and --usage and the two we just added
+  CPPUNIT_ASSERT(4 == TESTS.size());
+  std::clog << '\n';
+  for (auto const &kv : TESTS) {
+    std::clog << "key=" << kv.first << '\n';
+  }
+}
+
+auto tests::unit::Map::test_usage_item() -> void {
+  // There should not (must not) already be bindings for 'usage' and 'help'
+  urt::Map TESTS{{"usage", &empty_suite}, {"help", &empty_suite}};
+  // --help and --usage and the two we just added
+  CPPUNIT_ASSERT(4 == TESTS.size());
+}
+
+auto tests::unit::Map::test_duplicate_item_throws() -> void {
+  // Establishing duplicate bindings causes throwup
+  try {
+    urt::Map TESTS{{"--usage", &empty_suite}};
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::clog << "(expected) invalid argument (on duplicate) " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::Map::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Map");
+  s << call("initializer_list construction", &Map::test_initializer_list_construction)
+    << call("usage item", &Map::test_usage_item)
+    << call("usage item", &Map::test_duplicate_item_throws)
+    ;
+  return s.release();
+}
+#endiv

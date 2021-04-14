@@ -1,0 +1,29 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.to.Value.ARGUMENT
+#import json.Value
+#import json.String
+namespace json {
+  template<> inline auto to<String>(VALUE, String const &) -> Value;
+  template<> inline auto to<String>(VALUE, String &&) -> Value;
+}
+#endiv
+#divert <ipp>
+#import std.get
+template<> auto json::to<json::String>(VALUE, String const &source) -> Value {
+  // extract the std::string, let the construct do its job
+  return Value(std::get<1>(source));
+}
+
+#import json.value.constants
+#import std.forward
+#import std.move
+template<> auto json::to<json::String>(VALUE, String &&anon) -> Value {
+  std::string rough(std::get<1>(std::forward<String>(anon)));
+  // Construct the container the appropriate type.
+  json::Value polished(json::value::STRING);
+  // Assign the value into the container.
+  polished = rough;
+  return polished;
+}
+#endiv

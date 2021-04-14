@@ -1,0 +1,4 @@
+// -*- c++ -*- df1c19d5-2f5d-4c34-b73b-9be0f76c7d68
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/cast.h>

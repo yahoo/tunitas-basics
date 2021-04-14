@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+#import sys.at.position.Position
+#import sys.call.argument.Pathname
+#import sys.call.Result
+#import sys.id.File
+#import sys.required.Descriptor
+#import sys.posix.packaging.required // cascade namespace required
+namespace sys::posix::packaging::path {
+  namespace [[detail]] mostly {
+    //
+    // Scope:
+    //
+    //   namespace readlink::interface <---> readlink
+    //   namespace path::interface <-------> symlink, link, unlink, rename, rmdir
+    //   namespace at::interface <---------> the "at" series
+    //
+    // Usage:
+    //
+    //   the usual
+    //
+    inline namespace arguments {
+      // n.b. the use of argument::Position allows the on-site overload variation
+      // with either an 'int' dirfd or the symbolic AT::FDCWD constant.
+      template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
+      using call::argument::Pathname;
+    }
+    using id::File;
+    namespace result {
+      // expect std::string (readlink) or else a status int for the rest
+      template<typename RESULT> using Value = call::result::Value<RESULT>;
+      using Status = Value<int>;
+    }
+  }
+  namespace interface {
+    inline namespace argument { using namespace mostly::arguments; }
+    using mostly::File;
+    namespace result {
+      using namespace mostly::result;
+      // 
+    }
+  }
+}
+#endiv

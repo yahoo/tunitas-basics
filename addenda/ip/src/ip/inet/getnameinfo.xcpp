@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.in  // ip::in::sockaddr, ip::in::socklen_t
+#import ip.in4 // ip::in4::sockaddr
+#import ip.in6 // ip::in6::sockaddr
+#import ip.inet.result.Getnameinfo
+#import ip.inet.nameinfo
+#import ip.inet.NI.Features
+#import std.tuple
+namespace ip {
+  namespace inet {
+    template<typename... LOOKUPS> inline auto getnameinfo(in6::sockaddr const &, NI::Features) -> result::Getnameinfo<LOOKUPS...>;
+    template<typename... LOOKUPS> inline auto getnameinfo(in4::sockaddr const &, NI::Features) -> result::Getnameinfo<LOOKUPS...>;
+
+    template<typename... LOOKUPS> inline auto getnameinfo(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<LOOKUPS...>;
+    template<> inline auto getnameinfo<nameinfo::HOST, nameinfo::SERVICE>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>;
+    template<> inline auto getnameinfo<nameinfo::HOST>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::HOST>;
+    template<> inline auto getnameinfo<nameinfo::SERVICE>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::SERVICE>;
+ }
+}
+#endiv
+#divert <ipp>
+template<typename... LOOKUPS> inline auto ip::inet::getnameinfo(in6::sockaddr const &sa, NI::Features features) -> result::Getnameinfo<LOOKUPS...> {
+  return getnameinfo<LOOKUPS...>(reinterpret_cast<in::sockaddr const *>(&sa), sizeof (sa), features);
+}
+
+template<typename... LOOKUPS> inline auto ip::inet::getnameinfo(in4::sockaddr const &sa, NI::Features features) -> result::Getnameinfo<LOOKUPS...> {
+  return getnameinfo<LOOKUPS...>(reinterpret_cast<in::sockaddr const *>(&sa), sizeof (sa), features);
+}
+
+#import std.tuple_size
+#import std.tuple
+template<typename... LOOKUPS> auto ip::inet::getnameinfo(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<LOOKUPS...> {
+  static_assert(0 == std::tuple_size<std::tuple<LOOKUPS...>>::value && 0 != std::tuple_size<std::tuple<LOOKUPS...>>::value, "specializations only");
+  return result::Getnameinfo<LOOKUPS...>();
+}
+
+#import ip.inet.NI
+#import std.make_tuple
+#import std.size_t
+#include <cerrno>
+#import getnameinfo
+
+template<> auto ip::inet::getnameinfo<ip::inet::nameinfo::HOST, ip::inet::nameinfo::SERVICE>(in::sockaddr const *sa, in::socklen_t sa_length, NI::Features features) -> result::Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> {
+  using Result = result::Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>;
+  char host[NI::MAXHOST];
+  char service[NI::MAXSERVICE];
+  auto eai_code = ::getnameinfo(sa, sa_length, &host[0], sizeof (host), &service[0], sizeof (service), (int)(features));
+  int errnum = errno; // capture this as quickly as possible
+  bool ok = 0 == eai_code;
+  if (!ok) {
+    host[0] = '\0';
+    service[0] = '\0';
+  }
+  return Result{ok, errnum, std::make_tuple<std::string, std::string>(host, service), eai_code};
+}
+
+template<> auto ip::inet::getnameinfo<ip::inet::nameinfo::HOST>(in::sockaddr const *sa, in::socklen_t sa_length, NI::Features features) -> result::Getnameinfo<nameinfo::HOST> {
+  using Result = result::Getnameinfo<nameinfo::HOST>;
+  char host[NI::MAXHOST];
+  char *null_service_buf = nullptr;
+  std::size_t null_service_size = 0;
+  auto eai_code = ::getnameinfo(sa, sa_length, &host[0], sizeof (host), null_service_buf, null_service_size, (int)(features));
+  int errnum = errno; // capture this as quickly as possible
+  bool ok = 0 == eai_code;
+  if (!ok) {
+    host[0] = '\0';
+  }
+  return Result{ok, errnum, host, eai_code};
+}
+
+#import ip.inet.NI
+#include <cerrno>
+#import getnameinfo
+template<> auto ip::inet::getnameinfo<ip::inet::nameinfo::SERVICE>(in::sockaddr const *sa, in::socklen_t sa_length, NI::Features features) -> result::Getnameinfo<nameinfo::SERVICE> {
+  using Result = result::Getnameinfo<nameinfo::SERVICE>;
+  char service[NI::MAXSERVICE];
+  char *null_host_buf = nullptr;
+  std::size_t null_host_size = 0;
+  auto eai_code = ::getnameinfo(sa, sa_length, null_host_buf, null_host_size, &service[0], sizeof (service), (int)(features));
+  int errnum = errno; // capture this as quickly as possible
+  bool ok = 0 == eai_code;
+  if (!ok) {
+    service[0] = '\0';
+  }
+  return Result{ok, errnum, service, eai_code};
+}
+#endiv

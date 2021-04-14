@@ -1,0 +1,8 @@
+// -*- c++ -*- 3871775f-7867-462d-9a75-897b9a1739a9
+#pragma once
+// There is special version-specific trickery #ifdefs in here; done once, done right (ahem)
+//
+// https://en.cppreference.com/w/cpp/experimental/ostream_joiner/make_ostream_joiner
+// Library Fundamentals TS v2
+//
+#include <std.ostream_joiner>

@@ -1,0 +1,4 @@
+// -*- c++ -*- c374a6b2-6979-4cbc-9a22-6c102d97dcf7
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/sha3.h>

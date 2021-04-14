@@ -1,0 +1,123 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace error {
+      class Palette;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import sys.error.Code
+#import sys.e.Code
+#import std.vector
+class tests::unit::error::Palette {
+protected:
+  // Descendants only
+  Palette() = default;
+  ~Palette() = default;
+public:
+  // Unified in the descendant
+  virtual auto setUp() -> void;
+  virtual auto tearDown() -> void;
+
+  using code_vector_type = std::vector<::sys::error::Code>;
+  code_vector_type some_code_series;
+  using e_code_vector_type = std::vector<::sys::e::Code>;
+  e_code_vector_type some_e_code_series;
+};
+#divert </hpp>
+#divert <cpp>
+#import unit.rigging.lhs
+using unit::rigging::lhs;
+#import unit.rigging.clear
+using unit::rigging::clear;
+#import sys.posix.E
+auto tests::unit::error::Palette::setUp() -> void {
+  using E = ::sys::posix::E;
+  using ::sys::error::Code;
+  {
+    using v = code_vector_type;
+    lhs(some_code_series) = v{Code(E::SUCCESS),
+                              Code(E::PERM),
+                              Code(E::NOENT),
+                              Code(E::SRCH),
+                              Code(E::INTR),
+                              Code(E::IO),
+                              Code(E::NXIO),
+                              Code(E::TOOBIG),
+                              Code(E::NOEXEC),
+                              Code(E::BADF),
+                              Code(E::CHILD),
+                              Code(E::AGAIN),
+                              Code(E::NOMEM),
+                              Code(E::ACCES),
+                              Code(E::FAULT),
+                              Code(E::NOTBLK),
+                              Code(E::BUSY),
+                              Code(E::EXIST),
+                              Code(E::XDEV),
+                              Code(E::NODEV),
+                              Code(E::NOTDIR),
+                              Code(E::ISDIR),
+                              Code(E::INVAL),
+                              Code(E::NFILE),
+                              Code(E::MFILE),
+                              Code(E::NOTTY),
+                              Code(E::TXTBSY),
+                              Code(E::FBIG),
+                              Code(E::NOSPC),
+                              Code(E::SPIPE),
+                              Code(E::ROFS),
+                              Code(E::MLINK),
+                              Code(E::PIPE),
+                              Code(E::DOM),
+                              Code(E::RANGE)};
+  } {
+    using v = e_code_vector_type;
+    lhs(some_e_code_series) = v{E::SUCCESS,
+                                E::PERM,
+                                E::NOENT,
+                                E::SRCH,
+                                E::INTR,
+                                E::IO,
+                                E::NXIO,
+                                E::TOOBIG,
+                                E::NOEXEC,
+                                E::BADF,
+                                E::CHILD,
+                                E::AGAIN,
+                                E::NOMEM,
+                                E::ACCES,
+                                E::FAULT,
+                                E::NOTBLK,
+                                E::BUSY,
+                                E::EXIST,
+                                E::XDEV,
+                                E::NODEV,
+                                E::NOTDIR,
+                                E::ISDIR,
+                                E::INVAL,
+                                E::NFILE,
+                                E::MFILE,
+                                E::NOTTY,
+                                E::TXTBSY,
+                                E::FBIG,
+                                E::NOSPC,
+                                E::SPIPE,
+                                E::ROFS,
+                                E::MLINK,
+                                E::PIPE,
+                                E::DOM,
+                                E::RANGE};
+  }
+}
+
+auto tests::unit::error::Palette::tearDown() -> void {
+  lhs(some_code_series) = clear; 
+  lhs(some_e_code_series) = clear; 
+}
+#endiv
+

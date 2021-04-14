@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sqlite.api.detail.Bind.basic_string
+#import std.string
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<> struct Bind<std::string>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Bind
+#import sqlite.status.Code
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+#import sqlite.api.detail.WithDestructor
+template<> struct sqlite::api::detail::Bind<std::string>
+  : public sqlite::detail::ResultSFINAE<status::Code>
+  , public sqlite::detail::pass_by_const_reference<std::string>
+  , public sqlite::detail::specialization_is_valid
+  , public WithDestructor
+{ };
+#endiv

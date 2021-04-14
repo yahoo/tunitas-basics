@@ -1,0 +1,258 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import boost.lexical_cast
+#import c.str
+#import boost.program_options.options_description
+#import boost.program_options.positional_options_description
+#import boost.program_options.variables_map
+#import boost.program_options.store
+#import boost.program_options.notify
+#import boost.program_options.error
+#import boost.program_options.bool_switch
+#import options.Program
+#import tests.words.Badword
+#import tests.words.Configuration
+#import tests.words.Usage
+#import tests.words.Version
+#import tests.words.slurp
+#import tests.words
+#import std.cerr
+#import std.cout
+#import std.exception
+#import std.is_same
+#import std.move
+#import std.string
+#import std.vector
+#import sqlite.Application
+#import sqlite.transaction.Manager
+#import sqlite.transaction.Guard
+#import sqlite.Connection
+#import sqlite.Exception
+#import sqlite.eval
+
+namespace bpo = boost::program_options;
+
+auto main(int arg_c, char *arg_v[]) -> int {
+  try {
+    tests::words::Configuration cfg;
+    options::Program program(arg_c, arg_v);
+
+    char const *words_file = "words-file";
+
+    bool usage_command(false);
+    bool version_command(false);
+    std::string initialization_sql_file;
+    int signed __row_insertion_limit; // zero means "infinite"
+    bpo::options_description flags(cfg.NAME);
+    flags.add_options()
+      ("help,h", bpo::bool_switch(&usage_command), "Help")
+      ("usage,h", bpo::bool_switch(&usage_command), "Usage")
+      ("version,V", bpo::bool_switch(&version_command), "Version information")
+      ("verbose,v", bpo::bool_switch(&cfg.verbose_mode), "Verbose mode")
+      ("dry-run", bpo::bool_switch(&cfg.dry_run), "Dry run (pretend to do it, do nothing)")
+      ("ignore-invalid-words", bpo::bool_switch(&cfg.ignore_invalid_words), "Ignore (drop) invalid words (that won't fit into an SQL database)")
+      ("database", bpo::value<std::string>(&cfg.output_database), "the database into which to write")
+      ("initialization-sql-text", bpo::value<std::string>(&cfg.initialization_sql), "the SQL to initialize the database (with a schema)")
+      ("initialization-sql-file", bpo::value<std::string>(&initialization_sql_file), "the file containing SQL from which to initialize the database (with a schema)")
+      ("drop-sql-text", bpo::value<std::string>(&cfg.drop_sql), "the SQL to drop the database")
+      ("dump-sql-text", bpo::value<std::string>(&cfg.dump_sql), "the SQL to dump the database")
+      ("insert-sql-text", bpo::value<std::string>(&cfg.insert_sql), "the SQL to insert a word into the database")
+      ("row-insertion-limit", bpo::value<int>(&__row_insertion_limit)->default_value(0), "limit the number of rows to be inserted")
+      (words_file, bpo::value<std::vector<std::string>>(), "the words input files")
+      ;
+
+    bpo::positional_options_description positions;
+    positions.add("words-file", -1);
+  
+    bpo::command_line_parser pure_parser(arg_c, arg_v);
+    auto parser = pure_parser.options(flags).positional(positions).run();
+  
+    bpo::variables_map vm;
+    store(parser, vm);
+    notify(vm);
+
+    if (usage_command) {
+      throw tests::words::Usage(program);
+    }
+    if (version_command) {
+      throw tests::words::Version(program);
+    }
+    if (!vm.count(words_file)) {
+      std::cerr << cfg.NAME << ": error, nothing to do!\n";
+      throw tests::words::Usage(program);
+    }
+
+    if (cfg.output_database.empty()) {
+      std::cerr << cfg.NAME << ": error, the --database=DATABASE.sqlite is missing.\n";
+      throw tests::words::Usage(program, sys::exits::USAGE);
+    }
+    if (!initialization_sql_file.empty()) {
+      try {
+        if (cfg.verbose_mode) {
+          std::cerr << cfg.NAME << ": verbose, reading the initialization SQL from " << initialization_sql_file << '\n';
+        } 
+        cfg.initialization_sql = tests::words::slurp<std::string>(initialization_sql_file);
+        if (cfg.verbose_mode) {
+          std::cerr << cfg.NAME << ": verbose, recovered the SQL\n" << cfg.initialization_sql << '\n';
+        } 
+      } catch (std::ios::failure const &e) {
+        if (cfg.verbose_mode) {
+          std::cerr << cfg.NAME << ": verbose, failed to read the SQL in the file " << initialization_sql_file << '\n';
+        }
+        // FIXME .. better error reporting back into the text UI
+        throw sys::exits::CONFIG;
+      }
+    }
+    std::size_t row_insertion_limit = 0; // zero means "infinite"
+    if (__row_insertion_limit < 0) {
+      std::cerr << cfg.NAME << ": error, the row-limit=" << __row_insertion_limit << " cannot be negative\n";
+      throw tests::words::Usage(program);
+    } else {
+      row_insertion_limit = __row_insertion_limit;
+      if (cfg.verbose_mode) {
+        std::string limit_syntax = 0 == row_insertion_limit ? std::string("infinite") : boost::lexical_cast<std::string>(row_insertion_limit);
+        std::cerr << cfg.NAME << ": verbose, the row insertion limit is " << limit_syntax << '\n';
+      }
+    }
+
+    if (cfg.verbose_mode) {
+      if (cfg.dry_run) {
+        std::cerr << cfg.NAME << ": verbose, this is a dry run (no entries will be made in the database)\n";
+      }
+    }
+    sys::exits::Code accrued_exit = sys::exits::OK;
+
+    sqlite::Application app;
+    sqlite::Connection conn(app);
+
+    {
+      if (cfg.verbose_mode) {
+        std::cerr << cfg.NAME << ": verbose, the database file is " << cfg.output_database << '\n';
+      }
+      auto flags = sqlite::open::CREATE | sqlite::open::READWRITE;
+      check(conn.open(cfg.output_database, flags));
+      if (cfg.verbose_mode) {
+        std::cerr << cfg.NAME << ": verbose, the initialization statement is qq|" << cfg.initialization_sql << "|\n";
+        std::cerr << cfg.NAME << ": verbose, the drop statement is qq|" << cfg.drop_sql << "|\n";
+        std::cerr << cfg.NAME << ": verbose, the insert statement is qq|" << cfg.insert_sql << "|\n";
+        std::cerr << cfg.NAME << ": verbose, the dump statement is qq|" << cfg.dump_sql << "|\n";
+      }
+      // See https://sqlite.org/pragma.html
+      // This is a tester, so we'll use the dangerous mode (and go fast)
+      // To go fast in SQLite, you need synchronous=OFF; journal_mode=MEMORY;
+      static_assert(std::is_same<void, decltype(sqlite::eval(conn, ""))>::value, "eval does not return void?");
+      sqlite::eval(conn, cfg.pragmas_sql);
+      sqlite::eval(conn, cfg.initialization_sql);
+      if (cfg.verbose_mode) {
+        std::cerr << cfg.NAME << ": verbose, initialized!\n";
+      }
+    }
+    auto r_add = conn.prepare<sqlite::Statement>(cfg.insert_sql);
+    check(r_add, "insert into " + cfg.insert_sql);
+    sqlite::Statement add = std::move(value(r_add));
+    std::size_t count_of_rows_inserted = 0;
+    sqlite::transaction::Manager xact(conn);
+    for (auto const &file_words : vm[words_file].as<std::vector<std::string>>()) {
+      if (cfg.verbose_mode) {
+        std::cerr << cfg.NAME << ": verbose, reading " << file_words << '\n';
+      }
+      try {
+        sqlite::transaction::Guard guard(xact);
+        for (auto const &word : tests::words::slurp<std::vector<std::string>>(file_words)) {
+          if (count_of_rows_inserted >= row_insertion_limit) {
+            if (cfg.verbose_mode) {
+              std::cerr << cfg.NAME << ": verbose: quitting because the row insertion limit of " << row_insertion_limit << " has been reached\n";
+            }
+            break;
+          }
+          try {
+            auto cleaned = [](std::string subject) -> std::string {
+              // okay to have '-squote but not okay to have "-dquote
+              if (std::string::npos != subject.find_first_of("\"")) {
+                throw tests::words::Badword(subject);
+              }
+              return subject;
+            }(word);
+            if (cfg.verbose_mode) {
+              std::cerr << cfg.NAME << ": verbose, adding q(" << word << ") cleaned up as q(" << cleaned << ")\n";
+            }
+            if (!cfg.dry_run) {
+              add.reset();
+              add.clear_bindings();
+              auto rb = add.bind(1, cleaned);
+              check(rb, "bind " + cleaned);
+              auto rs = add.step();
+              check(rs, "step " + cleaned + " " + cfg.insert_sql);
+              count_of_rows_inserted++;
+            }
+          } catch (tests::words::Badword const &b) {
+            if (cfg.ignore_invalid_words) {
+              if (cfg.verbose_mode) {
+                std::cerr << cfg.NAME << ": verbose: ignoring " << b.what() << '\n';
+              }
+            } else {
+              throw;
+            }
+          }
+        }
+        guard.end();
+      } catch (std::exception const &e) {
+	accrued_exit &= sys::exits::FAIL;
+	std::cerr << cfg.NAME << ": error, failed to insert the contents of " << file_words << " into " << cfg.output_database << " because " << e.what() << '\n';
+      }
+    }
+    if (!cfg.dry_run) {
+      auto r_dump = conn.prepare<sqlite::Statement>(cfg.dump_sql);
+      check(r_dump, "dump from " + cfg.dump_sql);
+      sqlite::Statement dump = std::move(value(r_dump));
+      std::size_t count_of_rows_dumped = 0;
+      if (cfg.verbose_mode) {
+        std::cerr << cfg.NAME << ": verbose, column count is " << dump.column_count() << '\n';
+      }
+      if (dump.column_count() < 2) {
+        std::cerr << cfg.NAME << ": error, there were to be at least 2 columns, but instead there are " << dump.column_count() << '\n';
+      } else {
+        while (row(dump.step())) {
+          count_of_rows_dumped++;
+          auto rowid = dump.column<sqlite::int64>(0);
+          auto word = dump.column<std::string>(1);
+          if (word.empty()) {
+            word = "<empty>";
+          }
+          std::cout << count_of_rows_dumped << ": row " << rowid << " qq(" << word << ")\n";
+        }
+      }
+      if (count_of_rows_inserted != count_of_rows_dumped) {
+        char const *rows_inserted = 1 == count_of_rows_inserted ? "row" : "rows";
+        char const *rows_dumped = 1 == count_of_rows_dumped ? "row" : "rows";
+        std::cerr << cfg.NAME << ": error, there were "
+                  << count_of_rows_inserted << " " << rows_inserted << " inserted, but "
+                  << count_of_rows_dumped << " " << rows_dumped << " were dumped.\n";
+      }
+    }
+    return accrued_exit;
+  } catch (tests::words::Usage const &u) {
+    u.stream() << u.formatted() << '\n';
+    return u.code();
+  } catch (tests::words::Version const &v) {
+    std::cout << v << '\n';
+    return sys::exits::OK;
+  } catch (boost::program_options::error const &e) {
+    std::cerr << e.what() << '\n';
+    return sys::exits::USAGE;
+  } catch (sqlite::Exception const &e) {
+    std::cerr << "sqlite error " << e.what() << '\n';
+    return sys::exits::CONFIG;
+  } catch (std::exception const &e) {
+    std::cerr << "unexpected and surprising: " << e.what() << '\n';
+    return sys::exits::SOFTWARE;
+  } catch (sys::exits::Code c) {
+    return c;
+  } catch (...) {
+    std::cerr << "unexpected and surprising: (unexpected exception type)\n";
+    return sys::exits::SOFTWARE;
+  }
+  return sys::exits::OK;
+}
+#endiv

@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/sys.posix.AF>
+#endiv
+#divert <hpp>
+#import sys.net.Network
+#import sys.un.addr.Type
+#import sys.un.addr.Family
+#import sys.un.sock.Type
+#import sys.un.Sockaddr // [[FIXTHIS?]] should this be in AF::UN at all?
+#import sys.un.constants // [[FIXTHIS?]] ibidem.
+class sys::posix::AF::UN {
+  // Used exclusively to manufacture the public constants
+  using Network = net::Network;
+  template<Network NETWORK> inline static constexpr auto Family = un::addr::Family<NETWORK>;
+public:
+  using Address = un::addr::Type;
+  using Socket [[deprecated("should this be here at all?")]] = un::sock::Type;
+  using Sockaddr [[deprecated("should this be here at all?")]] = un::Sockaddr;
+  inline static constexpr auto LOCAL = Family<Network::LOCAL>;
+  inline static constexpr auto UNIX = Family<Network::UNIX>;
+  UN() = delete;
+  UN(UN const &) = delete;
+  auto operator=(UN const &) -> UN & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_AF_UN.Usage
+static_assert(tests::usage::posix_AF_UN::Usage<>);
+#endiv

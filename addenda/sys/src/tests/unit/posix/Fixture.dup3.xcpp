@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.create
+#import sys.posix.unlink
+#import sys.posix.O
+#import sys.posix.dup3
+auto tests::unit::posix::fixture::Fixture::test_dup3() -> void {
+  using O = six::O;
+  std::string file_exists = "/tmp/t99.tests.unit.posix.test.EXISTS-by-dup3ing";
+  six::unlink(file_exists);
+  auto c = nat::create(file_exists, 0666);
+  guardian::Close c_guard(value(c));
+  CPPUNIT_ASSERT(good(c));
+  std::clog << "unlinking " << file_exists << '\n';
+  auto u = six::unlink(file_exists);
+  std::clog << "unlinked returns " << value(u) << " with errno=" << error_num(u) << '\n';
+  CPPUNIT_ASSERT(good(u));
+  int some_fd = value(c);
+  { auto const MAGIC_VALUE = 108;
+    auto d = nat::dup3(some_fd, MAGIC_VALUE, O::CLOEXEC); // <----- test this
+    CPPUNIT_ASSERT(good(d));
+    guardian::Close d_guard(value(d));
+    int other_fd = value(d);
+    CPPUNIT_ASSERT(some_fd >= 0);
+    CPPUNIT_ASSERT(other_fd >= 0);
+    CPPUNIT_ASSERT(other_fd != some_fd);
+    CPPUNIT_ASSERT_EQUAL(MAGIC_VALUE, other_fd); }
+  { auto const MAGIC_VALUE = 109;
+    auto d = nat::dup3(some_fd, MAGIC_VALUE, O::NOCREATE); // <----- test this
+    CPPUNIT_ASSERT(good(d));
+    guardian::Close d_guard(value(d));
+    int other_fd = value(d);
+    CPPUNIT_ASSERT(some_fd >= 0);
+    CPPUNIT_ASSERT(other_fd >= 0);
+    CPPUNIT_ASSERT(other_fd != some_fd);
+    CPPUNIT_ASSERT_EQUAL(MAGIC_VALUE, other_fd); }
+}
+#endiv

@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace time {
+      namespace as {
+        class C;
+      }
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::time::as::C : public cppunit::test::Fixture {
+public:
+  auto test_something() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+//
+// Both these header files declare a two-argument header file
+// that attempts to overload on the return value AND the argument
+// e.g. template<typename RESULT, typename SOURCE> auto as(SOURCE) -> RESULT
+// This "does not work" and causes ambiguities.
+//
+#import c.as // <---------------------------------- test this
+#import sys.time.as // <--------------------------- ambiguity with this
+#import std.chrono.system_clock
+
+auto tests::unit::time::as::C::test_something() -> void {
+  // cycle the value for a bit to show the lack of ambiguity
+  auto now = std::chrono::system_clock::now();
+  auto spec_val = ::sys::time::as<sys::time::spec>(now);
+  auto tm_val = ::sys::time::as<::sys::time::tm>(spec_val);
+  auto t_val = ::sys::time::as<::sys::time::t>(tm_val);
+  CPPUNIT_ASSERT(1480918187l <= t_val);
+}
+
+#import rigging.suite.io
+auto tests::unit::time::as::C::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream s("as");
+  s << call("something", &C::test_something)
+    ;
+  return finalize(s);
+}
+#divert </cpp>

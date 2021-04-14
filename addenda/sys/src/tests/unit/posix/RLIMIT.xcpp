@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { struct RLIMIT; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.RLIMIT
+struct tests::unit::posix::RLIMIT : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::RLIMIT;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  // Most of these will already have been tested in tests::usage::posix_RLIMIT
+  auto RLIMIT::test_constants() -> void {
+    Subject::Limit l;
+    //
+    l = Subject::CPU_TIME;
+    l = Subject::FILE_SIZE;
+    l = Subject::DATA_SIZE;
+    l = Subject::STACK_SIZE;
+    l = Subject::CORE_FILE_SIZE;
+    l = Subject::RESIDENT_SET_SIZE;
+    l = Subject::OPEN_FILE_COUNT;
+    l = Subject::ADDRESS_SPACE_SIZE;
+    l = Subject::PROCESS_COUNT;
+    l = Subject::MEMORY_LOCK_SIZE;
+    l = Subject::FILE_LOCK_COUNT;
+    l = Subject::SIGNAL_PENDING_COUNT;
+    l = Subject::MESSAGE_QUEUE_SIZE;
+    l = Subject::NICE_PRIORITY;
+    l = Subject::REALTIME_PRIORITY;
+    l = Subject::REALTIME_CPU_TIME;
+    l = Subject::FSIZE;
+    l = Subject::OFILE;
+    //
+    l = Subject::CPU;
+    l = Subject::FILE;
+    l = Subject::DATA;
+    l = Subject::STACK;
+    l = Subject::CORE;
+    l = Subject::RSS;
+    l = Subject::NOFILE;
+    l = Subject::AS;
+    l = Subject::NPROC;
+    l = Subject::MEMLOCK;
+    l = Subject::LOCKS;
+    l = Subject::SIGPENDING;
+    l = Subject::MSGQUEUE;
+    l = Subject::NICE;
+    l = Subject::RTPRIO;
+    l = Subject::RTTIME;
+    CPPUNIT_ASSERT(sizeof (l));
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::RLIMIT::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("RLIMIT");
+  series << call("constants", &RLIMIT::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,435 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sqlite3.h> // just for those class name declarations, t hat is all
+namespace sqlite {
+  namespace api {
+    namespace unguarded {
+      // The "C"-style API of SQLite, from <sqlite3.h>
+      // Also see sqlite::c89 nearby which explains some other C-language policies.
+
+      using Connection = ::sqlite3;       // a.k.a. connection context, "a database"
+      using Function = ::sqlite3_context; // a.k.a. function context; function result context
+      using Statement = ::sqlite3_stmt;   // a.k.a. statement context
+      using Value = ::sqlite3_value;      // a.k.a. (function) parameter context
+    }
+  }
+}
+#divert <hpp>
+#include <sqlite3.h>
+#import c.const_buffer
+#import c.const_stringz
+#import sqlite.status.Code
+#import sqlite.config.session.Code
+#import sqlite.config.connection.Code
+#import sqlite.config.connection.codes
+#import sqlite.open.Flags
+#import sqlite.open.Name
+#import sqlite.Null
+#import sqlite.Value
+#import sqlite.Zeroblob
+#import std.size_t
+#import std.basic_string
+#import std.string
+#import std.wstring
+#import sqlite.api.detail.Bind
+#import sqlite.api.detail.Column
+#import sqlite.prepared.Result
+#import sqlite.prepared.BasicResult
+namespace sqlite {
+  namespace api {
+    namespace unguarded {
+      // In the "outside in" order in which you'd call the interface.
+      // Else in the same order as in <sqlite3.h>
+
+      inline auto open(c::const_stringz filename, Connection *&fill) -> status::Code;
+      inline auto open(c::const_stringz filename, Connection *&fill, sqlite::open::Flags) -> status::Code;
+      inline auto open(c::const_stringz filename, Connection *&fill, sqlite::open::Flags, c::const_stringz vfs) -> status::Code;
+      inline auto open(sqlite::open::Name location, Connection *&fill) -> status::Code;
+      inline auto open(sqlite::open::Name location, Connection *&fill, sqlite::open::Flags) -> status::Code;
+      inline auto open(sqlite::open::Name location, Connection *&fill, sqlite::open::Flags, c::const_stringz vfs) -> status::Code;
+      template<typename CHAR, typename TRAITS, typename ALLOC> inline auto open(std::basic_string<CHAR, TRAITS, ALLOC> const &filename, Connection *&) -> status::Code;
+      template<> inline auto open<std::string::value_type, std::string::traits_type, std::string::allocator_type>(std::string const &filename, Connection *&) -> status::Code;
+      template<> inline auto open<std::wstring::value_type, std::wstring::traits_type, std::wstring::allocator_type>(std::wstring const &filename, Connection *&) -> status::Code;
+
+      inline auto close(Connection *) -> status::Code;
+
+      inline auto extended_result_codes(Connection *, bool onoff) -> status::Code;
+      inline auto last_insert_rowid(Connection *) -> int64;
+
+      inline auto errcode(Connection *) -> status::Code;
+      inline auto extended_errcode(Connection *) -> status::Code;
+      inline auto errmsg(Connection *) -> std::string;
+
+      // unguarded AND unsafe ... wow!
+      namespace unsafe {
+        //
+        // WATCHOUT - these are just as dangerous as ::ioctl()
+        //
+        // The argument signatures are unchecked, uncheckable and
+        // barely documented in the commentariat of config::Code and <sqlite3.h>
+        //
+        // the whole application
+        inline auto config(sqlite::config::session::Code) -> status::Code;
+        template<typename FIRST> inline auto config(sqlite::config::session::Code, FIRST) -> status::Code;
+        template<typename FIRST, typename SECOND> inline auto config(sqlite::config::session::Code, FIRST, SECOND) -> status::Code;
+        template<typename FIRST, typename SECOND, typename THIRD> inline auto config(sqlite::config::session::Code, FIRST, SECOND, THIRD) -> status::Code;
+        // a database (connection)
+        inline auto config(Connection *, sqlite::config::connection::Code) -> status::Code;
+        template<typename FIRST> inline auto config(Connection *, sqlite::config::connection::Code, FIRST) -> status::Code;
+        template<typename FIRST, typename SECOND> inline auto config(Connection *, sqlite::config::connection::Code, FIRST, SECOND) -> status::Code;
+        template<typename FIRST, typename SECOND, typename THIRD> inline auto config(Connection *, sqlite::config::connection::Code, FIRST, SECOND, THIRD) -> status::Code;
+      }
+
+      inline auto config(Connection *, sqlite::config::connection::NOP) -> status::Code;
+      inline auto config(Connection *, sqlite::config::connection::LOOKASIDE, void *, int, int) -> status::Code;
+      inline auto config(Connection *, sqlite::config::connection::ENABLE_FOREIGN_KEY, int, int *) -> status::Code;
+      inline auto config(Connection *, sqlite::config::connection::ENABLE_TRIGGER, int, int *) -> status::Code;
+
+      inline auto attach(Connection *, c::const_stringz filename, c::const_stringz name) -> status::Code;
+      inline auto detach(Connection *, c::const_stringz name) -> status::Code;
+
+      // exec, but without the callback machinery
+      inline auto exec(Connection *, c::const_stringz statement) -> status::Code;
+
+      // For the convenience of the (guarded) sqlite::api
+      template<typename CONTINUATION, typename SYNTAX> inline auto prepare(Connection *, SYNTAX const &sql_syntax, std::size_t limit) -> prepared::BasicResult<Statement *, CONTINUATION>;
+
+      // Support the original scheme in the API to "walk down a very large '\0'-terminated buffer"
+      inline auto prepare(Connection *, char const *sql_syntax, std::size_t limit, Statement *&fills, char const *&fillr) -> status::Code;
+      // Support other "string-like" data types
+      inline auto prepare(Connection *, c::const_stringz sql_syntax, std::size_t limit, Statement *&fills, char const *&fillr) -> status::Code;
+
+      template<typename CHAR, typename TRAITS, typename ALLOC> inline auto prepare(Connection *, std::basic_string<CHAR, TRAITS, ALLOC> const &sql_syntax, std::size_t limit, Statement *&fills, typename std::basic_string<CHAR, TRAITS, ALLOC>::value_type const *&fillr) -> status::Code;
+      template<> inline auto prepare<std::string::value_type, std::string::traits_type, std::string::allocator_type>(Connection *, std::string const &sql_syntax, std::size_t limit, Statement *&fills, std::string::value_type const *&fillr) -> status::Code;
+      template<> inline auto prepare<std::wstring::value_type, std::wstring::traits_type, std::wstring::allocator_type>(Connection *, std::wstring const &sql_syntax, std::size_t limit, Statement *&fills, std::wstring::value_type const *&fillr) -> status::Code;
+
+      // Since all preparation is with "prepare v2" this is always applicable
+      inline auto sql(Statement const *) -> c::const_stringz;
+
+      inline auto readonly(Statement *) -> bool;
+      inline auto busy(Statement *) -> bool;
+
+      inline auto finalize(Statement *) -> status::Code;
+      inline auto reset(Statement *) -> status::Code;
+      inline auto step(Statement *) -> status::Code;
+
+      // recall: the 'api::unguarded::Value *' have an extra dimension of acl-as-typing that is not represented here
+      //
+      //     ^A [protected sqlite3_value] object may always be used where an
+      //     [unprotected sqlite3_value] object is required, so either
+      //     kind of [sqlite3_value] object can be used with the 'bind' or 'result' interfaces.
+      // 
+      // "unprotected" access is produced by
+      //     'column' family for accessing SQL row results
+      // "unprotected" access is consumed by the function families
+      //     'bind' for binding into an SQL statement
+      //     'result' for establishing the result of an SQL function
+      //
+      // "protected" access is produced by
+      //     SQLite and supplied to the application for accessing SQL UDF functions
+      // "protected" access is consumed by the function families
+      //     'parameter' for accessing the actual parameters of an SQL UDF function
+      //                 (a.k.a the "sqlite3_value" family, ahem, renamed here for sanity)
+      //
+
+      // The VALUE (or RESULT) may be other reasonable data types.
+      // The VALUE, when an 'unguarded::Value *' must be an "unprotected" values.
+      inline auto clear_bindings(Statement *) -> status::Code;
+      inline auto bind_parameter_count(Statement *) -> bind_index;
+      template<typename VALUE> inline auto bind(Statement *, bind_index, VALUE) -> typename detail::Bind<VALUE>::result_type;
+
+      inline auto column_count(Statement *) -> column_index;
+      template<typename RESULT> inline auto column(Statement *, column_index) -> typename detail::Column<RESULT>::result_type;
+      inline auto type(Statement *, column_index) -> Type;
+      // There is no "numeric_coercion" for column values, only for (protected) parameter values
+      template<typename VALUE> inline auto result(Function *, VALUE) -> typename detail::Result<VALUE>::result_type;
+
+      // The RESULT may be any other reasonable data type.
+      // The RESULT when a "value" must be a "protected" value, i.e. must be Value<PROTECTED>.
+      template<typename RESULT> inline auto parameter(Value *) -> typename detail::Parameter<RESULT>::result_type;
+      inline auto type(Value *value) -> Type;
+      inline auto numeric_coercion(Value *value) -> Type; // a.i.a. sqlite3_value_numeric_type(...)
+
+    }
+  }
+}
+#endiv
+#divert <ipp>
+auto sqlite::api::unguarded::open(c::const_stringz filename, Connection *&fill) -> status::Code {
+  return (status::Code)::sqlite3_open(filename.data(), &fill);
+}
+
+auto sqlite::api::unguarded::open(c::const_stringz filename, Connection *&fill, sqlite::open::Flags flags) -> status::Code {
+  return (status::Code)::sqlite3_open_v2(filename.data(), &fill, flags, nullptr);
+}
+
+auto sqlite::api::unguarded::open(c::const_stringz filename, Connection *&fill, sqlite::open::Flags flags, c::const_stringz vfs) -> status::Code {
+  return (status::Code)::sqlite3_open_v2(filename.data(), &fill, flags, vfs.data());
+}
+
+auto sqlite::api::unguarded::open(sqlite::open::Name location, Connection *&fill) -> status::Code {
+  return (status::Code)::sqlite3_open(name(location), &fill);
+}
+
+auto sqlite::api::unguarded::open(sqlite::open::Name location, Connection *&fill, sqlite::open::Flags flags) -> status::Code {
+  return (status::Code)::sqlite3_open_v2(name(location), &fill, flags, nullptr);
+}
+
+auto sqlite::api::unguarded::open(sqlite::open::Name location, Connection *&fill, sqlite::open::Flags flags, c::const_stringz vfs) -> status::Code {
+  return (status::Code)::sqlite3_open_v2(name(location), &fill, flags, vfs.data());
+}
+
+#import sqlite.detail
+template<typename CHAR, typename TRAITS, typename ALLOC> auto sqlite::api::unguarded::open(std::basic_string<CHAR, TRAITS, ALLOC> const &filename, Connection *&) -> status::Code {
+  static_assert(sqlite::detail::never_allowed<std::basic_string<CHAR, TRAITS, ALLOC>>::value, "only specializations");
+  return status::Code::OK;
+}
+
+template<> auto sqlite::api::unguarded::open<std::string::value_type, std::string::traits_type, std::string::allocator_type>(std::string const &filename, Connection *&fill) -> status::Code {
+  return (status::Code)::sqlite3_open(filename.c_str(), &fill);
+}
+
+template<> auto sqlite::api::unguarded::open<std::wstring::value_type, std::wstring::traits_type, std::wstring::allocator_type>(std::wstring const &filename, Connection *&fill) -> status::Code {
+  return (status::Code)::sqlite3_open16(filename.c_str(), &fill);
+}
+
+auto sqlite::api::unguarded::close(Connection *connection) -> status::Code {
+  // Reminder from <sqlite3.h>
+  //   The sqlite3_close_v2() interface is intended for use with
+  //   host languages that are garbage collected, and where the
+  //   order in which destructors are called is arbitrary.
+  // That is not C++.  For C++ we can use We use "close v1"
+  if (nullptr != connection) {
+    return (status::Code)::sqlite3_close(connection);
+  }
+  return status::Code::OK;
+}
+
+auto sqlite::api::unguarded::extended_result_codes(Connection *connection, bool onoff) -> status::Code {
+  return (status::Code)::sqlite3_extended_result_codes(connection, onoff);
+}
+
+auto sqlite::api::unguarded::last_insert_rowid(Connection *connection) -> int64 {
+  return ::sqlite3_last_insert_rowid(connection);
+}
+
+auto sqlite::api::unguarded::errcode(Connection *connection) -> status::Code {
+  return (status::Code)::sqlite3_errcode(connection);
+}
+
+auto sqlite::api::unguarded::extended_errcode(Connection *connection) -> status::Code {
+  return (status::Code)::sqlite3_extended_errcode(connection);
+}
+
+auto sqlite::api::unguarded::errmsg(Connection *connection) -> std::string {
+  auto message = ::sqlite3_errmsg(connection);
+  std::string ret(nullptr == message ? message : "no message");
+  return ret;
+}
+
+auto sqlite::api::unguarded::unsafe::config(config::session::Code code) -> status::Code {
+  return (status::Code)::sqlite3_config((int)code);
+}
+
+template<typename FIRST> auto sqlite::api::unguarded::unsafe::config(config::session::Code code, FIRST first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)code, first);
+}
+
+template<typename FIRST, typename SECOND> auto sqlite::api::unguarded::unsafe::config(config::session::Code code, FIRST first, SECOND second) -> status::Code {
+  return (status::Code)::sqlite3_config((int)code, first, second);
+}
+
+template<typename FIRST, typename SECOND, typename THIRD> auto sqlite::api::unguarded::unsafe::config(config::session::Code code, FIRST first, SECOND second, THIRD third) -> status::Code {
+  return (status::Code)::sqlite3_config((int)code, first, second, third);
+}
+
+auto sqlite::api::unguarded::unsafe::config(Connection *connection, sqlite::config::connection::Code code) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)code);
+}
+
+template<typename FIRST> auto sqlite::api::unguarded::unsafe::config(Connection *connection, sqlite::config::connection::Code code, FIRST first) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)code, first);
+}
+
+template<typename FIRST, typename SECOND> auto sqlite::api::unguarded::unsafe::config(Connection *connection, sqlite::config::connection::Code code, FIRST first, SECOND second) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)code, first, second);
+}
+
+template<typename FIRST, typename SECOND, typename THIRD> auto sqlite::api::unguarded::unsafe::config(Connection *connection, sqlite::config::connection::Code code, FIRST first, SECOND second, THIRD third) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)code, first, second, third);
+}
+
+auto sqlite::api::unguarded::config(Connection *, sqlite::config::connection::NOP) -> status::Code {
+  return status::Code::OK;
+}
+
+auto sqlite::api::unguarded::config(Connection *connection, sqlite::config::connection::LOOKASIDE op, void *first, int second, int third) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)op, first, second, third);
+}
+
+auto sqlite::api::unguarded::config(Connection *connection, sqlite::config::connection::ENABLE_FOREIGN_KEY op, int first, int *second) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)op, first, second);
+}
+
+auto sqlite::api::unguarded::config(Connection *connection, sqlite::config::connection::ENABLE_TRIGGER op, int first, int *second) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection, (int)op, first, second);
+}
+
+#import format.q
+#import std.ostringstream
+#import std.string
+auto sqlite::api::unguarded::attach(Connection *connection, c::const_stringz filename, c::const_stringz name) -> status::Code {
+  std::ostringstream buf;
+  // n.b ... you need the single quotes here
+  buf << "attach " << format::q(filename) << " as " << name << ';';
+  std::string statement = buf.str(); 
+  return exec(connection, statement.data());
+}
+
+auto sqlite::api::unguarded::detach(Connection *connection, c::const_stringz name) -> status::Code {
+  std::ostringstream buf;
+  buf << "detach " << name << ';';
+  std::string statement = buf.str(); 
+  return exec(connection, statement.data());
+}
+
+auto sqlite::api::unguarded::exec(Connection *connection, c::const_stringz statement) -> status::Code {
+  int (*callback_function)(void *state,int column_count,char **column_texts, char **column_names) = nullptr;
+  void *const callback_state = nullptr;
+  char **const error_location = nullptr;
+  return (status::Code)::sqlite3_exec(connection, statement.data(), callback_function, callback_state, error_location);
+}
+
+#import c.str
+#import std.move
+#import std.numeric_limits
+#import sqlite.prepared.manage_limit_truncation
+#import sqlite.api.utf.prepare
+#include <cassert>
+template<typename CONTINUATION, typename SYNTAX> auto sqlite::api::unguarded::prepare(Connection *connection, SYNTAX const &MUST_NOT_COPY_sql_syntax, std::size_t limit) -> prepared::BasicResult<Statement *, CONTINUATION> {
+  using result_type = prepared::BasicResult<Statement *, CONTINUATION>;
+  // recall: the nByte sparameter of sqlite3_prepare_v2 is a (32-bit) signed integer
+  // and negative values mean "parse until a full statement or '\0'-terminator sentinel"
+  // and 0 == nBytes will give you exactly that, no parsing at all and an OK return code.
+  int nBytes = prepared::manage_limit_truncation(limit);
+  assert(nBytes < std::numeric_limits<decltype(nBytes)>::max()/4); // ... reasonably
+  Statement *statement(nullptr);
+  CONTINUATION remaining(nullptr);
+  // No need to support "prepare v1"
+  status::Code code = (status::Code)utf::prepare_v2(connection, /*WATCHOUT - MUST_NOT_COPY*/ c::str(MUST_NOT_COPY_sql_syntax), nBytes, &statement, /*WATCHOUT - returns a pointer into sql_syntax*/ &remaining);
+  auto adl = typename result_type::adl_type();
+  result_type ret(adl, code, statement, remaining);
+  return ret;
+}
+
+#import sqlite.prepared
+#import sqlite.prepared.manage_limit_truncation
+auto sqlite::api::unguarded::prepare(Connection *connection, char const *sql_syntax, std::size_t limit, Statement *&fills, char const *&fillr) -> status::Code {
+  auto nBytes = prepared::manage_limit_truncation(limit);
+  return (status::Code)utf::prepare_v2(connection, sql_syntax, nBytes, &fills, &fillr);
+}
+
+#import sqlite.prepared.manage_limit_truncation
+auto sqlite::api::unguarded::prepare(Connection *connection, c::const_stringz sql_syntax, std::size_t limit, Statement *&fills, char const *&fillr) -> status::Code {
+  auto nBytes = prepared::manage_limit_truncation(limit);
+  return (status::Code)utf::prepare_v2(connection, sql_syntax.data(), nBytes, &fills, &fillr);
+}
+
+#import sqlite.detail
+template<typename CHAR, typename TRAITS, typename ALLOC> auto sqlite::api::unguarded::prepare(Connection *connection, std::basic_string<CHAR, TRAITS, ALLOC> const &sql_syntax, std::size_t limit, Statement *&fills, typename std::basic_string<CHAR, TRAITS, ALLOC>::value_type const *&fillr) -> status::Code {
+  static_assert(sqlite::detail::never_allowed<std::basic_string<CHAR, TRAITS, ALLOC>>::value, "only specializations");
+  return status::Code::OK;
+}
+
+#import sqlite.prepared.manage_limit_truncation
+template<> auto sqlite::api::unguarded::prepare<std::string::value_type, std::string::traits_type, std::string::allocator_type>(Connection *connection, std::string const &sql_syntax, std::size_t limit, Statement *&fills, std::string::value_type const *&fillr) -> status::Code {
+  // only "prepare v2", no need to support v1 at all
+  auto nBytes = prepared::manage_limit_truncation(limit);
+  return (status::Code)utf::prepare_v2(connection, sql_syntax.data(), nBytes, &fills, &fillr);
+}
+
+#import sqlite.c89
+#import sqlite.prepared.manage_limit_truncation
+template<>  auto sqlite::api::unguarded::prepare<std::wstring::value_type, std::wstring::traits_type, std::wstring::allocator_type>(Connection *connection, std::wstring const &sql_syntax, std::size_t limit, Statement *&fills, std::wstring::value_type const *&fillr) -> status::Code {
+  // only "prepare v2", no need to support v1 at all
+  auto nBytes = prepared::manage_limit_truncation(limit);
+  return (status::Code)utf::prepare_v2(connection, sql_syntax.data(), nBytes, &fills, &fillr);
+}
+
+auto sqlite::api::unguarded::sql(Statement const *statement) -> c::const_stringz {
+  // WATCHOUT -- we believe that this is a safe cast ...
+  return ::sqlite3_sql(const_cast<Statement *>(statement));
+}
+
+auto sqlite::api::unguarded::readonly(Statement *statement) -> bool {
+  return ::sqlite3_stmt_readonly(statement);
+}
+
+auto sqlite::api::unguarded::busy(Statement *statement) -> bool {
+  return ::sqlite3_stmt_busy(statement);
+}
+
+auto sqlite::api::unguarded::finalize(Statement *statement) -> status::Code {
+  // For the destructor-type operations, we provide nullptr safety
+  // But we do not zero-out the pointer, so the supplied pointer now is "invalid"
+  if (nullptr != statement) {
+    return (status::Code)::sqlite3_finalize(statement);
+  }
+  return status::Code::OK;
+}
+
+auto sqlite::api::unguarded::reset(Statement *statement) -> status::Code {
+  return (status::Code)::sqlite3_reset(statement);
+}
+
+auto sqlite::api::unguarded::step(Statement *statement) -> status::Code {
+  return (status::Code)::sqlite3_step(statement);
+}
+
+auto sqlite::api::unguarded::clear_bindings(Statement *statement) -> status::Code {
+  return (status::Code)::sqlite3_clear_bindings(statement);
+}
+
+auto sqlite::api::unguarded::bind_parameter_count(Statement *statement) -> bind_index {
+  return ::sqlite3_bind_parameter_count(statement);
+}
+
+#import sqlite.api.detail.Dispatch
+template<typename VALUE> auto sqlite::api::unguarded::bind(Statement *statement, bind_index idx, VALUE value) -> typename detail::Bind<VALUE>::result_type {
+  detail::Dispatch<VALUE> dispatch;
+  return dispatch.bind(statement, idx, value);
+}
+
+auto sqlite::api::unguarded::column_count(Statement *statement) -> column_index {
+  return ::sqlite3_column_count(statement);
+}
+
+template<typename RESULT> auto sqlite::api::unguarded::column(Statement *statement, column_index idx) -> typename detail::Column<RESULT>::result_type {
+  detail::Dispatch<RESULT> dispatch;
+  return dispatch.column(statement, idx);
+}
+
+template<typename VALUE> auto sqlite::api::unguarded::result(Function *function, VALUE value) -> typename detail::Result<VALUE>::result_type {
+  detail::Dispatch<VALUE> dispatch;
+  return dispatch.result(function, value);
+}
+
+auto sqlite::api::unguarded::type(Statement *statement, column_index idx) -> Type {
+  return (Type)::sqlite3_column_type(statement, idx);
+}
+
+template<typename RESULT> auto sqlite::api::unguarded::parameter(Value *value) -> typename detail::Parameter<RESULT>::result_type {
+  detail::Dispatch<RESULT> dispatch;
+  return dispatch.parameter(value);
+}
+
+auto sqlite::api::unguarded::type(Value *value) -> Type {
+  return (Type)::sqlite3_value_type(value);
+}
+
+auto sqlite::api::unguarded::numeric_coercion(Value *value) -> Type {
+  // yes, it's a rename: s/numeric_type/numeric_coerscion/
+  return (Type)::sqlite3_value_numeric_type(value);
+}
+#endiv

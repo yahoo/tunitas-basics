@@ -1,0 +1,99 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.conditional
+#import std.is_same
+#import std.is_class
+#import std.tuple
+#import std.tuple_size
+#import sys.id.required.Process
+#import sys.wait.Status
+#import sys.sig.Info
+#import sys.r.Usages
+static_assert(std::is_enum_v<sys::r::Usage>);
+static_assert(std::is_class_v<sys::r::Usages>);
+namespace sys::call::result::required {
+  //
+  // What are the legal types IDENTIFIER, STATUS, SIGINFO, for USAGE types for wait::Value<...>
+  //
+  // Indeed, 'struct rusage' is not part of the legal pantheon here.
+  // 
+  //
+  // Usage:
+  //
+  //   come on, it's a concept
+  //
+  namespace [[detail]] wait {
+    using namespace std;
+    namespace [[detail]] tuples {
+      template<unsigned INDEX, typename... TYPES> using Element = tuple_element_t<INDEX, tuple<TYPES..., void, void, void>>; // typename conditional<(INDEX < tuple_size_v<tuple<TYPES...>>), tuple_element<INDEX, TYPES...>, void>::type;
+      template<typename... TYPES> inline constexpr auto countof = std::tuple_size_v<std::tuple<TYPES...>>;
+    }
+    using tuples::Element;
+    using tuples::countof;
+    namespace [[detail]] is {
+      template<typename PROCESS> concept bool Process = id::required::Process<PROCESS>;
+      template<typename LHS, typename RHS> concept bool Same = is_same_v<LHS, RHS>;
+      namespace [[detail]] r {
+        template<typename USAGE> [[deprecated("never the singular; instead use is::r::Usages<USAGE>")]] concept bool Usage = requires(USAGE) {
+          requires false;
+        };
+        template<typename USAGES> concept bool Usages = requires(USAGES) {
+          requires is_class_v<sys::r::Usages>;
+          requires is_same_v<USAGES, sys::r::Usages>; // IS the plural structure
+          requires is_enum_v<sys::r::Usage>;
+          requires !is_same_v<USAGES, sys::r::Usage>; // NOT the singular enum
+        };
+      }
+    }
+    template<typename ONE> concept bool Wait1 = id::required::Process<ONE>;
+    template<typename ONE, typename TWO> concept bool Wait2 = requires(ONE, TWO) {
+      requires is::Process<ONE>;
+      requires is::Same<TWO, sys::wait::Status> || is::Same<TWO, sig::Info> || is::r::Usages<TWO>;
+    };
+    template<typename ONE, typename TWO, typename THREE> concept bool Wait3 = requires(ONE, TWO, THREE) {
+      requires is::Process<ONE>;
+      requires is::Same<TWO, sys::wait::Status>;
+      requires is::r::Usages<THREE>;
+    };
+    template<typename... SEVERAL> concept bool Wait = requires(SEVERAL...) {
+      requires 0 != countof<SEVERAL...>;
+      requires 1 != countof<SEVERAL...> || Wait1<Element<0, SEVERAL...>>;
+      requires 2 != countof<SEVERAL...> || Wait2<Element<0, SEVERAL...>, Element<1, SEVERAL...>>;
+      requires 3 != countof<SEVERAL...> || Wait3<Element<0, SEVERAL...>, Element<1, SEVERAL...>, Element<2, SEVERAL...>>;
+      requires 4 > countof<SEVERAL...>;
+    };
+  }
+  using wait::Wait;
+}
+#endiv
+#divert <cpp>
+#import pid_t
+#import sys.id.File
+#import sys.id.Process
+#import sys.id.Signal
+namespace {
+  namespace tests {
+    using namespace sys;
+    namespace required = call::result::required;
+    static_assert(required::Wait<pid_t>);
+    static_assert(required::Wait<id::Process>);
+    //
+    static_assert(required::Wait<pid_t, wait::Status>);
+    static_assert(required::Wait<id::Process, wait::Status>);
+    //
+    static_assert(required::Wait<pid_t, sig::Info>);
+    static_assert(required::Wait<id::Process, sig::Info>);
+    //
+    static_assert(required::Wait<pid_t, r::Usages>);
+    static_assert(required::Wait<id::Process, r::Usages>);
+    //
+    static_assert(required::Wait<pid_t, wait::Status, r::Usages>);
+    static_assert(required::Wait<id::Process, wait::Status, r::Usages>);
+    //
+    static_assert(!required::Wait<int, int, rusage>);
+    static_assert(!required::Wait<id::File>);
+    static_assert(!required::Wait<id::Signal>);
+  }
+}
+#endiv

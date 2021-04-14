@@ -1,0 +1,6 @@
+// -*- c++ -*- c38a5fe7-0bad-4add-a7a2-72699a1dae1c
+#pragma once
+#include <httpserver>
+namespace httpserver::exception {
+  using File_Access = httpserver::http::file_access_exception;
+}

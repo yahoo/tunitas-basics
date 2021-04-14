@@ -1,0 +1,74 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::pem { class From_String; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import std.filesystem.path
+class tests::unit::pem::From_String : public cppunit::test::Fixture {
+public:
+  auto test_from_string_evp_PKey() -> void;
+  auto test_from_string_x509_Crl() -> void;
+  auto test_from_string_x509_Crt() -> void;
+  auto test_from_string_x509_Req() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto slurp(std::filesystem::path const &basename) -> std::string;
+};
+#endiv
+#divert <cpp>
+#import std.filesystem.exists
+#import std.filesystem.path
+#import std.length_error
+#import slurp.file.read
+auto tests::unit::pem::From_String::slurp(std::filesystem::path const &basename) -> std::string {
+  using namespace std::filesystem;
+  for (auto candidate : {path{"."}, path{"tests/unit"}}) {
+    auto rebase = candidate / basename;
+    if (exists(rebase)) {
+      return ::slurp::file::read<std::string>(rebase);
+    }
+  }
+  // This is a logic error because it is YOUR fault for not writing the test file
+  // What else are we supposed to throw in this case?
+  throw std::logic_error{"missing test file"};
+}
+#import tests.unit.pem.constants.Slurpfile
+#import openssl.pem.from_string
+auto tests::unit::pem::From_String::test_from_string_evp_PKey() -> void {
+  auto slurped = slurp(constants::Slurpfile<::openssl::evp::PKey>::filepath());
+  auto subject = ::openssl::pem::from_string<::openssl::evp::PKey>(slurped);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.pem.from_string
+auto tests::unit::pem::From_String::test_from_string_x509_Crl() -> void {
+  auto slurped = slurp(constants::Slurpfile<::openssl::x509::Crl>::filepath());
+  auto subject = ::openssl::pem::from_string<::openssl::x509::Crl>(slurped);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.pem.from_string
+auto tests::unit::pem::From_String::test_from_string_x509_Crt() -> void {
+  auto slurped = slurp(constants::Slurpfile<::openssl::x509::Crt>::filepath());
+  auto subject = ::openssl::pem::from_string<::openssl::x509::Crt>(slurped);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.pem.from_string
+auto tests::unit::pem::From_String::test_from_string_x509_Req() -> void {
+  auto slurped = slurp(constants::Slurpfile<::openssl::x509::Req>::filepath());
+  auto subject = ::openssl::pem::from_string<::openssl::x509::Req>(slurped);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import rigging.suite.io
+auto tests::unit::pem::From_String::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("from_string");
+  series << call("evp::PKey", &From_String::test_from_string_evp_PKey)
+         << call("x509::Crl", &From_String::test_from_string_x509_Crl)
+         << call("x509::Crt", &From_String::test_from_string_x509_Crt)
+         << call("x509::Req", &From_String::test_from_string_x509_Req)
+    ;
+  return finalize(series);
+}
+#endiv

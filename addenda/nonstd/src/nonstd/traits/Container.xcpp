@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward nonstd.container_traits
+namespace nonstd::traits {
+  //
+  // A truth type
+  // Is CONTAINER an container with a nonstd::container_traits<CONTAINER> value?
+  //
+  // Specializations return true for instances of nonstd::container_traits
+  //
+  // WATCHOUT - traits::Container<CONTAINER> != container::Traits<CONTAINER>
+  //            traits::Container<container_traits<CONTAINER>>
+  //
+  template<typename> struct Container;
+  template<typename CONTAINER> struct Container<container_traits<CONTAINER>>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+#import std.false_type
+namespace nonstd::traits {
+  template<typename> struct Container : public std::false_type { };
+  template<typename CONTAINER> struct Container<container_traits<CONTAINER>> : public std::true_type { };
+}
+#endiv

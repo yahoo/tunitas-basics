@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_class
+#import std.is_enum
+#import std.tuple
+#import std.variant
+#import std.false_type
+#import std.true_type
+namespace sys::id::required::school {
+  //
+  //
+  // The New School (our) POSIX types
+  // Always flavored integers (enum class). or structures (classes)
+  //
+  // e.g. id::File, id::Signal, id::Wait
+  //      id::process::Process, id::process::Group, id::process::Either
+  //
+  namespace [[detail]] new_veau {
+    using namespace std;
+    template<typename TYPE> concept bool Basis = is_enum_v<TYPE>;
+    namespace [[detail, cannot("name this namespace tuple")]] two_pull {
+      template<typename TYPE> struct Deconstructor : public false_type { };
+      template<typename... TYPES> requires (true && ... && Basis<TYPES>) struct Deconstructor<tuple<TYPES...>> : public true_type { };
+      template<typename TYPE> concept bool Tuple = Deconstructor<TYPE>::value;
+    }
+    using two_pull::Tuple;
+    namespace [[detail, cannot("name this namespace variant")]] very_ant {
+      template<typename TYPE> struct Deconstructor : public false_type { };
+      template<typename... TYPES> requires (true && ... && Basis<TYPES>) struct Deconstructor<variant<TYPES...>> : public true_type { };
+      template<typename TYPE> concept bool Variant = Deconstructor<TYPE>::value;
+    }
+    using very_ant::Variant;
+    namespace [[detail]] except_for_the {
+      template<typename TYPE> concept bool Exceptions = false;
+    }
+    template<typename TYPE> concept bool New = Basis<TYPE> || Tuple<TYPE> || Variant<TYPE> || except_for_the::Exceptions<TYPE>;
+  }
+  using new_veau::New;
+}
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import sys.id.Process
+#import sys.id.Signal
+#import sys.id.Wait
+#import sys.id.process.Process
+#import sys.id.process.Group
+#import sys.id.process.Thread
+#import sys.id.process.Any
+#import sys.id.process.Either
+#import sys.id.wait.Typed
+#import sys.id.wait.Untyped
+#import pid_t
+#import id_t
+#import gid_t
+#import uid_t
+#import off_t
+#import sys.id.wait.Typed // wherein lives typed_t
+namespace {
+  namespace tests {
+    using namespace sys::id::required::school;
+    static_assert(New<sys::id::File>);
+    static_assert(New<sys::id::Process>);
+    static_assert(New<sys::id::Signal>);
+    static_assert(New<sys::id::Wait>);
+    static_assert(New<sys::id::process::Either>);
+    static_assert(New<sys::id::process::Any>);
+    static_assert(New<sys::id::wait::Untyped>);
+    static_assert(New<sys::id::wait::Typed>);
+    //
+    static_assert(!New<pid_t>);
+    static_assert(!New<id_t>);
+    static_assert(!New<size_t>);
+    static_assert(!New<ssize_t>);
+    static_assert(!New<off_t>);
+    static_assert(!New<sys::id::wait::typed_t>);
+  }
+}
+#endiv

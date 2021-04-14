@@ -1,0 +1,30 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import uuid
+#import std.string
+#import std.vector
+#import uuid.detail.Wrapper
+namespace uuid {
+  namespace unparsing {
+    inline auto lower(detail::Wrapper const &, char *append) -> void;
+    inline auto lower(detail::Wrapper const &, std::vector<char> &append) -> void;
+    inline auto lower(detail::Wrapper const &, std::string &append) -> void;
+  }
+}
+#endiv
+#divert <ipp>
+#import uuid.unparsing
+#import uuid.detail.unparse.scheme
+
+auto uuid::unparsing::lower(detail::Wrapper const &in, char *append) -> void {
+  detail::unparse::scheme(in, append, &uuid_unparse_lower);
+}
+
+auto uuid::unparsing::lower(detail::Wrapper const &in, std::string &append) -> void {
+  detail::unparse::scheme(in, append, &uuid_unparse_lower);
+}
+
+auto uuid::unparsing::lower(detail::Wrapper const &in, std::vector<char> &append) -> void {
+  detail::unparse::scheme(in, append, &uuid_unparse_lower);
+}
+#endiv

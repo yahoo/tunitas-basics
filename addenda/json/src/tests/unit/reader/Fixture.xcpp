@@ -1,0 +1,98 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::reader { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::reader::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  // Focused on json::Reader, ignoring json::reader::Simple, json::reader::Char
+  auto test_constructor_default() -> void;
+  auto test_constructor_features() -> void;
+  auto test_destructor() -> void;
+  auto test_operator_call_parse_nocomments() -> void;
+  auto test_operator_call_parse_yescomments() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import json.Reader
+#import json.String
+#import json.to
+auto tests::unit::reader::Fixture::test_constructor_default() -> void {
+  ::json::Reader r;
+}
+#import json.Features
+auto tests::unit::reader::Fixture::test_constructor_features() -> void {
+  ::json::Features all = ::json::Features::all();
+  ::json::Reader read(all);
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::reader::Fixture::test_destructor() -> void {
+  {
+    ::json::Features all = ::json::Features::all();
+    ::json::Reader read(all);
+    char const *const some_trivial_literal = R"json( {"apple":2,  "banana" : 3 } )json";
+    ::json::String syntax = ::json::to(::json::STRING(), some_trivial_literal);
+    auto result = read(syntax);
+    CPPUNIT_ASSERT(ok(result));
+    // <-------- the destructor happens here
+  }
+}
+auto tests::unit::reader::Fixture::test_operator_call_parse_nocomments() -> void {
+  ::json::Features all = ::json::Features::all();
+  ::json::Reader read(all);
+  char const *const some_trivial_literal = R"json( {"only":1} )json";
+  bool const comments = false; // <-------------------------- test this
+  ::json::String syntax = ::json::to(::json::STRING(), some_trivial_literal);
+  auto result = read(syntax, comments);
+  CPPUNIT_ASSERT(ok(result));
+}
+auto tests::unit::reader::Fixture::test_operator_call_parse_yescomments() -> void {
+  ::json::Features all = ::json::Features::all();
+  ::json::Reader read(all);
+  char const *const some_trivial_literal = R"json( {"only":1} )json";
+  bool const comments = true; // <-------------------------- test this
+  auto syntax = ::json::to(::json::STRING(), some_trivial_literal);
+  auto result = read(syntax, comments);
+  CPPUNIT_ASSERT(ok(result));
+}
+#import tests.unit.reader.Reader
+#import tests.unit.reader.Simple
+#import tests.unit.reader.Result
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::reader::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("reader");
+  {
+    Stream con("constructor");
+    con << call("default", &Fixture::test_constructor_default)
+        << call("features", &Fixture::test_constructor_features)
+      ;
+    series << add(con.release());
+  }
+  series << call("destructor", &Fixture::test_destructor)
+    ;
+  {
+    Stream cal("operator()");
+    {
+      Stream par("parse");
+      par << call("nocomments", &Fixture::test_operator_call_parse_nocomments)
+          << call("yescomments", &Fixture::test_operator_call_parse_yescomments)
+        ;
+      cal << add(par.release());
+    }
+    series << add(cal.release());
+  }
+  series << add(Result::suite())
+         << add(Reader::suite())
+         << add(Simple::suite())
+    ;
+  return series.release();
+}
+#endiv

@@ -1,0 +1,3 @@
+// -*- c++ -*- 4a03f3d4-2ac6-4bd1-95ac-ecd468cb2ef2
+#pragma once
+#include <boost/program_options/value_semantic.hpp>

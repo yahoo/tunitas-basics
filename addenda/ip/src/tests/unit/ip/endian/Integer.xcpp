@@ -1,0 +1,184 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+namespace tests::unit::ip::endian {
+  //
+  // Where WRAPPER is ::ip::endian::Integer<ORDER, INTEGER>
+  // And whereas this is a tester, we're not using concepts to constrain that.
+  //
+  template<typename WRAPPER> class Integer;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+template<typename WRAPPER> class tests::unit::ip::endian::Integer : public cppunit::test::Fixture {
+public:
+  using wrapper_type = WRAPPER;
+
+  auto test_constructor_default() -> void;
+  auto test_constructor_conversion() -> void;
+  auto test_constructor_reorder() -> void;
+  auto test_operator_cast() -> void;
+
+  auto test_operator_insert() -> void;
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+  auto test_operator_lt() -> void;
+  auto test_operator_le() -> void;
+  auto test_operator_gt() -> void;
+  auto test_operator_ge() -> void;
+
+  auto test_swap() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import ip.endian.Integer
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_constructor_default() -> void {
+  wrapper_type subject;
+  CPPUNIT_ASSERT(0 == subject);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_constructor_conversion() -> void {
+  wrapper_type subject(1);
+  CPPUNIT_ASSERT(1 == subject);
+}
+
+#import ip.endian.host_order
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_constructor_reorder() -> void {
+  namespace en = ::ip::endian;
+  using native_integer_type = typename WRAPPER::value_type;
+  {
+    en::Integer<en::Order::HOST, native_integer_type> specimen(1);
+    wrapper_type subject(specimen);
+    CPPUNIT_ASSERT(1 == en::host_order(subject));
+  } {
+    en::Integer<en::Order::HOST, native_integer_type> precursor(2);
+    en::Integer<en::Order::NETWORK, native_integer_type> specimen(precursor);
+    wrapper_type subject(specimen);
+    CPPUNIT_ASSERT(2 == en::host_order(subject));
+  }
+}
+
+#import tests.unit.ip.endian.Palette.Operator_Insert
+#import std.string
+#import std.ostringstream
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_insert() -> void {
+  using Generator = Palette::Operator_Insert<typename WRAPPER::value_type>;
+  wrapper_type subject(Generator::specimen());
+  std::ostringstream buf;
+  buf << subject; // <--------------------------------------------- test this
+  std::string actual = buf.str();
+  std::string expected = Generator::expected();
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_eq() -> void {
+  wrapper_type subject_a(100);
+  wrapper_type subject_b(99);
+  wrapper_type subject_c(100);
+  CPPUNIT_ASSERT(subject_a == subject_a);
+  CPPUNIT_ASSERT(! (subject_a == subject_b) );
+  CPPUNIT_ASSERT(subject_a == subject_c);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_ne() -> void {
+  wrapper_type subject_a(1);
+  wrapper_type subject_b(2);
+  wrapper_type subject_c(3);
+  CPPUNIT_ASSERT(! (subject_a != subject_a) );
+  CPPUNIT_ASSERT(subject_a != subject_b);
+  CPPUNIT_ASSERT(subject_a != subject_c);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_lt() -> void {
+  wrapper_type subject_a(1);
+  wrapper_type subject_b(2);
+  wrapper_type subject_c(3);
+  CPPUNIT_ASSERT(! (subject_a < subject_a) );
+  CPPUNIT_ASSERT(subject_a < subject_b);
+  CPPUNIT_ASSERT(subject_b < subject_c);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_le() -> void {
+  wrapper_type subject_a(11);
+  wrapper_type subject_b(21);
+  wrapper_type subject_c(31);
+  wrapper_type subject_d(subject_c);
+  CPPUNIT_ASSERT(subject_a <= subject_a);
+  CPPUNIT_ASSERT(subject_a <= subject_b);
+  CPPUNIT_ASSERT(subject_b <= subject_c);
+  CPPUNIT_ASSERT(subject_c <= subject_d);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_gt() -> void {
+  wrapper_type subject_a(1);
+  wrapper_type subject_b(2);
+  wrapper_type subject_c(3);
+  CPPUNIT_ASSERT(! (subject_a > subject_a) );
+  CPPUNIT_ASSERT(subject_b > subject_a);
+  CPPUNIT_ASSERT(! (subject_b > subject_b) );
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_ge() -> void {
+  wrapper_type subject_a(11);
+  wrapper_type subject_b(21);
+  wrapper_type subject_c(31);
+  wrapper_type subject_d(subject_c);
+  CPPUNIT_ASSERT(subject_a >= subject_a);
+  CPPUNIT_ASSERT(subject_b >= subject_a);
+  CPPUNIT_ASSERT(subject_c >= subject_b);
+  CPPUNIT_ASSERT(subject_d >= subject_c);
+}
+
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_swap() -> void {
+  wrapper_type const original_a(29);
+  wrapper_type const original_b(39);
+  wrapper_type subject_a(original_a);
+  wrapper_type subject_b(original_b);
+  swap(subject_a, subject_b);
+  CPPUNIT_ASSERT(subject_a == original_b);
+  CPPUNIT_ASSERT(subject_b == original_a);
+}
+
+#import want.cppunit.int128
+using want::cppunit::operator<<;
+// because WRAPPER may be ::ip::uint128_t
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::test_operator_cast() -> void {
+  auto specimen =  99u;
+  wrapper_type subject(99);
+  typename wrapper_type::value_type actual = subject; // <--------- test this
+  typename wrapper_type::value_type expected = specimen;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import std.string
+#import std.string_literals
+#import std.to_string
+#import std.type_info
+#import tests.unit.ip.endian.Integer
+#import rigging.suite.io
+template<typename WRAPPER> auto tests::unit::ip::endian::Integer<WRAPPER>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::suite;
+  Stream series("Integer["s + typeid(WRAPPER).name() + "]"s);
+  series << call("constructor_default", &Integer::test_constructor_default)
+         << call("constructor_conversion", &Integer::test_constructor_conversion)
+         << call("constructor_reorder", &Integer::test_constructor_reorder)
+         << call("operator_cast", &Integer::test_operator_cast)
+         << call("operator<<", &Integer::test_operator_insert)
+         << call("operator==", &Integer::test_operator_eq)
+         << call("operator!=", &Integer::test_operator_ne)
+         << call("operator<", &Integer::test_operator_lt)
+         << call("operator<=", &Integer::test_operator_le)
+         << call("operator>", &Integer::test_operator_gt)
+         << call("operator>=", &Integer::test_operator_ge)
+         << call("swap", &Integer::test_swap)
+    ;
+  return finalize(series);
+}
+#endiv

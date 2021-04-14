@@ -1,0 +1,11 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 1
+set -e
+${exe?} . 0
+${exe?} . 1
+${exe?} . 2
+${exe?} . 3
+${exe?} . 4
+${exe?} . 5
+${exe?} . 6
+${exe?} . 7

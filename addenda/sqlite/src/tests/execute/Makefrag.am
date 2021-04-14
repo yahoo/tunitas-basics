@@ -1,0 +1,33 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+check_bin_execute = check/bin/execute
+check_bin_execute_LDADD = \
+  $(lib_libsqlite_module_la) \
+  -loptions-module \
+  -lsys-exits-module \
+  $(end)
+check_bin_execute_LDFLAGS = $(CHECK_LDFLAGS_SET)
+# And CPPFLAGS, CXXFLAGS must remain available for the caller
+# no need to bitch about deprecated interfaces; we are testing those interfaces herein.
+$(check_bin_execute_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_execute_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+$(check_bin_execute_OBJECTS): # NOT AM_LDFLAGS
+check_bin_execute_SOURCES = \
+  obj/src/tests/execute/main.cpp \
+  \
+  obj/src/tests/execute/namespace.cpp \
+  obj/src/tests/execute/Configuration.cpp \
+  obj/src/tests/execute/Usage.cpp \
+  obj/src/tests/execute/Version.cpp \
+  $(end)
+$(scold_cxxdir)/tests/execute/dependencies.mk: $(check_bin_execute_SOURCES)
+$(check_bin_execute_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/execute/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/execute/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/execute/dependencies.mk

@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// Use the friend status of the structure to access private members for testing
+#import openssl.bio.Mode
+#endiv
+#divert <hpp>
+struct openssl::bio::Mode::tests::Access {
+  inline explicit Access(Mode &mode) : accessible{mode} { }
+  inline auto mode() const -> char const * { return accessible.mode(); }
+protected:
+  Mode const &accessible;
+};
+#endiv

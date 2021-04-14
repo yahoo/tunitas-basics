@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.x509.Extension
+#import c.const_stringz
+#import re.string
+namespace openssl::x509::extension {
+  //
+  // Generate (simple) constraints.
+  // The simple constriants are those which do not need an x509::v3::Ctx
+  //
+  // Usage:
+  //
+  //   Extension ext = extension::config(NID_basic_constraints, "CA:TRUE,pathlen:10");
+  //   Extension ext = extension::config("something-something", "dark-side");
+  //
+  namespace packaging::config::function {
+    using NID = int;
+    using Name = re::string<c::const_stringz>;
+    using Value = re::string<c::const_stringz>;
+    using Result = Extension;
+    inline auto config(NID, Value) -> Result;
+    inline auto config(Name, Value) -> Result;
+  }
+  using packaging::config::function::config;
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import openssl.error.Code
+#import openssl.functions
+#import openssl.x509.Extension
+#import std.error_code
+namespace openssl::x509::extension::packaging::config {
+  auto function::config(NID name, Value value) -> Result {
+    //
+    // https://svn.python.org/projects/external/openssl-0.9.8a/doc/openssl.txt
+    // https://docs.huihoo.com/doxygen/openssl/1.0.1c/v3__conf_8c.html
+    // https://github.com/openssl/openssl/blob/master/crypto/x509v3/v3_conf.c
+    // There is no better document than these?
+    //
+    //   <quote>
+    //     This function returns an extension based on a name and value pair,
+    //     if the pair will not need to access other sections in a config file
+    //     (or there is no config file) then the 'conf' parameter can be set to NULL.
+    //   </quote>
+    //
+    auto const conf = nullptr;
+    auto const ctx = nullptr;
+    auto pointer = X509V3_EXT_conf_nid(conf, ctx, name, c::str(value));
+    if (nullptr == pointer) {
+      throw std::error_code{error::Code::X509};
+    }
+    return Result{pointer};
+  }
+  auto function::config(Name name, Value value) -> Result {
+    auto const conf = nullptr;
+    auto const ctx = nullptr;
+    auto pointer = X509V3_EXT_conf(conf, ctx, c::str(name), c::str(value));
+    if (nullptr == pointer) {
+      throw std::error_code{error::Code::X509};
+    }
+    return Result{pointer};
+  }
+}
+#endiv

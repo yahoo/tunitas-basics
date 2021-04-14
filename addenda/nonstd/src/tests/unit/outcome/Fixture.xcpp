@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::outcome { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::outcome::Fixture : public cppunit::test::Fixture {
+  using ancestor = cppunit::test::Fixture;
+public:
+  auto test_usage_Success() -> void;
+  auto test_usage_Integer() -> void;
+  auto test_usage_String() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.error_code
+#import std.generic_category
+#import nonstd.Outcome
+#import nonstd.Success
+using namespace tests::unit::outcome;
+auto Fixture::test_usage_Success() -> void {
+  using Subject = ::nonstd::Success;
+  auto s0 = Subject{};
+  CPPUNIT_ASSERT(ok(s0));
+  auto s1 = Subject{nonstd::SUCCESS};
+  CPPUNIT_ASSERT(ok(s1));
+  auto s2 = Subject{std::error_code{1, std::generic_category()}};
+  CPPUNIT_ASSERT(!ok(s2));
+}
+auto Fixture::test_usage_Integer() -> void {
+  using Subject = ::nonstd::Outcome<int>;
+  auto s0 = Subject{};
+  CPPUNIT_ASSERT(ok(s0));
+  auto s1 = Subject{33};
+  CPPUNIT_ASSERT(ok(s1));
+  auto s2 = Subject{std::error_code{1, std::generic_category()}};
+  CPPUNIT_ASSERT(!ok(s2));
+}
+#import std.string
+auto Fixture::test_usage_String() -> void {
+  using Subject = ::nonstd::Outcome<std::string>;
+  auto s0 = Subject{};
+  CPPUNIT_ASSERT(ok(s0));
+  auto s1 = Subject{"33"};
+  CPPUNIT_ASSERT(ok(s1));
+  auto s2 = Subject{std::error_code{1, std::generic_category()}};
+  CPPUNIT_ASSERT(!ok(s2));
+}
+#import tests.unit.outcome.Outcome
+#import rigging.suite.io
+auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("outcome");
+  {
+    Stream use("usage");
+    use << call("Success", &Fixture::test_usage_Success)
+        << call("Integer", &Fixture::test_usage_Integer)
+        << call("String", &Fixture::test_usage_String)
+      ;
+    series << move(use);
+  }
+  series << add<Outcome<::nonstd::Success>>()
+         << add<Outcome<::nonstd::Outcome<int>>>()
+         << add<Outcome<::nonstd::Outcome<std::string>>>()
+    ;
+  return finalize(series);
+}
+#endiv

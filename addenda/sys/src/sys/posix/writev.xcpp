@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.iov.interface
+namespace sys::posix {
+  namespace packaging::writev {
+    using namespace packaging::iov::interface;
+    namespace function {
+      // writev(2)
+      inline auto writev(File, [[in]] io::Vec const *, Count) -> Result;
+      inline auto writev(File, [[in]] io::Vector<io::Vec const>) -> Result;
+      // pwritev(2)
+      inline auto writev(File, [[in]] io::Vec const *, Count, Offset) -> Result;
+      inline auto writev(File, [[in]] io::Vector<io::Vec const>, Offset) -> Result;
+      // pwritev2(2)
+      inline auto writev(File, [[in]] io::Vec const *, Count, Offset, Flags) -> Result;
+      inline auto writev(File, [[in]] io::Vector<io::Vec const>, Offset, Flags) -> Result;
+    }
+    namespace native {
+      // writev(2)
+      inline auto writev(int fd, [[in]] io::Vec const *, Count) -> Result;
+      inline auto writev(int fd, [[in]] io::Vector<io::Vec const>) -> Result;
+      // pwritev(2)
+      inline auto writev(int fd, [[in]] io::Vec const *, Count, Offset) -> Result;
+      inline auto writev(int fd, [[in]] io::Vector<io::Vec const>, Offset) -> Result;
+      // pwritev2(2)
+      inline auto writev(int fd, [[in]] io::Vec const *, Count, Offset, Flags) -> Result;
+      inline auto writev(int fd, [[in]] io::Vector<io::Vec const>, Offset, Flags) -> Result;
+    }
+  }
+  using packaging::writev::function::writev;
+  namespace native { using packaging::writev::native::writev; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::writev {
+  // writev(2)
+  auto function::writev(File fd, io::Vec const *vec, Count count) -> Result { return native::writev((int)fd, vec, count); }
+  auto function::writev(File fd, io::Vector<io::Vec const> vec) -> Result   { return native::writev((int)fd, vec); }
+  //
+  auto native::writev(int fd, io::Vec const *vec, Count count) -> Result    { return idiomatic::syscall<ssize_t>(Syscall::WRITEV, fd, vec, count); }
+  auto native::writev(int fd, io::Vector<io::Vec const> vec) -> Result      { return native::writev(fd, vec.data(), vec.size()); }
+}
+#import sys.posix.packaging.syscall.Offset
+namespace sys::posix::packaging::writev {
+  // pwritev(2)
+  auto function::writev(File fd, io::Vec const *vec, Count count, Offset offset) -> Result { return native::writev((int)fd, vec, count, offset); }
+  auto function::writev(File fd, io::Vector<io::Vec const> vec, Offset offset) -> Result   { return native::writev((int)fd, vec, offset); }
+  //
+  auto native::writev(int fd, io::Vec const *vec, Count count, Offset offset) -> Result    { return packaging::syscall::Offset::pwritev(fd, vec, count, offset); }
+  auto native::writev(int fd, io::Vector<io::Vec const> vec, Offset offset) -> Result      { return native::writev(fd, vec.data(), vec.size(), offset); }
+}
+namespace sys::posix::packaging::writev {
+  // pwritev2(2)
+  auto function::writev(File fd, io::Vec const *vec, Count count, Offset offset, Flags flags) -> Result { return native::writev((int)fd, vec, count, offset, flags); }
+  auto function::writev(File fd, io::Vector<io::Vec const> vec, Offset offset, Flags flags) -> Result   { return native::writev((int)fd, vec, offset, flags); }
+  //
+  auto native::writev(int fd, io::Vec const *vec, Count count, Offset offset, Flags flags) -> Result    { return packaging::syscall::Offset::pwritev2(fd, vec, count, offset, (int)flags); }
+  auto native::writev(int fd, io::Vector<io::Vec const> vec, Offset offset, Flags flags) -> Result      { return native::writev(fd, vec.data(), vec.size(), offset, flags); }
+}
+#endiv
+!

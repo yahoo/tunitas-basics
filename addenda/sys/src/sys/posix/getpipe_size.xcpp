@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.pipe.interface
+namespace sys::posix {
+  namespace packaging::getpipe_size {
+    using namespace packaging::pipe::interface;
+    using namespace bundle::control;
+    namespace function {
+      inline auto getpipe_size(File) -> Returned;
+    }
+    namespace native {
+      inline auto getpipe_size(int fd) -> Returned;
+    }
+  }
+  using packaging::getpipe_size::function::getpipe_size;
+  namespace native { using packaging::getpipe_size::native::getpipe_size; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::getpipe_size {
+  auto function::getpipe_size(File fd) -> Returned { return native::getpipe_size((int)fd); }
+  auto native::getpipe_size(int fd) -> Returned    {
+    auto called = posix::native::fcntl(fd, F::GETPIPE_SIZE);
+    auto ok = good(called);
+    auto val = ok ? Size(value(called)) : Size{};
+    return {ok, error_num(called), val};
+  }
+}
+#endiv

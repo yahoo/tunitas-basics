@@ -1,0 +1,120 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.iterator.Input
+#import nonstd.iterator.Traits
+#import std.conditional
+#import std.is_reference
+#import std.remove_reference
+#import std.add_lvalue_reference
+#import std.declval
+namespace nonstd::range::detail::indexing {
+  //
+  // The pairwise iterator for indexing(...)
+  //
+  // Concept
+  //
+  //   The POSITION may return a reference,, which is passed through
+  //   The POSITION may return a pointer, which is passed through
+  //   Constie or Mutable is preserved.
+  //
+  // Usage:
+  //
+  //   see nonstd::range::detail::indexing::Container
+  //
+  template<required::iterator::Input POSITION, typename SUBVALUE = typename iterator::Traits<POSITION>::Value> struct Iterator;
+  namespace iterator {
+    using namespace std;
+    //
+    // Lvalue<char>   -> char                   Lvalue<char const>   -> char
+    // Lvalue<char &> -> char const &           Lvalue<char const &> -> char const &
+    //
+    template<typename TYPE> using Constie = conditional_t<is_reference_v<TYPE>,
+                                                          add_lvalue_reference_t<add_const_t<remove_reference_t<TYPE>>>,
+                                                          remove_const_t<TYPE>>;
+    template<typename ITERATOR> using Lvalue = Constie<decltype(declval<ITERATOR const>().operator*())>;
+    //
+    // Rvalue<char>   -> char                   Rvalue<char const>   -> char
+    // Rvalue<char &> -> char &                 Rvalue<char const &> -> char
+    //
+    template<typename TYPE> using Mutable = conditional_t<is_reference_v<TYPE>,
+                                                          conditional_t<is_const_v<remove_reference_t<TYPE>>,
+                                                                        remove_const_t<remove_reference_t<TYPE>>,
+                                                                        TYPE>,
+                                                          remove_const_t<TYPE>>;
+    template<typename ITERATOR> using Rvalue = Mutable<decltype(declval<ITERATOR>().operator*())>;
+  }
+}
+#endiv
+#divert <hpp>
+#forward nonstd.range.detail.indexing.Container
+#import nonstd.range.detail.indexing.Index
+#import std.tuple
+namespace nonstd::range::detail {
+  namespace indexing {
+    template<required::iterator::Input POSITION, typename SUBVALUE> inline auto operator==(Iterator<POSITION, SUBVALUE> const &, Iterator<POSITION, SUBVALUE> const &) -> bool;
+    template<required::iterator::Input POSITION, typename SUBVALUE> inline auto operator!=(Iterator<POSITION, SUBVALUE> const &, Iterator<POSITION, SUBVALUE> const &) -> bool;
+  }
+  template<required::iterator::Input POSITION, typename SUBVALUE> class indexing::Iterator {
+    using Position = POSITION;
+    using Subvalue = SUBVALUE;
+    template<typename FIRST, typename SECOND> using Tuple = std::tuple<FIRST, SECOND>;
+    template<typename SUBVAL> using Value = Tuple<Index, SUBVAL>;
+  public:
+    Iterator() = default;
+    inline auto operator*() const -> Value<iterator::Lvalue<Position>>;
+    inline auto operator*() -> Value<iterator::Rvalue<Position>>;
+    inline auto operator++() -> Iterator &;
+    inline auto operator++(int) -> Iterator;
+  protected:
+    friend class indexing::Container<Position>;
+    // implicit OK because you have to be a friend to do that.
+    inline Iterator(Index, Position);
+    inline Iterator(Position); // because we don't know where the end is we have to say "unknown"
+    Optional<Index> index;
+    Position position;
+    friend auto indexing::operator!=<>(Iterator const &, Iterator const &) -> bool;
+  };
+}
+#endiv
+#divert <ipp>
+namespace nonstd::range::detail {
+  template<required::iterator::Input POSITION, typename SUBVALUE> auto indexing::operator==(Iterator<POSITION, SUBVALUE> const &a, Iterator<POSITION, SUBVALUE> const &b) -> bool { return !operator!=(a, b); }
+  template<required::iterator::Input POSITION, typename SUBVALUE> auto indexing::operator!=(Iterator<POSITION, SUBVALUE> const &a, Iterator<POSITION, SUBVALUE> const &b) -> bool {
+    if (a.position != b.position) {
+      // obvious
+      return true;
+    } else if (a.index && b.index) {
+      // positions are equal but the indices are known and unequal
+      return *a.index != *b.index;
+    } else {
+      // if (!a.index && !b.index) {
+      //    The positions are equal and both of the indices are unknown.
+      //    This heppens when both are default-constructed, or both are end()-constructed.
+      //    Thus they are equal.
+      // } else {
+      //    The positions are equal, either of the indices (exactly one) are unknown.
+      //    This happens when the end()-constructed iterator is used.
+      //    Thus they are equal.
+      // }
+      return false;
+    }
+  }
+  namespace indexing {
+    template<required::iterator::Input IN, typename SV> Iterator<IN,SV>::Iterator(Position position) : position{position} { }
+    template<required::iterator::Input IN, typename SV> Iterator<IN,SV>::Iterator(Index index, Position position) : index{index}, position{position} { }
+    template<required::iterator::Input IN, typename SV> auto Iterator<IN,SV>::operator*() const -> Value<iterator::Lvalue<Position>> { return {index.value_or(Index{}), *position}; }
+    template<required::iterator::Input IN, typename SV> auto Iterator<IN,SV>::operator*() -> Value<iterator::Rvalue<Position>>       { return {index.value_or(Index{}), *position}; }
+    template<required::iterator::Input IN, typename SV> auto Iterator<IN,SV>::operator++() -> Iterator & {
+      ++index;
+      ++position;
+      return *this;
+    }
+    template<required::iterator::Input IN, typename SV> auto Iterator<IN,SV>::operator++(int) -> Iterator {
+      auto old = *this;
+      operator++();
+      return old;
+    }
+  }
+}
+#endiv

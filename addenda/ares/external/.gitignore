@@ -1,0 +1,8 @@
+#
+# See ARES_WITH_C_ARES_SOURCE from configure.ac
+#
+# Establish the c-ares source code (we need ares_setup.h)
+#
+# cd $(srcdir)
+# mkdir -p .../external && git clone https://github.com/c-ares/c-ares.git ../external/.
+#

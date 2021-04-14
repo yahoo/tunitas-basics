@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.at.interface
+namespace sys::posix {
+  namespace packaging::symlinkat {
+    using namespace packaging::at::interface;
+    namespace function {
+      using Position = argument::Position<File>;
+      inline auto symlinkat(Pathname target, Position link_directory, Pathname link) -> result::Status;
+    }
+    namespace native {
+      using Position = argument::Position<int>;
+      inline auto symlinkat(Pathname target, Position link_directory, Pathname link) -> result::Status;
+    }
+  }
+  using packaging::symlinkat::function::symlinkat;
+  namespace native { using packaging::symlinkat::native::symlinkat; }
+}
+using sys::posix::symlinkat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::symlinkat {
+  auto function::symlinkat(Pathname target, Position link_directory, Pathname link) -> result::Status { return native::symlinkat(target, link_directory, link); }
+  auto native::symlinkat(Pathname target, Position link_directory, Pathname link) -> result::Status {
+    return idiomatic::syscall<int>(Syscall::SYMLINKAT, (char const *)target, (int)link_directory, (char const *)link);
+  }
+}
+#endiv

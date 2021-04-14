@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.set.Reference // for Purpose
+namespace tests::unit::fd::set {
+  using ::sys::fd::set::Purpose;
+  template<Purpose> class Reference;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.fd.set.Reference
+namespace tests::unit::fd {
+  template<set::Purpose PORPOISE> struct set::Reference : public cppunit::test::Fixture {
+    inline static constexpr auto PURPOSE = PORPOISE;
+    using Set = ::sys::fd::set::Set;
+    using Subject = ::sys::fd::set::Reference<PURPOSE>;
+    auto test_constructor_Set() -> void;
+    auto test_constructor_wrapper() -> void;
+    auto test_assignment_wrapper() -> void;
+    auto test_repointer() -> void;
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <tpp>
+#import sys.fd.set.Reference
+#import sys.fd.Set
+namespace tests::unit::fd::set {
+  template<Purpose _> auto Reference<_>::test_constructor_Set() -> void {
+    auto base = Set{};
+    base.at(33) = true;
+    auto ref = Subject{base}; // ---------- test this
+    CPPUNIT_ASSERT(!ref.get().at(32));
+    CPPUNIT_ASSERT(ref.get().at(33));
+    CPPUNIT_ASSERT(!ref.get().at(34));
+  }
+  template<Purpose _> auto Reference<_>::test_constructor_wrapper() -> void {
+    auto base = Set{};
+    base.at(33) = true;
+    auto ref = Subject{base}; // <--------------------------- test this
+    CPPUNIT_ASSERT(!ref.get().at(32));
+    CPPUNIT_ASSERT(ref.get().at(33));
+    CPPUNIT_ASSERT(!ref.get().at(34));
+  }
+  template<Purpose _> auto Reference<_>::test_assignment_wrapper() -> void {
+    auto decoy = Set{};
+    decoy.at(44) = true;
+    auto base = Set{};
+    base.at(33) = true;
+    auto target = Subject{base};
+    auto ref = Subject{decoy};
+    CPPUNIT_ASSERT(!ref.get().at(43));
+    CPPUNIT_ASSERT(ref.get().at(44));
+    CPPUNIT_ASSERT(!ref.get().at(45));
+    ref = target; // <------------------------------------------ test this
+    CPPUNIT_ASSERT(!ref.get().at(32));
+    CPPUNIT_ASSERT(ref.get().at(33));
+    CPPUNIT_ASSERT(!ref.get().at(34));
+  }
+  template<Purpose _> auto Reference<_>::test_repointer() -> void {
+    auto base = Set{};
+    base.at(33) = true;
+    auto ref = Subject{base};
+    CPPUNIT_ASSERT(nullptr != ref.repointer()); // <--------------- test this
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::fd::set {
+  template<Purpose _> auto Reference<_>::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    Stream series("Reference");
+    series << []() {
+                Stream con("constructor");
+                con << call("Set", &Reference::test_constructor_Set)
+                    << call("wrapper", &Reference::test_constructor_wrapper)
+                    << END;
+                return move(con);
+              }()
+           << []() {
+                Stream ass("assignment");
+                ass << call("wrapper", &Reference::test_assignment_wrapper)
+                    << END;
+                return move(ass);
+              }()
+           << call("repointer", &Reference::test_repointer)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_PF_IP.Usage
+//   static_assert(tests::usage::posix_PF_IP::Usage<>);
+//
+#import sys.posix.PF.IP
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_PF_IP {
+  using sys::posix::PF;
+  namespace [[detail]] packaging {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    template<typename IP> concept bool Instance = requires(IP) {
+      typename IP::Protocol;
+      requires model::Namespace_Object<IP>;
+      requires (int)IP::UNSPECIFIED == PF_UNSPEC;
+      requires (int)IP::IP == IPPROTO_IP;
+      requires (int)IP::ICMP == IPPROTO_ICMP;
+      requires (int)IP::IGMP == IPPROTO_IGMP;
+      requires (int)IP::IPIP == IPPROTO_IPIP;
+      requires (int)IP::TCP == IPPROTO_TCP;
+      requires (int)IP::EGP == IPPROTO_EGP;
+      requires (int)IP::PUP == IPPROTO_PUP;
+      requires (int)IP::UDP == IPPROTO_UDP;
+      requires (int)IP::IDP == IPPROTO_IDP;
+      requires (int)IP::TP == IPPROTO_TP;
+      requires (int)IP::DCCP == IPPROTO_DCCP;
+      requires (int)IP::IPV6 == IPPROTO_IPV6;
+      requires (int)IP::RSVP == IPPROTO_RSVP;
+      requires (int)IP::GRE == IPPROTO_GRE;
+      requires (int)IP::ESP == IPPROTO_ESP;
+      requires (int)IP::AH == IPPROTO_AH;
+      requires (int)IP::MTP == IPPROTO_MTP;
+      requires (int)IP::BEETPH == IPPROTO_BEETPH;
+      requires (int)IP::ENCAP == IPPROTO_ENCAP;
+      requires (int)IP::PIM == IPPROTO_PIM;
+      requires (int)IP::COMP == IPPROTO_COMP;
+      requires (int)IP::SCTP == IPPROTO_SCTP;
+      requires (int)IP::UDPLITE == IPPROTO_UDPLITE;
+      requires (int)IP::MPLS == IPPROTO_MPLS;
+      requires (int)IP::RAW == IPPROTO_RAW;
+      requires (int)IP::HOPOPTS == IPPROTO_HOPOPTS;
+      requires (int)IP::ROUTING == IPPROTO_ROUTING;
+      requires (int)IP::FRAGMENT == IPPROTO_FRAGMENT;
+      requires (int)IP::ICMPV6 == IPPROTO_ICMPV6;
+      requires (int)IP::DSTOPTS == IPPROTO_DSTOPTS;
+      requires (int)IP::NONE == IPPROTO_NONE;
+      requires (int)IP::MH == IPPROTO_MH;
+#ifdef IP_LTP2 // of <linux/l2tp.h>
+      requires (int)IP::L2TP == IPPROTO_L2TP;
+#endif
+      requires (int)IP::UNSPEC == IPPROTO_IP;
+    };
+#pragma GCC diagnostic pop
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<PF::IP>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

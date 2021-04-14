@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.iterator_traits
+#import nonstd.required.iterator.Basis
+namespace nonstd::required::iterator {
+  namespace producing { }
+  //
+  // An iterator iterator producing a specified type.
+  //
+  template<typename ITERATOR, typename NEEDED> concept bool Producing = Basis<ITERATOR> && requires(ITERATOR iterator) {
+    typename std::iterator_traits<ITERATOR>::value_type; // this is overkill
+    { *iterator } -> NEEDED;
+  };
+}
+#endiv

@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.underlying_type
+namespace ares::addrinfo {
+  //
+  // An addrinfo flag
+  //
+  enum Flag
+    { CANONNAME = ARES_AI_CANONNAME,
+      NUMERICHOST = ARES_AI_NUMERICHOST,
+      PASSIVE = ARES_AI_PASSIVE,
+      NUMERICSERV = ARES_AI_NUMERICSERV,
+      V4MAPPED = ARES_AI_V4MAPPED,
+      ALL = ARES_AI_ALL,
+      ADDRCONFIG = ARES_AI_ADDRCONFIG,
+      // Declared "reserved for future use"
+      IDN = ARES_AI_IDN,
+      IDN_ALLOW_UNASSIGNED = ARES_AI_IDN_ALLOW_UNASSIGNED,
+      IDN_USE_STD3_ASCII_RULES = ARES_AI_IDN_USE_STD3_ASCII_RULES,
+      CANONIDN = ARES_AI_CANONIDN };
+  namespace flag {
+    using Underlying = std::underlying_type<Flag>::type;
+  }
+}
+#endiv

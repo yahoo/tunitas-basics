@@ -1,0 +1,36 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../Makefrag.am; included in the top-level Makefile.am
+src_sys_flags_SOURCES_SET = \
+  obj/src/sys/flags/namespace.cpp \
+  obj/src/sys/flags/flagof.cpp \
+  obj/src/sys/flags/maskof.cpp \
+  obj/src/sys/flags/downcastof.cpp \
+  obj/src/sys/flags/get_flag.cpp \
+  obj/src/sys/flags/is_flag.cpp \
+  obj/src/sys/flags/Flags.cpp \
+  obj/src/sys/flags/Limits.declaration.cpp \
+  obj/src/sys/flags/Limits.at.Flags.cpp \
+  obj/src/sys/flags/Limits.dn.Notifies.cpp \
+  obj/src/sys/flags/Limits.f.Seals.cpp \
+  obj/src/sys/flags/Limits.fd.Flags.cpp \
+  obj/src/sys/flags/Limits.msg.Flags.cpp \
+  obj/src/sys/flags/Limits.ok.Access.cpp \
+  obj/src/sys/flags/Limits.s.Bits.cpp \
+  obj/src/sys/flags/Limits.s.Flags.cpp \
+  obj/src/sys/flags/Limits.template.cpp \
+  obj/src/sys/flags/Limits.w.Options.cpp \
+  obj/src/sys/flags/Limits.cpp \
+  obj/src/sys/flags/limits.Generic.declaration.cpp \
+  obj/src/sys/flags/limits.Generic.Flags.cpp \
+  obj/src/sys/flags/limits.Generic.Container.cpp \
+  obj/src/sys/flags/limits.Generic.cpp \
+  \
+  obj/src/sys/flags/required/namespace.cpp \
+  obj/src/sys/flags/required/Downcast.cpp \
+  obj/src/sys/flags/required/Flagset.cpp \
+  obj/src/sys/flags/required/flagset.Class.cpp \
+  obj/src/sys/flags/required/flagset.Enumeration.cpp \
+  obj/src/sys/flags/required/flagset.Integral.cpp \
+  $(end)

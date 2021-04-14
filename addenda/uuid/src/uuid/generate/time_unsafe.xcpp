@@ -1,0 +1,35 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import uuid.detail.Wrapper
+#import uuid.Container
+namespace uuid {
+  namespace generate {
+    // The legacy names
+    inline auto time/*unsafe*/(detail::Wrapper &out) -> void;
+    inline auto time() -> Container;
+    // The "new" names that remind us of the safety that we're practicing
+    inline auto time_unsafe(detail::Wrapper &out) -> void;
+    inline auto time_unsafe() -> Container;
+  }
+}
+#endiv
+#divert <ipp>
+#import uuid.detail.generate.scheme
+auto uuid::generate::time/*unsafe*/(detail::Wrapper &out) -> void {
+  time_unsafe(out);
+}
+
+auto uuid::generate::time/*unsafe*/() -> Container {
+  return time_unsafe();
+}
+
+auto uuid::generate::time_unsafe(detail::Wrapper &out) -> void {
+  detail::generate::scheme(out, &uuid_generate_time/*unsafe*/);
+}
+
+auto uuid::generate::time_unsafe() -> Container {
+  Container ret;
+  time_unsafe(ret);
+  return ret;
+}
+#endiv

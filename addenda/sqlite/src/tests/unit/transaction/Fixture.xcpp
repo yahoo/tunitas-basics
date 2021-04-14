@@ -1,0 +1,120 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::transaction {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.transaction.Database
+#import std.unique_ptr
+class tests::unit::transaction::Fixture : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  std::unique_ptr<Database> db;
+
+  auto test_constructor_prepare() -> void;
+  auto test_constructor_default_then_prepare() -> void;
+  auto test_destructor() -> void;
+  auto test_begin_default_transaction() -> void;
+  auto test_begin_choice_transaction() -> void;
+  auto test_end_transaction() -> void;
+  auto test_rollback_transaction() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.transaction.Manager
+#import sqlite.transaction.Guard
+
+auto tests::unit::transaction::Fixture::setUp() -> void {
+  db.reset(new Database());
+}
+
+auto tests::unit::transaction::Fixture::tearDown() -> void {
+  db.reset(nullptr);
+}
+
+auto tests::unit::transaction::Fixture::test_constructor_prepare() -> void {
+  sqlite::transaction::Manager xact(db->conn);
+  // Whee! it constructed
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::transaction::Fixture::test_constructor_default_then_prepare() -> void {
+  sqlite::transaction::Manager xact;
+  xact.prepare(db->conn);
+  // Whee! it constructed
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::transaction::Fixture::test_destructor() -> void {
+  {
+    sqlite::transaction::Manager xact(db->conn);
+    sqlite::transaction::Guard gu(xact);
+    // but no choice is made, begin & end is not done.
+  }
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::transaction::Fixture::test_begin_default_transaction() -> void {
+  {
+    sqlite::transaction::Manager xact(db->conn);
+    sqlite::transaction::Guard gu(xact);
+    gu.begin(); // <-------------- test this
+    // but no choice is made, begin & end is not done.
+  }
+  CPPUNIT_ASSERT(true); 
+}
+
+auto tests::unit::transaction::Fixture::test_begin_choice_transaction() -> void {
+  {
+    sqlite::transaction::Manager xact(db->conn);
+    sqlite::transaction::Guard gu(xact);
+    gu.begin(sqlite::transaction::Guard::ROLLBACK); // <-------------- test this
+    // but no choice is made, begin & end is not done.
+  }
+  CPPUNIT_ASSERT(true); 
+}
+
+auto tests::unit::transaction::Fixture::test_end_transaction() -> void {
+  {
+    sqlite::transaction::Manager xact(db->conn);
+    sqlite::transaction::Guard gu(xact);
+    gu.begin(); 
+    gu.end(); // <-------------- test this
+  }
+  CPPUNIT_ASSERT(true); 
+}
+
+auto tests::unit::transaction::Fixture::test_rollback_transaction() -> void {
+  {
+    sqlite::transaction::Manager xact(db->conn);
+    sqlite::transaction::Guard gu(xact);
+    gu.begin(); 
+    gu.rollback(); // <-------------- test this
+  }
+  CPPUNIT_ASSERT(true); 
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::transaction::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("transaction");
+  s << call("constructor_prepare", &Fixture::test_constructor_prepare)
+    << call("constructor_default_then_prepare", &Fixture::test_constructor_default_then_prepare)
+    << call("destructor", &Fixture::test_destructor)
+    << call("begin()", &Fixture::test_begin_default_transaction)
+    << call("begin(Choice)", &Fixture::test_begin_choice_transaction)
+    << call("end_transaction", &Fixture::test_end_transaction)
+    << call("rollback_transaction", &Fixture::test_rollback_transaction)
+    ;
+  return s.release();
+}
+#endiv

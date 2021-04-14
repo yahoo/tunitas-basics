@@ -1,0 +1,12 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 70
+set -e
+host -t a hexagon-hell.${TEST_DOMAIN?}
+a hexagon-hell.${TEST_DOMAIN?}
+a roof-party.${TEST_DOMAIN?}
+a www.${TEST_DOMAIN?}
+a lofi-tacos.${TEST_DOMAIN?}
+a post-ironic-symmetry.${TEST_DOMAIN?}
+a woke-beard.${TEST_DOMAIN?}
+a mailA.${TEST_DOMAIN?}
+a mailD.${TEST_DOMAIN?}

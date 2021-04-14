@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import shell.program.Program.declaration
+namespace shell::program {
+  //
+  // The diff(1) program.
+  // The simplistic version.
+  //
+  // Usage:
+  //
+  //   Program<DIFF> diff{file1, file2};
+  //   prog.run();
+  //
+  enum DIFF { };
+  template<> class Program<DIFF>;
+}
+#endiv
+#divert <hpp>
+#import shell.run.Runner
+#import std.string
+namespace shell::program {
+  template<> class Program<DIFF> : public run::Runner {
+    using Ancestor = run::Runner;
+  public:
+    using Filestring = std::string; // because we will exec these 
+    inline Program(Filestring, Filestring);
+  };
+}
+#endiv
+#divert <ipp>
+namespace shell::program {
+  Program<DIFF>::Program(Filestring file1, Filestring file2)
+    : Ancestor{EXECP, "diff"} {
+    args.push_back(move(file1));
+    args.push_back(move(file2));
+ }
+}
+#endiv

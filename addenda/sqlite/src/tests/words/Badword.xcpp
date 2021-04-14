@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace words {
+    class Badword;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Exception
+class tests::words::Badword : public sqlite::Exception {
+  using Ancestor = sqlite::Exception;
+public:
+  inline explicit Badword(std::string const &word);
+};
+#endiv
+#divert <ipp>
+tests::words::Badword::Badword(std::string const &arg_word)
+  : Ancestor("invalid word " + arg_word + " contains quotes") {
+  ;
+}
+#endiv
+

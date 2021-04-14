@@ -1,0 +1,3 @@
+// -*- c++ -*- 53cb5aa1-25c0-4133-adfc-251794ea03e9
+#pragma once
+#include <boost/program_options/errors.hpp>

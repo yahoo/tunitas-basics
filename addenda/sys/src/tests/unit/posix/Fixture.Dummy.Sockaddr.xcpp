@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.Fixture.Dummy>
+#import sys.posix.sockaddr_in4
+#import sys.posix.sockaddr_in6
+namespace tests::unit::posix::fixture {
+  static_assert(::sys::posix::required::Sockaddr<::sys::posix::sockaddr_in4>);
+  static_assert(::sys::posix::required::Sockaddr<::sys::posix::sockaddr_in6>);
+  template<> struct Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in4>;
+  template<> struct Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in6>;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::posix::fixture {
+  template<> struct Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in4> : public ::sys::posix::sockaddr_in4 {
+    using Ancestor = ::sys::posix::sockaddr_in4;
+    inline Sockaddr();
+  };
+  template<> struct Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in6> : public ::sys::posix::sockaddr_in6 {
+    using Ancestor = ::sys::posix::sockaddr_in6;
+    inline Sockaddr();
+  };
+}
+#endiv
+#divert <ipp>
+#import nonstd.uninitialized.zero
+namespace tests::unit::posix::fixture {
+  Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in4>::Sockaddr() {
+    nonstd::uninitialized::zero(*this);
+  }
+  Fixture::Dummy::Sockaddr<::sys::posix::sockaddr_in6>::Sockaddr() {
+    nonstd::uninitialized::zero(*this);
+  }
+}
+#endiv

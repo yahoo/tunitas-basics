@@ -1,0 +1,103 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::slurp::file::named {
+  class Result;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.string
+#import std.vector
+#import slurp.file.named.Result
+class tests::unit::slurp::file::named::Result : public cppunit::test::Fixture {
+public:
+  using adl_type = ::slurp::file::named::ADL;
+  using string_result_type = ::slurp::file::named::Result<std::string>;
+  using vector_result_type = ::slurp::file::named::Result<std::vector<char>>;
+
+  auto test_construction() -> void;
+  auto test_name() -> void;
+  auto test_body() -> void;
+  auto test_returning() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.file.named.Result
+#import std.string
+
+auto tests::unit::slurp::file::named::Result::test_construction() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  {
+    std::string file_contents("contents");
+    string_result_type sr(adl_type(), some_filename, std::string(file_contents));
+    CPPUNIT_ASSERT(some_filename == name(sr));
+    CPPUNIT_ASSERT(file_contents == body(sr));
+  } {
+    std::vector<char> file_contents{'c', 'o', 'n', 't', 'e', 'n', 't', 's'};
+    vector_result_type vcr(adl_type(), some_filename, std::vector<char>(file_contents));
+    CPPUNIT_ASSERT(some_filename == name(vcr));
+    {
+      // because operator== is defined over strings, not vector<char>
+      std::string refile_contents(file_contents.begin(), file_contents.end());
+      auto r = body(vcr);
+      std::string rebody(r.begin(), r.end());
+      CPPUNIT_ASSERT(refile_contents == rebody);
+    }
+  }
+}
+
+auto tests::unit::slurp::file::named::Result::test_name() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  std::string file_contents("contents");
+  string_result_type sr(adl_type(), some_filename, std::string(file_contents));
+  CPPUNIT_ASSERT(some_filename == name(sr));
+}
+
+auto tests::unit::slurp::file::named::Result::test_body() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  std::size_t const REALLY_BIG = 1000000;
+  std::vector<char> file_contents(REALLY_BIG); // really big
+  vector_result_type vcr(adl_type(), some_filename, std::vector<char>(file_contents));
+  CPPUNIT_ASSERT(REALLY_BIG == body(vcr).size());
+}
+
+namespace {
+  template<typename CONTAINER> auto return_a_Result_CONTAINER() -> ::slurp::file::named::Result<CONTAINER> {
+    std::string some_filename("/var/tmp/a-file");
+    CONTAINER file_contents{'c', 'o', 'n', 't', 'e', 'n', 't', 's'};
+    using adl_type = tests::unit::slurp::file::named::Result::adl_type;
+    using result_type = ::slurp::file::named::Result<CONTAINER>;
+    result_type sr(adl_type(), some_filename, CONTAINER(file_contents));
+    CPPUNIT_ASSERT(some_filename == name(sr));
+    CPPUNIT_ASSERT(file_contents == body(sr));
+    return sr;
+  }
+}
+
+auto tests::unit::slurp::file::named::Result::test_returning() -> void {
+  auto sr = return_a_Result_CONTAINER<std::string>();
+  CPPUNIT_ASSERT(!name(sr).empty());
+  CPPUNIT_ASSERT(!body(sr).empty());
+  auto vr = return_a_Result_CONTAINER<std::vector<char>>();
+  CPPUNIT_ASSERT(!name(vr).empty());
+  CPPUNIT_ASSERT(!body(vr).empty());
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::slurp::file::named::Result::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Result");
+  s << call("construction", &Result::test_construction)
+    << call("name", &Result::test_name)
+    << call("body", &Result::test_body)
+    << call("returning", &Result::test_returning)
+    ;
+  return s.release();
+}
+#endiv

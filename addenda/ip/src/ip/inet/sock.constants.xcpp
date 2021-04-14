@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.constants
+namespace ip::inet::sock {
+  inline namespace constants { using namespace sys::sock::constants; }
+}
+#endiv
+#divert <cpp>
+#import ip.inet.sock.Type
+#import std.is_same
+namespace {
+  static_assert(std::is_same_v<sys::sock::Type, ip::inet::sock::Type>);
+  namespace tests {
+    using namespace ip::inet::sock::constants;
+    static_assert(sizeof (NONE));
+    static_assert(sizeof (STREAM));
+    static_assert(sizeof (DATAGRAM));
+  }
+}
+#endiv

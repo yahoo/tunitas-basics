@@ -1,0 +1,10 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+namespace sqlite {
+  namespace prepared {
+    namespace detail {
+      // Implementation details for 'namespace sqlite::prepared'
+    }
+  }
+}
+#endiv

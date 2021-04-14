@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+namespace tests::unit::assertion {
+  template<typename TYPE> concept bool Is_Default_Constructible_Movable_Uncopyable = 
+    (std::is_default_constructible<TYPE>::value &&
+     std::is_move_constructible<TYPE>::value &&
+     !std::is_copy_constructible<TYPE>::value &&
+     std::is_move_assignable<TYPE>::value &&
+     !std::is_copy_assignable<TYPE>::value);
+}
+#endiv

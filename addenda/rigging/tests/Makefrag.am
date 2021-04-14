@@ -1,0 +1,12 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+tests_XFAIL_TEST = 
+tests_TEST = \
+  tests/list.test \
+  tests/Arabesque.test \
+  tests/Buffer.test \
+  tests/Exit.test \
+  tests/Lhs.test \
+  tests/Map.test \
+  tests/Stringz.test \
+  $(end)

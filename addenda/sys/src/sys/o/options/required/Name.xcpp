@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import sys.o.Access
+#import sys.o.Create
+#import sys.o.Status
+namespace sys::o::options::required {
+  //
+  // Is this type a name for use in Options<NAMES...>?
+  //
+  template<typename NAME> concept bool Name = std::is_same_v<NAME, o::Access> || std::is_same_v<NAME, o::Create> || std::is_same_v<NAME, o::Status>;
+}
+#endiv

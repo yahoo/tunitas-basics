@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::exception {
+  //
+  // There was some problem with the (delicate) JSON syntax.
+  //
+  // That second argument, JSON syntax, could be big, very big.
+  // [[FIXTHIS]] Presently it is ignored. [[FIXTHIS]] It should be cogently summarized.
+  // Be careful what you do with it.
+  //
+  // [[FIXTHIS]] we just drop the Syntax syntax on the floor as it's too problematic to handle it
+  //
+  // Usage:
+  //
+  //   throw Syntax{"bad thing", R"json({thing thing thing})json"};
+  //
+  class Syntax;
+}
+#endiv
+#divert <hpp>
+#import json.exception.Messaging
+#import json.String
+#import std.string
+class json::exception::Syntax: public Messaging {
+  using Ancestor = Messaging;
+public:
+  inline explicit Syntax(std::string const &explanation);
+  inline explicit Syntax(std::string &&explanation);
+  inline Syntax(std::string const &explanation, json::String const &syntax);
+  inline Syntax(std::string &&explanation, json::String &&syntax);
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+json::exception::Syntax::Syntax(std::string const &explanation)
+  : Ancestor{explanation}
+{ }
+json::exception::Syntax::Syntax(std::string &&explanation)
+  : Ancestor{std::forward<std::string>(explanation)}
+{ }
+json::exception::Syntax::Syntax(std::string const &explanation, json::String const &) // [[FIXTHIS]] summarize the json string
+  : Ancestor{explanation}
+{ }
+json::exception::Syntax::Syntax(std::string &&explanation, json::String &&) // [[FIXTHIS]] summarize the json string
+  : Ancestor{std::forward<std::string>(explanation)}
+{ }
+#endiv

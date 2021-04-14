@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.stream.required.Character
+#import nonstd.stream.required.Character_Traits
+#import nonstd.stream.required.Decoration
+namespace nonstd::stream::output::iterator::detail {
+  //
+  // The core of the implementation of the output streams iterators.
+  //
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> class Core;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace nonstd::stream::output::iterator {
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> class detail::Core : public std::iterator<std::output_iterator_tag, void, void, void, void> {
+    using ancestor = std::iterator<std::output_iterator_tag, void, void, void, void>;
+  protected:
+~Core() = default; // descendants only
+  public:
+    using cast_type = CAST;
+    using prefix_type = PREFIX;
+    using prefix_argument_type = typename PREFIX::argument_type;
+    using value_type = VALUE;
+    using value_argument_type = value_type const &;
+    using suffix_type = SUFFIX;
+    using suffix_argument_type = typename SUFFIX::argument_type;
+    using stream_type = std::basic_ostream<CHAR, TRAITS>;
+    using stream_argument_type = stream_type &;
+  protected:
+    using stream_capture_type = stream_type &;
+  public:
+    inline Core(prefix_argument_type, stream_argument_type, suffix_argument_type);
+    // Behave enough like an iterator that everyone, e.g. std::copy, is fooled
+    inline auto operator=(value_argument_type) -> Core &;
+    inline auto operator*() -> CAST &;
+    inline auto operator++() -> CAST &;
+    inline auto operator++(int) -> CAST &;
+  protected:
+    prefix_type prefix;
+    stream_capture_type stream;
+    suffix_type suffix;
+  };
+}
+#endiv
+#divert <ipp>
+namespace nonstd::stream::output::iterator::detail {
+template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::Core(prefix_argument_type prefix, stream_argument_type stream, suffix_argument_type suffix)
+    : ancestor()
+    , prefix(prefix)
+    , stream(stream)
+    , suffix(suffix) {
+    ;
+  }
+}
+
+#import nonstd.stream.output.iterator.detail.Decoration
+namespace nonstd::stream::output::iterator::detail {
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> auto Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::operator=(value_argument_type value) -> Core & {
+    stream << prefix << value << suffix;
+    return *this;
+  }
+}
+
+namespace nonstd::stream::output::iterator::detail {
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> auto Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::operator*() -> CAST & { return static_cast<CAST &>(*this); }
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> auto Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::operator++() -> CAST & { return static_cast<CAST &>(*this); }
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> auto Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::operator++(int) -> CAST & { return static_cast<CAST &>(*this); }
+}
+#endiv

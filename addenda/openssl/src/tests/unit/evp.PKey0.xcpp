@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::evp { class PKey0; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.evp.PKey
+#import openssl.evp.PKey0
+class tests::unit::evp::PKey0 : public cppunit::test::Fixture {
+public:
+  using Original = ::openssl::evp::PKey;
+  using Subject = ::openssl::evp::PKey0;
+  auto test_constructor_conversion() -> void;
+  auto test_base_id() -> void;
+  auto test_system() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import openssl.rsa.Pair
+#import openssl.rsa.generate
+auto tests::unit::evp::PKey0::test_constructor_conversion() -> void {
+  // Crt::get_pubkey calls this directly
+  // Req::get_pubkey calls this directly
+  namespace rsa = ::openssl::rsa;
+  namespace evp = ::openssl::evp;
+  auto pk = evp::PKey{};
+  auto pair = rsa::generate(rsa::Bits::RSA512);
+  pk.assign(std::move(pair));
+  auto subject = (evp::PKey0) pk; // <----------------------------------------- test this (the latent constructor)
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::evp::PKey0::test_base_id() -> void {
+  namespace rsa = ::openssl::rsa;
+  namespace evp = ::openssl::evp;
+  auto pk = evp::PKey{};
+  auto pair = rsa::generate(rsa::Bits::RSA512);
+  pk.assign(std::move(pair));
+  auto subject = (evp::PKey0) pk;
+  CPPUNIT_ASSERT(EVP_PKEY_RSA == subject.base_id()); // <---------------------- test this
+}
+auto tests::unit::evp::PKey0::test_system() -> void {
+  namespace rsa = ::openssl::rsa;
+  namespace evp = ::openssl::evp;
+  auto pk = evp::PKey{};
+  auto pair = rsa::generate(rsa::Bits::RSA512);
+  pk.assign(std::move(pair));
+  auto subject = (evp::PKey0) pk;
+  CPPUNIT_ASSERT(::openssl::System::RSA == subject.system()); // <--------------- test this
+}
+#import rigging.suite.io
+auto tests::unit::evp::PKey0::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("PKey[rsa]");
+  {
+    Stream con("constructor");
+    con << call("conversion", &PKey0::test_constructor_conversion)
+      ;
+    series << move(con);
+  } 
+  series << call("base_id", &PKey0::test_base_id)
+         << call("system", &PKey0::test_system)
+    ;
+  return finalize(series);
+}
+#endiv

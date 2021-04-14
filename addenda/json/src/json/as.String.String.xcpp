@@ -1,0 +1,19 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.as.RESULT.String
+#import json.String
+namespace json {
+  template<> inline auto as<String>(String const &) -> String;
+  template<> inline auto as<String>(String &&) -> String;
+}
+#endiv
+#divert <ipp>
+template<> auto json::as<json::String>(String const &subject) -> String {
+  return subject;
+}
+
+#import std.forward
+template<> auto json::as<json::String>(String &&anon) -> String {
+  return std::forward<String>(anon);
+}
+#endiv

@@ -1,0 +1,40 @@
+# -*- Makefile -*-
+
+lib_libwant_la = lib/libwant.la
+lib_libwant_la_LIBADD = $(nothing)
+lib_libwant_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+lib_libwant_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libwant_la_SOURCES))
+lib_libwant_la_SOURCES = \
+  obj/src/want/namespace.cpp \
+  obj/src/want/maximum.cpp \
+  obj/src/want/minimum.cpp \
+  obj/src/want/int128_t.cpp \
+  obj/src/want/uint128_t.cpp \
+  obj/src/want/nonstd.is_signed.cpp \
+  obj/src/want/nonstd.is_unsigned.cpp \
+  obj/src/want/nonstd.numeric_limits.cpp \
+  obj/src/want/nonstd.required.Among.cpp \
+  \
+  obj/src/want/cppunit/namespace.cpp \
+  obj/src/want/cppunit/int128.cpp \
+  \
+  obj/src/want/bigint.cpp \
+  obj/src/want/int128/namespace.cpp \
+  obj/src/want/int128/ostream.cpp \
+  obj/src/want/int128/ostream.signed.cpp \
+  obj/src/want/int128/ostream.unsigned.cpp \
+  \
+  obj/src/want/int128/format/namespace.cpp \
+  obj/src/want/int128/format/value.cpp \
+  obj/src/want/int128/format/leader.cpp \
+  $(end)
+
+$(lib_libwant_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/want/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $(lib_libwant_la_SOURCES))
+	@test -e $@
+include $(scold_cxxdir)/want/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/want/dependencies.mk

@@ -1,0 +1,53 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.as
+#import std.array
+#import std.size_t
+namespace c {
+  // and const variations of...
+  //  std::array of char -> c::buffer
+  //  std::array of char -> c::stringz
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR const, N> const &) -> RESULT;
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> const &) -> RESULT;
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> &) -> RESULT;
+
+  // and const variants ...
+  //   std::array of char * -> c::argv
+  //   std::array of char * -> c::environv
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR const *, N> const &) -> RESULT;
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR *, N> const &) -> RESULT;
+  template<typename RESULT, typename CHAR, std::size_t N> inline auto as(std::array<CHAR *, N> &) -> RESULT;
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.Dispatcher
+template<typename RESULT, typename CHAR, std::size_t N> auto c::as(std::array<CHAR const, N> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR, std::size_t N> inline auto c::as(std::array<CHAR, N> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR, std::size_t N> inline auto c::as(std::array<CHAR, N> &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR, std::size_t N> auto c::as(std::array<CHAR const *, N> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR, std::size_t N> inline auto c::as(std::array<CHAR *, N> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR, std::size_t N> inline auto c::as(std::array<CHAR *, N> &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+#divert </ipp>

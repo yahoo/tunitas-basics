@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.localtime
+#import sys.posix.time
+#import sys.time.now
+auto tests::unit::posix::fixture::Fixture::test_localtime() -> void {
+  {
+    auto r = six::localtime(value(six::time()));
+    CPPUNIT_ASSERT(good(r));
+    auto m = value(r);
+    CPPUNIT_ASSERT(m.tm_year >= 117);
+    CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon >= 5));
+    CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon > 5) || (m.tm_year == 117 && m.tm_mon == 5 && m.tm_mday >= 24));
+  } {
+    auto r = six::localtime(sys::time::now());
+    CPPUNIT_ASSERT(good(r));
+    auto m = value(r);
+    // How else to prove that this "worked"
+    CPPUNIT_ASSERT(m.tm_year >= 117);
+    CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon >= 5));
+    CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon > 5) || (m.tm_year == 117 && m.tm_mon == 5 && m.tm_mday >= 24));
+  }
+}
+#endiv

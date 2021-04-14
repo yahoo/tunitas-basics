@@ -1,0 +1,77 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace slurp {
+  //
+  // An exception capturing a failure to slurp (a file)
+  //
+  // Be careful with the reason (reason).
+  // system_error::what() formats the error_code and the reason together as follows:
+  //
+  //   $reason: $error_code
+  //
+  // Policies for usage:
+  //
+  //   1. $reason is the $filename, which provides a terse message
+  //      let $reason = $filename = q(some_file);
+  //      e.g.
+  //         some_file: Permission denied
+  //
+  //   2. $reason names the operation that failed, and the filename must be announced separately.
+  //      let $reason = q(open)
+  //      e.g.
+  //         open: No such file or directory
+  //
+  // slurp::file::read<...>(...) uses Policy #2
+  //
+  // Usage:
+  //
+  //     try {
+  //       throw Failure(code, reason, filename);
+  //       throw Failure(exception, reason, filename);
+  //     } catch (slurp::Failure const &e) {
+  //       std::cout << e.what() << '\n';
+  //       std::cout << e.filename() << " because " << e.what() << '\n';
+  //     }
+  //
+  class Failure;
+}
+#endiv
+#divert <hpp>
+#import std.error_code
+#import std.string
+#import std.system_error
+#import std.shared_ptr
+class slurp::Failure : public std::system_error {
+  using ancestor = std::system_error;
+public:
+  // constructor argument order being in sthe same order as the ancestor, std::system_error
+  inline Failure(std::error_code const &code, std::string const &reason, std::string filename);
+  inline Failure(std::system_error const &, std::string filename);
+  // following std::ios::failure, and std::system_error, this is an accessor function, not public member variable.
+  // n.b. 'filename' can name anything in the file system (e.g. a directory, a device, a socket).
+  inline auto filename() const -> std::string const &;
+  // reminder auto ancestor::code() const -> std::error_code const &;
+protected:
+  // Because exceptions must never throw on copy.
+  std::shared_ptr<std::string> offending_filename;
+};
+#endiv
+#divert <ipp>
+#import std.make_shared
+slurp::Failure::Failure(std::error_code const &code, std::string const &reason, std::string filename)
+  : ancestor(code, reason)
+  , offending_filename(std::make_shared<std::string>(filename)) {
+  ;
+}
+
+slurp::Failure::Failure(std::system_error const &prior, std::string filename)
+  : ancestor(prior)
+  , offending_filename(std::make_shared<std::string>(filename)) {
+  ;
+}
+
+auto slurp::Failure::filename() const -> std::string const & {
+  return *offending_filename;
+}
+#endiv

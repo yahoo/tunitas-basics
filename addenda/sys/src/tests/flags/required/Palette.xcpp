@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_default_constructible
+namespace tests::flags::required {
+  //
+  // What is a paleete?
+  // How must it into a scenario?
+  //
+  // Usage:
+  //
+  //   template<required::Palette PALETTE> struct Fixture : public cppunit::test::Fixture, Scenario<PALETTE> {
+  //     ...something...
+  //   };
+  //
+  template<typename PALETTE> concept bool Palette = requires(PALETTE palette) {
+    typename PALETTE::Flag;
+    typename PALETTE::Flags;
+    { palette.some_flag_series }; // ... the zero value must not be in this set
+    { palette.no_flags }; // ........... this is the zero value
+    { palette.all_flags }; // .......... the zero value MUST NOT be in this set
+    { palette.setUp() } -> void;
+    { palette.tearDown() } -> void;
+    // [[FIXTHIS]] want to say FIXTURE for the yet-to-be-defined Fixture
+    // Therefore PALETTE must have public default constructor & destructor
+    requires std::is_default_constructible_v<PALETTE>;
+    { PALETTE::template series<PALETTE>() } -> Series;
+    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flag{}) } -> typename PALETTE::Flag;
+    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flags{}) } -> typename PALETTE::Flag;
+    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flag{}) } -> typename PALETTE::Flags;
+    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flags{}) } -> typename PALETTE::Flags;
+    { palette.test_flag_constants() } -> void;
+    { palette.test_flags_constants() } -> void;
+  };
+}
+#endiv

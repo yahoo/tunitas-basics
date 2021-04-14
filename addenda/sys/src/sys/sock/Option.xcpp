@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/socket.h>
+namespace sys::sock {
+  // The individual option flags
+  // The "socket flags" are enumerated on the manual page socket(2)
+  enum class Option
+    { NONE      = 0, //                a.k.a. Option{}
+      CLOEXEC   = SOCK_CLOEXEC, //     "CLOEXEC" seems to parse out as "CL.ose O.n EXEC"
+      CLOSE_ON_EXEC = CLOEXEC, //      Words 
+      NONBLOCK  = SOCK_NONBLOCK };
+}
+#endiv
+#divert <hpp>
+namespace sys::sock {
+  inline constexpr auto is_flag(Option) -> bool { return true; } // by definition, an Option is only a flag (never a combination).
+  [[deprecated("instead prefer as<Option>(Option)")]] inline constexpr auto flag(Option o) -> Option { return o; }
+}
+#endiv

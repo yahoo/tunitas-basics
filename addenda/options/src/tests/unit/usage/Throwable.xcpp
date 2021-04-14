@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace usage {
+      class Throwable;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::usage::Throwable : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_argv_construction() -> void;
+  auto test_program_construction() -> void;
+  auto test_unformatted() -> void;
+  auto test_stream() -> void;
+  auto test_code() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.usage.Mock
+
+#import options.Program
+#import std.string
+auto tests::unit::usage::Throwable::test_argv_construction() -> void {
+  Mock mock("a.out");
+  CPPUNIT_ASSERT(ok(mock.code()));
+  options::Program const &mock_program = mock.program();
+  CPPUNIT_ASSERT( !mock_program.empty() );
+  std::string const mock_formatted = mock.formatted();
+  CPPUNIT_ASSERT( !mock_formatted.empty() );
+  char const *const mock_what = mock.what();
+  CPPUNIT_ASSERT( nullptr != mock_what );
+  std::string const mock_unformatted = mock.unformatted();
+  CPPUNIT_ASSERT( !mock_unformatted.empty() );
+}
+
+auto tests::unit::usage::Throwable::test_program_construction() -> void {
+  char const *const raw_argv[] = { "a.out", nullptr };
+  c::const_argv cav(raw_argv);
+  options::Program a_out(cav);
+  Mock mock(a_out);
+  options::Program const &mock_program = mock.program();
+  CPPUNIT_ASSERT( !mock_program.empty() );
+  std::string const mock_formatted = mock.formatted();
+  CPPUNIT_ASSERT( !mock_formatted.empty() );
+  char const *const mock_what = mock.what();
+  CPPUNIT_ASSERT( nullptr != mock_what );
+  std::string const mock_unformatted = mock.unformatted();
+  CPPUNIT_ASSERT( !mock_unformatted.empty() );
+}
+
+auto tests::unit::usage::Throwable::test_unformatted() -> void {
+  Mock mock("a.out");
+  std::string const uf = mock.unformatted();
+  CPPUNIT_ASSERT( !uf.empty() );
+}
+
+auto tests::unit::usage::Throwable::test_stream() -> void {
+  Mock mock("a.out");
+  std::string const f = mock.formatted();
+  mock.stream() << mock.formatted();
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::usage::Throwable::test_code() -> void {
+  Mock mock("a.out");
+  CPPUNIT_ASSERT(ok(mock.code()));
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::usage::Throwable::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("usage");
+  s << call("argv[0]", &Throwable::test_argv_construction)
+    << call("program", &Throwable::test_argv_construction)
+    << call("unformatted", &Throwable::test_unformatted)
+    << call("stream", &Throwable::test_stream)
+    << call("code", &Throwable::test_code)
+    ;
+  return finalize(s);
+}
+#endiv

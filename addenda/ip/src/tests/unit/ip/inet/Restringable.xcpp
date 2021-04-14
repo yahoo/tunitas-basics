@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import c.const_stringz
+#import re.string
+#import std.string
+#import std.is_same
+namespace tests::unit::ip::inet {
+  //
+  // These are basically the conversion-capable types for re::string
+  // They are not c::restring::Unifier, but more so, being also 'char const *" (language string literals)
+  //
+  template<typename RESTRINGABLE> concept bool Restringable = requires(RESTRINGABLE restringable) {
+    //
+    // Either kind of Restring<UNIFIER> is constructible from the RESTRINGLABLE type.
+    //
+    { ::re::string<c::const_stringz>(restringable) };
+    { ::re::string<std::string>(restringable) };
+  };
+}
+#endiv

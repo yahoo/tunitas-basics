@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Value.declaration
+namespace sys::call::result {
+  template<> class Value<void>;
+}
+#endiv
+#divert <hpp>
+#import std.tuple
+#import error_t
+template<> class sys::call::result::Value<void> : public std::tuple<bool, error_t> {
+  using Ancestor = std::tuple<bool, error_t>;
+public:
+  using value_type [[deprecated("instead prefer Element<0, Value<void>>::type")]] = void;
+  inline Value();
+  inline explicit Value(bool ok);
+  inline Value(bool ok, int errnum_errno);
+  // There in no "value" field herein.
+};
+#endiv
+#divert <ipp>
+#import errno
+namespace sys::call::result {
+  Value<void>::Value()
+    : Ancestor(true, 0)
+  { }
+  Value<void>::Value(bool arg_ok)
+    : Ancestor(arg_ok, errno)
+  { } 
+  Value<void>::Value(bool arg_ok, int arg_errno)
+    : Ancestor(arg_ok, arg_errno)
+  { }
+}
+#endiv

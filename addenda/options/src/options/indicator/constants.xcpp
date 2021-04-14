@@ -1,0 +1,96 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import options.indicator.Code
+namespace options::indicator {
+  // Just the convenient ones
+  // Remember, you can always go dive into the enum and get the any others that you need.
+
+  // Known To POSIX (KTP)
+  constexpr auto const NUL = Code::NUL;
+  constexpr auto const END = Code::END;
+  constexpr auto const UNKNOWN = Code::UNKNOWN;
+
+  // Known To GNU (KTG)
+  constexpr auto const MISSING = Code::MISSING;
+  constexpr auto const POSITION = Code::POSITION;
+
+  // Well Known Subcommands (WKS)
+  constexpr auto const USAGE_SUBCOMMAND = Code::USAGE_SUBCOMMAND;
+  constexpr auto const VERSION_SUBCOMMAND = Code::VERSION_SUBCOMMAND;
+
+  // Well Known Modes (WKM)
+  constexpr auto const VERBOSE_MODE = Code::VERBOSE_MODE;
+  constexpr auto const DRY_RUN_MODE = Code::DRY_RUN_MODE; // Well, which is it?  Prefer dry-run and DRY_RUN
+  constexpr auto const DRYRUN_MODE = Code::DRYRUN_MODE;
+  constexpr auto const DEBUG_MODE = Code::DEBUG_MODE;
+  constexpr auto const QUIET_MODE = Code::QUIET_MODE;
+  constexpr auto const WARNING_MODE = Code::WARNING_MODE;
+  constexpr auto const WARNINGS_MODE = Code::WARNINGS_MODE; // Well, which is it?  This is just bad grammar.
+
+  // Sure, and the alphabet and the numbers are fair game.
+  constexpr auto const CHR_a = Code::CHR_a;
+  constexpr auto const CHR_b = Code::CHR_b;
+  constexpr auto const CHR_c = Code::CHR_c;
+  constexpr auto const CHR_d = Code::CHR_d;
+  constexpr auto const CHR_e = Code::CHR_e;
+  constexpr auto const CHR_f = Code::CHR_f;
+  constexpr auto const CHR_g = Code::CHR_g;
+  constexpr auto const CHR_h = Code::CHR_h;
+  constexpr auto const CHR_i = Code::CHR_i;
+  constexpr auto const CHR_j = Code::CHR_j;
+  constexpr auto const CHR_k = Code::CHR_k;
+  constexpr auto const CHR_l = Code::CHR_l;
+  constexpr auto const CHR_m = Code::CHR_m;
+  constexpr auto const CHR_n = Code::CHR_n;
+  constexpr auto const CHR_o = Code::CHR_o;
+  constexpr auto const CHR_p = Code::CHR_p;
+  constexpr auto const CHR_q = Code::CHR_q;
+  constexpr auto const CHR_r = Code::CHR_r;
+  constexpr auto const CHR_s = Code::CHR_s;
+  constexpr auto const CHR_t = Code::CHR_t;
+  constexpr auto const CHR_u = Code::CHR_u;
+  constexpr auto const CHR_v = Code::CHR_v;
+  constexpr auto const CHR_w = Code::CHR_w;
+  constexpr auto const CHR_x = Code::CHR_x;
+  constexpr auto const CHR_y = Code::CHR_y;
+  constexpr auto const CHR_z = Code::CHR_z;
+  constexpr auto const CHR_A = Code::CHR_A;
+  constexpr auto const CHR_B = Code::CHR_B;
+  constexpr auto const CHR_C = Code::CHR_C;
+  constexpr auto const CHR_D = Code::CHR_D;
+  constexpr auto const CHR_E = Code::CHR_E;
+  constexpr auto const CHR_F = Code::CHR_F;
+  constexpr auto const CHR_G = Code::CHR_G;
+  constexpr auto const CHR_H = Code::CHR_H;
+  constexpr auto const CHR_I = Code::CHR_I;
+  constexpr auto const CHR_J = Code::CHR_J;
+  constexpr auto const CHR_K = Code::CHR_K;
+  constexpr auto const CHR_L = Code::CHR_L;
+  constexpr auto const CHR_M = Code::CHR_M;
+  constexpr auto const CHR_N = Code::CHR_N;
+  constexpr auto const CHR_O = Code::CHR_O;
+  constexpr auto const CHR_P = Code::CHR_P;
+  constexpr auto const CHR_Q = Code::CHR_Q;
+  constexpr auto const CHR_R = Code::CHR_R;
+  constexpr auto const CHR_S = Code::CHR_S;
+  constexpr auto const CHR_T = Code::CHR_T;
+  constexpr auto const CHR_U = Code::CHR_U;
+  constexpr auto const CHR_V = Code::CHR_V;
+  constexpr auto const CHR_W = Code::CHR_W;
+  constexpr auto const CHR_X = Code::CHR_X;
+  constexpr auto const CHR_Y = Code::CHR_Y;
+  constexpr auto const CHR_Z = Code::CHR_Z;
+  constexpr auto const CHR_0 = Code::CHR_0;
+  constexpr auto const CHR_1 = Code::CHR_1;
+  constexpr auto const CHR_2 = Code::CHR_2;
+  constexpr auto const CHR_3 = Code::CHR_3;
+  constexpr auto const CHR_4 = Code::CHR_4;
+  constexpr auto const CHR_5 = Code::CHR_5;
+  constexpr auto const CHR_6 = Code::CHR_6;
+  constexpr auto const CHR_7 = Code::CHR_7;
+  constexpr auto const CHR_8 = Code::CHR_8;
+  constexpr auto const CHR_9 = Code::CHR_9;
+
+}
+#endiv

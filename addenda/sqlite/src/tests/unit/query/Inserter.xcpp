@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace query {
+      //
+      // This is the recipe shown in sqlite::query::Insert
+      //
+      class Inserter;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Connection
+#import sqlite.query.Insert
+#import std.string
+class tests::unit::query::Inserter : public sqlite::query::Insert {
+  using Ancestor = sqlite::query::Insert;
+public:
+  explicit Inserter(connection_type &);
+  // see query::Database for the schema of the table t99
+  auto operator()(bool, int, double, std::string) -> status_type;
+  static auto format() -> std::string;
+};
+#endiv
+#divert <cpp>
+tests::unit::query::Inserter::Inserter(connection_type &conn)
+  : Ancestor(conn, format()) {
+  ;
+}
+
+auto tests::unit::query::Inserter::operator()(bool b, int i, double f, std::string s) -> status_type {
+  this->bind(b, i, f, s);
+  return this->prepared.step();
+}
+
+auto tests::unit::query::Inserter::format() -> std::string {
+  // see query::Database for the schema of the table t99
+  return R"sql(insert into t99(b1, i1, f1, s1) values(?, ?, ?, ?);)sql";
+}
+#endiv

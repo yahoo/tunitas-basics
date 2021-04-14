@@ -1,0 +1,54 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import re.required.Corelike
+#import std.is_base_of
+#import std.string
+#import std.vector
+namespace re::construct::detail {
+  //
+  // Choose the correct constructor data pointer for Buffery
+  //
+  // yup, it's a hack for UNIFIER=std::string and Buffery<UNIFIER>
+  //
+  //     value_type = char         std::string(char const *) <--------------------- and must be const
+  //     value_type = char         std::vector<char>(char const *)
+  //     value_type = char         c::basic_buffer<char>(char *) <----------------- and must be muting
+  //     value_type = char const   c::basic_buffer<char const>(char const *)
+  //
+  enum Constructor_Data_Pointer_Choice { VALUE_TYPE_CONST_STAR, DATA_TYPE };
+  template<required::Corelike UNIFIER, Constructor_Data_Pointer_Choice> struct Choose_Constructor_Data_Pointer;
+  template<required::Corelike UNIFIER> struct Choose_Constructor_Data_Pointer<UNIFIER, VALUE_TYPE_CONST_STAR>;
+  template<required::Corelike UNIFIER> struct Choose_Constructor_Data_Pointer<UNIFIER, DATA_TYPE>;
+  template<required::Corelike UNIFIER> using Constructor_Data_Pointer = Choose_Constructor_Data_Pointer<UNIFIER, (std::is_base_of<std::string, UNIFIER>::value ? VALUE_TYPE_CONST_STAR : 
+                                                                                                                  std::is_base_of<std::vector<char>, UNIFIER>::value ? VALUE_TYPE_CONST_STAR :
+                                                                                                                  DATA_TYPE)>;
+}
+#endiv
+#divert <hpp>
+#import std.is_same
+#import std.declval
+#import std.string
+namespace re::construct {
+  template<required::Corelike UNIFIER> struct detail::Choose_Constructor_Data_Pointer<UNIFIER, detail::VALUE_TYPE_CONST_STAR> {
+    // e.g. std::string, std::vector<char> (which in in non-const form, in C++17,. returns a non-const pointer)
+    //
+    // WATCHOUT we have to guess at what the return type ought to be
+    // as there is no 'data_type' alias
+    //
+    //     using type = typename UNIFIER::value_type [const?] *;
+    //
+    // WATCHOUT - instead C++17 makes this either consty or not
+    //
+    using type = decltype(std::declval<UNIFIER>().data());
+  };
+  template<required::Corelike UNIFIER> struct detail::Choose_Constructor_Data_Pointer<UNIFIER, detail::DATA_TYPE> {
+    // e.g. buffer, stringn, stringz (but not std::string or std::vector
+    using type = typename UNIFIER::data_type; // which is maybe consty & maybe-muting;
+  };
+}
+#endiv

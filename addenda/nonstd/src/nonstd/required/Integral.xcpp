@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_const
+#import std.is_volatile
+#import std.is_integral
+namespace nonstd::required {
+  //
+  // An integral type (which is a longer list than you'd think)
+  // Integral types are int-shaped things but are expressly NOT enumerations
+  //
+  // C++20 has https://en.cppreference.com/w/cpp/concepts/integral
+  // C++11 has https://en.cppreference.com/w/cpp/types/is_integral
+  //
+  // This concept is slightly different than
+  //     std::integral (C++20)
+  //     std::is_integral (C++11)
+  // <quote>if T is the type bool, char, char8_t, char16_t, char32_t, wchar_t, short, int, long, long long, or any implementation-defined extended integer types, including any signed, unsigned, and cv-qualified variants.</quote>
+  //
+  // Here, the cv-qualified variants are not allowed.
+  //
+  template<typename INTEGRAL> concept bool Integral = requires(INTEGRAL) {
+    requires !std::is_const<INTEGRAL>::value; // ...... to belabor the point
+    requires !std::is_volatile<INTEGRAL>::value; // ... why would you do this?
+    requires std::is_integral<INTEGRAL>::value;
+  };
+}
+#endiv
+#divert <cpp>
+#import std.byte
+namespace {
+  namespace tests {
+    using namespace nonstd::required;
+    // Testify! - 
+    static_assert(Integral<bool>);
+    static_assert(Integral<char>);
+    static_assert(Integral<unsigned char>);
+    static_assert(Integral<signed char>);
+    static_assert(!Integral<std::byte>);
+    static_assert(Integral<int>);
+    static_assert(Integral<int long unsigned>);
+    enum Ee { };
+    static_assert(!Integral<Ee>);
+    static_assert(!Integral<double>);
+  }
+}
+#endiv

@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/file.h> // availability as coumented in flock(2)
+namespace sys::flock {
+  // The individual option flags
+  // The "socket flags" are enumerated on the manual page socket(2)
+  enum class Operation {
+    SHARED    = LOCK_SH,
+    EXCLUSIVE = LOCK_EX,
+    UNLOCK    = LOCK_UN,
+    SH [[deprecated("spell it out! instead, prefer Operation::SHARED")]]    = SHARED,
+    EX [[deprecated("spell it out! instead, prefer Operation::EXCLUSIVE")]] = EXCLUSIVE,
+    UN [[deprecated("spell it out! instead, prefer Operation::UNLOCK")]]    = UNLOCK,
+  };
+}
+#endiv
+#divert <hpp>
+#import sys.flock.Option
+#import std.min
+#import std.is_same
+namespace sys::flock {
+  namespace operation {
+    namespace [[hack]] field {
+      //
+      // Yuk.  There is no better way to do this?
+      // Where does the Operation bitfield stop and the Options bitfield start?
+      // Who knows? ...  Only The Shadow Knows!
+      // We see, by inspection, in /usr/include/bits/fcntl-linux.h (glibc-headers-2.28-9.fc29.x86_64)
+      //  8 is the highest number of any operation, but WATCHOUT NB == NONBLOCK has value 4
+      //
+      //                                      
+      //          cc == 0x4 == NONBLOCK
+      // WATCHOUT cc (0x4) is not an Operation but is interleaved
+      //          |
+      //          \-----------------------------\ (here)
+      //                                        |
+      //                                        v
+      //                                     |ddccbbaa|
+      //                   |31              5|4      0|
+      // specification ::= |<----options...->|<--op-->|
+      //
+      constexpr auto lowest(Option only) -> Option { return only; }
+      template<typename... OPTIONS> constexpr auto lowest(Option first, Option second, OPTIONS ...rest) -> Option requires (true && ... && std::is_same_v<Option, OPTIONS>)
+      { return lowest(std::min(first, second), rest...); }
+      constexpr auto but_not_nonblock = ~(unsigned)Option::NONBLOCK;
+      constexpr auto overbroad_op_field_bitmask = (unsigned)lowest(Option::MANDATORY /*and others...as they appear*/) - 1u;
+      [[hack]] inline constexpr auto FIELD_BITMASK = but_not_nonblock & overbroad_op_field_bitmask;
+    }
+    using field::FIELD_BITMASK;
+  }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::flock::operation;
+    static_assert((0x1|0x2|0x8|0x10) == FIELD_BITMASK);
+  }
+}
+#endiv

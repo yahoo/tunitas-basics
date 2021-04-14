@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip::inet {
+  //
+  // Just the simple ones.
+  // If you need more then you MUST use sys::posix::sock::Type directly
+  //
+  struct [[deprecated("instead prefer ip::inet::sock::Type")]] SOCK;
+}
+#endiv
+#divert<hpp>
+#import sys.posix.SOCK
+struct ip::inet::SOCK : public sys::posix::SOCK { };
+#endiv

@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::slurp::directory {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::slurp::directory::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_throwing_good() -> void;
+  auto test_throwing_fail() -> void;
+  auto test_nothrow_good() -> void;
+  auto test_nothrow_fail() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.directory.read
+#import std.deque
+#import std.list
+#import std.string
+#import std.vector
+
+auto tests::unit::slurp::directory::Fixture::test_throwing_good() -> void {
+  auto entries = ::slurp::directory::read<std::vector<std::string>>("/tmp");
+  CPPUNIT_ASSERT(!entries.empty());
+  unsigned count = 0;
+  for (auto const &entry : entries) {
+    std::clog << "entry " << entry << '\n';
+    count++;
+  }
+  CPPUNIT_ASSERT(0 < count);
+}
+
+auto tests::unit::slurp::directory::Fixture::test_throwing_fail() -> void {
+  try {
+    auto entries = ::slurp::directory::read<std::deque<std::string>>("/tmp/t99.no-such.t99.file.or.directory.j99");
+    CPPUNIT_ASSERT(false); // <----------------- it should have thrown
+  } catch (::slurp::Failure const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import std.nothrow
+auto tests::unit::slurp::directory::Fixture::test_nothrow_good() -> void {
+  std::string subject("/tmp");
+  auto red = ::slurp::directory::read<std::list<std::string>>(std::nothrow, subject);
+  CPPUNIT_ASSERT(ok(red));
+  CPPUNIT_ASSERT(0 <= error_num(red)); // errno had some value at all
+  auto const &entries = value(red);
+  CPPUNIT_ASSERT(!entries.empty());
+}
+
+auto tests::unit::slurp::directory::Fixture::test_nothrow_fail() -> void {
+  try {
+    std::string subject("/tmp/t99.no-such.t99.file.or.directory.j99");
+    auto red = ::slurp::directory::read<std::vector<std::string>>(std::nothrow, subject);
+    CPPUNIT_ASSERT(!ok(red));
+    CPPUNIT_ASSERT(0 < error_num(red)); // errno had a nonzero value
+    auto const &entries = value(red);
+    CPPUNIT_ASSERT(entries.empty());
+  } catch (::slurp::Failure const &) {
+    // no exceptions were to have been seen
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+#import tests.unit.slurp.directory.named.Fixture
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::slurp::directory::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("directory");
+  s << call("throwing-good", &Fixture::test_throwing_good)
+    << call("throwing-fail", &Fixture::test_throwing_fail)
+    << call("nothrow-good", &Fixture::test_nothrow_good)
+    << call("nothrow-fail", &Fixture::test_nothrow_fail)
+    << add(named::Fixture::suite())
+    ;
+  return s.release();
+}
+#endiv

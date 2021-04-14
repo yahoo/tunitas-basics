@@ -1,0 +1,6 @@
+// -*- c++ -*- 5f78510d-1c2f-426e-bb3c-fde991a61de2
+#pragma once
+#include <cppunit/plugin/PlugInManager.h>
+namespace cppunit::plugin {
+  using Manager = CppUnit::PlugInManager;
+}

@@ -1,0 +1,4 @@
+// -*- c++ -*- 0a58ccbf-1dfd-46c3-a3d9-d3d675cb25c3
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/pubkey.h>

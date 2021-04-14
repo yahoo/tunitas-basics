@@ -1,0 +1,44 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringz
+namespace c {
+  namespace detail {
+    namespace stringz {
+      // Whereas as<...>(...) is a conversion operation,
+      // the new data invariant of stringz must be respected.
+      // these throw std::invalid_argument if the element at or before [N] is not the nulchar ('\0')
+      template<typename CHAR> inline auto as(CHAR const *) -> basic_stringz<CHAR const>;
+      template<typename CHAR> inline auto as(CHAR *) -> basic_stringz<CHAR>;
+      template<typename CHAR, std::size_t N> inline auto as(CHAR const (&)[N]) -> basic_stringz<CHAR const>;
+      template<typename CHAR, std::size_t N> inline auto as(CHAR (&)[N]) -> basic_stringz<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.stringy.enforce_terminating_nulchar_invariant
+
+template<typename CHAR> auto c::detail::stringz::as(CHAR const *subject) -> basic_stringz<CHAR const> {
+  basic_stringz<CHAR const> ret(subject);
+  // the nulchar termination invariant is unchecked because it cannot be done safely (or in constant-to-linear time)
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::stringz::as(CHAR *subject) -> basic_stringz<CHAR> {
+  basic_stringz<CHAR> ret(subject);
+  // the nulchar termination invariant is unchecked because it cannot be done safely (or in constant-to-linear time)
+  return ret;
+}
+
+template<typename CHAR, std::size_t N> auto c::detail::stringz::as(CHAR const *(&subject)[N]) -> basic_stringz<CHAR const> {
+  stringy::enforce_terminating_nulchar_invariant(&subject[0], &subject[N]);
+  basic_stringz<CHAR const> ret(subject);
+  return ret;
+}
+
+template<typename CHAR, std::size_t N> auto c::detail::stringz::as(CHAR *(&subject)[N]) -> basic_stringz<CHAR> {
+  stringy::enforce_terminating_nulchar_invariant(&subject[0], &subject[N]);
+  basic_stringz<CHAR> ret(subject);
+  return ret;
+}
+#divert </ipp>

@@ -1,0 +1,16 @@
+# This is a GNU -*- Makefile -*- fragment. For terms, see the LICENSE file at the top of the repository.
+obj_src_nonstd_required_iterator_SUBSOURCES = \
+  obj/src/nonstd/required/Iterator.cpp \
+  obj/src/nonstd/required/iterator/namespace.cpp \
+  obj/src/nonstd/required/iterator/Basis.cpp \
+  obj/src/nonstd/required/iterator/Basic.cpp \
+  obj/src/nonstd/required/iterator/Category.cpp \
+  obj/src/nonstd/required/iterator/Input.cpp \
+  obj/src/nonstd/required/iterator/Forward.cpp \
+  obj/src/nonstd/required/iterator/Bidirectional.cpp \
+  obj/src/nonstd/required/iterator/Output.cpp \
+  obj/src/nonstd/required/iterator/Undirected.cpp \
+  obj/src/nonstd/required/iterator/Random_Access.cpp \
+  obj/src/nonstd/required/iterator/Contiguous.cpp \
+  obj/src/nonstd/required/iterator/Producing.cpp \
+  $(end)

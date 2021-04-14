@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host::addresses {
+  template<Address_Genre> struct Traits;
+  template<> struct Traits<IN4>;
+  template<> struct Traits<IN6>;
+}
+#endiv
+#divert <hpp>
+#import ip.in
+#import ip.in4
+#import ip.in6
+namespace ares::managed::host::addresses {
+  template<> struct Traits<IN4> {
+    using Port = ip::in::port_t;
+    using Address = ip::in4::addr;
+    using Sockaddr = ip::in4::sockaddr;
+  };
+  template<> struct Traits<IN6> {
+    using Port = ip::in::port_t;
+    using Address = ip::in6::addr;
+    using Sockaddr = ip::in6::sockaddr;
+  };
+}
+#endiv

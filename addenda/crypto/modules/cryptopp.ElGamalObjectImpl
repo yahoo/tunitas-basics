@@ -1,0 +1,4 @@
+// -*- c++ -*- 64c65f4d-ce5c-4fb6-bcd8-d365b30697b7
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/elgamal.h>

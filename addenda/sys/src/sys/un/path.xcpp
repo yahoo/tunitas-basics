@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringn
+#import std.filesystem.path
+#import sys.un.required.Path
+#forward sys.un.Sockaddr
+#forward sys.un.lhs.Sockaddr
+namespace sys::un {
+  //
+  // Access or assign the path field of the sockaddr_un.
+  //
+  // Expectations:
+  //
+  //   the path<RESULT>(Sockaddr...)  function must only be called with a RESULT
+  //   which is appropriate for the type of the sockaddr sun_path
+  //
+  //   It is not always safe to inspect sun_path with path<char const *>(sockaddr).
+  //   Cases:
+  //     <pathname> wherein sun_path contains a non-zero length filesystem path terminated by \0
+  //     <unnamed> the sun_path field does not exist and must not be inspected;  Detect with length==sizeof (sa_family_t)
+  //     <abstract> commences with '\0' and the remaining 107 bytes in sun_path are the socket's name.
+  //
+  // Exceptions:
+  //
+  //   If the path is too long to fit into sun_path then an exception is thrown.
+  //
+  // Usage:
+  //
+  //   auto p = path(un);
+  //   path(un) = p;
+  //
+  inline auto path(Sockaddr const &) -> std::filesystem::path;
+  inline auto path(Sockaddr &);
+  //
+  template<required::Path RESULT> inline auto path(Sockaddr const &) -> RESULT;
+  template<> inline auto path<c::const_stringn>(Sockaddr const &) -> c::const_stringn;
+}
+#endiv
+#divert <ipp>
+#import sys.un.Sockaddr
+#import sys.un.lhs.Sockaddr
+#import strlen
+namespace sys {
+  inline auto un::path(Sockaddr const &sa) -> std::filesystem::path { return {sa.sun_path}; };
+  inline auto un::path(Sockaddr &sa) { return lhs::Sockaddr{sa}; }
+  //
+  template<un::required::Path RESULT> auto un::path(Sockaddr const &sa) -> RESULT { return {sa.sun_path}; };
+  template<> auto un::path<c::const_stringn>(Sockaddr const &sa) -> c::const_stringn { return {&sa.sun_path[0], strlen(sa.sun_path)}; }
+}
+#endiv

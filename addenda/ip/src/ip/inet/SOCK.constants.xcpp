@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.inet.SOCK
+#warning ip.inet.SOCK.constants is deprecated, instead prefer ip.inet.sock.constants (or not even that)
+#endiv
+#divert <hpp>
+#import sys.posix.sock.constants // Yes, the lower-case one.
+namespace ip::inet {
+  static_assert(sizeof (SOCK::NONE));
+  static_assert(sizeof (SOCK::STREAM));
+  static_assert(sizeof (SOCK::DGRAM));
+  static_assert(sizeof (SOCK::DATAGRAM));
+  static_assert(sizeof (SOCK::SEQPACKET));
+  static_assert(sizeof (SOCK::SEQUENCED));
+  static_assert(sizeof (SOCK::RDM));
+  static_assert(sizeof (SOCK::RELIABLE));
+  // and there are others ... but these are the ones we care about.
+}
+#endiv
+#import ip.inet.SOCK
+#import sys.posix.sock.constants // Yes, the lower-case one.  Whatever is in there, you get that.
+namespace ip::inet {
+  static_assert(sizeof (SOCK::NONE));
+  static_assert(sizeof (SOCK::STREAM));
+  static_assert(sizeof (SOCK::DATAGRAM));
+}
+#endiv

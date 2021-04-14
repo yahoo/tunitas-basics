@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::r {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.r.Limit
+#import sys.r.Usage
+namespace sys::r::constants {
+  //
+  // Simple pairwise association so you can't forget.
+  //
+  //   Limit <---> Limits   on resources <---> the 'resource' argument of getrlimit(2)
+  //   Usage <---> Usages   by whom <--------> the 'who' argument of getrusage(2), setrusage(2), prusage(2)
+  //
+  inline constexpr auto SELF     = Usage::SELF;
+  inline constexpr auto CHILDREN = Usage::CHILDREN;
+  inline constexpr auto THREAD   = Usage::THREAD;
+#if 202003L <= __cplusplus
+  // C++20? http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1099r5.html
+  using enum class Limit;
+#else
+  inline constexpr auto CPU_TIME             = Limit::CPU_TIME; //                  seconds        Per-process CPU limit, in seconds.
+  inline constexpr auto FILE_SIZE            = Limit::FILE_SIZE; //                 bytes          Largest file that can be created, in bytes.
+  inline constexpr auto DATA_SIZE            = Limit::DATA_SIZE; //                 bytes          Maximum size of data segment, in bytes.
+  inline constexpr auto STACK_SIZE           = Limit::STACK_SIZE; //                btyes          Maximum size of stack segment, in bytes.
+  inline constexpr auto CORE_FILE_SIZE       = Limit::CORE_FILE_SIZE; //            bytes          Largest core file that can be created, in bytes.
+  inline constexpr auto RESIDENT_SET_SIZE    = Limit::RESIDENT_SET_SIZE; //         bytes          Largest resident set size, in bytes.
+  inline constexpr auto OPEN_FILE_COUNT      = Limit::OPEN_FILE_COUNT; //           count          Number of open files.
+  inline constexpr auto ADDRESS_SPACE_SIZE   = Limit::ADDRESS_SPACE_SIZE; //        bytes          Address space limit.
+  inline constexpr auto PROCESS_COUNT        = Limit::PROCESS_COUNT; //             count          Number of processes.
+  inline constexpr auto MEMORY_LOCK_SIZE     = Limit::MEMORY_LOCK_SIZE; //          bytes          Locked-in-memory address space.
+  inline constexpr auto FILE_LOCK_COUNT      = Limit::FILE_LOCK_COUNT; //           count          Maximum number of file locks.
+  inline constexpr auto SIGNAL_PENDING_COUNT = Limit::SIGNAL_PENDING_COUNT; //      count          Maximum number of pending signals.
+  inline constexpr auto MESSAGE_QUEUE_SIZE   = Limit::MESSAGE_QUEUE_SIZE; //        bytes          Maximum bytes in POSIX message queues.
+  inline constexpr auto NICE_PRIORITY        = Limit::NICE_PRIORITY; //             1..40          Maximum nice priority allowed. Nice levels 19 .. -20 correspond to 0 .. 39
+  inline constexpr auto REALTIME_PRIORITY    = Limit::REALTIME_PRIORITY; //         priority       Maximum realtime priority allowed for non-priviledged processes.
+  inline constexpr auto REALTIME_CPU_TIME    = Limit::REALTIME_CPU_TIME; //         microseconds   Maximum CPU time in µs without [blocking](a system call)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto FSIZE [[deprecated("spell it out instead, prefer r::FILE")]]              = Limit::FSIZE;
+  inline constexpr auto OFILE [[compatibility("BSD name for r::NOFILE, and r::OPEN_FILE_COUNT")]] = Limit::OFILE;
+#pragma GCC diagnostic pop
+  inline constexpr auto CPU        = Limit::CPU;
+  inline constexpr auto FILE       = Limit::FILE;
+  inline constexpr auto DATA       = Limit::DATA;
+  inline constexpr auto STACK      = Limit::STACK;
+  inline constexpr auto CORE       = Limit::CORE;
+  inline constexpr auto RSS        = Limit::RSS;
+  inline constexpr auto NOFILE     = Limit::NOFILE;
+  inline constexpr auto AS         = Limit::AS;
+  inline constexpr auto NPROC      = Limit::NPROC;
+  inline constexpr auto MEMLOCK    = Limit::MEMLOCK;
+  inline constexpr auto LOCKS      = Limit::LOCKS;
+  inline constexpr auto SIGPENDING = Limit::SIGPENDING;
+  inline constexpr auto MSGQUEUE   = Limit::MSGQUEUE;
+  inline constexpr auto NICE       = Limit::NICE;
+  inline constexpr auto RTPRIO     = Limit::RTPRIO;
+  inline constexpr auto RTTIME     = Limit::RTTIME;
+#endif
+}
+namespace sys::r {
+  namespace limit {
+    // By convention, "helper constants" go in the nearby namespace.
+    // However, we also want that constant name to be available under 'using namespace sys::r::constants'
+    inline constexpr auto INFINITY = RLIM_INFINITY;
+  }
+  namespace constants { using limit::INFINITY; }
+}
+#endiv

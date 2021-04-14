@@ -1,0 +1,209 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::sysexits { class Code; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import nonstd.sysexits.Code
+#import std.numeric_limits
+class tests::unit::sysexits::Code : public cppunit::test::Fixture { 
+public: 
+  using Subject = ::nonstd::sysexits::Code;
+  inline static constexpr auto MIN = std::numeric_limits<Subject::Value>::min();
+  inline static constexpr auto MAX = std::numeric_limits<Subject::Value>::max();
+  auto test_constructor_default() -> void;
+  auto test_constructor_from_integer() -> void;
+  auto test_assignment() -> void;
+  auto test_and_assignment() -> void;
+  auto test_or_assignment() -> void;
+  auto test_conversion_to_integer() -> void;
+  auto test_operator_insert_1() -> void;
+  auto test_operator_insert_2() -> void;
+  auto test_operator_equal() -> void;
+  auto test_operator_notequal() -> void;
+  auto test_operator_and() -> void;
+  auto test_operator_or() -> void;
+  auto test_ok() -> void;
+  auto test_failure() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import nonstd.sysexits.Code
+#import nonstd.sysexits.constants
+auto tests::unit::sysexits::Code::test_constructor_default() -> void {
+  Subject d;
+  CPPUNIT_ASSERT(ok(d));
+  CPPUNIT_ASSERT(!failure(d));
+}
+#import std.numeric_limits
+auto tests::unit::sysexits::Code::test_constructor_from_integer() -> void {
+  for (unsigned i{MIN}, e{MAX}; e != i; ++i) {
+    Subject code{Subject::Value(i)};
+    CPPUNIT_ASSERT((unsigned)code == i);
+  }
+}
+auto tests::unit::sysexits::Code::test_assignment() -> void {
+  for (unsigned i{MIN}, e{MAX}; e != i; ++i) {
+    Subject code;
+    CPPUNIT_ASSERT(0 == (int)code);
+    code = Subject(i);
+    CPPUNIT_ASSERT(code == i);
+  }
+}
+auto tests::unit::sysexits::Code::test_and_assignment() -> void {
+  for (unsigned i{MIN}, e{MAX}; e != i; ++i) {
+    Subject base;
+    CPPUNIT_ASSERT(0 == base);
+    Subject item(i);
+    CPPUNIT_ASSERT(item == i);
+    bool base_as_truth = ok(base);
+    bool item_as_truth = ok(item);
+    base &= item; // <-------------------------test this
+    base_as_truth &= item_as_truth; // <------ against this
+    bool rebase_as_truth = ok(base);
+    CPPUNIT_ASSERT(base_as_truth == rebase_as_truth);
+  }
+}
+auto tests::unit::sysexits::Code::test_or_assignment() -> void {
+  for (unsigned i{MIN}, e{MAX}; e != i; ++i) {
+    Subject base;
+    CPPUNIT_ASSERT(0 == base);
+    CPPUNIT_ASSERT(ok(base));
+    Subject item(i);
+    CPPUNIT_ASSERT(item == i);
+    bool base_as_truth = ok(base);
+    bool item_as_truth = ok(item);
+    base |= item; // <-------------------------test this
+    base_as_truth |= item_as_truth; // <------ against this
+    bool rebase_as_truth = ok(base);
+    CPPUNIT_ASSERT(base_as_truth == rebase_as_truth);
+  }
+}
+auto tests::unit::sysexits::Code::test_conversion_to_integer() -> void {
+  for (int i{MIN}, e{MAX}; e != i; ++i) {
+    Subject code(i);
+    int recover = code;
+    CPPUNIT_ASSERT(i == code);
+    CPPUNIT_ASSERT(recover == code);
+    CPPUNIT_ASSERT(recover == i);
+    CPPUNIT_ASSERT((int)code == i);
+  }
+}
+#import std.ostringstream
+auto tests::unit::sysexits::Code::test_operator_insert_1() -> void {
+  Subject code;
+  std::ostringstream buf;
+  buf << code;
+  std::string str = buf.str();
+  CPPUNIT_ASSERT("exit 0" == str);
+}
+auto tests::unit::sysexits::Code::test_operator_insert_2() -> void {
+  Subject code(33);
+  std::ostringstream buf;
+  buf << code;
+  std::string str = buf.str();
+  CPPUNIT_ASSERT("exit 33" == str);
+}
+auto tests::unit::sysexits::Code::test_operator_equal() -> void {
+  for (unsigned ai{MIN}, ae{MAX}; ae != ai; ++ai) {
+    for (unsigned bi{MIN}, be{MAX}; be != bi; ++bi) {
+      Subject a(ai);
+      Subject b(bi);
+      bool integer_truth = ai == bi;
+      bool code_truth = a == b;
+      CPPUNIT_ASSERT(integer_truth == code_truth);
+    }
+  }
+}
+auto tests::unit::sysexits::Code::test_operator_notequal() -> void {
+  for (unsigned ai{MIN}, ae{MAX}; ae != ai; ++ai) {
+    for (unsigned bi{MIN}, be{MAX}; be != bi; ++bi) {
+      Subject a(ai);
+      Subject b(bi);
+      bool integer_truth = ai != bi;
+      bool code_truth = a != b;
+      CPPUNIT_ASSERT(integer_truth == code_truth);
+    }
+  }
+}
+auto tests::unit::sysexits::Code::test_operator_and() -> void {
+  Subject good;
+  Subject bad1(1);
+  Subject bad2(2);
+  Subject bad3(2);
+  Subject base;
+  CPPUNIT_ASSERT(ok(base));
+  base = base & good;
+  CPPUNIT_ASSERT(ok(base));
+  base = base & bad1;
+  CPPUNIT_ASSERT(!ok(base));
+  base = base & bad2 & bad3;
+  CPPUNIT_ASSERT(!ok(base));
+}
+auto tests::unit::sysexits::Code::test_operator_or() -> void {
+  Subject bad(MAX);
+  Subject good1;
+  Subject good2(0);
+  Subject base = bad;
+  CPPUNIT_ASSERT(!ok(base));
+  base = base | good1;
+  CPPUNIT_ASSERT(ok(base));
+  base = base | good2;
+  CPPUNIT_ASSERT(ok(base));
+}
+auto tests::unit::sysexits::Code::test_ok() -> void {
+  Subject bad(MAX);
+  CPPUNIT_ASSERT(!ok(bad));
+  Subject good;
+  CPPUNIT_ASSERT(ok(good));
+  Subject regood(good);
+  CPPUNIT_ASSERT(ok(regood));
+}
+auto tests::unit::sysexits::Code::test_failure() -> void {
+  Subject bad(MAX);
+  CPPUNIT_ASSERT(failure(bad));
+  Subject good;
+  CPPUNIT_ASSERT(!failure(good));
+  Subject regood(good);
+  CPPUNIT_ASSERT(!failure(regood));
+}
+#import rigging.suite.io
+auto tests::unit::sysexits::Code::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Code");
+  {
+    Stream cons{"constructor(from"};
+    cons << call("default", &Code::test_constructor_default)
+         << call("integer", &Code::test_constructor_from_integer)
+      ;
+    series << add(std::move(cons));
+  } {
+    Stream conv{"conversion(into)"};
+    conv << call("integer", &Code::test_conversion_to_integer)
+      ;
+    series << add(std::move(conv));
+  }
+  series << call("assignment", &Code::test_assignment)
+         << call("and_assignment", &Code::test_and_assignment)
+         << call("or_assignment", &Code::test_or_assignment)
+    ;
+  {
+    Stream ins{"operator<<"};
+    ins << call("1", &Code::test_operator_insert_1)
+        << call("2", &Code::test_operator_insert_2)
+      ;
+    series << add(std::move(ins));
+  }
+  series << call("operator_equal", &Code::test_operator_equal)
+         << call("operator_notequal", &Code::test_operator_notequal)
+         << call("operator_and", &Code::test_operator_and)
+         << call("operator_or", &Code::test_operator_or)
+         << call("ok", &Code::test_ok)
+         << call("failure", &Code::test_failure)
+    ;
+  return finalize(series);
+}
+#endiv

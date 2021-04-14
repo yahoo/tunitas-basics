@@ -1,0 +1,160 @@
+// -*- c++ -*- in the SCOLD styling
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace exception {
+      class Statement;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import tests.unit.exception.Sandbox
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sqlite.exception.Statement
+class tests::unit::exception::Statement : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  Sandbox sandbox;
+  using exception_type = sqlite::exception::Statement;
+
+  auto test_construction() -> void;
+  auto test_throwing() -> void;
+  // other tests?
+  auto test_what() -> void;
+  auto test_result() -> void;
+  auto test_code() -> void;
+  auto test_sql() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.exception.Generic
+#import sqlite.exception.Prepared
+#import sqlite.Statement
+#import sqlite.statement.Shell
+#import std.cout
+#import std.exception
+#import std.move
+#import std.runtime_error
+#import std.string
+
+auto tests::unit::exception::Statement::setUp() -> void {
+  sandbox.setUp();
+}
+
+auto tests::unit::exception::Statement::tearDown() -> void {
+  sandbox.tearDown();
+}
+
+auto tests::unit::exception::Statement::test_construction() -> void {
+  auto statement = "select 99;";
+  auto prepared = sandbox.conn.prepare<sqlite::Statement>(statement);
+  try {
+    throw exception_type(std::move(prepared), (std::string)("that should have worked"));
+  } catch (exception_type /*nonconst*/ &e) {
+    bool good = ok(e.result);
+    CPPUNIT_ASSERT(good);
+    sqlite::statement::Shell st = std::move(value(e.result));
+    CPPUNIT_ASSERT(st.is_prepared());
+    st.finalize(); // WATCHOUT - unless this is finalized (destructed) the sandbox won't close with BUSY
+    char const *rest = remaining(e.result);
+    CPPUNIT_ASSERT('\0' == *rest); // <--- by contsruction statement ends at end-of-string
+  }
+}
+
+auto tests::unit::exception::Statement::test_throwing() -> void {
+  try {
+    auto statement = "select 99;";
+    auto prepared = sandbox.conn.prepare<sqlite::Statement>(statement);
+    throw exception_type(std::move(prepared), "we are prepared");
+  } catch (exception_type /*nonconst*/ &e) {
+    std::cout << "good: " << e.what() << '\n';
+    CPPUNIT_ASSERT(ok(e.result));
+    sqlite::Statement st = std::move(value(e.result));
+    CPPUNIT_ASSERT(st.is_prepared());
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (std::runtime_error const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (...) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+auto tests::unit::exception::Statement::test_what() -> void {
+  constexpr auto select = "select 44;";
+  std::string const message = "badness of badness";
+  try {
+    auto prepared = sandbox.conn.prepare<sqlite::Statement>(select);
+    throw exception_type(std::move(prepared), message);
+  } catch (exception_type const &e) {
+    std::cout << "recovered " << e.what() << '\n';// <--- this is all we came for
+    bool good = ok(e.result);
+    CPPUNIT_ASSERT(good);
+    CPPUNIT_ASSERT(message == e.what());
+  }
+}
+
+auto tests::unit::exception::Statement::test_result() -> void {
+  constexpr auto select = "select 44;";
+  std::string const message = "badness of badness";
+  try {
+    auto prepared = sandbox.conn.prepare<sqlite::Statement>(select);
+    throw exception_type(std::move(prepared), message);
+  } catch (exception_type const &e) {
+    auto const &result = e.result; // <--- this is all we came for -- e.result
+    std::cout << "recovered " << e.what() << '\n';
+    bool good = ok(result); // <---------- ibidem
+    CPPUNIT_ASSERT(good);
+    CPPUNIT_ASSERT(message == e.what());
+  }
+}
+
+auto tests::unit::exception::Statement::test_code() -> void {
+  constexpr auto select = "select 44;";
+  std::string const message = "badness of badness";
+  try {
+    auto prepared = sandbox.conn.prepare<sqlite::Statement>(select);
+    throw exception_type(std::move(prepared), message);
+  } catch (exception_type const &e) {
+    auto c = e.code(); // <--- this is all we came for -- e.code()
+    std::cout << "recovered " << string(c) << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::exception::Statement::test_sql() -> void {
+  constexpr auto select = "select 44;";
+  std::string const message = "badness of badness";
+  try {
+    auto prepared = sandbox.conn.prepare<sqlite::Statement>(select);
+    throw exception_type(std::move(prepared), message);
+  } catch (exception_type const &e) {
+    auto s = e.sql(); // <--- this is all we came for -- e.sql()
+    std::cout << "recovered " << s << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::exception::Statement::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Statement");
+  s << call("construction", &Statement::test_construction)
+    << call("throwing", &Statement::test_throwing)
+    << call("what", &Statement::test_what)
+    << call("result", &Statement::test_result)
+    << call("code", &Statement::test_code)
+    << call("sql", &Statement::test_sql)
+    ;
+  return s.release();
+}
+#endiv

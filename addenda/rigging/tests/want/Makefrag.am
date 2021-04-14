@@ -1,0 +1,8 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+tests_want_XFAIL_TEST = 
+tests_want_TEST = \
+  tests/want/cases.test \
+  tests/want/iterator/cases.test \
+  tests/want/iterator/OutputStream.test \
+  $(end)

@@ -1,0 +1,4 @@
+// -*- c++ -*- 51f1357e-cc50-4b8c-a340-2d223e06f6aa
+// lockf
+#pragma once
+#include <unistd.h>

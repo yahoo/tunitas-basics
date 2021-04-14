@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::channel::option { class Blob; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.channel.option.Blob
+class tests::unit::channel::option::Blob : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::channel::option::Blob;
+  auto test_constructor_default() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::channel::option::Blob::test_constructor_default() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import std.move
+auto tests::unit::channel::option::Blob::test_constructor_move() -> void {
+  Subject specimen;
+  Subject subject = std::move(specimen);
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+auto tests::unit::channel::option::Blob::test_assignment_move() -> void {
+  Subject specimen;
+  Subject subject;
+  subject = std::move(specimen);
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import rigging.suite.io
+auto tests::unit::channel::option::Blob::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Blob"};
+  {
+    Stream con{"constructor"};
+    con << call("default", &Blob::test_constructor_default)
+        << call("move", &Blob::test_constructor_move)
+      ;
+    series << move(con);
+  } {
+    Stream ass{"assignment"};
+    ass << call("move", &Blob::test_constructor_move)
+      ;
+    series << move(ass);
+  }
+  return finalize(series);
+}
+#endiv

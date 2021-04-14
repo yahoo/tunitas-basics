@@ -1,0 +1,213 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::outcome {
+  enum Code { SUCCESS, ERROR = 1 };
+  template<typename OUTCOME> class Outcome;
+}
+#import std.is_error_code_enum
+namespace std {
+  template<> struct is_error_code_enum<tests::unit::outcome::Code>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_code_enum<tests::unit::outcome::Code> : std::true_type { };
+namespace tests::unit::outcome {
+  auto make_error_code(Code) -> std::error_code;
+}
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.error_code
+#import nonstd.Outcome
+template<typename OUTCOME> class tests::unit::outcome::Outcome : public cppunit::test::Fixture {
+public:
+  using Subject = OUTCOME;
+  using Payload = typename Subject::Payload;
+  using Error = typename Subject::Error;
+  auto test_constructor_default() -> void;
+  auto test_constructor_error_code() -> void;
+  auto test_constructor_Payload_copy() -> void;
+  auto test_constructor_Payload_move() -> void;
+  auto test_ok_good() -> void;
+  auto test_ok_fail() -> void;
+  auto test_good() -> void;
+  auto test_fail() -> void;
+  auto test_error_code_good() -> void;
+  auto test_error_code_fail() -> void;
+  auto test_error_message() -> void;
+  auto test_value_good() -> void;
+  auto test_value_fail() -> void;
+  auto test_value_consty() -> void;
+  auto test_value_muting() -> void;
+  auto test_value_moving() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import std.cerr
+#import std.error_code
+#import std.exception
+#import std.generic_category
+#import std.invalid_argument
+#import std.move
+#import tests.unit.outcome.Palette
+namespace tests::unit::outcome {
+  template<typename _> auto Outcome<_>::test_constructor_default() -> void {
+    Subject subject{};
+    CPPUNIT_ASSERT(ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_constructor_error_code() -> void {
+    Subject subject{std::error_code{99, std::generic_category()}};
+    CPPUNIT_ASSERT(!ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_constructor_Payload_copy() -> void {
+    Payload const specimen{};
+    Subject subject{specimen};
+    CPPUNIT_ASSERT(ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_constructor_Payload_move() -> void {
+    Subject subject{Payload{}};
+    CPPUNIT_ASSERT(ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_ok_good() -> void {
+    Subject subject{Payload{}};
+    CPPUNIT_ASSERT(ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_ok_fail() -> void {
+    Subject subject{std::error_code{Code::ERROR}};
+    CPPUNIT_ASSERT(!ok(subject));
+  }
+  template<typename _> auto Outcome<_>::test_good() -> void {
+    Subject subject{Payload{}};
+    CPPUNIT_ASSERT(good(subject));
+  }
+  template<typename _> auto Outcome<_>::test_fail() -> void {
+    Subject subject{std::error_code{Code::ERROR}};
+    CPPUNIT_ASSERT(fail(subject));
+  }
+  template<typename _> auto Outcome<_>::test_error_code_good() -> void {
+    Subject subject{std::error_code{Code::ERROR}};
+    CPPUNIT_ASSERT(!ok(subject));
+    auto ec = error_code(subject); // <---------------------- test this
+    CPPUNIT_ASSERT(0 != ec.value());
+  }
+  template<typename _> auto Outcome<_>::test_error_code_fail() -> void {
+    try {
+      Subject subject{Payload{}};
+      CPPUNIT_ASSERT(ok(subject));
+      auto ec = error_code(subject); // <---------------------- test this
+      CPPUNIT_ASSERT(0 != ec.value());
+    } catch (std::exception &e) {
+      std::cerr << "expected aspect " << e.what() << '\n';
+    }
+  }
+  template<typename _> auto Outcome<_>::test_error_message() -> void {
+    Subject subject{std::error_code{Code::ERROR}};
+    CPPUNIT_ASSERT(!ok(subject));
+    auto msg = error_message(subject); // <---------------------- test this
+    CPPUNIT_ASSERT(!msg.empty());
+    std::cerr << "message: " << msg << '\n';
+  }
+  template<typename _> auto Outcome<_>::test_value_good() -> void {
+    Payload const specimen = Palette<Payload>::literal();
+    Subject const subject{specimen};
+    CPPUNIT_ASSERT(ok(subject));
+    auto const &vv = value(subject);
+    CPPUNIT_ASSERT(specimen == vv);
+  }
+  template<typename _> auto Outcome<_>::test_value_fail() -> void {
+    try {
+      Subject subject{std::error_code{Code::ERROR}};
+      CPPUNIT_ASSERT(!ok(subject));
+      value(subject); // <------------------------- test this
+      CPPUNIT_ASSERT(false);
+    } catch (std::exception const &a) {
+      CPPUNIT_ASSERT(true);
+    }
+  }
+  template<typename _> auto Outcome<_>::test_value_consty() -> void {
+    Payload const specimen = Palette<Payload>::literal();
+    Subject subject{specimen};
+    CPPUNIT_ASSERT(ok(subject));
+    auto const &vv = value(subject);
+    CPPUNIT_ASSERT(specimen == vv);
+  }
+  template<typename _> auto Outcome<_>::test_value_muting() -> void { 
+    Payload const specimen = Palette<Payload>::literal();
+    Subject subject{specimen};
+    CPPUNIT_ASSERT(ok(subject));
+    auto &vv = value(subject);
+    CPPUNIT_ASSERT(specimen == vv);
+  }
+  template<typename _> auto Outcome<_>::test_value_moving() -> void {
+    Payload const specimen = Palette<Payload>::literal();
+    Subject subject{specimen};
+    CPPUNIT_ASSERT(ok(subject));
+    auto vv = value(std::move(subject));
+    CPPUNIT_ASSERT(specimen == vv);
+  }
+}
+#import rigging.suite.io
+template<typename _> auto tests::unit::outcome::Outcome<_>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Outcome");
+  series << []() {
+              Stream con("constructor");
+              con << call("default", &Outcome::test_constructor_default)
+                  << call("error_code", &Outcome::test_constructor_error_code)
+                  << []() {
+                       Stream pay("Payload");
+                       pay << call("copy", &Outcome::test_constructor_Payload_copy)
+                           << call("move", &Outcome::test_constructor_Payload_move)
+                           << END;
+                       return move(pay);
+                     }()
+                  << END;
+              return move(con);
+            }()
+         << []() {
+              Stream okk("ok");
+              okk << call("good", &Outcome::test_ok_good)
+                  << call("fail", &Outcome::test_ok_fail)
+                  << END;
+              return move(okk);
+            }()
+         << call("good", &Outcome::test_good)
+         << call("fail", &Outcome::test_fail)
+         << call("error_message", &Outcome::test_error_message)
+         << []() {
+              Stream eco("error_code");
+              eco << call("good", &Outcome::test_error_code_good)
+                  << call("fail", &Outcome::test_error_code_fail)
+                  << END;
+              return move(eco);
+            }()
+         << []() {
+              Stream val("value");
+              val << []() {
+                       Stream exc("exception");
+                       exc << call("good", &Outcome::test_value_good)
+                           << call("fail", &Outcome::test_value_fail)
+                           << END;
+                       return move(exc);
+                     }()
+                  << call("consty", &Outcome::test_value_consty)
+                  << call("muting", &Outcome::test_value_muting)
+                  << call("moving", &Outcome::test_value_moving)
+                  << END;
+              return move(val);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv
+#divert <cpp>
+#include <cassert>
+auto tests::unit::outcome::make_error_code(Code code) -> std::error_code {
+  // [[FIXTHIS]] this should be its own special category, but this is a tester
+  auto const &some_category = std::generic_category();
+  assert(0 != code); // this is a tester and we can do this
+  return std::error_code{(int) code, some_category};
+}
+#endiv

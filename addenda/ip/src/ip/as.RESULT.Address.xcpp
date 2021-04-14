@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.in4
+#import ip.in6
+#forward ip.Address
+#import std.string
+namespace ip {
+  template<typename RESULT> inline auto as(Address const &) -> RESULT;
+  template<> inline auto as<in4::addr_t>(Address const &) -> in4::addr_t;
+  template<> inline auto as<in4::addr>(Address const &) -> in4::addr;
+  template<> inline auto as<in6::addr_t>(Address const &) -> in6::addr_t;
+  template<> inline auto as<in6::addr>(Address const &) -> in6::addr;
+  template<> inline auto as<std::string>(Address const &) -> std::string;
+  template<> inline auto as<Address>(Address const &) -> Address;
+}
+#endiv
+#divert <ipp>
+#import ip.Address
+template<typename RESULT> auto ip::as(Address const &) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "specializations only");
+  return RESULT();
+}
+
+#import ip.as.RESULT.in4
+template<> auto ip::as<ip::in4::addr_t>(Address const &address) -> in4::addr_t {
+  return as<in4::addr_t>(as<in4::addr>(address));
+}
+
+#import ip.inet.pton
+#import std.invalid_argument
+template<> auto ip::as<ip::in4::addr>(Address const &address) -> in4::addr {
+  if (Address::Tag::IPv4 == address.tag) {
+    return address.in4;
+  } else if (Address::Tag::DOTS == address.tag) {
+    auto r = inet::pton<in4::addr>(address.space);
+    if (ok(r)) {
+      return value(r);
+    }
+  }
+  throw std::invalid_argument("does not contain an IPv4 address");
+}
+
+#import ip.as.RESULT.in6
+template<> auto ip::as<ip::in6::addr_t>(Address const &address) -> in6::addr_t {
+  return as<in6::addr_t>(as<in6::addr>(address));
+}
+
+#import ip.inet.pton
+#import std.invalid_argument
+template<> auto ip::as<ip::in6::addr>(Address const &address) -> in6::addr {
+  if (Address::Tag::IPv6 == address.tag) {
+    return address.in6;
+  } else if (Address::Tag::COLONS == address.tag) {
+    auto r = inet::pton<in6::addr>(address.space);
+    if (ok(r)) {
+      return value(r);
+    }
+  }
+  throw std::invalid_argument("does not contain an IPv6 address");
+}
+
+#import std.logic_error
+#import std.runtime_error
+template<> auto ip::as<std::string>(Address const &address) -> std::string {
+  switch (address.tag) {
+  case Address::Tag::NONE:
+    return std::string("none");
+  case Address::Tag::IPv4:
+    return as<std::string>(address.in4);
+  case Address::Tag::IPv6:
+    return as<std::string>(address.in6);
+  case Address::Tag::COLONS:
+  case Address::Tag::DOTS:
+    return std::string(address.space);
+  default:
+    throw std::runtime_error("invalid Tag for Address");
+  }
+  throw std::logic_error("notreached");
+}
+
+template<> auto ip::as<ip::Address>(Address const &address) -> Address {
+  return address;
+}
+#endiv

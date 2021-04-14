@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::lock { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.lock.Operation
+struct tests::unit::lock::Fixture : public cppunit::test::Fixture {
+  using Operation = ::sys::lock::Operation;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto lockalike(Operation) -> void;
+};
+#endiv
+#divert <cpp>
+#import sys.lock.constants
+namespace tests::unit::lock {
+  auto Fixture::lockalike(Operation) -> void { CPPUNIT_ASSERT(true); }
+  auto Fixture::test_constants() -> void {
+    using namespace ::sys::lock::constants;
+    auto c = Operation{};
+    c = READ;
+    c = WRITE;
+    c = UNLOCK;
+    c = END;
+    c = ENDLOCK;
+    lockalike(c);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::lock::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("lock");
+  series << call("constants", &Fixture::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

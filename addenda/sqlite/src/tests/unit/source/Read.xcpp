@@ -1,0 +1,133 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace source {
+      class Read;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::source::Read : public cppunit::test::Fixture {
+public:
+  auto test_throwing() -> void;
+  auto test_nothrow() -> void;
+  auto test_Result() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.read
+#import std.ofstream
+#import std.flush
+#import tests.unit.source.Tmpfile
+#import tests.unit.source.Sandbox
+
+auto tests::unit::source::Read::test_throwing() -> void {
+  Sandbox sandbox;
+  ::sqlite::read(sandbox.conn, "/dev/null");
+  {
+    Tmpfile tmp("thowing.1");
+    tmp << "select 99;" << std::flush;
+    ::sqlite::read(sandbox.conn, tmp.filename());
+  } {
+    Tmpfile tmp("thowing.2");
+    tmp << "create table t99(value integer);"
+        << std::flush;
+    ::sqlite::read(sandbox.conn, tmp.filename());
+  } {
+    Tmpfile tmp("thowing.3");
+    tmp << "create table t98(value integer);"
+        << "insert into t98(value) values (1), (2), (3);"
+        << std::flush;
+    ::sqlite::read(sandbox.conn, tmp.filename()); 
+  }
+  try {
+    ::sqlite::read(sandbox.conn, "/this/does/not/exist/at/all");
+    CPPUNIT_ASSERT(false);  
+  } catch (std::system_error const &se) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import format.q
+#import std.cerr
+#import sqlite.error.string
+#import std.nothrow
+auto tests::unit::source::Read::test_nothrow() -> void {
+  Sandbox sandbox;
+  {
+    auto r = ::sqlite::read(std::nothrow, sandbox.conn, "/dev/null");
+    CPPUNIT_ASSERT(ok(r));
+  } {
+    Tmpfile tmp("thowing.1");
+    tmp << "select 99;" << std::flush;
+    auto r = ::sqlite::read(std::nothrow, sandbox.conn, tmp.filename());
+    CPPUNIT_ASSERT(ok(r));
+  } {
+    Tmpfile tmp("thowing.2");
+    tmp << "create table t88(value integer);"
+        << std::flush;
+    auto r = ::sqlite::read(std::nothrow, sandbox.conn, tmp.filename());
+    CPPUNIT_ASSERT(ok(r));
+  } {
+    Tmpfile tmp("thowing.3");
+    tmp << "create table t87(value integer);"
+        << "insert into t87(value) values (1), (2), (3);"
+        << std::flush;
+    tmp.close();
+    auto r = ::sqlite::read(std::nothrow, sandbox.conn, tmp.filename()); 
+    if (!ok(r)) {
+      std::cerr << "sql error " << format::q(::sqlite::error::string(code(r)))
+                << "\nstd error " << format::q(error_code(r).message())
+                << "\nsql\n" << sql(r) << '\n';
+    }
+    CPPUNIT_ASSERT(ok(r));
+  }
+  try {
+    auto r = ::sqlite::read(std::nothrow, sandbox.conn, "/this/does/not/exist/at/all");
+    CPPUNIT_ASSERT(!ok(r));  
+  } catch (std::system_error const &se) {
+    // This was not supposed to throw
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+#import sqlite.detail.read.Result
+#import std.error_code
+#import std.system_category
+auto tests::unit::source::Read::test_Result() -> void {
+  using namespace ::sqlite::detail::read;
+  {
+    Result r = make(::sqlite::status::OK, std::error_code(), "/some.file", "no statement");
+    CPPUNIT_ASSERT(ok(r));
+    CPPUNIT_ASSERT_EQUAL(std::string("/some.file"), filename(r));
+  } {
+    int const error_num = 2;
+    std::error_code ec(error_num, std::system_category());
+    Result r = make(::sqlite::status::ERROR, ec, "/some.file", "no statement");
+    CPPUNIT_ASSERT(!ok(r));
+    CPPUNIT_ASSERT_EQUAL((int)(::sqlite::status::ERROR), (int)code(r));
+    CPPUNIT_ASSERT_EQUAL(error_num, error_code(r).value());
+    CPPUNIT_ASSERT_EQUAL(std::string("/some.file"), filename(r));
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::source::Read::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("read");
+  s << call("throwing", &Read::test_throwing)
+    << call("nothrow", &Read::test_nothrow)
+    << call("Result", &Read::test_Result)
+    ;
+  return s.release();
+}
+#endiv

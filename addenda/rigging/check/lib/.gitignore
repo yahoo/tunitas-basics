@@ -1,0 +1,4 @@
+# sure ... ./lib should always exist
+*.la
+.libs
+# end

@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::stack {
+  //
+  // The aspect of a stack, so the Stacklike concept can hook on it
+  // Descendants only; a triviality.
+  //
+  // Usage: all stacks class template (instances) inherit from this
+  //
+  class Aspect;
+}
+#endiv
+#divert <hpp>
+class openssl::stack::Aspect {
+protected:
+  ~Aspect() = default;
+};
+#endiv
+

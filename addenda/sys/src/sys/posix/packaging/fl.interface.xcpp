@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.Result
+#import sys.call.result.Value
+#import sys.f.Function
+#import sys.id.File
+#import sys.o.Access
+#import sys.o.Accesses
+#import sys.o.Status
+#import sys.o.Statuses
+#import sys.o.Options // ..... for Options<Access,Status>
+#import sys.o.options.required.Names
+#import sys.posix.required.rebundled // cascade namespace required for fd::required<-->required::fd, etc.
+namespace sys::posix::packaging::fl::interface {
+  using id::File;
+  using f::Function;
+  namespace payload {
+    using namespace sys::o; // especially o::Status, o::Statuses, o::Options<NAMES...>, etc.
+    using Payload = Options<Access, Status>;
+  }
+  using payload::Payload;
+  namespace result {
+    using Status = call::Result;
+    template<typename PAYLOAD> using Value = call::result::Value<PAYLOAD>;
+  }
+  namespace bundle {
+    using namespace o;
+    namespace getfl {
+      using Result = result::Value<Payload>;
+    }
+    namespace setfl {
+      using Argument = Payload;
+      using Result = result::Status;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.F
+#import sys.posix.fcntl
+namespace sys::posix::packaging::fl::interface {
+  using posix::F;
+}
+#endiv

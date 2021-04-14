@@ -1,0 +1,6 @@
+// -*- c++ -*- 52733c0a-3476-4d88-b5a8-53c65d268ffa
+#pragma once
+#include <cppunit/AdditionalMessage.h>
+namespace cppunit {
+  using CppUnit::AdditionalMessage;
+}

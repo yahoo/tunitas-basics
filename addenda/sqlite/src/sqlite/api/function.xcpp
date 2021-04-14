@@ -1,0 +1,28 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.Function
+#import sqlite.Value
+#import sqlite.api.detail.Result
+#import sqlite.api.detail.Parameter
+namespace sqlite {
+  namespace api {
+    // Where VALUE is Value<...> it must be at least Value<UNPROTECTED>
+    // SQLite takes a copy of the supplied value, so it may be deallocated after the handover
+    template<typename VALUE> inline auto result(Function &, VALUE) -> typename detail::Result<VALUE>::result_type;
+    template<typename RESULT> inline auto parameter(Value<PROTECTED> const &) -> typename detail::Parameter<RESULT>::result_type;
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.api.unguarded
+
+#import std.is_same
+template<typename VALUE> auto sqlite::api::result(Function &function, VALUE value) -> typename detail::Result<VALUE>::result_type {
+  static_assert(std::is_same<void, typename detail::Result<VALUE>::result_type>::value, "expected to return void but does not");
+  unguarded::result<VALUE>(function.safe(), value);
+}
+
+template<typename RESULT> auto sqlite::api::parameter(Value<PROTECTED> const &value) -> typename detail::Parameter<RESULT>::result_type {
+  return unguarded::parameter<RESULT>(value.safe());
+}
+#endiv

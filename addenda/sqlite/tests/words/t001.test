@@ -1,0 +1,21 @@
+#!/bin/sh
+f=${0##*/}
+b=${f%.test}
+cd "${0%/*}"
+export PATH="../../check/bin:../../bin:$PATH"
+wordsfile=${0##*/}.words
+dbfile=${0##*/}.sqlite
+function cleanup() {
+    rm $wordsfile
+    rm $dbfile
+}
+trap cleanup EXIT
+
+cat > $wordsfile <<EOF
+apple
+banana
+cherry
+EOF
+
+sed -e "s/^/$wordsfile> /" $wordsfile
+words --verbose --database=$dbfile $wordsfile

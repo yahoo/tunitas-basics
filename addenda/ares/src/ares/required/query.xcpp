@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.error.Code
+#import ares.Count
+#import ares.Buffer
+#import std.byte
+#import std.is_invocable
+namespace ares::required::query {
+  //
+  // The various callback options for ares::query(...)
+  //
+  template<typename CONTINUATION, typename STATE> concept bool Continuation = requires() {
+    // ares::query(channel, dnsclass, dnstype, continuation, state);
+    requires requires(void *_state, int _status, int _timeouts, unsigned char *_buffer, int _length) {
+      { CONTINUATION::_receive(_state, _status, _timeouts, _buffer, _length) } -> void;
+    };
+    requires requires(STATE &state, error::Code status, Count timeouts, Buffer<std::byte const> buffer) {
+      { CONTINUATION::receive(state, status, timeouts, buffer) } -> void;
+    };
+  };
+  template<typename FUNCTION> concept bool Function = requires() {
+    // ares::query(channel, dnsclass, dnstype, function);
+    requires requires(void *_function, int _status, int _timeouts, unsigned char *_buffer, int _length) {
+      { FUNCTION::template _receive<FUNCTION>(_function, _status, _timeouts, _buffer, _length) } -> void;
+    };
+    requires requires(FUNCTION function, ares::error::Code status, ares::Count timeouts, ares::Buffer<std::byte const> buffer) {
+      { function.receive(status, timeouts, buffer) } -> void;
+    };
+  };
+}
+#endiv

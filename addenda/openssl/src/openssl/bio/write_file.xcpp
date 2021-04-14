@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.bio.File
+#import sys.call.argument.Stringface
+namespace openssl::bio {
+  //
+  // Open an existing file for writing.
+  //
+  // Usage:
+  //
+  //   {
+  //     bio::File guard{bio::write_file(filepath)};
+  //     ...use the data in guard...
+  //   }
+  // 
+  namespace packaging::write_file::function {
+    using Result = File;
+    using Filepath = sys::call::argument::Stringface;
+    inline auto write_file(Filepath) -> File;
+  }
+  using packaging::write_file::function::write_file;
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import errno
+#import openssl.functions
+#import openssl.bio.File
+#import std.system_category
+#import std.system_error
+#import openssl.exception.System
+auto openssl::bio::packaging::write_file::function::write_file(Filepath filepath) -> Result {
+  Result res{BIO_new(BIO_s_file())};
+  // BIO_read_filename(), BIO_write_filename(), BIO_append_filename() and BIO_rw_filename() set the file BIO b to use file name for reading, writing, append or read write respectively. 
+  auto ok = BIO_write_filename(res.get(), /*YUUUUK-YUUUUK-YUUUUK-YUUUUK-YUUUUK-YUUUUK-*/ const_cast<char *>(c::str(filepath)));
+  if (!ok) {
+    throw exception::System{errno, std::system_category(), "write_file"};
+  }
+  return res;
+}
+#endiv

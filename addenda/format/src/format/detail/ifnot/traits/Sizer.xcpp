@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import format.detail.Formatter
+#import format.detail.separator.Formatter
+#import format.required.Character
+#import format.required.Container
+#import format.required.Element
+#import format.required.Stringlike
+#import std.optional
+
+namespace format::detail::ifnot::traits {
+  //
+  // The sizes of the traits.
+  //
+  template<typename VALUE> struct Sizer;
+  template<required::Character CHAR> struct Sizer<CHAR *>;
+  template<required::Stringlike STRING> struct Sizer<STRING>;
+  template<typename TYPE> class Sizer<std::optional<TYPE>>;
+
+  template<typename TYPE, typename CAPTURE> class Sizer<Formatter<TYPE, CAPTURE>>;
+  template<required::Container CONTAINER, required::Element SEPARATOR> struct Sizer<separator::Formatter<CONTAINER, SEPARATOR>>;
+
+}
+#endiv
+#divert <hpp>
+#import std.is_pointer
+namespace format::detail::ifnot {
+  template<typename VALUE> struct traits::Sizer {
+    using value_type = VALUE;
+    inline static constexpr auto is_null(value_type const &) -> bool { return false; }
+    inline static constexpr auto is_empty(value_type const &) -> bool { return false; }
+    static_assert(!std::is_pointer<VALUE>::value, "no pointers, CHAR pointers are specialized elsewhere");
+  };
+}
+
+namespace format::detail::ifnot::traits {
+  template<required::Character CHAR> struct Sizer<CHAR *> {
+    using value_type = CHAR const *; // yes, always add the consty
+    inline static constexpr auto is_null(value_type subject) -> bool { return nullptr == subject; }
+    inline static constexpr auto is_empty(value_type subject) -> bool { return !is_null(subject) && CHAR() == *subject; }
+  };
+
+  template<required::Stringlike STRING> struct Sizer<STRING> {
+    // For either lite strings (c::stringz, std::string_view, etc.) or heavy strings (std::string)
+    using value_type = STRING;
+    // Whereas lite strings could pass by value, heavy strings cannot; pass all stringlike types by reference.
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return nullptr == subject.data(); }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return !is_null(subject) && subject.empty(); }
+  };
+
+  template<typename TYPE> class Sizer<std::optional<TYPE>> { 
+    using Subsizer = Sizer<TYPE>;
+  public:
+    using value_type = std::optional<TYPE>;
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return !subject; }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return !is_null(subject) && Subsizer::is_empty(*subject); }
+  };
+
+  template<typename TYPE, typename CAPTURE> class Sizer<Formatter<TYPE, CAPTURE>> {
+    using Subsizer = Sizer<TYPE>;
+  public:
+    using value_type = Formatter<TYPE, CAPTURE>;
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return Subsizer::is_null(subject.value); }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return Subsizer::is_empty(subject.value); }
+  };
+
+  template<required::Container CONTAINER, required::Element SEPARATOR> struct Sizer<separator::Formatter<CONTAINER, SEPARATOR>> {
+    using Subsizer = Sizer<CONTAINER>;
+  public:
+    using value_type = separator::Formatter<CONTAINER, SEPARATOR>;
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return Subsizer::is_null(subject.container); }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return Subsizer::is_empty(subject.container); }
+  };
+}
+
+#import std.empty
+namespace format::detail::ifnot::traits {
+  template<required::Container CONTAINER> struct Sizer<CONTAINER> { 
+    using value_type = CONTAINER;
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return false; }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return std::empty(subject); }
+  };
+}
+#endiv

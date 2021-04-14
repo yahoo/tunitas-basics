@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward ip.inet.error.Category
+namespace ip::inet::error {
+  //
+  // The network error category
+  //
+  // Usage
+  //
+  //   auto const &c = network_category();
+  //   c.name()
+  //   c.message(99);
+  //
+  // n.b. there is also a using declaration at ip::inet::network_category
+  auto network_category() -> Category const &;
+}
+#endiv
+#divert <ipp>
+#import ip.inet.error.Category
+#endiv
+#divert <cpp>
+#import std.mutex
+#import std.lock_guard
+auto ip::inet::error::network_category() -> Category const & {
+  static std::mutex mutex;
+  std::lock_guard<std::mutex> guard{mutex};
+  static Category const singleton;
+  return singleton;
+}
+#endiv

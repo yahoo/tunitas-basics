@@ -1,0 +1,5 @@
+# these are synthetic
+*.o
+half_float.*.cpp
+std.*.cpp
+# main.cpp is not synthetic, do not ignore it

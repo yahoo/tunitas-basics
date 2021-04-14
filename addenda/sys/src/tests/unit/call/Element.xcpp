@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+namespace tests::unit::call {
+  template<std::size_t INDEX, typename EXPECTED, typename SUBJECT> class Element;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+template<std::size_t INDEX_VALUE, typename EXPECTED, typename SUBJECT> class tests::unit::call::Element : public cppunit::test::Fixture { 
+public: 
+  constexpr static auto INDEX = INDEX_VALUE;
+  using Expected = EXPECTED;
+  using Subject = SUBJECT;
+  auto test_expected() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import std.is_same
+#import sys.call.result.Value
+#import sys.call.result.Element
+template<std::size_t _1, typename _2, typename _3> auto tests::unit::call::Element<_1, _2, _3>::test_expected() -> void {
+  using expected_type = Expected;
+  using actual_type = typename ::sys::call::result::Element<INDEX, Subject>::type;
+  CPPUNIT_ASSERT((std::is_same<expected_type, actual_type>::value));
+}
+
+#import std.to_string
+#import std.type_info
+#import std.string_literals
+#import rigging.suite.io
+template<std::size_t _1, typename _2, typename _3> auto tests::unit::call::Element<_1, _2, _3>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Element<"s + std::to_string(INDEX) + ", "s + typeid(Subject).name() + ">"s);
+  series << call("expected", &Element::test_expected);
+  return finalize(series);
+}
+#endiv

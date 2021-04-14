@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import nonstd.required.iterator.Forward
+#import nonstd.required.iterator.Random_Access
+namespace nonstd::uninitialized {
+  //
+  // Zero out an uninitialized area of memory.
+  // The expectation is that the memory is otherwise uninitialized.
+  // 
+  // Following, rhyming with, std::uninitialized_fill(...)
+  // See https://en.cppreference.com/w/cpp/memory/uninitialized_fill
+  //
+  //   Thing array[5];
+  //   uninitialized_zero(array);
+  //
+  //   Thing single;
+  //   uninitialized_zero(single);
+  //
+  template<typename OBJECT> inline auto zero(OBJECT &) -> void;
+  template<typename OBJECT, std::size_t N> inline auto zero(OBJECT (&)[N]) -> void;
+  template<typename OBJECT> inline auto zero(OBJECT *, std::size_t N) -> void;
+  template<required::iterator::Forward ITERATOR> inline auto zero(ITERATOR first, ITERATOR last) -> void;
+  template<required::iterator::Random_Access ITERATOR> inline auto zero(ITERATOR first, ITERATOR last) -> void;
+}
+#endiv
+#divert <ipp>
+#import std.uninitialized_fill_n
+template<typename OBJECT> auto nonstd::uninitialized::zero(OBJECT &subject) -> void {
+  std::uninitialized_fill_n(reinterpret_cast<char *>(&subject), sizeof (OBJECT), '\0');
+}
+template<typename OBJECT, std::size_t N> auto nonstd::uninitialized::zero(OBJECT (&subject)[N]) -> void {
+  std::uninitialized_fill_n(reinterpret_cast<char *>(&subject[0]), N * sizeof (OBJECT), '\0');
+}
+template<typename OBJECT> auto nonstd::uninitialized::zero(OBJECT *subject, std::size_t N) -> void {
+  std::uninitialized_fill_n(reinterpret_cast<char *>(&subject[0]), N * sizeof (OBJECT), '\0');
+}
+#import std.distance
+#import nonstd.iterator.Traits
+template<nonstd::required::iterator::Forward ITERATOR> inline auto nonstd::uninitialized::zero(ITERATOR first, ITERATOR last) -> void {
+  for (auto here=first ; first != last; ++here) {
+    zero(*here);
+  }
+}
+template<nonstd::required::iterator::Random_Access ITERATOR> inline auto nonstd::uninitialized::zero(ITERATOR first, ITERATOR last) -> void {
+  auto const COUNT = std::distance(first, last);
+  using Value = typename iterator::Traits<ITERATOR>::Value;
+  std::uninitialized_fill_n(reinterpret_cast<char *>(&*first), COUNT * sizeof (Value), '\0');
+}
+#endiv

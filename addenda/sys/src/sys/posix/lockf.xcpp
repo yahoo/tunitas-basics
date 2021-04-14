@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+#import sys.posix.packaging.lock.Nomenclature
+namespace sys::posix {
+  //
+  // NOT A SYSTEM CALL
+  //
+  // <quote ref=lockf(3) ref=man-pages-4.16-3.fc29.noarch>
+  //   On Linux, lockf() is just an interface on top of fcntl(2) locking.
+  //   Many other systems implement lockf() in this way, but note that POSIX.1 leaves the relationship between lockf() and fcntl(2) locks unspecified.
+  //   A portable application  should probably avoid mixing calls to these interfaces.
+  // </quote>
+  //
+  // Usage:
+  //
+  //   lockf(fd, F::LOCK, Offset{1});
+  //   lockf(fd, F::TEST_AND_LOCK, Offset{2});
+  //   lockf(fd, F::UNLOCK, Offset{0});
+  //   lockf(fd, F::TEST, Offset{-1});
+  //
+  namespace packaging::lockf {
+    using namespace packaging::lock::interface;
+    using namespace bundle::lockf;
+    namespace function {
+      inline auto lockf(File, Operation, Offset) -> Status;
+    }
+    namespace native {
+      inline auto lockf(int, Operation, Offset) -> Status;
+    }
+  }
+  using packaging::lockf::function::lockf;
+  namespace native { using packaging::lockf::native::lockf; }
+}
+using sys::posix::lockf; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import lockf
+#import std.is_integral
+#import errno
+namespace sys::posix::packaging::lockf {
+  auto function::lockf(File fd, Operation op, Offset off) -> Status { return native::lockf((int)fd, op, off); }
+  auto native::lockf(int fd, Operation op, Offset off) -> Status    {
+    static_assert(!std::is_integral_v<Operation>); // ... WATCHOUT -- ensure that the following call to ::lockf(int, int, off_t) is not infinite recursion
+    int called = ::lockf(fd, (int)op, off); // .......... WATCHOUT - lockf is NOT a system call and ... has other behaviors implemented in (g)libc
+    return {0 <= called, errno, called};
+  }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_lockf.Usage
+static_assert(tests::usage::posix_lockf::Usage<>);
+#endiv

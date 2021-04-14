@@ -1,0 +1,93 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An X.509 Certificate Signing Request (CSR)
+  //
+  // Usage:
+  //
+  //   Req req;
+  //   ... this being RAII, either you got it or you're out of here...
+  //   req.set_version(req::Version{1});
+  //   req.set_group(std::move(gr));
+  //   ...etc...
+  //
+  class Req;
+  namespace req {
+    enum Version : int;
+    inline auto const VERSION = Version{1}; // all known versions are hardcoded at 1
+  }
+}
+#endiv
+#divert <hpp>
+#import openssl.evp.PKey
+#import openssl.evp.PKey0
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_REQ
+#import openssl.pem.load.declaration
+#import openssl.pem.from_string_view.declaration
+#import openssl.types
+#forward openssl.x509.Name
+#forward openssl.x509.Name0
+class openssl::x509::Req : public managed::Pointer<X509_REQ> {
+  using ancestor = managed::Pointer<X509_REQ>;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::load::detail::open_read_close(Filepath, std::function<POINTER *(BIO *)>) -> RESULT;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::from_string_view::detail::copy_read(std::string_view, std::function<POINTER *(BIO *)>) -> RESULT;
+  inline explicit Req(X509_REQ *);
+public:
+  inline Req();
+  inline auto set_version(req::Version) -> void;
+  inline auto get_pubkey() const -> evp::PKey0;
+  inline auto get_pubkey() -> evp::PKey;
+  inline auto set_pubkey(evp::PKey0 const &) -> void;
+  inline auto get_subject_name() const -> Name0;
+  inline auto get_subject_name() -> Name;
+  // EVP_sha1(), EVP_sha256(), etc.
+  inline auto sign(evp::PKey0 const &, EVP_MD const *function) -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.x509.Name
+#import openssl.x509.Name0
+#import openssl.error.Code
+#import std.error_code
+#import openssl.functions
+namespace openssl::x509 {
+  Req::Req()
+    : ancestor{X509_REQ_new()}
+  { }
+  Req::Req(X509_REQ *req)
+    : ancestor{req}
+  { }
+  auto Req::set_version(req::Version version) -> void {
+    if (!X509_REQ_set_version(get(), (int) version)) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Req::get_subject_name() const -> Name0 {
+    return Name0{X509_REQ_get_subject_name(get())};
+  }
+  auto Req::get_subject_name() -> Name {
+    return Name{X509_REQ_get_subject_name(get()), Name::Deleter{Name::Deleter::DROPPING}};
+  }
+  auto Req::get_pubkey() const -> evp::PKey0 {
+    return evp::PKey0{X509_REQ_get0_pubkey(get())};
+  }
+  auto Req::get_pubkey() -> evp::PKey {
+    return evp::PKey{X509_REQ_get_pubkey(get())};
+  }
+  auto Req::set_pubkey(evp::PKey0 const &pk) -> void {
+    auto ok = X509_REQ_set_pubkey(get(), const_cast<EVP_PKEY *>(pk.get()));
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Req::sign(evp::PKey0 const &pk, EVP_MD const *function) -> void {
+    auto ok = X509_REQ_sign(get(), const_cast<EVP_PKEY *>(pk.get()), function);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+}
+#endiv

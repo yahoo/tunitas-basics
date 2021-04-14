@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time.durations // seconds, microseconds, nanoseconds
+#import std.is_class
+namespace sys::posix::packaging::sleep::duration {
+  template<required::Integer REP, required::Ratio RATIO> using Duration = sys::time::durations::base<REP, RATIO>;
+  static_assert(std::is_class_v<Duration<int, std::ratio<1>>>);     // herein Duration is the template, still has flexibility for Duration<REP,RATIO>
+  using Seconds = sys::time::durations::seconds;
+  using Milliseconds = sys::time::durations::milliseconds;
+  using Microseconds = sys::time::durations::microseconds;
+  using Nanoseconds = sys::time::durations::nanoseconds;
+}
+#endiv

@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::x509 { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::x509::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_field_Named() -> void;
+  auto test_Fields() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::x509::Fixture::test_field_Named() -> void {
+  // See Fields.  You have to construct these within a Fields
+}
+#import openssl.x509.Fields
+auto tests::unit::x509::Fixture::test_Fields() -> void {
+  ::openssl::x509::Fields subject;
+  subject.C.value = "US";
+  CPPUNIT_ASSERT(!subject.C.name.empty());
+  CPPUNIT_ASSERT(!subject.C.value->empty());
+  subject.ST.value = "California";
+  CPPUNIT_ASSERT(!subject.ST.name.empty());
+  CPPUNIT_ASSERT(!subject.ST.value->empty());
+  subject.L.value = "Palo Alto";
+  CPPUNIT_ASSERT(!subject.L.name.empty());
+  CPPUNIT_ASSERT(!subject.L.value->empty());
+  subject.O.value = "Example Inc.";
+  CPPUNIT_ASSERT(!subject.O.name.empty());
+  CPPUNIT_ASSERT(!subject.O.value->empty());
+  subject.OU.value = "Operations";
+  CPPUNIT_ASSERT(!subject.OU.name.empty());
+  CPPUNIT_ASSERT(!subject.OU.value->empty());
+  subject.CN.value = "*.example.org";
+  CPPUNIT_ASSERT(!subject.CN.name.empty());
+  CPPUNIT_ASSERT(!subject.CN.value->empty());
+}
+#import tests.unit.x509.Crl
+#import tests.unit.x509.Crt
+#import tests.unit.x509.Extension
+#import tests.unit.x509.Name
+#import tests.unit.x509.Req
+#import tests.unit.x509.Revoked
+#import rigging.suite.io
+auto tests::unit::x509::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("x509");
+  series << call("field::Named", &Fixture::test_field_Named)
+         << call("Fields", &Fixture::test_Fields)
+         << add<Name>()
+         << add<Extension>()
+         << add<Revoked>()
+         << add<Req>()
+         << add<Crt>()
+         << add<Crl>()
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import off_t
+#import sys.id.File
+#import nonstd.dope
+#import sys.posix.pread
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_pread_function_1() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    auto red = sys::posix::pread(fd, &buf[0], size, offset);
+    CPPUNIT_ASSERT(fail(red));
+  }
+  auto Fixture::test_pread_function_2() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    auto const dope = nonstd::dope<char>{&buf[0], size};
+    auto red = sys::posix::pread(fd, dope, offset);
+    CPPUNIT_ASSERT(fail(red));
+  }
+}
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_pread_native_1() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    auto red = sys::posix::native::pread(fd, &buf[0], size, offset);
+    CPPUNIT_ASSERT(fail(red));
+  }
+  auto Fixture::test_pread_native_2() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const dope = nonstd::dope<char>{&buf[0], size};
+    auto const offset = off_t{0};
+    auto red = sys::posix::native::pread(fd, dope, offset);
+    CPPUNIT_ASSERT(fail(red));
+  }
+}
+#endiv

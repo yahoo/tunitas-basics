@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::function::query {
+  //
+  // The basis of a function-object endpoint of a query.
+  // Descendants only.
+  //
+  // Usage:
+  //
+  //   see function::Query
+  //
+  class Basis;
+}
+#endiv
+#divert <hpp>
+#import ares.Buffer
+#import ares.Count
+#import ares.error.Code
+#import std.byte
+#import std.is_base_of
+class ares::function::query::Basis {
+protected:
+  virtual ~Basis() = default;
+public:
+  Basis() = default;
+  template<typename QUERY> static auto _receive(void *function, int status, int timeouts, unsigned char *buffer, int length) noexcept -> void requires std::is_base_of<Basis, QUERY>::value;
+  virtual auto receive(error::Code, Count, Buffer<std::byte const>) -> void = 0;
+};
+#divert <tpp>
+#import ares.exception.Invariant
+#import std.size_t
+namespace ares::function::query {
+  template<typename QUERY> auto Basis::_receive(void *_function, int _status, int _timeouts, unsigned char *_buffer, int _length) noexcept -> void requires std::is_base_of<Basis, QUERY>::value try {
+    auto &function = *reinterpret_cast<QUERY *>(_function);
+    auto status = error::Code{_status};
+    if (_timeouts < 0) { throw exception::Invariant{"negative count"}; }
+    auto timeouts = Count(_timeouts);
+    if (_length < 0) { throw exception::Invariant{"negative length"}; }
+    auto buffer = nonstd::span<std::byte const>{reinterpret_cast<std::byte const *>(_buffer), std::size_t(_length)};
+    function.receive(status, timeouts, buffer);
+  } catch (...) {
+    // What can we do?   Exceptions must not cross back into the C runtime
+    // [[FIXTHIS]] either rebuild ares event pumping to be in the C++ runtime; or else use the "save the exception" separately trickery.
+  }
+}
+#endiv

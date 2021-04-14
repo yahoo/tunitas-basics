@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.argv
+#import sys.exits.Code
+namespace tests::rsa {
+  auto main(c::argv) -> sys::exits::Code;
+}
+#divert <cpp>
+#import openssl.evp.PKey
+#import openssl.pem.to_string
+#import openssl.rsa.generate
+#import std.cout
+#import std.cerr
+#import sys.exits.constants
+#import tests.is_usage
+auto tests::rsa::main(c::argv av) -> sys::exits::Code {
+  if (1 != av.size()) {
+    std::cerr << "usage: rsa         (no options or words)\n";
+    return is_usage(av) ? sys::exits::OK : sys::exits::CONFIG;
+  } else {
+    using namespace ::openssl;
+    namespace rsa = ::openssl::rsa;
+    auto pk = evp::PKey{};
+    auto pair = rsa::generate(rsa::Bits::RSA2048);
+    pk.assign(std::move(pair));
+    std::cout << pem::to_string(pk);
+    return sys::exits::OK;
+  }
+}
+#endiv

@@ -1,0 +1,282 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Integer
+namespace nonstd::detail::to_integer {
+  //
+  // The modern way of doing string-to-integer (strtol, strtoul)
+  // Especially for the int128 series, but also applicable to the lower ranks.
+  //
+  // Patterned after the specifications declared at
+  //   https://en.cppreference.com/w/cpp/string/basic_string/stoul
+  //   https://en.cppreference.com/w/cpp/string/basic_string/stol
+  //
+  // But more importantly, reproducing quirks-compatibility with the GNU C Library
+  // from glibc.git/stdlib/strtol_l.c
+  // but without all the C macrotization; and with C++ constexpr, inlining & templatizing
+  //
+  // Usage:
+  //
+  //   Modern<int8_t> modern;      (signed & unsigned of all integer sizes)
+  //   Modern<uint16_t> modern;
+  //   Modern<int32_t> modern;
+  //   Modern<uint32_t> modern;
+  //   Modern<int64_t> modern;
+  //   Modern<int128_t> modern;
+  //   Modern<uint128_t> modern;
+  //
+  //   auto value = modern.sto(syntax, base);
+  //   auto outcome = modern.to_integer(syntax, base);
+  //
+  //   auto [value, end, overflow, invalid] = modern.parse(syntax, base);
+  //
+  template<required::Integer> struct Modern;
+  namespace modern {
+    enum class Invalid { NO, YES };
+    enum class Overflow { NO, YES };
+  }
+}
+#endiv
+#divert <hpp>
+#import nonstd.Outcome
+#import nonstd.make_unsigned
+#import nonstd.numeric_limits
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import std.tuple
+#import std.basic_string_view
+namespace nonstd::detail {
+  template<required::Integer INTEGER> struct to_integer::Modern {
+    using Value = INTEGER;
+    using Limit = numeric_limits<Value>;
+    using Unsigned = typename make_unsigned<Value>::type;
+    template<required::Character CHAR, required::Character_Traits TRAITS> inline auto to_integer(std::basic_string_view<CHAR, TRAITS> const &, int base) const noexcept -> Outcome<Value>;
+    template<required::Character CHAR, required::Character_Traits TRAITS> inline auto sto(std::basic_string_view<CHAR, TRAITS> const &, int base) const -> Value;
+    //
+    // The parse(...) operation is mostly complete for "invalid"
+    // Yet it follows the documented semantic of the strtol(...) family
+    // wherein "0x" -> 0 and also "0y" -> 0.
+    // wherein "0abc" -> 0   end@'a' if base <= 10
+    // wherein "0abc" -> 10  end@'b' if base <= 11
+    // wherein "0abc" -> 131 end@'c' if base <= 12
+    using Parsed = std::tuple<Value, std::size_t, modern::Invalid, modern::Overflow>;
+
+    template<required::Character CHAR, required::Character_Traits TRAITS> inline auto parse(std::basic_string_view<CHAR, TRAITS> const &, int base) const noexcept -> Parsed;
+  };
+}
+namespace nonstd::detail::to_integer::modern {
+  inline constexpr auto is(Invalid candidate) -> bool { return Invalid::NO != candidate; }
+  inline auto operator|(Invalid, Invalid) -> Invalid;
+  inline auto operator|=(Invalid &, Invalid) -> Invalid &;
+  inline auto operator|=(Invalid &, bool) -> Invalid &;
+}
+namespace nonstd::detail::to_integer::modern {
+  inline constexpr auto is(Overflow candidate) -> bool { return Overflow::NO != candidate; }
+  inline auto operator|(Overflow, Overflow) -> Overflow;
+  inline auto operator|=(Overflow &, Overflow) -> Overflow &;
+  inline auto operator|=(Overflow &, bool) -> Overflow &;
+}
+#endiv
+#divert <ipp>
+namespace nonstd::detail::to_integer {
+  auto modern::operator|(Invalid a, Invalid b) -> Invalid {
+    a |= b;
+    return a;
+  }
+  auto modern::operator|=(Invalid &lhs, Invalid rhs) -> Invalid & {
+    if (is(rhs)) {                        
+      lhs = rhs;
+    }
+    return lhs;
+  }
+  auto modern::operator|=(Invalid &lhs, bool rhs) -> Invalid & {
+    if (rhs) {                        
+     lhs = Invalid::YES;
+    }
+    return lhs;
+  }
+}
+namespace nonstd::detail::to_integer {
+  auto modern::operator|(Overflow a, Overflow b) -> Overflow {
+    a |= b;
+    return a;
+  }
+  auto modern::operator|=(Overflow &lhs, Overflow rhs) -> Overflow & {
+    if (is(rhs)) {                        
+      lhs = rhs;
+    }
+    return lhs;
+  }
+  auto modern::operator|=(Overflow &lhs, bool rhs) -> Overflow & {
+    if (rhs) {                        
+      lhs = Overflow::YES;
+    }
+    return lhs;
+  }
+}
+#import std.size_t
+#import std.error_code
+#import nonstd.error.to_integer.Code
+namespace nonstd::detail::to_integer {
+  template<required::Integer _> template<required::Character CHAR, required::Character_Traits TRAITS> auto Modern<_>::to_integer(std::basic_string_view<CHAR, TRAITS> const &syntax, int base) const noexcept -> Outcome<Value> {
+    using Result = Outcome<Value>;
+    using Error_Code = error::to_integer::Code;
+    auto [value, end, invalid, overflow] = parse(syntax, base);
+    if (is(invalid) || end != syntax.size()) {
+      return Result{std::error_code{Error_Code::INVALID_ARGUMENT}};
+    }
+    if (is(overflow)) {
+      return Result{std::error_code{Error_Code::OUT_OF_RANGE}};
+    }
+    return Result{value};
+  }
+  template<required::Integer _> template<required::Character CHAR, required::Character_Traits TRAITS> inline auto Modern<_>::sto(std::basic_string_view<CHAR, TRAITS> const &syntax, int base) const -> Value {
+    auto [value, end, invalid, overflow] = parse(syntax, base);
+    if (is(invalid) || syntax.size() != end) {
+      throw std::invalid_argument{"sto"};
+    }
+    if (is(overflow)) {
+      throw std::out_of_range{"sto"};
+    }
+    return value;
+  }
+}
+#endiv
+#divert <tpp>
+#import nonstd.detail.to_integer.Cutoff
+#import nonstd.detail.to_integer.Widen
+#import nonstd.detail.to_integer.Locale
+#import nonstd.is_signed
+#import std.localeconv
+namespace nonstd::detail::to_integer {
+  template<required::Integer _> template<required::Character CHAR, required::Character_Traits TRAITS> auto Modern<_>::parse(std::basic_string_view<CHAR, TRAITS> const &syntax, int base) const noexcept -> Parsed {
+    using Result = Parsed;
+    using Widen = to_integer::Widen<CHAR>;
+    using Locale = to_integer::Locale<CHAR>;
+    using Cutoff = to_integer::Cutoff<Unsigned>;
+    using namespace modern;
+    // 
+    auto here{syntax.begin()};
+    auto const first{here};
+    bool negative{false};
+    while (Widen::isspace (*here)) {
+      ++here;
+    }
+    if (*here == Widen::NUL) {
+      auto const end = std::size_t(here-first);
+      auto const zero = Value{0};
+      return {zero, end, Invalid::NO, Overflow::NO};
+    } else if (*here == Widen::MINUS) {
+      negative = true;
+      ++here;
+    } else if (*here == Widen::PLUS) {
+      ++here;
+    }
+    // n.b. there can be no white space after the operator (plus-or-minus)
+    // n.b. here may point at '\0' at this point
+    auto leading_zero = here[0] == Widen::L0; // leading '0' means hex or octal
+    auto leading_hex = leading_zero && Widen::toupper(here[1]) == Widen::LX; // leading '0x' means hex
+    if (leading_hex) { here += 2; }
+    if (0 == base) {
+      // Recognize number prefix and if BASE is zero, figure it out ourselves.
+      if (leading_zero) {
+        if (leading_hex) {
+          base = 16;
+        } else {
+          base = 8;
+        }
+      } else {
+        base = 10;
+      }
+    }
+    if (base < Cutoff::min_base() || Cutoff::max_base() < base) {
+      return Result{0, 0lu, Invalid::YES, Overflow::NO};
+    }
+    Locale locale{std::localeconv()};
+    if (10 != base) {
+      locale.no_grouping();
+    }
+    Cutoff cutoff{base};   
+    Overflow overflow{};
+    Invalid invalid{};
+    //
+    Unsigned accumulator{0};
+    auto const last{locale.end(here, syntax.end())};
+    for ( ; last != here; ++here) {
+      auto [contu, brake, digit] = [here, &locale]() -> std::tuple</*continue*/ bool, /*break*/ bool, /*value*/ int> {
+        auto const c = *here;
+        if (Widen::isdigit(c)) {
+          return { false, false, c - Widen::L0 };
+        } else if (Widen::isalpha(c)) {
+          // base 11 to base 36 are characters 'A' to 'Z' (either case)
+          return { false, false, Widen::toupper(c) - Widen::LA + 10 };
+        } else if (locale.is_grouping(here)) {
+          return { true, false, 0 };
+        } else {
+          return { false, true, 0 };
+        }
+      }();
+      if (contu) { continue; }
+      if (brake) {
+        invalid = Invalid::YES;
+        break;
+      }
+      if (digit > base) {
+        break; // not yet Invalid::YES
+      }
+      if (cutoff.would_overflow(accumulator, digit)) {
+          overflow = Overflow::YES; // any reason we shouldn't quit here? (yes: end is not set, invalid is not assessed)
+      } else {
+        accumulator *= base;
+        accumulator += digit;
+      }
+    }
+    std::size_t end(here - first); // presumptively establish 'end'
+    if (last == here) {
+      // Good, but maybe nothing anything actually happened.
+      //
+      // As specified->documented->implemented in glibc.git/stdlib/strtol_l.c 
+      //   The base is 0 or 16 and the first two characters are '0' and 'x',
+      //   but the rest are no hexadecimal digits.
+      //   This is not an error case.
+      //   We return 0 and 'end' points to the `x`.        "0x" -> 0 and also "0y" -> 0.
+      //
+      if (2 <= here - first && Widen::LX == Widen::toupper(here[-1]) && Widen::L0 == here[-2]) {
+        --end;
+        accumulator = 0;
+      }
+    } else {
+      // The caller assesses whether not-end-of-string means invalid
+      // NOT HERE ---> invalid = Invalid::YES;
+    }
+    if constexpr (is_signed<Value>::value) {
+      //
+      // Check for a value that is within the range of `unsigned LONG int', but outside the range of `signed LONG int'.
+      //
+      // signed  unsigned   operation
+      //   -128      0x80     Limit::min()
+      //   -127      0x81   1+Limit::min()
+      //    127    0x0081   Unsigned
+      //   -127    0xff81   negate that
+      //   -128    0xff80   add one
+      //
+      constexpr auto NEGATIVE_BOUND = 1 + -Unsigned(1 + Limit::min());
+      constexpr auto POSITIVE_BOUND = 0 + +Unsigned(0 + Limit::max());
+      auto const BOUND = negative ? NEGATIVE_BOUND : POSITIVE_BOUND;
+      overflow |= BOUND < accumulator;
+    }
+    auto signed_accumulator = [negative, overflow](auto unsigned_accumulator) -> Value {
+                                if (is(overflow)) {
+                                  return negative ? Limit::min() : Limit::max();
+                                } else {
+                                  if (negative) {
+                                    return - unsigned_accumulator;
+                                  } else {
+                                    return unsigned_accumulator;
+                                  }
+                                }
+                              }(accumulator);
+    return {signed_accumulator, end, invalid, overflow};
+  }
+}
+#endiv

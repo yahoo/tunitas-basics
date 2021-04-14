@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+namespace nonstd::detail::to_integer {
+  //
+  // A palette of widened characters
+  // is constexpr
+  //
+  // Usage: really?
+  //
+  template<required::Character CHAR> struct Widen;
+}
+#endiv
+#divert <hpp>
+#import std.toupper
+#import std.isalpha
+#import std.isdigit
+#import std.isspace
+namespace nonstd::detail {
+  template<required::Character CHAR> struct to_integer::Widen {
+    using Char = CHAR;
+    inline static constexpr auto NUL = Char('\0');
+    inline static constexpr auto MINUS = Char('-');
+    inline static constexpr auto PLUS = Char('+');
+    inline static constexpr auto L0 = Char('0');
+    inline static constexpr auto L9 = Char('9');
+    inline static constexpr auto LA = Char('A');
+    inline static constexpr auto LF = Char('F'); // not just hex (base-16)
+    inline static constexpr auto LZ = Char('Z'); // but full base-36
+    inline static constexpr auto LX = Char('X'); // that pesky ambiguity "0x", what is it?
+    inline static constexpr auto widen(char narrow) -> Char { return Char{narrow}; }
+    inline static constexpr auto toupper(Char c) -> Char { return std::toupper(c); }
+    inline static constexpr auto isalpha(Char c) -> bool { return std::isalpha(c); }
+    inline static constexpr auto isdigit(Char c) -> bool { return std::isdigit(c); }
+    inline static constexpr auto isspace(Char c) -> bool { return std::isspace(c); }
+  };
+}
+#endiv

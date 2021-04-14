@@ -1,0 +1,116 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::vector {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::c::vector::Fixture : public cppunit::test::Fixture { 
+public:
+  auto test_universe() -> void;
+  auto test_rest() -> void;
+  auto test_usage() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import c.vector
+#import c.const_vector
+#import c.basic_vector
+
+auto tests::unit::c::vector::Fixture::test_universe() -> void {
+  // show they can be declared and default-constructede
+  {
+    ::c::basic_vector<char> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<char const> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<wchar_t> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<wchar_t const> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<char16_t> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<char16_t const> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<char32_t> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  } {
+    ::c::basic_vector<char32_t const> declared;
+    CPPUNIT_ASSERT(declared.empty());
+  }
+}
+
+#import c.rest
+#import std.string
+auto tests::unit::c::vector::Fixture::test_rest() -> void {
+  char buf0[] = "/bin/cat";
+  char buf1[] = "-e";
+  char buf2[] = "/dev/null";
+  char *vec_v[] = { &buf0[0], &buf1[0], &buf2[0] /*NOT nullptr*/ };
+  int vec_c = sizeof (vec_v)/sizeof (vec_v[0]);
+  ::c::vector specimen(vec_c, vec_v);
+  CPPUNIT_ASSERT(3 == specimen.size());
+  CPPUNIT_ASSERT((std::string)("/dev/null")  == specimen.data()[2]);
+  ::c::vector fixup = rest(specimen); // <--------------------------------------- test this via ADL
+  CPPUNIT_ASSERT(2 == fixup.size());
+  CPPUNIT_ASSERT((::std::string)("-e")  == fixup.data()[0]);
+  CPPUNIT_ASSERT((::std::string)("/dev/null")  == fixup.data()[1]);
+}
+
+auto tests::unit::c::vector::Fixture::test_usage() -> void {
+  char buf0[] = "/bin/cat";
+  char buf1[] = "-e";
+  char buf2[] = "/dev/null";
+  char *vec_v[] = { &buf0[0], &buf1[0], &buf2[0] /*NOT nullptr*/ };
+  int vec_c = sizeof (vec_v)/sizeof (vec_v[0]);
+  ::c::vector specimen(vec_c, vec_v);
+  CPPUNIT_ASSERT(!specimen.empty());
+  CPPUNIT_ASSERT_EQUAL(3lu, specimen.size());
+  CPPUNIT_ASSERT_EQUAL(std::string(buf0), std::string(specimen[0]));
+  CPPUNIT_ASSERT_EQUAL(std::string(buf1), std::string(specimen[1]));
+  CPPUNIT_ASSERT_EQUAL(std::string(buf2), std::string(specimen[2]));
+  std::ostringstream buf;
+  for (auto const *ptr : specimen) {
+    buf << ptr << ' ';
+  }
+  buf << "END";
+  std::string const actual(buf.str());
+  std::string const expected("/bin/cat -e /dev/null END");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import tests.unit.c.vector.Consty
+#import tests.unit.c.vector.Muting
+#import tests.unit.c.vector.Nullptr
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+#import rigging.unit.suite.add
+#import std.unique_ptr
+auto tests::unit::c::vector::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("vector");
+  series << call("usage", &Fixture::test_usage)
+         << call("rest", &Fixture::test_rest)
+         << add(Consty::suite())
+         << add(Muting::suite())
+         << add(Nullptr<::c::vector>::suite())
+         << add(Nullptr<::c::const_vector>::suite())
+    ;
+  return series.release();
+}
+#divert </cpp>

@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::bignum {
+  //
+  // These are nonstandard and gcc-specific
+  //
+  using int128_t = __int128 signed;
+  using uint128_t = __int128 unsigned;
+#if 0
+  using int256_t = __int256 signed;
+  using uint256_t = __int256 unsigned;
+#endif
+}
+#import std.is_signed
+#import std.is_unsigned
+namespace std {
+  template<> struct is_unsigned<nonstd::bignum::int128_t>;
+  template<> struct is_signed<nonstd::bignum::int128_t>;
+
+  template<> struct is_unsigned<nonstd::bignum::uint128_t>;
+  template<> struct is_signed<nonstd::bignum::uint128_t>;
+}
+#endiv
+#divert <hpp>
+template<> struct std::is_unsigned<nonstd::bignum::int128_t> { static constexpr auto const value = false; };
+template<> struct std::is_signed<nonstd::bignum::int128_t>   { static constexpr auto const value = true; };
+
+template<> struct std::is_unsigned<nonstd::bignum::uint128_t> { static constexpr auto const value = true; };
+template<> struct std::is_signed<nonstd::bignum::uint128_t>   { static constexpr auto const value = false; };
+#endiv

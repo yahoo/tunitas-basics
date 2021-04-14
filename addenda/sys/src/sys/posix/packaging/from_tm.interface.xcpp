@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time.point
+#import sys.time.tm
+#import sys.time.t
+#import sys.call.result.Value
+namespace sys::posix::packaging::from_tm::interface {
+  //
+  // Usage:
+  //
+  //    namespace packaging::timesomething::function{
+  //     using namespace packaging::from_tm::interface;
+  //     ...declare timelocal(Disaggregated const &) -> Result<Point>;
+  //   }
+  using Disaggregated = time::tm;
+  using Old = time::t;
+  using Point = time::point;
+  template<typename RESULT> using Result = call::result::Value<RESULT>;
+}
+#endiv

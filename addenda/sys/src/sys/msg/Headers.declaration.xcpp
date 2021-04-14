@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.msg.required.hdr.Multiple
+namespace sys::msg {
+  //
+  // The only multi-message {send,recv}mmsg(2) family.
+  // Specializations only.
+  // The default is initialization; uninitialized requires an indication.
+  //
+  // There no support for a plurality of (single) msghdr (think about it)
+  //
+  // <strike>msghdr  - standard default</strike>
+  // mmsghdr - a Linux extension
+  //
+  // Usage:
+  //
+  //   Headers<mmsghdr, 3> buf;
+  //   Header<mmsghdr, 5> buf{UNINITIALIZED};
+  //
+  template<required::hdr::Multiple, std::size_t> struct Headers;
+}
+#endiv

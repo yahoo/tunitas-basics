@@ -1,0 +1,174 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::regex { class Match; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::regex::Match : public cppunit::test::Fixture {
+  auto test_case1_01() -> void;
+  auto test_case1_02() -> void;
+  auto test_case2_01() -> void;
+  auto test_case2_02() -> void;
+  auto test_case3_01() -> void;
+  auto test_case3_02() -> void;
+  auto test_case4_01() -> void;
+  auto test_case4_02() -> void;
+  auto test_case5_01() -> void;
+  auto test_case5_02() -> void;
+  auto test_case6_01() -> void;
+  auto test_case6_02() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.copy
+#import std.ostream_iterator
+#import std.string
+#import std.string_literals
+#import std.char_traits
+#import std.allocator
+#import nonstd.regex.match
+#import nonstd.regex.matching.constants
+namespace tests::unit::regex {
+  using namespace ::nonstd::regex;
+  using namespace std::string_literals;
+  auto Match::test_case1_01() -> void {
+    auto const specimen = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    auto first = specimen.begin();
+    auto last = specimen.end();
+    matching::Results<std::string::const_iterator> results;
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[ a-z]+"};
+    auto flag = matching::constants::DEFAULT;
+    bool matched = match(first, last, results, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case1_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Match::test_case2_01() -> void {
+    char const *subject{"apple banana cherry"};
+    using Match_Alloc = std::allocator<matching::Sub<char const *>>;
+    matching::Results<char const *, Match_Alloc> results;
+    using Pattern_Traits = Traits<char>;
+    using Pattern = Basic_Pattern<char, Pattern_Traits>;
+    Pattern const pattern{"a.* b.* c.*"};
+    auto flag = matching::constants::DEFAULT;
+    auto matched = match(subject, results, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case2_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Match::test_case3_01() -> void {
+    using String_Traits = std::char_traits<char>;
+    using String_Alloc = std::allocator<char>;
+    std::basic_string<char, String_Traits, String_Alloc> subject{"apple banana cherry"};
+    using Match_Alloc = std::allocator<matching::Sub<std::basic_string<char, String_Traits, String_Alloc>::const_iterator>>;
+    matching::Results<std::basic_string<char, String_Traits, String_Alloc>::const_iterator, Match_Alloc> results;
+    using Pattern_Traits = Traits<char>;
+    using Pattern = Basic_Pattern<char, Pattern_Traits>;
+    Pattern const pattern{"a.* b.* c.*"};
+    auto flag = matching::constants::DEFAULT;
+    auto matched = match(subject, results, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case3_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Match::test_case4_01() -> void {
+    auto const specimen = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    auto first = specimen.begin();
+    auto last = specimen.end();
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[ a-z]+"};
+    auto flag = matching::constants::DEFAULT;
+    bool matched = match(first, last, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case4_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Match::test_case5_01() -> void {
+    char const *subject{"apple banana cherry"};
+    using Pattern_Traits = Traits<char>;
+    using Pattern = Basic_Pattern<char, Pattern_Traits>;
+    Pattern const pattern{"a.* b.* c.*"};
+    auto flag = matching::constants::DEFAULT;
+    auto matched = match(subject, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case5_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Match::test_case6_01() -> void {
+    using String_Traits = std::char_traits<char>;
+    using String_Alloc = std::allocator<char>;
+    std::basic_string<char, String_Traits, String_Alloc> subject{"apple banana cherry"};
+    using Match_Alloc = std::allocator<matching::Sub<std::basic_string<char, String_Traits, String_Alloc>::const_iterator>>;
+    matching::Results<std::basic_string<char, String_Traits, String_Alloc>::const_iterator, Match_Alloc> results;
+    using Pattern_Traits = Traits<char>;
+    using Pattern = Basic_Pattern<char, Pattern_Traits>;
+    Pattern const pattern{"a.* b.* c.*"};
+    auto flag = matching::constants::DEFAULT;
+    auto matched = match(subject, results, pattern, flag);
+    CPPUNIT_ASSERT(matched);
+  }
+  auto Match::test_case6_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::regex::Match::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  auto suite = Stream{"match"};
+  suite << []() {
+             auto ca1 = Stream{"case1"};
+             ca1 << call("01", &Match::test_case1_01)
+                 << call("02", &Match::test_case1_02)
+                 << END;
+             return move(ca1);
+           }()
+        << []() {
+             auto ca2 = Stream{"case2"};
+             ca2 << call("01", &Match::test_case2_01)
+                 << call("02", &Match::test_case2_02)
+                 << END;
+             return move(ca2);
+           } ()
+        << [](){
+             auto ca3 = Stream{"case3"};
+             ca3 << call("01", &Match::test_case3_01)
+                 << call("02", &Match::test_case3_02)
+                 << END;
+             return move(ca3);
+           } ()
+        << [](){
+             auto ca4 = Stream{"case4"};
+             ca4 << call("01", &Match::test_case4_01)
+                 << call("02", &Match::test_case4_02)
+                 << END;
+             return move(ca4);
+           } ()
+        << [](){
+             auto ca5 = Stream{"case5"};
+             ca5 << call("01", &Match::test_case5_01)
+                 << call("02", &Match::test_case5_02)
+                 << END;
+             return move(ca5);
+           } ()
+        << [](){
+             auto ca6 = Stream{"case6"};
+             ca6 << call("01", &Match::test_case6_01)
+                 << call("02", &Match::test_case6_02)
+                 << END;
+             return move(ca6);
+           }()
+        << END;
+  return finalize(suite);
+}
+#endiv

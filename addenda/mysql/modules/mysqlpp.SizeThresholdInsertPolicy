@@ -1,0 +1,3 @@
+// -*- c++ -*- f85bd18c-3527-40dc-a451-3704d029cf6d
+#pragma once
+#include "mysql++/insertpolicy.h"

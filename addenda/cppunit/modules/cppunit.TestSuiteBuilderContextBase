@@ -1,0 +1,9 @@
+// -*- c++ -*- dd28e054-6193-436c-8913-717b24fd3419
+#pragma once
+#include <vector>
+#include <cppunit/Test.h>
+#include <cppunit/extensions/TestNamer.h>
+#include <cppunit/extensions/TestSuiteBuilderContext.h>
+namespace cppunit {
+  using CppUnit::TestSuiteBuilderContextBase;
+}

@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace error {
+    namespace detail {
+      namespace message {
+        template<typename RESULT> struct Dispatch;
+      }
+    }
+  }
+}
+#entail sqlite.error.detail.message.Dispatch.const_stringz
+#entail sqlite.error.detail.message.Dispatch.string
+#entail sqlite.error.detail.message.Dispatch.wstring
+#endiv
+#divert <hpp>
+#import sqlite.connection.Shell
+#import sqlite.error.detail.message.Result
+template<typename RESULT> struct sqlite::error::detail::message::Dispatch {
+  // There are no valid template implementations of this, only specializations
+  inline auto operator()(connection::Shell &) -> typename Result<RESULT>::result_type;
+};
+#endiv
+#divert <ipp>
+#import sqlite.detail
+template<typename RESULT> auto sqlite::error::detail::message::Dispatch<RESULT>::operator()(connection::Shell &) -> typename Result<RESULT>::result_type {
+  static_assert(sqlite::detail::never_allowed<RESULT>::value, "only specializations");
+}
+#endiv

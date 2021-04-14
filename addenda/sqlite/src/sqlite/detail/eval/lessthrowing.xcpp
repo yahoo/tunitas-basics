@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sqlite.detail.eval.Result
+namespace sqlite {
+  namespace detail {
+    namespace eval {
+      //
+      // Implemetation for the std::nothrow variant of sqlite::eval(...)
+      //
+      // Call teh ACGTION, trapping the various sqlite exceptions that come off of it.
+      // Convert the thrown values into eval::Result to be returned
+      //
+      // Availabilities
+      //    Code   code      the sqlite code for the problematic (sic)
+      //    string message   the formatted message, may or may not be more than sqlite::error::string(code)
+      //    string sql       the offending sql statement itself, may be big; definitely not the message
+      //
+      template<typename ACTION> inline auto lessthrowing(ACTION) -> detail::eval::Result;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.detail.eval.Result // make(...)
+#import sqlite.exception.Statement
+#import sqlite.exception.Status
+#import sqlite.exception.Generic
+#import sqlite.status.Code
+template<typename ACTION> auto sqlite::detail::eval::lessthrowing(ACTION action) -> detail::eval::Result {
+  try {
+    return action();
+  } catch (exception::Statement const &e) {
+    return detail::eval::make(e.code(), e.what(), e.sql());
+  } catch (exception::Status const &e) {
+    return detail::eval::make(e.code(), e.what(), "some SQL statement");
+  } catch (exception::Generic const &e) {
+    return make(status::ERROR, e.what(), "some SQL statement");
+  }
+}
+#endiv

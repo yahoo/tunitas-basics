@@ -1,0 +1,4 @@
+// -*- c++ -*- e9637c46-f988-4f0d-8e88-43add200e449
+#pragma once
+// Also see strdup for the controversy
+#include <cstring> 

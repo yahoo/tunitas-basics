@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.channel.option.Set
+namespace ares::channel::option {
+  // There is no need to mark all of these as [[deprecated]], is there?   Set and Single are already marked as [[deprecated]].
+  // Packaged in a namespace for easy 'using'-importation elsewhere
+  inline namespace constants {
+    constexpr auto NONE = Set{};
+    constexpr auto FLAGS = NONE | Single::FLAGS;
+    constexpr auto TIMEOUT = NONE | Single::TIMEOUT;
+    constexpr auto TRIES = NONE | Single::TRIES;
+    constexpr auto NDOTS = NONE | Single::NDOTS;
+    constexpr auto UDP_PORT = NONE | Single::UDP_PORT;
+    constexpr auto TCP_PORT = NONE | Single::TCP_PORT;
+    constexpr auto SERVERS = NONE | Single::SERVERS;
+    constexpr auto DOMAINS = NONE | Single::DOMAINS;
+    constexpr auto LOOKUPS = NONE | Single::LOOKUPS;
+    constexpr auto SOCK_STATE_CB = NONE | Single::SOCK_STATE_CB;
+    constexpr auto SORTLIST = NONE | Single::SORTLIST;
+    constexpr auto SOCK_SNDBUF = NONE | Single::SOCK_SNDBUF;
+    constexpr auto SOCK_RCVBUF = NONE | Single::SOCK_RCVBUF;
+    constexpr auto TIMEOUTMS = NONE | Single::TIMEOUTMS;
+    constexpr auto ROTATE = NONE | Single::ROTATE;
+    constexpr auto EDNSPSZ = NONE | Single::EDNSPSZ;
+    constexpr auto NOROTATE = NONE | Single::NOROTATE;
+    constexpr auto ALL = ( Single::FLAGS |
+                           Single::TIMEOUT |
+                           Single::TRIES |
+                           Single::NDOTS |
+                           Single::UDP_PORT |
+                           Single::TCP_PORT |
+                           Single::SERVERS |
+                           Single::DOMAINS |
+                           Single::LOOKUPS |
+                           Single::SOCK_STATE_CB |
+                           Single::SORTLIST |
+                           Single::SOCK_SNDBUF |
+                           Single::SOCK_RCVBUF |
+                           Single::TIMEOUTMS |
+                           Single::ROTATE |
+                           Single::EDNSPSZ |
+                           Single::NOROTATE );
+  }
+}
+#endiv

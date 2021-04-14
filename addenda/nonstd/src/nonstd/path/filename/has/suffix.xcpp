@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.path.filename.has.somefix
+#import c.const_stringz
+namespace nonstd::path::filename::has {
+  //
+  // has::suffix of a filename (stopping at path boundaries)
+  // Using '.' as an implicit separator, which is implicitly supplied.
+  //
+  // has::suffix("app.le", "le") -> true
+  // has::suffix("o.make.out", "out") -> true
+  // has::suffix("rc.d/file.log", "log") -> true
+  // has::suffix(".bashrc", "bashrc") -> true
+  //
+  // The empty subject cannot match any suffix.
+  // The empty suffix matches "files ending in '.'"
+  //
+  // A detailed specification is in the implementation detail has::somefix(...)
+  //
+  inline auto suffix(c::const_stringz subject, c::const_stringz suffix) -> bool;
+}
+#endiv
+#divert <ipp>
+#import nonstd.path.filename.has.somefix
+#import std.reverse_iterator
+auto nonstd::path::filename::has::suffix(c::const_stringz subject, c::const_stringz suffix) -> bool {
+  using iterator = std::reverse_iterator<c::const_stringz::const_iterator>;
+  iterator const sb(subject.end());
+  iterator const se(subject.begin());
+  iterator const pb(suffix.end());
+  iterator const pe(suffix.begin());
+  return has::somefix(sb, se, pb, pe);
+}
+#endiv

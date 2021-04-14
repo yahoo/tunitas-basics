@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::nonstd::copy { struct Thing; }
+#endiv
+#divert <hpp>
+#import std.string
+#import std.to_string
+struct tests::unit::nonstd::copy::Thing {
+  Thing(int value) : i{value}, syntax{std::to_string(value)} { }
+  int i;
+  std::string syntax;
+};
+#endiv

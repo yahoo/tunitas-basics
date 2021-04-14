@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.basic_string
+#import nonstd.regex.Basic_Pattern
+#import nonstd.regex.matching.constants
+#import nonstd.regex.matching.Results
+#import nonstd.regex.required.ALL
+//
+// Whereas "search" and "match" are basically the same thing modulo ^...$
+// This is the same wrapping treatment that "match" receives
+//
+namespace nonstd::regex {
+  // filling matching::Result
+  template<required::iterator::Bidirectional BI,
+           required::Allocator MATCH_ALLOC, required::Char CHAR, required::Traits PATTERN_TRAITS>
+  requires required::iterator::Producing<BI, CHAR>
+  inline auto search(BI first, BI last,
+                     [[inout]] matching::Results<BI, MATCH_ALLOC> &results,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(first, last, results, pattern, flags);
+  }
+  template<required::Char CHAR, required::Allocator MATCH_ALLOC, required::Traits PATTERN_TRAITS>
+  inline auto search(CHAR const *subject, 
+                     [[inout]] matching::Results<CHAR const *, MATCH_ALLOC> &results,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(subject, results, pattern, flags);
+  }
+  template<required::Char_Traits STRING_TRAITS, required::Allocator STRING_ALLOC,
+           required::Allocator MATCH_ALLOC, required::Char CHAR, required::Traits PATTERN_TRAITS>
+  inline auto search(std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC> const &subject,
+                     [[inout]] matching::Results<typename std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC>::const_iterator, MATCH_ALLOC> &results,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(subject, results, pattern, flags);
+  }
+}
+namespace nonstd::regex {
+  // no matching::Results<I,A> at all
+  template<required::iterator::Bidirectional BI,
+           required::Char CHAR, required::Traits PATTERN_TRAITS>
+  requires required::iterator::Producing<BI, CHAR>
+  inline auto search(BI first, BI last,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(first, last, pattern, flags);
+  }
+  template<required::Char CHAR, required::Traits PATTERN_TRAITS>
+  inline auto search(CHAR const *subject, 
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(subject, pattern, flags);
+  }
+  template<required::Char_Traits STRING_TRAITS, required::Allocator STRING_ALLOC,
+           required::Char CHAR, required::Traits PATTERN_TRAITS>
+  inline auto search(std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC> const &subject,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(subject, pattern, flags);
+  }
+}
+namespace nonstd::regex {
+  // cannot accept memory-temporary strings (it would populate match results with ephemeral iterators)
+  template<required::Char_Traits STRING_TRAITS, required::Allocator STRING_ALLOC,
+           required::Allocator MATCH_ALLOC, required::Char CHAR, required::Traits PATTERN_TRAITS> 
+  inline auto search(std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC> const &&subject,
+                     [[inout]] matching::Results<typename std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC>::const_iterator, MATCH_ALLOC> &results,
+                     Basic_Pattern<CHAR, PATTERN_TRAITS> const &pattern,
+                     matching::Flags flags = {}) -> bool {
+    return std::regex_search(std::forward<std::basic_string<CHAR, STRING_TRAITS, STRING_ALLOC>>(subject), results, pattern, flags);
+  }
+}
+#endiv

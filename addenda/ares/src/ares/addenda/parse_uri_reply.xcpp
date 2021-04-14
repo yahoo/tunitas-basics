@@ -1,0 +1,245 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+// Copyright (C) 2009 by Jakub Hrozek <jhrozek@redhat.com>
+//
+// Permission to use, copy, modify, and distribute this
+// software and its documentation for any purpose and without
+// fee is hereby granted, provided that the above copyright
+// notice appear in all copies and that both that copyright
+// notice and this permission notice appear in supporting
+// documentation, and that the name of M.I.T. not be used in
+// advertising or publicity pertaining to distribution of the
+// software without specific, written prior permission.
+// M.I.T. makes no representations about the suitability of
+// this software for any purpose.  It is provided "as is"
+// without express or implied warranty.
+//
+#divert <hpp>
+#forward ares.unmanaged.Uri
+#import std.byte
+namespace ares::addenda {
+  //
+  // ares::parse_uri_reply(buf, size, out)
+  //
+  // ALSO ... WATCHOUT ... [[FIXTHIS]] we are pretending this is a C Runtime with no exceptions
+  // Not only must no exceptions escape from within parse_uri_reply(...) but ALSO any in flight
+  // memory allocation that is disturbted by a thrown exception must be released.  NOT HANDLED.
+  //
+  inline auto parse_URI_reply(std::byte const *, std::size_t, [[out]] unmanaged::Uri *&) noexcept -> int;
+  inline namespace c_style_api {
+    using uri_reply = unmanaged::Uri;
+    [[deprecated("prefer parse_URI_reply(byte const *, size_t, Uri *&)")]] auto parse_uri_reply(unsigned char const *, int, uri_reply **) noexcept -> int;
+  }
+}
+#endiv
+#divert <ipp>
+auto ares::addenda::parse_URI_reply(std::byte const *buf, std::size_t len, unmanaged::Uri *&out) noexcept -> int {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  return parse_uri_reply(reinterpret_cast<unsigned char const *>(buf), int(len), &out);
+#pragma GCC diagnostic push
+}
+#endiv
+#divert <cpp>
+#import ares.unmanaged.Uri
+
+// From here on down you'll need access to the internals of ares (being the source code private headers)
+// See (our) config.h which stubs out (their) ares_config.h
+#include "ares_setup.h"
+
+#ifdef HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif
+#ifdef HAVE_NETDB_H
+#  include <netdb.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#  include <arpa/inet.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#  include <arpa/nameser.h>
+#else
+#  include "nameser.h"
+#endif
+#ifdef HAVE_ARPA_NAMESER_COMPAT_H
+#  include <arpa/nameser_compat.h>
+#endif
+
+#include "ares.h"
+#include "ares_dns.h"
+#include "ares_data.h"
+#include "ares_private.h"
+
+/* [[rly?]] AIX portability check */
+#ifndef T_URI
+#  define T_URI ns_t_uri /* 256 - uniform resource indicator */
+#endif
+#import std.copy
+#import nonstd.span
+namespace {
+  using Span = nonstd::span<unsigned char const>;
+  inline auto remaining_string(Span target, Span record, [[out]] unsigned char *&string) -> int {
+    // We have to use (ares)malloc because free(3) is in the destructor
+    auto const start = target.data();
+    auto const finish = start + target.size();
+    if (finish > record.data()+record.size()) {
+      return ARES_EBADSTR;
+    }
+    string = (unsigned char *) ::malloc(1+target.size());
+    if (nullptr == string) {
+      return ARES_ENOMEM;
+    }
+    std::copy(start, finish, string);
+    string[target.size()] = '\0';
+    return ARES_SUCCESS;
+  }
+}
+#import std.string_view // REMOVETHIS 
+#include <iostream> // REMOVETHIS 
+auto ares::addenda::c_style_api::parse_uri_reply(const unsigned char *abuf, int alen, uri_reply **uri_out) noexcept -> int try {
+  unsigned int qdcount, ancount;
+  const unsigned char *aptr;
+  int status, rr_type, rr_class, rr_len;
+  long len; // [[FIXTHIS]] why does this need to have a signed capability?
+  char *hostname = NULL, *rr_name = NULL;
+  uri_reply *uri_head = NULL;
+  uri_reply *uri_last = NULL;
+  uri_reply *uri_curr;
+
+  /* Set *uri_out to NULL for all failure cases. */
+  *uri_out = NULL;
+
+  /* Give up if abuf doesn't have room for a header. */
+  if (alen < HFIXEDSZ)
+    return ARES_EBADRESP;
+
+  /* Fetch the question and answer count from the header. */
+  qdcount = DNS_HEADER_QDCOUNT (abuf);
+  ancount = DNS_HEADER_ANCOUNT (abuf);
+  if (qdcount != 1)
+    return ARES_EBADRESP;
+  if (ancount == 0)
+    return ARES_ENODATA;
+
+  /* Expand the name from the question, and skip past the question. */
+  aptr = abuf + HFIXEDSZ;
+  status = ares_expand_name (aptr, abuf, alen, &hostname, &len);
+  if (status != ARES_SUCCESS)
+    return status;
+
+  if (aptr + len + QFIXEDSZ > abuf + alen)
+    {
+      ares_free_string (hostname); // WAS: ares_free(hostname)
+      return ARES_EBADRESP;
+    }
+  aptr += len + QFIXEDSZ;
+
+  /* Examine each answer resource record (RR) in turn. */
+  try {
+    for (auto i = 0u; i < ancount; i++) {
+      /* Decode the RR up to the data field. */
+      status = ares_expand_name (aptr, abuf, alen, &rr_name, &len);
+      if (status != ARES_SUCCESS)
+        {
+          break;
+        }
+      aptr += len;
+      if (aptr + RRFIXEDSZ > abuf + alen)
+        {
+          status = ARES_EBADRESP;
+          break;
+        }
+      rr_type = DNS_RR_TYPE (aptr);
+      rr_class = DNS_RR_CLASS (aptr);
+      rr_len = DNS_RR_LEN (aptr);
+      aptr += RRFIXEDSZ;
+      if (aptr + rr_len > abuf + alen)
+        {
+          status = ARES_EBADRESP;
+          break;
+        }
+
+      /* Check if we are really looking at a URI record */
+      if (rr_class == C_IN && rr_type == T_URI)
+        {
+          /* parse the URI record itself */
+
+          /* RR must contain at least five bytes = 2 x int16 + 1 x string */
+          if (rr_len < 5)
+            {
+              status = ARES_EBADRESP;
+              break;
+            }
+
+          /* Allocate storage for this URI answer appending it to the list */
+          uri_curr = new uri_reply{}; // ares_malloc_data(ARES_DATATYPE_URI_REPLY);
+          if (!uri_curr)
+            {
+              status = ARES_ENOMEM;
+              break;
+            }
+          if (uri_last)
+            {
+              uri_last->next = uri_curr;
+            }
+          else
+            {
+              uri_head = uri_curr;
+            }
+          uri_last = uri_curr;
+
+          auto vptr = aptr;
+          auto target_len = rr_len;
+
+          uri_curr->priority = DNS__16BIT(vptr);
+          vptr += sizeof(unsigned short);
+          target_len -= sizeof(unsigned short);;
+
+          uri_curr->weight = DNS__16BIT(vptr);
+          vptr += sizeof(unsigned short);
+          target_len -= sizeof(unsigned short);;
+
+          std::cerr << "REMOVETHIS DEBUG0 vptr='" << std::string_view((char const *)vptr, target_len) << "'\n";
+          // status = ares_expand_string(vptr, abuf, alen, &uri_curr->uri, &len);
+          status = remaining_string(Span(vptr, target_len), Span(abuf, alen), uri_curr->uri);
+          std::cerr << "REMOVETHIS DEBUG1 uri='" << uri_curr->uri << "'\n";
+          if (status != ARES_SUCCESS)
+            break;
+        }
+
+      /* Don't lose memory in the next iteration */
+      ares_free_string (rr_name); // WAS: ares_free(rr_name)
+      rr_name = NULL;
+
+      /* Move on to the next record */
+      aptr += rr_len;
+    }
+  } catch (std::bad_alloc const &) {
+    // we hope to unwind and clean up any other allocations that are in flight
+    // [[FIXTHIS]] go all-in on C++ and use RAII to do this.  Have the compiler help you.
+    status = ARES_ENOMEM;
+  }
+
+  if (hostname)
+    ares_free_string (hostname); // WAS: ares_free(hostname)
+  if (rr_name)
+    ares_free_string (rr_name); // WAS: ares_free(rr_name)
+
+  /* clean up on error */
+  if (status != ARES_SUCCESS)
+    {
+      if (uri_head)
+        delete uri_head; // WAS: ares_free_data (uri_head);
+      return status;
+    }
+
+  /* everything looks fine, return the data */
+  *uri_out = uri_head;
+
+  return ARES_SUCCESS;
+} catch (...) {
+  // [[FIXTHIS]] any in flight memory in stack-local variables becomes lost
+  // [[FIXTHIS]] put some guardians around such pointers.
+  return ARES_EBADQUERY;
+}
+#endiv

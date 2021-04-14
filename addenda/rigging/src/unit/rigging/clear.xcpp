@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rigging.unit.clear
+#import unit.rigging
+#endiv
+#divert <cpp>
+#import std.is_same
+namespace {
+  constexpr auto const rb = &::rigging::unit::clear;
+  constexpr auto const ub = &::unit::rigging::clear;
+  static_assert(rb == ub);
+}
+#endiv

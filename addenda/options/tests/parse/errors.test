@@ -1,0 +1,20 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 1
+cd ${0%/*}
+output="$name".out
+golden="$name".gold
+set -e
+(
+    # we can't quit on first error
+    set +e
+    # the error is at "--goat billy" should be "--goat=billy" for optional arguments
+    parse --long-only --apple --banana --cherry --dog=beagle --eagle=bald --frog=bull --goat billy
+    # the "--" ends the argument parsing
+    parse --long-only --apple --banana --cherry -- --dog=beagle --eagle=bald --frog=bull --goat billy
+    parse --bogus bogus
+    parse bogus
+
+    # always end on a positive note, so the caller doesn't quit with 'set -e'
+    true
+) >& $output
+diff $golden $output

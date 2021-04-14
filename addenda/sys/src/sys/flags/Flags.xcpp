@@ -1,0 +1,103 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.required
+#import sys.required.Enumeration
+#import sys.required.Integral
+namespace sys::flags {
+  //
+  // The flags are a bitmask of the (singular) FLAG
+  //
+  // Constructed with operators and casts.
+  // All reasonable operators are provided.
+  // This is a class so that we can get the implicit constructor promotion from FLAG to Flags<FLAG>.
+  //
+  // Usage:
+  //
+  //   using Access = flags::Flags<Query, int>;
+  //
+  template<required::Enumeration SINGLE, required::Integral CARRIER = unsigned> struct Flags;
+}
+#endiv
+#divert <hpp>
+#import sys.flags.Limits
+#import sys.flags.is_flag
+namespace sys {
+  template<required::Enumeration SINGLE, required::Integral CARRIER> class flags::Flags {
+    enum Empty { };
+    using Single = SINGLE;
+    using Carrier = CARRIER;
+  public:
+    using Flag = Single;
+    using Limits = flags::Limits<Flags<Single, Carrier>>;
+    inline static Empty const NONE = Empty{};
+    using Value = Carrier;
+    inline constexpr Flags() : value{0} { }
+    inline constexpr Flags(Empty) : value{0} { }
+    inline constexpr Flags(Flag f) : value{(Value) f} { }
+    inline constexpr explicit Flags(Value f) : value{f} { }
+    inline constexpr explicit operator Value() const { return value; }
+    inline auto operator=(Flag) -> Flags &;
+    auto operator=(Flags const &) -> Flags & = default;
+    inline auto operator|=(Flag) -> Flags &;
+    inline auto operator|=(Flags) -> Flags &;
+    inline auto operator&=(Flag) -> Flags &;
+    inline auto operator&=(Flags) -> Flags &;
+    // This allows Flags::NONE == something for something in Flags or Flag
+    friend inline constexpr auto operator==(Empty a, Flags b) -> bool { return operator==(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator==(Flags a, Empty b) -> bool { return operator==(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator!=(Empty a, Flags b) -> bool { return operator!=(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator!=(Flags a, Empty b) -> bool { return operator!=(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator|(Empty a, Flag b) -> Flags { return operator|(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator|(Flag a, Empty b) -> Flags { return operator|(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator&(Empty a, Flag b) -> Flags { return operator&(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator&(Flag a, Empty b) -> Flags { return operator&(Flags{a}, Flags{b}); }
+    friend inline constexpr auto operator~(Empty e) -> Flags { return ~Flags{}; } // WATCHOUT for Flag width limits
+    // normal promotion among Empty, Flag & Flags
+    friend inline constexpr auto operator==(Flags a, Flags b) -> bool { return (Value) a == (Value) b; }
+    friend inline constexpr auto operator!=(Flags a, Flags b) -> bool { return !operator==(a, b); }
+    friend inline constexpr auto operator|(Flags a, Flags b) -> Flags { return Flags{(Value) a | (Value) b}; }
+    friend inline constexpr auto operator|(Flag a, Flags b) -> Flags { return Flags{(Value) a | (Value) b}; }
+    friend inline constexpr auto operator|(Flags a, Flag b) -> Flags { return Flags{(Value) a | (Value) b}; }
+
+    friend inline constexpr auto operator&(Flags a, Flags b) -> Flags { return Flags{(Value) a & (Value) b}; }
+    friend inline constexpr auto operator&(Flag a, Flags b) -> Flags { return Flags{(Value) a & (Value) b}; }
+    friend inline constexpr auto operator&(Flags a, Flag b) -> Flags { return Flags{(Value) a & (Value) b}; }
+    inline constexpr auto operator~() const -> Flags { return Flags{(Value)~Flag{} & ~value}; } // WATCHOUT for Flag width limits
+    friend inline constexpr auto contains(Flags a, Flags b) -> bool { return (Value)b == (Value)(a & b); }
+    friend inline constexpr auto contains(Flags a, Flag b) -> bool { return (Value)b == (Value)(a & b); }
+    friend auto is_flag(Flags const &fs) -> bool { return flags::is_flag<Flag>(fs.value, Limits::begin(), Limits::end()); }
+  protected:
+    Value value;
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::flags {
+  template<required::Enumeration S, required::Integral C> auto Flags<S,C>::operator=(Flag rhs) -> Flags & {
+    auto &lhs{*this};
+    lhs = Flags{rhs};
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integral C> auto Flags<S,C>::operator|=(Flags rhs) -> Flags & {
+    auto &lhs{*this};
+    lhs = lhs | rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integral C> auto Flags<S,C>::operator|=(Flag rhs) -> Flags & {
+    auto &lhs{*this};
+    lhs = lhs | rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integral C> auto Flags<S,C>::operator&=(Flags rhs) -> Flags & {
+    auto &lhs{*this};
+    lhs = lhs & rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integral C> auto Flags<S,C>::operator&=(Flag rhs) -> Flags & {
+    auto &lhs{*this};
+    lhs = lhs & rhs;
+    return lhs;
+  }
+}
+#endiv

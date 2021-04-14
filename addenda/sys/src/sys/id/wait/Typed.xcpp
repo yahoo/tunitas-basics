@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple
+#import sys.id.wait.Type
+#import sys.id.wait.Untyped
+#import std.underlying_type
+namespace sys::id::wait {
+  //
+  // The type binding fo for the untyped process identifiers
+  //
+  // Usage:
+  //
+  //   Oh come on ... it's a tuple
+  //
+  using Typed = std::tuple<Type, Untyped>;
+  using typed_t = std::tuple<Type, std::underlying_type_t<Untyped>>;
+}
+#endiv
+#divert <hpp>
+#import std.get
+namespace sys::id::wait {
+  inline constexpr auto type(Typed const &ty)      { return std::get<0>(ty); }
+  inline constexpr auto type(typed_t const &ty)    { return std::get<0>(ty); }
+  inline constexpr auto untyped(Typed const &ty)   { return std::get<1>(ty); }
+  inline constexpr auto untyped(typed_t const &ty) { return std::get<1>(ty); }
+}
+#import sys.id.process.Process
+#import sys.id.process.Group
+#import sys.id.process.Either
+#import sys.id.process.Any
+namespace sys::id::process {
+  // Constructors (assess and disaggregate)
+  inline auto typify(Process) -> wait::Typed;
+  inline auto typify(Group) -> wait::Typed;
+  inline auto typify(Either) -> wait::Typed;
+  inline auto typify(Any) -> wait::Typed;
+}
+#endiv
+#divert <ipp>
+#import nonstd.Visitor
+#import std.visit // [[FIXTHIS]] move to nonstd::visit when convenient
+namespace sys::id {
+  namespace {
+    using wait::Typed;
+    using wait::Untyped;
+    using wait::Type;
+    using nonstd::Visitor;
+    using std::visit;
+  }
+  auto process::typify(Process pp) -> Typed { return {Type::PROCESS, Untyped(pp)}; }
+  auto process::typify(Group gg) -> Typed   { return {Type::GROUP, Untyped(gg)}; }
+  auto process::typify(Either ee) -> Typed {
+    auto vv = Visitor{[](Process pp) { return Typed{Type::PROCESS, Untyped(pp)}; },
+                      [](Group gg)   { return Typed{Type::GROUP, Untyped(gg)}; }};
+    return visit(vv, ee);
+  }
+  auto process::typify(Any aa) -> Typed {
+    auto vv = Visitor{[](Process pp) { return Typed{Type::PROCESS, Untyped(pp)}; },
+                      [](Group gg)   { return Typed{Type::GROUP, Untyped(gg)}; },
+                      [](Thread tt)  { return Typed{Type::PROCESS, Untyped(tt)}; }}; // [[FIXTHIS]] dubious
+    return visit(vv, aa);
+  }
+}
+#endiv

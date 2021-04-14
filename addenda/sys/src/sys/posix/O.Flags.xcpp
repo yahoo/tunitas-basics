@@ -1,0 +1,7 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// And there is older code out in the real world that referenced this one.
+#warning sys.posix.O.Flags is deprecated, instead prefer sys.posix.O
+#import sys.posix.O
+#endiv

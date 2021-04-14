@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace execute {
+    class Version;
+  }
+}
+#endiv
+#divert <hpp>
+#import options.version.String
+#import options.throwable.Version
+class tests::execute::Version : public options::throwable::Version {
+  using Ancestor = options::throwable::Version;
+public:
+  using Ancestor::Version;
+  using String = options::version::String;
+  auto version() const -> String final;
+};
+#endiv
+#divert <cpp>
+auto tests::execute::Version::version() const -> String {
+  // it's a tester ... so it's always "v0.0.0"
+  return String{0,0,0};
+}
+#endiv

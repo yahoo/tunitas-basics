@@ -1,0 +1,26 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+lib_libwant_la = lib/libwant.la
+lib_libwant_la_LIBADD = $(nothing)
+lib_libwant_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+lib_libwant_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libwant_la_SOURCES))
+lib_libwant_la_SOURCES = \
+  obj/src/want/namespace.cpp \
+  obj/src/want/copy.cpp \
+  obj/src/want/getline.cpp \
+  obj/src/want/istream_getline_iterator.cpp \
+  obj/src/want/rbegin.cpp \
+  obj/src/want/rend.cpp \
+  $(end)
+
+$(scold_cxxdir)/want/dependencies.mk: $(lib_libwant_la_SOURCES)
+$(lib_libwant_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/want/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/want/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/want/dependencies.mk

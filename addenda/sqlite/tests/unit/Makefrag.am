@@ -1,0 +1,34 @@
+# how do we know we're running them all?
+# at least see tests/unit/list
+#
+# The rigging's Runner will run all tests
+# from the top level ... that it knows about.
+#
+# How do we know we got 'em all?
+# grep -nH -e 'Stream.*"' */Fixture.xcpp
+#
+tests_unit_XFAIL_TESTS = $(none)
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  tests/unit/all.test \
+  tests/unit/api.test \
+  tests/unit/column.test \
+  tests/unit/config.test \
+  tests/unit/config-connection.test \
+  tests/unit/config-session.test \
+  tests/unit/connection.test \
+  tests/unit/error.test \
+  tests/unit/error-source.test \
+  tests/unit/exception.test \
+  tests/unit/flags.test \
+  tests/unit/name.test \
+  tests/unit/open.test \
+  tests/unit/prepared.test \
+  tests/unit/query.test \
+  tests/unit/session.test \
+  tests/unit/source.test \
+  tests/unit/statement.test \
+  tests/unit/status.test \
+  tests/unit/transaction.test \
+  tests/unit/all.test \
+  $(end)

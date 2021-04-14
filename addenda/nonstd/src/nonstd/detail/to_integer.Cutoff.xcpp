@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.integer.Unsigned
+#import nonstd.numeric_limits
+namespace nonstd::detail::to_integer {
+  //
+  // What is the cutoff for overflowage?
+  //
+  // Usage:
+  //
+  //   using Integer = int long unsigned;   e.g. a bigint
+  //   using Limit = numeric_limits<Integer>;
+  //
+  //   Integer accumulator = ...somehow...  e.g. a bigint
+  //   auto digit = ...somehow...           e.g. an int
+  //
+  //   Cutoff<Integer, Limit> cutoff{base};
+  //   if (cutoff.will_overlow(accumulator, digit)) {
+  //     ...yup, don't do it.
+  //   } else {
+  //     ... ok
+  //     accumulator *= base;
+  //     accumulator += digit;
+  //   }
+  //
+  class Base;
+  template<required::integer::Unsigned UNSIGNED, typename LIMIT = numeric_limits<UNSIGNED>> class Cutoff;
+}
+#endiv
+#divert <hpp>
+namespace nonstd::detail {
+  struct to_integer::Base {
+    inline static constexpr auto min_base() -> int { return 2; }
+    inline static constexpr auto max_base() -> int { return 36; } // characters 0-9, A-F and then G-Z
+  };
+  template<required::integer::Unsigned UNSIGNED, typename LIMIT> struct to_integer::Cutoff : public Base {
+    using Unsigned = UNSIGNED;
+    using Limit = LIMIT; // unchecked: should be an instance of numeric_limit<UNSIGNED>
+    // unchecked: do not be stupid with the base (zero, one, negative)
+    inline explicit Cutoff(int base) : maximum{Limit::max() / base} , remainder(Limit::max() % base) { }
+    inline auto max_accumulator() const -> Unsigned { return maximum; }
+    inline auto max_digit() const -> unsigned { return remainder; }
+    // Will this computation overflow?  accumulator = digit + (base*accumulator)
+    inline auto would_overflow(Unsigned const &accumulator, unsigned digit) const -> bool {
+      // if (CUTOFF < accumulator || (CUTOFF == accumulator && CUTLIMIT < digit))
+      // if (cutoff.max() < accumulator || (cutoff.max() == accumulator && cutoff.rem() < digit))
+      return max_accumulator() < accumulator || (max_accumulator() == accumulator && max_digit() < digit);
+    }
+  protected:
+    Unsigned maximum;
+    unsigned remainder;
+  };
+}
+#endiv

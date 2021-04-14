@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.asn1.Time
+#import openssl.required.Time
+namespace openssl::asn1 {
+  //
+  // Extract and cast an asn1::Time out to some value that can be processed
+  // The choices are seconds in POSIX time (time_t) or C++ time (time::Point)
+  //
+  // Usage:
+  //
+  //   see as(Time0) -> RESULT
+  //
+  template<required::Time RESULT> inline auto as(Time const &) -> RESULT;
+}
+#endiv
+#divert <ipp>
+#import openssl.asn1.as.Time0
+namespace openssl {
+  template<required::Time RESULT> auto asn1::as(Time const &muting) -> RESULT {
+    return as<RESULT>(Time0{muting});
+  }
+}
+#endiv

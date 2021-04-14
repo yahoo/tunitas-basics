@@ -1,0 +1,115 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace posix {
+      class Execp;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.call.Result
+struct tests::unit::posix::Execp : public cppunit::test::Fixture {
+  auto test_arg() -> void;
+  auto test_arg_envv() -> void;
+  auto test_argv() -> void;
+  auto test_argv_envv() -> void;
+  auto test_vararg_args_only() -> void;
+  auto test_vararg_args_end_envv() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto complain(::sys::call::Result) -> void;
+};
+#divert </hpp>
+#divert <cpp>
+#import tests.unit.posix.exec.complain
+auto tests::unit::posix::Execp::complain(::sys::call::Result result) -> void {
+  // dodge the name occulsions
+  posix::exec::complain(result);
+}
+#import sys.posix.execp
+#import sys.posix.fork
+namespace tests::unit::posix {
+  auto Execp::test_arg() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      complain(execp("date", "date"));
+    }
+  }
+  auto Execp::test_arg_envv() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      c::const_environv empty;
+      complain(execp("date", "date", empty));
+    }
+  }
+  auto Execp::test_argv() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      char argv0[] = "date";
+      char *base[] = { argv0, nullptr };
+      c::const_argv argv(sizeof (base)/sizeof (base[0])-1, base);
+      complain(execp("date", argv));
+    }
+  }
+  auto Execp::test_argv_envv() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      char argv0[] = "date";
+      char *base[] = { argv0, nullptr };
+      c::const_argv argv(sizeof (base)/sizeof (base[0])-1, base);
+      char var0[] = "VAR0=zero";
+      char var1[] = "VAR1=one";
+      char *vars[] = { var0, var1, nullptr };
+      c::const_environv envv(vars);
+      complain(execp("date", argv, envv));
+    }
+  }
+  auto Execp::test_vararg_args_only() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      using csz = c::const_stringz;
+      complain(execp("echo", csz("echo"), csz("dater"), csz("truthful"), csz("truthiness")));
+    }
+  }
+  auto Execp::test_vararg_args_end_envv() -> void {
+    using ::sys::posix::fork;
+    using ::sys::posix::execp;
+    if (is_child(fork())) {
+      char var0[] = "VAR0=zero";
+      char var1[] = "VAR1=one";
+      char *vars[] = { var0, var1, nullptr };
+      c::const_environv envv(vars);
+      using csz = c::const_stringz;
+      complain(execp("date", csz("date"), "dater", csz("datie"), csz("dateliness"), envv));
+    }
+  }
+}
+#import tests.unit.posix.execp.Const_Stringz
+#import tests.unit.posix.execp.String
+#import rigging.suite.io
+auto tests::unit::posix::Execp::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("execp");
+  series << call("arg", &Execp::test_arg)
+         << call("arg_envv", &Execp::test_arg_envv)
+         << call("argv", &Execp::test_argv)
+         << call("argv_envv", &Execp::test_argv_envv)
+         << call("vararg_args_only", &Execp::test_vararg_args_only)
+         << call("vararg_args_end_envv", &Execp::test_vararg_args_end_envv)
+         << add<execp::Const_Stringz>()
+         << add<execp::String>()
+         << END;
+  return finalize(series);
+}
+#divert </cpp>

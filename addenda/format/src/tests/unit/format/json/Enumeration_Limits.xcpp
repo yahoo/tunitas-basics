@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::json {
+  template<typename ENUMERATION> struct Enumeration_Limits;
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+namespace tests::unit::format::json::required {
+  template<typename ENUMERATION> concept bool Enumeration_Limits = requires(ENUMERATION enumeration) {
+    typename json::Enumeration_Limits<ENUMERATION>::type; 
+    { json::Enumeration_Limits<ENUMERATION>::min() } -> std::size_t;
+    { json::Enumeration_Limits<ENUMERATION>::max() } -> std::size_t;
+    { json::Enumeration_Limits<ENUMERATION>::size() } -> std::size_t;
+    { json::Enumeration_Limits<ENUMERATION>::index(enumeration) } -> std::size_t;
+  };
+}
+#endiv

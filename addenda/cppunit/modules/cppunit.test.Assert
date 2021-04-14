@@ -1,0 +1,8 @@
+// -*- c++ -*- 785c3fcb-42a9-46a3-8510-97c84fb8256b
+#pragma once
+#include <cppunit/TestAssert.h>
+namespace cppunit {
+  namespace test {
+    // CPPUNIT_ASSERT et al. are cpp macros.
+  }
+}

@@ -1,0 +1,9 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#include <math.h> // #define OVERFLOW, #define UNDERFLOW
+#import sys.error.e.Code // sys::error::e::Code::OVERFLOW -> Code::_OVERFLOW_ or Code::E_OVERFLOW
+#import sys.error.e.constants // sys::error::e::OVERFLOW -> e::_OVERFLOW_ or e::E_OVERFLOW or [[FIXTHIS]] just exactly what are we supposed to do when the #define space rudely steps into the C++ namespaces with common words?
+// Prove this compiles, and the #defines are respected
+static_assert(sys::error::e::Code::OVERFLOW == sys::error::e::OVERFLOW);
+#endiv

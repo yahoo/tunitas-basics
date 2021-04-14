@@ -1,0 +1,383 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace statement {
+      class Shell;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sqlite.connection.Shell
+#import tests.unit.Gensym
+class tests::unit::statement::Shell : public cppunit::test::Fixture {
+public:
+  Gensym table_name_generator;
+
+  std::string table_name;
+  std::string create_table_of_values;
+  std::string select_some_values;
+  std::string insert_some_values;
+
+  class Guard;
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  auto test_sql() -> void;
+  auto test_readonly() -> void;
+  auto test_busy() -> void;
+  auto test_finalize() -> void;
+  auto test_reset() -> void;
+  auto test_step() -> void;
+  auto test_bind() -> void;
+  auto test_column_count() -> void;
+  auto test_column() -> void;
+  auto test_type() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto setup_table_of_values(sqlite::connection::Shell &conn) -> void; 
+};
+#endiv
+#divert <cpp>
+#import sqlite.api.statement
+#import sqlite.Application
+#import sqlite.Connection
+#import sqlite.Statement
+#import sqlite.open.Name
+#import sqlite.status.Code
+#import std.move
+
+#import unit.rigging.lhs
+using unit::rigging::lhs;
+#import unit.rigging.clear
+using unit::rigging::clear;
+
+#import std.ostringstream
+auto tests::unit::statement::Shell::setUp() -> void {
+  table_name = table_name_generator();
+  {
+    std::ostringstream buf;
+    // WATCHOUT - you have to say "temporary table" if the location is Name::MEMORY
+    // otherwise the statement preparation of the 'create table' fails inexplicably.
+    buf << "create temporary table " << table_name << "(i integer, f float, t text);"
+        << "\ninsert into " << table_name << "(i, f, t)"
+        << "\nvalues"
+        << "\n(1, 2.3, \"three\"),"
+        << "\n(8, 9.10, \"eleven\"),"
+        << "\n(2, 3.4, \"five\"),"
+        << "\n(7, 8.9, \"ten\");"
+        << "\nselect * from " << table_name << ";";
+    create_table_of_values = buf.str();
+  } {
+    std::ostringstream buf;
+    buf << "select i, f, t from " << table_name << ";";
+    select_some_values = buf.str();
+  } {
+    std::ostringstream buf;
+    buf << "insert into " << table_name << "(i, f, t) values(?, ?, ?);";
+    insert_some_values = buf.str();
+  }
+}
+
+auto tests::unit::statement::Shell::tearDown() -> void {
+  lhs(create_table_of_values) = clear;
+  lhs(select_some_values) = clear;
+  lhs(insert_some_values) = clear;
+}
+
+#import std.cerr
+#import std.hex
+auto tests::unit::statement::Shell::setup_table_of_values(sqlite::connection::Shell &conn) -> void {
+  CPPUNIT_ASSERT(ok(conn.open(sqlite::open::Name::MEMORY)));
+  CPPUNIT_ASSERT(ok(conn.extended_result_codes(true)));
+  char const *position = this->create_table_of_values.data();
+  do {
+    auto prepared = conn.prepare<sqlite::Statement>(position);
+    if (!ok(prepared)) {
+      std::cerr << std::hex
+                << "Error " << conn.errmsg() << '\n'
+                << "Codes " << (int)conn.errcode() << ' ' << (int)conn.extended_errcode() << '\n'
+                << "Error at \"" << position << "\"\n";
+    }
+    CPPUNIT_ASSERT(ok(prepared));
+    sqlite::Statement stmt = std::move(value(prepared));
+    while (row(stmt.step())) {
+      CPPUNIT_ASSERT(true);
+    }
+    position = remaining(prepared);
+  } while ('\0' != *position);
+}
+
+#import tests.unit.statement.Shell.Guard
+auto tests::unit::statement::Shell::test_sql() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  CPPUNIT_ASSERT(ok(conn.open(sqlite::open::Name::MEMORY)));
+  std::string const syntax = "select strftime('%s', 'now');";
+  auto prepared = conn.prepare<sqlite::statement::Shell>(syntax);
+  CPPUNIT_ASSERT(ok(prepared));
+  sqlite::statement::Shell stmt = std::move(value(prepared));
+  Guard guard(stmt);
+  std::string resyntax = stmt.sql(); // <--- test this
+  CPPUNIT_ASSERT(syntax == resyntax);
+}
+
+auto tests::unit::statement::Shell::test_readonly() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  CPPUNIT_ASSERT(ok(conn.open(sqlite::open::Name::MEMORY)));
+  std::string const syntax = "select strftime('%s', 'now');";
+  auto prepared = conn.prepare<sqlite::statement::Shell>(syntax);
+  CPPUNIT_ASSERT(ok(prepared));
+  sqlite::statement::Shell stmt = std::move(value(prepared));
+  Guard guard(stmt);
+  CPPUNIT_ASSERT(stmt.readonly()); // <------- test this
+}
+
+auto tests::unit::statement::Shell::test_busy() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {
+        tested_something = true;
+        CPPUNIT_ASSERT(stmt.busy()); // <----------- test this
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_finalize() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {
+        tested_something = true;
+      }
+      // explicit finalize instead of ~Statement()
+      CPPUNIT_ASSERT(ok(stmt.finalize())); // <----------- test this
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_reset() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      unsigned const desired_repetition_count = 10;
+      for (unsigned ri(0), re(desired_repetition_count); re != ri; ++ri) {
+        CPPUNIT_ASSERT(ok(stmt.reset())); // <----------- test this stmt.reset()
+        while (row(stmt.step())) {  // <----------- test this stmt.step()
+          tested_something = true;
+          std::cout << "value "  << stmt.column<sqlite::int64>(0) << '\n';
+        }
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_step() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {  // <----------- test this stmt.step()
+        tested_something = true;
+        std::cout << "value "  << stmt.column<sqlite::int64>(0) << '\n';
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_bind() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  std::size_t const SOME_REPETITIONS = 30;
+  {
+    auto prepared = conn.prepare<sqlite::statement::Shell>(insert_some_values);
+    CPPUNIT_ASSERT(ok(prepared));
+    sqlite::statement::Shell stmt = std::move(value(prepared));
+    Guard guard(stmt);
+    sqlite::int64 const SOME_INTEGER_CONSTANT = 46843289582l; // yup, a random number
+    double const SOME_FLOATING_CONSTANT = 16800.15898775;     // yup, a random number
+    for (unsigned i(0), e(SOME_REPETITIONS); e != i; ++i) {
+      CPPUNIT_ASSERT(ok(stmt.bind(1, SOME_INTEGER_CONSTANT+i)));
+      CPPUNIT_ASSERT(ok(stmt.bind(2, SOME_FLOATING_CONSTANT+i)));
+      std::ostringstream text;
+      text << "text-boulevard-" << i;
+      CPPUNIT_ASSERT(ok(stmt.bind(3, text.str())));
+      CPPUNIT_ASSERT(done(stmt.step()));
+      tested_something = true;
+      // recall: reset and clear_bindings are two different acts
+      CPPUNIT_ASSERT(ok(stmt.reset()));
+      CPPUNIT_ASSERT(ok(stmt.clear_bindings()));
+    }
+  } {
+    // The expectation is that we'll go through this loop but once
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      std::size_t row_count(0);
+      while (row(stmt.step())) {  // <----------- test this stmt.step()
+        row_count++;
+        CPPUNIT_ASSERT(0 < stmt.column_count());
+        std::cout << "row: ";
+        for (sqlite::column_index ci(0), ce(stmt.column_count()); ce != ci; ++ci) {
+          auto value = stmt.column<sqlite::Column>(ci); // <------- test this
+          std::cout << ' ' << value;
+        }
+        std::cout << '\n';
+
+      }
+      // There were some rows in the table before we added
+      CPPUNIT_ASSERT(SOME_REPETITIONS < row_count);
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_column_count() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {  // <----------- test this stmt.step()
+        tested_something = true;
+        CPPUNIT_ASSERT(0 < stmt.column_count()); // <------ test this
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_column() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {  // <----------- test this stmt.step()
+        tested_something = true;
+        CPPUNIT_ASSERT(0 < stmt.column_count());
+        std::cout << "row: ";
+        for (sqlite::column_index ci(0), ce(stmt.column_count()); ce != ci; ++ci) {
+          auto value = stmt.column<sqlite::Column>(ci); // <------- test this
+          std::cout << ' ' << value;
+        }
+        std::cout << '\n';
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::statement::Shell::test_type() -> void {
+  bool tested_something = false;
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  setup_table_of_values(conn);
+  {
+    char const *position = select_some_values.data();
+    do {
+      auto prepared = conn.prepare<sqlite::statement::Shell>(position);
+      CPPUNIT_ASSERT(ok(prepared));
+      sqlite::statement::Shell stmt = std::move(value(prepared));
+      Guard guard(stmt);
+      while (row(stmt.step())) {  // <----------- test this stmt.step()
+        tested_something = true;
+        // The create table statement (above) has three columns
+        CPPUNIT_ASSERT(3 == stmt.column_count());
+        CPPUNIT_ASSERT(sqlite::Type::INTEGER == stmt.type(0)); // <------ test this
+        CPPUNIT_ASSERT(sqlite::Type::FLOAT == stmt.type(1)); // <------ test this
+        CPPUNIT_ASSERT(sqlite::Type::TEXT == stmt.type(2)); // <------ test this
+      }
+      position = remaining(prepared);
+    } while ('\0' != *position);
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::statement::Shell::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Shell");
+  s << call("sql", &Shell::test_sql)
+    << call("readonly", &Shell::test_readonly)
+    << call("busy", &Shell::test_busy)
+    << call("finalize", &Shell::test_finalize)
+    << call("reset", &Shell::test_reset)
+    << call("step", &Shell::test_step)
+    << call("bind", &Shell::test_bind)
+    << call("column_count", &Shell::test_column_count)
+    << call("column", &Shell::test_column)
+    << call("type", &Shell::test_type)
+    ;
+  return s.release();
+}
+#endiv

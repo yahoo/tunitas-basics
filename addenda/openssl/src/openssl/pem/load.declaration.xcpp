@@ -1,0 +1,82 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.required.Loadable
+#import openssl.types
+#import std.function
+#import sys.call.argument.Stringface
+namespace openssl::pem {
+  //
+  // Overloading on the return type requires lots of declarations in a specific order.
+  //
+  // Usage:
+  //
+  //   auto k = load<evp::PKey>(keyfile);
+  //   auto c = load<x509::Crt>(crtfile);
+  //   auto r = load<x509::Req>(reqfile);
+  //
+  namespace packaging::load::function {
+    using Filepath = sys::call::argument::Stringface;
+    template<required::Loadable RESULT> inline auto load(Filepath) -> RESULT;
+  }
+  using packaging::load::function::load;
+  namespace packaging::load::detail {
+    //
+    // An implementation detail, READER is one of
+    //
+    //   using Callback = int (char *, int, int, void *);
+    //   using Calldata = void *
+    //
+    //   reader = [](BIO *b) -> TYPE * { return PEM_read_bio_PrivateKey(b, nullptr, nullptr, nullptr); }
+    //   reader = [](BIO *b) -> TYPE * { return PEM_read_bio_X509(b, nullptr, nullptr, nullptr); }
+    //   ... and so forth...
+    //
+    // Derived as such:
+    //
+    //   typedef int pem_password_callback(char *buf, int size, int rwflag, void *u);
+    //
+    // https://www.openssl.org/docs/man1.1.0/man3/PEM_read_bio_PrivateKey.html
+    //   EVP_PKEY *PEM_read_bio_PrivateKey(BIO *bp, EVP_PKEY **x, pem_password_callback *callback, void *callback_data);
+    //
+    // https://www.openssl.org/docs/man1.1.0/man3/PEM_read_bio_X509.html
+    //   EVP_PKEY *PEM_read_bio_X509(BIO *bp, EVP_PKEY **x, pem_password_callback *callback, void *callback_data);
+    //
+    //   <quote>
+    //     The PEM read functions all take an argument TYPE **x and return a TYPE * pointer.
+    //     Where TYPE is whatever structure the function uses.
+    //     If x is NULL then the parameter is ignored.
+    //     If x is not NULL but *x is NULL then the structure returned will be written to *x.
+    //     If neither x nor *x is NULL then an attempt is made to reuse the structure at *x (but see BUGS and EXAMPLES sections).
+    //     Irrespective of the value of x a pointer to the structure is always returned (or NULL if an error occurred).
+    //   </quote>
+    //
+    using Filepath = sys::call::argument::Stringface;
+    template<required::Loadable RESULT, typename POINTER> inline auto open_read_close(Filepath, std::function<POINTER *(BIO *)>) -> RESULT;
+  }
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+#import openssl.bio.File
+#import openssl.error.Code
+#import std.system_category
+#import std.error_code
+#import errno
+#import openssl.exception.System
+namespace openssl::pem::packaging::load {
+  template<required::Loadable RESULT, typename POINTER> auto detail::open_read_close(Filepath filepath, std::function<POINTER *(BIO *)> reader) -> RESULT {
+    bio::File in;
+    auto ok = BIO_read_filename(in.get(), /*YUUK-YUUK-YUUK-YUUK-YUUK-YUUK-YUUK*/ const_cast<char *>(c::str(filepath)));
+    if (!ok) {
+      throw exception::System{errno, std::system_category(), "bio-open"};
+    }
+    auto pointer = reader(in.get());
+    if (nullptr == pointer) {
+      // We presume that this is a PEM encoding problem so we throw that sort of exception.
+      // [[FIXTHIS]] how to distinguish operating system problems (e.g. I/O errors) from PEM problems?
+      throw std::error_code{error::Code::PEM};
+    }
+    return RESULT{pointer};
+  }
+}
+#endiv

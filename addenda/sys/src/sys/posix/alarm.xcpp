@@ -1,0 +1,56 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sleep.interface
+namespace sys::posix {
+  //
+  // Schedule a SIG::ALARM for some seconds from now
+  //
+  // WATCHOUT - the value zero remains overloaded to have the disarm semantic.
+  //
+  //   alarm(1s);  ... arms the alarm
+  //   alarm(0s);  ... disarms
+  //
+  // Noted
+  //
+  //   setitimer(...) and alarm(...) share the same signal, ALARM; do not mix them.
+  //   sleep(...) may or may nt use ALARM.
+  //
+  // Precision:
+  //
+  //   The alarm is specified in precision of seconds.
+  //   For finer precision use an itimer.
+  //
+  // Returns:
+  //
+  //    The count of seconds that the previous alarm had left on it.
+  //    The return value always contains the number of seconds to the next alarm.
+  //
+  //    If the Optional is empty that means there was no pending future alarm
+  //    (i.e. the underling alarm(2) system call returned 0)
+  //
+  //
+  namespace packaging::alarm {
+    namespace interface {
+      using namespace sleep::interface;
+      inline auto alarm(arguments::Optional<duration::Seconds>) -> result::Optional<duration::Seconds>;
+    }
+  }
+  using packaging::alarm::interface::alarm;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::alarm {
+  auto interface::alarm(arguments::Optional<duration::Seconds> seconds) -> result::Optional<duration::Seconds> {
+    auto const encoded = seconds.value_or(duration::Seconds{}).count();
+    auto const remaining = direct::syscall<unsigned int>(Syscall::ALARM, encoded);
+    if (0 == remaining) {
+      return result::Optional<duration::Seconds>{};
+      return {}; // [[FIXTHIS]] why?  src/sys/posix/alarm.xcpp:50:15: warning: ‘<anonymous>’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+    } else {
+      return duration::Seconds{remaining};
+    }
+  }
+}
+#endiv

@@ -1,0 +1,101 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::flock { class Options; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.flock.Options
+struct tests::unit::flock::Options : public cppunit::test::Fixture {
+  using Option = ::sys::flock::Option;
+  using Subject = ::sys::flock::Options;
+  auto test_constructor_default() -> void;
+  auto test_constructor_Option() -> void;
+  auto test_operator_Value() -> void;
+  auto test_constants_preferred() -> void;
+  auto test_constants_deprecated() -> void;
+  auto test_as() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.flock.as
+#import sys.flock.constants
+#import std.exception
+namespace tests::unit::flock {
+  using namespace ::sys::flock::constants;
+  auto Options::test_constructor_default() -> void {
+    auto subject = Subject{};
+    CPPUNIT_ASSERT(sizeof (subject));    
+  }
+  auto Options::test_constructor_Option() -> void {
+    auto subject = Subject{Option::MANDATORY};
+    CPPUNIT_ASSERT(Option::MAND == subject);
+  }
+  auto Options::test_operator_Value() -> void {
+    auto subject = Subject{Option::NONBLOCK};
+    CPPUNIT_ASSERT(Subject{Option::MANDATORY} != subject);
+  }
+  auto Options::test_constants_preferred() -> void {
+    using namespace ::sys::flock::constants;
+    auto const none = Subject{Subject::NONE};
+    CPPUNIT_ASSERT(ADVISORY == none);
+    auto const advisory = Subject{Option::ADVISORY};
+    CPPUNIT_ASSERT(ADVISORY == advisory);
+    auto const mandatory = Subject{Option::MANDATORY};
+    CPPUNIT_ASSERT(MANDATORY == mandatory);
+  }
+  auto Options::test_constants_deprecated() -> void {
+    auto const mand = Subject{Option::MAND};
+    CPPUNIT_ASSERT(MAND == mand);
+    auto const nb = Subject{Option::NB};
+    CPPUNIT_ASSERT(NB == nb);
+  }
+  auto Options::test_as() -> void {
+    using ::sys::flock::as;
+    try {
+      auto const none = Subject{Subject::NONE};
+      CPPUNIT_ASSERT(ADVISORY == none);
+      as<Option>(none); // this throws because there are no bits to turn into a flag
+      CPPUNIT_ASSERT(false);
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(true);
+    }
+    { auto const mandatory = Subject{Option::MANDATORY};
+      CPPUNIT_ASSERT(MANDATORY == mandatory);
+      CPPUNIT_ASSERT(Option::MANDATORY == as<Option>(mandatory)); }
+    { auto const nonblock = Subject{Option::NONBLOCK};
+      CPPUNIT_ASSERT(NONBLOCK == nonblock);
+      CPPUNIT_ASSERT(Option::NONBLOCK == as<Option>(nonblock)); }
+  }
+}
+#import rigging.suite.io
+auto tests::unit::flock::Options::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Options");
+  series << []() {
+              Stream con{"constructor"};
+              con << call("default", &Options::test_constructor_default)
+                  << call("Option", &Options::test_constructor_Option)
+                ;
+              return move(con);
+            }()
+         << []() {
+              Stream op{"operator"};
+              op << call("Value", &Options::test_operator_Value)
+                ;
+              return move(op);
+            }()
+         << []() {
+              Stream con{"constants"};
+              con << call("preferred", &Options::test_constants_preferred)
+                  << call("deprecated", &Options::test_constants_deprecated)
+                  << END;
+              return move(con);
+            }()
+         << call("as", &Options::test_as)
+         << END;
+  return finalize(series);
+}
+#endiv

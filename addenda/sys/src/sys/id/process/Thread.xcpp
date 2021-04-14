@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import pid_t
+namespace sys::id::process {
+  //
+  // Thread Identifier (pid)
+  //
+  enum class Thread : pid_t;
+}
+#endiv
+#divert <hpp>
+namespace sys::id::process {
+  inline constexpr auto is_thread(Thread) -> bool  { return true; }
+  inline constexpr auto is_process(Thread) -> bool { return false; }
+  inline constexpr auto is_group(Thread) -> bool   { return false; }
+}
+#endiv

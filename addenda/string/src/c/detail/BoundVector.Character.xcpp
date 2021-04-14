@@ -1,0 +1,52 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.detail.BoundVector
+#import c.detail.Character
+namespace c {
+  namespace detail {
+    template<typename CHAR> class BoundVector<Character<CHAR>>;
+  }
+}
+#entail c.detail.BoundVector.Character.consty
+#entail c.detail.BoundVector.Character.muting
+#divert </fpp>
+#divert <hpp>
+#import std.basic_ostream
+namespace c {
+  namespace detail {
+    template<typename CHAR, typename TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, BoundVector<Character<CHAR const>> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+    template<typename CHAR, typename TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, BoundVector<Character<CHAR>> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+    template<typename CHAR, typename TRAITS, typename CHARACTER> inline auto ostream_insert(std::basic_ostream<CHAR, TRAITS> &, BoundVector<Character<CHARACTER>> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CHAR, typename TRAITS> auto c::detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, BoundVector<Character<CHAR const>> const &s) -> std::basic_ostream<CHAR, TRAITS> & {
+  return ostream_insert(o, s);
+}
+
+template<typename CHAR, typename TRAITS> auto c::detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, BoundVector<Character<CHAR>> const &s) -> std::basic_ostream<CHAR, TRAITS> & {
+  return ostream_insert(o, s);
+}
+
+template<typename CHAR, typename TRAITS, typename CHARACTER> auto c::detail::ostream_insert(std::basic_ostream<CHAR, TRAITS> &o, BoundVector<Character<CHARACTER>> const &s) -> std::basic_ostream<CHAR, TRAITS> & {
+#if defined(_OSTREAM_INSERT_H)
+  // See <bits/ostream_insert.h>
+  // See <ext/vstring.h>
+  //   _GLIBCXX_RESOLVE_LIB_DEFECTS
+  //   586. string inserter not a formatted function
+  //
+  // This will obey the formatting (padding, justification, etc.)
+  return std::__ostream_insert(o, s.data(), s.size());
+#else
+  // This will not obey the formatting (padding, justification, etc.)
+  o.write(s.data(), s.size());
+  return o;
+#endif
+}
+#divert </ipp>

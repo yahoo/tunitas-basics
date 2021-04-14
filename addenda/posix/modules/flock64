@@ -1,0 +1,5 @@
+// -*- c++ -*- 184c2aa2-0f36-40ec-81ac-20e3af4c216a
+// struct flock64
+#pragma once
+#include <unistd.h>
+#include <fcntl.h>

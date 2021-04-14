@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.path.interface
+namespace sys::posix {
+  namespace packaging::rename {
+    using namespace packaging::path::interface;
+    namespace function {
+      inline auto rename(Pathname source, Pathname destination) -> result::Status;
+    }
+  }
+  using packaging::rename::function::rename;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::rename {
+  auto function::rename(Pathname source, Pathname destination) -> result::Status { return idiomatic::syscall<int>(Syscall::RENAME, (char const *)source, (char const *)destination); }
+}
+#endiv

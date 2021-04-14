@@ -1,0 +1,282 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::run { class Pipe_To; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::run::Pipe_To : public cppunit::test::Fixture {
+public:
+  auto test_constructor_path() -> void;
+  auto test_constructor_exec_path() -> void;
+  auto test_constructor_path_name() -> void;
+  auto test_constructor_exec_path_name() -> void;
+  auto test_start() -> void;
+  auto test_run() -> void;
+  auto test_write_stream() -> void;
+  auto test_write_string() -> void;
+  auto test_wait() -> void;
+  template<unsigned COUNT> auto test_many() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct Sink;
+  struct Horse;
+  static std::string const HIPSTER;
+  static std::string const DIPSTER;
+};
+namespace tests::unit::run {
+  template<> auto Pipe_To::test_many<0>() -> void;
+  template<> auto Pipe_To::test_many<1>() -> void;
+  template<> auto Pipe_To::test_many<2>() -> void;
+  template<> auto Pipe_To::test_many<3>() -> void;
+}
+#endiv
+#divert <cpp>
+#import tests.unit.run.Pipe_To.Horse
+#import tests.unit.run.Pipe_To.Sink
+namespace tests::unit::run {
+  // See https://hipsum.co/?paras=1&type=hipster-latin
+  std::string const Pipe_To::HIPSTER = "Brooklyn fixie post-ironic in biodiesel mixtape snackwave farm-to-table culpa. Leggings echo park drinking vinegar man braid. Quinoa 90's tbh ut freegan lyft chartreuse cardigan pinterest. Incididunt echo park ut occupy fashion axe. IPhone artisan in jianbing tofu PBR&B before they sold out minim distillery seitan photo booth. Post-ironic roof party hell of, snackwave butcher pabst fingerstache shoreditch church-key 3 wolf moon before they sold out semiotics mustache tote bag. Taiyaki gentrify snackwave semiotics."s;
+  std::string const Pipe_To::DIPSTER = ("Oompa Loompa doompadee doo\n"
+                                        "I've got another puzzle for you\n"
+                                        "Oompa Loompa doompadah dee\n"
+                                        "If you are wise you'll listen to me\n"
+                                        "What do you get from a glut of TV?\n"
+                                        "A pain in the neck and an IQ of three\n"
+                                        "Why don't you try simply reading a book?\n"
+                                        "Or could you just not bear to look?\n"
+                                        "\n"
+                                        "...Something Something Chocolate Bar...\n"
+                                        "\n"
+                                        "You'll get no commercials\n"
+                                        "Oompa Loompa Doompadee Dah\n"
+                                        "If you're like reading you will go far\n"
+                                        "You will live in happiness too\n"
+                                        "Like the Oompa\n"
+                                        "Oompa Loompa doompadee do\n");
+  auto Pipe_To::test_constructor_path() -> void {
+    Sink j1{std::filesystem::path{"/bin/true"}};
+    Sink j2{std::string{"/bin/true"}};
+    Sink j3{"/bin/true"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+  }
+  auto Pipe_To::test_constructor_exec_path() -> void {
+    Sink j1{Sink::EXEC, std::filesystem::path{"/bin/true"}};
+    Sink j2{Sink::EXEC, std::string{"/bin/true"}};
+    Sink j3{Sink::EXEC, "/bin/true"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+    Sink k1{Sink::EXECP, std::filesystem::path{"false"}};
+    Sink k2{Sink::EXECP, std::string{"false"}};
+    Sink k3{Sink::EXECP, "false"};
+    CPPUNIT_ASSERT(sizeof (k1) == sizeof (k2) && sizeof (k2) == sizeof (k3));
+  }
+  auto Pipe_To::test_constructor_path_name() -> void {
+    Sink j1{std::filesystem::path{"/bin/true"}, "veracity"};
+    Sink j2{std::string{"/bin/true"}, "vérité"};
+    Sink j3{"/bin/true", "verdad"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+  }
+  auto Pipe_To::test_constructor_exec_path_name() -> void {
+    Sink j1{Sink::EXEC, std::filesystem::path{"/bin/false"}, "veracity"};
+    Sink j2{Sink::EXEC, std::string{"/bin/false"}, "vérité"};
+    Sink j3{Sink::EXEC, "/bin/false", "verdad"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+    Sink k1{Sink::EXECP, std::filesystem::path{"falsity"}};
+    Sink k2{Sink::EXECP, std::string{"false"}, "fausseté"};
+    Sink k3{Sink::EXECP, "falsedad"}; // is that really Spanish for "falsity"?  I blame translate.google.com
+    CPPUNIT_ASSERT(sizeof (k1) == sizeof (k2) && sizeof (k2) == sizeof (k3));
+  }
+  auto Pipe_To::test_start() -> void {
+    Horse subject;
+    auto started = subject.start(); // <------------- test this
+    CPPUNIT_ASSERT(ok(started));
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  auto Pipe_To::test_run() -> void {
+    Horse subject;
+    auto ran = subject.run(); // <------------- test this
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  auto Pipe_To::test_write_stream() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    auto &outbound{subject.stream()}; // <------------- test this
+    outbound <<  HIPSTER;
+    CPPUNIT_ASSERT((bool) outbound);
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  auto Pipe_To::test_write_string() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    auto wrote = subject.write(HIPSTER); // <------------- test this
+    CPPUNIT_ASSERT(ok(wrote));
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  auto Pipe_To::test_wait() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait(); // <------------- test this
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  template<> auto Pipe_To::test_many<0>() -> void {
+    // Exactly what it says.  It tests zero cases.
+    CPPUNIT_ASSERT(true);
+  }
+  template<> auto Pipe_To::test_many<1>() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+#if 0
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(ok(waited));
+#endif
+  }
+  template<> auto Pipe_To::test_many<2>() -> void {
+#if 1
+    Horse subject0{"/tmp/t99.Pipe_To.test_many.2.subject0.t99"};
+    Horse subject1{"/tmp/t99.Pipe_To.test_many.2.subject1.t99"};
+    auto started0 = subject0.start();
+    auto started1 = subject1.start();
+    CPPUNIT_ASSERT(ok(started0));
+    CPPUNIT_ASSERT(ok(started1));
+    //
+    auto wrote0 = subject0.write(HIPSTER);
+    auto wrote1 = subject1.write(DIPSTER);
+    CPPUNIT_ASSERT(ok(wrote0));
+    CPPUNIT_ASSERT(ok(wrote1));
+    //
+    std::cerr << "before subject0.run()\n";
+    auto ran0 = subject0.run();
+    std::cerr << "after subject0.run()\n";
+    std::cerr << "before subject1.run()\n";
+    auto ran1 = subject1.run();
+    std::cerr << "after subject1.run()\n";
+    CPPUNIT_ASSERT(ok(ran0));
+    CPPUNIT_ASSERT(ok(ran1));
+#if 0
+    //
+    auto waited0 = subject0.wait();
+    auto waited1 = subject1.wait();
+    CPPUNIT_ASSERT(ok(waited0));
+    CPPUNIT_ASSERT(ok(waited1));
+#endif
+#else
+    {
+      Horse subject0{"/tmp/t99.Pipe_To.test_many.2.subject0.t99"};
+      auto started0 = subject0.start();
+      CPPUNIT_ASSERT(ok(started0));
+      //
+      auto wrote0 = subject0.write(HIPSTER);
+      CPPUNIT_ASSERT(ok(wrote0));
+      //
+      std::cerr << "before subject0.run()\n";
+      auto ran0 = subject0.run();
+      std::cerr << "after subject0.run()\n";
+      CPPUNIT_ASSERT(ok(ran0));
+    } {
+      Horse subject1{"/tmp/t99.Pipe_To.test_many.2.subject1.t99"};
+      auto started1 = subject1.start();
+      CPPUNIT_ASSERT(ok(started1));
+      //
+      auto wrote1 = subject1.write(DIPSTER);
+      CPPUNIT_ASSERT(ok(wrote1));
+      //
+      std::cerr << "before subject1.run()\n";
+      auto ran1 = subject1.run();
+      std::cerr << "after subject1.run()\n";
+      CPPUNIT_ASSERT(ok(ran1));
+    }
+#endif
+  }
+  template<> auto Pipe_To::test_many<3>() -> void {
+    Horse subject[3];
+    for (auto &item : subject) {
+      auto started = item.start();
+      CPPUNIT_ASSERT(ok(started));
+    }
+    char fill='1';
+    for (auto &item : subject) {
+      std::string buf;
+      for (auto i{0}, e{30}; i != e; ++i) {
+        buf += fill;
+      }
+      fill++;
+      auto wrote = item.write(buf);
+      CPPUNIT_ASSERT(ok(wrote));
+    }
+    for (auto &item : subject) {
+      auto ran = item.run();
+      CPPUNIT_ASSERT(ok(ran));
+    }
+#if 0
+    for (auto &item : subject) {
+      auto waited = item.wait();
+      CPPUNIT_ASSERT(ok(waited));
+    }
+#endif
+  }
+}
+#import rigging.suite.io
+auto tests::unit::run::Pipe_To::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Pipe_To");
+  series << []() {
+              Stream sub{"constructor"};
+              sub << call("path", &Pipe_To::test_constructor_path)
+                  << call("exec,path", &Pipe_To::test_constructor_exec_path)
+                  << call("path,name", &Pipe_To::test_constructor_path_name)
+                  << call("exec,path,name", &Pipe_To::test_constructor_exec_path_name)
+                ;
+              return move(sub);
+            }()
+         << call("start", &Pipe_To::test_start)
+         << call("run", &Pipe_To::test_run)
+         << []() {
+              Stream sub{"write"};
+              sub << call("stream", &Pipe_To::test_write_stream)
+                  << call("string", &Pipe_To::test_write_string)
+                ;
+              return move(sub);
+            }()
+         << call("wait", &Pipe_To::test_wait)
+         << []() {
+              Stream sub{"many"};
+              sub << call("0", &Pipe_To::test_many<0>) // oh come on!
+                  << call("1", &Pipe_To::test_many<1>)
+                  << call("2", &Pipe_To::test_many<2>)
+                  << call("3", &Pipe_To::test_many<3>)
+                ;
+              return move(sub);
+            }()      ;
+  return finalize(series);
+}
+#endiv

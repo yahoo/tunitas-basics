@@ -1,0 +1,18 @@
+// -*- c++ -*- 8e4c9fc2-1ebf-4b8a-baa4-8e498a56d657
+#pragma once
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+//
+// Shut. Up.
+//
+// /opt/nonstd/half/include/half/half.hpp:645:28: warning: suggest parentheses around arithmetic in operand of ‘|’ [-Wparentheses]
+//       return hbits | 0x7C00 - (hbits>>15);
+//                      ~~~~~~~^~~~~~~~~~~~~
+// /opt/nonstd/half/include/half/half.hpp:647:28: warning: suggest parentheses around arithmetic in operand of ‘|’ [-Wparentheses]
+//       return hbits | 0x7BFF + (hbits>>15);
+//                      ~~~~~~~^~~~~~~~~~~~~
+// /opt/nonstd/half/include/half/half.hpp:648:27: warning: suggest parentheses around arithmetic in operand of ‘|’ [-Wparentheses]
+//      return hbits | 0x7BFF + (R!=std::round_toward_zero);
+//                     ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+#include <half/half.hpp>
+#pragma GCC diagnostic pop

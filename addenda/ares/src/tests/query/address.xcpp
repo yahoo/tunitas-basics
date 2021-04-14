@@ -1,0 +1,74 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.key
+#import ares.dns.Type
+#import c.argv
+#import sys.exits.Code
+namespace tests::query::address {
+  //
+  // Perform the main(...) work flow.
+  // Of course, this works for the address types
+  //
+  template<ares::key::Resource_Record RECORD, ares::dns::Type TYPE> auto main(c::argv) -> sys::exits::Code;
+}
+#endiv
+#divert <tpp>
+#import ares.dns.type.constants
+#import ip.inet.ntop // [[FIXTHIS]] sure, why not ... but we ought to use ares::ntop(...) when it is ready
+namespace tests::query {
+  template<ares::key::Resource_Record RECORD, ares::dns::Type TYPE> auto address::main(c::argv av) -> sys::exits::Code {
+    using namespace ::ares;
+    static_assert(ares::AAAA == RECORD || ares::A == RECORD);
+    static_assert(ares::dns::AAAA == TYPE || ares::dns::A == TYPE);
+    static_assert((ares::AAAA == RECORD) == (ares::dns::AAAA == TYPE));
+    static_assert((ares::A == RECORD) == (ares::dns::A == TYPE));
+    Library library;
+    auto chunnel = Channel{};
+    channel::Guard toolkeeper{chunnel};
+    auto const dnsclass = dns::IN;
+    auto const dnstype = TYPE;
+    auto ecode = sys::exits::OK;
+    auto const receive = [&ecode](error::Code code, Count timeouts, Buffer<std::byte const> buffer) -> void {
+                           if (error::Code::SUCCESS != code) {
+                             auto recode = std::error_code{code};
+                             std::cerr << "failed: " << recode.message() << '\n';
+                             ecode &= sys::exits::FAIL;
+                             return;
+                           }
+                           reply::Record<RECORD> record;
+                           auto parsed = reply::parse<RECORD>(std::nothrow, buffer, record);
+                           if (!ok(parsed)) {
+                             std::cerr << "failed: " << error_code(parsed).message() << '\n';
+                             ecode &= sys::exits::FAIL;
+                             return;
+                           };
+                           std::ostream &outbound{std::cout};
+                           for (auto const &at : record.addresses) {
+                             auto ped = ip::inet::ntop(at.address());
+                             if (ok(ped)) {
+                               outbound << format::q(value(ped)) << '\n';
+                             } else {
+                               outbound << "not-an-address: " << error_code(ped).message() << '\n';
+                             }
+                           }
+                           // [[FIXTHIS]] there was (English) grammar::plural(...)
+                           auto const addresss_noun = 1 == record.addresses.size() ? "address" : "addresses";
+                           auto const timeouts_noun = Count{1} == timeouts ? "timeout" : "timeouts";
+                           outbound << "found: " << record.addresses.size() << " " << addresss_noun << " after " << underlying(timeouts) << ' ' << timeouts_noun << '\n';
+                         };
+    for (std::string qdn : c::rest(av)) {
+      std::cout << "query " << format::q(qdn) << '\n';
+      qq(chunnel, qdn, dnsclass, dnstype, receive);
+      fd::Sets readies;
+      for (auto ccc=selectable(chunnel, readies); !zero(ccc); ccc=selectable(chunnel, readies)) {
+        select(ccc, readies, timeout(chunnel, REASONABLE_TIMEOUT));
+        process(chunnel, readies);
+      }
+      // Never gonna happen.  Move on.
+      chunnel.cancel();
+    }
+    return ecode;
+  }
+}
+#endiv

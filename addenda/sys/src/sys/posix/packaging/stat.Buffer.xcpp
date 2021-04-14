@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+struct stat;
+typedef struct stat __struct_stat;
+namespace sys::posix::packaging::stat {
+  //
+  // How to call the version-controlled system calls.
+  // In the stat family.
+  //
+  using Buffer = __struct_stat;
+}
+#endiv
+#divert <hpp>
+#include <sys/stat.h>
+// From /usr/include/asm-generic/stat.h packaged as kernel-headers-4.18.16-300.fc29.x86_64
+// By convention, 64 bit architectures use the stat interface, while 32 bit architectures use the stat64 interface.
+static_assert(sizeof (struct stat));
+static_assert(sizeof (__struct_stat));
+static_assert(sizeof (sys::posix::packaging::stat::Buffer));
+#endiv

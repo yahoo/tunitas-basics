@@ -1,0 +1,181 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace query {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.query.Database
+#import std.unique_ptr
+class tests::unit::query::Fixture : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void;
+  auto tearDown() -> void;
+  
+  std::unique_ptr<Database> database;
+
+  auto test_Cursor() -> void;
+  auto test_Row() -> void;
+  auto test_Rows() -> void;
+  auto test_Getter_1() -> void;
+  auto test_Getter_N() -> void;
+  auto test_idiom() -> void;
+
+  auto test_insert_prototype() -> void;
+  auto test_select_prototype() -> void;
+  auto test_update_prototype() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.query.Query
+
+auto tests::unit::query::Fixture::setUp() -> void {
+  database.reset(new Database());
+}
+
+auto tests::unit::query::Fixture::tearDown() -> void {
+  database.reset(nullptr);
+}
+
+auto tests::unit::query::Fixture::test_Cursor() -> void {
+  // see test_idiom for usage
+  Query::cursor_type *c = nullptr;
+  CPPUNIT_ASSERT(nullptr == c);
+}
+
+auto tests::unit::query::Fixture::test_Row() -> void {
+  // see test_idiom for usage
+  Query::row_type *r = nullptr;
+  CPPUNIT_ASSERT(nullptr == r);
+}
+
+auto tests::unit::query::Fixture::test_Rows() -> void {
+  // see test_idiom for usage
+  Query::rows_type *r = nullptr;
+  CPPUNIT_ASSERT(nullptr == r);
+}
+
+auto tests::unit::query::Fixture::test_Getter_1() -> void {
+  // see test_idiom for usage
+  // extracting the tuple (Row) out of the iterator (Cursor) uses detail::Getter
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::query::Fixture::test_Getter_N() -> void {
+  // Ibidem.
+  CPPUNIT_ASSERT(true);
+}
+
+#import std.ostringstream
+#import std.get
+auto tests::unit::query::Fixture::test_idiom() -> void {
+  std::ostringstream buf;
+  Query q;
+  q.prepare(database->conn);
+  auto rows = q.exec();
+  for (auto row : rows) {
+    auto uu = std::get<0>(row);
+    bool b1 = std::get<1>(row);
+    int i1 = std::get<2>(row);
+    double f1 = std::get<3>(row);
+    std::string s1 = std::get<4>(row);
+    CPPUNIT_ASSERT(Query::UNIQUENESS() == uu);
+    buf << (int)(b1) << '-' << i1 << '-' << f1 << '-' << s1 << '\n';
+  }
+  std::string const actual(buf.str());
+  // See the insert statements in Database.xcpp
+  std::string const expected(("0-1-2.3-one\n"
+                              "1-2-3.4-two\n"
+                              "1-3-4.5-three\n"));
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import tests.unit.query.Inserter
+auto tests::unit::query::Fixture::test_insert_prototype() -> void {
+  Inserter ins(database->conn);
+  { auto status = ins(true, 101, 200.300400, "five hundred");
+    CPPUNIT_ASSERT(done(status)); }
+  { auto status = ins(true, 102, 200.300400, "five hundred");
+    CPPUNIT_ASSERT(done(status)); }
+  { auto status = ins(true, 103, 200.300400, "five hundred");
+    CPPUNIT_ASSERT(done(status)); }
+  { auto status = ins(true, 104, 200.300400, "five hundred");
+    CPPUNIT_ASSERT(done(status)); }
+}
+
+#import tests.unit.query.Selecter
+auto tests::unit::query::Fixture::test_select_prototype() -> void {
+  Selecter sel(database->conn);
+  { bool query_phase = true;
+    auto rows = sel(query_phase);
+    bool did_one_row = false;
+    for (auto row : rows) {
+      auto u = std::get<0>(row);
+      auto b = std::get<1>(row);
+      auto i = std::get<2>(row);
+      auto f = std::get<3>(row);
+      auto s = std::get<4>(row);
+      std::clog << "row u=" << (int)(u) << ", b=" << b << ", i=" << i << ", f=" << f << ", s=q(" << s <<  ")\n";
+      did_one_row = true;
+    }
+    CPPUNIT_ASSERT(did_one_row);
+  }
+}
+
+#import tests.unit.query.Updater
+#import tests.unit.query.Lookup
+#import std.get
+auto tests::unit::query::Fixture::test_update_prototype() -> void {
+  Updater upd(database->conn);
+  Lookup lkp(database->conn);
+  sqlite::int64 rowid = 1u;
+  { auto status = upd(rowid, true, 99, 99.99, "ninety nine"); // <---- test this
+    check(status);
+    auto the_row = lkp(rowid);
+    CPPUNIT_ASSERT_EQUAL(true, lkp.column<1>(rowid)); }
+
+  { auto status = upd(rowid, true, 88, 88.88, "eighty eight"); // <---- test this
+    check(status);
+    auto the_row = lkp(rowid);
+    CPPUNIT_ASSERT_EQUAL(88, lkp.column<2>(rowid)); }
+
+  { auto status = upd(rowid, true, 77, 77.77, "seventy seven"); // <---- test this
+    check(status);
+    auto the_row = lkp(rowid);
+    auto value = lkp.column<3>(rowid);
+    CPPUNIT_ASSERT(77.76 < value && value < 77.78); }
+
+  { auto status = upd(rowid, true, 66, 66.66, "sixty-six"); // <---- test this
+    check(status);
+    auto the_row = lkp(rowid);
+    CPPUNIT_ASSERT_EQUAL(std::string("sixty-six"), lkp.column<4>(rowid)); }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::query::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("query");
+  s << call("Cursor", &Fixture::test_Cursor)
+    << call("Row", &Fixture::test_Row)
+    << call("Rows", &Fixture::test_Rows)
+    << call("Getter-1", &Fixture::test_Getter_1)
+    << call("Getter-N", &Fixture::test_Getter_N)
+    << call("idiom", &Fixture::test_idiom)
+    << call("insert", &Fixture::test_insert_prototype)
+    << call("select", &Fixture::test_select_prototype)
+    << call("update", &Fixture::test_update_prototype)
+    ;
+  return s.release();
+}
+#endiv

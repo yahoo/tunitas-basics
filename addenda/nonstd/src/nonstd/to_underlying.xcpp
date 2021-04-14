@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.underlying_type
+#import nonstd.required.Enumeration
+namespace nonstd {
+  //
+  // Convert an enumeration to its underlying integral type.
+  //
+  // To be adopted in C++23
+  // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1682r0.html
+  //
+  // Not-so-bizarrely, they did not also specify and accept to_signed(...), to_unsigned(...) in rhyming form.
+  // At least because such conversions cannot be defined in constexpr form ... UB can occur.
+  // Yet, see these nearby.
+  //
+  // Usage:
+  //
+  //   enum Something { };
+  //   auto something = Something{...somehow...};
+  //   auto underlying = to_underlying(something);
+  //
+  template<required::Enumeration ENUMERATION> inline constexpr auto to_underlying(ENUMERATION e) noexcept -> std::underlying_type_t<ENUMERATION> { return std::underlying_type_t<ENUMERATION>(e); }
+}
+#endiv

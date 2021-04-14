@@ -1,0 +1,15 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_stream_SUBSOURCES = \
+  obj/src/tests/unit/stream/namespace.cpp \
+  obj/src/tests/unit/stream/compatibility.cpp \
+  obj/src/tests/unit/stream/Fixture.cpp \
+  obj/src/tests/unit/stream/posix.Fixture.cpp \
+  obj/src/tests/unit/stream/posix.Streambuf.cpp \
+  obj/src/tests/unit/stream/posix.Stream.cpp \
+  obj/src/tests/unit/stream/output/namespace.cpp \
+  obj/src/tests/unit/stream/output/Fixture.cpp \
+  obj/src/tests/unit/stream/input/namespace.cpp \
+  obj/src/tests/unit/stream/input/Fixture.cpp \
+  obj/src/tests/unit/stream/setting.Width.cpp \
+  $(end)

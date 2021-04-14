@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::stream::setting {
+  //
+  // The width setter for nontd::setwidth
+  //
+  // Usage:
+  //
+  //   the return value of nontd::setwidth(int)
+  //
+  class Width;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import std.basic_istream
+#import nonstd.stream.required.Character
+#import nonstd.stream.required.Character_Traits
+#import std.setw
+class nonstd::stream::setting::Width {
+public:
+  inline explicit Width(int value) : value{value} { }
+  template<required::Character CHAR, required::Character_Traits TRAITS> friend auto operator<<(std::basic_ostream<CHAR, TRAITS> &o, Width const &w) -> std::basic_ostream<CHAR, TRAITS> & {
+    return o << std::setw(w.value);
+  }
+  template<required::Character CHAR, required::Character_Traits TRAITS> friend auto operator>>(std::basic_istream<CHAR, TRAITS> &i, Width const &w) -> std::basic_istream<CHAR, TRAITS> & {
+    return i >> std::setw(w.value);
+  }
+protected:
+  int value;
+};
+#endiv

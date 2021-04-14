@@ -1,0 +1,4 @@
+// -*- c++ -*- be0f6aae-b342-41e7-a834-039fbca5814c
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/mars.h>

@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace parse {
+    template<typename KEY> class Dispatcher;
+  }
+}
+#endiv
+#divert <hpp>
+#import c.argv
+#import std.map
+#import std.function
+#import std.initializer_list
+#import sys.exits.Code
+//
+// Usage:
+//
+//    auto peek(c::const_argv) -> Selector; <---- specified separately
+//    auto do_this(Selector, c::argv) -> sys::exits::Code;
+//    auto do_that(Selector, c::argv) -> sys::exits::Code;
+//    auto do_otherwise(Selector, c::argv) -> sys::exits::Code;
+//
+//    auto main(int argc, char *argv[]) -> int {
+//      try {
+//        Dispatcher<Selector> disp{{Selector::THIS, &do_this}, {Selector::THAT, &do_that}, {Selector::OTHERWISE, &do_otherwise}};
+//        auto go = disp(peek(av));
+//        return go(av);
+//      } catch (sys::exits::Code const &e) {
+//        return e;
+//      }
+//    }
+//
+// If you need "otherwise" or "default" behavior, then build it into peek(...)
+template<typename KEY> class tests::parse::Dispatcher : private std::map<KEY, std::function<sys::exits::Code (KEY, c::argv)>> {
+  // Use c::argv in lieu of c::const_argv because the functions do get to rearrange the argv 
+  using Ancestor = std::map<KEY, std::function<sys::exits::Code (KEY, c::argv)>>;
+public:
+  Dispatcher() = default;
+  inline explicit Dispatcher(std::initializer_list<typename Ancestor::value_type>);
+  using continuation_type = std::function<sys::exits::Code (c::argv)>;
+  // Throws sys::exits::SOFTWARE if there is no such key
+  inline auto operator()(typename Ancestor::key_type key) const -> continuation_type;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#endiv
+#divert <ipp>
+template<typename KEY> tests::parse::Dispatcher<KEY>::Dispatcher(std::initializer_list<typename Ancestor::value_type> il)
+  : Ancestor(il) {
+  ;
+}
+
+#import std.bind
+#import std.placeholders
+#import sys.exits.constants
+template<typename KEY> auto tests::parse::Dispatcher<KEY>::operator()(typename Ancestor::key_type key) const -> continuation_type {
+  auto place = Ancestor::find(key);
+  if (Ancestor::end() == place) {
+    throw sys::exits::SOFTWARE;
+  } else {
+    using namespace std::placeholders;
+    continuation_type c = std::bind(place->second, key, _1);
+    return c;
+  }
+}
+#endiv

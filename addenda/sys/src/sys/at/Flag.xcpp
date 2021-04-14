@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #define values that establish the values of the enumeration elements
+#include <fcntl.h>
+namespace sys::at {
+  //
+  // The flags, with encodings suitable for composition as the bitmask Flags
+  //
+  // Oh My Pearls!  Don't they call these things "code smells" out in bizbook land?
+  // From /usr/include/fcntl.h observed in glibc-headers-2.28-9.fc29.x86_64
+  //
+  //  <quote>
+  //    The constants AT_REMOVEDIR and AT_EACCESS have the same value.
+  //     AT_EACCESS is meaningful only to faccessat, while AT_REMOVEDIR is meaningful only to unlinkat.
+  //     The two functions do completely different things and therefore, the flags can be allowed to overlap.
+  //     For example, passing AT_REMOVEDIR to faccessat would be undefined behavior and thus treating it equivalent to AT_EACCESS is valid undefined behavior.
+  //   </quote>
+  //
+  enum class Flag {
+    // WATCHOUT - these are already encoded as masks, they are not bit indices (DO NOT use flagof(...)
+    SYMLINK_NOFOLLOW = AT_SYMLINK_NOFOLLOW,
+    SYMLINK_FOLLOW   = AT_SYMLINK_FOLLOW,
+    REMOVE_DIRECTORY = AT_REMOVEDIR,    // ... commentariat says: same value as AT_EACCESS
+    // ... buy a vowel (every other one is a full word, so shall this one be)
+    REMOVEDIR [[deprecated("try to prefer Flag::REMOVE_DIRECTORY, which has all the letters")]] = REMOVE_DIRECTORY,
+    NO_AUTOMOUNT     = AT_NO_AUTOMOUNT,
+    EMPTY_PATH       = AT_EMPTY_PATH,
+    EACCESS          = AT_EACCESS, // ......... behave as eaccess(2), a.k.a. euidaccess(2)
+    // [[FIXTHIS]] something about the STATX flags SYNC_TYPE, SYNC_AS_STAT, FORCE_SYNC, DONT_SYNC
+  };
+}
+#endiv
+#divert <hpp>
+namespace sys::at {
+  [[deprecated("instead prefer as<Flag>(Flag) which is not constexpr and can throw")]] constexpr auto flag(Flag) -> Flag = delete;
+  [[deprecatable("who cares")]] inline constexpr auto is_flag(Flag) -> bool { return true; }
+}
+#endiv

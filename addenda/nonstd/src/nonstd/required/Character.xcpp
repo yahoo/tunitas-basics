@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.character.Type
+namespace nonstd::required {
+  //
+  // A character, suitable for a string, a stream or std::char_traits
+  // Character<CHAR> is pairable with Character_Traits<TRAITS>
+  //
+  // Usage:
+  //
+  //   template<required::Character C> struct Something;
+  //   template<required::Character C, required::Character_Traits T> struct Something_Else;
+  //
+  template<typename CHAR> concept bool Character = character::Type<CHAR>;
+}
+#endiv
+#divert <cpp>
+namespace nonstd::required {
+  // Testify! - All known character types are Characters
+  static_assert(Character<char>);
+  static_assert(Character<wchar_t>);
+  static_assert(Character<char16_t>);
+  static_assert(Character<char32_t>);
+}
+#endiv

@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.ip.Version
+namespace sys::ip::addr {
+  template<Version> struct Traits;
+  template<> struct Traits<Version::IPv4>;
+  template<> struct Traits<Version::IPv6>;
+}
+#endiv
+#divert <hpp>
+#import in4_addr
+#import in6_addr
+#import nonstd.uint128_t
+#import sockaddr_in4
+#import sockaddr_in6
+#import std.uint32_t
+#import sys.ip.version.Traits
+namespace sys::ip {
+  template<Version> struct addr::Traits : public std::false_type { };
+  namespace addr {
+    template<> struct Traits<Version::IPv4> : public version::Traits<Version::IPv4> {
+      struct [[hacky,avoid]] order {
+        enum [[order("host")]] Host : std::uint32_t;
+        enum [[order("network")]] Network : std::uint32_t;
+      };
+      using Address = ::in_addr;
+      using Sockaddr = ::sockaddr_in;
+    };
+    template<> struct Traits<Version::IPv6> : public version::Traits<Version::IPv6> {
+      struct [[hacky,avoid]] order {
+        enum [[order("host")]] Host : nonstd::uint128_t;
+        enum [[order("network")]] Network : nonstd::uint128_t;
+      };
+      using Address [[order("network")]] = ::in6_addr;
+      using Sockaddr = ::sockaddr_in6;
+    };
+  }
+}
+#endiv

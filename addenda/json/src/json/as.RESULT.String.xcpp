@@ -1,0 +1,21 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import json.String
+namespace json {
+  template<typename RESULT> inline auto as(String const &) -> RESULT;
+  template<typename RESULT> inline auto as(String &&) -> RESULT;
+}
+#entail json.as.String.String
+#entail json.as.string.String
+#endiv
+#divert <ipp>
+template<typename RESULT> auto json::as(String const &) -> RESULT {
+  static_assert(0 == sizeof (RESULT) || 0 != sizeof (RESULT), "only specializations");
+  return RESULT();
+}
+
+template<typename RESULT> auto json::as(String &&) -> RESULT {
+  static_assert(0 == sizeof (RESULT) || 0 != sizeof (RESULT), "only specializations");
+  return RESULT();
+}
+#endiv

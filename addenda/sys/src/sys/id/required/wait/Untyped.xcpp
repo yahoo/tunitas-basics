@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import std.underlying_type
+#import sys.id.wait.Untyped
+namespace sys::id::required::wait {
+  //
+  // Is this type an untyped Wait wait identifier (enum) or its underlying type (id_t)?
+  //
+  // Usage:
+  //
+  //   Oh come on.
+  //
+  namespace untyped {
+    using namespace std;
+    namespace id = sys::id::wait;
+    template<typename ID> concept bool Title_Case = is_same_v<ID, id::Untyped>;
+    template<typename ID> concept bool Lower_Case = is_same_v<ID, underlying_type_t<id::Untyped>>;
+    template<typename ID> concept bool Untyped = Title_Case<ID> || Lower_Case<ID>;
+  }
+  using untyped::Untyped;
+}
+#endiv
+#divert <cpp>
+#import id_t
+#import pid_t
+#import sys.id.Wait
+namespace {
+  namespace tests {
+    using namespace sys::id;
+    static_assert(required::wait::Untyped<sys::id::Wait>);
+    static_assert(required::wait::Untyped<sys::wait::Identifier>);
+    static_assert(required::wait::Untyped<id_t>);
+    static_assert(!required::wait::Untyped<pid_t>);
+  }
+}
+#endiv

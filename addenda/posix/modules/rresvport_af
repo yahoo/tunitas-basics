@@ -1,0 +1,3 @@
+// -*- c++ -*- 1b356632-2e2d-4922-81e9-86d0c4078bd6
+#pragma once
+#include <netdb.h>

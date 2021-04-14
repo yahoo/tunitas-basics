@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace query {
+    //
+    // Usage:
+    //     struct Update : public sqlite::query::Update {
+    //         Update(Connection &conn) : Ancestor(conn, format()) { }
+    //         auto operator()(...rigid-type-arguments...) -> status_type {
+    //             this->bind(...rigid-type-arguments...);
+    //             return this->step();
+    //         }
+    //     };
+    //     sqlite::Connection conn ...is set up...
+    //     Update upd(conn);
+    //     auto status = upd(...args...);               r is a sqlite::status::Code
+    //     check(status);
+    //     
+    class Update;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.query.Prototype
+#import std.string
+class sqlite::query::Update : public Prototype {
+  using Ancestor = Prototype;
+  //
+  // Usage (see Prototype)
+  //
+  // A descendant of Update implements the protocol
+  //     The prepare(...) is called from the constructor
+  //     Typically the descendant contains a static format(...) -> std::string function
+  //     an query returns no ROWS, just DONE (or error).
+  //
+protected:
+  using Ancestor::Prototype;
+public:
+  // An update query returns DONE.
+  // An update  never is steppable; never "returns rows"
+  //
+  // Obligation: the descendant implements 'exec' or 'operator()'
+  //   See above.
+};
+#endiv

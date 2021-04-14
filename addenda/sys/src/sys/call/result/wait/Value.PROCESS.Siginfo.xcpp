@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sig.Info
+#import sys.call.result.required.Process
+#import sys.call.result.wait.Value.declaration
+namespace sys::call::result::wait {
+  //
+  // The outome of a wait(2) family of calls that returns the (process) identifier and the siginfo bundle.
+  //
+  // This needs to be a distinct type (not a type alia) so that ADL will find it.
+  //
+  // Usage:
+  //
+  //   auto called = sys::posix::wait<Process>(sutats, ofnigis);
+  //   if (good(called)) {
+  //     auto p = pid(called)
+  //     auto p = process(called)
+  //     auto s = siginfo(called)
+  //     ...bask in the success...
+  //   } else {
+  //     ...complain...
+  //   }
+  //
+  using Siginfo = sys::sig::Info; // because this isn't inherited into 'namespace wait'
+  template<required::Process ID> struct Value<ID,Siginfo>;
+}
+#endiv
+#divert <hpp>
+#import sys.call.result.Value
+#forward sys.call.result.Size
+#forward sys.call.result.Element
+namespace sys::call::result::wait {
+  template<required::Process ID> [[deprecated("spell it out!; prefer process<ID>(Value<ID,Siginfo>)")]] inline auto pid(Value<ID,Siginfo> const &) -> ID;
+  template<required::Process ID> inline auto process(Value<ID,Siginfo> const &) -> ID;
+  //
+  template<required::Process ID> inline auto siginfo(Value<ID,Siginfo> const &) -> Siginfo const &;
+  template<required::Process ID> inline auto siginfo(Value<ID,Siginfo> &) -> Siginfo &;
+  //
+  template<required::Process ID> struct Value<ID,Siginfo> : public result::Value<ID,Siginfo> {
+    using Ancestor = result::Value<ID,Siginfo>;
+    friend class result::Element<0, Value<ID,Siginfo>>;
+    friend class result::Element<1, Value<ID,Siginfo>>;
+    friend class result::Size<Value<ID,Siginfo>>;
+  public:
+    Value() = default;
+    using Ancestor::Value;
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::call::result {
+  template<wait::required::Process ID> auto wait::pid(Value<ID,Siginfo> const &r) -> ID     { return result::get<0>(r); }
+  template<wait::required::Process ID> auto wait::process(Value<ID,Siginfo> const &r) -> ID { return result::get<0>(r); }
+  //
+  template<wait::required::Process ID> auto wait::siginfo(Value<ID,Siginfo> const &r) -> Siginfo const & { return result::get<1>(r); }
+  template<wait::required::Process ID> auto wait::siginfo(Value<ID,Siginfo> &r) -> Siginfo &             { return result::get<1>(r); }
+}
+#endiv

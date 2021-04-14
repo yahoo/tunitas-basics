@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.evp.PKey
+#import openssl.pem.from_string_view.declaration
+namespace openssl::pem::packaging::from_string_view::function {
+  //
+  // Load the (public-)private key from the string_view.
+  // Throws on failure to recover the key from the string_view.
+  // [[FIXTHIS]] provide a (less-,non-)throwing variant which returns an outcome.
+  //
+  // Usage:
+  //
+  //   auto const pem = std::string_view{...somehow...};
+  //   auto pkey = from_string_view<evp::PKey>(pem);
+  //
+  template<> inline auto from_string_view<evp::PKey>(std::string_view pemmican) -> evp::PKey;
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+namespace openssl::pem::packaging::from_string_view {
+  template<> auto function::from_string_view<evp::PKey>(std::string_view pemmican) -> evp::PKey {
+    using Reader = std::function<EVP_PKEY *(BIO *)>;
+    Reader const reader = [](BIO *in) {
+                            // See the commentariat in Load.declaration.xcpp
+                            auto const indirect_x = nullptr;
+                            auto const callback_function = nullptr;
+                            auto const callback_data = nullptr;;
+                            return PEM_read_bio_PrivateKey(in, indirect_x, callback_function, callback_data);
+                          };
+    return detail::copy_read<evp::PKey>(pemmican, reader);
+  }
+}
+#endiv

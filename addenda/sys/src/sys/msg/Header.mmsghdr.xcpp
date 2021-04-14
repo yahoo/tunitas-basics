@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.msg.Header.declaration
+#import mmsghdr
+namespace sys::msg {
+  //
+  // The {send,recv}msg(2) message header structure
+  // Default initialized to zero.
+  // 
+  // Usage:
+  //
+  //   #import sys.msg.Header
+  //   auto flags = Flags{...};
+  //   auto timeout = timespec{...};
+  //
+  //   sys::msg::Header<mmsghdr> buf{sys::UNINITIALIZED};
+  //   auto received = recvmmsg(fd, buf, flags, timeout);
+  //
+  //   sys::msg::Header<mmsghdr> buf;
+  //   auto sent = sendmmsg(fd, buf, flags);
+  //
+  template<> struct Header<::mmsghdr>;
+}
+#endiv
+#divert <hpp>
+namespace sys::msg {
+  template<> struct Header<::mmsghdr> : public ::mmsghdr {
+    inline Header();
+    inline explicit Header(Uninitialized);
+  };
+}
+#endiv
+#divert <ipp>
+#import nonstd.uninitialized.zero
+namespace sys::msg {
+  Header<mmsghdr>::Header() { nonstd::uninitialized::zero(*this); }
+  Header<mmsghdr>::Header(Uninitialized) { }
+}
+#endiv

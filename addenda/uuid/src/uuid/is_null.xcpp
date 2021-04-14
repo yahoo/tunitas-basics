@@ -1,0 +1,12 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import uuid.detail.Wrapper
+namespace uuid {
+  inline auto is_null(detail::Wrapper const &) -> bool;
+}
+#endiv
+#divert <ipp>
+auto uuid::is_null(detail::Wrapper const &c) -> bool {
+  return ::uuid_is_null(c.value);
+}
+#endiv

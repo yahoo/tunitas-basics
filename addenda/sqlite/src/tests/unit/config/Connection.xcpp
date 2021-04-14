@@ -1,0 +1,174 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace config {
+      class Connection;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sqlite.Connection
+#import sqlite.Application
+#import std.unique_ptr
+class tests::unit::config::Connection : public cppunit::test::Fixture {
+public:
+  Connection();
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  sqlite::Application application;
+  // Because you can't construct a connection without an initialized application
+  std::unique_ptr<sqlite::Connection> connection;
+
+  // This is the safe interface (see config::unsafe::Connection for the unsafe variants)
+  auto test_nop()-> void;
+  auto test_lookaside() -> void;
+  auto test_enable_foreign_key_getting() -> void;
+  auto test_enable_foreign_key_setting() -> void;
+  auto test_enable_trigger_getting() -> void;
+  auto test_enable_trigger_setting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.api.config
+#import sqlite.Application
+#import sqlite.config.connection
+using namespace sqlite::config::connection;
+
+tests::unit::config::Connection::Connection()
+  : application(sqlite::noinitialize)
+  , connection() {
+}
+
+#import sqlite.open.Name
+#import std.nothrow
+auto tests::unit::config::Connection::setUp() -> void {
+  // Let the cppunit system throw, Application will normally throw if it can't initialize
+  CPPUNIT_ASSERT(ok(application.initialize(std::nothrow)));
+  connection.reset(new sqlite::Connection(application));
+  CPPUNIT_ASSERT(ok(connection->open(sqlite::open::Name::MEMORY)));
+}
+
+auto tests::unit::config::Connection::tearDown() -> void {
+  // Let the cppunit system throw if the database can't shutdown cleanly
+  CPPUNIT_ASSERT(ok(connection->close()));
+  connection.reset();
+  CPPUNIT_ASSERT(ok(application.shutdown()));
+}
+
+auto tests::unit::config::Connection::test_nop()-> void {
+  auto val = sqlite::api::config(*connection, sqlite::config::connection::NOP::VALUE);
+  CPPUNIT_ASSERT(ok(val));
+}
+
+auto tests::unit::config::Connection::test_lookaside()-> void {
+  // <dd> ^This option takes three additional arguments that determine the 
+  // [lookaside memory allocator] configuration for the [database connection].
+  // ^The first argument (the third parameter to [sqlite3_db_config()] is a
+  // pointer to a memory buffer to use for lookaside memory.
+  // ^The first argument after the SQLITE_DBCONFIG_LOOKASIDE verb
+  // may be NULL in which case SQLite will allocate the
+  // lookaside buffer itself using [sqlite3_malloc()]. ^The second argument is the
+  // size of each lookaside buffer slot.  ^The third argument is the number of
+  // slots.  The size of the buffer in the first argument must be greater than
+  // or equal to the product of the second and third arguments.  The buffer
+  // must be aligned to an 8-byte boundary.  ^If the second argument to
+  // SQLITE_DBCONFIG_LOOKASIDE is not a multiple of 8, it is internally
+  // rounded down to the next smaller multiple of 8.  ^(The lookaside memory
+  // configuration for a database connection can only be changed when that
+  // connection is not currently using lookaside memory, or in other words
+  // when the "current value" returned by
+  // when the "current value" returned by
+  // [sqlite3_db_status](D,[SQLITE_CONFIG_LOOKASIDE],...) is zero.
+  // Any attempt to change the lookaside memory configuration when lookaside
+  // memory is in use leaves the configuration unchanged and returns 
+  // [SQLITE_BUSY].)^</dd>
+  char *buffer = nullptr;
+  std::size_t const SIZE1 = 1024;
+  std::size_t const SIZE2 = 10;
+  CPPUNIT_ASSERT(ok(sqlite::api::config(*connection, sqlite::config::connection::LOOKASIDE::VALUE, buffer, SIZE1, SIZE2)));
+}
+
+auto tests::unit::config::Connection::test_enable_foreign_key_getting()-> void {
+  auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_FOREIGN_KEY::VALUE);
+  CPPUNIT_ASSERT(ok(result));
+  // Just show that 'enabled(...)' is callable
+  CPPUNIT_ASSERT(enabled(result) || !enabled(result));
+}
+
+auto tests::unit::config::Connection::test_enable_foreign_key_setting()-> void {
+  // <dd> ^This option is used to enable or disable the enforcement of
+  // [foreign key constraints].  There should be two additional arguments.
+  // The first argument is an integer which is 0 to disable FK enforcement,
+  // positive to enable FK enforcement or negative to leave FK enforcement
+  // unchanged.  The second parameter is a pointer to an integer into which
+  // is written 0 or 1 to indicate whether FK enforcement is off or on
+  // following this call.  The second parameter may be a NULL pointer, in
+  // which case the FK enforcement setting is not reported back. </dd>
+  {
+    bool const disable = false;
+    auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_FOREIGN_KEY::VALUE, disable);
+    CPPUNIT_ASSERT(ok(result));
+    CPPUNIT_ASSERT(!enabled(result));
+  } {
+    bool const enable = true;
+    auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_FOREIGN_KEY::VALUE, enable);
+    CPPUNIT_ASSERT(ok(result));
+    CPPUNIT_ASSERT(enabled(result));
+  }
+}
+
+auto tests::unit::config::Connection::test_enable_trigger_getting()-> void {
+  auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_TRIGGER::VALUE);
+  CPPUNIT_ASSERT(ok(result));
+  // Just show that 'enabled(...)' is callable
+  CPPUNIT_ASSERT(enabled(result) || !enabled(result));
+}
+
+auto tests::unit::config::Connection::test_enable_trigger_setting()-> void {
+  // <dd> ^This option is used to enable or disable [CREATE TRIGGER | triggers].
+  // There should be two additional arguments.
+  // The first argument is an integer which is 0 to disable triggers,
+  // positive to enable triggers or negative to leave the setting unchanged.
+  // The second parameter is a pointer to an integer into which
+  // is written 0 or 1 to indicate whether triggers are disabled or enabled
+  // following this call.  The second parameter may be a NULL pointer, in
+  // which case the trigger setting is not reported back. </dd>
+  {
+    bool const disable = false;
+    auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_TRIGGER::VALUE, disable);
+    CPPUNIT_ASSERT(ok(result));
+    CPPUNIT_ASSERT(!enabled(result));
+  } {
+    bool const enable = true;
+    auto result = sqlite::api::config(*connection, sqlite::config::connection::ENABLE_TRIGGER::VALUE, enable);
+    CPPUNIT_ASSERT(ok(result));
+    CPPUNIT_ASSERT(enabled(result));
+  }
+}
+
+#import tests.unit.config.Connection
+#import tests.unit.config.Connection
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::config::Connection::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("connection");
+  s << call("nop", &Connection::test_nop)
+    << call("lookaside", &Connection::test_lookaside)
+    << call("foreign_key-get", &Connection::test_enable_foreign_key_getting)
+    << call("foreign_key-set", &Connection::test_enable_foreign_key_setting)
+    << call("trigger-get", &Connection::test_enable_trigger_getting)
+    << call("trigger-set", &Connection::test_enable_trigger_setting)
+    ;
+  return s.release();
+}
+#endiv

@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::bio { class String; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.bio.String
+class tests::unit::bio::String : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::bio::String;
+  auto test_constructor() -> void;
+  auto test_to_string() -> void;
+  auto test_write_priv() -> void;
+  auto test_write_pub() -> void;
+  auto test_write_csr() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.bio.generate
+auto tests::unit::bio::String::test_constructor() -> void {
+  Subject in;
+  auto s = to_string(in);
+  CPPUNIT_ASSERT(s.empty());
+}
+auto tests::unit::bio::String::test_to_string() -> void {
+  Subject out;
+  auto hello = "Hello World\n"s;
+  BIO_puts(out.get(), hello.c_str());
+  auto to = to_string(out);
+  CPPUNIT_ASSERT_EQUAL(hello.size(), to.size());
+}
+#include "openssl/pem.h"
+auto tests::unit::bio::String::test_write_priv() -> void {
+  Subject out;
+  auto pkey = generate::some_pkey();
+  auto ok = PEM_write_bio_PrivateKey(out.get(), pkey.get(), NULL, NULL, 0, 0, NULL);
+  CPPUNIT_ASSERT(ok);
+}
+auto tests::unit::bio::String::test_write_pub() -> void {
+  Subject out;
+  auto pkey = generate::some_pkey();
+  auto ok = PEM_write_bio_PUBKEY(out.get(), pkey.get());
+  CPPUNIT_ASSERT(ok);
+}
+#import openssl.x509.Req
+auto tests::unit::bio::String::test_write_csr() -> void {
+  Subject out;
+  openssl::x509::Req req;
+  auto pkey = generate::some_pkey();
+  req.set_pubkey(pkey);;
+  req.sign(pkey, EVP_sha256());
+  auto ok = PEM_write_bio_X509_REQ(out.get(), req.get());
+  CPPUNIT_ASSERT(ok);
+}
+#import rigging.suite.io
+auto tests::unit::bio::String::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("String");
+  series << call("constructor", &String::test_constructor)
+         << call("to_string", &String::test_constructor)
+    ;
+  {
+    Stream wri("write");
+    wri << call("priv", &String::test_write_priv)
+        << call("pub", &String::test_write_pub)
+        << call("csr", &String::test_write_csr)
+         ;
+    series << move(wri);
+  }
+  return finalize(series);
+}
+#endiv

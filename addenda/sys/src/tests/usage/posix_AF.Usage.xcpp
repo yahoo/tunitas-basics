@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_AF.Usage
+//   static_assert(tests::usage::posix_AF::Usage<>);
+//
+#import sys.posix.AF
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_AF {
+  using sys::posix::AF;
+  namespace [[detail]] packaging {
+    template<typename AF> concept bool Instance = requires(AF) {
+      typename AF::Address;
+      requires model::Namespace_Object<AF>;
+      requires (int)AF::UNSPECIFIED == AF_UNSPEC;
+      requires (int)AF::UNIX == AF_UNIX;
+      requires (int)AF::LOCAL == AF_LOCAL;
+      requires (int)AF::INET4 == AF_INET;
+      requires (int)AF::INET6 == AF_INET6;
+      requires (int)AF::IPX == AF_IPX;
+      requires (int)AF::NETLINK == AF_NETLINK;
+      requires (int)AF::X25 == AF_X25;
+      requires (int)AF::AX25 == AF_AX25;
+      requires (int)AF::ATMPVC == AF_ATMPVC;
+      requires (int)AF::APPLETALK == AF_APPLETALK;
+      requires (int)AF::PACKET == AF_PACKET;
+      requires (int)AF::ALGORITHM == AF_ALG;
+      requires (int)AF::UNSPEC == AF_UNSPEC;
+      requires (int)AF::INET == AF_INET;
+      requires (int)AF::ALG == AF_ALG;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<AF>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

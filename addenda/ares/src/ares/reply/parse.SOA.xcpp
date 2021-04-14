@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.reply.parse.declaration
+#import ares.reply.Record.SOA
+namespace ares::reply {
+  //
+  // Specialization to parse an SOA record.
+  // Usage: see parse.declaration.xcpp
+  //
+  template<> inline auto parse<SOA>(std::nothrow_t, Buffer<std::byte const>, [[fill, inout]] Record<SOA> &) noexcept -> Success;
+}
+#endiv
+#divert <ipp>
+namespace ares::reply {
+  template<> auto parse<SOA>(std::nothrow_t no, Buffer<std::byte const> buffer, Record<SOA> &record) noexcept -> Success {
+    return detail::parse<SOA>(buffer, record, ::ares_parse_soa_reply);
+  }
+}
+#endiv

@@ -1,0 +1,23 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.as.RESULT.string
+#import std.string
+namespace json {
+  //
+  // an identity transform, provided for completeness.
+  // neither a "constructor" nor a "cast" really...
+  //
+  template<> inline auto as<std::string>(std::string const &) -> std::string;
+  template<> inline auto as<std::string>(std::string &&) -> std::string;
+}
+#endiv
+#divert <ipp>
+template<> auto json::as<std::string>(std::string const &subject) -> std::string {
+  return subject;
+}
+
+#import std.forward
+template<> auto json::as<std::string>(std::string &&anon) -> std::string {
+  return std::forward<std::string>(anon);
+}
+#endiv

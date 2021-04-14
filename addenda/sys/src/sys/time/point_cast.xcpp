@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.time.duration_cast
+namespace sys {
+  namespace time {
+    // Following with s/time_point/time::point/g for convenience
+    // we flow along s/time_point_cast/time::point_cast/g for convenience
+    template<typename TARGET_DURATION, typename CLOCK, typename SOURCE_DURATION> inline auto point_cast(points::base<CLOCK, SOURCE_DURATION>) -> points::base<CLOCK, TARGET_DURATION>;
+  }
+}
+#endiv
+#divert <ipp>
+template<typename TARGET_DURATION, typename CLOCK, typename SOURCE_DURATION> auto sys::time::point_cast(points::base<CLOCK, SOURCE_DURATION> source) -> points::base<CLOCK, TARGET_DURATION> {
+  using target_duration = typename std::chrono::time_point<CLOCK, TARGET_DURATION>::duration;
+  return std::chrono::time_point_cast<target_duration>(source);
+}
+#endiv

@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../Makefrag.am; included in the top-level Makefile.am
+src_sys_w_SOURCES_SET = \
+  obj/src/sys/w/namespace.cpp \
+  obj/src/sys/w/as.cpp \
+  obj/src/sys/w/constants.cpp \
+  obj/src/sys/w/Option.cpp \
+  obj/src/sys/w/Options.cpp \
+  \
+  obj/src/sys/w/required/namespace.cpp \
+  obj/src/sys/w/required/Options.cpp \
+  $(end)

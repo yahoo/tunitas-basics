@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace want {
+  template<typename TYPE> struct is_movable_butnot_copyable;
+}
+#endiv
+#divert <hpp>
+#import want.is_movable
+#import want.is_copyable
+template<typename TYPE> struct want::is_movable_butnot_copyable {
+  using value_type = TYPE;
+  using this_is_movable = want::is_movable<value_type>;
+  using this_is_copyable = want::is_copyable<value_type>;
+  static constexpr bool const value = this_is_movable::value && !this_is_copyable::value;
+  struct assertion;
+};
+
+template<typename TYPE> struct want::is_movable_butnot_copyable<TYPE>::assertion {
+  static_assert(value, "fails to be movable but not copyable");
+};
+#endiv

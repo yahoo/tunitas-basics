@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::pem { class Convert; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::pem::Convert : public cppunit::test::Fixture {
+public:
+  template<typename OBJECT> auto test_convert() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import tests.unit.pem.Maker
+#import openssl.pem.convert
+#import std.cerr
+namespace tests::unit::pem {
+  template<typename OBJECT> auto Convert::test_convert() -> void {
+    Maker<OBJECT> maker;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    // Reminder ... convert is deprecating; instead prefer to_string(...)
+    auto stringy = ::openssl::pem::convert(maker());
+#pragma GCC diagnostic pop
+    CPPUNIT_ASSERT(!stringy.empty());
+    std::cerr << stringy;
+  }
+}
+#endiv
+#divert <cpp>
+#import openssl.evp.PKey
+#import openssl.x509.Req
+#import openssl.x509.Crt
+#import rigging.suite.io
+auto tests::unit::pem::Convert::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("convert");
+  series << call("evp::PKey", &Convert::test_convert<::openssl::evp::PKey>)
+         << call("x509::Req", &Convert::test_convert<::openssl::x509::Req>)
+         << call("x509::Crt", &Convert::test_convert<::openssl::x509::Crt>)
+    ;
+  return finalize(series);
+}
+#endiv

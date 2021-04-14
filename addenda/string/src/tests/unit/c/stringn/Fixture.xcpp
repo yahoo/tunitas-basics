@@ -1,0 +1,227 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::stringn {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.stringy.Palette
+class tests::unit::c::stringn::Fixture : public cppunit::test::Fixture, stringy::Palette { 
+  using ancestor = cppunit::test::Fixture;
+public: 
+  Fixture() = default;
+  Fixture(Fixture const &) = delete;
+  auto operator=(Fixture const &) -> Fixture & = delete;
+
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  auto test_constructor_default() -> void;
+
+  auto test_operator_insert_consty() -> void;
+  auto test_operator_insert_muting() -> void;
+  auto test_front_consty() -> void;
+  auto test_front_muting() -> void;
+  auto test_back_consty() -> void;
+  auto test_back_muting() -> void;
+
+  auto test_copy_from_consty_to_consty() -> void;
+  auto test_copy_from_consty_to_muting() -> void;
+  auto test_copy_from_muting_to_consty() -> void;
+  auto test_copy_from_muting_to_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+auto tests::unit::c::stringn::Fixture::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::stringn::Fixture::tearDown() -> void {
+  Palette::tearDown();
+}
+
+auto tests::unit::c::stringn::Fixture::test_constructor_default() -> void {
+  ::c::stringn sn;
+  CPPUNIT_ASSERT(sn.empty());
+  ::c::const_stringn csn;
+  CPPUNIT_ASSERT(csn.empty());
+}
+
+#import c.stringn
+#import c.const_stringn
+#import std.ostringstream
+auto tests::unit::c::stringn::Fixture::test_operator_insert_muting() -> void {
+  ::std::ostringstream actual, expected;
+  ::c::stringn t(this->aNc); // <--- the size will be acquired from the manifest array
+  ::c::const_stringn ct(t);
+  // See the elaborate tests on the consty variant
+  CPPUNIT_ASSERT(ct.data() == t.data());
+}
+
+#import want.printable.crudely.as_string
+#import std.hex
+auto tests::unit::c::stringn::Fixture::test_operator_insert_consty() -> void {
+  ::std::ostringstream abuf, ebuf;
+  ::c::const_stringn t(this->aNcc); // ibidem. A manifest array.
+  //
+  // WATCHOUT ... the embedded '\0' characters are difficult
+  // Example (cat -ve)
+  //
+  //     see [adorn^@^@^@^@^@^@^@^@^@^@^@]$ <--------------------- because of the stringn size
+  //     see [adorn]$ <------------------------------------------- because of operator<<(STREAM, char const (&)[N])
+  //
+  ::std::cerr << "see [" << t << "]\n"
+              << "see [" << this->aNcc << "]\n"; 
+  abuf << "see [" << t << "]";
+  ebuf << "see [" << this->aNcc << "]"; // WATCHOUT -- this does not put the '\0' characters into the stream
+  ::std::string astr = abuf.str();
+  ::std::string estr = ebuf.str();
+  ::std::ostringstream actual_syntax_stream;
+  actual_syntax_stream << "both(e.a):";
+  for (::std::string::const_iterator ei(estr.begin()), ee(estr.end()), ai(astr.begin()), ae(astr.end()); ai != ae || ei != ee; /*below*/) {
+    auto e_end = ee == ei;
+    auto a_end = ae == ai;
+    using want::printable::crudely::as_string;
+    auto e_value = e_end ? "END" : as_string(*ei, ::std::hex);
+    auto a_value = a_end ? "END" : as_string(*ai, ::std::hex);
+    actual_syntax_stream << ' ' << e_value << '.' << a_value;
+    if (!a_end) {
+      ++ai;
+    }
+    if (!e_end) {
+      ++ei;
+    }
+  }
+  ::std::string const expected = R"expected(both(e.a): s.s e.e e.e \SPC.\SPC [.[ a.a d.d o.o r.r n.n ].\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.\x00 END.])expected";
+  ::std::string const actual = actual_syntax_stream.str();
+  auto expected_size = expected.size();
+  auto actual_size = actual.size();
+  CPPUNIT_ASSERT_EQUAL(expected_size, actual_size);
+  CPPUNIT_ASSERT(expected == actual);
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::c::stringn::Fixture::test_front_consty() -> void {
+  ::c::const_stringn ct(this->aNcc); // <--- the size will be acquired from the manifest array
+  auto c = ct.front();
+  CPPUNIT_ASSERT_EQUAL(this->aNcc[0], c);
+}
+
+auto tests::unit::c::stringn::Fixture::test_front_muting() -> void {
+  ::c::stringn t(this->aNc); // <--- the size will be acquired from the manifest array
+  auto c = t.front();
+  CPPUNIT_ASSERT_EQUAL(this->aNc[0], c);
+}
+
+auto tests::unit::c::stringn::Fixture::test_back_consty() -> void {
+  ::c::const_stringn ct(this->aNcc); // <--- the size will be acquired from the manifest array
+  auto c = ct.back();
+  auto const LAST = sizeof (this->aNcc)/sizeof (this->aNcc[0]) - 1;
+  CPPUNIT_ASSERT_EQUAL(this->aNc[LAST], c);
+}
+
+auto tests::unit::c::stringn::Fixture::test_back_muting() -> void {
+  ::c::stringn t(this->aNc); // <--- the size will be acquired from the manifest array
+  auto c = t.back();
+  auto const LAST = sizeof (this->aNc)/sizeof (this->aNc[0]) - 1;
+  CPPUNIT_ASSERT_EQUAL(this->aNc[LAST], c);
+}
+
+auto tests::unit::c::stringn::Fixture::test_copy_from_consty_to_consty() -> void {
+  // These failed elsewhere
+  char buf[] = "constructed";
+  ::c::const_stringn consty(buf); // <------ consty
+  ::c::const_stringn redo(consty); // <----- consty
+  std::string const s_expected(buf);
+  std::string const s_consty(consty.begin(), consty.end());
+  std::string const s_redo(redo.begin(), redo.end());
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_consty);
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_redo);
+}
+
+auto tests::unit::c::stringn::Fixture::test_copy_from_consty_to_muting() -> void {
+  // const-to-muting is invalid
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::c::stringn::Fixture::test_copy_from_muting_to_consty() -> void {
+  // These failed elsewhere
+  char buf[] = "constructed";
+  ::c::stringn muting(buf); // <------------ muting
+  ::c::const_stringn redo(muting); // <----- consty
+  std::string const s_expected(buf);
+  std::string const s_muting(muting.begin(), muting.end());
+  std::string const s_redo(redo.begin(), redo.end());
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_muting);
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_redo);
+}
+
+auto tests::unit::c::stringn::Fixture::test_copy_from_muting_to_muting() -> void {
+  // These failed elsewhere
+  char buf[] = "constructed";
+  ::c::stringn muting(buf); // <----------- muting
+  ::c::stringn redo(muting); // <---------- muting
+  std::string const s_expected(buf);
+  std::string const s_muting(muting.begin(), muting.end());
+  std::string const s_redo(redo.begin(), redo.end());
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_muting);
+  CPPUNIT_ASSERT_EQUAL(s_expected, s_redo);
+}
+
+#import tests.unit.c.stringn.Consty
+#import tests.unit.c.stringn.Muting
+#import tests.unit.c.stringn.Constructors
+#import tests.unit.c.stringn.Nullptr
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+auto tests::unit::c::stringn::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("stringn");
+  series << call("default", &Fixture::test_constructor_default)
+    ;
+  {
+    Stream sub("operator<<");
+    sub << call("consty", &Fixture::test_operator_insert_consty)
+        << call("muting", &Fixture::test_operator_insert_muting)
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("front");
+    sub << call("consty", &Fixture::test_front_consty)
+        << call("muting", &Fixture::test_front_muting)
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("back");
+    sub << call("consty", &Fixture::test_back_consty)
+        << call("muting", &Fixture::test_back_muting)
+      ;
+    series << add(sub.release());
+  } {
+    Stream cf("copy-from");
+    cf << call("consty-to-consty", &Fixture::test_copy_from_consty_to_consty)
+       << call("consty-to-muting", &Fixture::test_copy_from_consty_to_muting)
+       << call("muting-to-consty", &Fixture::test_copy_from_muting_to_consty)
+       << call("muting-to-muting", &Fixture::test_copy_from_muting_to_muting)
+      ;
+    series << add(cf.release());
+  }
+  series << add(Nullptr<::c::const_stringn>::suite())
+         << add(Nullptr<::c::stringn>::suite())
+         << add(Consty::suite())
+         << add(Muting::suite())
+         << add(Constructors::suite())
+    ;
+  return series.release();
+}
+#divert </cpp>

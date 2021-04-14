@@ -1,0 +1,187 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.pipe.interface
+namespace sys::posix {
+  //
+  // The file descriptors are returned in the outcome.
+  // Upon success they must be used or closed
+  //
+  // For posix::pipe2(Flags), although only the Status flags are respected, all Flags are passable.
+  // This is the same as in the C API where one can pass all sorts of junk; the kernel will reject in its own sweet way, or not.
+  //
+  // Usage:
+  //
+  //   auto piped = sys::posix::pipe(O::CLOEXEC | O::DIRECT | O::NONBLOCK)
+  //   if (ok(piped)) {
+  //     std::cerr << "bad " << error_message(piped) << '\n';
+  //   } else {
+  //     auto rfd = read_side(piped);
+  //     auto wfd = write_side(piped);
+  //   }
+  //
+  namespace packaging::pipe {
+    using namespace packaging::pipe::interface;
+    using namespace bundle::create;
+    namespace function {
+      inline auto pipe() -> Returned<File>;
+      inline auto pipe([[out]] File &read, [[out]] File &write) -> Status;
+      inline auto pipe([[out]] File read_write[2]) -> Status;
+      //
+      inline auto pipe(fd::Flags) -> Returned<File>;
+      inline auto pipe(fd::Flags, [[out]] File &read, [[out]] File &write) -> Status;
+      inline auto pipe(fd::Flags, [[out]] File read_write[2]) -> Status;
+      //
+      inline auto pipe(o::Flags) -> Returned<File>;
+      inline auto pipe(o::Flags, [[out]] File &read, [[out]] File &write) -> Status;
+      inline auto pipe(o::Flags, [[out]] File read_write[2]) -> Status;
+    }
+    namespace native {
+      inline auto pipe() -> Returned<int>;
+      inline auto pipe([[out]] int &read, [[out]] int &write) -> Status;
+      inline auto pipe([[out]] int read_write[2]) -> Status;
+      //
+      inline auto pipe(fd::Flags) -> Returned<int>;
+      inline auto pipe(fd::Flags, [[out]] int &read, [[out]] int &write) -> Status;
+      inline auto pipe(fd::Flags, [[out]] int read_write[2]) -> Status;
+      //
+      inline auto pipe(o::Flags) -> Returned<int>;
+      inline auto pipe(o::Flags, [[out]] int &read, [[out]] int &write) -> Status;
+      inline auto pipe(o::Flags, [[out]] int read_write[2]) -> Status;
+    }
+    namespace detail {
+      inline auto convert(fd::Flags) -> o::Flags;
+    }
+  }
+  using packaging::pipe::function::pipe;
+  namespace native { using packaging::pipe::native::pipe; }
+}
+#endiv
+#divert <ipp>
+#import errno
+#import sys.posix.syscall
+#import std.is_same
+namespace sys::posix::packaging::pipe {
+  auto detail::convert(fd::Flags fdflags) -> o::Flags { return contains(fdflags, FD::CLOEXEC) ? O::CLOEXEC : O::NOCREATE; }
+  //
+  // pipe with no flags
+  //
+  auto function::pipe() -> Returned<File> {
+    auto called = native::pipe();
+    return {good(called), error_num(called), File{get<0>(called)}, File{get<1>(called)}};
+  }
+  auto function::pipe(File &read, File &write) -> Status {
+    if constexpr (std::is_same_v<int, std::underlying_type_t<File>>) {
+      return native::pipe(reinterpret_cast<int &>(read), reinterpret_cast<int &>(write));
+    } else {
+      int create[2]{-1,-1};
+      auto called = native::pipe(&create[0]);
+      if (good(called)) {
+        read = File{create[0]};
+        write = File{create[1]};
+      }
+      return called;
+    }
+  }
+  auto function::pipe(File read_write[2]) -> Status {
+    if constexpr (std::is_same_v<int, std::underlying_type_t<File>>) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+      return native::pipe(reinterpret_cast<int (&)[2]>(read_write));
+#pragma GCC diagnostic pop
+    } else {
+      int create[2]{-1,-1};
+      auto called = native::pipe(create);
+      if (good(called)) {
+        read_write[0] = File{create[0]};
+        read_write[1] = File{create[1]};
+      }
+      return called;
+    }
+  }
+  //
+  // pipe with some flags
+  //
+  auto function::pipe(fd::Flags flags) -> Returned<File>                  { return pipe(detail::convert(flags)); }
+  auto function::pipe(fd::Flags flags, File &read, File &write) -> Status { return pipe(detail::convert(flags), read, write); }
+  auto function::pipe(fd::Flags flags, File read_write[2]) -> Status      { return pipe(detail::convert(flags), read_write); }
+  auto function::pipe(o::Flags flags) -> Returned<File> {
+    auto called = native::pipe(flags);
+    return {good(called), error_num(called), File{get<0>(called)}, File{get<1>(called)}};
+  }
+  auto function::pipe(o::Flags flags, File &read, File &write) -> Status {
+    if constexpr (std::is_same_v<int, std::underlying_type_t<File>>) {
+      return native::pipe(flags, reinterpret_cast<int &>(read), reinterpret_cast<int &>(write));
+    } else {
+      int create[2]{-1,-1};
+      auto called = native::pipe(flags, &create[0]);
+      if (good(called)) {
+        read = File{create[0]};
+        write = File{create[1]};
+      }
+      return called;
+    }
+  }
+  auto function::pipe(o::Flags flags, File read_write[2]) -> Status {
+    if constexpr (std::is_same_v<int, std::underlying_type_t<File>>) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+      return native::pipe(flags, reinterpret_cast<int (&)[2]>(read_write));
+#pragma GCC diagnostic pop
+    } else {
+      int create[2]{-1,-1};
+      auto called = native::pipe(flags, create);
+      if (good(called)) {
+        read_write[0] = File{create[0]};
+        read_write[1] = File{create[1]};
+      }
+      return called;
+    }
+  }
+}
+namespace sys::posix::packaging::pipe {
+  //
+  // pipe with no flags
+  //
+  auto native::pipe() -> Returned<int> {
+    int pipefd[2]{-1,-1};
+    auto called = direct::syscall(Syscall::PIPE, &pipefd[0]);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto good = 0 <= called;
+    return {good, errnum, pipefd[0], pipefd[1]};
+  }
+  auto native::pipe(int &read, int &write) -> Status {
+    int create[2]{-1,-1};
+    auto called = idiomatic::syscall<int>(Syscall::PIPE, &create[0]);
+    if (good(called)) {
+      read = create[0];
+      write = create[1];
+    }
+    return called;
+  }
+  auto native::pipe(int read_write[2]) -> Status { return idiomatic::syscall<int>(Syscall::PIPE, &read_write[0]); }
+  //
+  // pipe with some flags
+  //
+  auto native::pipe(fd::Flags flags) -> Returned<int>                 { return pipe(detail::convert(flags)); }
+  auto native::pipe(fd::Flags flags, int &read, int &write) -> Status { return pipe(detail::convert(flags), read, write); }
+  auto native::pipe(fd::Flags flags, int read_write[2]) -> Status     { return pipe(detail::convert(flags), read_write); }
+  auto native::pipe(o::Flags flags) -> Returned<int> {
+    int create[2]{-1,-1};
+    auto called = direct::syscall(Syscall::PIPE2, &create[0], (int)flags);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto good = 0 <= called;
+    return {good, errnum, create[0], create[1]};
+  }
+  auto native::pipe(o::Flags flags, int &read, int &write) -> Status {
+    int create[2]{-1,-1};
+    auto called = idiomatic::syscall<int>(Syscall::PIPE2, &create[0], (int)flags);
+    if (good(called)) {
+      read = create[0];
+      write = create[0];
+    }
+    return called;
+  }
+  auto native::pipe(o::Flags flags, int read_write[2]) -> Status { return idiomatic::syscall<int>(Syscall::PIPE2, &read_write[0], (int)flags); }
+}
+#endiv

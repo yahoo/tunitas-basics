@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.character.Traits
+namespace ares::required::character {
+  //
+  // Reminder, Traits is a 2-argument concept                               /--------- here 
+  //                                                                        |
+  // Usage:                                                                 |
+  //                                                                        v
+  //   template<required::character::Type CHAR, required::character::Traits<CHAR> TRAITS>
+  //   inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Order) -> std::basic_ostream<CHAR, TRAITS> &;
+  //
+  using nonstd::required::character::Traits;
+}
+#endiv

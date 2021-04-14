@@ -1,0 +1,3 @@
+// -*- c++ -*- f4ff3451-487b-408a-adaa-1580fd414998
+#pragma once
+#include "mysql++/beemutex.h"

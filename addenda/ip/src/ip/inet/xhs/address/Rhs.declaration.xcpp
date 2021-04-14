@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in4 // in4::addr_t, addr
+#import ip.in6 // in6::addr_t, addr
+#import ip.required.Address
+namespace ip::inet::xhs::address {
+  //
+  // An address (addr_t, addr) on the rhs.
+  // Specializations only
+  //
+  // Usage: before <fpp>
+  //
+  template<required::Address> class Rhs;
+}
+#endiv

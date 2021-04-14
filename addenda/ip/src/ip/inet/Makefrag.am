@@ -1,0 +1,266 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.6/02.maroon-iron-crow series/v0.6/03.red-mercury-goose series/v0.7/04.green-copper-heron; do
+#       increment=$(git log $branch | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# Counterfactual historiography, for when C:R:A is applied to the maintenance branches:
+# API 191  herein preparing for SCOLDING, Release 05 (Purple Tin Partridge) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 100  reserved for SCOLDing, Release 04 (Green Copper Heron), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API  62  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API  29  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# This module was not available in the Black Platinum Hen era.
+# API   0  reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+# API   0  used in all previous releases as C:R:A=0.0.0
+#
+# The C:R:A of libinet-module.la may evolve separately from that of libip-module.la
+lib_libinet_module_la_CURRENT = 191
+lib_libinet_module_la_REVISION = 1
+lib_libinet_module_la_AGE = 0
+lib_libinet_module_la_CRA = $(lib_libinet_module_la_CURRENT):$(lib_libinet_module_la_REVISION):$(lib_libinet_module_la_AGE)
+lib_libinet_module_la_VERSION_INFO = -version-info $(lib_libinet_module_la_CRA)
+
+lib_libinet_module_la = lib/libinet-module.la
+lib_libinet_module_la_LIBADD = -lip-module
+lib_libinet_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libinet_module_la_VERSION_INFO)
+lib_libinet_module_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libinet_module_la_SOURCES))
+#
+# -Wno-cpp will shut up all the deprecation warnings and legacy compatibility warnings when building within the library
+#
+$(lib_libinet_module_la_OBJECTS) : AM_CPPFLAGS+=-Wno-cpp
+lib_libinet_module_la_SOURCES = \
+  obj/src/ip/inet/namespace.cpp \
+  \
+  obj/src/ip/inet/aton.cpp \
+  obj/src/ip/inet/aton.in4.cpp \
+  obj/src/ip/inet/aton.in6.cpp \
+  obj/src/ip/inet/ntop.cpp \
+  obj/src/ip/inet/ntop.in4.cpp \
+  obj/src/ip/inet/ntop.in6.cpp \
+  obj/src/ip/inet/pton.cpp \
+  obj/src/ip/inet/pton.in4.cpp \
+  obj/src/ip/inet/pton.in6.cpp \
+  obj/src/ip/inet/getaddrinfo.cpp \
+  obj/src/ip/inet/getnameinfo.cpp \
+  obj/src/ip/inet/getsockaddrbyname.cpp \
+  obj/src/ip/inet/network_category.cpp \
+  obj/src/ip/inet/lhs.cpp \
+  obj/src/ip/inet/rhs.cpp \
+  \
+  obj/src/ip/inet/detail/namespace.cpp \
+  \
+  obj/src/ip/inet/addrinfo/namespace.cpp \
+  obj/src/ip/inet/addrinfo/filladdrinfo.cpp \
+  obj/src/ip/inet/addrinfo/Iterator.cpp \
+  obj/src/ip/inet/addrinfo/List.cpp \
+  obj/src/ip/inet/addrinfo/Specification.cpp \
+  obj/src/ip/inet/addrinfo/Value.cpp \
+  obj/src/ip/inet/addrinfo/Value.in4.cpp \
+  obj/src/ip/inet/addrinfo/Value.in6.cpp \
+  \
+  obj/src/ip/inet/Family.cpp \
+  obj/src/ip/inet/Protocol.cpp \
+  $(src_ip_inet_AF_SOURCES_HACKS) \
+  $(src_ip_inet_PF_SOURCES_HACKS) \
+  $(src_ip_inet_SOCK_SOURCES_HACKS) \
+  $(src_ip_inet_IPPROTO_SOURCES_HACKS) \
+  \
+  obj/src/ip/inet/AI/namespace.cpp \
+  obj/src/ip/inet/AI/as.cpp \
+  obj/src/ip/inet/AI/Features.cpp \
+  obj/src/ip/inet/AI/flag/namespace.cpp \
+  obj/src/ip/inet/AI/flag/as.cpp \
+  obj/src/ip/inet/AI/flag/Feature.cpp \
+  \
+  obj/src/ip/inet/EAI/namespace.cpp \
+  obj/src/ip/inet/EAI/Code.cpp \
+  \
+  obj/src/ip/inet/error/namespace.cpp \
+  obj/src/ip/inet/error/Category.cpp \
+  obj/src/ip/inet/error/Code.cpp \
+  obj/src/ip/inet/error/Condition.cpp \
+  obj/src/ip/inet/error/network_category.cpp \
+  \
+  obj/src/ip/inet/nameinfo/namespace.cpp \
+  \
+  obj/src/ip/inet/NI/namespace.cpp \
+  obj/src/ip/inet/NI/as.cpp \
+  obj/src/ip/inet/NI/Features.cpp \
+  obj/src/ip/inet/NI/flag/namespace.cpp \
+  obj/src/ip/inet/NI/flag/as.cpp \
+  obj/src/ip/inet/NI/flag/Feature.cpp \
+  \
+  obj/src/ip/inet/required/namespace.cpp \
+  obj/src/ip/inet/required/Family.cpp \
+  obj/src/ip/inet/required/Protocol.cpp \
+  \
+  obj/src/ip/inet/Result.cpp \
+  obj/src/ip/inet/result/namespace.cpp \
+  obj/src/ip/inet/result/Getaddrinfo.cpp \
+  obj/src/ip/inet/result/Getnameinfo.HOST.SERVICE.cpp \
+  obj/src/ip/inet/result/Getnameinfo.HOST.cpp \
+  obj/src/ip/inet/result/Getnameinfo.SERVICE.cpp \
+  obj/src/ip/inet/result/Getnameinfo.cpp \
+  obj/src/ip/inet/result/Value.cpp \
+  \
+  obj/src/ip/inet/family.cpp \
+  obj/src/ip/inet/port.cpp \
+  obj/src/ip/inet/address.cpp \
+  obj/src/ip/inet/sockaddr/Generic.cpp \
+  obj/src/ip/inet/sockaddr/namespace.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.declaration.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.in4.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.in6.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.FAMILY.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.PORT.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.ADDRESS.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.FAMILY.in4.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.FAMILY.in6.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.PORT.in4.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.PORT.in6.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.ADDRESS.in4.cpp \
+  obj/src/ip/inet/sockaddr/Lhs.ADDRESS.in6.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.declaration.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.in4.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.in6.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.FAMILY.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.ADDRESS.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.PORT.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.FAMILY.in4.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.FAMILY.in6.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.PORT.in4.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.PORT.in6.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.ADDRESS.in4.cpp \
+  obj/src/ip/inet/sockaddr/Rhs.ADDRESS.in6.cpp \
+  obj/src/ip/inet/sockaddr/Xhs.cpp \
+  obj/src/ip/inet/sockaddr/Xhs.declaration.cpp \
+  obj/src/ip/inet/sockaddr/Xhs.in4.cpp \
+  obj/src/ip/inet/sockaddr/Xhs.in6.cpp \
+  \
+  obj/src/ip/inet/traits/namespace.cpp \
+  obj/src/ip/inet/traits/Addr.cpp \
+  obj/src/ip/inet/traits/Sockaddr.cpp \
+  \
+  obj/src/ip/inet/xhs/address/namespace.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.declaration.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in4.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in4.addr.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in4.addr_t.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in6.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in6.addr.cpp \
+  obj/src/ip/inet/xhs/address/Lhs.in6.addr_t.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.declaration.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in4.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in4.addr.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in4.addr_t.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in6.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in6.addr.cpp \
+  obj/src/ip/inet/xhs/address/Rhs.in6.addr_t.cpp \
+  \
+  obj/src/ip/inet/xhs/family/namespace.cpp \
+  obj/src/ip/inet/xhs/family/Lhs.declaration.cpp \
+  obj/src/ip/inet/xhs/family/Lhs.cpp \
+  obj/src/ip/inet/xhs/family/Lhs.Family.cpp \
+  obj/src/ip/inet/xhs/family/Rhs.declaration.cpp \
+  obj/src/ip/inet/xhs/family/Rhs.cpp \
+  obj/src/ip/inet/xhs/family/Rhs.Family.cpp \
+  \
+  obj/src/ip/inet/xhs/port/namespace.cpp \
+  obj/src/ip/inet/xhs/port/Lhs.declaration.cpp \
+  obj/src/ip/inet/xhs/port/Lhs.cpp \
+  obj/src/ip/inet/xhs/port/Lhs.in.port_t.cpp \
+  obj/src/ip/inet/xhs/port/Rhs.declaration.cpp \
+  obj/src/ip/inet/xhs/port/Rhs.cpp \
+  obj/src/ip/inet/xhs/port/Rhs.in.port_t.cpp \
+  \
+  obj/src/ip/inet/zero.cpp \
+  $(end)
+
+src_ip_inet_AF_SOURCES_HACKS = \
+  obj/src/ip/inet/AF.cpp \
+  obj/src/ip/inet/AF.Family.cpp \
+  obj/src/ip/inet/AF.constants.cpp \
+  obj/src/ip/inet/af.cpp \
+  obj/src/ip/inet/af.Type.cpp \
+  obj/src/ip/inet/af.constants.cpp \
+  $(end)
+src_ip_inet_PF_SOURCES_HACKS = \
+  obj/src/ip/inet/PF.cpp \
+  obj/src/ip/inet/PF.Family.cpp \
+  obj/src/ip/inet/PF.constants.cpp \
+  obj/src/ip/inet/pf.cpp \
+  obj/src/ip/inet/pf.Type.cpp \
+  obj/src/ip/inet/pf.constants.cpp \
+  $(end)
+src_ip_inet_SOCK_SOURCES_HACKS = \
+  obj/src/ip/inet/SOCK.cpp \
+  obj/src/ip/inet/SOCK.Type.cpp \
+  obj/src/ip/inet/SOCK.constants.cpp \
+  obj/src/ip/inet/sock.cpp \
+  obj/src/ip/inet/sock.Type.cpp \
+  obj/src/ip/inet/sock.constants.cpp \
+  $(end)
+src_ip_inet_IPPROTO_SOURCES_HACKS = \
+  obj/src/ip/inet/IPPROTO.cpp \
+  obj/src/ip/inet/IPPROTO.Type.cpp \
+  obj/src/ip/inet/IPPROTO.constants.cpp \
+  obj/src/ip/inet/ipproto.cpp \
+  obj/src/ip/inet/ipproto.Type.cpp \
+  obj/src/ip/inet/ipproto.constants.cpp \
+  $(end)
+
+$(lib_libinet_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/ip/inet/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $(lib_libinet_module_la_SOURCES))
+	@test -e $@
+include $(scold_cxxdir)/ip/inet/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/ip/inet/dependencies.mk

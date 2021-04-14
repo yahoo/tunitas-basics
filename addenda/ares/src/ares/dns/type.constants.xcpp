@@ -1,0 +1,105 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.dns.Type
+namespace ares::dns {
+  //
+  // As a reminder and giving the more natural names as constants in the namespace
+  // And whereas these are well known, well published values
+  //   the #include <arpa/nameser.h> is not strictly, truly necessary.
+  // And <arpa/nameser.h> comes with some significant CPP #define baggage.
+  //
+  namespace type {
+    inline constexpr auto INVALID = ns_t_invalid;
+    inline constexpr auto MAX = ns_t_max;
+    inline namespace constants {
+      inline constexpr auto A = ns_t_a;
+      inline constexpr auto NS = ns_t_ns;
+      inline constexpr auto MD = ns_t_md;
+      inline constexpr auto MF = ns_t_mf;
+      inline constexpr auto CNAME = ns_t_cname;
+      inline constexpr auto SOA = ns_t_soa;
+      inline constexpr auto MB = ns_t_mb;
+      inline constexpr auto MG = ns_t_mg;
+      inline constexpr auto MR = ns_t_mr;
+      inline constexpr auto NULLL = ns_t_null; // [[editorial]] can't get away from this one
+      inline constexpr auto NUULL = ns_t_null; // [[editorial]] can't get away from this one
+      inline constexpr auto WKS = ns_t_wks;
+      inline constexpr auto PTR = ns_t_ptr;
+      inline constexpr auto HINFO = ns_t_hinfo;
+      inline constexpr auto MINFO = ns_t_minfo;
+      inline constexpr auto MX = ns_t_mx;
+      inline constexpr auto TXT = ns_t_txt;
+      inline constexpr auto RP = ns_t_rp;
+      inline constexpr auto AFSDB = ns_t_afsdb;
+      inline constexpr auto X25 = ns_t_x25;
+      inline constexpr auto ISDN = ns_t_isdn;
+      inline constexpr auto RT = ns_t_rt;
+      inline constexpr auto NSAP = ns_t_nsap;
+      inline constexpr auto nsap_PTR = ns_t_nsap_ptr;
+      inline constexpr auto SIG = ns_t_sig;
+      inline constexpr auto KEY = ns_t_key;
+      inline constexpr auto PX = ns_t_px;
+      inline constexpr auto GPOS = ns_t_gpos;
+      inline constexpr auto AAAA = ns_t_aaaa;
+      inline constexpr auto LOC = ns_t_loc;
+      inline constexpr auto NXT = ns_t_nxt;
+      inline constexpr auto EID = ns_t_eid;
+      inline constexpr auto NIMLOC = ns_t_nimloc;
+      inline constexpr auto SRV = ns_t_srv;
+      inline constexpr auto ATMA = ns_t_atma;
+      inline constexpr auto NAPTR = ns_t_naptr;
+      inline constexpr auto KX = ns_t_kx;
+      inline constexpr auto CERT = ns_t_cert;
+      inline constexpr auto A6 = ns_t_a6;
+      inline constexpr auto DNAME = ns_t_dname;
+      inline constexpr auto SINK = ns_t_sink;
+      inline constexpr auto OPT = ns_t_opt;
+      inline constexpr auto APL = ns_t_apl;
+      inline constexpr auto DS = ns_t_ds;
+      inline constexpr auto SSHFP = ns_t_sshfp;
+      inline constexpr auto IPSECKEY = ns_t_ipseckey;
+      inline constexpr auto RRSIG = ns_t_rrsig;
+      inline constexpr auto NSEC = ns_t_nsec;
+      inline constexpr auto DNSKEY = ns_t_dnskey;
+      inline constexpr auto DHCID = ns_t_dhcid;
+      inline constexpr auto NSEC3 = ns_t_nsec3;
+      inline constexpr auto NSEC3PARAM = ns_t_nsec3param;
+      inline constexpr auto TLSA = ns_t_tlsa;
+      inline constexpr auto SMIMEA = ns_t_smimea;
+      inline constexpr auto HIP = ns_t_hip;
+      inline constexpr auto NINFO = ns_t_ninfo;
+      inline constexpr auto RKEY = ns_t_rkey;
+      inline constexpr auto TALINK = ns_t_talink;
+      inline constexpr auto CDS = ns_t_cds;
+      inline constexpr auto CDNSKEY = ns_t_cdnskey;
+      inline constexpr auto OPENPGPKEY = ns_t_openpgpkey;
+      inline constexpr auto CSYNC = ns_t_csync;
+      inline constexpr auto SPF = ns_t_spf;
+      inline constexpr auto UINFO = ns_t_uinfo;
+      inline constexpr auto UID = ns_t_uid;
+      inline constexpr auto GID = ns_t_gid;
+      inline constexpr auto UNSPEC = ns_t_unspec;
+      inline constexpr auto NID = ns_t_nid;
+      inline constexpr auto L32 = ns_t_l32;
+      inline constexpr auto L64 = ns_t_l64;
+      inline constexpr auto LP = ns_t_lp;
+      inline constexpr auto EUI48 = ns_t_eui48;
+      inline constexpr auto EUI64 = ns_t_eui64;
+      inline constexpr auto TKEY = ns_t_tkey;
+      inline constexpr auto TSIG = ns_t_tsig;
+      inline constexpr auto IXFR = ns_t_ixfr;
+      inline constexpr auto AXFR = ns_t_axfr;
+      inline constexpr auto MAILB = ns_t_mailb;
+      inline constexpr auto MAILA = ns_t_maila;
+      inline constexpr auto ANY = ns_t_any;
+      inline constexpr auto URI = ns_t_uri;
+      inline constexpr auto CAA = ns_t_caa;
+      inline constexpr auto AVC = ns_t_avc;
+      inline constexpr auto TA = ns_t_ta;
+      inline constexpr auto DLV = ns_t_dlv;
+    }
+  }
+  using namespace type::constants;
+}
+#endiv

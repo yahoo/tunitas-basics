@@ -1,0 +1,114 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::buffer {
+  class Palette;
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+class tests::unit::c::buffer::Palette {
+protected:
+  Palette();
+  ~Palette() = default;
+  Palette(Palette const &) = delete;
+  auto operator=(Palette const &) -> Palette & = delete;
+public: 
+  static constexpr ::std::size_t const LENGTH = 20;
+  static_assert(LENGTH <= 26, "std::isalpha will fail");
+
+  // These won't be 0-terminated, they will be full of "bytes" not (codepage) "chars"
+  char aNc[LENGTH];         // array-of-length-N of character
+  char const aNcc[LENGTH];  // array-of-length-N of const_character
+  char *pc;                 // pointer-to-character
+  char const *pcc;          // pointer-to-const_character
+
+  virtual auto setUp() -> void;
+  virtual auto tearDown() -> void;
+
+  // Used in Consty & Muting
+  template<typename BUFFER> inline static auto generic_testification(BUFFER) -> void;
+protected:
+  // "establish" in lieu of 'generate' 'fill' 'initialize' all of which are in std
+  // but have differfent senses.  So "establish" is used to setUp and tearDown.
+  template<typename ITERATOR, typename FUNCTOR> inline auto establish(ITERATOR start, ITERATOR finish, FUNCTOR function) -> void;
+  template<typename BASE, typename FUNCTOR> inline auto establish(BASE const *start, BASE const *finish, FUNCTOR function) -> void;
+private:
+  template<typename ITERATOR, typename FUNCTOR> auto do_establish(ITERATOR start, ITERATOR finish, FUNCTOR function) -> void;
+};
+#endiv
+#divert <tpp>
+#import std.generate
+
+template<typename ITERATOR, typename FUNCTOR> auto tests::unit::c::buffer::Palette::do_establish(ITERATOR start, ITERATOR finish, FUNCTOR function) -> void {
+  ::std::generate(start, finish, function);
+}
+
+template<typename ITERATOR, typename FUNCTOR> auto tests::unit::c::buffer::Palette::establish(ITERATOR start, ITERATOR finish, FUNCTOR function) -> void {
+  do_establish(start, finish, function);
+}
+
+template<typename BASE, typename FUNCTOR> auto tests::unit::c::buffer::Palette::establish(BASE const *start, BASE const *finish, FUNCTOR function) -> void {
+  // ahem ... cast away the constness (oh the humanity)
+  do_establish(const_cast<char *>(start), const_cast<char *>(finish), function);
+}
+
+#import cppunit.test.Assert
+#import c.buffer
+#import c.const_buffer
+#import std.distance
+#import std.is_same
+#import std.isalpha
+#import std.isspace
+template<typename BUFFER> auto tests::unit::c::buffer::Palette::generic_testification(BUFFER buf) -> void {
+  static_assert((::std::is_same<::c::buffer, BUFFER>::value
+                 ||
+                 ::std::is_same<::c::const_buffer, BUFFER>::value),
+                "the BUFFER is not actually instantiated as c::buffer at all"); 
+  CPPUNIT_ASSERT(!buf.empty());
+  CPPUNIT_ASSERT(0 != buf.size());
+  CPPUNIT_ASSERT(buf.begin() != buf.end());
+  CPPUNIT_ASSERT(0 != ::std::distance(buf.begin(), buf.end()));
+  for (auto byte : buf) {
+    CPPUNIT_ASSERT(std::isspace(byte) || std::isalpha(byte));
+  }
+}
+#endiv
+#divert <cpp>
+constexpr ::std::size_t const tests::unit::c::buffer::Palette::LENGTH;
+
+tests::unit::c::buffer::Palette::Palette()
+  : aNc()
+  , aNcc()
+  , pc()
+  , pcc() {
+  ; // aNc and aNcc remain unassigned
+}
+
+#import rigging.unit.lhs
+auto tests::unit::c::buffer::Palette::setUp() -> void {
+  using ::rigging::unit::lhs;
+  unsigned count;
+  count=0;
+  establish(aNc, aNc+LENGTH, [&count](){ return 'a' + count++; });
+  count=0;
+  establish(aNcc, aNcc+LENGTH, [&count](){ return 'A' + count++; });
+  lhs(pc) = aNc;
+  lhs(pcc) = aNcc;
+}
+
+#import rigging.unit.lhs
+#import rigging.unit.clear
+auto tests::unit::c::buffer::Palette::tearDown() -> void {
+  using ::rigging::unit::lhs;
+  using ::rigging::unit::clear;
+  establish(aNc, aNc+sizeof (aNc), [](){ return '\0';});
+  establish(aNcc, aNcc+sizeof (aNcc), [](){ return '\0';});
+  lhs(pc) = clear;
+  lhs(pcc) = clear;
+}
+#endiv

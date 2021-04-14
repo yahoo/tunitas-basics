@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::re::construct {
+  template<typename CHAR> struct Literals_Palette;
+}
+#endiv
+#divert <hpp>
+template<typename CHAR> struct tests::unit::re::construct::Literals_Palette {
+  using char_type = CHAR;
+  using literal_type = char_type const *;
+  static auto specimen() -> literal_type;
+};
+
+namespace tests::unit::re::construct {
+  template<> auto Literals_Palette<char>::specimen() -> literal_type;
+  template<> auto Literals_Palette<wchar_t>::specimen() -> literal_type;
+  template<> auto Literals_Palette<char16_t>::specimen() -> literal_type;
+  template<> auto Literals_Palette<char32_t>::specimen() -> literal_type;
+}
+#endiv
+#divert <cpp>
+template<> auto tests::unit::re::construct::Literals_Palette<char>::specimen() -> literal_type {
+  return "narrow";
+}
+
+template<> auto tests::unit::re::construct::Literals_Palette<wchar_t>::specimen() -> literal_type {
+  return L"wide";
+}
+
+template<> auto tests::unit::re::construct::Literals_Palette<char16_t>::specimen() -> literal_type {
+  return u"UTF-16";
+}
+
+template<> auto tests::unit::re::construct::Literals_Palette<char32_t>::specimen() -> literal_type {
+  return U"UTF-16";
+}
+#endiv

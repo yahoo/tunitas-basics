@@ -1,0 +1,8 @@
+// -*- c++ -*- more or less but in the SCOLD styling
+#divert <hpp>
+#import rigging.unit.assignment.Clear
+namespace rigging::unit {
+  // similar to std::nothrow_t -contra- std::othrow
+  constexpr assignment::Clear const clear;
+}
+#endiv

@@ -1,0 +1,23 @@
+// -*- c++ -*- more or less but in the SCOLD styling
+#divert <hpp>
+#import rigging.unit.test.detail.TestNameEnumerator
+#import std.string
+class rigging::unit::test::detail::TestNameEnumerator::Guard {
+public:
+  inline Guard(TestNameEnumerator &subject, std::string const &name);
+  inline ~Guard();
+  Guard(Guard const &) = delete;
+  auto operator=(Guard const &) -> Guard & = delete;
+  TestNameEnumerator &subject;
+};
+#endiv
+#divert <ipp>
+rigging::unit::test::detail::TestNameEnumerator::Guard::Guard(TestNameEnumerator &arg_subject, std::string const &arg_name)
+  : subject(arg_subject) {
+  subject.parents.push_back(arg_name);
+}
+
+rigging::unit::test::detail::TestNameEnumerator::Guard::~Guard() {
+  subject.parents.pop_back();
+}
+#endiv

@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.endian.required.Order
+namespace ip::endian {
+  //
+  // Integers in
+  //   NETWORK order are big endian
+  //   HOST order are either (Intel is little endian)
+  //
+  // The enum is used both as a concept, and as (the only) instance of that concept.
+  // ... here, the value; the only instance of the concept.
+  //
+  // See the template Integer<ORDER, INTEGER> nearby
+  //
+  using required::Order;
+}
+#endiv

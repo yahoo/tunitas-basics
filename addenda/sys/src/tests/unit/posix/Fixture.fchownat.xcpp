@@ -1,0 +1,86 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <tpp>
+#import sys.id.User
+#import sys.id.Group
+#import sys.posix.fchownat
+#import sys.posix.AT
+namespace tests::unit::posix::fixture {
+  template<typename FD> auto Fixture::exercise_fchownat_Uid(FD fd) -> void {
+    namespace id = ::sys::id;
+    using AT = six::AT;
+    auto const noplace = no_such_file_at_all("fchownat");
+    auto owned = six::fchownat(fd, noplace, id::User(-1), AT::NONE);
+    CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad fd, bad path, no permissions to fchownat
+  }
+  template<typename FD> auto Fixture::exercise_fchownat_Gid(FD fd) -> void {
+    namespace id = ::sys::id;
+    using AT = six::AT;
+    auto const noplace = no_such_file_at_all("fchownat");
+    auto owned = six::fchownat(fd, noplace, id::Group(-1), AT::NONE);
+    CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad fd, bad path, no permissions to fchownat
+  }
+  template<typename FD> auto Fixture::exercise_fchownat_Uid_Gid(FD fd) -> void {
+    namespace id = ::sys::id;
+    using AT = six::AT;
+    auto const noplace = no_such_file_at_all("fchownat");
+    auto owned = six::fchownat(fd, noplace, id::User{}, id::Group{}, AT::NONE);
+    CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad fd, bad path, no permissions to fchownat
+  }
+  template<typename FD> auto Fixture::exercise_fchownat_uid_gid(FD fd) -> void {
+    auto const noplace = no_such_file_at_all("fchownat");
+    using AT = six::AT;
+    auto owned = six::fchownat(fd, noplace, ::uid_t{}, ::gid_t{}, AT::NONE);
+    CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad fd, bad path, no permissions to fchownat
+  }
+}
+#endiv
+#divert <cpp>
+auto tests::unit::posix::fixture::Fixture::test_fchownat_int_uid_gid() -> void {
+  namespace id = sys::id;
+  using AT = six::AT;
+  //
+  // special -------\ (here)
+  //                |
+  //                v
+  auto owned = six::native::fchownat(-1, "nosuch", ::uid_t{}, ::gid_t{}, AT::NONE);
+  CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad fd, bad path, no permissions to fchownat
+}
+#import sys.id.File
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_fchownat_File_Uid() -> void { exercise_fchownat_Uid(::sys::id::File{-1}); }
+  auto Fixture::test_fchownat_File_Gid() -> void { exercise_fchownat_Gid(::sys::id::File{-1}); }
+  auto Fixture::test_fchownat_File_Uid_Gid() -> void { exercise_fchownat_Uid_Gid(::sys::id::File{-1}); }
+  auto Fixture::test_fchownat_File_uid_gid() -> void { exercise_fchownat_uid_gid(::sys::id::File{-1}); }
+}
+#import sys.at.Cwd
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_fchownat_Cwd_Uid() -> void { exercise_fchownat_Uid(::sys::at::Cwd::FDCWD); }
+  auto Fixture::test_fchownat_Cwd_Gid() -> void { exercise_fchownat_Gid(::sys::at::Cwd::FDCWD); }
+  auto Fixture::test_fchownat_Cwd_Uid_Gid() -> void { exercise_fchownat_Uid_Gid(::sys::at::Cwd::FDCWD); }
+  auto Fixture::test_fchownat_Cwd_uid_gid() -> void { exercise_fchownat_uid_gid(::sys::at::Cwd::FDCWD); }
+}
+#import sys.posix.open
+#import sys.posix.openat
+#import sys.posix.unlinkat
+auto tests::unit::posix::fixture::Fixture::test_fchownat_something() -> void {
+  namespace id = ::sys::id;
+  using O = six::O;
+  using AT = six::AT;
+  auto t = nat::open("/tmp", O::DIRECTORY|O::RDONLY);
+  auto dirfd = id::File{value(t)};
+  guardian::Close guard0(value(t));
+  std::string file_exists = "t99.tests.unit.posix.test.EXISTS-via-fchownat";
+  six::unlinkat(value(t), file_exists, AT::NONE);
+  auto c = nat::openat(value(t), file_exists, O::CREATE|O::WRONLY, 0666);
+  guardian::Close guard1(value(c));
+  CPPUNIT_ASSERT(good(c));
+  auto a = six::fchownat(dirfd, file_exists, id::User{0}, id::Group{0}, AT::NONE); // <---------- test this
+  CPPUNIT_ASSERT(!good(a)); // <-------- this should always fail ... because you aren't root (YES?)
+  auto u = six::unlinkat(value(t), file_exists, AT::NONE);
+  CPPUNIT_ASSERT(good(u));
+}
+#endiv

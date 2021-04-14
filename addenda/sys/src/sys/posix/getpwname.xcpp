@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringz
+#import re.string
+#import sys.posix
+#import sys.posix.packaging.getpw
+namespace sys::posix {
+  //
+  // Get a password file entry, by name
+  // Is thread safe.
+  //
+  // Usage:
+  //
+  //   std::string some_name{...somehow...}
+  //   auto got = getpwname(some_name);
+  //   if (ok(got)) {
+  //      auto ptr = value(std::move(got));
+  //      ...use ptr->pw_uid...
+  //      ...etc...
+  //   } else {
+  //      std::cerr << "could not get " << some_name << " because " << error_code(got).message() << '\n';
+  //   }
+  //
+  inline auto getpwname(re::string<c::const_stringz> name) -> packaging::getpw::Result;
+}
+#endiv
+#divert <ipp>
+#import std.move
+#import sys.entry.Buffer
+#import errno
+#import passwd
+#import getpwnam_r
+auto sys::posix::getpwname(re::string<c::const_stringz> name) -> packaging::getpw::Result {
+  using namespace packaging::getpw;
+  using std::move;
+  Pointer ptr{new Buffer{}};
+  ::passwd *result{nullptr};
+  auto r = [&ptr, name, &result]() {
+	     auto g = ptr.get();
+	     return ::getpwnam_r((char const *) name, g->entry(), g->data(), g->size(), &result);
+	   }();
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r && nullptr != result;
+  if (!b) {
+    ptr.reset();
+  }
+  return {move(b), move(errnum), move(ptr), move(result), move(r)};
+}
+#endiv

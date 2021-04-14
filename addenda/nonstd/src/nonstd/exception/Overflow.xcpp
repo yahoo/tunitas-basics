@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// https://en.cppreference.com/w/cpp/error/overflow_error
+// constructs from std::string (copying)
+#import std.overflow_error
+namespace substd::exception {
+  using Overflow = std::overflow_error;
+}
+#import nonstd.exception.constructible.required.From
+#import nonstd.exception.constructible.School
+#import nonstd.exception.string.View.Overflow
+namespace nonstd::exception {
+  template<constructible::required::From FROM> using Overflow = typename constructible::School<std::overflow_error, FROM>::Type;
+}
+#endiv

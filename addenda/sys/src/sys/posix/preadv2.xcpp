@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.iov.interface
+namespace sys::posix {
+  namespace packaging::preadv2 {
+    using namespace packaging::iov::interface;
+    namespace function {
+      inline auto preadv2(File, [[out]] io::Vec *, Count, Offset, Flags) -> Result;
+      inline auto preadv2(File, [[out]] io::Vector<io::Vec>, Offset, Flags) -> Result;
+    }
+    namespace native {
+      inline auto preadv2(int fd, [[out]] io::Vec *, Count, Offset, Flags) -> Result;
+      inline auto preadv2(int fd, [[out]] io::Vector<io::Vec>, Offset, Flags) -> Result;
+    }
+  }
+  using packaging::preadv2::function::preadv2;
+  namespace native { using packaging::preadv2::native::preadv2; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.readv
+namespace sys::posix::packaging::preadv2 {
+  auto function::preadv2(File fd, io::Vec *vec, Count size, Offset offset, Flags flags) -> Result { return posix::readv(fd, vec, size, offset, flags); }
+  auto function::preadv2(File fd, io::Vector<io::Vec> vec, Offset offset, Flags flags) -> Result  { return posix::readv(fd, vec, offset, flags); }
+  //
+  auto native::preadv2(int fd, io::Vec *vec, Count size, Offset offset, Flags flags) -> Result { return posix::native::readv(fd, vec, size, offset, flags); }
+  auto native::preadv2(int fd, io::Vector<io::Vec> vec, Offset offset, Flags flags) -> Result  { return posix::native::readv(fd, vec, offset, flags); }
+}
+#endiv
+!

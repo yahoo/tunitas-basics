@@ -1,0 +1,8 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Outcomable
+#warning AVOID instead prefer nonstd.required.Outcomable without that 'e' following Movable without that 'e'
+namespace nonstd::required {
+  template<typename TYPE> concept Outcomeable = Outcomable<TYPE>;
+}
+#endiv

@@ -1,0 +1,6 @@
+// -*- c++ -*- 0466dc0c-e1e0-40e7-ac22-90153e24a8fd
+#pragma once
+#include <cppunit/plugin/DynamicLibraryManagerException.h>
+namespace cppunit {
+  using CppUnit::DynamicLibraryManagerException;
+}

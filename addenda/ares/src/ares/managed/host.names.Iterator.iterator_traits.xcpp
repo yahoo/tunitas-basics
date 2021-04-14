@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.host.names.Iterator
+#import std.iterator_traits
+namespace std {
+  template<> struct iterator_traits<ares::managed::host::names::Iterator>;
+}
+#endiv
+#divert <hpp>
+#import std.forward_iterator_tag // lazy ... not implementing bidirectional ... but we could
+#import std.ptrdiff_t
+#import std.string
+template<> struct std::iterator_traits<ares::managed::host::names::Iterator> {
+  // New School
+  using Value = std::string;
+  using Difference = std::ptrdiff_t;
+  using Pointer = void; // ...... can't take the address of returned values
+  using Reference = void; // .... ibidem.
+  using Category = std::forward_iterator_tag;
+  // old_school
+  using value_type = Value;
+  using difference_type = Difference;
+  using pointer = Pointer;
+  using reference = Reference;
+  using iterator_category = Category;
+};
+#endiv

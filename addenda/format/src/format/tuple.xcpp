@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.detail.tuple.Formatter
+#import std.tuple
+namespace format {
+  //
+  // usage:
+  //
+  //     auto container = std::list<int>{1,2,3,4,5}
+  //     std::cout << tuple(container);
+  //
+  // VALUE may be anything operable with operator<< , but especially a CONTAINER or std::tuple
+  //
+  // Of course, the reference to the VALUE must last for the lifetime of the formatter object
+  template<typename... VALUES> inline auto tuple(VALUES const &...) -> detail::tuple::Formatter<std::tuple<VALUES const &...>>;
+}
+#endiv
+#divert <ipp>
+template<typename... VALUES> auto format::tuple(VALUES const &...values) -> detail::tuple::Formatter<std::tuple<VALUES const &...>> {
+  using tuple_of_const_reference_type = std::tuple<VALUES const &...>;
+  using tocr = tuple_of_const_reference_type;
+  return detail::tuple::Formatter<tocr>(tocr(values...));
+}
+#endiv

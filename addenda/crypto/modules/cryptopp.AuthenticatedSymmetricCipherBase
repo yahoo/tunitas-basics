@@ -1,0 +1,4 @@
+// -*- c++ -*- 01936114-ac50-455d-ac6e-2f600af23e67
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/authenc.h>

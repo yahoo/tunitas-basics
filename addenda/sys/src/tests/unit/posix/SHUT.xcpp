@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class SHUT; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.SHUT
+class tests::unit::posix::SHUT : public cppunit::test::Fixture {
+public:
+  using Subject = ::sys::posix::SHUT;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto SHUT::test_constants() -> void {
+    CPPUNIT_ASSERT_EQUAL((int)SHUT_RD, (int)Subject::RD);
+    CPPUNIT_ASSERT_EQUAL((int)SHUT_WR, (int)Subject::WR);
+    CPPUNIT_ASSERT_EQUAL((int)SHUT_RDWR, (int)Subject::RDWR);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::SHUT::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("SHUT");
+  series << call("constants", &SHUT::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

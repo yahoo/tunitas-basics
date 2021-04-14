@@ -1,0 +1,193 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::regex { class Replace; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::regex::Replace : public cppunit::test::Fixture {
+  auto test_case1_01() -> void;
+  auto test_case1_02() -> void;
+  auto test_case2_01() -> void;
+  auto test_case2_02() -> void;
+  auto test_case3_01() -> void;
+  auto test_case3_02() -> void;
+  auto test_case4_01() -> void;
+  auto test_case4_02() -> void;
+  auto test_case5_01() -> void;
+  auto test_case5_02() -> void;
+  auto test_case6_01() -> void;
+  auto test_case6_02() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.copy
+#import std.ostream_iterator
+#import std.string
+#import std.string_literals
+#import std.char_traits
+#import std.allocator
+#import nonstd.regex.replace
+namespace tests::unit::regex {
+  using namespace ::nonstd::regex;
+  using namespace std::string_literals;
+  auto Replace::test_case1_01() -> void {
+    char buf[100];
+    using Out = char *;
+    Out out_start{&buf[0]};
+    auto const specimen = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    using In = std::string::const_iterator;
+    In const first = specimen.begin();
+    In const last = specimen.end();
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    using Format_Traits = std::char_traits<char>;
+    using Format_Alloc = std::allocator<char>;
+    using Format_String = std::basic_string<char, Format_Traits, Format_Alloc>;
+    auto const format = Format_String{"word"};
+    auto flag = matching::constants::DEFAULT;
+    Out out_finish = replace(out_start, first, last, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    auto const actual = std::string{out_start, out_finish};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case1_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Replace::test_case2_01() -> void {
+    char buf[100];
+    using Out = char *;
+    Out out_start{&buf[0]};
+    auto const specimen = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    using In = std::string::const_iterator;
+    In const first = specimen.begin();
+    In const last = specimen.end();
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    char const *const format{"word"};
+    auto flag = matching::constants::DEFAULT;
+    Out out_finish = replace(out_start, first, last, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    auto const actual = std::string{out_start, out_finish};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case2_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Replace::test_case3_01() -> void {
+    auto const subject = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    using Format_Traits = std::char_traits<char>;
+    using Format_Alloc = std::allocator<char>;
+    using Format_String = std::basic_string<char, Format_Traits, Format_Alloc>;
+    auto const format = Format_String{"word"};
+    auto flag = matching::constants::DEFAULT;
+    auto const actual = replace(subject, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case3_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Replace::test_case4_01() -> void {
+    auto const subject = "the lazy brown fox jumped over the camel died on the seventh day"s;
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    char const *const format{"word"};
+    auto flag = matching::constants::DEFAULT;
+    auto const actual = replace(subject, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case4_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Replace::test_case5_01() -> void {
+    char const *const subject{"the lazy brown fox jumped over the camel died on the seventh day"};
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    using Format_Traits = std::char_traits<char>;
+    using Format_Alloc = std::allocator<char>;
+    using Format_String = std::basic_string<char, Format_Traits, Format_Alloc>;
+    auto const format = Format_String{"word"};
+    auto flag = matching::constants::DEFAULT;
+    auto const actual = replace(subject, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case5_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Replace::test_case6_01() -> void {
+    char const *const subject{"the lazy brown fox jumped over the camel died on the seventh day"};
+    using Case_Traits = Traits<char>;
+    using Case_Pattern = Basic_Pattern<char, Case_Traits>;
+    Case_Pattern const pattern{"[a-z]+"};
+    char const *const format{"word"};
+    auto flag = matching::constants::DEFAULT;
+    auto const actual = replace(subject, pattern, format, flag);
+    auto const expected = "word word word word word word word word word word word word word"s;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Replace::test_case6_02() -> void {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::regex::Replace::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  auto suite = Stream{"replace"};
+  suite << []() {
+             auto ca1 = Stream{"case1"};
+             ca1 << call("01", &Replace::test_case1_01)
+                 << call("02", &Replace::test_case1_02)
+                 << END;
+             return move(ca1);
+           }()
+        << []() {
+             auto ca2 = Stream{"case2"};
+             ca2 << call("01", &Replace::test_case2_01)
+                 << call("02", &Replace::test_case2_02)
+                 << END;
+             return move(ca2);
+           }()
+        << []() {
+             auto ca3 = Stream{"case3"};
+             ca3 << call("01", &Replace::test_case3_01)
+                 << call("02", &Replace::test_case3_02)
+                 << END;
+             return move(ca3);
+           }()
+        << []() {
+             auto ca4 = Stream{"case4"};
+             ca4 << call("01", &Replace::test_case4_01)
+                 << call("02", &Replace::test_case4_02)
+                 << END;
+             return move(ca4);
+           }()
+        << []() {
+             auto ca5 = Stream{"case5"};
+             ca5 << call("01", &Replace::test_case5_01)
+                 << call("02", &Replace::test_case5_02)
+                 << END;
+             return move(ca5);
+           }()
+        << []() {
+             auto ca6 = Stream{"case6"};
+             ca6 << call("01", &Replace::test_case6_01)
+                 << call("02", &Replace::test_case6_02)
+                 << END;
+             return move(ca6);
+           }()
+        << END;
+  return finalize(suite);
+}
+#endiv

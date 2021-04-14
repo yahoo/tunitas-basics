@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import openssl.error.Condition
+namespace openssl::error {
+  //
+  // The rich error code
+  // These error codes are for domain-specific problems of OpenSSL.
+  //
+  // The general mechanics of data invariant failures (out of memory, stack empty), etc,
+  // are signalled through exceptions anchored around openssl::exception::Aspect
+  //
+  enum class Code
+    { SUCCESS = (int) Condition::SUCCESS,
+      FAILURE = (int) Condition::FAILURE,
+      MISSING, // the item is missing
+      // undistinguished subsystem errors
+      ASN1,
+      BN,
+      EC,
+      EVP,
+      PEM,
+      RSA,
+      X509 };
+}
+#import std.is_error_code_enum
+namespace std {
+  template<> struct is_error_code_enum<openssl::error::Code>;
+}
+#endiv
+#divert <hpp>
+template<> struct std::is_error_code_enum<openssl::error::Code> : public std::true_type { };
+#import std.error_code
+namespace openssl::error {
+  inline auto make_error_code(Code) -> std::error_code;
+}
+#endiv
+#divert <ipp>
+#import openssl.error.category
+auto openssl::error::make_error_code(Code code) -> std::error_code {
+  return std::error_code{(int) code, category()};
+}
+#endiv

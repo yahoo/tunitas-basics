@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::traits::school {
+  //
+  // Is this type an old_school type from the (C++ Standard Library)?
+  //
+  // Concept:
+  //
+  //   Specializations establish what is old_school.
+  //   The old_school types use lower case only for the subtypes.
+  //
+  //     value_type
+  //     size_type
+  //     difference_type
+  //     iterator
+  //     const_iterator
+  //
+  //   There are a finite number of old_school types.
+  //   The old_school types live at least in the C++ Standard Library.
+  //
+  // Design:
+  //
+  //   The traits allow for specialization.
+  //   However, the concept system is used to make some decent guesses.
+  //   Otherwise there are too many specializations to make and maintain
+  //
+  // Usage:
+  //
+  //   auto is_old = school::Old<std::vector<char>>;
+  //
+  namespace [[eponymous]] old {
+    // These are dectectors for the old_school names and only the old_school names.
+    template<typename CONTAINER> concept bool Value_Type = 0 != sizeof (typename CONTAINER::value_type);
+    template<typename CONTAINER> concept bool Iterator = 0 != sizeof (typename CONTAINER::iterator);
+    template<typename CONTAINER> concept bool Const_Iterator = 0 != sizeof (typename CONTAINER::const_iterator);
+    template<typename TYPE> struct Old;
+  }
+  using old::Old;
+}
+#endiv
+#divert <hpp>
+#import std.false_type
+namespace nonstd::traits::school {
+  template<typename TYPE> struct old::Old {
+    inline static constexpr bool value = Value_Type<TYPE> && (Iterator<TYPE> || Const_Iterator<TYPE>);
+  };
+}
+#endiv

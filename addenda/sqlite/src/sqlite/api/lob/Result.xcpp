@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple
+namespace sqlite {
+  namespace api {
+    namespace lob {
+      enum Lookup { ADL };
+      template<typename MEMORY, typename SIZE> using Result = std::tuple<Lookup, MEMORY, SIZE>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import std.tuple_element
+namespace sqlite {
+  namespace api {
+    namespace lob {
+      template<typename MEMORY, typename SIZE> inline auto data(Result<MEMORY, SIZE> const &) -> typename std::tuple_element<1, Result<MEMORY, SIZE>>::type;
+      template<typename MEMORY, typename SIZE> inline auto size(Result<MEMORY, SIZE> const &) -> typename std::tuple_element<2, Result<MEMORY, SIZE>>::type;
+    }
+  }
+}
+#endiv
+#divert <ipp>      
+#import std.get
+template<typename MEMORY, typename SIZE> auto sqlite::api::lob::data(Result<MEMORY, SIZE> const &thing) -> typename std::tuple_element<1, Result<MEMORY, SIZE>>::type {
+  return std::get<1>(thing);
+}
+
+template<typename MEMORY, typename SIZE> auto sqlite::api::lob::size(Result<MEMORY, SIZE> const &thing) -> typename std::tuple_element<2, Result<MEMORY, SIZE>>::type {
+  return std::get<2>(thing);
+}
+#endiv

@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.fcntl.interface
+namespace sys::posix {
+  //
+  // <quote>
+  //   In multithreaded programs, using fcntl() F_SETFD to set the close-on-exec flag at the same time 
+  //   as another thread performs a fork(2) plus execve(2) is vulnerable to a race condition that may
+  //   unintentionally leak the file descriptor to the program executed in the child process.
+  //   See the [man page] discussion of the O_CLOEXEC flag in open(2) for details and a remedy to the problem.
+  // </quote>
+  //
+  // Get the FD::CLOEXEC flag, is it on?
+  //
+  // Set the FD::CLOEXEC flag
+  //
+  namespace packaging::cloexec {
+    using namespace packaging::fcntl::interface;
+    using namespace result;
+    namespace function {
+      inline auto cloexec(File) -> Truth; // .......... get
+      inline auto cloexec(File, bool) -> Status; // ... set
+    }
+    namespace native {
+      inline auto cloexec(int fd) -> Truth;
+      inline auto cloexec(int fd, bool) -> Status;
+    }
+  }
+  using packaging::cloexec::function::cloexec;
+  namespace native { using packaging::cloexec::native::cloexec; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getfd
+#import sys.posix.setfd
+namespace sys::posix::packaging::cloexec {
+  auto function::cloexec(File fd) -> Truth                 { return native::cloexec((int) fd); }
+  auto function::cloexec(File fd, bool setpoint) -> Status { return native::cloexec((int) fd, setpoint); }
+  auto native::cloexec(int fd) -> Truth {
+    auto got = posix::native::getfd(fd);
+    return {good(got), error_num(got), FD::CLOEXEC == (value(got) & FD::CLOEXEC)};
+  }
+  auto native::cloexec(int fd, bool setpoint) -> Status {
+    auto const encoded = setpoint ? FD::CLOEXEC : ~FD::CLOEXEC;
+    return posix::native::setfd(fd, encoded);
+  }
+}
+#endiv

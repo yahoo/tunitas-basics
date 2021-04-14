@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // Constants suitable for use in flock(2)
+  //
+  // Compatibility and uniformity.
+  // We have FLOCK contra LOCK
+  //
+  // Alternatives:
+  //   struct FLOCK
+  //   struct LOCK
+  //   namespace lock
+  //
+  // Pattern:
+  //   struct-as-namespace.
+  //
+  // Usage:
+  //
+  //   auto got = flock(fd, FLOCK::SHARED);
+  //   auto got = flock(fd, FLOCK::EXCLUSIVE);
+  //   auto got = flock(fd, FLOCK::END);
+  //
+  //   auto got = flock(fd, FLOCK::SHARED | FLOCK::ADVISORY);
+  //   auto got = flock(fd, FLOCK::SHARED | FLOCK::MANDATORY);
+  //   auto got = flock(fd, FLOCK::SHARED | FLOCK::MANDATORY | FLOCK::NONBLOCK);
+  //
+  //   auto got = flock(fd, FLOCK::EXCLUSIVE, FLOCK::ADVISORY);
+  //   auto got = flock(fd, FLOCK::EXCLUSIVE, FLOCK::MANDATORY);
+  //   auto got = flock(fd, FLOCK::EXCLUSIVE, FLOCK::MANDATORY | FLOCK::NONBLOCK);
+  //
+  // Compatibility (with old naming schemes, lack of vowels, preciousness in the elision of consonants)
+  //
+  //   auto got = flock(fd, FLOCK::SH);
+  //   auto got = flock(fd, FLOCK::EX);
+  //   auto got = flock(fd, FLOCK::EN);
+  //   auto got = flock(fd, FLOCK::SH | FLOCK::MAND);
+  //   auto got = flock(fd, FLOCK::SH | FLOCK::NB);
+  //
+  struct FLOCK;
+}
+#endiv
+#divert <hpp>
+#import sys.flock.Operation
+#import sys.flock.Specification
+#import sys.flock.constants
+struct sys::posix::FLOCK {
+  using Operation = flock::Operation;
+  using Options = flock::Options;
+  // NOT mentioning ... = flock::Specification)
+  inline static constexpr auto SHARED    = flock::SHARED;
+  inline static constexpr auto EXCLUSIVE = flock::EXCLUSIVE;
+  inline static constexpr auto END       = flock::UNLOCK;
+  inline static constexpr auto ADVISORY  = flock::ADVISORY;
+  inline static constexpr auto MANDATORY = flock::MANDATORY;
+  inline static constexpr auto NONBLOCK  = flock::NONBLOCK;
+  [[deprecated("use the common form. instead, prefer FLOCK::END")]] inline static constexpr auto UNLOCK = flock::UNLOCK;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("spell it out! instead, prefer FLOCK::SHARED")]]    inline static constexpr auto SH   = flock::SH;
+  [[deprecated("spell it out! instead, prefer FLOCK::EXCLUSIVE")]] inline static constexpr auto EX   = flock::EX;
+  [[deprecated("spell it out! instead, prefer FLOCK::UNLOCK")]]    inline static constexpr auto UN   = flock::UN;
+  [[deprecated("spell it out! instead, prefer FLOCK::NONBLOCK")]]  inline static constexpr auto NB   = flock::NB;
+  [[deprecated("spell it out! instead, prefer FLOCK::MANDATORY")]] inline static constexpr auto MAND = flock::MAND;
+#pragma GCC diagnostic pop
+  FLOCK() = delete;
+  FLOCK(FLOCK const &) = delete;
+  auto operator=(FLOCK const &) -> FLOCK & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_FLOCK.Usage
+static_assert(tests::usage::posix_FLOCK::Usage<>);
+#endiv

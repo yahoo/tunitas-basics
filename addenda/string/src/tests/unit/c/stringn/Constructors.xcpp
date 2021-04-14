@@ -1,0 +1,202 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::stringn {
+  class Constructors;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.stringy.Palette
+#import std.size_t
+
+class tests::unit::c::stringn::Constructors : public cppunit::test::Fixture, stringy::Palette { 
+  using ancestor = cppunit::test::Fixture;
+public: 
+  Constructors() = default;
+
+  // unify the MI
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  auto test_default_constructor() -> void;
+  auto test_data_type_constructor() -> void;
+  auto test_manifest_array_constructor() -> void;
+  auto test_basic_string_constructor() -> void;
+  auto test_vector_constructor_consty() -> void;
+  auto test_vector_constructor_muting() -> void;
+  auto test_buffer_constructor() -> void;
+  auto test_stringn_constructor() -> void;
+  auto test_stringz_constructor_consty() -> void;
+  auto test_stringz_constructor_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import c.buffer
+#import c.const_buffer
+#import c.stringn
+#import c.const_stringn
+#import c.stringz
+#import c.const_stringz
+#import std.strlen
+#import std.cerr
+#import std.cout
+
+auto tests::unit::c::stringn::Constructors::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::stringn::Constructors::tearDown() -> void {
+  Palette::tearDown();
+}
+
+auto tests::unit::c::stringn::Constructors::test_default_constructor() -> void {
+  {
+    ::c::stringn t;
+    CPPUNIT_ASSERT(t.empty());
+  } {
+    ::c::const_stringn t;
+    CPPUNIT_ASSERT(t.empty());
+  }
+}
+
+auto tests::unit::c::stringn::Constructors::test_data_type_constructor() -> void {
+  {
+    ::c::stringn t(this->pc, std::strlen(this->pc));
+    CPPUNIT_ASSERT(!t.empty());
+    CPPUNIT_ASSERT(::std::strlen(this->pc) == t.size());
+  } {
+    ::c::const_stringn t(this->pcc, std::strlen(this->pcc));
+    CPPUNIT_ASSERT(!t.empty());
+    CPPUNIT_ASSERT(::std::strlen(this->pcc) == t.size());
+  }
+}
+
+auto tests::unit::c::stringn::Constructors::test_manifest_array_constructor() -> void {
+  {
+    ::c::stringn t(this->aNc);
+    CPPUNIT_ASSERT(!t.empty());
+    CPPUNIT_ASSERT(sizeof (this->aNc)-1 == t.size());
+  } {
+    ::c::const_stringn t(this->aNcc);
+    CPPUNIT_ASSERT(!t.empty());
+    CPPUNIT_ASSERT(sizeof (this->aNcc)-1 == t.size());
+  }
+}
+
+#import std.string
+auto tests::unit::c::stringn::Constructors::test_basic_string_constructor() -> void {
+  {
+    ::std::string raw(this->pc);
+    // CANNOT ::c::stringn t(raw); <---------- because of stringz wants a non-const pointer into raw
+    // CANNOT CPPUNIT_ASSERT(!t.empty());
+  } {
+    ::std::string raw(this->pc);
+    ::c::const_stringn t(raw);
+    CPPUNIT_ASSERT(!t.empty());
+    CPPUNIT_ASSERT_EQUAL(raw.size(), t.size());
+  }
+}
+
+#import std.vector
+auto tests::unit::c::stringn::Constructors::test_vector_constructor_muting() -> void {
+  ::std::vector<char> raw(this->pc, this->pc + 1 + std::strlen(this->pc));
+  ::c::stringn t(raw); // <-------------- test this
+  CPPUNIT_ASSERT(!t.empty());
+  ::std::cerr << "raw.size=" << raw.size() << ", t.size=" << t.size() << '\n';
+  // The t.size() will be less-equal the raw.size() because of the embedded '\0' characters, which are counted
+  CPPUNIT_ASSERT(t.size() <= raw.size());
+}
+
+auto tests::unit::c::stringn::Constructors::test_vector_constructor_consty() -> void {
+  ::std::vector<char> raw(this->pc, this->pc + 1 + std::strlen(this->pc));
+  ::c::const_stringn t(raw); // <-------------- test this
+  CPPUNIT_ASSERT(!t.empty());
+  // Which is not LENGTH because the embedded '\0' in the manifest array shorten it
+  CPPUNIT_ASSERT(::std::strlen(this->pc) == t.size());
+}
+
+#import c.buffer
+#import c.const_buffer
+auto tests::unit::c::stringn::Constructors::test_buffer_constructor() -> void {
+  {
+    ::c::buffer raw(this->aNc);
+    ::c::stringn t(raw); // <-------------- test this
+    CPPUNIT_ASSERT(!t.empty());
+    // Which is not raw.size() because the embedded '\0' in the manifest array shorten it
+    ::std::cerr << "length aNc=" << ::std::strlen(this->aNc) << ", t.size=" << t.size() << "\n";
+    CPPUNIT_ASSERT(sizeof (this->aNc)-1 == t.size());
+  } {
+    ::c::const_buffer raw(this->aNcc);
+    ::c::const_stringn t(raw); // <-------------- test this
+    CPPUNIT_ASSERT(!t.empty());
+    // Which is not raw.size() because the embedded '\0' in the manifest array shorten it
+    CPPUNIT_ASSERT(sizeof (this->aNcc)-1 == t.size());
+  }
+}
+
+#import c.stringn
+#import c.const_stringn
+auto tests::unit::c::stringn::Constructors::test_stringn_constructor() -> void {
+  {
+    ::c::stringn raw(this->aNc);
+    ::c::stringn t(raw); // <-------------- test this
+    CPPUNIT_ASSERT(!t.empty());
+    // the t.size() will be less than raw.size() because of the embedded '\0' characters, which are counted
+    CPPUNIT_ASSERT(t.size() <= raw.size());
+  } {
+    ::c::const_buffer raw(this->aNcc);
+    ::c::const_stringz t(raw); // <-------------- test this
+    CPPUNIT_ASSERT(!t.empty());
+    // Ibidem.
+    CPPUNIT_ASSERT(t.size() <= raw.size());
+  }
+}
+
+#import c.buffer
+#import c.stringz
+auto tests::unit::c::stringn::Constructors::test_stringz_constructor_muting() -> void {
+  ::c::buffer raw(this->aNc, sizeof (this->aNcc));
+  ::c::stringn t(raw); // <-------------- test this
+  CPPUNIT_ASSERT(!t.empty());
+  // The t.size() will be smaller than the raw.size() because of the embedded '\0' characters
+  CPPUNIT_ASSERT(t.size() <= raw.size());
+}
+
+#import c.const_buffer
+#import c.const_stringz
+auto tests::unit::c::stringn::Constructors::test_stringz_constructor_consty() -> void {
+  ::c::const_buffer raw(this->aNcc, sizeof (this->aNcc));
+  ::c::const_stringn t(raw); // <-------------- test this
+  CPPUNIT_ASSERT(!t.empty());
+  // Ibidem.
+  CPPUNIT_ASSERT(t.size() <= raw.size());
+}
+
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+auto tests::unit::c::stringn::Constructors::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("constructors");
+  series << call("default_constructor", &Constructors::test_default_constructor)
+         << call("data_type_constructor", &Constructors::test_data_type_constructor)
+         << call("manifest_array_constructor", &Constructors::test_manifest_array_constructor)
+         << call("basic_string_constructor", &Constructors::test_basic_string_constructor)
+         << call("vector_constructor-consty", &Constructors::test_vector_constructor_consty)
+         << call("vector_constructor-muting", &Constructors::test_vector_constructor_muting)
+         << call("buffer_constructor", &Constructors::test_buffer_constructor)
+         << call("stringn_constructor", &Constructors::test_stringn_constructor)
+         << call("stringz_constructor-consty", &Constructors::test_stringz_constructor_consty)
+         << call("stringz_constructor-muting", &Constructors::test_stringz_constructor_muting)
+    ;
+  return series.release();
+}
+#divert </cpp>

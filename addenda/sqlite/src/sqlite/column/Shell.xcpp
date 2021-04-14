@@ -1,0 +1,104 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace column {
+    class Shell;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+namespace sqlite {
+  namespace column {
+    auto operator<<(std::ostream &, Shell &&) -> std::ostream &;
+    inline auto operator<<(std::ostream &, Shell &) -> std::ostream &;
+  }
+}
+
+#import sqlite.statement.Shell
+#import sqlite.Type
+#import sqlite.api.detail.Column
+class sqlite::column::Shell {
+  // A column is a statement-and-a-column_index
+  // A column has the lifetime of the statement whence it came.
+  using statement_type = statement::Shell;
+public:
+  // ^The leftmost column is number 0; the column_index_type is an unsigned quantity, not just "an integer"
+  using column_index_type = sqlite::column_index;
+  inline Shell(statement::Shell &owner, column_index_type);
+  // copy-semantics and ... move semantics.
+  inline auto whence() -> statement::Shell &;
+  inline auto index() const -> column_index_type;
+  // Recover the type of the column
+  inline auto type() -> Type;
+  // Recover the value in the column (of the current row)
+  template<typename RESULT> inline auto get() -> typename api::detail::Column<RESULT>::result_type;
+protected:
+  // Reminder (again): a column has the lifetime of the statement whence it came.
+  // so there is no reason not to manage a column through the artifice of a pointer to its owning statement.
+  // Use a pointer so that copy & move semantics "just work"
+  statement_type *owner;
+  column_index idx;
+};
+#endiv
+#divert <ipp>
+#import sqlite.api.statement
+
+auto sqlite::column::operator<<(std::ostream &o, Shell &s) -> std::ostream & {
+  return o << std::move(s);
+}
+
+sqlite::column::Shell::Shell(statement::Shell &arg_owner, column_index_type arg_idx)
+  : owner(&arg_owner)
+  , idx(arg_idx) {
+  ;
+}
+
+auto sqlite::column::Shell::whence() -> statement::Shell & {
+  return *this->owner;
+}
+
+auto sqlite::column::Shell::index() const -> column_index_type {
+  return this->idx;
+}
+
+auto sqlite::column::Shell::type() -> Type {
+  return api::type(*this->owner, this->idx);
+}
+
+template<typename RESULT> auto sqlite::column::Shell::get() -> typename api::detail::Column<RESULT>::result_type {
+  return api::column<RESULT>(*this->owner, this->idx);
+}
+#endiv
+#divert <cpp>
+#import c.const_buffer
+#import c.const_stringz
+auto sqlite::column::operator<<(std::ostream &o, Shell &&col) -> std::ostream & {
+  switch (col.type()) {
+  case Type::UNDEFINED:
+    o << "undefined";
+    break;
+  case Type::INTEGER:
+    o << col.get<int64>();
+    break;
+  case Type::FLOAT:
+    o << col.get<double>();
+    break;
+  case Type::SQLNULL:
+    o << "NULL";
+    break;
+  case Type::TEXT:
+    // DO NOT use const_stringz here ... it won't work (there is no '\0' terminator inside sqlite)
+    o << '"' << col.get<c::const_stringn>() << '"';
+    break;
+  case Type::BLOB:
+    o << "blob{size=" << col.get<c::const_buffer>().size() << "}";
+    break;
+  default:
+    o << "?SQLite?";
+    break;
+  }
+  return o;
+}
+#endiv

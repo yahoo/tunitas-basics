@@ -1,0 +1,139 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.endian.required.Order
+#import ip.endian.required.Integer
+namespace ip::endian {
+  //
+  // Integers in
+  //   NETWORK order are big endian
+  //   HOST order are either (Intel is little endian)
+  //
+  // An Integer<ORDER, INTEGER> is merely a tagging artifice for containing an INTEGER and
+  // thereby marking which ordering obtains upon it. It doesn't provide more service than that.
+  //
+  // Usage:
+  //    Integer<Order::HOST, std::uint32_t> hosty = 99;
+  //    Integer<Order::NETWORK, std::uint32_t> netty = network_order(hosty);
+  //
+  //    Integer<Order::HOST, std::uint128_t> hosty = ...somehow...
+  //    Integer<Order::NETWORK, std::uint128_t> netty = network_order(hosty);
+  //    Integer<Order::HOST, std::uint128_t> back_again = host_order(netty);
+  //
+  template<required::Order ORDER, required::Integer INTEGER> class Integer;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace ip::endian {
+  template<typename CHAR, typename TRAITS, endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Integer<VALUE, INTEGER> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto swap(Integer<VALUE, INTEGER> &, Integer<VALUE, INTEGER> &) -> void;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator==(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator!=(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator<(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator<=(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator>(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> inline auto operator>=(Integer<VALUE, INTEGER> const &, Integer<VALUE, INTEGER> const &) -> bool;
+}
+
+#import std.swap
+namespace std {
+  using ip::endian::swap;
+}
+
+#import ip.endian.Order
+namespace ip {
+  template<endian::required::Order ORDER_VALUE, endian::required::Integer INTEGER> class endian::Integer {
+  public:
+    static constexpr auto const ORDER = ORDER_VALUE;
+    using value_type = INTEGER;
+    inline Integer();
+    inline explicit Integer(value_type);
+    template<endian::required::Order REORDER> explicit Integer(Integer<REORDER, INTEGER> const &);
+    inline operator value_type() const;
+  private:
+    value_type value;
+    // WATCHOUT [[FIXTHIS]] these should be class-scoped template-friend-definitions inside the class template.
+    // WATCHOUT - these declarations *look* like they work. But they introduce a new declaration, which matches no other definitino.
+    //   template<typename C, typename T> friend auto endian::operator<<(std::basic_ostream<C, T> &, Integer<ORDER_VALUE, INTEGER> const &) -> std::basic_ostream<C, T> &;
+    //   template<typename C, typename T> friend auto endian::operator<<(std::basic_ostream<C, T> &, Integer const &) -> std::basic_ostream<C, T> &;
+    template<typename C, typename T, endian::required::Order O, endian::required::Integer I> friend auto endian::operator<<(std::basic_ostream<C, T> &, Integer<O, I> const &) -> std::basic_ostream<C, T> &;
+    friend auto endian::swap <>(Integer &, Integer &) -> void;
+    friend auto endian::operator== <>(Integer const &, Integer const &) -> bool;
+    friend auto endian::operator< <>(Integer const &, Integer const &) -> bool;
+    friend auto endian::operator<= <>(Integer const &, Integer const &) -> bool;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.conditional
+#import std.is_same
+#import want.int128.ostream
+#import ip.endian.host_order
+namespace ip {
+  template<typename CHAR, typename TRAITS, endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Integer<VALUE, INTEGER> const &v) -> std::basic_ostream<CHAR, TRAITS> & {
+    using want::int128::operator<<;
+    using native_integer_type = typename Integer<VALUE, INTEGER>::value_type;
+    using printable_integer_type = typename std::conditional<std::is_same<native_integer_type, std::uint8_t>::value, std::uint16_t, native_integer_type>::type;
+    // Always print from the representation organized in host order.
+    // WATCHOUT - else infinite recursion.
+    // WATCHOUT - the uint8_t natively prints out as a character, not as a small integer.
+    return o << (printable_integer_type) host_order(v);
+  }
+}
+namespace ip {
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::swap(Integer<VALUE, INTEGER> &a, Integer<VALUE, INTEGER> &b) -> void {
+    std::swap(a.value, b.value);
+  }
+}
+namespace ip {
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator==(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    using native_integer_type = typename Integer<VALUE, INTEGER>::value_type;
+    // Always compare the raw values only from the host ordering; WATCHOUT - else infinite recursion.
+    return (native_integer_type) host_order(a.value) == (native_integer_type) host_order(b.value);
+  }
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator<(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    using native_integer_type = typename Integer<VALUE, INTEGER>::value_type;
+    // Always compare the raw values only from the host ordering; WATCHOUT - else infinite recursion.
+    return (native_integer_type) host_order(a.value) < (native_integer_type) host_order(b.value);
+  }
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator<=(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    using native_integer_type = typename Integer<VALUE, INTEGER>::value_type;
+    // Always compare the raw values only from the host ordering; WATCHOUT - else infinite recursion.
+    return (native_integer_type) host_order(a.value) <= (native_integer_type) host_order(b.value);
+  }
+}
+namespace ip {
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator!=(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    return !operator==(a, b);
+  }
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator>(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    return b < a;
+  }
+  template<endian::required::Order VALUE, endian::required::Integer INTEGER> auto endian::operator>=(Integer<VALUE, INTEGER> const &a, Integer<VALUE, INTEGER> const &b) -> bool {
+    return b <= a;
+  }
+}
+namespace ip::endian {
+  template<required::Order ORDER, required::Integer INTEGER> Integer<ORDER, INTEGER>::Integer()
+    : value(value_type()) {
+    ;
+  }
+  template<required::Order ORDER, required::Integer INTEGER> Integer<ORDER, INTEGER>::Integer(value_type value)
+    : value(value) {
+    ;
+  }
+}
+#import ip.endian.convert
+namespace ip::endian {
+  template<required::Order ORDER, required::Integer INTEGER> template<endian::required::Order REORDER> Integer<ORDER, INTEGER>::Integer(Integer<REORDER, INTEGER> const &other)
+    : value((INTEGER) endian::convert<ORDER>(other)) {
+    ;
+    }
+}
+namespace ip::endian {
+  template<required::Order ORDER, required::Integer INTEGER> Integer<ORDER, INTEGER>::operator value_type() const {
+    return value;
+  }
+}
+#endiv

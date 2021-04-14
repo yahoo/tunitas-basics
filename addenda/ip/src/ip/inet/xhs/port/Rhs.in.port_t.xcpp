@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in // ip::in::port_t
+#forward ip.inet.xhs.port.Rhs.declaration
+namespace ip::inet::xhs::port {
+  //
+  // Given the port value in host order (little endian)
+  // Stores the port value in network order (big endian)
+  //
+  template<> class Rhs<in::port_t>;
+}
+#endiv
+#divert <hpp>
+template<> class ip::inet::xhs::port::Rhs<ip::in::port_t> {
+public:
+  using subject_type = in::port_t;
+  inline explicit Rhs(subject_type const &); // ... assumed to be lying in a sockaddr; in network order
+  inline operator in::port_t() const; // .......... returns in host order
+protected:
+  subject_type const &subject;
+};
+#endiv
+#divert <ipp>
+#import ip.endian.Integer
+#import ip.endian.host_order
+namespace ip::inet::xhs::port {
+  Rhs<ip::in::port_t>::Rhs(subject_type const &subject)
+  : subject(subject)
+  { }
+  Rhs<ip::in::port_t>::operator in::port_t() const {
+    endian::Integer<endian::Order::NETWORK, in::port_t> norder{subject};
+    return endian::host_order(norder);
+  }
+}
+#endiv

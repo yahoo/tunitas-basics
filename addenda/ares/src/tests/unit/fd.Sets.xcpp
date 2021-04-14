@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::fd { class Sets; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.fd.Sets
+class tests::unit::fd::Sets : public cppunit::test::Fixture {
+public:
+  using Subject = ares::fd::Sets;
+  auto test_constructor() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::fd::Sets::test_constructor() -> void {
+  Subject subject;
+  // Yup, there they are.
+  CPPUNIT_ASSERT(sizeof (subject.reads));
+  CPPUNIT_ASSERT(sizeof (subject.writes));
+}
+#import rigging.suite.io
+auto tests::unit::fd::Sets::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Sets"};
+  series << call("constructor", &Sets::test_constructor)
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,97 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::slurp::file::named {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::slurp::file::named::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_read_both() -> void;
+  auto test_slurp_nothing() -> void;
+  auto test_slurp_something() -> void;
+  auto test_returnable() -> void;
+  auto test_throwable() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.file.named.read
+#import std.nothrow
+
+auto tests::unit::slurp::file::named::Fixture::test_read_both() -> void {
+  std::string specimen = "/dev/null"; // does not matter what this is
+  auto ref = ::slurp::file::named::read<std::string>(std::nothrow, specimen);
+  CPPUNIT_ASSERT(ok(ref));
+  auto xhs = ::slurp::file::named::read<std::string>(std::nothrow, std::string(specimen));
+  CPPUNIT_ASSERT(ok(xhs));
+}
+
+auto tests::unit::slurp::file::named::Fixture::test_slurp_nothing() -> void {
+  auto r = ::slurp::file::named::read<std::string>("/dev/null");
+  CPPUNIT_ASSERT("/dev/null" == name(r));
+  CPPUNIT_ASSERT(body(r).empty());
+}
+
+auto tests::unit::slurp::file::named::Fixture::test_slurp_something() -> void {
+  auto r = ::slurp::file::named::read<std::string>("/etc/group");
+  CPPUNIT_ASSERT("/etc/group" == name(r));
+  CPPUNIT_ASSERT(!body(r).empty());
+}
+
+#import std.error_code
+#import std.system_category
+#import slurp.Failure
+auto tests::unit::slurp::file::named::Fixture::test_throwable() -> void {
+  try {
+    std::error_code const ec(/*errno*/ 0, std::system_category());
+    ::slurp::Failure f(ec, "bad bad bad, very bad", "/tmp/thingy");
+    throw f;
+    CPPUNIT_ASSERT(false);
+  } catch (::slurp::Failure const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import slurp.file.named.Result
+#import std.string
+#import std.vector
+auto tests::unit::slurp::file::named::Fixture::test_returnable() -> void {
+  std::string some_filename = "/home/username/.cshrc";
+  std::string some_body_string{"peep"};
+  using adl_type = ::slurp::file::named::ADL;
+  ::slurp::file::named::Result<std::string> rs(adl_type(), some_filename, some_body_string);
+  CPPUNIT_ASSERT(!name(rs).empty());
+  CPPUNIT_ASSERT(!body(rs).empty());
+  std::vector<char> some_body_vector{'p', 'e', 'e', 'p'};
+  ::slurp::file::named::Result<std::vector<char>> vc(adl_type(), some_filename, some_body_vector);;
+  CPPUNIT_ASSERT(!name(vc).empty());
+  CPPUNIT_ASSERT(!body(vc).empty());
+}
+
+#import tests.unit.slurp.file.named.Result_syscall
+#import tests.unit.slurp.file.named.Result
+#import tests.unit.slurp.file.named.Returning
+#import tests.unit.slurp.file.named.Throwing
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::slurp::file::named::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("file");
+  s << call("nothing", &Fixture::test_slurp_something)
+    << call("something", &Fixture::test_slurp_something)
+    << call("throwable", &Fixture::test_throwable)
+    << call("returnable", &Fixture::test_returnable)
+    << add(Result_syscall::suite())
+    << add(Result::suite())
+    << add(Returning::suite())
+    << add(Throwing::suite())
+    ;
+  return s.release();
+}
+#endiv

@@ -1,0 +1,37 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+namespace c {
+  //
+  // Repare for the partial specialization of as<...>(...) against SOURCE:
+  // in the conceptual declaration
+  // 
+  //     template<typename RESULT, typename SOURCE> inline auto as(SOURCE const &) -> RESULT;
+  //
+  template<typename RESULT, typename SOURCE> inline auto as(SOURCE const &) -> RESULT;
+}
+// We want to buy all overloads variants (pretend specializations)
+// e.g. ls -1 as.*.xcpp | sed -e 's/\(.*\)\.xcpp/#import c.\1>/
+#entail c.as.RESULT.argv
+#entail c.as.RESULT.array
+#entail c.as.RESULT.basic_argv
+#entail c.as.RESULT.basic_buffer
+#entail c.as.RESULT.basic_environv
+#entail c.as.RESULT.basic_string
+#entail c.as.RESULT.basic_stringn
+#entail c.as.RESULT.basic_stringz
+#entail c.as.RESULT.buffer
+#entail c.as.RESULT.char
+#entail c.as.RESULT.environv
+#entail c.as.RESULT.pair
+#entail c.as.RESULT.stringn
+#entail c.as.RESULT.stringz
+#entail c.as.RESULT.tuple
+#entail c.as.RESULT.vector
+#endiv
+#divert <ipp>
+template<typename RESULT, typename SOURCE> auto c::as(SOURCE const &) -> RESULT {
+  static_assert(0 == sizeof (SOURCE) && 0 != sizeof (SOURCE), "specializations only (see the nearby overloads)");
+  return RESULT();
+}
+#endiv
+

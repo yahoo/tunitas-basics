@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace c {
+  namespace detail {
+    template<typename ITEM> class UnboundVector;
+  }
+}
+#entail c.detail.UnboundVector.Character
+#entail c.detail.UnboundVector.Stringz
+#divert </fpp>
+#divert <hpp>
+namespace c {
+  namespace detail {
+
+    template<typename ITEM> inline auto operator==(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+    template<typename ITEM> inline auto operator!=(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+
+    template<typename ITEM> inline auto operator<(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+    template<typename ITEM> inline auto operator<=(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+    template<typename ITEM> inline auto operator>(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+    template<typename ITEM> inline auto operator>=(UnboundVector<ITEM> const &, UnboundVector<ITEM> const &) -> bool;
+
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import std.equal
+#import std.lexicographical_compare
+
+//
+// This is syntactically the same as for BoundVector except establishment of UnboundVector<ITEM>::end()
+// is recovered by walking down the vector to find the terminating sentinel (the '\0'-character or nullptr).
+//
+
+template<typename ITEM> auto c::detail::operator==(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  return std::equal(a.begin(), a.end(), b.begin(), b.end());
+}
+
+template<typename ITEM> auto c::detail::operator!=(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  return !operator==(a, b);
+}
+
+template<typename ITEM> auto c::detail::operator<(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  auto cmp = [](typename UnboundVector<ITEM>::char_type a, typename UnboundVector<ITEM>::char_type b) {
+    return a < b;
+  };
+  return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), cmp);
+}
+
+template<typename ITEM> auto c::detail::operator<=(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  auto cmp = [](typename UnboundVector<ITEM>::char_type a, typename UnboundVector<ITEM>::char_type b) {
+    return a <= b;
+  };
+  return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), cmp);
+}
+
+template<typename ITEM> auto c::detail::operator>(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  return operator<(b, a);
+}
+
+template<typename ITEM> auto c::detail::operator>=(UnboundVector<ITEM> const &a, UnboundVector<ITEM> const &b) -> bool {
+  return operator<=(b, a);
+}
+#divert </ipp>

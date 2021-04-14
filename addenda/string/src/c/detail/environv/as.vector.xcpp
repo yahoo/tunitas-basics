@@ -1,0 +1,37 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_environv
+#import std.vector
+namespace c {
+  namespace detail {
+    namespace environv {
+      // Whereas as<...>(...) is a conversion operation,
+      // the new data invariant of environv must be respected.
+      // These throw std::invalid_argument if the element at [N] is not nullptr
+      template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR const *, ALLOC> const &) -> basic_environv<CHAR const>;
+      template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR *, ALLOC> const &) -> basic_environv<CHAR const>;
+      template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR *, ALLOC> &) -> basic_environv<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.environv
+template<typename CHAR, typename ALLOC> auto c::detail::environv::as(std::vector<CHAR const *, ALLOC> const &vec) -> basic_environv<CHAR const> {
+  enforce_terminating_nullptr_invariant(vec);
+  basic_environv<CHAR const> ret(vec.data());
+  return ret;
+}
+
+template<typename CHAR, typename ALLOC> auto c::detail::environv::as(std::vector<CHAR *, ALLOC> const &vec) -> basic_environv<CHAR const> {
+  enforce_terminating_nullptr_invariant(vec);
+  basic_environv<CHAR const> ret(vec.data());
+  return ret;
+}
+
+template<typename CHAR, typename ALLOC> auto c::detail::environv::as(std::vector<CHAR *, ALLOC> &vec) -> basic_environv<CHAR> {
+  enforce_terminating_nullptr_invariant(vec);
+  basic_environv<CHAR> ret(vec.data());
+  return ret;
+}
+#divert </ipp>

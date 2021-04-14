@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple
+#import std.string
+namespace slurp::directory::named {
+  enum class ADL { };
+  template<typename CONTAINER> using Result = std::tuple<ADL, std::string, CONTAINER>;
+}
+#entail slurp.directory.named.Result.syscall
+#endiv
+#divert <hpp>
+namespace slurp::directory::named {
+
+  template<typename CONTAINER> inline auto name(Result<CONTAINER> const &) -> std::string const &;
+  template<typename CONTAINER> inline auto entries(Result<CONTAINER> const &) -> CONTAINER const &;
+
+  template<typename CONTAINER> inline auto name(Result<CONTAINER> &&) -> std::string;
+  template<typename CONTAINER> inline auto entries(Result<CONTAINER> &&) -> CONTAINER;
+}
+#endiv
+#divert <ipp>
+#import std.get
+
+template<typename CONTAINER> auto slurp::directory::named::name(Result<CONTAINER> const &res) -> std::string const & {
+  return std::get<1>(res);
+}
+
+#import std.forward
+template<typename CONTAINER> auto slurp::directory::named::name(Result<CONTAINER> &&anon) -> std::string {
+  return std::get<1>(std::forward<Result<CONTAINER>>(anon));
+}
+
+template<typename CONTAINER> auto slurp::directory::named::entries(Result<CONTAINER> const &res) -> CONTAINER const & {
+  return std::get<2>(res);
+}
+
+#import std.forward
+template<typename CONTAINER> auto slurp::directory::named::entries(Result<CONTAINER> &&anon) -> CONTAINER {
+  return std::get<2>(std::forward<Result<CONTAINER>>(anon));
+}
+#endiv

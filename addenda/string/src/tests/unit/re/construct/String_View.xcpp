@@ -1,0 +1,185 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.required.String_View
+namespace tests::unit::re::construct {
+  template<::c::required::String_View VIEW> class String_View;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import re.string_view
+#import c.required.Character
+#import std.is_same
+namespace tests::unit::re {
+  template<::c::required::String_View VIEW> class construct::String_View : public cppunit::test::Fixture {
+  public:
+    using Subject = ::re::string_view<VIEW>;
+    using view_type = typename Subject::value_type;
+    static_assert(std::is_same<VIEW, view_type>::value, "fail");
+    using char_type = typename view_type::value_type;
+    static_assert(::c::required::Character<char_type>, "fail");
+
+    auto test_constructor_default() -> void;
+    auto test_constructor_convert_from_string_view() -> void;
+    auto test_constructor_convert_from_character_literal() -> void;
+    auto test_operator_cast() -> void;
+
+    auto test_empty() -> void;
+    auto test_size() -> void;
+    auto test_data() -> void;
+    auto test_begin_end() -> void;
+    auto test_for_loop() -> void;
+
+    auto test_operator_insert() -> void;
+
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::re::construct {
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_constructor_default() -> void {
+    Subject subject;
+    auto view = (view_type) subject; // <-------------------- test this
+    CPPUNIT_ASSERT(view.empty());
+  }
+}
+
+#import tests.unit.re.construct.Literals_Palette
+namespace tests::unit::re::construct {
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_constructor_convert_from_string_view() -> void {
+    auto specimen = Literals_Palette<char_type>::specimen();
+    view_type view(specimen);
+    Subject subject(view); // <----------------------- test this
+    auto review = (view_type) subject;
+    CPPUNIT_ASSERT(!review.empty());
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_constructor_convert_from_character_literal() -> void {
+    auto specimen = Literals_Palette<char_type>::specimen();
+    Subject subject(specimen); // <----------------------- test this
+    auto review = (view_type) subject;
+    CPPUNIT_ASSERT(!review.empty());
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_operator_cast() -> void {
+    auto specimen = Literals_Palette<char_type>::specimen();
+    Subject subject(specimen);
+    auto review = (view_type) subject; // <----------------------- test this
+    CPPUNIT_ASSERT(!review.empty());
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_empty() -> void {
+    {
+      Subject subject;
+      CPPUNIT_ASSERT(subject.empty());
+    } {
+      auto specimen = Literals_Palette<char_type>::specimen();
+      Subject subject(specimen);
+      CPPUNIT_ASSERT(!subject.empty());
+    }
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_size() -> void {
+    {
+      Subject subject;
+      CPPUNIT_ASSERT_EQUAL(0lu, subject.size());
+    } {
+      auto specimen = Literals_Palette<char_type>::specimen();
+      Subject subject(specimen);
+      CPPUNIT_ASSERT(0lu != subject.size());
+    }
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_data() -> void {
+    {
+      Subject subject;
+      CPPUNIT_ASSERT(nullptr == subject.data());
+    } {
+      auto specimen = Literals_Palette<char_type>::specimen();
+      Subject subject(specimen);
+      CPPUNIT_ASSERT(nullptr != subject.data());
+    }
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_begin_end() -> void {
+    auto specimen = Literals_Palette<char_type>::specimen();
+    Subject subject(specimen);
+    using const_iterator = typename Subject::const_iterator;
+    std::size_t count = 0;
+    for (const_iterator i(subject.begin()), e(subject.end()); e != i; ++i) {
+      ++count;
+    }
+    CPPUNIT_ASSERT_EQUAL(count, subject.size());
+    CPPUNIT_ASSERT(0 < count);
+  }
+
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_for_loop() -> void {
+    auto specimen = Literals_Palette<char_type>::specimen();
+    Subject subject(specimen);
+    std::size_t count = 0;
+    for (auto re : subject) {
+      CPPUNIT_ASSERT(0 != re || 0 < count);
+      ++count;
+    }
+    CPPUNIT_ASSERT_EQUAL(count, subject.size());
+    CPPUNIT_ASSERT(0 < count);
+  }
+}
+
+#import std.basic_ostringstream
+namespace tests::unit::re::construct {
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::test_operator_insert() -> void {
+    using ostringstream = std::basic_ostringstream<typename VIEW::value_type, typename VIEW::traits_type>;
+    using string = std::basic_string<typename VIEW::value_type, typename VIEW::traits_type>;
+    auto specimen = Literals_Palette<char_type>::specimen();
+    Subject subject(specimen);
+    ostringstream buf;
+    buf << subject; // <----------------------------- test this
+    string const actual(buf.str());
+    string const expected(specimen);
+    CPPUNIT_ASSERT(expected == actual);
+  }
+}
+
+#import std.string_literals
+#import std.type_info
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+namespace tests::unit::re::construct {
+  template<::c::required::String_View VIEW> auto String_View<VIEW>::suite() -> cppunit::Test * {
+    using namespace std::string_literals;
+    using namespace ::rigging::unit::suite;
+    Stream series("string_view<"s + typeid(VIEW).name() + ">"s);
+    {
+      Stream co("constructor");
+      co << call("default", &String_View::test_constructor_default)
+        ;
+      {
+        Stream cv("convert-from");
+        cv << call("string_view", &String_View::test_constructor_convert_from_string_view)
+           << call("character_literal", &String_View::test_constructor_convert_from_character_literal)
+          ;
+        co << add(cv.release());
+      }
+      series << add(co.release());
+    }
+    series << call("operator view_type()", &String_View::test_operator_cast)
+           << call("empty", &String_View::test_empty)
+           << call("size", &String_View::test_size)
+           << call("data", &String_View::test_data)
+           << call("begin_end", &String_View::test_begin_end)
+           << call("for_loop", &String_View::test_for_loop)
+           << call("operator<<", &String_View::test_operator_insert)
+      ;
+    return series.release();
+  }
+}
+#endiv

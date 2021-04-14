@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace argument {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::argument::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_initialization() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.argument.constants
+namespace {
+  inline auto use(options::argument::Code a) -> options::argument::Code {
+    // gratuitously "use" it.
+    return a;
+  }
+}
+
+auto tests::unit::argument::Fixture::test_initialization() -> void {
+  namespace a = options::argument;
+  a::Code single = a::NO;
+  single = use(single);
+  a::Code array[] = { a::NO, a::REQUIRED, a::OPTIONAL };
+  array[0] = use(array[0]);
+  struct Holder {
+    char const *word;
+    a::Code how;
+  } holder[] = {
+    { "no", a::NO },
+    { "required", a::REQUIRED },
+    { "optional", a::OPTIONAL },
+  };
+  holder[0].how = use(holder[0].how);
+  CPPUNIT_ASSERT(true); // yup, it compiles
+}
+
+#import tests.unit.argument.Code
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::argument::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("argument");
+  s << call("initialization", &Fixture::test_initialization)
+    << add<Code>();
+  return finalize(s);
+}
+#endiv

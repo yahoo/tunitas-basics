@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::inet { class Family; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import ip.inet.Family
+class tests::unit::ip::inet::Family : public cppunit::test::Fixture {
+public:
+  using Subject = ::ip::inet::Family;
+  auto test_type() -> void;
+  auto test_constants() -> void;
+  auto test_concept() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ip.inet.required.Family
+#import ip.inet.Family
+#import ip.inet.af.Type
+#import sys.posix.af.Type
+#import std.is_same
+#import std.is_enum
+#import std.string
+namespace tests::unit::ip::inet {
+  auto Family::test_type() -> void {
+    auto subject = Subject{};
+    static_assert(std::is_same_v<Subject, ::ip::inet::Family>);
+    static_assert(std::is_same_v<Subject, ::ip::inet::af::Type>);
+    static_assert(std::is_same_v<Subject, ::sys::af::Type>);
+    static_assert(std::is_enum_v<Subject>);
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+  auto Family::test_constants() -> void {
+#warning FIXTHIS ... make Family::UNSPECIFIED work
+#if 0
+    CPPUNIT_ASSERT(sizeof (Subject::UNSPEC));
+    CPPUNIT_ASSERT(sizeof (Subject::INET4));
+    CPPUNIT_ASSERT(sizeof (Subject::INET6));
+#endif
+  }
+  auto Family::test_concept() -> void {
+    static_assert(::ip::inet::required::Family<Subject>);
+    static_assert(!::ip::inet::required::Family<int>);
+    static_assert(!::ip::inet::required::Family<char const *>);
+    static_assert(!::ip::inet::required::Family<std::string>);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::ip::inet::Family::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Family");
+  series << call("type", &Family::test_type)
+         << call("constants", &Family::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

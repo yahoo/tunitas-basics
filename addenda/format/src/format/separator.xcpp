@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.detail.separator.Formatter
+#import format.required.Container
+#import format.required.Character
+#import format.required.Element
+#import std.size_t
+namespace format {
+  //
+  // Usage:
+  //
+  //     auto container = std::list<int>{1,2,3,4,5}
+  //
+  //     std::cout << separator(container, ' ');
+  //
+  //     std::cout << separator(container, "/");
+  //
+  //     auto const *cs = "/";
+  //     std::cout << separator(container, cs);
+  //
+  //     using namespace std::string_literals;
+  //     std::cout << separator(container, "/"s);
+  //
+  // Of course, the reference to the CONTAINER and the VALUE must last for the lifetime of the formater object
+  template<required::Container CONTAINER, required::Element SEPARATOR> inline auto separator(CONTAINER const &, SEPARATOR const &) -> detail::separator::Formatter<CONTAINER, SEPARATOR>;
+  template<required::Container CONTAINER, required::Character CHARACTER, std::size_t N> inline auto separator(CONTAINER const &, CHARACTER const (&)[N]) -> detail::separator::Formatter<CONTAINER, CHARACTER const []>;
+}
+#endiv
+#divert <ipp>
+template<format::required::Container CONTAINER, format::required::Element SEPARATOR> auto format::separator(CONTAINER const &container, SEPARATOR const &separator) -> detail::separator::Formatter<CONTAINER, SEPARATOR> {
+  return detail::separator::Formatter<CONTAINER, SEPARATOR>(container, separator);
+}
+
+template<format::required::Container CONTAINER, format::required::Character CHARACTER, std::size_t N> auto format::separator(CONTAINER const &container, CHARACTER const (&separator)[N]) -> detail::separator::Formatter<CONTAINER, CHARACTER const []> {
+  return detail::separator::Formatter<CONTAINER, CHARACTER const []>(container, separator);
+}
+#endiv

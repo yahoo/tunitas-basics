@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import format.required.Character
+#import format.detail.Match
+namespace format::detail::ifnot::traits {
+  //
+  // The traits of the types; sizing and inserting
+  //
+  template<typename VALUE> struct Operations;
+  template<required::Character CHAR, typename VALUE> struct Operations<Match<CHAR, VALUE>>;
+}
+#endiv
+#divert <hpp>
+#import format.detail.ifnot.traits.Sizer
+#import format.detail.ifnot.traits.Inserter
+namespace format::detail::ifnot {
+  template<typename VALUE> struct traits::Operations : public Sizer<VALUE>, public Inserter<VALUE> { };
+}
+
+namespace format::detail::ifnot::traits {
+  // Funny inheritance because Match inherits from Formatter, and the template system does not see that without help
+  template<required::Character CHAR, typename TYPE> struct Operations<Match<CHAR, TYPE>>
+    : public Sizer<Formatter<TYPE>>, public Inserter<Match<CHAR, TYPE>>
+  { };
+}
+#endiv
+#divert <cpp>
+#import c.stringn
+#import c.const_stringn
+#import c.stringz
+#import c.const_stringz
+#import std.optional
+#import std.string
+#import std.string_view
+#import format.detail.ifnot.expected.Operations
+namespace format::detail::ifnot::traits {
+  // test code
+  static_assert(expected::Operations<traits::Operations<int>>, "fail");
+  static_assert(expected::Operations<traits::Operations<char const *>>, "fail");
+  static_assert(expected::Operations<traits::Operations<char *>>, "fail");
+  static_assert(expected::Operations<traits::Operations<c::const_stringn>>, "fail");
+  static_assert(expected::Operations<traits::Operations<c::stringn>>, "fail");
+  static_assert(expected::Operations<traits::Operations<c::const_stringz>>, "fail");
+  static_assert(expected::Operations<traits::Operations<c::stringz>>, "fail");
+  static_assert(expected::Operations<traits::Operations<std::string>>, "fail");
+  static_assert(expected::Operations<traits::Operations<std::string_view>>, "fail");
+  static_assert(expected::Operations<traits::Operations<std::optional<int>>>, "fail");
+  static_assert(expected::Operations<traits::Operations<std::optional<std::string>>>, "fail");
+  static_assert(expected::Operations<traits::Operations<std::optional<std::string_view>>>, "fail");
+  static_assert(expected::Operations<traits::Operations<Match<char, char const *>>>, "fail");
+  static_assert(expected::Operations<traits::Operations<Match<char, c::const_stringz>>>, "fail");
+  static_assert(expected::Operations<traits::Operations<Match<char, std::string>>>, "fail");
+}
+#endiv

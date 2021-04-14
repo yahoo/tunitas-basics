@@ -1,0 +1,37 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import re.required.Swizzle2able
+namespace re::construct::detail {
+  //
+  // See Swizzle_Constructor_Arguments
+  //
+  template<required::Swizzle2able ARGUMENT> struct Construct_Begin_End;
+}
+#endiv
+#divert <hpp>
+#import std.declval
+#import std.size_t
+template<re::required::Swizzle2able ARGUMENT> struct re::construct::detail::Construct_Begin_End {
+  using unifier_type = ARGUMENT;
+  using size_type = std::size_t;
+  using value_type = typename ARGUMENT::value_type;
+  using data_type = decltype(std::declval<ARGUMENT>().data());
+  using const_data_type = decltype(std::declval<ARGUMENT const>().data());
+  using const_iterator_object = typename ARGUMENT::const_iterator;
+  using iterator_object = typename ARGUMENT::iterator;
+  using iterator_pointer = value_type const *;
+  // PASS unifier_type BY REFERENCE ONLY, DO NOT COPY
+  // for buffer<UNIFIER>
+  inline static auto first(unifier_type const &un) -> const_iterator_object { return un.begin(); }
+  inline static auto first(unifier_type &un) -> iterator_object { return un.begin(); }
+  inline static auto first(data_type data, size_type) -> iterator_pointer { return data; }
+  inline static auto second(unifier_type const &un) -> const_iterator_object { return un.end(); }
+  inline static auto second(unifier_type &un) -> iterator_object { return un.end(); }
+  inline static auto second(data_type data, size_type size) -> iterator_pointer { return data+size; }
+};
+#endiv

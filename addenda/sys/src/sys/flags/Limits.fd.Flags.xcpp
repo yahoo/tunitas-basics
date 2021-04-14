@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.declaration
+#forward sys.fd.Flags
+namespace sys::flags {
+  //
+  // The limits of the AT Flags
+  //
+  // Usage:
+  //
+  //   you know.
+  //
+  template<> struct Limits<fd::Flags>;
+}
+#endiv
+#divert <hpp>
+#import sys.fd.Flag
+namespace sys::flags {
+  template<> struct Limits<fd::Flags> : public limits::Generic<fd::Flags, fd::Flag, std::underlying_type_t<fd::Flag>, 8*sizeof (std::underlying_type_t<fd::Flag>)> { };
+}
+#endiv
+#divert <ipp>
+#import sys.fd.Flags
+#endiv

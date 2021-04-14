@@ -1,0 +1,25 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_exception_SUBSOURCES = \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Toy.cpp \
+  obj/src/tests/unit/exception/Utensil.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  obj/src/tests/unit/exception/Fixture.Palette.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.template.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.Palette.template.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.Palette.char.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.Palette.wchar_t.cpp \
+  obj/src/tests/unit/exception/Basic_Quitting.Palette.cpp \
+  obj/src/tests/unit/exception/Invalid_Datum.cpp \
+  obj/src/tests/unit/exception/Invalid_Enum.cpp \
+  obj/src/tests/unit/exception/detail.format.Fixture.cpp \
+  obj/src/tests/unit/exception/detail.format.If_Not_Null.cpp \
+  obj/src/tests/unit/exception/detail.format.If_Not_Empty.cpp \
+  obj/src/tests/unit/exception/Quitting.cpp \
+  obj/src/tests/unit/exception/Unreachable.cpp \
+  obj/src/tests/unit/exception/Unexpected.cpp \
+  obj/src/tests/unit/exception/Unimplemented.cpp \
+  obj/src/tests/unit/exception/Unimplemented.Operator.Insert.cpp \
+  $(end)

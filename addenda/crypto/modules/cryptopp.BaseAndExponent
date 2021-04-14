@@ -1,0 +1,4 @@
+// -*- c++ -*- 6a1d9798-2db9-420d-bad6-de94d8bd29c6
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/algebra.h>

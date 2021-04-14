@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include "openssl/obj_mac.h" // NID_X9_62
+namespace openssl::ec {
+  //
+  // An Elliptic Curve Group, a named group.
+  //
+  // Usage:
+  //
+  //   Group gr{group::Name::PRIME256V1};
+  //   ... this being RAII, either you got it or you're out of here...
+  //   key.set_group(std::move(gr));
+  //
+  class Group;
+  namespace group {
+    enum class Name {
+      // openssl ecparam -list_curves
+      // secp224r1 : NIST/SECG curve over a 224 bit prime field
+      // secp256k1 : SECG curve over a 256 bit prime field
+      // secp384r1 : NIST/SECG curve over a 384 bit prime field
+      // secp521r1 : NIST/SECG curve over a 521 bit prime field
+      // prime256v1: X9.62/SECG curve over a 256 bit prime field
+      PRIME256V1 = NID_X9_62_prime256v1,
+      SECP521R1 = NID_secp521r1 };
+  }
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.EC_GROUP
+class openssl::ec::Group : public managed::Pointer<EC_GROUP> {
+  using ancestor = managed::Pointer<EC_GROUP>;
+public:
+  inline explicit Group(group::Name);
+};
+#endiv
+#divert <ipp>
+#import openssl.error.Code
+#import openssl.functions
+#import std.error_code
+namespace openssl::ec {
+  Group::Group(group::Name name)
+    : ancestor{EC_GROUP_new_by_curve_name((int) name)} // [[FIXTHIS]] throws exception::Alloc on nullptr (bad curve name); instead throw something else that indicates the curve name was bad
+  { }
+}
+#endiv

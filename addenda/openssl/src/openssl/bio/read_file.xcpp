@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.bio.File
+#import sys.call.argument.Stringface
+namespace openssl::bio {
+  //
+  // Open an existing file for reading.
+  //
+  // Usage:
+  //
+  //   {
+  //     bio::File guard{bio::read_file(filepath)};
+  //     ...use the data in guard...
+  //   }
+  // 
+  namespace packaging::read_file::function {
+    using Result = File;
+    using Filepath = sys::call::argument::Stringface;
+    inline auto read_file(Filepath) -> File;
+  }
+  using packaging::read_file::function::read_file;
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import errno
+#import openssl.functions
+#import openssl.bio.File
+#import std.system_category
+#import std.system_error
+#import openssl.exception.System
+auto openssl::bio::packaging::read_file::function::read_file(Filepath filepath) -> Result {
+  Result res{BIO_new(BIO_s_file())};
+  auto ok = BIO_read_filename(res.get(), c::str(filepath));
+  if (!ok) {
+    throw exception::System{errno, std::system_category(), "read_file"};
+  }
+  return res;
+}
+#endiv

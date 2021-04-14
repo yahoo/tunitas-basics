@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Same
+#import sys.posix.packaging.wait
+#import sys.posix.required
+#import sys.id.required.process
+#import sys.id.required.wait
+namespace sys::posix::packaging::wait::required {
+  using namespace sys::posix::required; // ............. cascade the namespace required
+  using nonstd::required::Same; // ..................... many templates need this
+  namespace process = sys::id::required::process; // ... graft in
+  namespace wait = sys::id::required::wait; // ......... graft in
+}
+#endiv

@@ -1,0 +1,81 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::un::lhs {
+  //
+  // The lhs of an assignment to the 'path' field.
+  //
+  // Usage:
+  //
+  //   auto sa = un::Sockaddr{};
+  //   path(sa) = "literal";
+  //   path(sa) = "string"s;
+  //   path(sa) = "string_view"sv;
+  //   path(sa) = std::filesystem::path{"path"};
+  //
+  struct Sockaddr;
+}
+#endiv
+#divert <hpp>
+#forward sys.un.Sockaddr
+#import sys.un.path
+#import sys.un.required.Path
+#import re.string
+#import nonstd.basic_dope
+#import nonstd.required.Dopelike
+#import std.filesystem.path
+#import std.is_same
+#import std.string
+#import std.string_view
+#import c.const_stringz
+#import c.const_stringn
+class sys::un::lhs::Sockaddr final {
+  friend auto un::path(un::Sockaddr &);
+  using Lhs = un::Sockaddr;
+  inline explicit Sockaddr(Lhs &);
+public:
+  Sockaddr(Sockaddr const &) = default;
+  auto operator=(Sockaddr const &) -> Sockaddr & = default;
+  inline auto operator=(re::string<c::const_stringz>) -> Sockaddr &;
+  template<typename RHS> inline auto operator=(RHS rhs) -> Sockaddr & requires nonstd::required::Dopelike<RHS>;
+  template<typename PATH> inline auto operator=(PATH const &rhs) -> Sockaddr & requires std::is_same_v<PATH, std::filesystem::path>;
+  inline operator std::string() const;
+  template<required::Path RESULT> inline explicit operator RESULT() const; // covers when RESULT=std::filesystem::path
+private:
+  Lhs &lhs;
+  using Rhs = nonstd::basic_dope<char const>;
+  inline auto assign(Rhs rhs) -> Sockaddr &;
+};
+namespace sys::un::lhs {
+  template<> inline Sockaddr::operator c::const_stringn() const;
+  template<> inline Sockaddr::operator char const *() const;
+}
+#endiv
+#divert <ipp>
+#import std.copy
+#import std.length_error
+#import strlen
+namespace sys::un::lhs {
+  Sockaddr::Sockaddr(Lhs &lhs) : lhs{lhs} { }
+  template<typename PATH> auto Sockaddr::operator=(PATH const &rhs) -> Sockaddr & requires std::is_same_v<PATH, std::filesystem::path> { return operator=((std::string) rhs); }
+  template<typename RHS> auto Sockaddr::operator=(RHS rhs) -> Sockaddr & requires nonstd::required::Dopelike<RHS> { return assign(Rhs{rhs.data(), rhs.size()}); }
+  auto Sockaddr::operator=(re::string<c::const_stringz> rhs) -> Sockaddr & { return assign(Rhs{rhs.data(), rhs.size()}); }
+  //
+  template<required::Path RESULT> Sockaddr::operator RESULT() const { return RESULT{lhs.sun_path}; }
+  Sockaddr::operator std::string() const { return std::string{lhs.sun_path}; };
+  template<> Sockaddr::operator c::const_stringn() const { return c::const_stringn{lhs.sun_path, strlen(lhs.sun_path)}; }
+  template<> Sockaddr::operator char const *() const { return &lhs.sun_path[0]; };
+  //
+  auto Sockaddr::assign(Rhs rhs) -> Sockaddr & {
+    auto lhs_path = &lhs.sun_path[0];
+    auto const lhs_size = sizeof (lhs.sun_path)-1; // -1 for the \0 at the end
+    auto const rhs_size = rhs.size();
+    if (rhs_size > lhs_size) {
+      throw std::length_error{"sun_path"};
+    }
+    std::copy(rhs.begin(), rhs.end(), lhs_path); // DOES NOT '\0'-terminate the path.
+    lhs_path[rhs_size] = '\0';
+    return *this;
+  }
+}
+#endiv

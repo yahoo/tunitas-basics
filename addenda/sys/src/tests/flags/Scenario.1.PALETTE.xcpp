@@ -1,0 +1,242 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.flags.Scenario.declaration
+namespace tests::flags {
+  template<required::Palette PALETTE> struct Scenario<1, PALETTE>;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+namespace tests::flags {
+  template<required::Palette PALETTE> struct Scenario<1, PALETTE> : public cppunit::test::Fixture, public PALETTE {
+    using Palette = PALETTE;
+    using Flag = typename Palette::Flag;
+    using Flags = typename Palette::Flags;
+    //
+    // Unify the MI, Establish / disestablish the variables all_flags, no_flags, some_flag_series
+    auto setUp() -> void override;
+    auto tearDown() -> void override;
+    //
+    auto test_flag_universe() -> void;
+    auto test_flags_universe() -> void;
+    //
+    auto test_and_ss() -> void;
+    auto test_and_s1() -> void;
+    auto test_and_1s() -> void;
+    auto test_and_11() -> void;
+    auto test_and_assign() -> void;
+    auto test_decumulate_and_assign() -> void;
+    auto test_decumulate_via_rhs() -> void;
+    //
+    auto test_or_ss() -> void;
+    auto test_or_s1() -> void;
+    auto test_or_1s() -> void;
+    auto test_or_11() -> void;
+    auto test_or_assign() -> void;
+    auto test_accumulate_or_assign() -> void;
+    auto test_accumulate_via_rhs() -> void;
+    //
+    auto test_contains() -> void;
+    auto test_is_flag() -> void;
+    //
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <tpp>
+#import cppunit.Asserter // CPPUNIT_ASSERT
+namespace tests::flags {
+  template<required::Palette _> auto Scenario<1,_>::setUp() -> void { Palette::setUp(); }
+  template<required::Palette _> auto Scenario<1,_>::tearDown() -> void { Palette::tearDown(); }
+  template<required::Palette _> auto Scenario<1,_>::test_flag_universe() -> void {
+    unsigned count = 0;
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT((int) f != 0);
+      count++;
+    }
+    CPPUNIT_ASSERT(0 < count);
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_flags_universe() -> void {
+    unsigned count = 0;
+    Flags accumulate = Flags{};
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT((int) f != 0);
+      accumulate |= f;
+      CPPUNIT_ASSERT((int) accumulate != 0);
+      CPPUNIT_ASSERT((Flags)f == (f & accumulate));
+      count++;
+    }
+    CPPUNIT_ASSERT(0 < count);
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_and_ss() -> void {
+    for (auto f : Palette::some_flag_series) {
+      Flags fs = Flags{f};
+      CPPUNIT_ASSERT(fs == (Palette::all_flags & fs));
+      CPPUNIT_ASSERT(fs == (fs & fs));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_and_s1() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Flags{f} == (Palette::all_flags & f));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_and_1s() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Flags{f} == (f & Palette::all_flags));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_and_11() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Flags{f} == (f & f));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_and_assign() -> void {
+    for (auto f : Palette::some_flag_series) {
+      Flags fs = Palette::all_flags;
+      fs &= f;
+      CPPUNIT_ASSERT(Flags{f} == fs);
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_decumulate_and_assign() -> void {
+    Flags decumulator = Palette::all_flags;
+    for (auto f : Palette::some_flag_series) {
+      decumulator &= ~f;
+    }
+    CPPUNIT_ASSERT(0 == (int)Flags{});
+    CPPUNIT_ASSERT(decumulator == Flags{});
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_decumulate_via_rhs() -> void {
+    Flags decumulator = Palette::all_flags;
+    for (auto f : Palette::some_flag_series) {
+      decumulator = decumulator & ~f;
+    }
+    CPPUNIT_ASSERT(0 == (int)Flags{});
+    CPPUNIT_ASSERT(decumulator == Flags{});
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_or_ss() -> void {
+    for (auto f : Palette::some_flag_series) {
+      Flags fs = Flags{f};
+      CPPUNIT_ASSERT(Palette::all_flags == (Palette::all_flags | fs));
+      CPPUNIT_ASSERT(fs == (Flags{} | fs));
+      CPPUNIT_ASSERT(fs == (fs | fs));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_or_s1() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Palette::all_flags == (Palette::all_flags | f));
+      CPPUNIT_ASSERT(Flags{f} == (Flags{} | f));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_or_1s() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Palette::all_flags == (f | Palette::all_flags));
+      CPPUNIT_ASSERT(Flags{f} == (f | Flags{}));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_or_11() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(Flags{f} == (f | f));
+      CPPUNIT_ASSERT(Flags{f} == (Flags{} | f));
+      CPPUNIT_ASSERT(Flags{f} == (f | Flags{}));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_or_assign() -> void {
+    for (auto f : Palette::some_flag_series) {
+      Flags fs = Flags{};
+      fs |= f;
+      CPPUNIT_ASSERT(Flags{f} == fs);
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_accumulate_or_assign() -> void {
+    Flags accumulator = Palette::no_flags;
+    for (auto f : Palette::some_flag_series) {
+      accumulator |= f;
+    }
+    CPPUNIT_ASSERT(0 != (int)Palette::all_flags);
+    CPPUNIT_ASSERT(accumulator == Palette::all_flags);
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_accumulate_via_rhs() -> void {
+    Flags accumulator = Palette::no_flags;
+    for (auto f : Palette::some_flag_series) {
+      accumulator = accumulator | f;
+    }
+    CPPUNIT_ASSERT(0 != (int)Palette::all_flags);
+    CPPUNIT_ASSERT(accumulator == Palette::all_flags);
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_contains() -> void {
+    for (auto f : Palette::some_flag_series) {
+      CPPUNIT_ASSERT(contains(Palette::all_flags, f));
+      CPPUNIT_ASSERT(!contains(Palette::no_flags, f));
+      CPPUNIT_ASSERT(!contains(Palette::all_flags & ~f, f));
+      CPPUNIT_ASSERT(!contains(Palette::no_flags & ~f, f));
+    }
+  }
+  template<required::Palette _> auto Scenario<1,_>::test_is_flag() -> void {
+    CPPUNIT_ASSERT(!is_flag(Palette::all_flags));
+    CPPUNIT_ASSERT(!is_flag(Palette::no_flags));
+    for (auto item : Palette::some_flag_series) {
+      auto const really_is_a_flag = Flag{} != item; // the zero value is never a flag
+      Flag f = item;
+      Flags fs = Palette::template as<Flags>(f);
+      CPPUNIT_ASSERT(really_is_a_flag == is_flag(fs)); // <--- is_flag(Flags)
+      auto s2 = Palette::template as<Flags>(fs);
+      CPPUNIT_ASSERT(s2 == fs);
+    }
+  }
+}
+#import rigging.suite.io
+namespace tests::flags {
+  template<required::Palette _> auto Scenario<1,_>::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    Stream series{"Scenario.1"};
+    series << Palette::template series<Scenario>()
+           << []() {
+                Stream uni{"universe"};
+                uni << call("flag", &Scenario<1,_>::test_flag_universe)
+                    << call("flags", &Scenario<1,_>::test_flags_universe)
+                  ;
+                return move(uni);
+              }()
+           << []() {
+                Stream ann{"and"};
+                ann << call("ss", &Scenario<1,_>::test_and_ss)
+                    << call("s1", &Scenario<1,_>::test_and_s1)
+                    << call("1s", &Scenario<1,_>::test_and_1s)
+                    << call("11", &Scenario<1,_>::test_and_11)
+                    << call("assign", &Scenario<1,_>::test_and_assign)
+                  ;
+                return move(ann);
+              }()
+           << []() {
+                Stream orr{"or"};
+                orr << call("ss", &Scenario<1,_>::test_or_ss)
+                    << call("s1", &Scenario<1,_>::test_or_s1)
+                    << call("1s", &Scenario<1,_>::test_or_1s)
+                    << call("11", &Scenario<1,_>::test_or_11)
+                    << call("assign", &Scenario<1,_>::test_or_assign)
+                  ;
+                return move(orr);
+              }()
+           << []() {
+                Stream acc{"acc"};
+                acc << call("or_assign", &Scenario<1,_>::test_accumulate_or_assign)
+                    << call("via_rhs", &Scenario<1,_>::test_accumulate_via_rhs)
+                  ;
+                return move(acc);
+              }()
+           << []() {
+                Stream dec{"dec"};
+                dec << call("and_assign", &Scenario<1,_>::test_decumulate_and_assign)
+                    << call("via_rhs", &Scenario<1,_>::test_decumulate_via_rhs)
+                  ;
+                return move(dec);
+              }()
+           << call("contains", &Scenario<1,_>::test_contains)
+           << call("is_flag", &Scenario<1,_>::test_is_flag)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

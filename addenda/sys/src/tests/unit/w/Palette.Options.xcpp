@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward tests.unit.w.Palette.declaration
+#import sys.w.Options
+namespace tests::unit::w {
+  template<> class Palette<::sys::w::Options>;
+}
+#endiv
+#divert <hpp>
+#import std.vector
+template<> class tests::unit::w::Palette<::sys::w::Options> {
+protected:
+  // descendants only
+  Palette() = default;
+  ~Palette() = default;
+public:
+  virtual auto setUp() -> void;
+  virtual auto tearDown() -> void;
+  struct Subjects {
+    using Option = ::sys::w::Option;
+    using Options = ::sys::w::Options;
+  };
+  std::vector<Subjects::Options> some_flags_series;
+  Subjects::Options all_flags;
+  Subjects::Options no_flags;
+};
+#endiv
+#divert <cpp>
+#import rigging.unit.lhs
+#import rigging.unit.clear
+#import sys.w.constants
+#import sys.posix.W
+namespace tests::unit::w {
+  using rigging::unit::lhs;
+  using rigging::unit::clear;
+  auto Palette<::sys::w::Options>::setUp() -> void {
+    lhs(some_flags_series) = []() {
+                               using namespace ::sys::w::constants;
+                               std::vector<Subjects::Options> series;
+                               using ::sys::posix::W;
+                               series.push_back(W::NOHANG);
+                               series.push_back(W::UNTRACED);
+                               series.push_back(W::STOPPED);
+                               series.push_back(W::EXITED);
+                               series.push_back(W::CONTINUED);
+                               series.push_back(W::NOWAIT);
+                               return series;
+                             }();
+    lhs(no_flags) = Subjects::Options{};
+    lhs(all_flags) = Subjects::Options{::sys::w::packaging::options::ALL};
+  }
+  auto w::Palette<::sys::w::Options>::tearDown() -> void {
+    lhs(some_flags_series) = clear;
+    lhs(no_flags) = clear;
+    lhs(all_flags) = clear;
+  }
+}
+#endiv

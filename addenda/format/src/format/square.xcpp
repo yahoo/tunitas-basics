@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.detail.Match_Match
+namespace format {
+  //
+  // Usage:
+  //
+  //     std::cout << square(container)
+  //     std::cout << square(commalist(some_set));
+  //
+  // Towards mathy type matrix-vector brackets: [ a, b, c ]
+  // Adds spacing surrounding the subject
+  //
+  // Of course, the reference to the VALUE must last for the lifetime of the formatter object
+  template<typename VALUE> inline auto square(VALUE const &) -> detail::Match_Match<char, VALUE>;
+}
+#endiv
+#divert <ipp>
+template<typename VALUE> auto format::square(VALUE const &value) -> detail::Match_Match<char, VALUE> {
+  return detail::Match_Match<char, VALUE>('[', detail::Match<char, VALUE>(' ', value, ' '), ']');
+}
+#endiv

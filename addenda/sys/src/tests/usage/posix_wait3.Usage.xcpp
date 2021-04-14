@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_wait3.Usage
+//   static_assert(tests::usage::posix_wait3::Usage<>);
+//
+#import nonstd.convertible_to
+#import pid_t
+#import sys.call.result.wait.Value
+#import sys.id.Process
+#import sys.id.required.Process
+#import sys.posix.wait3
+#import sys.r.Usages
+#import sys.w.Options
+#import sys.wait.Status
+#import tests.usage.countof
+namespace tests::usage::posix_wait3 {
+  using sys::posix::wait3;
+  using sys::posix::native::wait3; // WATCHOUT - this makes some calls to wait3() ambiguous ... deal with it
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    namespace io {
+      using Options = sys::w::Options;
+      using Status = sys::wait::Status;
+      using Usages = sys::r::Usages;
+    }
+    namespace required = sys::id::required;
+    namespace result { using namespace sys::call::result::wait; }
+    namespace [[detail]] {
+      namespace [[detail]] disambiguate_function {
+        using sys::posix::wait3;
+        template<typename RETURNED> concept bool Instance = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
+          requires required::Process<RETURNED>; // ........... superclass
+          requires same_as<RETURNED, sys::id::Process>; // ... specific
+          // WATCHOUT - this is copypasta among the two disambiguation namespaces
+          { wait3() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait3(options) } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait3(options, segasu) } -> convertible_to<result::Value<RETURNED, io::Status>>;
+          { wait3(options, sutats) } -> convertible_to<result::Value<RETURNED, io::Usages>>;
+          { wait3(options, sutats, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          //
+          { wait3(options, {}, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, sutats, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, {}, {}) } -> convertible_to<result::Value<RETURNED>>;
+          //
+          { wait3({}, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3({}, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+        };
+      }
+      namespace [[detail]] disambiguate_native {
+        using sys::posix::native::wait3;
+        template<typename RETURNED> concept bool Instance = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
+          requires required::Process<RETURNED>; // ... superclass
+          requires same_as<RETURNED, pid_t>; // ...... specific
+          // WATCHOUT - this is copypasta among the two disambiguation namespaces
+          { wait3() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait3(options) } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait3(options, segasu) } -> convertible_to<result::Value<RETURNED, io::Status>>;
+          { wait3(options, sutats) } -> convertible_to<result::Value<RETURNED, io::Usages>>;
+          { wait3(options, sutats, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          //
+          { wait3(options, {}, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, sutats, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, {}, {}) } -> convertible_to<result::Value<RETURNED>>;
+          //
+          { wait3({}, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3({}, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+        };
+      }
+    }
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires disambiguate_native::Instance<pid_t>;
+      requires disambiguate_function::Instance<sys::id::Process>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

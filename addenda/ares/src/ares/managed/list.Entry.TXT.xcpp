@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.managed.list.Entry.declaration
+namespace ares::managed::list {
+  //
+  // A single TXT RR (Text)
+  //
+  // This is the (short) Text of the TXT record
+  // The (extended) Text is elsewhere, nearby
+  //
+  // Usage: see reply::Record<TXT> and managed::List<Entry<TXT>>
+  //
+  template<> struct Entry<TXT>;
+}
+#endiv
+#divert <hpp>
+#import ares.unmanaged.Structure
+#import ares.managed.list.entry.Basis
+#import ares.required.Spanlike
+#import std.string
+namespace ares::managed::list {
+  template<> struct Entry<TXT> : public entry::Basis<unmanaged::Structure<TXT>::List_Item> {
+    using ancestor = entry::Basis<unmanaged::Structure<TXT>::List_Item>; // declaring ancestor::Unmanaged
+  public:
+    inline explicit Entry(Unmanaged const *);
+    inline auto empty() const -> bool;
+    inline auto size() const -> Size; // ..... C++ traditional name
+    inline auto length() const -> Size; // ... same as size
+    inline auto txt() const -> std::string;
+    template<required::Spanlike SPANLIKE> auto host() const -> SPANLIKE;
+  };
+}
+#endiv
+#divert <ipp>
+#import strlen
+namespace ares::managed::list {
+  Entry<TXT>::Entry(Unmanaged const *un) : ancestor{un} { }
+  auto Entry<TXT>::empty() const -> bool { return 0 == unmanaged->length; }
+  auto Entry<TXT>::length() const -> Size { return unmanaged->length; }
+  auto Entry<TXT>::size() const -> Size { return unmanaged->length; }
+  auto Entry<TXT>::txt() const -> std::string {
+    return std::string{reinterpret_cast<char const *>(unmanaged->txt), unmanaged->length};
+  }
+  template<required::Spanlike SPANLIKE> auto Entry<TXT>::host() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type>(unmanaged->txt), unmanaged->length};
+  }
+}
+#endiv

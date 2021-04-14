@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ip.inet.sockaddr.Rhs.declaration
+namespace ip::inet::sockaddr {
+  template<> class Rhs<FAMILY, in4::sockaddr>;
+}
+#endiv
+#divert <hpp>
+#import ip.inet.sockaddr.Xhs.in4
+template<> class ip::inet::sockaddr::Rhs<ip::inet::sockaddr::FAMILY, ip::in4::sockaddr> : public Xhs<ip::in4::sockaddr const, IN4> {
+  using Ancestor = Xhs<ip::in4::sockaddr const, IN4>;
+public:
+  using Ancestor::Xhs;
+  inline operator Family() const { return Ancestor::get_family(); }
+};
+#endiv

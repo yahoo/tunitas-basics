@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::un::lhs {
+  //
+  // Implement assignment to sa.sun_family
+  // Which is something (probably an unsigned short)
+  // From the rvalue of an enumeration af::Enumeration of our own invention in sys::posix::af::Enumeration
+  //
+  // Usage:
+  //
+  //   auto sa = un::Sockaddr{};
+  //   family(sa) = AF::UNIX;
+  //
+  struct Family;
+}
+#endiv
+#divert <hpp>
+#import sys.un.Sockaddr
+#import sys.un.family
+#import sys.un.lhs.required.Address
+#import std.is_enum
+#import sys.af.Type
+class sys::un::lhs::Family {
+  friend auto sys::un::family(un::Sockaddr &);
+  using Lhs = un::Sockaddr;
+  inline explicit Family(Lhs &);
+  Lhs &lhs;
+  using Implementation = decltype(Lhs::sun_family);
+  using Enumeration = af::Type; // expect AF::UNIX or AF::LOCAL (but pointlessly, you may assign any other member)
+  static_assert(std::is_enum_v<Enumeration>);
+public:
+  inline operator Enumeration() const;
+  inline auto operator=(Enumeration) -> Family &;
+  template<required::Address RESULT> inline auto get() const -> RESULT;
+  template<required::Address RHS> inline auto operator=(RHS) -> Family &;
+};
+#endiv
+#divert <ipp>
+namespace sys::un::lhs {
+  Family::Family(Lhs &lhs) : lhs{lhs} { }
+  Family::operator Enumeration() const { return Enumeration{lhs.sun_family}; }
+  auto Family::operator=(Enumeration rhs) -> Family & {
+    lhs.sun_family = (Implementation) rhs;
+    return *this;
+  }
+  template<required::Address RESULT> auto Family::get() const -> RESULT { return RESULT{lhs.sun_family}; }
+  template<required::Address RHS> auto Family::operator=(RHS rhs) -> Family & {
+    lhs.sun_family = (Implementation) rhs;
+    return *this;
+  }
+}
+#endiv

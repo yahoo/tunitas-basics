@@ -1,0 +1,74 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::bio {
+  //
+  // The mode of a BIO (file)
+  // Which is *exactly* the same as stdio fopen; e.g. "w", "r", etc.
+  // But this is C++ so we also accept arguments to std::ifstream; e.g. std::in, std;:out.
+  //
+  // Usage:
+  //
+  //   auto mode = Mode{"w"};
+  //   auto mode = Mode{"r"};
+  //   auto mode = Mode{std::ios_base::out};
+  //   auto mode = Mode{"r"};
+  //
+  class Mode;
+}
+#endiv
+#divert <hpp>
+#import openssl.bio.new_file
+#import std.ios_base
+class openssl::bio::Mode {
+  friend class bio::File;
+public:
+  inline Mode();
+  Mode(char const *syntax); // throws invalid_argument on bad syntax
+  using Openmode = std::ios_base::openmode;
+  inline Mode(Openmode); // throws invalid_argument if std::ios::in, std::ios::out is not present
+protected:
+  friend auto bio::packaging::new_file::function::new_file(Filepath, Mode const &) -> Result;
+  inline auto mode() const -> char const *;
+  inline static auto const IN = std::ios_base::in;
+  inline static auto const OUT = std::ios_base::out;
+  Openmode captured_mode;
+public:
+  struct tests { struct Access; };
+  friend struct tests::Access;
+};
+#endiv
+#divert <ipp>
+namespace openssl::bio {
+  Mode::Mode()
+    : captured_mode{std::ios_base::in}
+  { }
+  Mode::Mode(Openmode mode)
+    : captured_mode{mode}
+  { }
+  auto Mode::mode() const -> char const * {
+    // Depends upon the contructor establishing IN or OUT.
+    return OUT & captured_mode ? "w" : "r";
+  }
+}
+#endiv
+#divert <cpp>
+#import openssl.exception.Argument
+namespace openssl::bio {
+  Mode::Mode(char const *syntax) {
+    if (nullptr == syntax || '\0' == syntax[0] || '\0' != syntax[1]) {
+      throw exception::Argument{"open mode"};
+    }
+    switch (syntax[0]) {
+    case 'r':
+      captured_mode = IN;
+      break;
+    case 'w':
+      captured_mode = OUT;
+      break;
+    default:
+      throw exception::Argument{"open mode"};
+    }
+  }
+}
+#endiv

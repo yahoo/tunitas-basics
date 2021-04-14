@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.tuple
+namespace ish::tuple::detail {
+  //
+  // Avoiding the cut&paste ...
+  // ... called exclusively from ish::tuple::rest(...)
+  //
+  // The expectation is that SUBJECT is one of
+  //     std::tuple<types...>
+  //     ish::tuple::Bundle<types...>
+  //
+  template<typename RESULT, typename SUBJECT, typename... TYPES> inline auto rest(SUBJECT const &) -> RESULT;
+  template<typename RESULT, typename SUBJECT, typename... TYPES> inline auto rest(SUBJECT &&) -> RESULT;
+}
+#endiv
+#divert <ipp>
+#import std.move
+template<typename RESULT, typename SUBJECT, typename... TYPES> auto ish::tuple::detail::rest(SUBJECT const &subject) -> RESULT {
+  auto copy = subject;
+  return rest<RESULT, SUBJECT, TYPES...>(std::move(copy));
+}
+
+#import std.forward
+#import std.size_t
+#import ish.tuple.Size
+#import ish.tuple.detail.rebuild.Dispatcher
+template<typename RESULT, typename SUBJECT, typename... TYPES> auto ish::tuple::detail::rest(SUBJECT &&subject) -> RESULT {
+  constexpr std::size_t const SIZE = Size<SUBJECT>::value;
+  detail::rebuild::Dispatcher<true, SIZE, 0u, TYPES...> rebuilder;
+  return rebuilder(std::forward<SUBJECT>(subject));
+}
+#endiv

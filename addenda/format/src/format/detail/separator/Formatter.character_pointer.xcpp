@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward format.detail.separator.Formatter
+#import format.required.Character
+#import format.required.Container
+namespace format::detail::separator {
+  template<required::Container CONTAINER, required::Character CHARACTER> class Formatter<CONTAINER, CHARACTER const *>;
+}
+#endiv
+#divert <hpp>
+#import format.detail.separator.State
+template<format::required::Container CONTAINER, format::required::Character CHARACTER> class format::detail::separator::Formatter<CONTAINER, CHARACTER const *> {
+public:
+  using container_type = CONTAINER;
+  using character_type = CHARACTER;
+  using separator_type = character_type const *;
+  inline Formatter(container_type const &, character_type const *);
+  inline Formatter(container_type &&, character_type const *) = delete;
+  container_type const &container;
+  // An array of unbound size, captured by value, as the address of the first element; with implicit '\0' termination.
+  separator_type separator;
+  using state_type = State<separator_type, separator_type>;
+};
+#endiv
+#divert <ipp>
+#import format.detail.separator.Formatter // contains the rest of the interface; e.g. operator<<
+
+template<format::required::Container CONTAINER, format::required::Character CHARACTER> format::detail::separator::Formatter<CONTAINER, CHARACTER const *>::Formatter(container_type const &arg_container, character_type const *arg_separator)
+  : container(arg_container)
+  , separator(arg_separator) {
+  ;
+}
+#endiv

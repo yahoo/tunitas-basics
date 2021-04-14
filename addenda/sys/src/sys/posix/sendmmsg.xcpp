@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.mmsg.interface
+namespace sys::posix {
+  namespace packaging::sendmmsg {
+    using namespace packaging::mmsg::interface;
+    //
+    // The [[in]] parameters are universal
+    // There is no timeout for the multi-send side of the pair
+    //
+    namespace function {
+      // single (false multiple)
+      inline auto sendmmsg(File, [[in]] Header<mmsghdr> const &, Flags = NONE) -> Result;
+      // (true) multiple)
+      inline auto sendmmsg(File, [[in]] Dope<mmsghdr const>, Flags = NONE) -> Result;
+      template<std::size_t N> inline auto sendmmsg(File, [[in]] Headers<mmsghdr, N> const &, Flags = NONE) -> Result;
+      inline auto sendmmsg(File, [[in]] mmsghdr const *, size::Count, Flags = NONE) -> Result;
+    }
+    namespace native {
+      // single (false multiple)
+      inline auto sendmmsg(int fd, [[in]] mmsghdr const &, Flags = NONE) -> Result;
+      // (true) multiple)
+      inline auto sendmmsg(int fd, [[in]] Dope<mmsghdr const>, Flags = NONE) -> Result;
+      template<std::size_t N> inline auto sendmmsg(int fd, [[in]] Headers<mmsghdr, N> const &, Flags = NONE) -> Result;
+      inline auto sendmmsg(int fd, [[in]] mmsghdr const *, size::Count, Flags = NONE) -> Result;
+    }
+  }
+  using packaging::sendmmsg::function::sendmmsg;
+  namespace native { using packaging::sendmmsg::native::sendmmsg; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::sendmmsg {
+  auto function::sendmmsg(File fd, Header<mmsghdr> const &buf, Flags flags) -> Result                             { return native::sendmmsg((int) fd, &buf, 1u, flags); }
+  auto function::sendmmsg(File fd, Dope<mmsghdr const> buf, Flags flags) -> Result                                { return native::sendmmsg((int) fd, buf.data(), buf.size(), flags); }
+  template<std::size_t N> auto function::sendmmsg(File fd, Headers<mmsghdr, N> const &buf, Flags flags) -> Result { return native::sendmmsg((int) fd, buf.data(), buf.size(), flags); }
+  auto function::sendmmsg(File fd, mmsghdr const *buf, size::Count len, Flags flags) -> Result                    { return native::sendmmsg((int) fd, buf, len, flags); }
+  //
+  auto native::sendmmsg(int fd, mmsghdr const &buf, Flags flags) -> Result                                     { return sendmmsg(fd, &buf, 1u, flags); }
+  auto native::sendmmsg(int fd, Dope<mmsghdr const> buf, Flags flags) -> Result                                { return sendmmsg(fd, buf.data(), buf.size(), flags); }
+  template<std::size_t N> auto native::sendmmsg(int fd, Headers<mmsghdr, N> const &buf, Flags flags) -> Result { return sendmmsg(fd, buf.data(), buf.size(), flags); }
+  auto native::sendmmsg(int fd, mmsghdr const *buf, size::Count len, Flags flags) -> Result                    { return idiomatic::syscall<size::Signed>(Syscall::SENDMMSG, fd, buf, len, (int)flags); }
+}
+#endiv

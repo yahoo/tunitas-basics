@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix {
+  //
+  // wait2(2) just the simple one.
+  //
+  // You likely want wait(2) which has all the overloadings
+  //
+  // As defined in man::wait(2)
+  //
+  //    wait(&status) <--> waitpid(-1, &wstatus, 0);
+  //
+  namespace packaging::wait2 {
+    using namespace packaging::wait::interface;
+    namespace function { using namespace bundle::wait2::function; }
+    namespace native { using namespace bundle::wait2::native; }
+  }
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::wait2 {
+  namespace function {
+    inline auto wait2() -> status::Returned;
+    inline auto wait2([[out]] status::Filled &) -> identifier::Returned;
+    inline auto wait2(status::Unfilled) -> identifier::Returned;
+  }
+  namespace native {
+    inline auto wait2() -> status::Returned;
+    inline auto wait2([[out]] status::Filled &) -> identifier::Returned;
+    inline auto wait2(status::Unfilled) -> identifier::Returned;
+  }
+}
+namespace sys::posix {
+  using packaging::wait2::function::wait2;
+  namespace native { using packaging::wait2::native::wait2; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.waitpid
+namespace sys::posix::packaging::wait2 {
+  auto function::wait2() -> status::Returned                            { return posix::waitpid(id::Process(-1)); }
+  auto function::wait2(status::Filled &sutats) -> identifier::Returned  { return posix::waitpid(id::Process(-1), sutats, Options{}); }
+  auto function::wait2(status::Unfilled sutats) -> identifier::Returned { return posix::waitpid(id::Process(-1), sutats, Options{}); }
+  auto native::wait2() -> status::Returned                            { return posix::native::waitpid(pid_t(-1)); }
+  auto native::wait2(status::Filled &sutats) -> identifier::Returned  { return posix::native::waitpid(pid_t(-1), sutats, Options{}); }
+  auto native::wait2(status::Unfilled sutats) -> identifier::Returned { return posix::native::waitpid(pid_t(-1), sutats, Options{}); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_wait2.Usage
+static_assert(tests::usage::posix_wait2::Usage<>);
+#endiv

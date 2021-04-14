@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.is.interface
+namespace sys::posix {
+  namespace packaging::is {
+    using namespace packaging::is::interface;
+    namespace function {
+      inline auto ischr(Pathname) -> bool;
+      inline auto ischr(Buffer const &) -> bool;
+      inline auto ischr(Permissions) -> bool;
+      inline auto ischr(File) -> bool;
+    }
+    namespace native {
+      inline auto ischr(int) -> bool;
+    }
+  }
+  using packaging::is::function::ischr;
+  namespace native { using packaging::is::native::ischr; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.fstat
+#import sys.posix.stat
+namespace sys::posix::packaging::is {
+  auto function::ischr(Buffer const &b) -> bool { return ischr(b.st_mode); }
+  auto function::ischr(Permissions p) -> bool { return S_ISCHR((mode_t) p); }
+  auto function::ischr(Pathname pathname) -> bool {
+    auto r = posix::stat(move(pathname));
+    return good(r) && ischr(value(r));
+  }
+  auto function::ischr(File f) -> bool {
+    auto r = posix::fstat(f);
+    return good(r) && ischr(value(r));
+  }
+  auto native::ischr(int fd) -> bool {
+    auto r = posix::native::fstat(fd);
+    return good(r) && function::ischr(value(r));
+  }
+}
+#endiv

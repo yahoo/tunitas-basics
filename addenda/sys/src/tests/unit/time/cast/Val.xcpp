@@ -1,0 +1,86 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time
+namespace tests::unit::time::cast {
+  namespace val {
+    class Val;
+    namespace library = ::sys::time;
+  }
+  using val::Val;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.time.Val
+struct tests::unit::time::cast::val::Val : public cppunit::test::Fixture {
+  auto setUp() -> void override;
+  auto tearDown() -> void override;
+  using Subject = library::Val;
+  Subject now;
+  auto test_Point() -> void;
+  auto test_Since() -> void;
+  auto test_Old() -> void;
+  auto test_Val() -> void;
+  auto test_Spec() -> void;
+  auto test_Managed() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import rigging.unit.lhs
+#import rigging.unit.clear
+#import std.chrono.system_clock
+#import sys.time.cast
+namespace tests::unit::time::cast {
+  using rigging::unit::lhs;
+  using rigging::unit::clear;
+  auto Val::setUp() -> void {
+    now = library::cast<library::Val>(std::chrono::system_clock::now());
+    CPPUNIT_ASSERT(now.tv_sec >= 1480858504l);
+  }
+  auto Val::tearDown() -> void {
+    lhs(now) = clear;
+  }
+  auto Val::test_Point() -> void {
+    auto vv = library::cast<library::Point>(now);
+    CPPUNIT_ASSERT(vv.time_since_epoch().count() >= 1493693135784282910l);
+    CPPUNIT_ASSERT(vv >= library::cast<library::Point>(library::cast<library::Since>(1480858509l)));
+  }
+  auto Val::test_Old() -> void {
+    auto vv = library::cast<library::Old>(now);
+    CPPUNIT_ASSERT(vv.t_sec >= 1480858514l);
+  }
+  auto Val::test_Since() -> void {
+    auto vv = library::cast<library::Since>(now);
+    CPPUNIT_ASSERT((long)vv >= 1480858514l);
+  }
+  auto Val::test_Val() -> void {
+    auto vv = library::cast<library::Val>(now);
+    CPPUNIT_ASSERT(vv.tv_sec >= 1480858516l);
+  }
+  auto Val::test_Spec() -> void {
+    auto vv = library::cast<library::Spec>(now);
+    CPPUNIT_ASSERT(vv.tv_sec >= 1480858511l);
+  }
+  auto Val::test_Managed() -> void {
+    auto vv = library::cast<library::Managed>(now);
+    CPPUNIT_ASSERT(vv.tm_year+1900 >= 2016);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::time::cast::Val::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  auto series = Stream{"Val"};
+  series << call("Point", &Val::test_Point)
+         << call("Since", &Val::test_Since)
+         << call("Old", &Val::test_Old)
+         << call("Val", &Val::test_Val)
+         << call("Spec", &Val::test_Spec)
+         << call("Managed", &Val::test_Managed)
+         << END;
+  return finalize(series);
+}
+#endiv

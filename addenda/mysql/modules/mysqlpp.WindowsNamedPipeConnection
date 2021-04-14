@@ -1,0 +1,3 @@
+// -*- c++ -*- 3dcb3974-28eb-4657-b233-15b74d567bf2
+#pragma once
+#include "mysql++/wnp_connection.h"

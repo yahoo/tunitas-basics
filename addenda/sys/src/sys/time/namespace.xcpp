@@ -1,0 +1,362 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys
+#import std.chrono.duration
+#import std.chrono.hours
+#import std.chrono.microseconds
+#import std.chrono.milliseconds
+#import std.chrono.minutes
+#import std.chrono.nanoseconds
+#import std.chrono.seconds
+#import std.chrono.system_clock
+#import std.chrono.time_point
+#import std.intmax_t
+#import std.ratio
+#import time_t
+#import timespec
+#import timeval
+#import timezone
+#import tm
+namespace sys {
+  namespace time {
+    // reserve the namespaces
+    namespace bounds { }
+    namespace clock { }
+    namespace detail { }
+    namespace durations { }
+    namespace periods { }
+    namespace points { }
+    namespace unix { }   // The old "C style", Unix or (g)libc 
+    namespace detail {
+      using std::intmax_t;
+    }
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace clock {
+      // We (think) we always want the system_clock
+      // But the steady_clock is best for measuring (commercial?) intervals
+      //
+      // http://en.cppreference.com/w/cpp/chrono/system_clock
+      // http://en.cppreference.com/w/cpp/chrono/steady_clock
+      //
+      // The base clock is our policy choice system or steady
+      // It has a simple name because we'll refer to it as 'clock::base' always
+      // reserve the namespace
+
+      typedef std::chrono::system_clock base;
+      typedef base::time_point point;
+      typedef base::duration duration;
+      typedef base::period period;
+    }
+
+  }
+}
+
+namespace sys {
+  namespace time {
+
+    using duration = clock::duration;
+    using point = clock::point;
+
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace periods {
+      // reserve the namespaces
+      inline namespace commerce { } // because we are *in* the commerce business
+               
+      template<detail::intmax_t NUMERATOR, detail::intmax_t DENOMINATOR = 1>
+      using base = std::ratio<NUMERATOR, DENOMINATOR>;
+
+      // Here we only support a simple "scale up" facility
+      // Just use base<N, D> (std::ratio) directly if you want ratio-based "scale down"
+      // In that eventuality, ratio_multiply<R, R> and ratio_divide<R, R> may be helpful.
+      template<detail::intmax_t K, typename PERIOD = typename std::ratio<1>>
+	using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
+
+      template<detail::intmax_t K> using nanoseconds = scale<K, std::chrono::nanoseconds::period>;
+      template<detail::intmax_t K> using microseconds = scale<K, std::chrono::microseconds::period>;
+      template<detail::intmax_t K> using milliseconds = scale<K, std::chrono::milliseconds::period>;
+      template<detail::intmax_t K> using seconds = scale<K, std::chrono::seconds::period>;
+      template<detail::intmax_t K> using minutes = scale<K, std::chrono::minutes::period>;
+      template<detail::intmax_t K> using hours = scale<K, std::chrono::hours::period>;
+      namespace clock {
+	//
+	//                             clocks        seconds
+	// [nsecval]  =  [clockval] x  -------  x  -----------
+	//                             seconds     nanoseconds
+	//
+	// Reminder: from clock(3)
+	// POSIX specifies CLOCKS_PER_SEC = 1,000,000 independent of the actual precision.
+	//
+	template<detail::intmax_t K> using ticks = std::ratio<K, CLOCKS_PER_SEC>;
+      }
+      namespace commerce {
+	// The concept of "day", "month" & "year" are only well-posed in commerce.
+	// These durations (named in the plural after the standard ones)
+	// Are fit to hold "days" or "months" or "years" (e.g. 2 years)
+	template<detail::intmax_t K> using days = scale<K, hours<24>>;
+	template<detail::intmax_t K> using weeks = scale<K, days<7>>;
+	template<detail::intmax_t K> using months = scale<K, days<30>>;
+	template<detail::intmax_t K> using years = scale<K, days<365>>;
+      }
+    }
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace durations {
+      // reserve the namespaces
+      namespace clock { }
+      inline namespace commerce { } // because we are *in* the commerce business
+      namespace fractional { }
+      namespace literals { }
+               
+      // To convert between different durations
+      //    a. duration_cast<durations::something>(source)
+      //    b. ceil<destinations::something>(source)
+      //    c. floor<destinations::something>(source)
+      //    d. round<destinations::something>(source)
+      //
+      // reminder: these give resolution in the basic duration,
+      //
+      // It's reasonable to use 'seconds' always and compute
+      // using typed time durations; e.g. time::days(1), time::months(1), time::years(1)
+      template<typename REP, typename PERIOD = typename std::ratio<1>> using base = std::chrono::duration<REP, PERIOD>;
+      typedef time::clock::duration::rep integral_type;
+      typedef time::clock::duration::period base_period;
+
+      using std::chrono::nanoseconds;
+      using std::chrono::microseconds; 
+      using std::chrono::milliseconds; 
+      using std::chrono::seconds; 
+      using std::chrono::minutes; 
+      using std::chrono::hours; 
+      namespace clock {
+	//
+	//                             clocks        seconds
+	// [nsecval]  =  [clockval] x  -------  x  -----------
+	//                             seconds     nanoseconds
+	//
+	// Reminder: from clock(3)
+	// POSIX specifies CLOCKS_PER_SEC = 1,000,000 independent of the actual precision.
+	//
+	typedef base<std::chrono::seconds::rep, periods::clock::ticks<1>> ticks;
+      }
+      namespace commerce {
+	// The concept of "day", "month" & "year" are only well-posed in commerce.
+	// These durations (named in the plural after the standard ones)
+	// Are fit to hold "days" or "months" or "years" (e.g. 2 years)
+	typedef std::chrono::duration<std::chrono::hours::rep, periods::days<1>> days;
+	typedef std::chrono::duration<std::chrono::hours::rep, periods::weeks<1>> weeks;
+	typedef std::chrono::duration<std::chrono::hours::rep, periods::months<1>> months;
+	typedef std::chrono::duration<std::chrono::hours::rep, periods::years<1>> years;
+      }
+      namespace fractional {
+	// reserve the namespaces
+	inline namespace commerce { } // because we are *in* the commerce business
+
+	// So we don't have to keep repeating these derivations "out there"
+
+	typedef double fractional_type;
+	typedef base<fractional_type, std::chrono::nanoseconds::period> nanoseconds;
+	typedef base<fractional_type, std::chrono::microseconds::period> microseconds; 
+	typedef base<fractional_type, std::chrono::milliseconds::period> milliseconds; 
+	typedef base<fractional_type, std::chrono::seconds::period> seconds; 
+	typedef base<fractional_type, std::chrono::minutes::period> minutes; 
+	typedef base<fractional_type, std::chrono::hours::period> hours; 
+                
+	namespace commerce {
+	  // Ibidem.
+	  typedef base<fractional_type, durations::commerce::days::period> days; 
+	  typedef base<fractional_type, durations::commerce::weeks::period> weeks; 
+	  typedef base<fractional_type, durations::commerce::months::period> months; 
+	  typedef base<fractional_type, durations::commerce::years::period> years; 
+	}
+      }
+      namespace literals {
+	// reserve the namespaces
+	typedef base<integral_type, base_period> integral;
+	typedef base<fractional::fractional_type, base_period> fractional;
+      }
+    }
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace periods {
+      // reserve the namespaces
+      inline namespace commerce { } // because we are *in* the commerce business
+               
+      template<detail::intmax_t NUMERATOR, detail::intmax_t DENOMINATOR = 1>
+      using base = std::ratio<NUMERATOR, DENOMINATOR>;
+
+      // Here we only support a simple "scale up" facility
+      // Just use base<N, D> (std::ratio) directly if you want ratio-based "scale down"
+      // In that eventuality, ratio_multiply<R, R> and ratio_divide<R, R> may be helpful.
+      template<detail::intmax_t K, typename PERIOD = typename std::ratio<1>>
+	using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
+
+      template<detail::intmax_t K> using nanoseconds = scale<K, std::chrono::nanoseconds::period>;
+      template<detail::intmax_t K> using microseconds = scale<K, std::chrono::microseconds::period>;
+      template<detail::intmax_t K> using milliseconds = scale<K, std::chrono::milliseconds::period>;
+      template<detail::intmax_t K> using seconds = scale<K, std::chrono::seconds::period>;
+      template<detail::intmax_t K> using minutes = scale<K, std::chrono::minutes::period>;
+      template<detail::intmax_t K> using hours = scale<K, std::chrono::hours::period>;
+      namespace clock {
+	//
+	//                             clocks        seconds
+	// [nsecval]  =  [clockval] x  -------  x  -----------
+	//                             seconds     nanoseconds
+	//
+	// Reminder: from clock(3)
+	// POSIX specifies CLOCKS_PER_SEC = 1,000,000 independent of the actual precision.
+	//
+	template<detail::intmax_t K> using ticks = std::ratio<K, CLOCKS_PER_SEC>;
+      }
+      namespace commerce {
+	// The concept of "day", "month" & "year" are only well-posed in commerce.
+	// These durations (named in the plural after the standard ones)
+	// Are fit to hold "days" or "months" or "years" (e.g. 2 years)
+	template<detail::intmax_t K> using days = scale<K, hours<24>>;
+	template<detail::intmax_t K> using weeks = scale<K, days<7>>;
+	template<detail::intmax_t K> using months = scale<K, days<30>>;
+	template<detail::intmax_t K> using years = scale<K, days<365>>;
+      }
+    }
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace points {
+      // You use resolution_cast to get between points of different resolutions
+      //
+      // points::hours h = resolution_cast<durations::hours>(clock::base::now());
+      // points::days d = resolution_cast<durations::days>(clock::base::now());
+      // points::weeks w = resolution_cast<durations::weeks>(clock::base::now());
+      //
+
+      // reserve the namespace
+      inline namespace commerce { }
+      namespace fractional { }
+
+      // alias std::chrono::time_point<CLOCK, DURATION> here as sys::time::points::base<CLOCK, DURATION>
+      template<typename CLOCK, typename DURATION = typename CLOCK::duration> using base = std::chrono::time_point<CLOCK, DURATION>;
+
+      // standard-resolution points
+      typedef base<clock::base, durations::nanoseconds> nanoseconds;
+      typedef base<clock::base, durations::microseconds> microseconds;
+      typedef base<clock::base, durations::milliseconds> milliseconds;
+      typedef base<clock::base, durations::seconds> seconds;
+      typedef base<clock::base, durations::minutes> minutes;
+      typedef base<clock::base, durations::hours> hours;
+      namespace commerce {
+	typedef base<clock::base, durations::days> days;
+	typedef base<clock::base, durations::weeks> weeks;
+	typedef base<clock::base, durations::months> months;
+	typedef base<clock::base, durations::years> years;
+      }
+      namespace fractional {
+	inline namespace commerce { }
+	// standard-resolution points
+	typedef base<clock::base, durations::fractional::nanoseconds> nanoseconds;
+	typedef base<clock::base, durations::fractional::microseconds> microseconds;
+	typedef base<clock::base, durations::fractional::milliseconds> milliseconds;
+	typedef base<clock::base, durations::fractional::seconds> seconds;
+	typedef base<clock::base, durations::fractional::minutes> minutes;
+	typedef base<clock::base, durations::fractional::hours> hours;
+	namespace commerce {
+	  typedef base<clock::base, durations::fractional::days> days;
+	  typedef base<clock::base, durations::fractional::weeks> weeks;
+	  typedef base<clock::base, durations::fractional::months> months;
+	  typedef base<clock::base, durations::fractional::years> years;
+	}
+      }
+    }
+  }
+}
+
+namespace sys {
+  namespace time {
+    namespace unix {
+      // reserve the namespaces
+
+      // Try to avoid using these directly from ::
+      // The 'poison' namespace will make sure we don't reference them within namespace sys
+      // Reminder, don't try to call this namespace 'sys', call it 'unix' whence it came
+      //     this is because sys::time::sys will frequently be ambiguous with sys::sys
+      // The APIs are available en masse via "sys/time/namespace.hpp"
+      using ::clock_t;
+      using ::tm;
+      using ::timeval;   // for microseconds
+      using ::timespec;  // for nanoseconds
+      using timezone = __struct_timezone;
+
+      //
+      // (ours)              <chrono>                "unix"             what
+      // ------------------- ----------------------  ----------------   ---------------
+      // sys::time::point    std::chrono::time_point std::time          measure since "the epoch"
+      // sys::time::duration std::chrono::duration   sys::time_offset_t a delta time, since sometime
+      //
+      using ::time_t; // the type (not the function, function could be mentioned in the *.hpp)
+      using time_off_t = time_t;  // (our invention)
+    }
+    using t = ::time_t;
+    // NOT using b = ::timeb; (milliseconds via ftime(3)
+    using val = ::timeval;
+    using spec = ::timespec;
+    using tm = ::tm;
+  }
+  namespace poison {
+    // Ensure that the "old" way is referenced only via a qualified name
+    // that explicitly has "old" in the path; e.g. sys::time::unix::XYZ 
+    // poison the data types
+    namespace standard_types_package {
+      using clock_t = void;
+      using time_offset_t = void;
+      using time_t = void;
+      using timespec = void;
+      using timezone = void;
+      using tm = void;
+    }
+    namespace standard_api_package {
+      using clock = void;
+      // but not this one (typedef void time)
+      using gettimeofday = void;
+      using gmtime_r = void;
+      using localtime_r = void;
+      using timegm = void;
+      using settimeofday = void;
+      using strftime = void;
+      using strptime = void;
+    }
+    using namespace standard_types_package;
+    // NOT using standard_api_package
+    //    - can't poison the api calls because we override some
+    //    - see sys/time/unix.hpp
+  }
+}
+
+namespace sys {
+  namespace time {
+    using t = unix::time_t;
+    using off = unix::time_off_t;
+    using spec = unix::timespec;
+    using tm = unix::tm;
+    using val = unix::timeval;
+    using zone = unix::timezone;
+    namespace clock {
+      using t = unix::clock_t;
+    }
+  }
+}
+#endiv

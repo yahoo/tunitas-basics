@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::function {
+  //
+  // A function-object endpoint of a query ... is an object capturing the (callback) function and the state.
+  // Descendants only.
+  //
+  // There is no real guarantee that these won't get "lost", so it is up to the caller to manage their lifetimes.
+  //
+  // Usage:
+  //
+  //   see Variant #3 of ares::query(...)
+  //
+  // Usage:
+  //
+  //   auto qdn = std::string{...somehow...};
+  //
+  //   template<typename STATE> class my::Function : public ares::function::Query<STATE> {
+  //     explicit Function(State &ref) : ancestor{ref} { }
+  //     auto receive(error::Code code, Count timeouts, Buffer<std::byte const> buffer) -> void final;
+  //   };
+  //
+  //   auto state = my::State{...somehow...};
+  //   auto function = my::Function<my::State>{state};
+  //
+  //   ares::query(channel, qdn, dnsclass, dnstype, function);
+  //
+  template<typename STATE> class Query;
+}
+#endiv
+#divert <hpp>
+#import ares.function.query.Basis
+template<typename STATE> class ares::function::Query : public query::Basis {
+  using ancestor = query::Basis;
+protected:
+  virtual ~Query() = default;
+public:
+  using State = STATE;
+  inline explicit Query(State &state) : state{state} { }
+  // descendants are still obliged to implement
+  //
+  //   auto receive(error::Code, Count, buffer<std::byte const>) -> void override;
+  //
+protected:
+  State &state;
+};
+#import ares.function.Query.void
+#endiv

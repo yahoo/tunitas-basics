@@ -1,0 +1,95 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::separator {
+  //
+  // We're testing
+  //        format::Separator
+  // a.k.a. format::separator::detail::State
+  //
+  class State;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::separator::State : public cppunit::test::Fixture {
+public:
+  auto test_char() -> void;
+  auto test_char_const_star() -> void;
+  auto test_string() -> void;
+  auto test_int() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import format.Separator
+#import std.ostringstream
+#import std.string
+#import std.vector
+
+auto tests::unit::format::separator::State::test_char() -> void {
+  using ::format::Separator;
+  using v = std::vector<std::string>;
+  Separator<char> sep(',');
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << sep << word;
+  }
+  std::string const actual(buf.str());
+  std::string const expected("apple,banana,cherry");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::separator::State::test_char_const_star() -> void {
+  using ::format::Separator;
+  using v = std::vector<std::string>;
+  Separator<char const *> sep("::");
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << sep << word;
+  }
+  std::string const actual(buf.str());
+  std::string const expected("apple::banana::cherry");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::separator::State::test_string() -> void {
+  using ::format::Separator;
+  using v = std::vector<std::string>;
+  Separator<std::string> sep(":!:");
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << sep << word;
+  }
+  std::string const actual(buf.str());
+  std::string const expected("apple:!:banana:!:cherry");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::separator::State::test_int() -> void {
+  using ::format::Separator;
+  using v = std::vector<int>;
+  Separator<std::string> sep(":!:");
+  std::ostringstream buf;
+  for (auto word : v{1, 2, 3}) {
+    buf << sep << word;
+  }
+  std::string const actual(buf.str());
+  std::string const expected("1:!:2:!:3");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+#import rigging.suite.io
+auto tests::unit::format::separator::State::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("State");
+  series << call("char", &separator::State::test_char)
+         << call("char const *", &separator::State::test_char_const_star)
+         << call("string", &separator::State::test_string)
+         << call("int", &separator::State::test_int)
+    ;
+  return finalize(series);
+}
+#endiv

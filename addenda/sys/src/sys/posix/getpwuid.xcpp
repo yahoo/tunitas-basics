@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.getpw
+#import sys.id.User
+#import uid_t
+namespace sys::posix {
+  //
+  // Get a password file entry, by uid
+  // Is thread safe.
+  //
+  // Usage:
+  //
+  //   uid_t some_uid{...somehow...};
+  //   auto got = getpwuid(some_uid);
+  //   if (ok(got)) {
+  //      auto ptr = value(std::move(got));
+  //      ...use ptr->pw_uid...
+  //      ...etc...
+  //   } else {
+  //      std::cerr << "could not get " << some_uid << " because " << error_code(got).message() << '\n';
+  //   }
+  //
+  inline auto getpwuid(id::User) -> packaging::getpw::Result;
+  namespace native { 
+    inline auto getpwuid(uid_t) -> packaging::getpw::Result;
+  }
+}
+#endiv
+#divert <ipp>
+auto sys::posix::getpwuid(id::User uid) -> packaging::getpw::Result { return native::getpwuid((uid_t) uid); }
+#import std.move
+#import errno
+#import getpwuid_r
+#import passwd
+auto sys::posix::native::getpwuid(uid_t uid) -> packaging::getpw::Result {
+  using namespace packaging::getpw;
+  using std::move;
+  Pointer ptr{new Buffer{}};
+  ::passwd *result{nullptr};  
+  auto r = [&ptr, uid, &result]() {
+	     auto g = ptr.get();
+	     return ::getpwuid_r(uid, g->entry(), g->data(), g->size(), &result);
+	   }();
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r && nullptr != result;
+  if (!b) {
+    ptr.reset();
+  }
+  return {move(b), move(errnum), move(ptr), move(result), move(r)};
+}
+#endiv

@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+namespace sys::posix {
+  namespace packaging::ofd_setlk {
+    using namespace packaging::lock::interface;
+    using namespace bundle::setlock;
+    namespace function {
+      [[deprecated("buy a vowel, prefer setlock(File, flock const &)")]] inline auto ofd_setlk(File, [[in]] truct::flock const &) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer setlock(File, flock const &)")]] inline auto ofd_setlk(int fd, [[in]] truct::flock const &) -> Status;
+    } 
+  }
+  using packaging::ofd_setlk::function::ofd_setlk;
+  namespace native { using packaging::ofd_setlk::native::ofd_setlk; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.setlock
+namespace sys::posix::packaging::ofd_setlk {
+  auto function::ofd_setlk(File fd, truct::flock const &lock) -> Status { return posix::setlock(fd, F::FILE, F::NOWAIT, lock); }
+  auto native::ofd_setlk(int fd, truct::flock const &lock) -> Status    { return posix::native::setlock(fd, F::FILE, F::NOWAIT, lock); }
+}
+#endiv

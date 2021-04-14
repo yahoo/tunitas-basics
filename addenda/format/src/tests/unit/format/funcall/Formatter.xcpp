@@ -1,0 +1,130 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::funcall {
+  //
+  // Testing various things but at least:
+  //
+  // format::funcall(...)
+  //
+  // format::Funcall
+  // format::funcall::State
+  //
+  class Formatter;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::funcall::Formatter : public cppunit::test::Fixture {
+public:
+  auto test_usage1() -> void;
+  auto test_constructor1() -> void;
+  auto test_constructor2() -> void;
+  auto test_constructor3() -> void;
+  auto test_operator_insert_0arg() -> void;
+  auto test_operator_insert_some1() -> void;
+  auto test_operator_insert_some2() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import format.funcall
+#import format.detail.funcall.Formatter
+#import std.ostringstream
+#import std.string
+
+auto tests::unit::format::funcall::Formatter::test_usage1() -> void {
+  using ::format::funcall;
+  std::ostringstream buf;
+  buf << funcall("strcmp", "apple", "banana");
+  std::string const actual = buf.str();
+  std::string const expected = "strcmp(apple, banana)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::format::funcall::Formatter::test_constructor1() -> void {
+  using ::format::detail::funcall::Formatter;
+  auto const *literal = "function";
+  Formatter<char const *> funcall(literal); // WATCHOUT - this takes a reference arg, DO NOT pass a literal
+  CPPUNIT_ASSERT(nullptr != funcall.name);
+}
+
+auto tests::unit::format::funcall::Formatter::test_constructor2() -> void {
+  using ::format::detail::funcall::Formatter;
+  std::string read{"read"};
+  char const *fd{"fd"};
+  char const *buffer{"buffer"};
+  char const *size{"size"};
+  Formatter<std::string, char const *, char const *, char const *> funcall{read, fd, buffer, size}; // WATCHOUT - this takes a reference arg, DO NOT pass a literal
+  CPPUNIT_ASSERT(!funcall.name.empty());
+  CPPUNIT_ASSERT(nullptr != std::get<0>(funcall.arguments.value));
+  CPPUNIT_ASSERT(nullptr != std::get<1>(funcall.arguments.value));
+  CPPUNIT_ASSERT(nullptr != std::get<2>(funcall.arguments.value));
+}
+
+auto tests::unit::format::funcall::Formatter::test_constructor3() -> void {
+  using ::format::detail::funcall::Formatter;
+  std::string read{"read"};
+  auto one{1};
+  const char *buf{"&buf[0]"};
+  auto size{99lu};
+  Formatter<std::string, int, char const *, std::size_t> funcall{read, one, buf, size}; // WATCHOUT - this takes a reference arg, DO NOT pass a literal
+  CPPUNIT_ASSERT(!funcall.name.empty());
+  CPPUNIT_ASSERT(1 == std::get<0>(funcall.arguments.value));
+  CPPUNIT_ASSERT(nullptr != std::get<1>(funcall.arguments.value));
+  CPPUNIT_ASSERT(99lu == std::get<2>(funcall.arguments.value));
+}  
+
+auto tests::unit::format::funcall::Formatter::test_operator_insert_0arg() -> void {
+  std::ostringstream buf;
+  char const *getpid{"getpid"};
+  ::format::detail::funcall::Formatter<char const *> funcall{getpid}; // WATCHOUT - this takes a reference arg, DO NOT pass a literal
+  buf << funcall;
+  std::string const actual = buf.str();
+  std::string const expected = "getpid()";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::funcall::Formatter::test_operator_insert_some1() -> void {
+  std::ostringstream buf;
+  char const *read{"read"};
+  char const *fd{"fd"};
+  char const *buffer{"buffer"};
+  char const *size{"size"};
+  ::format::detail::funcall::Formatter<char const *, char const *, char const *, char const *> funcall{read, fd, buffer, size}; // WATCHOUT - this takes a reference arg, DO NOT pass a literal
+  buf << funcall;
+  std::string const actual = buf.str();
+  std::string const expected = "read(fd, buffer, size)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::funcall::Formatter::test_operator_insert_some2() -> void {
+  std::ostringstream buf;
+  std::string read{"read"};
+  int  fd{1};
+  char const *buffer{"&buf[0]"};
+  std::size_t size{99};
+  ::format::detail::funcall::Formatter<std::string, int, char const *, std::size_t> funcall(read, fd, buffer, size);
+  buf << funcall;
+  std::string const actual = buf.str();
+  std::string const expected = "read(1, &buf[0], 99)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+#import rigging.suite.io
+auto tests::unit::format::funcall::Formatter::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Formatter");
+  series << call("usage-1", &Formatter::test_usage1)
+         << call("constructor-1", &Formatter::test_constructor1)
+         << call("constructor-2", &Formatter::test_constructor2)
+         << call("constructor-3", &Formatter::test_constructor3)
+         << call("operator<<-0arg", &Formatter::test_operator_insert_0arg)
+         << call("operator<<_some1", &Formatter::test_operator_insert_some1)
+         << call("operator<<_some2", &Formatter::test_operator_insert_some1)
+    ;
+  return finalize(series);
+}
+#endiv

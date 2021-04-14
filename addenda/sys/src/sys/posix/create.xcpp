@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.open.interface
+namespace sys::posix {
+  namespace packaging::create {
+    using namespace packaging::open::interface;
+    namespace function {
+      using Result = result::Single<id::File>;
+      inline auto create(Pathname, Permissions) -> Result;
+    }
+    namespace native {
+      using Result = result::Single<int>;
+      inline auto create(Pathname, Permissions) -> Result;
+    }
+  }
+  using packaging::create::function::create;
+  namespace native { using packaging::create::native::create; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::create {
+  auto function::create(Pathname pathname, Permissions perms) -> Result { return idiomatic::syscall<id::File>(Syscall::CREAT, (char const *)pathname, (mode_t)perms); }
+  auto native::create(Pathname pathname, Permissions perms) -> Result   { return idiomatic::syscall<int>(Syscall::CREAT, (char const *)pathname, (mode_t)perms); }
+}
+#endiv

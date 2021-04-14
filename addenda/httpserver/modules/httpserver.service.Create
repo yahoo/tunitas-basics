@@ -1,0 +1,6 @@
+// -*- c++ -*- 93a0cba4-df17-414c-9f2e-7f4228364f08
+#pragma once
+#include <httpserver> // WATCHOUT - httpserver::webserver is the name of the underlying class(!)
+namespace httpserver::service {
+  using Create = httpserver::create_webserver;
+}

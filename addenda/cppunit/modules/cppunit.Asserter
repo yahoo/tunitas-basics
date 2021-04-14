@@ -1,0 +1,6 @@
+// -*- c++ -*- 5f2894b0-d6f5-4b27-a89d-827774f7f83d
+#pragma once
+#include <cppunit/Asserter.h>
+namespace cppunit {
+  using CppUnit::Asserter;
+}

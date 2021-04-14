@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+#import std.string_view
+namespace tests::query { }
+#endiv
+#divert <hpp>
+#import std.string_literals
+#import std.string_view_literals
+#import std.chrono_literals
+#import std.cerr
+namespace tests::query {
+  using namespace std::literals;
+  // WATCHOUT - add a timeout or if you miss an answer packet, you hang waiting forever
+  inline constexpr auto REASONABLE_TIMEOUT = 1s; // you're running unit tests on a lan
+}
+// Every single query main(...) will need all of these
+#import ares.Buffer
+#import ares.Channel
+#import ares.channel.Guard
+#import ares.Count
+#import ares.dns.type.constants
+#import ares.dns.class.constants
+#import ares.error.Code
+#import ares.key
+#import ares.Library
+#import ares.process
+#import ares.query
+#import ares.reply.parse
+#import ares.reply.Record
+#import ares.select
+#import ares.selectable
+#import ares.timeout
+#import c.argv
+#import c.rest
+#import format.q
+#import std.cerr
+#import std.cout
+#import std.string
+#import std.error_code
+#import sys.exits.constants
+#endiv

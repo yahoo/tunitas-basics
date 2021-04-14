@@ -1,0 +1,4 @@
+// -*- c++ -*- 5326b1f2-22f4-4101-9a92-cfbd3c940b15
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/serpent.h>

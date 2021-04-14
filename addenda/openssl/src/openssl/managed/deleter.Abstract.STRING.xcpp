@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.managed.deleter.Abstract
+#import openssl.types // ASN1_STRING
+namespace openssl::managed::deleter {
+  //
+  // Delete an ANS1_STRING
+  //
+  template<> struct Abstract<ASN1_STRING, Usage::STRING>;
+}
+#endiv
+#divert <hpp>
+namespace openssl::managed::deleter {
+  template<> struct Abstract<ASN1_STRING, Usage::STRING> {
+    using Value = ASN1_STRING;
+    inline auto operator()(Value *) const -> void;
+  };
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+namespace openssl::managed::deleter {
+  auto Abstract<ASN1_STRING, Usage::STRING>::operator()(Value *value) const -> void {
+    if (value) {
+      ASN1_STRING_free(value);
+    }
+  }
+}
+#endiv

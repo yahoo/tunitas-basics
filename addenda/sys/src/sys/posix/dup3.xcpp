@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.dup.interface
+namespace sys::posix {
+  namespace packaging::dup3 {
+    using namespace packaging::dup::interface;
+    namespace function {
+      inline auto dup3(File oldfd, File newfd, fd::Flags) -> Result<File>;
+      inline auto dup3(File oldfd, File newfd, o::Flags) -> Result<File>;
+    }
+    namespace native {
+      inline auto dup3(int oldfd, int newfd, fd::Flags) -> Result<int>;
+      inline auto dup3(int oldfd, int newfd, o::Flags) -> Result<int>;
+    }
+  }
+  using packaging::dup3::function::dup3;
+  namespace native { using packaging::dup3::native::dup3; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.dup
+namespace sys::posix::packaging::dup3 {
+  auto function::dup3(File oldfd, File newfd, fd::Flags flags) -> Result<File> { return posix::dup(oldfd, newfd, flags); }
+  auto function::dup3(File oldfd, File newfd, o::Flags flags) -> Result<File>  { return posix::dup(oldfd, newfd, flags); }
+  auto native::dup3(int oldfd, int newfd, fd::Flags flags) -> Result<int>      { return posix::native::dup(oldfd, newfd, flags); }
+  auto native::dup3(int oldfd, int newfd, o::Flags flags) -> Result<int>       { return posix::native::dup(oldfd, newfd, flags); }
+}
+#endiv

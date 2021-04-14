@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::fd {
+  // For convenience, each is a standalone constant.
+  // They are bundled in a namespace for easy import elsewhere.
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.fd.Flag
+#import sys.fd.Flags
+namespace sys::fd::constants {
+  inline constexpr auto NONE    = Flags{Flag::NONE};
+  inline constexpr auto CLOEXEC = Flags{Flag::CLOEXEC};
+}
+#endiv

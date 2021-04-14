@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sqlite3.h> // for various typedefs, that is all
+namespace sqlite {
+  namespace c89 {
+    // nomenclature from <sqlite3.h>
+
+    // yuk: SQLite, being a "C" interface, uses approximations
+
+    // blobs are totally opaque (which is not true, they have a length in bytes)
+    using binary = void;         // in lieu of something sized with 8-bits
+
+    // of UTF-8 and UTF-16
+    using utf16 = void;         // in lieu of wchar_t
+    using utf8 = char unsigned; // in lieu of char
+
+    // used in & around the management of user-defined functions.
+    using Func = void (*)(::sqlite3_context *, int, ::sqlite3_value **);
+    using Step = void (*)(::sqlite3_context *, int, ::sqlite3_value **);
+    using Final = void (*)(::sqlite3_context *);
+    using Destroy = void (*)(void *);
+
+    // SQLITE_CONFIG_SQLLOG
+    // see the commentariat in <sqlite3.h> for the interpretation of the Log arguments,
+    using Log = void (*)(void *,int, char const *);
+
+    // SQLITE_CONFIG_SQLLOG
+    // see the commentariat in <sqlite3.h> for the interpretation of the Sqllog arguments,
+    // and (apparently) the example usage in test_sqllog.c within the sqlite3 source distro.
+    using Sqllog = void (*)(void *, ::sqlite3 *, char const *, int);
+  }
+}
+#endiv

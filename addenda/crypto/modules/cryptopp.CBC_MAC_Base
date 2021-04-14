@@ -1,0 +1,4 @@
+// -*- c++ -*- 6fa540d4-c5a6-4a14-9a98-338dcb555c2e
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/cbcmac.h>

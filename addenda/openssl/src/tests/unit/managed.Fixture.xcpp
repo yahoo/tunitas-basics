@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::managed { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::managed::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Pointer() -> void;
+  template<typename TYPE> auto test_Deleter() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  template<typename TYPE> struct Maker;
+  template<typename TYPE> struct Something;
+};
+#endiv
+#divert <tpp>
+#import openssl.managed.Deleter.EC_KEY
+#import openssl.managed.Deleter.EC_GROUP
+#import openssl.managed.Deleter.EVP_PKEY
+#import openssl.managed.Deleter.X509_CRT
+#import openssl.managed.Deleter.X509_REQ
+#import tests.unit.managed.Fixture.Maker
+template<typename TYPE> auto tests::unit::managed::Fixture::test_Deleter() -> void {
+  ::openssl::managed::Deleter<TYPE> deleter;
+  deleter(nullptr); // <---- test required to ignore nullptr;
+  Maker<TYPE> maker;
+  deleter(maker()); // <---- test the roundtrip make & delete
+}
+#endiv
+#divert <cpp>
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.BIO
+#import tests.unit.managed.Fixture.Something
+auto tests::unit::managed::Fixture::test_Pointer() -> void {
+  Something<BIO> subject0{BIO_new(BIO_s_mem())};
+  Something<BIO> subject1{BIO_new(BIO_s_mem())};
+  swap(subject0, subject1); // <------------- test this
+}
+#import openssl.types
+#import rigging.suite.io
+auto tests::unit::managed::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("managed");
+  series << call("Pointer", &Fixture::test_Pointer)
+    ;
+  {
+    Stream poi("pointer");
+    poi << call("EC_KEY", &Fixture::test_Deleter<EC_KEY>)
+        << call("EC_GROUP", &Fixture::test_Deleter<EC_GROUP>)
+        << call("EVP_PKEY", &Fixture::test_Deleter<EVP_PKEY>)
+        << call("X509_CRT", &Fixture::test_Deleter<openssl::X509_CRT>)
+        << call("X509_REQ", &Fixture::test_Deleter<X509_REQ>)
+      ;
+    series << move(poi);
+  }
+  return finalize(series);
+}
+#endiv

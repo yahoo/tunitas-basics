@@ -1,0 +1,8 @@
+// -*- c++ -*- 0869de67-ec37-4d5d-94f0-ddfa8b52cdf7
+#pragma once
+#include <cppunit/TestCase.h>
+namespace cppunit {
+  namespace test {
+    using Case = CppUnit::TestCase;
+  }
+}

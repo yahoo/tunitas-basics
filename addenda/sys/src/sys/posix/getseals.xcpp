@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.seals.interface
+namespace sys::posix {
+  //
+  // Prefer posix::get_seals(...)
+  //
+  // <pesky>
+  //   This variant of the fcntl(2) series contains an underscore in the name 
+  //   This interface is available because ... why not.   But the underscore variant (add_seals) is preferred
+  // </pesky>
+  //
+  namespace packaging::getseals {
+    using namespace packaging::seals::interface;
+    using namespace bundle::get_seals;
+    namespace function {
+      [[deprecated("when to use the underscore? prefer get_seals(File)")]] inline auto getseals(File) -> Returned;
+      [[deprecated("when to use the underscore? prefer get_seals(File, Seals &)")]] inline auto getseals(File, [[out]] Argument &) -> Status;
+    } 
+    namespace native {
+      [[deprecated("when to use the underscore? prefer get_seals(File)")]] inline auto getseals(int fd) -> Returned;
+      [[deprecated("when to use the underscore? prefer get_seals(File, Seals &)")]] inline auto getseals(int fd, [[out]] Argument &) -> Status;
+    } 
+  }
+  using packaging::getseals::function::getseals;
+  namespace native { using packaging::getseals::native::getseals; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.get_seals
+namespace sys::posix::packaging::getseals {
+  auto function::getseals(File fd) -> Returned              { return posix::get_seals(fd); }
+  auto function::getseals(File fd, Argument &arg) -> Status { return posix::get_seals(fd, arg); }
+  //
+  auto native::getseals(int fd) -> Returned              { return posix::native::get_seals(fd); }
+  auto native::getseals(int fd, Argument &arg) -> Status { return posix::native::get_seals(fd, arg); }
+}
+#endiv

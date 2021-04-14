@@ -1,0 +1,104 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import re.required.Bufferlike
+namespace re::construct {
+  //
+  // A (more buffer-like) Core
+  // ... adds the common buffer-like operations
+  //
+  template<required::Bufferlike UNIFIER> class Buffery;
+}
+#endiv
+#divert <hpp>
+#import c.basic_buffer
+#import c.basic_stringn
+#import c.basic_stringz
+#import re.construct.Core
+#import re.construct.enable.Buffery
+#import re.required.Swizzle2able
+#import std.enable_if
+#import std.size_t
+#import std.string
+#import std.string_view
+#import std.vector
+#import re.construct.detail.Swizzle_Constructor_Arguments
+namespace re {
+  template<required::Bufferlike UNIFIER> class construct::Buffery : public Core<UNIFIER> {
+    using ancestor = Core<UNIFIER>;
+  protected:
+    ~Buffery() = default; // still descendants only
+  public:
+    //
+    // All are implicit conversions.
+    //
+    // Either copy into the string or accept the managed pointer.
+    Buffery() = default;
+    // for buffer, typename ancestor::value_type
+    // (recall for string), it is always const
+    inline Buffery(typename ancestor::descendant_constructor_data_pointer_maybe_consty_argument_type, std::size_t);
+    template<required::Swizzle2able OTHER, typename = typename std::enable_if<enable::Buffery<OTHER>::value, void>::type> Buffery(OTHER &&);
+    template<required::Swizzle2able OTHER, typename = typename std::enable_if<enable::Buffery<OTHER>::value, void>::type> Buffery(OTHER &);
+    template<required::Swizzle2able OTHER, typename = typename std::enable_if<enable::Buffery<OTHER>::value, void>::type> Buffery(OTHER const &);
+    inline explicit operator c::const_buffer() const;
+    inline explicit operator c::const_stringn() const = delete; // this is never safe
+    inline explicit operator std::string_view() const;
+    inline explicit operator std::vector<char>() const;
+    // These must still be implemented in the descendant
+    operator std::string() const = delete;
+    auto back() const -> typename ancestor::value_type = delete;
+  private:
+    //
+    // Nasty: the argument order of the constructors is inverted
+    //    UNIFIER c::buffer         -> c::buffer(std:size_t size, char *data) <----------------------------- mutatable datable bytes
+    //    UNIFIER c::const_buffer   -> c::const_buffer(std:size_t size, char const *data)
+    //    UNIFIER c::stringn        -> c::stringn(char *data, std:size_t size) <---------------------------- ibidem
+    //    UNIFIER c::const_stringn  -> c::const_stringn(char const *data, std:size_t size);
+    //    UNIFIER std::string       -> std::string(char const *data, std::size_t)
+    //    UNIFIER std::vector<char> -> std::vector(char const *data, std::size_t)
+    //
+    using swizzle = detail::Swizzle_Constructor_Arguments2<UNIFIER>;
+    template<required::Swizzle2able OTHER> using swozzle = detail::Swizzle_Constructor_Arguments2<UNIFIER, OTHER>;
+  };
+}
+#endiv
+#divert <ipp>
+namespace re::construct {
+  template<required::Bufferlike UNIFIER> Buffery<UNIFIER>::Buffery(typename ancestor::descendant_constructor_data_pointer_maybe_consty_argument_type data, std::size_t size)
+    : ancestor(typename ancestor::unifier_type(swizzle::first(data, size), swizzle::second(data, size))) {
+    ;
+  }
+}
+
+#import std.forward
+namespace re::construct {
+  template<required::Bufferlike UNIFIER> template<required::Swizzle2able OTHER, typename> Buffery<UNIFIER>::Buffery(OTHER &&other)
+    : ancestor(typename ancestor::unifier_type(swozzle<OTHER>::first(/*DO NOT FORWARD*/other), swozzle<OTHER>::second(/*DO NOT FORWARD*/other))) {
+    ;
+  }
+  template<required::Bufferlike UNIFIER> template<required::Swizzle2able OTHER, typename> Buffery<UNIFIER>::Buffery(OTHER &other)
+    : ancestor(typename ancestor::unifier_type(swozzle<OTHER>::first(other), swozzle<OTHER>::second(other))) {
+    ;
+  }
+  template<required::Bufferlike UNIFIER> template<required::Swizzle2able OTHER, typename> Buffery<UNIFIER>::Buffery(OTHER const &other)
+    : ancestor(typename ancestor::unifier_type(swozzle<OTHER>::first(other), swozzle<OTHER>::second(other))) {
+    ;
+  }
+}
+
+namespace re::construct {
+  template<required::Bufferlike UNIFIER> Buffery<UNIFIER>::operator c::const_buffer() const {
+    return c::const_buffer(ancestor::unifier.size(), ancestor::unifier.data());
+  }
+  template<required::Bufferlike UNIFIER> Buffery<UNIFIER>::operator std::string_view() const {
+    return std::string_view(ancestor::unifier.data(), ancestor::unifier.size());
+  }
+  template<required::Bufferlike UNIFIER> Buffery<UNIFIER>::operator std::vector<char>() const {
+    return std::vector<char>(ancestor::unifier.begin(), ancestor::unifier.end());
+  }
+}
+#endiv

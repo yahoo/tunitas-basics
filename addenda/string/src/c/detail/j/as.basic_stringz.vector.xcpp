@@ -1,0 +1,28 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringz
+#import std.vector
+namespace c { 
+  namespace detaik {
+    // Whereas as<...>(...) is a conversion operation,
+    // the new data invariant of stringz must be respected.
+    // These throw std::invalid_argument if the element at or before [N] is not '\0'
+    template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR const, ALLOC> const &) -> basic_stringz<CHAR const>;
+    template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR, ALLOC> const &) -> basic_stringz<CHAR>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.stringz
+template<typename CHAR, typename ALLOC> auto c::detail::as(std::vector<CHAR const, ALLOC> const &vec) -> basic_stringz<CHAR const> {
+  stringz::enforce_terminating_nulchar_invariant(vec);
+  basic_stringz<CHAR const> ret(vec.data());
+  return ret;
+}
+
+template<typename CHAR, typename ALLOC> auto c::detail::as(std::vector<CHAR, ALLOC> const &vec) -> basic_stringz<CHAR> {
+  stringz::enforce_terminating_nulchar_invariant(vec);
+  basic_stringz<CHAR> vec(vec.data());
+  return vec;
+}
+#divert </ipp>

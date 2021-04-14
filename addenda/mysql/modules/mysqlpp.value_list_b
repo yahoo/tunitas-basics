@@ -1,0 +1,3 @@
+// -*- c++ -*- ff33808b-6e3f-4874-be90-7ca54c4f6e69
+#pragma once
+#include "mysql++/vallist.h"

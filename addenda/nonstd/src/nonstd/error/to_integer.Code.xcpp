@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::error::to_integer {
+  //
+  // The error codes of the "to_integer" sphere
+  //   e.g. nonstd::sto<INTEGER>(DOPELIKE const &) -> Outcome<INTEGER>
+  //
+  enum class Code {
+    SUCCESS = 0, //           you want this
+    EXTRA_CHARACTERS, //      extra characters at the end of the number; e.g. 123xyz is not 123
+    INVALID_ARGUMENT, //      obviously bogus and not a number; e.g. "yes", "no", "maybe so"
+    OUT_OF_RANGE, //          out of range for the carrier type; e.g. value 257 in an 8-bit number
+    TRANSLUCENT_EXCEPTION, // a surprising std::exception descendant was thrown (and what() was not recovered)
+    OPAQUE_EXCEPTION, //      a surprising exception was thrown which could not be reflected upon
+  };
+}
+#import std.is_error_code_enum
+namespace std {
+  template<> struct is_error_code_enum<nonstd::error::to_integer::Code>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_code_enum<nonstd::error::to_integer::Code> : public std::true_type { };
+#import std.error_code
+namespace nonstd::error::to_integer {
+  //
+  // Following:
+  //    https://en.cppreference.com/w/cpp/error/errc/make_error_code
+  //    https://en.cppreference.com/w/cpp/io/io_errc/make_error_code
+  //    https://en.cppreference.com/w/cpp/thread/future_errc/make_error_code
+  //    ... et al. ...
+  //
+  inline auto make_error_code(Code) -> std::error_code;
+}
+namespace std { using nonstd::error::to_integer::make_error_code; }
+#endiv
+#divert <ipp>
+#import nonstd.error.to_integer.category
+auto nonstd::error::to_integer::make_error_code(Code code) -> std::error_code {
+  return std::error_code{(int)code, category()};
+}
+#endiv

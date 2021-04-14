@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward format.detail.tuple.Inserter
+namespace format::detail::tuple {
+  template<typename CHAR, typename TRAITS, std::size_t I, std::size_t N, typename... VALUES> struct Inserter<CHAR, TRAITS, true, I, N, VALUES...>;
+}
+#endiv
+#divert <hpp>
+#import c.basic_stringn
+#import std.basic_ostream
+#import std.tuple
+#import format.detail.tuple.Emittable
+template<typename CHAR, typename TRAITS, std::size_t I, std::size_t N, typename... VALUES> struct format::detail::tuple::Inserter<CHAR, TRAITS, true, I, N, VALUES...> : public Emittable<CHAR, TRAITS, VALUES...> {
+  using ancestor = Emittable<CHAR, TRAITS, VALUES...>;
+public:
+  using ancestor::Emittable;
+  inline auto emit(std::basic_ostream<CHAR, TRAITS> &) const -> void;
+};
+#endiv
+#divert <ipp>
+template<typename CHAR, typename TRAITS, std::size_t I, std::size_t N, typename... VALUES> auto format::detail::tuple::Inserter<CHAR, TRAITS, true, I, N, VALUES...>::emit(std::basic_ostream<CHAR, TRAITS> &o) const -> void {
+  // base case; nothing to emit.
+}
+#endiv

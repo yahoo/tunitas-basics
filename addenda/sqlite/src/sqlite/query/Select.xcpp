@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace query {
+    //
+    // Usage:
+    //     struct Select : public sqlite::query::Select {
+    //         explicit Select(Connection &conn) : Ancestor(conn, format()) { }
+    //         enum UNQIUENESS { };
+    //         using rows_type = sqlite::query::Rows<UNIQUENESS, VALUES...>;
+    //         auto operator()(...rigid-type-arguments...) -> rows_type {
+    //             this->bind(...rigid-type-arguments...);
+    //             return rows_type(this->prepared);
+    //         }
+    //         static auto format() -> std::string;
+    //     };
+    //     sqlite::Connection conn ...is set up...
+    //     Select sel(conn);
+    //     auto rows = sel(...args...);              r is a sqlite::query::Rows
+    //     for (auto row : rows) {
+    //         row is a std::tuple<...> with the elements of the row
+    //         use std::get<...>(...)
+    //     }
+    //     
+    class Select;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.query.Prototype
+#import sqlite.statement.Shell
+class sqlite::query::Select : public sqlite::query::Prototype {
+  using Ancestor = sqlite::query::Prototype;
+  //
+  // Usage (see Query)
+  //
+  // A descendant of Select implements the protocol
+  //     The prepare(...) is called from the constructor
+  //     Typically the descendant contains a static format(...) -> std::string function
+  //     exec(...) returns a Rows, which is steppable
+  //     The Rows has a Cursor, which is an iterator
+  //     The Cursor increments and can produce a Row, which is a tuple
+  //
+protected:
+  using Ancestor::Prototype;
+public:
+  using steppable_type = sqlite::statement::Shell;
+};
+#endiv

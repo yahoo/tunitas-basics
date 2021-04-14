@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// Trick: struct F::SEAL is a type alias of F::_SEAL_
+//        struct F::_SEAL_::SEAL is a manifest constant of f::Seal::SEAL
+//
+// Now you can utter:
+//
+//    #import sys.posix.F.SEAL
+//    auto value = F::SEAL::SEAL;      which rhymes with the unfortunately-named #define F_SEAL_SEAL
+//
+#import sys.posix.F._SEAL_
+#endiv
+#divert <cpp>
+#import tests.usage.posix_F_SEAL.Usage
+static_assert(tests::usage::posix_F_SEAL::Usage<>);
+#endiv

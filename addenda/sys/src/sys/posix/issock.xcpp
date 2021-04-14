@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.is.interface
+namespace sys::posix {
+  namespace packaging::is {
+    using namespace packaging::is::interface;
+    namespace function {
+      inline auto issock(Pathname) -> bool;
+      inline auto issock(Buffer const &) -> bool;
+      inline auto issock(Permissions) -> bool;
+      inline auto issock(File) -> bool;
+    }
+    namespace native {
+      inline auto issock(int) -> bool;
+    }
+  }
+  using packaging::is::function::issock;
+  namespace native { using packaging::is::native::issock; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.fstat
+#import sys.posix.stat
+namespace sys::posix::packaging::is {
+  auto function::issock(Buffer const &b) -> bool { return issock(b.st_mode); }
+  auto function::issock(Permissions p) -> bool { return S_ISSOCK((mode_t) p); }
+  auto function::issock(Pathname pathname) -> bool {
+    auto r = posix::stat(move(pathname));
+    return good(r) && issock(value(r));
+  }
+  auto function::issock(File f) -> bool {
+    auto r = posix::fstat(f);
+    return good(r) && issock(value(r));
+  }
+  auto native::issock(int fd) -> bool {
+    auto r = posix::native::fstat(fd);
+    return good(r) && function::issock(value(r));
+  }
+}
+#endiv

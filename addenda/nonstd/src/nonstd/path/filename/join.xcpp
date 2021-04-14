@@ -1,0 +1,21 @@
+// -*- c++ -*- with the SCOLD stylings
+#divert <hpp>
+#import nonstd.path.filename.mount.Joiner
+namespace nonstd::path::filename {
+  template<typename SEPARATOR, typename CONTAINER> inline auto join(SEPARATOR, CONTAINER const &) -> mount::Joiner<SEPARATOR, CONTAINER>;
+  template<typename SEPARATOR, typename ITERATOR> inline auto join(SEPARATOR, ITERATOR, ITERATOR) -> mount::Joiner<SEPARATOR, std::pair<ITERATOR, ITERATOR>>;
+}
+#endiv
+#divert <ipp>
+#import std.move
+template<typename SEPARATOR, typename CONTAINER> inline auto nonstd::path::filename::join(SEPARATOR s, CONTAINER const &c) -> mount::Joiner<SEPARATOR, CONTAINER> {
+  mount::Joiner<SEPARATOR, CONTAINER> ret(s, c);
+  return ret;
+}
+
+#import std.make_pair
+template<typename SEPARATOR, typename ITERATOR> inline auto nonstd::path::filename::join(SEPARATOR separator, ITERATOR start, ITERATOR finish) -> mount::Joiner<SEPARATOR, std::pair<ITERATOR, ITERATOR>> {
+  mount::Joiner<SEPARATOR, std::pair<ITERATOR, ITERATOR>> ret(separator, start, finish);
+  return ret; 
+}
+#endiv

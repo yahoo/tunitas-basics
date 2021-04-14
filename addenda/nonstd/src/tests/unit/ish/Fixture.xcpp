@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ish { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import tests.unit.ish.Palette
+class tests::unit::ish::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_something() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::ish::Fixture::test_something() -> void {
+  // nothing to test (yet)
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.ish.bash.Fixture
+#import tests.unit.ish.cxx.Fixture
+#import tests.unit.ish.make.Fixture
+#import tests.unit.ish.perl.Fixture
+#import tests.unit.ish.shell.Fixture
+#import tests.unit.ish.tuple.Fixture
+#import rigging.suite.io
+auto tests::unit::ish::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("ish");
+  series << call("something", &Fixture::test_something)
+         << add<bash::Fixture>()
+         << add<cxx::Fixture>()
+         << add<make::Fixture>()
+         << add<perl::Fixture>()
+         << add<shell::Fixture>()
+         << add<tuple::Fixture>()
+    ;
+  return finalize(series);
+}
+#endiv

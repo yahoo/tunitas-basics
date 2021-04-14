@@ -1,0 +1,70 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix.ipproto.Usage
+//   using namespace tests::usage::posix::ipproto;
+//   static_assert(Usage<sys::posix::IPPROTO>);
+//
+#import sys.posix.IPPROTO
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_IPPROTO {
+  using sys::posix::IPPROTO;
+  namespace [[detail]] packaging {
+    template<typename E> concept bool Instance = requires(IPPROTO) {
+      typename IPPROTO::Protocol;
+      requires model::Namespace_Object<IPPROTO>;
+      requires requires(IPPROTO) {
+        // To make the point entirely clear so you can't miss it
+        requires (int)IPPROTO::IP == 0;
+        requires (int)IPPROTO::IP == IPPROTO_IP;
+        requires (int)IPPROTO::NONE == IPPROTO_NONE;
+        requires IPPROTO::IP != IPPROTO::NONE;
+      };
+      requires (int)IPPROTO::IP == IPPROTO_IP;
+      requires (int)IPPROTO::ICMP == IPPROTO_ICMP;
+      requires (int)IPPROTO::IGMP == IPPROTO_IGMP;
+      requires (int)IPPROTO::IPIP == IPPROTO_IPIP;
+      requires (int)IPPROTO::TCP == IPPROTO_TCP;
+      requires (int)IPPROTO::EGP == IPPROTO_EGP;
+      requires (int)IPPROTO::PUP == IPPROTO_PUP;
+      requires (int)IPPROTO::UDP == IPPROTO_UDP;
+      requires (int)IPPROTO::IDP == IPPROTO_IDP;
+      requires (int)IPPROTO::TP == IPPROTO_TP;
+      requires (int)IPPROTO::DCCP == IPPROTO_DCCP;
+      requires (int)IPPROTO::IPV6 == IPPROTO_IPV6;
+      requires (int)IPPROTO::RSVP == IPPROTO_RSVP;
+      requires (int)IPPROTO::GRE == IPPROTO_GRE;
+      requires (int)IPPROTO::ESP == IPPROTO_ESP;
+      requires (int)IPPROTO::AH == IPPROTO_AH;
+      requires (int)IPPROTO::MTP == IPPROTO_MTP;
+      requires (int)IPPROTO::BEETPH == IPPROTO_BEETPH;
+      requires (int)IPPROTO::ENCAP == IPPROTO_ENCAP;
+      requires (int)IPPROTO::PIM == IPPROTO_PIM;
+      requires (int)IPPROTO::COMP == IPPROTO_COMP;
+      requires (int)IPPROTO::SCTP == IPPROTO_SCTP;
+      requires (int)IPPROTO::UDPLITE == IPPROTO_UDPLITE;
+      requires (int)IPPROTO::MPLS == IPPROTO_MPLS;
+      requires (int)IPPROTO::RAW == IPPROTO_RAW;
+      requires (int)IPPROTO::HOPOPTS == IPPROTO_HOPOPTS;
+      requires (int)IPPROTO::ROUTING == IPPROTO_ROUTING;
+      requires (int)IPPROTO::FRAGMENT == IPPROTO_FRAGMENT;
+      requires (int)IPPROTO::ICMPV6 == IPPROTO_ICMPV6;
+      requires (int)IPPROTO::NONE == IPPROTO_NONE;
+      requires (int)IPPROTO::DSTOPTS == IPPROTO_DSTOPTS;
+      requires (int)IPPROTO::MH == IPPROTO_MH;
+#ifdef IPPROTO_LTP2 // of <linux/l2tp.h>
+      requires (int)IPPROTO::L2TP == IPPROTO_L2TP;
+#endif
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<IPPROTO>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

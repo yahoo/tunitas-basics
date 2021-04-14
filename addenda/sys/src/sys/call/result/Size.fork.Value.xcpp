@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.required.Process
+#import sys.call.result.Size.declaration
+#forward sys.call.result.fork.Value
+namespace sys::call::result {
+  //
+  // Specialized for the various fork::Value<...specializations...>
+  //
+  // Usage:
+  //
+  //     using t99 = call::result::fork::Value<id::Process>;
+  //     constexpr auto const t99_size = Size<t99>::value;
+  //     ... blah blah blah ... you know how this works ...
+  //
+  template<required::Process PROCESS> struct Size<fork::Value<PROCESS>>;
+}
+#endiv
+#divert <hpp>
+#import sys.call.result.Size.Value
+#import sys.call.result.fork.Value
+namespace sys::call {
+  template<result::required::Process PROCESS> struct result::Size<result::fork::Value<PROCESS>> : public Size<typename fork::Value<PROCESS>::Ancestor> { };
+}
+#endiv

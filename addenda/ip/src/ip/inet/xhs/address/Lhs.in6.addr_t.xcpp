@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in6 // ip::in6::addr_t
+#forward ip.inet.xhs.address.Lhs.declaration
+namespace ip::inet::xhs::address {
+  template<> class Lhs<in6::addr_t>;
+}
+#endiv
+#divert <hpp>
+template<> class ip::inet::xhs::address::Lhs<ip::in6::addr_t> {
+public:
+  using subject_type = in6::addr_t;
+  inline explicit Lhs(subject_type &);
+  Lhs(Lhs const &) = default;
+  auto operator=(Lhs const &) -> Lhs & = default;
+  Lhs(Lhs &&) = default;
+  auto operator=(Lhs &&) -> Lhs & = default;
+  inline auto operator=(in6::addr_t) -> Lhs &;
+  inline auto operator=(in6::addr const &) -> Lhs &;
+protected:
+  subject_type &subject;
+};
+#endiv
+#divert <ipp>
+ip::inet::xhs::address::Lhs<ip::in6::addr_t>::Lhs(subject_type &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+
+auto ip::inet::xhs::address::Lhs<ip::in6::addr_t>::operator=(in6::addr_t rhs) -> Lhs & {
+  subject = rhs;
+  return *this;
+}
+
+#import std.remove_const
+#import std.remove_reference
+#import std.is_same
+#import ip.endian.reorder
+auto ip::inet::xhs::address::Lhs<ip::in6::addr_t>::operator=(in6::addr const &rhs) -> Lhs & {
+  // recall: network order is "big endian" so that the lexicographic prefix property of addresses holds
+  // n.b. to follow the pattern, there should be a 128-bit integer field named in6_addr::s6_addr
+  // ick. instead there are some goofy #defines which mask over to the character array of 16 characters.
+  // want to see: address.s6_addr as uint128_t
+  auto const &rhs_s6_addr = *reinterpret_cast<ip::uint128_t const *>(&rhs.__in6_u.__u6_addr8[0]);
+  static_assert(std::is_same<ip::uint128_t, std::remove_const<std::remove_reference<decltype(rhs_s6_addr)>::type>::type>::value, "not a 128-bit unsigned integer");
+  subject = endian::reorder<128>(rhs_s6_addr);
+  return *this;
+}
+#endiv
+

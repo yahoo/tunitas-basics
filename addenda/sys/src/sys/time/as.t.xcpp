@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.time.point
+#import sys.time.duration
+#import sys.time.spec
+#import sys.time.val
+#import sys.time.t
+#import sys.time.tm
+namespace sys::time {
+  template<typename RESULT> auto as(t) -> RESULT = delete;
+  template<> inline auto as<point>(t) -> point; // .......... dubious but since time_t is both a time point and a duration
+  template<> inline auto as<duration>(t) -> duration; // .... dubious ibidem; and use duration_cast<...>(...) to change precision
+  template<> inline auto as<spec>(t) -> spec;
+  template<> inline auto as<val>(t) -> val;
+  template<> inline auto as<t>(t) -> t;
+  template<> inline auto as<tm>(t) -> tm;
+}
+#endiv
+#divert <ipp>
+template<> auto sys::time::as<sys::time::point>(t v0) -> point {
+  point const v1 = time::clock::base::from_time_t(v0);
+  return v1;
+}    
+template<> auto sys::time::as<sys::time::duration>(t v0) -> duration {
+  point const v1{time::clock::base::from_time_t(v0)};
+  duration const v2 = v1.time_since_epoch();
+  return v2;
+}    
+template<> auto sys::time::as<sys::time::spec>(t v0) -> spec {
+  spec const v1 = { v0, 0 };
+  return v1;
+}
+template<> auto sys::time::as<sys::time::val>(t v0) -> val {
+  val const v1 = { v0, 0 };
+  return v1;
+}
+template<> auto sys::time::as<sys::time::t>(t v0) -> t {
+  return v0;
+}
+#import gmtime_r
+#import std.invalid_argument
+template<> auto sys::time::as<sys::time::tm>(t v0) -> tm {
+  tm v1;
+  if (nullptr == ::gmtime_r(&v0, &v1)) {
+    throw std::invalid_argument("gmtime_r fails");
+  }
+  return v1;
+}
+#endiv

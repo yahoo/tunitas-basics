@@ -1,0 +1,10 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+namespace sqlite {
+  namespace exception {
+    //
+    // The exception pantheon
+    //
+  }
+}
+#endiv

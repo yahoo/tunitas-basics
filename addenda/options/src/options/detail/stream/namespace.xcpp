@@ -1,0 +1,22 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.ostream
+#import std.string
+namespace options {
+  namespace detail {
+    namespace stream {
+      extern std::ostream &err;
+      extern std::ostream &devnull;
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#import std.cerr
+std::ostream &options::detail::stream::err(std::cerr);
+#import stream.null
+namespace {
+  stream::null nullity;
+}
+std::ostream &options::detail::stream::devnull(nullity);
+#endiv

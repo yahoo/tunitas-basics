@@ -1,0 +1,3 @@
+// -*- c++ -*- 35503ed6-94bc-4994-b8f3-1d1b94d15f73
+#pragma once
+#include <streambuf>

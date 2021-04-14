@@ -1,0 +1,114 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace want {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::want::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_getline_string() -> void;
+  auto test_getline_vector() -> void;
+  auto test_getline_iterator() -> void;
+  auto test_rbegin_rend() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.istringstream
+#import std.string
+#import want.getline
+
+auto tests::unit::want::Fixture::test_getline_string() -> void {
+  // This is just testing theo ne in the standard library, so this mustn't be hard
+  std::istringstream buf("apple\nbanana\ncherry");
+  using s = std::string;
+  std::string line1;
+  auto &r1 = ::want::getline(buf, line1, '\n');
+  CPPUNIT_ASSERT(r1);
+  CPPUNIT_ASSERT_EQUAL(s("apple"), line1);
+  std::string line2;
+  auto &r2 = ::want::getline(buf, line2, '\n');
+  CPPUNIT_ASSERT(r2);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), line2);
+  std::string line3;
+  auto &r3 = ::want::getline(buf, line3, '\n');
+  CPPUNIT_ASSERT(r3);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), line3);
+  std::string line4;
+  auto &r4 = ::want::getline(buf, line4, '\n');
+  CPPUNIT_ASSERT(!r4);
+}
+
+auto tests::unit::want::Fixture::test_getline_vector() -> void {
+  std::istringstream buf("apple\nbanana\ncherry");
+  using s = std::string;
+  std::vector<char> line1;
+  auto &r1 = ::want::getline(buf, line1, '\n');
+  CPPUNIT_ASSERT(r1);
+  CPPUNIT_ASSERT_EQUAL(s("apple"), std::string(line1.begin(), line1.end()));
+  std::vector<char> line2;
+  auto &r2 = ::want::getline(buf, line2, '\n');
+  CPPUNIT_ASSERT(r2);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), std::string(line2.begin(), line2.end()));
+  std::vector<char> line3;
+  auto &r3 = ::want::getline(buf, line3, '\n');
+  CPPUNIT_ASSERT(r3);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), std::string(line3.begin(), line3.end()));
+  std::vector<char> line4;
+  auto &r4 = ::want::getline(buf, line4, '\n');
+  CPPUNIT_ASSERT(!r4);
+}
+
+#import want.istream_getline_iterator
+auto tests::unit::want::Fixture::test_getline_iterator() -> void {
+  std::istringstream buf("apple\nbanana\ncherry");
+  using vtype = std::vector<char>;
+  ::want::istream_getline_iterator<vtype> i(buf);
+  ::want::istream_getline_iterator<vtype> e;
+  CPPUNIT_ASSERT(e != i);
+  vtype line1 = *i++;
+  vtype line2 = *i++;
+  vtype line3 = *i++;
+  CPPUNIT_ASSERT(e == i);
+}
+
+#import want.rbegin
+#import want.rend
+auto tests::unit::want::Fixture::test_rbegin_rend() -> void {
+  std::vector<int> specimen{1, 2, 3, 4, 5, 6, 7, 8, 9};
+  using riterator = decltype(::want::rbegin(specimen));
+  int high = 10;
+  unsigned count = 0;
+  for (riterator i(::want::rbegin(specimen)), e(::want::rend(specimen)); e != i; ++i) {
+    int const here = *i;
+    int smaller = std::min(here, high);
+    CPPUNIT_ASSERT(here == smaller);
+    smaller = here;
+    count++;
+  }
+  CPPUNIT_ASSERT(9 == count);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::want::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("want");
+  s << call("getline-string", &Fixture::test_getline_string)
+    << call("getline-vector", &Fixture::test_getline_vector)
+    << call("getline_iterator", &Fixture::test_getline_iterator)
+    << call("rbegin..rend", &Fixture::test_rbegin_rend)
+    ;
+  return s.release();
+}
+#endiv

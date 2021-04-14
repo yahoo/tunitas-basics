@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import std.error_code
+#import std.system_category
+#import sys.posix.fork
+#import sys.posix.exec
+auto tests::unit::posix::fixture::Fixture::test_exec() -> void {
+  using six::fork;
+  using six::exec;
+  auto r = fork();
+  if (is_error(r)) {
+    CPPUNIT_ASSERT(false);
+  } else if (is_parent(r)) {
+    // TODO - FIXME -- wait on the child
+  } else if (is_child(r)) {
+    auto r = exec("/bin/true", "true");
+    // if we get here then exec failed
+    std::error_code ec(error_num(r), std::system_category());
+    std::cerr << "exec failed because " << ec.message() << '\n';
+    CPPUNIT_ASSERT(false);
+  }
+}
+#import std.error_code
+#import std.system_category
+#import sys.posix.execp
+#import sys.posix.fork
+auto tests::unit::posix::fixture::Fixture::test_execp() -> void {
+  using six::fork;
+  using six::execp;
+  auto r = fork();
+  if (is_error(r)) {
+    CPPUNIT_ASSERT(false);
+  } else if (is_parent(r)) {
+    // TODO - FIXME -- wait on the child
+  } else if (is_child(r)) {
+    auto r = execp("true", "true");
+    // if we get here then execp has failed
+    std::error_code ec(error_num(r), std::system_category());
+    std::cerr << "execp failed because " << ec.message() << '\n';
+    CPPUNIT_ASSERT(false);
+  }
+}
+#endiv

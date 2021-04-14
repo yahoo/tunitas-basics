@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.at.interface
+namespace sys::posix {
+  namespace packaging::faccessat {
+    using namespace packaging::at::interface;
+    namespace function {
+      using Position = argument::Position<File>;
+      inline auto faccessat(Position, Pathname, Access, Flags) -> result::Status;
+    }
+    namespace native {
+      using Position = argument::Position<int>;
+      inline auto faccessat(Position, Pathname, Access, Flags) -> result::Status;
+    }
+  }
+  using packaging::faccessat::function::faccessat;
+  namespace native { using packaging::faccessat::native::faccessat; }
+}
+using sys::posix::faccessat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::faccessat {
+  auto function::faccessat(Position position, Pathname pathname, Access access, Flags flags) -> result::Status { return native::faccessat(position, pathname, access, flags); }
+  auto native::faccessat(Position position, Pathname pathname, Access access, Flags flags) -> result::Status   { return idiomatic::syscall<int>(Syscall::FACCESSAT, (int)position, (char const *)pathname, (int)access, (int)flags); }
+}
+#endiv

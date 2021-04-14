@@ -1,0 +1,142 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_O.Usage
+//   static_assert(tests::usage::posix_O::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.O
+#import tests.model.Namespace_Object
+#import tests.model.Namespace_Object_Flags
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_O {
+  using sys::posix::O;
+  namespace [[detail]] packaging {
+    using nonstd::convertible_to;
+    template<typename O> concept bool Instance = requires(O) {
+      typename O::Access;
+      typename O::Accesses;
+      typename O::Create;
+      typename O::Creates;
+      typename O::Status;
+      typename O::Statuses;
+      requires model::Namespace_Object<O>;
+      requires model::Namespace_Object_Flags<O, typename O::Access, typename O::Access>;
+      requires model::Namespace_Object_Flags<O, typename O::Create, typename O::Creates>;
+      requires model::Namespace_Object_Flags<O, typename O::Status, typename O::Statuses>;
+      requires (int)O::READ == O_RDONLY;
+      requires (int)O::WRITE == O_WRONLY;
+      requires (int)O::READWRITE == O_RDWR;
+      requires (int)O::RD == O_RDONLY;
+      requires (int)O::WR == O_WRONLY;
+      requires (int)O::RDWR == O_RDWR;
+      requires (int)O::RDONLY == O_RDONLY;
+      requires (int)O::WRONLY == O_WRONLY;
+      requires (int)O::READONLY == O_RDONLY;
+      requires (int)O::WRITEONLY == O_WRONLY;
+      // Creates
+      requires (int)O::NOCREATE == 0;
+      requires (int)O::CLOSE_ON_EXEC == O_CLOEXEC;
+      requires (int)O::CREATE == O_CREAT;
+      requires (int)O::DIRECTORY == O_DIRECTORY;
+      requires (int)O::EXCLUSIVE == O_EXCL;
+      requires (int)O::NO_CONTROL_TERMINAL == O_NOCTTY;
+      requires (int)O::NOFOLLOW == O_NOFOLLOW;
+      requires (int)O::TRUNCATE == O_TRUNC;
+      requires (int)O::CLOEXEC == O_CLOEXEC;
+      requires (int)O::CREAT == O_CREAT;
+      requires (int)O::EXCL == O_EXCL;
+      requires (int)O::NOCTTY == O_NOCTTY;
+      requires (int)O::TRUNC == O_TRUNC;
+      // Statuses
+      requires (int)O::NONE == 0;
+      requires (int)O::APPEND == O_APPEND;
+      requires (int)O::ASYNC == O_ASYNC;
+      requires (int)O::DIRECT == O_DIRECT;
+      requires (int)O::DIRECTORY == O_DIRECTORY;
+      requires (int)O::DSYNC == O_DSYNC;
+      requires (int)O::LARGEFILE == O_LARGEFILE;
+      requires (int)O::NOATIME == O_NOATIME;
+      requires (int)O::NONBLOCK == O_NONBLOCK;
+      requires (int)O::PATH == O_PATH;
+      requires (int)O::SYNC == O_SYNC;
+      requires (int)O::TMPFILE == O_TMPFILE;
+      requires (int)O::NDELAY == O_NDELAY;
+      requires requires(O, typename O::Access ess, typename O::Accesses ses) {
+#if 202003L < __cplusplus
+        { O::template as<typename O::Access>(ess) } -> convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(ess) } -> convertible_to<typename O::Accesses>;
+        { O::template as<typename O::Access>(ses) } -> convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(ses) } -> convertible_to<typename O::Accesses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { O::template as<typename O::Access>(ess) } -> typename O::Access;
+        { O::template as<typename O::Accesses>(ess) } -> typename O::Accesses;
+        { O::template as<typename O::Access>(ses) } -> typename O::Access;
+        { O::template as<typename O::Accesses>(ses) } -> typename O::Accesses;
+#endif
+      };
+      requires requires(O, typename O::Create ate, typename O::Create tes) {
+#if 202003L < __cplusplus
+        { O::template as<typename O::Create>(ate) } -> convertible_to<typename O::Create>;
+        { O::template as<typename O::Creates>(ate) } -> convertible_to<typename O::Creates>;
+        { O::template as<typename O::Create>(tes) } -> convertible_to<typename O::Create>;
+        { O::template as<typename O::Creates>(tes) } -> convertible_to<typename O::Creates>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { O::template as<typename O::Create>(ate) } -> typename O::Create;
+        { O::template as<typename O::Creates>(ate) } -> typename O::Creates;
+        { O::template as<typename O::Create>(tes) } -> typename O::Create;
+        { O::template as<typename O::Creates>(tes) } -> typename O::Creates;
+#endif
+      };
+      requires requires(O, typename O::Status tus, typename O::Statuses ses) {
+#if 202003L < __cplusplus
+        { O::template as<typename O::Status>(tus) } -> convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(tus) } -> convertible_to<typename O::Statuses>;
+        { O::template as<typename O::Status>(ses) } -> convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(ses) } -> convertible_to<typename O::Statuses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { O::template as<typename O::Status>(tus) } -> typename O::Status;
+        { O::template as<typename O::Statuses>(tus) } -> typename O::Statuses;
+        { O::template as<typename O::Status>(ses) } -> typename O::Status;
+        { O::template as<typename O::Statuses>(ses) } -> typename O::Statuses;
+#endif
+      };
+      requires requires(O, typename O::Flags ags) {
+#if 202003L < __cplusplus
+        { O::template as<typename O::Access>(ags) } -> convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(ags) } -> convertible_to<typename O::Accesses>;
+        { O::template as<typename O::Create>(ags) } -> convertible_to<typename O::Creates>;
+        { O::template as<typename O::Creates>(ags) } -> convertible_to<typename O::Creates>;
+        { O::template as<typename O::Status>(ags) } -> convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(ags) } -> convertible_to<typename O::Statuses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { O::template as<typename O::Access>(ags) } -> typename O::Access;
+#if 0
+        { O::template as<typename O::Accesses>(ags) } -> typename O::Accesses;
+        { O::template as<typename O::Create>(ags) } -> typename O::Creates;
+        { O::template as<typename O::Creates>(ags) } -> typename O::Creates;
+        { O::template as<typename O::Status>(ags) } -> typename O::Status;
+        { O::template as<typename O::Statuses>(ags) } -> typename O::Statuses;
+#endif
+        requires true;
+#endif
+      };
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<O>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

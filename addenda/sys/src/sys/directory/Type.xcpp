@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <dirent.h>
+namespace sys {
+  namespace directory {
+    enum class Type {
+      BLK = DT_BLK,
+      CHR = DT_CHR,
+      DIR = DT_DIR,
+      FIFO = DT_FIFO,
+      LNK = DT_LNK,
+      REG = DT_REG,
+      SOCK = DT_SOCK,
+      UNKNOWN = DT_UNKNOWN,
+    };
+  }
+}
+#endiv

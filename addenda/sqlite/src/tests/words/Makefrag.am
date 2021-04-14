@@ -1,0 +1,41 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+check_bin_words = check/bin/words
+check_bin_words_LDADD = \
+  $(lib_libsqlite_module_la) \
+  -lboost_program_options \
+  -loptions-module \
+  -lsys-exits-module \
+  $(end)
+check_bin_words_LDFLAGS = $(CHECK_LDFLAGS_SET)
+# And CPPFLAGS, CXXFLAGS must remain available for the caller
+# no need to bitch about deprecated interfaces; we are testing those interfaces herein.
+$(check_bin_words_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_words_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+$(check_bin_words_OBJECTS): # NOT AM_LDFLAGS
+check_bin_words_SOURCES = \
+  obj/src/tests/words/main.cpp \
+  \
+  obj/src/tests/words/namespace.cpp \
+  obj/src/tests/words/Badword.cpp \
+  obj/src/tests/words/Configuration.cpp \
+  obj/src/tests/words/Usage.cpp \
+  obj/src/tests/words/Version.cpp \
+  obj/src/tests/words/slurp.cpp \
+  obj/src/tests/words/finalize.cpp \
+  obj/src/tests/words/formatter.cpp \
+  \
+  obj/src/tests/words/detail/namespace.cpp \
+  obj/src/tests/words/detail/Formatter.cpp \
+  $(end)
+$(scold_cxxdir)/tests/words/dependencies.mk: $(check_bin_words_SOURCES)
+$(check_bin_words_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/words/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/words/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/words/dependencies.mk

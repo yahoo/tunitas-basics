@@ -1,0 +1,15 @@
+// -*- c++ -*- C++23+ with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_base_of
+#import std.is_same
+namespace nonstd::required::iterator {
+  // Because all (nearly all?) the concept definitions use this
+  using std::is_base_of; 
+  using std::is_base_of_v; 
+  using std::is_same; 
+  using std::is_same_v; 
+}
+// Ibidem.
+#import nonstd.iterator_traits
+#include <hpp/nonstd.iterator_traits>
+#endiv

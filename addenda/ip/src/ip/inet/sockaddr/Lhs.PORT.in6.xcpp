@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ip.inet.sockaddr.Lhs.declaration
+namespace ip::inet::sockaddr {     
+  template<> class Lhs<PORT, in6::sockaddr>;
+}
+#endiv
+#divert <hpp>
+#import ip.inet.sockaddr.Xhs.in6
+template<> class ip::inet::sockaddr::Lhs<ip::inet::sockaddr::PORT, ip::in6::sockaddr> : public Xhs<in6::sockaddr, IN6> {
+  using Ancestor = Xhs<in6::sockaddr, IN6>;
+public:
+  using Ancestor::Xhs;
+  inline operator port::Integer() const { return Ancestor::get_port(); } // ... extracts in host order
+  inline auto operator=(port::Host) -> Lhs &;
+  inline auto operator=(port::Integer) -> Lhs &; // ....................... assigns from host order
+};
+#endiv
+#divert <ipp>
+#import ip.inet.lhs
+auto ip::inet::sockaddr::Lhs<ip::inet::sockaddr::PORT, ip::in6::sockaddr>::operator=(port::Host po) -> Lhs & {
+  lhs(subject.sin6_port) = po; // <-------------- the only thing different between IPv4 and IPv6 (the field name)
+  return *this;
+}
+auto ip::inet::sockaddr::Lhs<ip::inet::sockaddr::PORT, ip::in6::sockaddr>::operator=(port::Integer po) -> Lhs & {
+  lhs(subject.sin6_port) = po;  // ibidem
+  return *this;
+}
+#endiv

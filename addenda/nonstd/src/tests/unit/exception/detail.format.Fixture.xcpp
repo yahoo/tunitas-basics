@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception::detail::format { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import tests.unit.exception.detail.format.If_Not_Null
+#import nonstd.exception.detail.format.If_Not_Null
+#import tests.unit.exception.detail.format.If_Not_Empty
+#import nonstd.exception.detail.format.If_Not_Empty
+class tests::unit::exception::detail::format::Fixture : public cppunit::test::Fixture {
+public:
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct Null {
+    template<typename SUBJECT> using Rigging = ::tests::unit::exception::detail::format::If_Not_Null<SUBJECT>;
+    template<typename CHAR, typename VALUE> using Subject = ::nonstd::exception::detail::format::If_Not_Null<CHAR, VALUE>;
+  };
+  struct Empty {
+    template<typename SUBJECT> using Rigging = ::tests::unit::exception::detail::format::If_Not_Empty<SUBJECT>;
+    template<typename CHAR, typename VALUE> using Subject = ::nonstd::exception::detail::format::If_Not_Empty<CHAR, VALUE>;
+  };
+};
+#endiv
+#divert <cpp>
+#import c.const_stringz
+#import re.string
+#import std.string
+#import tests.unit.exception.detail.format.If_Not_Null
+#import tests.unit.exception.detail.format.If_Not_Empty
+#import rigging.suite.io
+auto tests::unit::exception::detail::format::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("detail");
+  {
+    Stream frm("format");
+    {
+      Stream inn("inn");
+      inn << add<Null::Rigging<Null::Subject<char, char const *>>>()
+        << add<Null::Rigging<Null::Subject<char, c::const_stringz>>>()
+        << add<Null::Rigging<Null::Subject<char, re::string<c::const_stringz>>>>()
+        << add<Null::Rigging<Null::Subject<char, re::string<std::string>>>>()
+        ;
+      frm << add(std::move(inn));
+    }
+    {
+      Stream ine("ine");
+      ine << add<Empty::Rigging<Empty::Subject<char, char const *>>>()
+        << add<Empty::Rigging<Empty::Subject<char, c::const_stringz>>>()
+        << add<Empty::Rigging<Empty::Subject<char, re::string<c::const_stringz>>>>()
+        << add<Empty::Rigging<Empty::Subject<char, re::string<std::string>>>>()
+        ;
+      frm << add(std::move(ine));
+    }
+    series << add(std::move(frm));
+  }
+  return finalize(series);
+}
+#endiv

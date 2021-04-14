@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::call::argument::converter {
+  //
+  // Specify how conversions are to be done
+  // The default implementation is obvious.
+  // The non-default implementations are left up to specializations.
+  //
+  // Rhymes with std::is_convertible<FROM, TO>.
+  // But does not mandate that exception the general case.
+  //
+  // Usage:
+  //
+  //   using Target = ...something...
+  //   using Source = ...something...
+  //   using Conversion = converter::Conversion<Source, Target>;
+  //
+  //   Source source = ...somehow...
+  //   Target destination = Conversion::convert(source);
+  //
+  template<typename SOURCE, typename TARGET> struct Conversion;
+}
+#endiv

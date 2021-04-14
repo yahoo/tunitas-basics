@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sys.call.argument.Stringface
+#import sys.call.argument.required.stringface.Resultable
+#import std.vector
+namespace sys::call::argument {
+  //
+  // Recover the stringable type from a Stringface by explicit means
+  // Always performs a copy.
+  //
+  // Usage:
+  //
+  //   auto ppp = as<char const *>(thing);
+  //   auto csz = as<c::const_stringz>(thing);
+  //   auto csn = as<c::const_stringn>(thing);
+  //   auto csn = as<std::string>(thing);
+  //   auto csn = as<std::string_view>(thing);
+  //
+  template<required::stringface::Resultable RESULT> inline auto as(Stringface const &pathname) -> RESULT;
+  // These must be specialized because they take a 2-arg constructor
+  template<> inline auto as<std::vector<char>>(Stringface const &) -> std::vector<char>;
+}
+#endiv
+#divert <ipp>
+#import sys.call.argument.Stringface
+#import sys.call.argument.detail.as
+namespace sys::call::argument {
+  template<> auto as<std::vector<char>>(Stringface const &pathname) -> std::vector<char> {
+    return detail::as2<std::vector<char>>(pathname);
+  }
+}
+namespace sys::call {
+  template<argument::required::stringface::Resultable RESULT> auto argument::as(Stringface const &pathname) -> RESULT {
+    return detail::as1<RESULT>(pathname);
+  }
+}
+#endiv
+

@@ -1,0 +1,3 @@
+// -*- c++ -*- 00ad2f02-77e3-4111-9f9e-6404d3e72046
+#pragma once
+#include <system_error>

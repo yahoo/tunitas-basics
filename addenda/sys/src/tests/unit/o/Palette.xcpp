@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::o {
+  //
+  // Some common types and helpers.
+  // Descendants only.
+  //
+  // Usage:
+  //
+  //   class my::Fixture : bpulic cppunit::test::Fixture, private Palette {
+  //     Fixture(...somehow...);
+  //   };
+  //
+  class Palette;
+}
+#endiv
+#divert <hpp>
+#import sys.o.Access
+#import sys.o.Accesses
+#import sys.o.Creates
+#import sys.o.Statuses
+#import sys.o.options.Options
+#import sys.o.options.Composer
+#import sys.o.options.required.Options
+#import tests.unit.o // WATCHOUT -- Does. Not. Work. (see commentariat in __library)
+#import tests.unit.o.__library
+class tests::unit::o::Palette {
+protected:
+  virtual ~Palette() = default;
+public:
+  using Access = library::Access;
+  using Accesses = library::Accesses;
+  using Create = library::Create;
+  using Creates = library::Creates;
+  using Status = library::Status;
+  using Statuses = library::Statuses;
+  template<typename... NAMES> requires library::options::required::Names<NAMES...> using Options = library::options::Options<NAMES...>;
+  template<library::options::required::Options OPTIONS> using Composer = library::options::Composer<OPTIONS>;
+protected:
+  // Some functions to call which will trigger the implicit conversion at the call site.
+  template<library::options::required::Options OPTIONS> static auto composer(Composer<OPTIONS>) -> Composer<OPTIONS>;
+  template<library::options::required::Options OPTIONS> static auto options(OPTIONS) -> OPTIONS;
+};
+#endiv
+#divert <tpp>
+#import cppunit.Asserter
+namespace tests::unit::o {
+  // These exist to be called without ambiguity.  That is all they do, exhibit callability.
+  template<library::options::required::Options OPTIONS> auto Palette::composer(Composer<OPTIONS> in) -> Composer<OPTIONS> { return in; }
+  template<library::options::required::Options OPTIONS> auto Palette::options(OPTIONS in) -> OPTIONS { return in; }
+}
+#endiv

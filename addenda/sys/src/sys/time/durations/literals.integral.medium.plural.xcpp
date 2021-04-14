@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sys.time.durations.literals
+namespace sys {
+  namespace time {
+    namespace durations {
+      namespace literals {
+
+	// Medium (plural)
+	constexpr inline integral operator"" _nsecs(unsigned long long);
+	constexpr inline integral operator"" _usecs(unsigned long long);
+	constexpr inline integral operator"" _msecs(unsigned long long);
+	constexpr inline integral operator"" _secs(unsigned long long);
+	constexpr inline integral operator"" _mins(unsigned long long);
+	constexpr inline integral operator"" _hrs(unsigned long long);
+
+      }
+    }
+  }
+}
+
+#import sys.time.duration_cast
+
+constexpr auto sys::time::durations::literals::operator"" _nsecs(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::nanoseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _usecs(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::microseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _msecs(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::milliseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _secs(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::seconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _mins(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::minutes(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _hrs(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::hours(n));
+}
+#endiv

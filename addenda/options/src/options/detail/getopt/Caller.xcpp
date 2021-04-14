@@ -1,0 +1,70 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// prefiguring "getoptions.h"
+struct option;
+namespace options {
+  namespace detail {
+    namespace getopt {
+      class Caller;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import options.detail.getopt.State
+// Captures the state of the getopt API
+// The POSIX and GNU API both side-effect (public and private) global variables.
+// The concept here is to capture the variables before and after the calls
+//
+// Usage
+//   Getopt state;
+//   Getopt::Caller calling(state);
+//   int r = calling.getopt(...)
+//
+class options::detail::getopt::Caller {
+public:
+  inline explicit Caller(State &state);
+  // Just like the glibc API (global variable-based)
+  inline auto getopt(int argc, char *const *argv, char const *short_options_specification) -> int;
+  inline auto getopt_long(int argc, char *const *argv, char const *short_options_specification, ::option const *long_options_specification, int *long_options_index) -> int;
+  inline auto getopt_long_only(int argc, char *const *argv, char const *short_options_specification, option const *long_options_specification, int *long_options_index) -> int;
+protected:
+  State &state;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+#import options.detail.getopt.Guard
+#import options.detail.getopt.State
+#import getopt      // POSIX getopt (short)
+#import getopt_long // GNU getopt_long
+
+options::detail::getopt::Caller::Caller(State &the_state)
+  : state(the_state) {
+  ;
+}
+
+#import std.hex
+#import std.dec
+#import std.setfill
+#import std.setw
+#import std.uint64_t
+#import std.cerr
+auto options::detail::getopt::Caller::getopt(int argc, char *const *argv, char const *short_options_specification) -> int {
+  Guard guard(state);
+  return ::getopt(argc, argv, short_options_specification);
+}
+  
+auto options::detail::getopt::Caller::getopt_long(int argc, char *const *argv, char const *short_options_specification, ::option const *long_options_specification, int *long_options_index) -> int {
+  Guard guard(state);
+  return ::getopt_long(argc, argv, short_options_specification, long_options_specification, long_options_index);
+}
+
+auto options::detail::getopt::Caller::getopt_long_only(int argc, char *const *argv, char const *short_options_specification, option const *long_options_specification, int *long_options_index) -> int {
+  Guard guard(state);
+  return ::getopt_long_only(argc, argv, short_options_specification, long_options_specification, long_options_index);
+}
+#divert </ipp>

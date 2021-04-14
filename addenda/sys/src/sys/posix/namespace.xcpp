@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import id_t // [[REMOVETHIS]] when ready, instead use sys.id.process.Process
+#import idtype_t // [[REMOVETHIS]] when ready, intead use something from sys.w.Type or such
+#import pid_t // [[REMOVETHIS]] when ready
+#import siginfo_t // [[REMOVETHIS]] when ready ... see sys.signal.Info or such
+namespace sys::posix {
+  namespace avoid {
+    //
+    // A Void Interface
+    // An Untyped Interface
+    // Good Luck.
+    // The dreaded 'void *' interface of POSIX and C.
+    // AVOID.
+    //
+  }
+  namespace direct {
+    //
+    // The "direct"-return system call.
+    // These return an 'int' or a 'long' not a call::result::Value<int> or Value<long>
+    // Example: sys.posix.syscall
+    //          ...this is the only exmaple..
+    //
+  }
+  namespace [[detail]] positioned {
+    //
+    // System calls in here are implementation details. 
+    // This namespace variant is not expected to be available for all system calls.
+    // They uses an overloaded 'int' for variant argument accepting a dirfd or AT::FDCWD.
+    // Example: sys.posix.faccessat
+    // 
+  }
+  namespace native {
+    //
+    // The "native" style system calls which return an integer file descriptor.
+    // Contrast with the (deprecating) namespace intfd
+    // Examples:
+    //
+    //      sys::posix::native::open(int, Pathname, Flags, Mode) -> Result   ... returning the integer)
+    //      sys::posix::native::openat(int, Pathname, Flags, Mode) -> Result ... ibidem.
+    //
+    // e.g.
+    //      open, close,
+    //      {,p}{read,write}{,v}, fcntl (et al.), ioctl (et al.)
+    //      the "f" variants; e.g. fchmod, fchown, fstat, etc.
+    //      the "at" variant, e.g. faccessat, fchmodat, fchownat, fstatat, etc.
+  }
+  namespace [[deprecated("ill-posed, prefer namespace native")]] intfd {
+    //
+    // (deprecating) system calls that return 'int' as a file descriptor.
+    // This is more rare than namespace native.
+    // PREFER the id::File variants which are in convenient namespaces.
+    // THEN PREFER namespace namtive
+    // THEN namespace intfd
+    //
+    // Examples
+    //
+    //   never mind, this one is ill-posed.  PREFER namespace native
+    //
+  }
+  //
+  // [[REMOVEWHEN]] ... they are swapped out for the indicated modernizations
+  //
+  using ::id_t; // ........... id::Wait
+  using ::idtype_t; // ....... id::wait::Type
+  using ::pid_t; // .......... id::Process (process::Process)
+  using pgid_t = pid_t; // ... id::process::Group
+  using ::siginfo_t; // [[FIXTHIS]] what is this, why is it here?
+  // <strike>should have struct ::stat here</strike> see sys.posix.packaging.stat.Buffer
+}
+#endiv

@@ -1,0 +1,4 @@
+# the compiler trash
+*.o
+main
+prove

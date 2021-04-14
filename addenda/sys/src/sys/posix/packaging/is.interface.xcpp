@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.argument.Pathname
+#import sys.call.argument.Permissions
+#import sys.id.File
+#import sys.posix.packaging.stat.Buffer
+namespace sys::posix::packaging::is::interface {
+  //
+  // Usage:
+  //
+  //   namespace sys::posix {
+  //     namespace packaging::is {
+  //       using namespace packaging::is::interface;
+  //       namespace function {
+  //       ...declare... auto isdir(Pathname) -> Result;
+  //       }
+  //     }
+  //
+  using stat::Buffer;
+  using id::File;
+  using call::argument::Pathname;
+  using call::argument::Permissions;
+}
+#endiv

@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.is_unsigned // to capture the sense of the bignums
+#include <hpp/nonstd.is_unsigned>
+#import nonstd.required.character.Type
+#import std.is_floating_point
+namespace nonstd::required::integer {
+  //
+  // What constitutes an unsigned integer?
+  //
+  // n.b. definitionally, the "character" types are not integers.
+  // There are "large" integers out there (bignums
+  //
+  template<typename INTEGER> concept bool Unsigned = is_unsigned<INTEGER>::value && !character::Type<INTEGER> && !std::is_floating_point<INTEGER>::value;
+}
+#endiv
+#divert <cpp>
+#import nonstd.integers
+namespace {
+  namespace tests {
+    using namespace nonstd::required::integer;
+    using namespace nonstd::integers;
+    // signed
+    static_assert(!Unsigned<int8_t>);
+    static_assert(!Unsigned<int16_t>);
+    static_assert(!Unsigned<int32_t>);
+    static_assert(!Unsigned<int64_t>);
+    static_assert(!Unsigned<int128_t>);
+    // unsigned
+    static_assert(Unsigned<uint8_t>);
+    static_assert(Unsigned<uint16_t>);
+    static_assert(Unsigned<uint32_t>);
+    static_assert(Unsigned<uint64_t>);
+    static_assert(Unsigned<uint128_t>);
+    // and the "not an integer" ones.
+    static_assert(not Unsigned<long double>);
+    static_assert(not Unsigned<double>);
+    static_assert(not Unsigned<float>);
+    static_assert(not Unsigned<char>);
+    static_assert(not Unsigned<wchar_t>);
+    static_assert(not Unsigned<char32_t>);
+    static_assert(not Unsigned<char16_t>);
+#if 9 < __GNUC__
+    static_assert(not Unsigned<char8_t>);
+#endif
+  }
+}
+#endiv

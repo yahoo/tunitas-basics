@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time.durations
+
+// These are promised to us in the std::literals::chrono_literals in C++14
+// See http://en.cppreference.com/w/cpp/chrono/duration#Literals
+//
+// We supply them here in sys.time.durations.literals
+// e.g.
+// using namespace sys::time::durations::literals
+//
+#endiv
+#divert <hpp>
+#import sys.time.durations.literals.integral.short
+#import sys.time.durations.literals.integral.medium.singular
+#import sys.time.durations.literals.integral.medium.plural
+#import sys.time.durations.literals.integral.long.singular
+#import sys.time.durations.literals.integral.long.plural
+
+#import sys.time.durations.literals.fractional.short
+#import sys.time.durations.literals.fractional.medium.singular
+#import sys.time.durations.literals.fractional.medium.plural
+#import sys.time.durations.literals.fractional.long.singular
+#import sys.time.durations.literals.fractional.long.plural
+#endiv

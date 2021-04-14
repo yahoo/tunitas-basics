@@ -1,0 +1,123 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.basic_argv
+namespace c {
+  template<required::Character CHAR> class basic_argv<CHAR const>;
+}
+#endiv
+#divert <hpp>
+#import c.check
+#import c.detail.BoundVector.Stringz
+#import std.pair
+#import std.size_t
+#import std.tuple
+#import std.vector
+
+// This provides NO storage management.
+template<c::required::Character CHAR> class c::basic_argv<CHAR const> : public detail::BoundVector<detail::Stringz<CHAR const>> {
+  using ancestor = detail::BoundVector<detail::Stringz<CHAR const>>;
+public:
+  basic_argv() = default;
+  // preceding size is primary
+  inline basic_argv(std::size_t argc, typename ancestor::const_data_type argv);
+  // trailing size overrides inferred size
+  template<std::size_t N> inline basic_argv(typename ancestor::value_type const (&argv)[N], std::size_t argc = N-1);
+  template<std::size_t N> [[deprecated]] inline basic_argv(check::Bound, std::size_t argc, typename ancestor::value_type const (&argv)[N]);
+  template<std::size_t N> [[deprecated]] inline basic_argv(check::No, std::size_t argc, typename ancestor::value_type const (&argv)[N]);
+  inline basic_argv(std::pair<std::size_t, CHAR **>);
+  inline basic_argv(std::pair<std::size_t, CHAR const *const *>);
+  inline basic_argv(std::tuple<std::size_t, CHAR **>);
+  inline basic_argv(std::tuple<std::size_t, CHAR const *const *>);
+  template<typename ALLOC> inline basic_argv(std::vector<CHAR *, ALLOC> const &);
+  template<typename ALLOC> inline basic_argv(std::vector<CHAR const *, ALLOC> const &);
+  inline basic_argv(basic_argv<CHAR>);
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#import std.is_same
+static_assert(std::is_same<char const *, c::basic_argv<char const>::const_value_type>::value, "FAIL: c::basic_argv<char const>::const_value_type is a surprise");
+static_assert(std::is_same<char const *const *, c::basic_argv<char const>::const_data_type>::value, "FAIL: c::basic_argv<char const>::const_data_type is a surprise");
+static_assert(std::is_same<char const *, c::basic_argv<char const>::value_type>::value, "FAIL: c::basic_argv<char const>::value_type is a surprise");
+static_assert(std::is_same<char const *const *, c::basic_argv<char const>::data_type>::value, "FAIL: c::basic_argv<char const>::data_type is a surprise");
+#import std.is_constructible
+// TO(FROM)
+static_assert(std::is_constructible<c::basic_argv<char const>, char const *const (&)[2]>::value, "FAIL: basic_argv<char const> is not constructible from '(char const *const [2])'");
+static_assert(std::is_constructible<c::basic_argv<char const>, int, char const *const [3]>::value, "FAIL: basic_argv<char const> is not constructible from the pair '(int, char const *const [3])'");
+static_assert(std::is_constructible<c::basic_argv<char const>, int, char const *const *>::value, "FAIL: basic_argv<char const> is not constructible from the pair '(int, char const *const *)'");
+static_assert(std::is_constructible<c::basic_argv<char const>, int, char *const *>::value, "FAIL: basic_argv<char const> is not constructible from the pair '(int, char *const *)'");
+static_assert(std::is_constructible<c::basic_argv<char const>, int, char **>::value, "FAIL: basic_argv<char const> is not constructible from the pair '(int, char **)'");
+#endiv
+#divert <ipp>
+#import c.basic_argv
+#import c.detail.argv.enforce_terminating_nullptr_invariant
+#import std.get
+#import std.length_error
+#import std.min
+template<c::required::Character CHAR> template<std::size_t N> c::basic_argv<CHAR const>::basic_argv(check::Bound, std::size_t arg_argc, typename ancestor::value_type const (&arg_argv)[N])
+  : basic_argv(check::No::CHECK, arg_argc, arg_argv) {
+  if (arg_argc > N-1) {
+    throw std::length_error("size > N");
+  }
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> template<std::size_t N> c::basic_argv<CHAR const>::basic_argv(check::No, std::size_t arg_argc, typename ancestor::value_type const (&arg_argv)[N])
+  : ancestor(arg_argv, std::min(arg_argc, N-1)) {
+  // Even though N is manifest we are directed to not compare it against ancestor::length.
+  // no check for nullptr end sentinel either
+}
+
+template<c::required::Character CHAR> template<std::size_t N> c::basic_argv<CHAR const>::basic_argv(typename ancestor::value_type const (&arg_argv)[N], std::size_t arg_argc)
+  : basic_argv(std::min(arg_argc, N-1), arg_argv) {
+  if (arg_argc > N-1) {
+    throw std::length_error("size > N");
+  }
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(std::size_t arg_argc, typename ancestor::const_data_type arg_argv)
+  : ancestor(arg_argv, arg_argc) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(std::pair<std::size_t, CHAR **> subject)
+  : ancestor(subject.second, subject.first) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(std::pair<std::size_t, CHAR const *const *> subject)
+  : ancestor(subject.second, subject.first) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(std::tuple<std::size_t, CHAR **> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(std::tuple<std::size_t, CHAR const *const *> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> template<typename ALLOC> c::basic_argv<CHAR const>::basic_argv(std::vector<CHAR *, ALLOC> const &subject)
+  : ancestor(subject.data(), detail::argv::size_after_discounting_final_nullptr(subject)) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> template<typename ALLOC> c::basic_argv<CHAR const>::basic_argv(std::vector<CHAR const *, ALLOC> const &subject)
+  : ancestor(subject.data(), detail::argv::size_after_discounting_final_nullptr(subject)) {
+  detail::argv::enforce_terminating_nullptr_invariant(ancestor::length, ancestor::held);
+}
+
+template<c::required::Character CHAR> c::basic_argv<CHAR const>::basic_argv(basic_argv<CHAR> subject)
+  : ancestor(subject.data(), subject.size()) {
+  ; // no need to revalidate if basic_argv<CHAR> already did
+}
+#endiv

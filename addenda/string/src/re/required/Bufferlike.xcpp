@@ -1,0 +1,58 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.basic_stringn
+#import c.basic_stringz
+#include <hpp/c.basic_stringn>  // to get the complete type declaration for use in the requires clause
+#include <hpp/c.basic_stringz> // ibidem.
+#import re.required.Corelike
+#import std.is_same
+#import std.size_t
+namespace re::required {
+  //
+  // Only these two types can be the implementation choices for the Core<UNIFIER>
+  // Yup, just these and no more.
+  //
+  template<typename UNIFIER> concept bool Bufferlike = requires(UNIFIER unifier, UNIFIER const cunifier) {
+    requires Corelike<UNIFIER>;
+    typename UNIFIER::value_type;
+    { unifier.data() } -> typename UNIFIER::value_type const *; // but maybe non-const too
+    { cunifier.data() } -> typename UNIFIER::value_type const *;
+    { unifier.size() } -> std::size_t;
+    // and many other needs, which are not yet declared here.
+    //
+    // Loosen the specification a bit to allow other types that match the (above) concept criteria
+    // TOO TIGHT ---> requires (std::is_same<UNIFIER, c::basic_buffer<char const>>::value ||
+    // TOO TIGHT --->           std::is_same<UNIFIER, c::basic_buffer<char>>::value ||
+    // TOO TIGHT --->           std::is_same<UNIFIER, c::basic_stringn<char const>>::value ||
+    // TOO TIGHT --->           std::is_same<UNIFIER, c::basic_stringn<char>>::value ||
+    // TOO TIGHT --->           std::is_same<UNIFIER, std::string>::value ||
+    // TOO TIGHT --->           std::is_same<UNIFIER, std::vector<char>>::value);
+    // But deny these types as they are unsuitable, expecting a '\0' terminator sentinel
+    requires !(std::is_same<UNIFIER, c::basic_stringn<char const>>::value ||
+               std::is_same<UNIFIER, c::basic_stringn<char>>::value ||
+               std::is_same<UNIFIER, c::basic_stringz<char const>>::value ||
+               std::is_same<UNIFIER, c::basic_stringz<char>>::value);
+  };
+}
+#endiv
+#divert <hpp>
+#import c.basic_buffer
+#import std.string
+#import std.vector
+namespace re::required {
+  // At least we know these will work.
+  static_assert(Bufferlike<c::basic_buffer<char>>, "fail");
+  static_assert(Bufferlike<c::basic_buffer<char const>>, "fail");
+  static_assert(!Bufferlike<c::basic_stringn<char>>, "fail");
+  static_assert(!Bufferlike<c::basic_stringn<char const>>, "fail");
+  static_assert(!Bufferlike<c::basic_stringz<char>>, "fail");
+  static_assert(!Bufferlike<c::basic_stringz<char const>>, "fail");
+  static_assert(Bufferlike<std::string>, "fail");
+  static_assert(Bufferlike<std::vector<char>>, "fail");
+}
+#endiv

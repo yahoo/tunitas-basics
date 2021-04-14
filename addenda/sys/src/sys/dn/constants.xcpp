@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::dn {
+  // For convenience, each is a standalone constant.
+  // They are bundled in a namespace for easy import elsewhere.
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.dn.Notify
+#import sys.dn.Notifies
+namespace sys::dn::constants {
+  inline constexpr auto NONE = Notifies{Notifies::NONE};
+  inline constexpr auto ACCESS = Notifies{Notify::ACCESS};
+  inline constexpr auto MODIFY = Notifies{Notify::MODIFY};
+  inline constexpr auto CREATE = Notifies{Notify::CREATE};
+  inline constexpr auto DELETE = Notifies{Notify::DELETE};
+  inline constexpr auto RENAME = Notifies{Notify::RENAME};
+  inline constexpr auto ATTRIBUTE = Notifies{Notify::ATTRIBUTE};
+  inline constexpr auto MULTISHOT = Notifies{Notify::MULTISHOT};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto ATTRIB = Notifies{Notify::ATTRIB};
+#pragma GCC diagnostic pop
+}
+#endiv

@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::time {
+  //
+  // The time "VAL"ue
+  //
+  // Concept:
+  //
+  //   Microseconds.
+  //   Not at global scope; ADL capable.
+  //
+  //   If you want more fluidity & facilities then use duration::Microseconds.
+  //
+  // Traditions:
+  //
+  //   Keep with the POSIX tradition of dropping vowels and consonants.
+  //   Keep with the POSIX tradition of arbitrary names like "value" contra "spec"
+  //    
+  struct Val;
+}
+#endiv
+#divert <hpp>
+#import sys.time // [[FIXTHIS]] everything is in the "namespace" module
+class sys::time::Val : public time::val {
+  using Ancestor = time::val;
+public:
+  using From = Ancestor;
+  constexpr Val() noexcept : Ancestor{val{}} { }
+  constexpr Val(Ancestor const &a) noexcept : Ancestor{a} { }
+  constexpr Val(time_t whole, suseconds_t fraction) noexcept : Ancestor{whole, fraction} { }
+  using Ancestor::timeval;
+};
+#endiv

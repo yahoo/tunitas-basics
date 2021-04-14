@@ -1,0 +1,23 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+namespace json {
+  // no declarations in here (yet)
+}
+#forward json.Value
+#import std.string
+#import boost.lexical_cast
+namespace boost {
+  // No matter what sort of json type it is, return a string thing.
+  template<> inline auto lexical_cast<std::string, json::Value>(json::Value const &) -> std::string;
+}
+#endiv
+#divert <ipp>
+#import json.Value
+template<> auto boost::lexical_cast<std::string, json::Value>(json::Value const &v) -> std::string {
+  if (v.isString()) {
+    return v.asString();
+  } else {
+    return v.toStyledString();
+  }
+}
+#endiv

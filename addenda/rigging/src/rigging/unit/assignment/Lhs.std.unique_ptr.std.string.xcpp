@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rigging.unit.assignment.Lhs
+#import std.unique_ptr
+#import std.string
+namespace rigging::unit::assignment {
+  template<> class Lhs<std::unique_ptr<std::string>>;
+}
+#endiv
+#divert <hpp>
+#import rigging.unit.Buffer
+#import rigging.unit.Stringz
+#import rigging.unit.assignment.Clear
+#import std.unique_ptr
+
+#import std.is_same
+template<> class rigging::unit::assignment::Lhs<std::unique_ptr<std::string>> {
+public:
+  using value_type = std::unique_ptr<std::string>;
+  using base_type = typename value_type::element_type;
+  using char_type = typename value_type::element_type::value_type;
+
+  inline explicit Lhs(value_type &lhs);
+  inline auto operator=(Clear) -> Lhs &;
+  // only move semantics
+  inline auto operator=(value_type &&) -> Lhs &;
+  template<std::size_t N> inline auto operator=(char_type const (&rhs)[N]) -> Lhs &;
+  inline auto operator=(base_type rhs) -> Lhs &;
+  inline auto operator=(Buffer rhs) -> Lhs &;
+  inline auto operator=(Stringz rhs) -> Lhs &;
+protected:
+  value_type &lhs;
+  template<typename WRAPPER> inline auto reset_and_copy(WRAPPER) -> void;
+};
+#endiv
+#divert <ipp>
+rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::Lhs(value_type &arg)
+  : lhs(arg) {
+  ;
+}
+
+auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::operator=(Clear) -> Lhs & {
+  lhs.reset();
+  return *this;
+}
+
+#import std.forward
+auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::operator=(value_type &&rhs) -> Lhs & {
+  lhs = std::forward<value_type>(rhs);
+  return *this;
+}
+
+#import std.is_same
+#import std.copy
+#import std.back_inserter
+template<typename WRAPPER> auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::reset_and_copy(WRAPPER rhs) -> void {
+  static_assert((std::is_same<WRAPPER, Buffer>::value
+                 ||
+                 std::is_same<WRAPPER, Stringz>::value),
+                "instantiated with neither 'const_buffer' nor 'const_stringz'");
+  if (rhs.empty()) {
+    lhs.reset();
+  } else {
+    lhs.reset(new base_type());
+    auto inserter = std::back_inserter(*lhs.get());
+    std::copy(rhs.begin(), rhs.end(), inserter);
+  }
+}
+
+#import rigging.unit.Stringz
+#import std.copy
+template<std::size_t N> auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::operator=(char_type const (&rhs)[N]) -> Lhs & {
+  // WATCHOUT - we want the Stringz variant, not the Buffer variant,
+  // because presumably there is a '\0' sentinel buried in rhs, at least at rhs[N-1]
+  rigging::unit::Stringz buf(rhs);
+  return operator=(buf);
+}
+
+auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::operator=(Buffer rhs) -> Lhs & {
+  reset_and_copy(rhs);
+  return *this;
+}
+
+auto rigging::unit::assignment::Lhs<std::unique_ptr<std::string>>::operator=(Stringz rhs) -> Lhs & {
+  reset_and_copy(rhs);
+  return *this;
+}
+#endiv

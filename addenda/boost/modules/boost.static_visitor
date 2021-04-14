@@ -1,0 +1,3 @@
+// -*- c++ -*- be545c5b-1584-4c91-87ec-a0fc565720c8
+#pragma once
+#include "boost/variant/static_visitor.hpp"

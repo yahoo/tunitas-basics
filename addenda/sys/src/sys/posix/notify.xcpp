@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.fcntl.interface
+namespace sys::posix {
+  namespace packaging::notify {
+    using namespace packaging::fcntl::interface;
+    using Result = result::Status;
+    namespace function {
+      inline auto notify(File,  Notifies) -> Result;
+    } 
+    namespace native {
+      inline auto notify(int fd,  Notifies) -> Result;
+    } 
+  }
+  using packaging::notify::function::notify;
+  namespace native { using packaging::notify::native::notify; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.F
+#import sys.posix.fcntl
+namespace sys::posix::packaging::notify {
+  auto function::notify(File fd,  Notifies notifies) -> Result { return native::notify((int)fd, notifies); }
+  auto native::notify(int fd,  Notifies notifies) -> Result    { return posix::native::fcntl(fd, F::NOTIFY, notifies); }
+}
+#endiv

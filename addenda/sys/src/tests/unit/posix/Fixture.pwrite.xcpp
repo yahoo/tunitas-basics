@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import off_t
+#import sys.id.File
+#import nonstd.const_dope
+#import nonstd.uninitialized_zero
+#import sys.posix.pwrite
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_pwrite_function_1() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::pwrite(fd, &buf[0], size, offset);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_pwrite_function_2() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    auto const dope = nonstd::const_dope<char>{&buf[0], size};
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::pwrite(fd, dope, offset);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_pwrite_native_1() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const offset = off_t{0};
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::native::pwrite(fd, &buf[0], size, offset);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_pwrite_native_2() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    auto const dope = nonstd::const_dope<char>{&buf[0], size};
+    auto const offset = off_t{0};
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::native::pwrite(fd, dope, offset);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+#endiv

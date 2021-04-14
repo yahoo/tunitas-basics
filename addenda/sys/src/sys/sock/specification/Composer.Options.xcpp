@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.specification.Composer.declaration
+#forward sys.sock.Options
+namespace sys::sock::specification {
+  //
+  // Useful in accept4(2) where the 4th argument is an Options
+  // 
+  // Usage:
+  //
+  //  auto function(Options, Options) -> Something;
+  //  auto function(Composer<Options>, Options) -> Something;
+  //  auto function(Options, Composer<Options>) -> Something;
+  //
+  template<> class Composer<Options>;
+}
+#endiv
+#divert <hpp>
+#import sys.sock.Option
+#import sys.sock.Options
+template<> class sys::sock::specification::Composer<sys::sock::Options> {
+public:
+  // NO SUCH constexpr Composer(Type);
+  inline constexpr [[implicit]] Composer(Option o) : value{(int) o} { }
+  inline constexpr [[implicit]] Composer(Options s) : value{(int) s} { }
+  using Value = int; // This is the type of the 4th argument to accept4(2)
+  using value_type [[deprecated]] = Value;
+  inline constexpr operator Value() const { return value; }
+protected:
+  Value value;
+};
+#endiv

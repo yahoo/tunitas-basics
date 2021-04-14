@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host {
+  //
+  // The host aliases.
+  // Normally are stored in some sort of char** thingy with a nullptr sentinel at the end.
+  // Robust Safety being the order of the day, herewith is a typesafe interface
+  //
+  // Const semantics only; value-generating on access.
+  // Shallow copy semantics; but it's const semantics so there is no point
+  // Move semantics: default.
+  // No destruction; the containing List manages that; being List<Entry<HOST4>>, List<Entry<HOST6>>.
+  // 
+  // Usage: see Host<HOST4>, Host<HOST6>.
+  //
+  class Aliases;
+}
+#endiv
+#divert <hpp>
+#import c.const_environv
+#forward ares.managed.host.aliases.Iterator
+class ares::managed::host::Aliases : private c::const_environv {
+  using ancestor = c::const_environv;
+public:
+  inline explicit Aliases(char const *const *aliases);
+  using ancestor::empty;
+  using ancestor::size;
+  using const_iterator = aliases::Iterator;
+  using iterator = const_iterator;
+  inline auto begin() const -> const_iterator;
+  inline auto end() const -> const_iterator;
+};
+#endiv
+#divert <ipp>
+#import ares.managed.host.aliases.Iterator
+namespace ares::managed::host {
+  Aliases::Aliases(char const *const *aliases)
+    : ancestor{aliases}
+  { }
+  auto Aliases::begin() const -> const_iterator {
+    return const_iterator{ancestor::begin()};
+  }
+  auto Aliases::end() const -> const_iterator {
+    return const_iterator{ancestor::end()};
+  }
+}
+#endiv
+o

@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_FLOCK.Usage
+//   static_assert(tests::usage::posix_FLOCK::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.FLOCK
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_FLOCK {
+  using sys::posix::FLOCK;
+  namespace [[detail]] packaging {
+    template<typename FLOCK> concept bool Instance = requires(FLOCK) {
+      typename FLOCK::Operation;
+      typename FLOCK::Options;
+      model::Namespace_Object<FLOCK>;
+      requires (int)FLOCK::EXCLUSIVE == LOCK_EX;
+      requires (int)FLOCK::SHARED == LOCK_SH;
+      requires (int)FLOCK::END == LOCK_UN;
+      requires (int)FLOCK::MANDATORY == LOCK_MAND;
+      requires (int)FLOCK::NONBLOCK == LOCK_NB;
+      requires (int)FLOCK::UNLOCK == LOCK_UN;
+      requires (int)FLOCK::EX == LOCK_EX;
+      requires (int)FLOCK::SH == LOCK_SH;
+      requires (int)FLOCK::UN == LOCK_UN;
+      requires (int)FLOCK::MAND == LOCK_MAND;
+      requires (int)FLOCK::NB == LOCK_NB;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<FLOCK>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

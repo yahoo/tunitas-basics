@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.time
+auto tests::unit::posix::fixture::Fixture::test_time() -> void {
+  {
+    auto r = six::time();
+    CPPUNIT_ASSERT(good(r));
+    CPPUNIT_ASSERT(0 <= value(r));
+  } {
+    ::sys::time::t place = -2;
+    auto r = six::time();
+    CPPUNIT_ASSERT(good(r));
+    place = value(r);
+    CPPUNIT_ASSERT(-2 != place);
+    CPPUNIT_ASSERT(place == value(r));
+  }
+}
+#endiv

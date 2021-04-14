@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.nonstd.Fixture
+#import nonstd.to_underlying
+#import nonstd.same_as
+#import std.remove_const
+auto tests::unit::nonstd::fixture::Fixture::test_to_underlying() -> void {
+  enum Something : long { };
+  auto something = Something{3};
+  auto underlying = library::to_underlying(something); // <----- test this
+  // to_underlying is constexpr so it can't fail (at runtime)
+  CPPUNIT_ASSERT((library::same_as<long, std::remove_const_t<decltype(underlying)>>));
+  CPPUNIT_ASSERT(3 == underlying);
+}
+#endiv

@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace query {
+      //
+      // The query on the (test) database.
+      //
+      class Query;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Connection
+#import sqlite.Statement
+#import std.string
+#import sqlite.query.Row
+#import sqlite.query.Rows
+#import sqlite.query.Cursor
+class tests::unit::query::Query {
+public:
+  Query();
+  enum UNIQUENESS { };
+  // WATCHOUT - do not use 'char' as the datatype for column #1; that just means "TEXT"  in SQLite.
+  //            see https://www.sqlite.org/datatype3.html
+  //
+  // Recall: there is no 'bool' in SQLite, just 'TINYINT'
+  //
+  using row_type = ::sqlite::query::Row<UNIQUENESS, bool, int, double, std::string>;
+  using rows_type = ::sqlite::query::Rows<UNIQUENESS, bool, int, double, std::string>;
+  using cursor_type = ::sqlite::query::Cursor<UNIQUENESS, bool, int, double, std::string>; 
+  // this is a tester ... these throw on any problem
+  auto prepare(::sqlite::Connection &conn) -> void;
+  auto exec() -> rows_type;
+protected:
+  ::sqlite::Statement prepared;
+  std::string unprepared;
+};
+#endiv
+#divert <cpp>
+tests::unit::query::Query::Query()
+  : prepared()
+  , unprepared("select * from t99") {
+  ;
+}
+
+auto tests::unit::query::Query::prepare(::sqlite::Connection &conn) -> void {
+  auto r = conn.prepare<::sqlite::Statement>(unprepared);
+  check(r, "failure to prepare " + unprepared);
+  prepared = std::move(value(r));
+}
+
+auto tests::unit::query::Query::exec() -> rows_type {
+  return rows_type(prepared);
+}
+#endiv

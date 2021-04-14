@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.iterator_traits
+#forward slurp.file.istream.Iterator.byte
+namespace std {
+  template<> struct iterator_traits<slurp::file::istream::Iterator<std::byte>>;
+}
+#endiv
+#divert <hpp>
+#import std.byte
+#import std.ptrdiff_t
+#import std.input_iterator_tag
+template<> struct std::iterator_traits<slurp::file::istream::Iterator<std::byte>> {
+  // New School
+  using Value = std::byte;
+  using Difference = std::ptrdiff_t;
+  using Pointer = Value const *;
+  using Reference = Value const &;
+  using Category = std::input_iterator_tag;
+  // old_school
+  using value_type = Value;
+  using difference_type = Difference;
+  using pointer = Pointer;
+  using reference = Reference;
+  using iterator_category = Category;
+};
+#endiv

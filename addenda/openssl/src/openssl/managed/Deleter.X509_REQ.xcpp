@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.managed.Deleter
+#import openssl.types // x509_REQ
+namespace openssl::managed {
+  template<> struct Deleter<X509_REQ>;
+}
+#endiv
+#divert <hpp>
+template<> struct openssl::managed::Deleter<X509_REQ> {
+  using Value = X509_REQ;
+  inline auto operator()(Value *) const -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+auto openssl::managed::Deleter<X509_REQ>::operator()(Value *value) const -> void {
+  if (value) {
+    X509_REQ_free(value);
+  }
+}
+#endiv

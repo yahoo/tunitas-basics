@@ -1,0 +1,15 @@
+// -*- c++ -*- bcb463d7-0711-4606-8324-d6a4926da6fb
+#pragma once
+#include <cppunit/ui/text/TextTestRunner.h>
+namespace cppunit {
+  namespace text {
+    //
+    // WATCHOUT - this thing has different semantics than CppUnit::TestRunner;
+    // It overloads the members differently and it performs policy on the
+    // configuration of the invocation which is non-obvious from the ancestor.
+    //
+    // Avoid.
+    //
+    using Runner = CppUnit::TextTestRunner;
+  }
+}

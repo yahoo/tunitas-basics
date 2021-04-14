@@ -1,0 +1,197 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::channel { class Channel; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.channel.Channel
+#import ares.Library
+#import std.unique_ptr
+class tests::unit::channel::Channel : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::channel::Channel;
+  auto setUp() -> void final;
+  auto tearDown() -> void final;
+  auto test_constructor_default() -> void;
+  auto test_constructor_blob_set() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_destructor() -> void;
+  auto test_dup() -> void;
+  auto test_save() -> void;
+  auto test_cancel() -> void;
+  auto test_swap() -> void;
+  auto test_get() -> void;
+  auto test_release() -> void;
+  auto test_reset() -> void;
+  auto test_set_source_ip4() -> void;
+  auto test_set_source_ip6() -> void;
+  auto test_set_source_device() -> void;
+  auto test_set_address_ordering_specification() -> void;
+  auto test_set_sortlist() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  std::unique_ptr<::ares::Library> library;
+  static auto generate() -> Subject;
+};
+#endiv
+#divert <cpp>
+#import std.make_unique
+auto tests::unit::channel::Channel::setUp() -> void {
+  library = std::make_unique<ares::Library>();
+}
+auto tests::unit::channel::Channel::tearDown() -> void {
+  library.reset();
+}
+auto tests::unit::channel::Channel::generate() -> Subject {
+  ::ares::channel::option::Blob blob{};
+  ::ares::channel::option::Set set{};
+  return Subject{blob, set};
+}
+auto tests::unit::channel::Channel::test_constructor_default() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+#import ares.channel.option.Blob
+#import ares.channel.option.Set
+auto tests::unit::channel::Channel::test_constructor_blob_set() -> void {
+  ::ares::channel::option::Blob blob{};
+  ::ares::channel::option::Set set{};
+  Subject subject{blob, set}; // <----------------------------------------- test this
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::channel::Channel::test_constructor_move() -> void {
+  auto specimen = generate();
+  Subject subject = std::move(specimen); // <------------------------------ test this
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::channel::Channel::test_assignment_move() -> void {
+  auto specimen = generate();
+  Subject subject;
+  subject = std::move(specimen); // <------------------------------ test this
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::channel::Channel::test_destructor() -> void {
+  // every test case exercises the the destructor
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::channel::Channel::test_dup() -> void {
+  Subject subject = generate();
+  auto duplicated = subject.dup(); // ------------------------- test this
+  CPPUNIT_ASSERT(sizeof (duplicated));
+}
+auto tests::unit::channel::Channel::test_save() -> void {
+  Subject subject = generate();
+  auto saved = subject.save(); // ------------------------- test this
+  CPPUNIT_ASSERT(sizeof (saved));
+}
+#import ares.query
+#import ares.dns.constants
+auto tests::unit::channel::Channel::test_cancel() -> void {
+  namespace dns = ::ares::dns;
+  Subject subject = generate();
+  std::function<void (::ares::error::Code, ::ares::Count, ::ares::Buffer<std::byte const >)> fff = [](::ares::error::Code, ::ares::Count, ::ares::Buffer<std::byte const >) {
+                                                                                                     std::cerr << "CANCEL HAPPENED\n";
+                                                                                                   };
+  ::ares::query(subject, "junk.junk.junk.", dns::IN, dns::TXT, fff);
+  subject.cancel(); // ------------------------- test this
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::channel::Channel::test_swap() -> void {
+  Subject one = generate();
+  auto const gone = one.get();
+  Subject two = generate();
+  auto const gtwo = two.get();
+  swap(one, two); // <-------------------------------------- test this
+  CPPUNIT_ASSERT(two.get() == gone);
+  CPPUNIT_ASSERT(one.get() == gtwo);
+}
+auto tests::unit::channel::Channel::test_get() -> void {
+  Subject subject = generate();
+  auto const got = subject.get();
+  CPPUNIT_ASSERT(nullptr != got);
+}
+auto tests::unit::channel::Channel::test_release() -> void {
+  Subject subject = generate();
+  auto const old = subject.get();
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  Subject cleanup;
+  cleanup.reset(subject.release());
+  CPPUNIT_ASSERT(nullptr == subject.get());
+  CPPUNIT_ASSERT(old == cleanup.get());
+}
+auto tests::unit::channel::Channel::test_reset() -> void {
+  Subject subject = generate();
+  subject.reset();
+  CPPUNIT_ASSERT(nullptr == subject.get());
+}
+#import ip.in4 // in4::addr_t, in4::addr
+#import ip.as
+auto tests::unit::channel::Channel::test_set_source_ip4() -> void {
+  Subject subject = generate();
+  ::ip::in4::addr_t integer = (192 << 24) | (2 << 8) | 3;
+  subject.set_source(::ip::as<::ip::in4::addr>(integer));
+}
+auto tests::unit::channel::Channel::test_set_source_ip6() -> void {
+  Subject subject = generate();
+  ::ip::in6::addr_t integer = ::ip::in6::addr_t(0x0'2001'0db8lu << 32) << 64 | 0x1;
+  subject.set_source(::ip::as<::ip::in6::addr>(integer));
+}
+auto tests::unit::channel::Channel::test_set_source_device() -> void {
+  Subject subject = generate();
+  subject.set_source("eth0");
+}
+auto tests::unit::channel::Channel::test_set_address_ordering_specification() -> void {
+  Subject subject = generate();
+  subject.set_address_ordering_specification("192.0.2.0/255.255.255.0 2001:0db8::/ffff:ffff::");
+}
+auto tests::unit::channel::Channel::test_set_sortlist() -> void {
+  Subject subject = generate();
+  subject.set_sortlist("192.0.2.0/255.255.255.0 2001:0db8::/ffff:ffff::");
+}
+#import rigging.suite.io
+auto tests::unit::channel::Channel::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Channel"};
+  {
+    Stream con{"constructor"};
+    con << call("default", &Channel::test_constructor_default)
+        << call("blob,set", &Channel::test_constructor_blob_set)
+        << call("move", &Channel::test_constructor_move)
+      ;
+    series << move(con);
+  } {
+    Stream ass{"assignment"};
+    ass << call("move", &Channel::test_assignment_move)
+      ;
+    series << move(ass);
+  }
+  series << call("destructor", &Channel::test_destructor)
+         << call("dup", &Channel::test_dup)
+         << call("save", &Channel::test_save)
+         << call("cancel", &Channel::test_cancel)
+         << call("swap", &Channel::test_swap)
+         << call("get", &Channel::test_get)
+         << call("release", &Channel::test_release)
+         << call("reset", &Channel::test_reset)
+    ;
+  {
+    Stream set{"set"};
+    {
+      Stream sou{"source"};
+      sou << call("ip4", &Channel::test_set_source_ip4)
+          << call("ip6", &Channel::test_set_source_ip6)
+          << call("device", &Channel::test_set_source_device)
+        ;
+      set << move(sou);
+    }
+    series << move(set)
+           << call("address-ordering-specification", &Channel::test_set_address_ordering_specification)
+           << call("sortlist", &Channel::test_set_sortlist)
+      ;
+  }
+  return finalize(series);
+}
+#endiv

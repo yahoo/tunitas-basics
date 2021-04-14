@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::failure {
+  //
+  // Frequently, error signalling can be by return value or by exception.
+  // These types provide a overload possibility similar to std::nothrow_t.
+  //
+  // Usage:
+  //
+  //    #include json.failure
+  //    auto function(Throwing, ...arguments...) -> Result;
+  //    auto function(Returning, ...arguments...) -> Result;
+  //
+  //    #include json.failure.constants
+  //    auto f = function(THROWING, ...arguments...);
+  //    auto f = function(RETURNING, ...arguments...);
+  //
+  enum class Throwing { VALUE [[deprecated("instead use json::failure::Throwing{}")]] = 0 };
+  enum class Returning { VALUE [[deprecated("instead use json::failure::Returning{}")]] = 0 };
+  using Thrown [[deprecated("instead use json::failure::Throwing")]] = Throwing;
+  using Returned [[deprecated("instead use json::failure::Returning")]] = Returning;
+}
+#endiv

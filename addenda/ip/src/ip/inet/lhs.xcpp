@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.inet.xhs.family.Lhs
+#import ip.inet.xhs.address.Lhs
+#import ip.inet.xhs.port.Lhs
+#import ip.required.Address
+#import ip.required.Port
+#import ip.inet.required.Family
+namespace ip::inet {
+  //
+  // Modulate the assignments to ip{4,6}::addr{,_t}
+  // managing the network-order (big endian) and host order (little endian)
+  //
+  //   lhs(item) = some_value_at_all
+  //
+  // for: in4::addr_t, in4::addr, in6::addr_t, in6::addr
+  //
+  template<required::Address ADDRESS> inline auto lhs(ADDRESS &) -> xhs::address::Lhs<ADDRESS>;
+  //
+  // WATCHOUT - the family (sin_family, sin6_family) is *also* an unsigned short.
+  // Witness - /usr/include/linux/socket.h:12:typedef unsigned short __kernel_sa_family_t;
+  //
+  template<required::Port PORT> inline auto lhs(in::port_t &) -> xhs::port::Lhs<PORT>;
+  template<required::Family FAMILY> inline auto lhs(unsigned short &) -> xhs::family::Lhs<FAMILY>;
+  inline auto lhs(in::port_t &) -> xhs::port::Lhs<in::port_t>;
+}
+#endiv
+#divert <ipp>
+namespace ip {
+  template<inet::required::Address ADDRESS> auto inet::lhs(ADDRESS &subject) -> xhs::address::Lhs<ADDRESS> {
+    return xhs::address::Lhs<ADDRESS>(subject); 
+  }
+  auto inet::lhs(in::port_t &subject) -> xhs::port::Lhs<in::port_t> {
+    return xhs::port::Lhs<in::port_t>(subject);
+  }
+  template<inet::required::Port PORT> auto inet::lhs(in::port_t &subject) -> xhs::port::Lhs<PORT> {
+    return xhs::port::Lhs<PORT>(subject); 
+  }
+  template<inet::required::Family FAMILY> auto inet::lhs(unsigned short &subject) -> xhs::family::Lhs<FAMILY> {
+    return xhs::family::Lhs<FAMILY>(subject);
+  }
+}
+#endiv

@@ -1,0 +1,152 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward tests.unit.c.as.Palette
+namespace tests::unit::c::as {
+  enum class WORDS { };
+  template<> class Palette<WORDS>;
+}
+#divert </fpp>
+#divert <hpp>
+#import c.basic_argv
+#import std.array
+#import std.size_t
+#import std.vector
+#import std.free
+#import strdup
+template<> class tests::unit::c::as::Palette<tests::unit::c::as::WORDS> { 
+protected:
+  // descendants only
+  virtual ~Palette() = default;
+  // Unified in the descendant
+  virtual auto setUp() -> void;
+  virtual auto tearDown() -> void;
+public: 
+  Palette() = default;
+
+  ::c::basic_argv<char> bac;            // (::c::)basic_argv of char
+  ::c::basic_argv<char const> bacc;     // (::c::)basic_argv of const_char
+  ::std::array<char *, 13> apc;         // (::std::)array-of-pointer-to-char
+  ::std::array<char const *, 13> apcc;  // (::std::)array-of-pointer-to-const-char
+private:
+  template<typename CONTAINER> inline auto tearDown(CONTAINER &) -> void;
+  ::std::vector<char *> c_basic_argv_pool;
+  ::std::vector<char *> std_array_pool;
+public:
+  template<typename CHAR_A, typename CHAR_B> auto prove_is_same(::c::basic_argv<CHAR_A> const &a, ::c::basic_argv<CHAR_B> const &b) -> void;
+  template<typename CHAR_A, ::std::size_t N, typename CHAR_B> auto prove_is_same(::std::array<CHAR_A *, N> const &a, ::c::basic_argv<CHAR_B> const &b) -> void;
+  template<typename CHAR_A, typename CHAR_B, ::std::size_t N> auto prove_is_same(::c::basic_argv<CHAR_A> const &a, ::std::array<CHAR_B *, N> const &b) -> void;
+  template<typename CHAR, ::std::size_t N> auto prove_is_same(::std::array<CHAR *, N> const &a, ::std::array<CHAR *, N> const &b) -> void;
+};
+#divert </hpp>
+#divert <tpp>
+#import cppunit.test.Assert // require CPPUNIT_ASSERT
+
+template<typename CHAR, ::std::size_t N> auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::prove_is_same(::std::array<CHAR *, N> const &a, ::std::array<CHAR *, N> const &b) -> void {
+  // WATCHOUT - for the "argv" data type, the arr[arr.size()-1()] must be nullptr so the "declared size" is size-1
+  // Can't say this enough times.
+  ::c::basic_argv<CHAR const> baa(a.size()-1, a.begin());
+  ::c::basic_argv<CHAR const> bab(b.size()-1, b.begin());
+  prove_is_same(baa, bab);
+}
+
+template<typename CHAR_A, ::std::size_t N, typename CHAR_B> auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::prove_is_same(::std::array<CHAR_A *, N> const &a, ::c::basic_argv<CHAR_B> const &b) -> void {
+  // WATCHOUT - for the "argv" data type, the arr[arr.size()-1()] must be nullptr so the "declared size" is size-1
+  // Can't say this enough times.
+  ::c::basic_argv<CHAR_B const> baa(a.size()-1, a.begin());
+  ::c::basic_argv<CHAR_B const> bab(b.size(), b.begin());
+  prove_is_same(baa, bab);
+}
+
+template<typename CHAR_A, typename CHAR_B, ::std::size_t N> auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::prove_is_same(::c::basic_argv<CHAR_A> const &a, ::std::array<CHAR_B *, N> const &b) -> void {
+  // WATCHOUT - for the "argv" data type, the arr[arr.size()-1()] must be nullptr so the "declared size" is size-1
+  // Can't say this enough times.
+  ::c::basic_argv<CHAR_A const> baa(a.size(), a.begin());
+  ::c::basic_argv<CHAR_A const> bab(b.size()-1, b.begin());
+  prove_is_same(baa, bab);
+}
+
+template<typename CHAR_A, typename CHAR_B> auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::prove_is_same(::c::basic_argv<CHAR_A> const &a, ::c::basic_argv<CHAR_B> const &b) -> void {
+  CPPUNIT_ASSERT(a.size() == b.size());
+  CPPUNIT_ASSERT(!a.empty());
+  CPPUNIT_ASSERT(0 != a.size());
+  using argv_a_type = ::c::basic_argv<CHAR_A>;
+  using argv_b_type = ::c::basic_argv<CHAR_B>;
+  typename argv_a_type::const_iterator ai, ae;
+  typename argv_b_type::const_iterator bi, be;
+  for (ai=a.begin(), ae=a.end(), bi=b.begin(), be=b.end(); ae != ai && be != bi; ++ai, ++bi) {
+    if (nullptr == *ai || nullptr == *bi) {
+      CPPUNIT_ASSERT(ai == bi);
+    } else {
+      CPPUNIT_ASSERT(nullptr != ai && nullptr != bi);
+      ::std::string avalue(*ai); 
+      ::std::string bvalue(*bi);
+      CPPUNIT_ASSERT_EQUAL(avalue, bvalue);
+      CPPUNIT_ASSERT(!avalue.empty());
+      CPPUNIT_ASSERT(0 != avalue.size());
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#import c.as
+
+#import rigging.unit.lhs
+using ::rigging::unit::lhs;
+#import rigging.unit.clear
+using ::rigging::unit::clear;
+
+auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::setUp() -> void {
+  c_basic_argv_pool.push_back(strdup("apple"));
+  c_basic_argv_pool.push_back(strdup("banana"));
+  c_basic_argv_pool.push_back(strdup("cherry"));
+  c_basic_argv_pool.push_back(strdup("dog"));
+  c_basic_argv_pool.push_back(strdup("eagle"));
+  c_basic_argv_pool.push_back(strdup("frog"));
+  c_basic_argv_pool.push_back(strdup("goat"));
+  c_basic_argv_pool.push_back(strdup("harpie"));
+  c_basic_argv_pool.push_back(strdup("idiot"));
+  c_basic_argv_pool.push_back(strdup("jackass"));
+  c_basic_argv_pool.push_back(nullptr); // the terminating nullptr sentinel
+
+  lhs(bac) = c_basic_argv_pool;
+  lhs(bacc) = c_basic_argv_pool;
+
+  std_array_pool.push_back(strdup("llama"));
+  std_array_pool.push_back(strdup("marmot"));
+  std_array_pool.push_back(strdup("narwal"));
+  std_array_pool.push_back(strdup("ocelot"));
+  std_array_pool.push_back(strdup("penguin"));
+  std_array_pool.push_back(strdup("quail"));
+  std_array_pool.push_back(strdup("rat"));
+  std_array_pool.push_back(strdup("seal"));
+  std_array_pool.push_back(strdup("turkey"));
+  std_array_pool.push_back(nullptr); // ibidem.
+
+  lhs(apc) = std_array_pool;
+  lhs(apcc) = std_array_pool;
+}
+
+#import std.free
+#include <cassert>
+template<typename CONTAINER> auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::tearDown(CONTAINER &subject) -> void {
+  for (auto s : subject) {
+    ::std::free(s);
+  }
+  subject.clear();
+  assert(0 == subject.size());
+}
+
+auto tests::unit::c::as::Palette<tests::unit::c::as::WORDS>::tearDown() -> void {
+  lhs(bac) = clear; 
+  lhs(bacc) = clear; 
+  lhs(apc) = clear; 
+  lhs(apcc) = clear; 
+  tearDown(c_basic_argv_pool);
+  tearDown(std_array_pool);
+}
+#divert </cpp>

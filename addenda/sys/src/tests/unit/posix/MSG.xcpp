@@ -1,0 +1,81 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class MSG; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.MSG // this is how you should say it
+struct tests::unit::posix::MSG : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::MSG;
+  auto test_object() -> void;
+  auto test_as() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto tests::unit::posix::MSG::test_object() -> void {
+    auto mmm1 = Subject::NONE;
+    auto mmm2 = Subject::CMSG_CLOEXEC;
+    auto mmm3 = Subject::CONFIRM;
+    auto mmm4 = Subject::CTRUNC;
+    auto mmm5 = Subject::DONTROUTE;
+    auto mmm6 = Subject::NOSIGNAL;
+    auto mmm7 = Subject::DONTWAIT;
+    auto mmm8 = Subject::EOR;
+    auto mmm9 = Subject::ERRQUEUE;
+    auto mmm10 = Subject::MORE;
+    auto mmm11 = Subject::OOB;
+    auto mmm12 = Subject::PEEK;
+    auto mmm13 = Subject::TRUNC;
+    auto mmm14 = Subject::WAITALL;
+    CPPUNIT_ASSERT(mmm1 != mmm2);
+    CPPUNIT_ASSERT(mmm2 != mmm3);
+    CPPUNIT_ASSERT(mmm3 != mmm4);
+    CPPUNIT_ASSERT(mmm4 != mmm5);
+    CPPUNIT_ASSERT(mmm5 != mmm6);
+    CPPUNIT_ASSERT(mmm6 != mmm7);
+    CPPUNIT_ASSERT(mmm7 != mmm8);
+    CPPUNIT_ASSERT(mmm8 != mmm9);
+    CPPUNIT_ASSERT(mmm9 != mmm10);
+    CPPUNIT_ASSERT(mmm10 != mmm11);
+    CPPUNIT_ASSERT(mmm11 != mmm12);
+    CPPUNIT_ASSERT(mmm12 != mmm13);
+    CPPUNIT_ASSERT(mmm13 != mmm14);
+  }
+  auto MSG::test_as() -> void {
+#warning WRITETHIS MSG::test_as() -> void
+  }
+  auto MSG::test_constants() -> void {
+    Subject::Flags mmm;
+    mmm = Subject::CMSG_CLOEXEC;
+    mmm = Subject::CONFIRM;
+    mmm = Subject::CTRUNC;
+    mmm = Subject::DONTROUTE;
+    mmm = Subject::NOSIGNAL;
+    mmm = Subject::DONTWAIT;
+    mmm = Subject::EOR;
+    mmm = Subject::ERRQUEUE;
+    mmm = Subject::MORE;
+    mmm = Subject::OOB;
+    mmm = Subject::PEEK;
+    mmm = Subject::TRUNC;
+    mmm = Subject::WAITALL;
+    // there, uttered them all [[FIXTHIS]] how do we know it was all of the?
+    CPPUNIT_ASSERT(Subject::NONE != mmm);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::MSG::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("MSG");
+  series << call("object", &MSG::test_object)
+         << call("constants", &MSG::test_constants)
+         << call("as", &MSG::test_as)
+    ;
+  return finalize(series);
+}
+#endiv

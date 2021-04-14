@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::flagset { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::flagset::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Cast() -> void;
+  auto test_Shift() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  enum class Shiftable { C0, C1, C2, C3, C4, C5, C6 };
+  enum class Castable { M1 = 0x1, M2 = 0x2, M3 = 0x4, M4 = 0x8 };
+};
+#endiv
+#divert <cpp>
+#import sys.flagset.Cast
+#import sys.flagset.Shift
+namespace tests::unit::flagset {
+  auto Fixture::test_Cast() -> void {
+    using Pluralizer = sys::flagset::Cast<Castable, int>;
+    { auto promoted = Pluralizer::promote(Castable::M1);
+      CPPUNIT_ASSERT_EQUAL(0x1, promoted); };
+    { auto promoted = Pluralizer::promote(Castable::M2);
+      CPPUNIT_ASSERT_EQUAL(0x2, promoted); };
+    { auto promoted = Pluralizer::promote(Castable::M3);
+      CPPUNIT_ASSERT_EQUAL(0x4, promoted); };
+    { auto promoted = Pluralizer::promote(Castable::M4);
+      CPPUNIT_ASSERT_EQUAL(0x8, promoted); };
+  }
+  auto Fixture::test_Shift() -> void {
+    using Pluralizer = ::sys::flagset::Shift<Shiftable, int>;
+    { auto promoted = Pluralizer::promote(Shiftable::C1);
+      CPPUNIT_ASSERT_EQUAL(0x1, promoted); };
+    { auto promoted = Pluralizer::promote(Shiftable::C2);
+      CPPUNIT_ASSERT_EQUAL(0x2, promoted); };
+    { auto promoted = Pluralizer::promote(Shiftable::C3);
+      CPPUNIT_ASSERT_EQUAL(0x4, promoted); };
+    { auto promoted = Pluralizer::promote(Shiftable::C4);
+      CPPUNIT_ASSERT_EQUAL(0x8, promoted); };
+  }
+}
+#import tests.unit.flagset.Candies
+#import tests.unit.flagset.Tokens
+#import rigging.suite.io
+namespace tests::unit::flagset {
+  auto Fixture::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    Stream series{"flagset"};
+    series << add<Candies>()
+           << add<Tokens>()
+      ;
+    return finalize(series);
+  }
+}
+#endiv

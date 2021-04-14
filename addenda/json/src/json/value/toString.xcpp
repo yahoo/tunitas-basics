@@ -1,0 +1,93 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import c.const_stringz
+#import json.Value
+#import std.string
+namespace json {
+  namespace value {
+    template<typename TYPE> inline auto toString(TYPE) -> std::string;
+    // jsoncpp-1.8.3-1.fc27.x86_64 has a const-accepting variant of the writers
+    inline auto toString(json::Value const &) -> std::string;
+
+    // WATCHOUT - jsoncpp-1.7.2-3.fc24.x86_64
+    // They use 'int' and 'long long int' with nothing in between; there are no unambiguous overloads for 'long int'
+    // So we have to provide them (erg!)
+    template<> inline auto toString<int long signed>(int long signed) -> std::string;
+    template<> inline auto toString<int long unsigned>(int long unsigned) -> std::string;
+
+    // [[FIXTHIS]] use re::string<c::const_stringz>
+    // [[UNFIXED]] Sigh ... once again ... we have to provide *all* the overloads
+    inline auto toString(char const *) -> std::string;
+    inline auto toString(char *) -> std::string;
+    inline auto toString(c::const_stringz const &) -> std::string;
+    inline auto toString(std::string const &) -> std::string;
+  }
+}
+#endiv
+#divert <hpp>
+#include "json/writer.h"
+template<typename TYPE> auto json::value::toString(TYPE value) -> std::string {
+  return ::Json::valueToString(value);
+}
+
+#import json.writer.Compact
+auto json::value::toString(json::Value const &value) -> std::string {
+  writer::Compact c;
+  return c.write(value);
+}
+
+#if !defined(JSON_HAS_INT64)
+#error JSON_HAS_INT64 was not configured
+#endif
+
+template<> auto json::value::toString<int long signed>(int long signed value) -> std::string {
+  // See the WATCHOUT commentariat, above.
+  ::Json::LargestInt revalue = value;
+  return ::Json::valueToString(revalue);
+}
+
+template<> auto json::value::toString<int long unsigned>(int long unsigned value) -> std::string {
+  // See the WATCHOUT commentariat, above.
+  ::Json::LargestUInt revalue = value;
+  return ::Json::valueToString(revalue);
+}
+
+auto json::value::toString(char const *value) -> std::string {
+  // named gratuitously differently "valueToQuotedString" in lieu of "valueToString"
+  return ::Json::valueToQuotedString(value);
+}
+
+auto json::value::toString(char *value) -> std::string {
+  char const *revalue = value;
+  return toString(revalue);
+}
+
+auto json::value::toString(c::const_stringz const &value) -> std::string {
+  return ::Json::valueToQuotedString(value.data());
+}
+
+auto json::value::toString(std::string const &value) -> std::string {
+  return ::Json::valueToQuotedString(value.data());
+}
+
+static_assert(sizeof (decltype(json::value::toString(bool{}))));
+static_assert(sizeof (decltype(json::value::toString(char{}))));
+static_assert(sizeof (decltype(json::value::toString((char signed){}))));
+static_assert(sizeof (decltype(json::value::toString((char unsigned){}))));
+static_assert(sizeof (decltype(json::value::toString((int short signed){}))));
+static_assert(sizeof (decltype(json::value::toString((int short unsigned){}))));
+static_assert(sizeof (decltype(json::value::toString((int unsigned){}))));
+static_assert(sizeof (decltype(json::value::toString((int long signed){}))));
+static_assert(sizeof (decltype(json::value::toString((int long unsigned){}))));
+static_assert(sizeof (decltype(json::value::toString((int long long signed){}))));
+static_assert(sizeof (decltype(json::value::toString((int long long unsigned){}))));
+
+static_assert(sizeof (decltype(json::value::toString(float{}))));
+static_assert(sizeof (decltype(json::value::toString(double{}))));
+
+static_assert(sizeof (decltype(json::value::toString((char const *)(nullptr)))));
+static_assert(sizeof (decltype(json::value::toString(c::const_stringz{}))));
+static_assert(sizeof (decltype(json::value::toString(std::string{}))));
+static_assert(sizeof (decltype(json::value::toString(json::Value{}))));
+#endiv

@@ -1,0 +1,158 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import tests.unit.posix.Fixture.Dummy.Sockaddr
+#import sys.posix.sendto
+#import sys.posix.MSG
+#import sys.posix.sockaddr_in // globally, and for the concept
+#import sys.posix.sockaddr_in6
+#import nonstd.uninitialized.zero
+#import std.move
+auto tests::unit::posix::fixture::Fixture::test_sendto_0() -> void {
+  auto const fd = int{-1};
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    sockaddr_in const sa = []() {
+                             sockaddr_in tmp;
+                             nonstd::uninitialized::zero(tmp);
+                             return tmp;
+                           }();
+    socklen_t const sal = sizeof (sa); 
+    auto sent = six::avoid::sendto(fd, reinterpret_cast<void const *>(&buf), sizeof (buf), six::MSG::NONE, reinterpret_cast<sockaddr const *>(&sa), sal);
+    CPPUNIT_ASSERT(!good(sent)); } // of course, because the fd was invalid, but it was callable
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+    socklen_t const sal = sizeof (sa); 
+    auto sent = six::avoid::sendto(fd, reinterpret_cast<void const *>(&buf), sizeof (buf), six::MSG::NONE, reinterpret_cast<sockaddr const *>(&sa), sal);
+    CPPUNIT_ASSERT(!good(sent)); } // of course, because the fd was invalid, but it was callable
+}
+auto tests::unit::posix::fixture::Fixture::test_sendto_1() -> void {
+  auto const fd = int{-1};
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+    auto sent = six::avoid::sendto(fd, reinterpret_cast<void const *>(&buf), sizeof (buf), six::MSG::NONE, sa);
+    CPPUNIT_ASSERT(!good(sent)); } // of course, because the fd was invalid, but it was callable
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+    auto sent = six::avoid::sendto(fd, reinterpret_cast<void const *>(&buf), sizeof (buf), six::MSG::NONE, sa);
+    CPPUNIT_ASSERT(!good(sent)); } // of course, because the fd was invalid, but it was callable
+}
+#import std.byte
+#import nonstd.const_dope
+auto tests::unit::posix::fixture::Fixture::test_sendto_2() -> void {
+  auto const fd = int{-1};
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    auto doped = ::nonstd::const_dope<char>{&buf[0], sizeof (buf)};
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { auto const B = std::byte{};
+    std::byte const buf[10] = { B, B, B, B, B, B, B, B, B, B };
+    auto doped = ::nonstd::const_dope<std::byte>{&buf[0], sizeof (buf)};
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { char unsigned const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    auto doped = ::nonstd::const_dope<char unsigned>{&buf[0], sizeof (buf)};
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { char signed const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    auto doped = ::nonstd::const_dope<char signed>{&buf[0], sizeof (buf)};
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+}
+#import tests.unit.posix.Fixture.Dummy.Thing
+auto tests::unit::posix::fixture::Fixture::test_sendto_3() -> void {
+  auto const fd = int{-1};
+  { char const buf = 0;
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } } // ibidem.
+  { short const buf = 0;
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { int const buf = 0;
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { double const buf = 0;
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { Dummy::Thing const buf;
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+}
+#import tests.unit.posix.Fixture.Dummy.Thing
+auto tests::unit::posix::fixture::Fixture::test_sendto_4() -> void {
+  auto const fd = int{-1};
+  { char const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { short const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { int const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { double const buf[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+  { Dummy::Thing const buf[10];
+    { sockaddr_in const &sa = Dummy::Sockaddr<sockaddr_in>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } // ibidem.
+    { sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+      auto sent = six::native::sendto(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(sent)); } }
+}
+#endiv

@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.to_tm.interface
+#import sys.posix.packaging.required.to_tm.Thunk
+#import sys.posix.packaging.required.to_tm.From
+namespace sys::posix::packaging::to_tm {
+  //
+  // Usage:
+  //
+  //   return perform(::localtime, Point{...somehow...});
+  //   return perform(::gmtime, Old{...somehow...});
+  //
+  using namespace packaging::to_tm::interface;
+  namespace required = packaging::required;
+  template<required::to_tm::Thunk THUNK, required::to_tm::From FROM> auto perform(THUNK, FROM) -> Result;
+}
+#endiv
+#divert <ipp>
+#import errno
+#import nonstd.uninitialized.zero
+#import sys.time.as
+namespace sys::posix::packaging::to_tm {
+  template<required::to_tm::Thunk THUNK, required::to_tm::From FROM> auto perform(THUNK thunk, FROM from) -> Result {
+    auto const in = time::as<Old>(from);
+    auto out = Disaggregated{};
+    auto r = thunk(&in, &out);
+    auto e = errno; // capture this quickly.
+    auto b = nullptr != r;
+    if (!b) {
+      nonstd::uninitialized::zero(out);
+    }
+    return {b, e, out};
+  }
+}
+#endiv

@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace value {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::value::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_type_operator_insert() -> void;
+  auto test_menagerie() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import json.value.constants
+#import std.ostringstream
+auto tests::unit::value::Fixture::test_type_operator_insert() -> void {
+  // testing   auto json::value::operator<<(std::ostream &, Type) -> std::ostream &;
+  std::ostringstream buf;
+  using namespace json::value;
+  buf << '/' << JSONNULL
+      << '/' << INT
+      << '/' << UINT
+      << '/' << REAL
+      << '/' << STRING
+      << '/' << BOOLEAN
+      << '/' << ARRAY
+      << '/' << OBJECT;
+  std::string actual = buf.str();
+  std::string expected = "/NULL/INT/UINT/REAL/STRING/BOOLEAN/ARRAY/OBJECT";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import std.string
+#import json.value.toString
+auto tests::unit::value::Fixture::test_menagerie() -> void {
+  char const some_consty_manifest[] = "consty";
+  auto from_consty_manifest = ::json::value::toString(some_consty_manifest);
+  std::cerr << "some_consty_manifest = qq!" << some_consty_manifest << "|\n";
+  std::cerr << "from_consty_manifest = qq!" << from_consty_manifest << "|\n";
+  std::string requoted_some_consty_manifest;
+  requoted_some_consty_manifest +="\"";
+  requoted_some_consty_manifest += some_consty_manifest;
+  requoted_some_consty_manifest += "\"";
+  CPPUNIT_ASSERT(from_consty_manifest == requoted_some_consty_manifest);
+
+  char some_muting_manifest[] = "muting";
+  auto from_muting_manifest = ::json::value::toString(some_muting_manifest);
+  std::cerr << "some_muting_manifest = qq!" << some_muting_manifest << "|\n";
+  std::cerr << "from_muting_manifest = qq!" << from_muting_manifest << "|\n";
+  std::string requoted_some_muting_manifest;
+  requoted_some_muting_manifest +="\"";
+  requoted_some_muting_manifest += some_muting_manifest;
+  requoted_some_muting_manifest += "\"";
+  CPPUNIT_ASSERT(from_muting_manifest == requoted_some_muting_manifest);
+
+  std::string some_string("string");
+  auto from_string = ::json::value::toString(some_string);
+  std::string requoted_some_string;
+  requoted_some_string +="\"";
+  requoted_some_string += some_string;
+  requoted_some_string += "\"";
+  CPPUNIT_ASSERT(from_string == requoted_some_string);
+}
+
+#import tests.unit.value.ToString
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::value::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("value");
+  series << call("menagerie", &Fixture::test_menagerie)
+         << add(ToString::suite())
+                ;
+  return series.release();
+}
+#endiv

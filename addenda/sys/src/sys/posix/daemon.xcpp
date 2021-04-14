@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+namespace sys::posix {
+  namespace packaging::daemon_function {
+    using Result = call::Result;
+    enum class Chdir { NO, YES };
+    enum class Close { NO, YES };
+    inline auto daemon(Chdir, Close) -> Result;
+  }
+  using packaging::daemon_function::daemon;
+  constexpr auto NOCHDIR = packaging::daemon_function::Chdir::NO;
+  constexpr auto CHDIR = packaging::daemon_function::Chdir::YES;
+  constexpr auto NOCLOSE = packaging::daemon_function::Close::NO;
+  constexpr auto CLOSE = packaging::daemon_function::Close::YES;
+}
+#endiv
+#divert <ipp>
+#import daemon
+auto sys::posix::packaging::daemon_function::daemon(Chdir chdir, Close close) -> Result {
+  auto nochdir = !(int)chdir;
+  auto noclose = !(int)close;
+  int r = ::daemon(nochdir, noclose);
+  int errnum = errno; // capture this before doing anything else
+  bool b = 0 <= r;
+  return Result{b, errnum, r};
+}
+#endiv

@@ -1,0 +1,11 @@
+tests_rsa_XFAIL_TESTS = \
+  $(end)
+tests_rsa_TESTS = \
+  tests/rsa/empty.test \
+  \
+  tests/rsa/run.usage.test \
+  tests/rsa/run.help.test \
+  tests/rsa/run.h.test \
+  \
+  tests/rsa/run.case.01.test \
+  $(end)

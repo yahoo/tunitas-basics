@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.iov.interface
+namespace sys::posix {
+  namespace packaging::write {
+    using namespace packaging::iov::interface;
+    namespace function {
+      // write(2)
+      inline auto write(File, [[in]] void const *, Size) -> Result;
+      template<required::Octet OCTET> inline auto write(File, [[in]] Buffer<OCTET const>) -> Result;
+      // pwrite(2)
+      inline auto write(File, [[in]] void const *, Size, Offset) -> Result;
+      template<required::Octet OCTET> inline auto write(File, [[in]] Buffer<OCTET const>, Offset) -> Result;
+    }
+    namespace native {
+      // write(2)
+      inline auto write(int fd, [[in]] void const *, Size) -> Result;
+      template<required::Octet OCTET> inline auto write(int fd, [[in]] Buffer<OCTET const>) -> Result;
+      // pwrite(2)
+      inline auto write(int fd, [[in]] void const *, Size, Offset) -> Result;
+      template<required::Octet OCTET> inline auto write(int fd, [[in]] Buffer<OCTET const>, Offset) -> Result;
+    }
+  }
+  using packaging::write::function::write;
+  namespace native { using packaging::write::native::write; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::write {
+  // write(2)
+  auto function::write(File fd, void const *buf, Size size) -> Result                              { return native::write((int)fd, buf, size); }
+  template<required::Octet OCTET> auto function::write(File fd, Buffer<OCTET const> buf) -> Result { return native::write((int)fd, buf); }
+  //
+  auto native::write(int fd, void const *buf, Size size) -> Result                              { return idiomatic::syscall<ssize_t>(Syscall::WRITE, fd, buf, size); }
+  template<required::Octet OCTET> auto native::write(int fd, Buffer<OCTET const> buf) -> Result { return write(fd, buf.data(), buf.size()); }
+}
+#import sys.posix.packaging.syscall.Offset
+namespace sys::posix::packaging::write {
+  // pwrite(2)
+  auto function::write(File fd, void const *buf, Size size, Offset offset) -> Result                              { return native::write((int)fd, buf, size, offset); }
+  template<required::Octet OCTET> auto function::write(File fd, Buffer<OCTET const> buf, Offset offset) -> Result { return native::write((int)fd, buf, offset); }
+  //
+  auto native::write(int fd, void const *buf, Size size, Offset offset) -> Result                              { return packaging::syscall::Offset::pwrite(fd, buf, size, offset); }
+  template<required::Octet OCTET> auto native::write(int fd, Buffer<OCTET const> buf, Offset offset) -> Result { return write(fd, buf.data(), buf.size(), offset); }
+}
+#endiv

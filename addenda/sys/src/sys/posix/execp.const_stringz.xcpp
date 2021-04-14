@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_argv
+#import c.const_environv
+#import c.const_stringz
+#import sys.call.Result
+namespace sys::posix {
+  // In the 'execp' series, the 'command' name is searched for in $PATH, absent an internal '/'
+  inline auto execp(c::const_stringz command, c::const_stringz arg0) -> call::Result;
+  inline auto execp(c::const_stringz command, c::const_stringz arg0, c::const_environv envv) -> call::Result;
+  inline auto execp(c::const_stringz command, c::const_argv argv) -> call::Result;
+  inline auto execp(c::const_stringz command, c::const_argv argv, c::const_environv envv) -> call::Result;
+  // two-in-one
+  // Concept: The final in ARGUMENTS is either c::const_stringz or else c::const_environv
+  template<typename... ARGUMENTS> auto execp(c::const_stringz command, c::const_stringz arg0, c::const_stringz arg1, ARGUMENTS ...) -> call::Result;
+}
+#divert </hpp>
+#divert <ipp>
+#import sys.posix.packaging.exec.call
+auto sys::posix::execp(c::const_stringz command, c::const_stringz arg0) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRL.execp(), command, arg0);
+}
+#import c.as
+#import c.const_argv
+#import std.size_t
+auto sys::posix::execp(c::const_stringz command, c::const_stringz arg0, c::const_environv envv) -> call::Result {
+  using namespace packaging::exec;
+  char const *const argv[] = { arg0.data(), nullptr };
+  std::size_t const argc = sizeof (argv)/sizeof (argv[0]) - 1;
+  return call(PAIRVE.execp(), command, c::as<c::const_argv>(argc, argv), envv);
+}
+auto sys::posix::execp(c::const_stringz command, c::const_argv argv) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRV.execp(), command, argv);
+}
+auto sys::posix::execp(c::const_stringz command, c::const_argv argv, c::const_environv envv) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRVE.execp(), command, argv, envv);
+}
+#import sys.posix.packaging.exec.Dispatcher
+#import sys.posix.packaging.exec.Selector
+template<typename... ARGUMENTS> auto sys::posix::execp(c::const_stringz command, c::const_stringz arg0, c::const_stringz arg1, ARGUMENTS ...arguments) -> call::Result {
+  using namespace packaging::exec;
+  using arg0_type = c::const_stringz;
+  using arg1_type = c::const_stringz;
+  using dispatcher_type = typename Selector<Dispatcher, arg0_type, arg1_type, ARGUMENTS...>::type;
+  dispatcher_type call(PAIRL.execp(), PAIRLE.execp());
+  return call(command, arg0, arg1, arguments...);
+}
+#endiv

@@ -1,0 +1,114 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::fd { class Select; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::fd::Select : public cppunit::test::Fixture {
+public:
+  // yes count
+  auto test_count_read_write() -> void;
+  auto test_count_read_write_timeout() -> void;
+  auto test_count_sets() -> void;
+  auto test_count_sets_timeout() -> void;
+  // no count
+  auto test_read_write() -> void;
+  auto test_read_write_timeout() -> void;
+  auto test_sets() -> void;
+  auto test_sets_timeout() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ares.select
+#import ares.Channel
+#import ares.selectable
+#import ares.fd.Set
+#import ares.fd.Sets
+#import ares.time.literals
+namespace tests::unit::fd { using namespace ares::time::literals; }
+// --- with the count --------------------------------
+auto tests::unit::fd::Select::test_count_read_write() -> void {
+  ::ares::fd::Set rs, ws;
+  ::ares::Channel channel;
+  auto ccc = ::ares::selectable(channel, rs, ws);
+  auto selected = ::ares::select(ccc, rs, ws);
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready, and no timeout
+}
+auto tests::unit::fd::Select::test_count_read_write_timeout() -> void {
+  ::ares::fd::Set rs, ws;
+  ::ares::Channel channel;
+  auto ccc = ::ares::selectable(channel, rs, ws);
+  auto limit = 10ms;
+  auto selected = ::ares::select(ccc, rs, ws, limit);
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and a timeout
+}
+#import ares.fd.count
+auto tests::unit::fd::Select::test_count_sets() -> void {
+  ::ares::fd::Sets rw;
+  ::ares::Channel channel;
+  auto ccc = count(channel, rw);
+  auto selected = ::ares::select(ccc, rw);
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and no timeout
+}
+auto tests::unit::fd::Select::test_count_sets_timeout() -> void {
+  ::ares::fd::Sets rw;
+  ::ares::Channel channel;
+  auto ccc = count(channel, rw);
+  auto limit = 10ms;
+  auto selected = ::ares::select(ccc, rw, limit);
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and a timeout
+}
+// --- without the count --------------------------------
+auto tests::unit::fd::Select::test_read_write() -> void {
+  ::ares::fd::Set rs, ws;
+  auto selected = ::ares::select(rs, ws);
+  if (ok(selected)) { std::cerr << "OK\n"; } else { std::cerr << "NOT OK " << error_code(selected).message() << '\n'; }
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and no timeout
+}
+auto tests::unit::fd::Select::test_read_write_timeout() -> void {
+  ::ares::fd::Set rs, ws;
+  auto limit = 10ms;
+  auto selected = ::ares::select(rs, ws, limit);
+  if (ok(selected)) { std::cerr << "OK\n"; } else { std::cerr << "NOT OK " << error_code(selected).message() << '\n'; }
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and a timeout
+}
+auto tests::unit::fd::Select::test_sets() -> void {
+  ::ares::fd::Sets rw;
+  auto selected = ::ares::select(rw);
+  if (ok(selected)) { std::cerr << "OK\n"; } else { std::cerr << "NOT OK " << error_code(selected).message() << '\n'; }
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and no timeout
+}
+auto tests::unit::fd::Select::test_sets_timeout() -> void {
+  ::ares::fd::Sets rw;
+  auto limit = 10ms;
+  auto selected = ::ares::select(rw, limit);
+  if (ok(selected)) { std::cerr << "OK\n"; } else { std::cerr << "NOT OK " << error_code(selected).message() << '\n'; }
+  CPPUNIT_ASSERT(ok(selected)); // there were no sockets ready and a timeout
+}
+#import rigging.suite.io
+auto tests::unit::fd::Select::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"select"};
+  {
+    Stream wit{"with-count"};
+    wit << call("read-write", &Select::test_count_read_write)
+        << call("read-write-timeout", &Select::test_count_read_write_timeout)
+        << call("sets", &Select::test_count_sets)
+        << call("sets-timeout", &Select::test_count_sets_timeout)
+      ;
+    series << move(wit);
+  } {
+    Stream out{"without-count"};
+    out << call("read-write", &Select::test_read_write)
+        << call("read-write-timeout", &Select::test_read_write_timeout)
+        << call("sets", &Select::test_sets)
+        << call("sets-timeout", &Select::test_sets_timeout)
+      ;
+    series << move(out);
+  }
+  return finalize(series);
+}
+#endiv

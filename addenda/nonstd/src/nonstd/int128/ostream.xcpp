@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// Shorthand for importing both signed and unsigned variants
+//
+// Usage:
+//
+//   #import nonstd.int128.ostream
+//   using namespace nonstd::int128; // you still need to import the operations because int128_t is a global-scoped type
+//
+//   auto biggie = nonstd::int128_t{...somehow...};
+//   cout << "signed: " << biggie;
+//
+//   auto biggie = nonstd::uint128_t{...somehow...};
+//   cout << "unsigned: " << biggie;
+//
+#import nonstd.int128.ostream.signed
+#import nonstd.int128.ostream.unsigned
+#endiv

@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::container::traits::glue {
+  //
+  // An ancestor class suitable for defining the old_school traits.
+  // The New School traits then become defined in terms of the old_school
+  //
+  // Concept:
+  //
+  //   Facilitates well-playing among
+  //
+  //      nonstd::container::Traits<CONTAINER>
+  //      nonstd::container_traits<CONTAINER>
+  //
+  // Conformance:
+  //
+  //   <no-such>https://en.cppreference.com/w/cpp/container/container_traits</no-such>
+  //
+  // Invariant
+  //
+  //   typename CONTAINER::value_type must exist (this is a traits class so it SHOULD not be enforced with a requires)
+  //
+  // Usage:
+  //
+  //   see nonstd::container::Traits<CONTAINER>
+  //
+  template<typename CONTAINER> struct Old;
+}
+#endiv
+#divert <hpp>
+#import nonstd.container.traits.glue.old_school
+namespace nonstd::container::traits {
+  template<typename CONTAINER> struct glue::Old : public old_school::Mutable_Iterator<CONTAINER>, public old_school::Constie_Iterator<CONTAINER> {
+    using Container = CONTAINER;
+    using value_type = typename CONTAINER::value_type;
+    using Value = value_type; // ................................... for continuity with the New School
+    // (optionally available) use Old<CONTAINER>::iterator ......... and Old<CONTAINER>::Iterator
+    // (optionally available) use Old<CONTAINER>::const_iterator ... and Old<CONTAINER>::Const_Iterator
+  protected:
+    ~Old() = default;
+  };
+}
+#endiv

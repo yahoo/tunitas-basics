@@ -1,0 +1,5 @@
+Whereas the #include file naming of half is incomprehensible and arbitrary,
+A (the) Right & Proper C++ interface to the half_float capabilities.
+
+See nonstd-half, half, http://half.sourceforge.net/
+

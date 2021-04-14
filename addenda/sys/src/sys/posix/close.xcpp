@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+#import sys.id.File
+namespace sys::posix {
+  namespace packaging::close {
+    using Result = call::Result;
+    namespace function {
+      inline auto close(id::File) -> Result;
+    }
+    namespace native {
+      inline auto close(int fd) -> Result;
+    }
+  }
+  using packaging::close::function::close;
+  namespace native { using packaging::close::native::close; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::close {
+  auto function::close(id::File fd) -> call::Result   { return native::close((int) fd); }
+  auto native::close(int fd) -> call::Result { return idiomatic::syscall<int>(Syscall::CLOSE, fd); }
+}
+#endiv

@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::big {
+  //
+  // An big integer (a bignum)
+  //
+  // An integer of any size, but usually a biggie one.
+  //
+  // Usage:
+  //
+  //   auto biggie = big::Num{};
+  //   auto biggie = big::Num{1};
+
+  //   unsigned char bytes_array[N] = { ...somehow... };
+  //   auto biggie = big::Num{bytes_array};
+  //
+  //   unsigned char *bytes_pointer = ...somehow...
+  //   auto biggie = big::Num{byte_pointer, size};
+  //
+  class Num;
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#import openssl.required.Integer
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.BIGNUM
+class openssl::big::Num : public managed::Pointer<BIGNUM> {
+  using ancestor = managed::Pointer<BIGNUM>;
+public:
+  inline Num();
+  template<required::Integer INTEGER> inline explicit Num(INTEGER);
+  template<std::size_t N> inline explicit Num(unsigned char const (&bytes)[N]);
+  inline Num(unsigned char const *, std::size_t);
+  inline Num(Num &&) = default;
+  template<required::Integer INTEGER> inline auto operator=(INTEGER) -> Num &;
+  auto operator=(Num &&) -> Num & = default;
+};
+#endiv
+#divert <ipp>
+#import openssl.error.Code
+#import openssl.functions
+#import std.error_code
+#import openssl.big.bin.Preparator
+#import std.cerr
+#import std.hex
+#include <openssl/err.h>
+namespace openssl::big {
+  Num::Num()
+    : ancestor{BN_new()}
+  { }
+  template<required::Integer INTEGER> Num::Num(INTEGER integer)
+    : ancestor{BN_new()} {
+    bin::Preparator<INTEGER> preparation{integer};
+    //
+    // https://www.openssl.org/docs/man1.1.0/man3/ERR_get_error.html
+    // https://www.openssl.org/docs/man1.1.0/man3/BN_bin2bn.html
+    // <quote>
+    //   BN_bin2bn() converts the positive integer in big-endian form of length len at s into a BIGNUM and places it in ret.
+    //   If ret is NULL, a new BIGNUM is created.
+    //   BN_bn2lebinpad() and BN_bin2lbn() are identical to BN_bn2binpad() and BN_bin2bn() except the buffer is in little-endian format.
+    // <quote>
+    auto pointer = BN_bin2bn(preparation.data(), preparation.size(), get());
+    if (!pointer) {
+      throw std::error_code{error::Code::BN};
+    }
+  }
+  template<std::size_t N> Num::Num(unsigned char const (&bytes)[N])
+    : ancestor{BN_new()} {
+    auto pointer = BN_bin2bn(bytes, N, get());
+    if (!pointer) {
+      throw std::error_code{error::Code::BN};
+    }
+  }
+  Num::Num(unsigned char const *bytes, std::size_t size)
+    : ancestor{BN_new()} {
+    auto pointer = BN_bin2bn(bytes, size, get());
+    if (!pointer) {
+      throw std::error_code{error::Code::BN};
+    }
+  }
+  template<required::Integer INTEGER> auto Num::operator=(INTEGER integer) -> Num & {
+    bin::Preparator<INTEGER> preparation{integer};
+    auto pointer = BN_bin2bn(preparation.data(), preparation.size(), get());
+    if (!pointer) {
+      throw std::error_code{error::Code::BN};
+    }
+    return *this;
+  }
+}
+#endiv

@@ -1,0 +1,50 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.api.detail.Dispatch
+#import c.const_buffer
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<> inline auto Dispatch<c::const_buffer>::bind(unguarded::Statement *, bind_index, Bind<value_type>::argument_type) -> Bind<value_type>::result_type;
+      template<> inline auto Dispatch<c::const_buffer>::column(unguarded::Statement *, column_index) -> Column<value_type>::result_type;
+      template<> inline auto Dispatch<c::const_buffer>::result(unguarded::Function *, typename Result<value_type>::argument_type) -> typename Result<value_type>::result_type;
+      template<> inline auto Dispatch<c::const_buffer>::parameter(unguarded::Value *) -> typename Parameter<value_type>::result_type;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+#import sqlite.api.unguarded
+
+template<> auto sqlite::api::detail::Dispatch<c::const_buffer>::bind(unguarded::Statement *statement, bind_index idx, c::const_buffer value) -> Bind<value_type>::result_type {
+  Bind<value_type>::destructor gozer;
+  return (status::Code)::sqlite3_bind_text(statement, idx, value.data(), value.size(), gozer.target());
+}
+
+#import sqlite.c89
+#import sqlite.api.lob.Getter
+template<> auto sqlite::api::detail::Dispatch<c::const_buffer>::column(unguarded::Statement *statement, column_index idx) -> Column<value_type>::result_type {
+  lob::Getter<unguarded::Statement, char, c89::binary> const get(::sqlite3_column_blob, ::sqlite3_column_bytes);
+  auto got = get(statement, idx);
+  // WATCHOUT - the data is NOT copied out of SQLite space, the pointers continue to point across the boundary
+  c::const_buffer ret(size(got), data(got));
+  return ret;
+}
+
+#import std.is_same
+template<> auto sqlite::api::detail::Dispatch<c::const_buffer>::result(unguarded::Function *function, typename Result<value_type>::argument_type value) -> typename Result<value_type>::result_type {
+  static_assert(std::is_same<void, Result<value_type>::result_type>::value, "not void");
+  static_assert(std::is_same<void, decltype(::sqlite3_result_blob(function, nullptr, 0, nullptr))>::value, "not void");
+  Result<value_type>::destructor gozer;
+  ::sqlite3_result_blob(function, value.data(), value.size(), gozer.target());
+}
+
+template<> auto sqlite::api::detail::Dispatch<c::const_buffer>::parameter(unguarded::Value *value) -> typename Parameter<value_type>::result_type {
+  lob::Getter<unguarded::Value, char, c89::binary> const get(::sqlite3_value_blob, ::sqlite3_value_bytes);
+  auto got = get(value);
+  // WATCHOUT - the data is NOT copied out of SQLite space, the pointers continue to point across the boundary
+  c::const_buffer ret(size(got), data(got));
+  return ret;
+}
+#endiv

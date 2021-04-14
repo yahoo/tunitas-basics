@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.declaration
+#forward sys.dn.Notifies
+namespace sys::flags {
+  //
+  // The limits of the F Notifies
+  //
+  // Usage:
+  //
+  //   you know.
+  //
+  template<> struct Limits<dn::Notifies>;
+}
+#endiv
+#divert <hpp>
+#import sys.dn.Notify
+namespace sys::flags {
+  template<> struct Limits<dn::Notifies> : public limits::Generic<dn::Notifies, dn::Notify, std::underlying_type_t<dn::Notify>, 8*sizeof (std::underlying_type_t<dn::Notify>)> { };
+}
+#endiv
+#divert <ipp>
+#import sys.dn.Notifies
+#endiv

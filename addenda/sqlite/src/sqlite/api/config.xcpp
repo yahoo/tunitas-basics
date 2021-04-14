@@ -1,0 +1,168 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#forward sqlite
+#forward sqlite.c89
+#import sqlite.status.Code
+#import sqlite.Connection
+#import sqlite.config.session.codes
+#import sqlite.config.connection.codes
+#import sqlite.api.feature.Result
+namespace sqlite {
+  namespace api {
+    inline auto config(sqlite::config::session::NOP) -> status::Code;
+    inline auto config(sqlite::config::session::SINGLETHREAD) -> status::Code; 
+    inline auto config(sqlite::config::session::MULTITHREAD) -> status::Code; 
+    inline auto config(sqlite::config::session::SERIALIZED) -> status::Code; 
+    inline auto config(sqlite::config::session::MALLOC, methods::memory *) -> status::Code; 
+    inline auto config(sqlite::config::session::GETMALLOC, methods::memory *) -> status::Code; 
+    inline auto config(sqlite::config::session::SCRATCH, void *, int sz, int N) -> status::Code; 
+    inline auto config(sqlite::config::session::PAGECACHE, void *, int sz, int N) -> status::Code; 
+    inline auto config(sqlite::config::session::HEAP, void *, int nByte, int min) -> status::Code; 
+    inline auto config(sqlite::config::session::MEMSTATUS, bool) -> status::Code; 
+    inline auto config(sqlite::config::session::MUTEX, methods::mutex *) -> status::Code; 
+    inline auto config(sqlite::config::session::GETMUTEX, methods::mutex *) -> status::Code; 
+    // previously CHUNKALLOC which is now unused & unmentionable
+    inline auto config(sqlite::config::session::LOOKASIDE, int, int) -> status::Code; 
+    inline auto config(sqlite::config::session::PCACHE, methods::obsolete::pcache1 *) -> status::Code; 
+    inline auto config(sqlite::config::session::GETPCACHE, methods::obsolete::pcache1 *) -> status::Code; 
+    inline auto config(sqlite::config::session::LOG, c89::Log, void *) -> status::Code; 
+    inline auto config(sqlite::config::session::URI, int) -> status::Code; 
+    inline auto config(sqlite::config::session::PCACHE2, methods::pcache2 *) -> status::Code; 
+    inline auto config(sqlite::config::session::GETPCACHE2, methods::pcache2 *) -> status::Code; 
+    inline auto config(sqlite::config::session::COVERING_INDEX_SCAN, int) -> status::Code; 
+    inline auto config(sqlite::config::session::SQLLOG, c89::Sqllog, void *) -> status::Code; 
+    inline auto config(sqlite::config::session::MMAP_SIZE, int64, int64) -> status::Code; 
+    inline auto config(sqlite::config::session::WIN32_HEAPSIZE, int nByte) -> status::Code;
+
+    inline auto config(Connection &, sqlite::config::connection::NOP) -> status::Code;
+    inline auto config(Connection &, sqlite::config::connection::LOOKASIDE, void *, int, int) -> status::Code;
+    inline auto config(Connection &, sqlite::config::connection::ENABLE_FOREIGN_KEY) -> feature::Result;
+    inline auto config(Connection &, sqlite::config::connection::ENABLE_FOREIGN_KEY, bool setting) -> feature::Result;
+    inline auto config(Connection &, sqlite::config::connection::ENABLE_TRIGGER) -> feature::Result;
+    inline auto config(Connection &, sqlite::config::connection::ENABLE_TRIGGER, bool setting) -> feature::Result;
+  }
+}
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+
+auto sqlite::api::config(sqlite::config::session::NOP) -> status::Code {
+  return status::Code::OK;
+}
+
+auto sqlite::api::config(sqlite::config::session::SINGLETHREAD op) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op);
+}
+
+auto sqlite::api::config(sqlite::config::session::MULTITHREAD op) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op);
+}
+
+auto sqlite::api::config(sqlite::config::session::SERIALIZED op) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op);
+}
+
+auto sqlite::api::config(sqlite::config::session::MALLOC op, methods::memory *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::GETMALLOC op, methods::memory *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::SCRATCH op, void *first, int sz, int N) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, sz, N);
+}
+
+auto sqlite::api::config(sqlite::config::session::PAGECACHE op, void *first, int sz, int N) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, sz, N);
+}
+
+auto sqlite::api::config(sqlite::config::session::HEAP op, void *first, int nByte, int min) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, nByte, min);
+}
+
+auto sqlite::api::config(sqlite::config::session::MEMSTATUS op, bool first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::MUTEX op, methods::mutex *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::GETMUTEX op, methods::mutex *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::LOOKASIDE op, int first, int second) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, second);
+}
+
+auto sqlite::api::config(sqlite::config::session::PCACHE op, methods::obsolete::pcache1 *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::GETPCACHE op, methods::obsolete::pcache1 *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::LOG op, c89::Log first, void *second) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, second);
+}
+
+auto sqlite::api::config(sqlite::config::session::URI op, int first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::PCACHE2 op, methods::pcache2 *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::GETPCACHE2 op, methods::pcache2 *first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::COVERING_INDEX_SCAN op, int first) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first);
+}
+
+auto sqlite::api::config(sqlite::config::session::SQLLOG op, c89::Sqllog first, void *second) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, second);
+}
+
+auto sqlite::api::config(sqlite::config::session::MMAP_SIZE op, int64 first, int64 second) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, first, second);
+}
+
+auto sqlite::api::config(sqlite::config::session::WIN32_HEAPSIZE op, int nByte) -> status::Code {
+  return (status::Code)::sqlite3_config((int)op, nByte);
+}
+
+auto sqlite::api::config(Connection &, sqlite::config::connection::NOP) -> status::Code {
+  return status::Code::OK;
+}
+
+auto sqlite::api::config(Connection &connection, sqlite::config::connection::LOOKASIDE op, void *first, int second, int third) -> status::Code {
+  return (status::Code)::sqlite3_db_config(connection.safe(), (int)op, first, second, third);
+}
+
+#import sqlite.api.feature.get
+auto sqlite::api::config(Connection &connection, sqlite::config::connection::ENABLE_FOREIGN_KEY op) -> feature::Result {
+  return feature::get(connection, op);
+}
+
+#import sqlite.api.feature.set
+auto sqlite::api::config(Connection &connection, sqlite::config::connection::ENABLE_FOREIGN_KEY op, bool value) -> feature::Result {
+  return feature::set(connection, op, value);
+}
+
+#import sqlite.api.feature.get
+auto sqlite::api::config(Connection &connection, sqlite::config::connection::ENABLE_TRIGGER op) -> feature::Result {
+  return feature::get(connection, op);
+}
+
+#import sqlite.api.feature.set
+auto sqlite::api::config(Connection &connection, sqlite::config::connection::ENABLE_TRIGGER op, bool value) -> feature::Result {
+  return feature::set(connection, op, value);
+}
+#endiv

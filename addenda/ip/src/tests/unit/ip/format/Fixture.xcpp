@@ -1,0 +1,311 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::format {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::ip::format::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_in4_addr() -> void;
+  auto test_in6_addr() -> void;
+  auto test_in4_addr_t() -> void;
+  auto test_in6_addr_t() -> void;
+
+  auto test_optional_in4_addr_null() -> void;
+  auto test_optional_in6_addr_null() -> void;
+  auto test_optional_in4_addr_t_null() -> void;
+  auto test_optional_in6_addr_t_null() -> void;
+
+  auto test_optional_in4_addr_inn() -> void;
+  auto test_optional_in6_addr_inn() -> void;
+  auto test_optional_in4_addr_t_inn() -> void;
+  auto test_optional_in6_addr_t_inn() -> void;
+
+  auto test_optional_in4_addr_full() -> void;
+  auto test_optional_in6_addr_full() -> void;
+  auto test_optional_in4_addr_t_full() -> void;
+  auto test_optional_in6_addr_t_full() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ip.as
+#import ip.format.colons
+#import ip.format.dots
+#import std.string
+#import std.ostringstream
+#import tests.unit.make.constructors
+
+auto tests::unit::ip::format::Fixture::test_in4_addr() -> void {
+  // respect ... RFC 3849
+  auto specimen = ::ip::as<::ip::in4::addr>(make::in4_addr_t(192, 0, 2, 77));
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  buf << dots(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.77";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_in6_addr() -> void {
+  // respect ... RFC 5737
+  auto specimen = ::ip::as<::ip::in6::addr>(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                             0x07, 0xdf, 0xec, 0x3f,
+                                                             0x33, 0xfb, 0x41, 0x6d,
+                                                             0x9a, 0x57, 0x67, 0xda));
+  std::ostringstream buf;
+  using ::ip::format::colons;
+  buf << colons(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:7df:ec3f:33fb:416d:9a57:67da";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_in4_addr_t() -> void {
+  // respect ... RFC 3849
+  auto specimen = make::in4_addr_t(192, 0, 2, 66);
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  buf << dots(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.66";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_in6_addr_t() -> void {
+  // respect ... RFC 5737
+  auto specimen = make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                   0x6e, 0xa9, 0x2f, 0xaa,
+                                   0x51, 0x23, 0x44, 0x2c,
+                                   0xae, 0x23, 0x38, 0x66);
+  std::ostringstream buf;
+  using ::ip::format::colons;
+  buf << colons(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:6ea9:2faa:5123:442c:ae23:3866";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import format.q
+#import std.cerr
+#import std.optional
+#import std.invalid_argument
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_null() -> void {
+  try {
+    std::optional<::ip::in4::addr> specimen;
+    std::ostringstream buf;
+    using ::ip::format::dots;
+    buf << dots(specimen); // <--------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "caught an expected exception saying: " << ::format::q(e.what()) << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_null() -> void {
+  try {
+    std::optional<::ip::in6::addr> specimen;
+    std::ostringstream buf;
+    using ::ip::format::colons;
+    buf << colons(specimen); // <--------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "caught an expected exception saying: " << ::format::q(e.what()) << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_t_null() -> void {
+  try {
+    std::optional<::ip::in4::addr_t> specimen;
+    std::ostringstream buf;
+    using ::ip::format::dots;
+    buf << dots(specimen); // <--------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "caught an expected exception saying: " << ::format::q(e.what()) << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_t_null() -> void {
+  try {
+    std::optional<::ip::in6::addr_t> specimen;
+    std::ostringstream buf;
+    using ::ip::format::colons;
+    buf << colons(specimen); // <--------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "caught an expected exception saying: " << ::format::q(e.what()) << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import format.inn
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_inn() -> void {
+  std::optional<::ip::in4::addr> specimen;
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  using ::format::inn;
+  buf << inn(dots(specimen)); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "(null)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_inn() -> void {
+  std::optional<::ip::in6::addr> subject;
+  using ::ip::format::colons;
+  using ::format::inn;
+  std::ostringstream buf;
+  buf << inn(colons(subject)); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "(null)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_t_inn() -> void {
+  std::optional<::ip::in4::addr_t> specimen;
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  using ::format::inn;
+  buf << inn(dots(specimen)); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "(null)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_t_inn() -> void {
+  std::optional<::ip::in6::addr_t> specimen;
+  using ::ip::format::colons;
+  using ::format::inn;
+  std::ostringstream buf;
+  buf << inn(colons(specimen)); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "(null)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_full() -> void {
+  // respect ... RFC 3849
+  std::optional<::ip::in4::addr> specimen = ::ip::as<::ip::in4::addr>(make::in4_addr_t(192, 0, 2, 77));
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  buf << dots(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.77";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_full() -> void {
+  // respect ... RFC 5737
+  std::optional<::ip::in6::addr> specimen = ::ip::as<::ip::in6::addr>(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                                                       0x07, 0xdf, 0xec, 0x3f,
+                                                                                       0x33, 0xfb, 0x41, 0x6d,
+                                                                                       0x9a, 0x57, 0x67, 0xda));
+  using ::ip::format::colons;
+  std::ostringstream buf;
+  buf << colons(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:7df:ec3f:33fb:416d:9a57:67da";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in4_addr_t_full() -> void {
+  // respect ... RFC 3849
+  std::optional<::ip::in4::addr_t> specimen = make::in4_addr_t(192, 0, 2, 66);
+  std::ostringstream buf;
+  using ::ip::format::dots;
+  buf << dots(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.66";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::format::Fixture::test_optional_in6_addr_t_full() -> void {
+  // respect ... RFC 5737
+  std::optional<::ip::in6::addr_t> specimen = make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                               0x6e, 0xa9, 0x2f, 0xaa,
+                                                               0x51, 0x23, 0x44, 0x2c,
+                                                               0xae, 0x23, 0x38, 0x66);
+  using ::ip::format::colons;
+  std::ostringstream buf;
+  buf << colons(specimen); // <--------------- test this
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:6ea9:2faa:5123:442c:ae23:3866";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import rigging.suite.io
+auto tests::unit::ip::format::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("format");
+  {
+    Stream in4("in4");
+    {
+      Stream addr("addr");
+      {
+        Stream optional("optional");
+        optional << call("null", &Fixture::test_optional_in4_addr_null)
+                 << call("inn", &Fixture::test_optional_in4_addr_inn)
+                 << call("full", &Fixture::test_optional_in4_addr_full)
+          ;
+        addr << call("plain", &Fixture::test_in4_addr)
+             << move(optional)
+          ;
+      }
+      Stream addr_t("addr_t");
+      {
+        Stream optional("optional");
+        optional << call("null", &Fixture::test_optional_in4_addr_t_null)
+                 << call("inn", &Fixture::test_optional_in4_addr_t_inn)
+                 << call("full", &Fixture::test_optional_in4_addr_t_full)
+          ;
+        addr_t << call("plain", &Fixture::test_in4_addr_t)
+             << move(optional)
+          ;
+      }
+      in4 << move(addr)
+          << move(addr_t)
+      ;
+    }
+    Stream in6("in6");
+    {
+      Stream addr("addr");
+      {
+        Stream optional("optional");
+        optional << call("null", &Fixture::test_optional_in6_addr_null)
+                 << call("inn", &Fixture::test_optional_in6_addr_inn)
+                 << call("full", &Fixture::test_optional_in6_addr_full)
+          ;
+        addr << call("plain", &Fixture::test_in6_addr)
+             << move(optional)
+          ;
+      }
+      Stream addr_t("addr_t");
+      {
+        Stream optional("optional");
+        optional << call("null", &Fixture::test_optional_in6_addr_t_null)
+                 << call("inn", &Fixture::test_optional_in6_addr_t_inn)
+                 << call("full", &Fixture::test_optional_in6_addr_t_full)
+          ;
+        addr_t << call("plain", &Fixture::test_in6_addr_t)
+             << move(optional)
+          ;
+      }
+      in6 << move(addr)
+          << move(addr_t)
+      ;
+    }
+    series << move(in4)
+           << move(in6);
+  }
+  return finalize(series);
+}
+#endiv

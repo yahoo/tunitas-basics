@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Type
+namespace nonstd::required::container {
+  //
+  // Is this the sort of container that has a push_back(Value) member?
+  //
+  template<typename CONTAINER> concept bool Push_Back = requires(CONTAINER container) {
+    requires Type<CONTAINER>;
+    typename CONTAINER::value_type;
+    { container.push_back(typename CONTAINER::value_type{}) };
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Push_Back<vector<string>>);
+    static_assert(Push_Back<string>);
+  }
+}
+#endiv

@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace generator {
+      class Number;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import tests.unit.generator.State
+#import std.uniform_int_distribution
+class tests::unit::generator::Number : public std::uniform_int_distribution<> {
+  using Ancestor = std::uniform_int_distribution<>;
+public:
+  inline Number(int low, int high);
+  inline auto operator()(State &) -> int;
+};
+#endiv
+#divert <ipp>
+tests::unit::generator::Number::Number(int low, int high)
+  : Ancestor(low, high) {
+  ;
+}
+
+auto tests::unit::generator::Number::operator()(State &state) -> int {
+  Ancestor &an(*this);
+  return an(state.grd);
+}
+#endiv

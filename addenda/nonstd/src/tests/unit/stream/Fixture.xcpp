@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::stream { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::stream::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Nullbuf() -> void;
+  auto test_usage_null() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.ostringstream
+#import std.unique_ptr
+#import nonstd.stream.Nullbuf
+auto tests::unit::stream::Fixture::test_usage_Nullbuf() -> void {
+  std::ostringstream buf;
+  std::unique_ptr<::nonstd::stream::Nullbuf<char>> n( new ::nonstd::stream::Nullbuf<char>());
+  buf << "[see this]";
+  static_cast<std::ios&>(buf).rdbuf(n.get()); // <----- tricky. reach up into the ios and modify the streambuf pointer of the stringstream
+  buf << "[NOT SEE THIS]";
+  std::string const expected("[see this]");
+  std::string const actual(buf.str());
+  CPPUNIT_ASSERT(expected == actual);
+}
+#import nonstd.stream.null
+auto tests::unit::stream::Fixture::test_usage_null() -> void {
+  ::nonstd::stream::null buf;
+  buf << "[NOT SEE THIS]";
+  // and no coredumps(!)
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.stream.input.Fixture
+#import tests.unit.stream.output.Fixture
+#import tests.unit.stream.posix.Fixture
+#import tests.unit.stream.setting.Width
+#import rigging.suite.io
+auto tests::unit::stream::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"stream"};
+  series << []() {
+              Stream use{"usage"};
+              use << call("null", &Fixture::test_usage_null)
+                  << call("Nullbuf", &Fixture::test_usage_Nullbuf)
+                ;
+              return move(use);
+            } ()
+         << []() {
+              Stream set{"setting"};
+              set << add<setting::Width>()
+                ;
+              return move(set);
+            }()
+         << add<input::Fixture>()
+         << add<output::Fixture>()
+         << add<posix::Fixture>()
+    ;
+  return finalize(series);
+}
+#endiv

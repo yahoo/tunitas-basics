@@ -1,0 +1,6 @@
+// -*- c++ -*- 1f52e436-6ca6-4a63-ad3f-64e78de39fee
+#pragma once
+#include <httpserver>
+namespace httpserver::http {
+  using httpserver::http::dump_header_map;
+}

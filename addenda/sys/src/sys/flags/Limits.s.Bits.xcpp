@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.declaration
+#forward sys.s.Bits
+namespace sys::flags {
+  //
+  // The limits of the S Bits?
+  //
+  // Usage:
+  //
+  //   you know.
+  //
+  template<> struct Limits<s::Bits>;
+}
+#endiv
+#divert <hpp>
+#import sys.s.Bit
+namespace sys::flags {
+  template<> struct Limits<s::Bits> : limits::Generic<s::Bits, s::Bit, std::underlying_type_t<s::Bit>, 3u> { };
+}
+#endiv
+#divert <ipp>
+#import sys.s.Bits
+#endiv

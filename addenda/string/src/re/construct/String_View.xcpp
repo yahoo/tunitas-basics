@@ -1,0 +1,112 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.required.String_View
+namespace re::construct {
+  //
+  // Like std::basic_string_view
+  // but...
+  //    no implicit construction from 'CHAR const *'
+  //    only explicit construction from 'CHAR const *'
+  // implicit disgorgement of the underlying basic_string_view
+  //
+  // The problem we're solving here is that the following is ambiguous
+  //     Declaration:
+  //         auto function(std::string) -> ANY;
+  //         auto function(std::string_view) -> ANY;
+  //      Ambiguous:
+  //          function("abcdef")
+  //
+  // The solution is to add more type wrapping, wrapping the wrapping wrappers.
+  //     Declaration:
+  //         auto function(re::string<std::string>) -> ANY;
+  //         auto function(re::string_view<std::string_view>) -> ANY;
+  //      Unambiguous:
+  //          function("abcdef") <----- will construct the std::string, will avoid the string_view
+  //
+  template<c::required::String_View VIEW> class String_View;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace re::construct {
+  template<typename CHAR, typename TRAITS, c::required::String_View VIEW> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, String_View<VIEW> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import std.size_t
+template<c::required::String_View VIEW> class re::construct::String_View {
+public:
+  // recall, the value_type must be an instance of std::basic_string_view<CHAR, TRAITS>
+  // ... so it is cheap to copy, pass by value, etc.
+  using value_type = VIEW;
+  using char_type = typename value_type::value_type; // e.g. CHAR, char, wchar_t, etc.
+  using iterator = typename value_type::iterator;
+  using const_iterator = typename value_type::const_iterator;
+  String_View() = default;
+  //
+  // The whole point here is this constructor
+  //
+  //     explicit String_View(char_type const *)
+  //     implicit basic_string_view(CHAR const *) <--- avoid
+  //
+  inline explicit String_View(char_type const *);
+  // This one can be implicit
+  inline String_View(value_type);
+  inline [[implicit]] operator value_type() const;
+  // a thin skin (not every element of the basic_string_view interface)
+  inline auto empty() const -> bool;
+  inline auto size() const -> std::size_t;
+  inline auto data() const -> char_type const *;
+  inline auto begin() const -> const_iterator;
+  inline auto end() const -> const_iterator; 
+protected:
+  value_type value;
+};
+#endiv
+#divert <ipp>
+#import std.basic_string_view
+#import std.is_same
+template<typename CHAR, typename TRAITS, c::required::String_View VIEW> auto re::construct::operator<<(std::basic_ostream<CHAR, TRAITS> &o, String_View<VIEW> const &v) -> std::basic_ostream<CHAR, TRAITS> & {
+  static_assert(std::is_same<CHAR, typename VIEW::value_type>::value, "char_types differ");
+  static_assert(std::is_same<TRAITS, typename VIEW::traits_type>::value, "traits_types differ");
+  return o << (VIEW) v;
+}
+
+template<c::required::String_View VIEW> re::construct::String_View<VIEW>::String_View(char_type const *precursor)
+  : value(precursor) {
+  ;
+}
+
+template<c::required::String_View VIEW> re::construct::String_View<VIEW>::String_View(value_type value)
+  : value(value) {
+  ;
+}
+
+template<c::required::String_View VIEW> re::construct::String_View<VIEW>::operator value_type() const {
+  return value;
+}
+
+template<c::required::String_View VIEW> auto re::construct::String_View<VIEW>::empty() const -> bool {
+  return value.empty();
+}
+
+template<c::required::String_View VIEW> auto re::construct::String_View<VIEW>::size() const -> std::size_t {
+  return value.size();
+}
+
+template<c::required::String_View VIEW> auto re::construct::String_View<VIEW>::data() const -> char_type const * {
+  return value.data();
+}
+
+template<c::required::String_View VIEW> auto re::construct::String_View<VIEW>::begin() const -> const_iterator {
+  return value.begin();
+}
+
+template<c::required::String_View VIEW> auto re::construct::String_View<VIEW>::end() const -> const_iterator {
+  return value.end();
+}
+#endiv

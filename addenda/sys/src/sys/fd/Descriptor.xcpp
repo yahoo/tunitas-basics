@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.Managed
+namespace sys::fd {
+
+  // The fd::Descriptor rhymes with std::unique_ptr or std::shared_ptr.
+  // To access its contents use: get(), release(), reset()
+  //
+  // Manage a file descriptor with RAII
+  // No copy semantic; but move semantics.
+  // Close the file descriptor on destructtion (release the resource)
+  //
+  // Usage:
+  //
+  //   fd::Descriptor socky{socket(...arguments...)};
+  //   fd:;Descriptor filey{open(...arguments...)};
+  //
+  using Descriptor [[deprecated("instead prefer sys::fd::Managed")]] = Managed;
+}
+#endiv

@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip::endian::converter {
+  //
+  // Yes reordering.
+  //
+  struct Swap;
+}
+#endiv
+#divert <hpp>
+#import ip.endian.required.Integer
+struct ip::endian::converter::Swap {
+  template<required::Integer INTEGER> inline auto operator()(INTEGER) -> INTEGER;
+};
+#endiv
+#divert <ipp>
+#import ip.endian.reorder
+template<ip::endian::required::Integer INTEGER> auto ip::endian::converter::Swap::operator()(INTEGER v) -> INTEGER {
+  return endian::reorder<8*sizeof (INTEGER), INTEGER>(v);
+}
+#endiv

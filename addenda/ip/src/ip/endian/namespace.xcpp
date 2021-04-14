@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip // ip::uint{16,32,64,128}_t
+// require __BYTE_ORDER
+// require __LITTLE_ENDIAN
+// require __BIG_ENDIAN
+#include <endian.h>
+#if __BYTE_ORDER == __BIG_ENDIAN
+// good
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+// good
+#else
+#error BAD this machine / compiler system is neither big endian nor little endian
+#endif
+namespace ip::endian {
+  // Support for endian-ness; byte-swapping of the integers
+}
+#endiv

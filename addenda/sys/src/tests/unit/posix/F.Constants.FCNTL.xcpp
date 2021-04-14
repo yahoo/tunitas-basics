@@ -1,0 +1,185 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.F>
+namespace tests::unit::posix {
+  inline constexpr auto FCNTL = lib::Call::FCNTL;
+  template<> struct F::Constants<FCNTL>;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.F
+#import sys.f.Function
+namespace tests::unit::posix {
+  template<> struct F::Constants<FCNTL> : public cppunit::test::Fixture {
+    using F = ::sys::posix::F;
+    auto test_call() -> void;
+    auto test_assignment() -> void;
+    static auto suite() -> cppunit::Test *;
+  protected:
+    using Function = ::sys::f::Function;
+    static auto fcntlalike(Function) -> void; // Merely show that it can be called unambiguously
+  };
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto F::Constants<FCNTL>::fcntlalike(Function) -> void { CPPUNIT_ASSERT(true); }
+  auto F::Constants<FCNTL>::test_call() -> void {
+    fcntlalike(F::DUPFD);
+    fcntlalike(F::DUPFD_CLOEXEC);
+    fcntlalike(F::GETFD);
+    fcntlalike(F::SETFD);
+    fcntlalike(F::GETFL);
+    fcntlalike(F::SETFL);
+    fcntlalike(F::GETLK);
+    fcntlalike(F::SETLK);
+    fcntlalike(F::SETLKW);
+    fcntlalike(F::OFD_GETLK);
+    fcntlalike(F::OFD_SETLK);
+    fcntlalike(F::OFD_SETLKW);
+    fcntlalike(F::GETLOCK);
+    fcntlalike(F::SETLOCK);
+    fcntlalike(F::SETLOCK_WAITING);
+    fcntlalike(F::GETLOCK_PROCESS);
+    fcntlalike(F::SETLOCK_PROCESS);
+    fcntlalike(F::SETLOCK_PROCESS_WAITING);
+    fcntlalike(F::GETLOCK_FILE);
+    fcntlalike(F::SETLOCK_FILE);
+    fcntlalike(F::SETLOCK_FILE_WAITING);
+    fcntlalike(F::GETLK64);
+    fcntlalike(F::SETLK64);
+    fcntlalike(F::SETLKW64);
+    fcntlalike(F::GETLOCK64);
+    fcntlalike(F::SETLOCK64);
+    fcntlalike(F::SETLOCK64_WAITING);
+    fcntlalike(F::GETLOCK64_PROCESS);
+    fcntlalike(F::SETLOCK64_PROCESS);
+    fcntlalike(F::SETLOCK64_PROCESS_WAITING);
+    fcntlalike(F::SETLEASE);
+    fcntlalike(F::GETLEASE);
+    fcntlalike(F::SETPIPE_SZ);
+    fcntlalike(F::GETPIPE_SZ);
+    fcntlalike(F::SETPIPE_SIZE);
+    fcntlalike(F::GETPIPE_SIZE);
+    fcntlalike(F::NOTIFY);
+    fcntlalike(F::GETOWN);
+    fcntlalike(F::SETOWN);
+    fcntlalike(F::GETOWN_EX);
+    fcntlalike(F::SETOWN_EX);
+    fcntlalike(F::GETOWNER);
+    fcntlalike(F::SETOWNER);
+    fcntlalike(F::GETOWNER_EX);
+    fcntlalike(F::SETOWNER_EX);
+    fcntlalike(F::GETSIG);
+    fcntlalike(F::SETSIG);
+    fcntlalike(F::GETSIGNAL);
+    fcntlalike(F::SETSIGNAL);
+    fcntlalike(F::ADD_SEALS);
+    fcntlalike(F::GET_SEALS);
+    fcntlalike(F::GET_RW_HINT);
+    fcntlalike(F::SET_RW_HINT);
+    fcntlalike(F::GET_RWH_PROCESS);
+    fcntlalike(F::SET_RWH_PROCESS);
+    fcntlalike(F::GET_RWH_FILE);
+    fcntlalike(F::SET_RWH_FILE);
+#ifdef F_OFD_GETLK64
+    fcntlalike(F::OFD_GETLK64);
+    fcntlalike(F::OFD_SETLK64);
+    fcntlalike(F::OFD_SETLKW64);
+    fcntlalike(F::GETLOCK64_FILE;
+    fcntlalike(F::SETLOCK64_FILE);
+    fcntlalike(F::SETLOCK64_FILE_WAITING);
+#endif
+#ifdef F_GETOWNER_UIDS
+    fcntlalike(F::GETOWNER_UIDS);
+#endif
+  }
+  auto F::Constants<FCNTL>::test_assignment() -> void {
+    F::Function f;
+    f = F::DUPFD;
+    f = F::DUPFD_CLOEXEC;
+    f = F::GETFD;
+    f = F::SETFD;
+    f = F::GETFL;
+    f = F::SETFL;
+    f = F::GETLK;
+    f = F::SETLK;
+    f = F::SETLKW;
+    f = F::OFD_GETLK;
+    f = F::OFD_SETLK;
+    f = F::OFD_SETLKW;
+    f = F::GETLOCK;
+    f = F::SETLOCK;
+    f = F::SETLOCK_WAITING;
+    f = F::GETLOCK_PROCESS;
+    f = F::SETLOCK_PROCESS;
+    f = F::SETLOCK_PROCESS_WAITING;
+    f = F::GETLOCK_FILE;
+    f = F::SETLOCK_FILE;
+    f = F::SETLOCK_FILE_WAITING;
+    f = F::GETLK64;
+    f = F::SETLK64;
+    f = F::SETLKW64;
+    f = F::GETLOCK64;
+    f = F::SETLOCK64;
+    f = F::SETLOCK64_WAITING;
+    f = F::GETLOCK64_PROCESS;
+    f = F::SETLOCK64_PROCESS;
+    f = F::SETLOCK64_PROCESS_WAITING;
+    f = F::SETLEASE;
+    f = F::GETLEASE;
+    f = F::NOTIFY;
+    f = F::SETPIPE_SZ;
+    f = F::GETPIPE_SZ;
+    f = F::SETPIPE_SIZE;
+    f = F::GETPIPE_SIZE;
+    f = F::GETOWN;
+    f = F::SETOWN;
+    f = F::GETOWN_EX;
+    f = F::SETOWN_EX;
+    f = F::GETOWNER;
+    f = F::SETOWNER;
+    f = F::GETOWNER_EX;
+    f = F::SETOWNER_EX;
+    f = F::GETSIG;
+    f = F::SETSIG;
+    f = F::GETSIGNAL;
+    f = F::SETSIGNAL;
+    f = F::ADD_SEALS;
+    f = F::GET_SEALS;
+    f = F::GET_RW_HINT;
+    f = F::SET_RW_HINT;
+    f = F::GET_RWH_PROCESS;
+    f = F::SET_RWH_PROCESS;
+    f = F::GET_RWH_FILE;
+    f = F::SET_RWH_FILE;
+#ifdef F_OFD_GETLK64
+    f = F::OFD_GETLK64;
+    f = F::OFD_SETLK64;
+    f = F::OFD_SETLKW64;
+    f = F::GETLOCK64_FILE;
+    f = F::SETLOCK64_FILE;
+    f = F::SETLOCK64_FILE_WAITING;
+#endif
+#ifdef F_GETOWNER_UIDS
+    f = F::GETOWNER_UIDS;
+#endif
+    CPPUNIT_ASSERT(sizeof (f));
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::posix {
+  auto F::Constants<FCNTL>::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    using ::rigging::suite::call; // reminder: tests::unit::call occludes this
+    Stream series{"Constants<FCNTL>"};
+    series << call("assignment", &Constants::test_assignment)
+           << call("call", &Constants::test_call)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::sock::specification {
+  //
+  // The constructor-coercion helper.
+  // To grind down on the combinatorial complexity inherent in Type, Option, Options, Flags.
+  //
+  // Used by (at least) Flags::Flags
+  // So that the API calls, e.g. accept4(...), socket(...) and setsockopt(...) can be simpler
+  //
+  // Usage:
+  //
+  //   auto function(Flags, Composer<Flags>) -> Something;
+  //   auto function(Composer<Flags>, Flags) -> Something;
+  //
+  template<typename> struct Composer;
+}
+#endiv

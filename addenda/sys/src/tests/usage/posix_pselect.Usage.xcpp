@@ -1,0 +1,110 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_pselect.Usage
+//   static_assert(tests::usage::posix_pselect::Usage<>);
+//
+#import std.optional
+#import std.reference_wrapper
+#import sys.call.result.Value
+#import sys.fd.set.Reference
+#import sys.time.spec
+namespace tests::usage::posix_pselect {
+  namespace [[detail]] reference {
+    using namespace sys::fd::set;
+    using Reads = Reference<Purpose::READ>::Optional;
+    using Writes = Reference<Purpose::WRITE>::Optional;
+    using Excepts = Reference<Purpose::EXCEPT>::Optional;
+  }
+  using reference::Reads;
+  using reference::Writes;
+  using reference::Excepts;
+  using Timespec = sys::time::spec;
+  using Timeout = std::optional<Timespec>;
+  using Sigset = std::optional<std::reference_wrapper<sigset_t const>>;
+  using Count = sys::call::result::Value<int>;
+}
+#endiv
+#divert <tpp>
+#import sys.posix.pselect
+#import nonstd.same_as
+#import nonstd.convertible_to
+#import sys.posix.packaging.select.Optional
+#import tests.usage.countof
+namespace tests::usage::posix_pselect {
+  using sys::posix::pselect;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    template<typename...> concept bool PselectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s) {
+      { pselect(r, s) } -> same_as<Count>;
+      { pselect(w, s) } -> same_as<Count>;
+      { pselect(e, s) } -> same_as<Count>;
+      { pselect(r, w, s) } -> same_as<Count>;
+      { pselect(r, e, s) } -> same_as<Count>;
+      { pselect(w, e, s) } -> same_as<Count>;
+      { pselect(r, w, e, s) } -> same_as<Count>;
+      //
+      { pselect(n, r, s) } -> same_as<Count>;
+      { pselect(n, w, s) } -> same_as<Count>;
+      { pselect(n, e, s) } -> same_as<Count>;
+      { pselect(n, r, w, s) } -> same_as<Count>;
+      { pselect(n, r, e, s) } -> same_as<Count>;
+      { pselect(n, w, e, s) } -> same_as<Count>;
+      { pselect(n, r, w, e, s) } -> same_as<Count>;
+    };
+    template<typename...> concept bool PselectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
+      { pselect(r, s, t) } -> same_as<Count>;
+      { pselect(w, s, t) } -> same_as<Count>;
+      { pselect(e, s, t) } -> same_as<Count>;
+      { pselect(r, w, s, t) } -> same_as<Count>;
+      { pselect(r, e, s, t) } -> same_as<Count>;
+      { pselect(w, e, s, t) } -> same_as<Count>;
+      { pselect(r, w, e, s, t) } -> same_as<Count>;
+      //
+      { pselect(n, r, s, t) } -> same_as<Count>;
+      { pselect(n, w, s, t) } -> same_as<Count>;
+      { pselect(n, e, s, t) } -> same_as<Count>;
+      { pselect(n, r, w, s, t) } -> same_as<Count>;
+      { pselect(n, r, e, s, t) } -> same_as<Count>;
+      { pselect(n, w, e, s, t) } -> same_as<Count>;
+      { pselect(n, r, w, e, s, t) } -> same_as<Count>;
+    };
+    template<typename...> concept bool PselectTimeout = requires(int n, Reads r, Writes w, Excepts e, Timeout t) {
+      { pselect(r, t) } -> same_as<Count>;
+      { pselect(r, w, t) } -> same_as<Count>;
+      { pselect(r, e, t) } -> same_as<Count>;
+      { pselect(w, e, t) } -> same_as<Count>;
+      { pselect(r, w, e, t) } -> same_as<Count>;
+      { pselect(n, r, t) } -> same_as<Count>;
+      { pselect(n, r, w, t) } -> same_as<Count>;
+      { pselect(n, r, e, t) } -> same_as<Count>;
+      { pselect(n, w, e, t) } -> same_as<Count>;
+      { pselect(n, r, w, e, t) } -> same_as<Count>;
+    };
+    template<typename...> concept bool PselectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
+      { pselect(r, t, s) } -> same_as<Count>;
+      { pselect(r, w, t, s) } -> same_as<Count>;
+      { pselect(r, e, t, s) } -> same_as<Count>;
+      { pselect(w, e, t, s) } -> same_as<Count>;
+      { pselect(r, w, e, t, s) } -> same_as<Count>;
+      { pselect(n, r, t, s) } -> same_as<Count>;
+      { pselect(n, r, w, t, s) } -> same_as<Count>;
+      { pselect(n, r, e, t, s) } -> same_as<Count>;
+      { pselect(n, w, e, t, s) } -> same_as<Count>;
+      { pselect(n, r, w, e, t, s) } -> same_as<Count>;
+    };
+    template<typename..._> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires PselectSigset<>;
+      requires PselectSigsetTimeout<>
+      requires PselectTimeoutSigset<>
+      requires PselectTimeout<>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

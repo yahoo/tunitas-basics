@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Octet
+namespace slurp::file::istream {
+  //
+  // Because there is no operator>>(basic_istream<CHAR, TRAITS> &, std::byte &)
+  // and we wish that such did exist,
+  // but we're not so bold as to pollute the global namespace with it.
+  // Instead, we specialize the istream iterator to specialize the problem away for std::byte alone
+  //
+  // Yes, we're only slurping bytes against  thin character streams.  Think about it.
+  //
+  // Usage (see read.xcpp)
+  //
+  //   auto &in = ...std::istream somehow...
+  //   auto begin = Iterator<byte>{in};
+  //   auto end = Iterator<byte>{};
+  //   auto ret = CONTAINER{...somehow...}
+  //   auto sink = std::back_inserter(ret);
+  //   std::copy(begin, end, sink);
+  //
+  template<nonstd::required::Octet OCTET> class Iterator;
+}
+#import slurp.file.istream.Iterator.byte
+#endiv
+#divert <hpp>
+#import std.istream_iterator
+namespace slurp::file {
+  template<nonstd::required::Octet OCTET> struct istream::Iterator : public std::istream_iterator<OCTET> {
+    Iterator() = default;
+    using std::istream_iterator<OCTET>::istream_iterator;
+  };
+}
+#endiv

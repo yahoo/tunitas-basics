@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.syscall.pusher.Pusher.declaration
+namespace sys::posix::packaging::syscall::pusher {
+  //
+  // Within glibc-2.30-73-gd59630f995
+  //
+  // From ./sysdeps/unix/sysv/linux/x86_64/sysdep.h
+  //   How to pass the off{64}_t argument on p{readv,writev}{64}.
+  //   #undef LO_HI_LONG
+  //   #define LO_HI_LONG(val) (val), 0 <---------------------------- two values are passed
+  //
+  // From ./sysdeps/unix/sysv/linux/x86_64/x32/sysdep.h
+  //   How to pass the off{64}_t argument on p{readv,writev}{64}.
+  //   #undef LO_HI_LONG
+  //   #define LO_HI_LONG(val) (val) <-------------------------------- only one value is passed
+  //
+  // From ./sysdeps/unix/sysv/linux/sysdep.h
+  // 
+  //   Provide a macro to pass the off{64}_t argument on p{readv,writev}{64}.
+  //   #define LO_HI_LONG(val) \ (backslash)
+  //                     (long) (val), \ (backslash)
+  //                     (long) (((uint64_t) (val)) >> 32) <---------- two values are passed
+  //
+  enum LO_HI_LONG { };
+  template<> struct Pusher<LO_HI_LONG>;
+  namespace bundle {
+    using pusher::LO_HI_LONG;
+  }
+}
+#endiv
+#divert <hpp>
+#import off_t
+#import std.pair
+#import sys.posix.packaging.syscall.pusher.Memory
+namespace sys::posix::packaging::syscall::pusher {
+  template<> class Pusher<LO_HI_LONG> : private std::pair<off_t, off_t>, protected Memory {
+    using Ancestor = std::pair<off_t, off_t>;
+  public:
+    using Value = off_t;
+    inline explicit Pusher(Value original);
+    inline auto first() const;
+    inline auto second() const;
+  private:
+    inline static auto lo(Value) -> Value;
+    inline static auto hi(Value) -> Value;
+    inline static constexpr auto is_x86_64 = true; // // [[FIXTHIS]] ... what? to? do? here?
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::syscall::pusher {
+  Pusher<LO_HI_LONG>::Pusher(Value value) : Ancestor{lo(value), hi(value)} { }
+  auto Pusher<LO_HI_LONG>::first() const { return Ancestor::first; }
+  auto Pusher<LO_HI_LONG>::second() const { return Ancestor::second; }
+  auto Pusher<LO_HI_LONG>::lo(Value specimen) -> Value {
+    if constexpr (is_x86_64) { return specimen; }
+    else                     { return specimen; }
+  }
+  auto Pusher<LO_HI_LONG>::hi(Value specimen) -> Value {
+    if constexpr (is_x86_64) { return 0; }
+    else                     { return specimen >> 32; }
+  }
+}
+#endiv

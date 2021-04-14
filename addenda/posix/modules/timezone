@@ -1,0 +1,10 @@
+// -*- c++ -*- ae6ae96f-3fac-4ede-a668-a653eb121156
+#pragma once
+// require timeval
+// require timezone (if BSD)
+#include <sys/time.h>
+
+#if ! defined _BSD_SOURCE
+struct timezone; // Then we define it ourselves (good enough)
+#endif
+typedef struct timezone __struct_timezone;

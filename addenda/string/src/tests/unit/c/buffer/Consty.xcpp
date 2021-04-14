@@ -1,0 +1,444 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::buffer {
+  class Consty;
+}
+#endiv
+#divert <hpp>
+#import c.basic_buffer
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.buffer.Palette
+class tests::unit::c::buffer::Consty : public cppunit::test::Fixture, Palette { 
+public: 
+  using Subject = ::c::basic_buffer<char const>;
+
+  virtual auto setUp() -> void override final;
+  virtual auto tearDown() -> void override final;
+
+  auto test_constructor_default() -> void;
+  auto test_constructor_pointer_size() -> void;
+  auto test_constructor_manifest_array() -> void;
+  auto test_constructor_manifest_array_smaller() -> void;
+  auto test_constructor_manifest_array_too_big() -> void;
+  auto test_constructor_muting_buffer() -> void;
+  auto test_constructor_muting_stringz() -> void;
+  auto test_constructor_consty_stringz() -> void;
+  auto test_constructor_muting_stringn() -> void;
+  auto test_constructor_consty_stringn() -> void;
+  auto test_constructor_muting_pair_size_first() -> void;
+  auto test_constructor_muting_pair_size_second() -> void;
+  auto test_constructor_consty_pair_size_first() -> void;
+  auto test_constructor_consty_pair_size_second() -> void;
+  auto test_constructor_muting_tuple_size_first() -> void;
+  auto test_constructor_muting_tuple_size_second() -> void;
+  auto test_constructor_consty_tuple_size_first() -> void;
+  auto test_constructor_consty_tuple_size_second() -> void;
+  auto test_constructor_array() -> void;
+  auto test_constructor_string() -> void;
+  auto test_constructor_string_view() -> void;
+  auto test_constructor_vector() -> void;
+  auto test_iteration() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import c.basic_buffer
+#import std.size_t
+
+auto tests::unit::c::buffer::Consty::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::buffer::Consty::tearDown() -> void {
+  Palette::tearDown();
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_default() -> void {
+  Subject t; // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_pointer_size() -> void {
+  Subject t(LENGTH, pcc); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.distance
+auto tests::unit::c::buffer::Consty::test_constructor_manifest_array() -> void {
+  Subject t(aNcc); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(aNcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_manifest_array_smaller() -> void {
+  auto const smaller_size = LENGTH - 5;
+  Subject t(aNc, smaller_size); // <------------- test this 
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(smaller_size == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(aNc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(smaller_size == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.length_error
+auto tests::unit::c::buffer::Consty::test_constructor_manifest_array_too_big() -> void {
+  try {
+    Subject t(aNc, LENGTH+1); // <------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::length_error const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_muting_buffer() -> void {
+  using SUBTEST_CHAR_TYPE = char; // <— we're in the "consty" tester
+  ::c::basic_buffer<SUBTEST_CHAR_TYPE> a(aNc);
+  Subject t(a); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == a[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import c.stringz
+auto tests::unit::c::buffer::Consty::test_constructor_muting_stringz() -> void {
+  char buf[] = "something";
+  auto const buf_LENGTH = sizeof (buf)-1;
+  ::c::stringz sz(buf);
+  Subject t(sz); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(buf_LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == buf[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(buf_LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import c.const_stringz
+auto tests::unit::c::buffer::Consty::test_constructor_consty_stringz() -> void {
+  char const buf[] = "quite something";
+  auto const buf_LENGTH = sizeof (buf)-1;
+  ::c::const_stringz sz(buf);
+  Subject t(sz); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(buf_LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == buf[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(buf_LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import c.stringn
+auto tests::unit::c::buffer::Consty::test_constructor_muting_stringn() -> void {
+  char buf[] = "something";
+  auto const buf_LENGTH = sizeof (buf)-1;
+  ::c::stringn sn(buf);
+  Subject t(sn); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(buf_LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == buf[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(buf_LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import c.const_stringn
+auto tests::unit::c::buffer::Consty::test_constructor_consty_stringn() -> void {
+ // basic_buffer(Stringz<CHAR const> const &);
+  char const buf[] = "quite something";
+  auto const buf_LENGTH = sizeof (buf)-1;
+  ::c::const_stringn sn(buf);
+  Subject t(sn); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(buf_LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == buf[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(buf_LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.pair
+auto tests::unit::c::buffer::Consty::test_constructor_muting_pair_size_first() -> void {
+  ::std::pair<::std::size_t, char *> p(LENGTH, pc); // <------------------------ char *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_muting_pair_size_second() -> void {
+  ::std::pair<char *, ::std::size_t> p(pc, LENGTH); // <------------------------ char *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_consty_pair_size_first() -> void {
+  ::std::pair<::std::size_t, char const *> p(LENGTH, pcc); // <------------------ char const *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_consty_pair_size_second() -> void {
+  ::std::pair<char const *, ::std::size_t> p(pcc, LENGTH); // <------------------ char const *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.tuple
+auto tests::unit::c::buffer::Consty::test_constructor_muting_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, char *> u(LENGTH, pc); // <-------------------------- char *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_muting_tuple_size_second() -> void {
+  ::std::tuple<char *, ::std::size_t> u(pc, LENGTH); // <-------------------------- char *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_consty_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, char const *> u(LENGTH, pcc); // <------------------ char const *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+auto tests::unit::c::buffer::Consty::test_constructor_consty_tuple_size_second() -> void {
+  ::std::tuple<char const *, ::std::size_t> u(pcc, LENGTH); // <------------------ char const *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pcc == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.array
+#import std.copy
+#import std.distance
+auto tests::unit::c::buffer::Consty::test_constructor_array() -> void {
+  ::std::array<char, LENGTH> a;
+  // prepare for & copy in the nullptr at the end of pcc
+  ::std::copy(pcc, pcc+LENGTH+1, a.begin());
+  Subject t(a); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == a[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.back_inserter
+#import std.copy
+#import std.basic_string
+auto tests::unit::c::buffer::Consty::test_constructor_string() -> void {
+  ::std::basic_string<char> s;
+  ::std::copy(pcc, pcc+LENGTH, std::back_inserter(s));
+  Subject t(s); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == s[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.back_inserter
+#import std.copy
+#import std.basic_string_view
+auto tests::unit::c::buffer::Consty::test_constructor_string_view() -> void {
+  ::std::basic_string<char> s;
+  ::std::copy(pcc, pcc+LENGTH, std::back_inserter(s));
+  ::std::basic_string_view<char> sv(s);
+  Subject t(sv); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == sv[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.vector
+auto tests::unit::c::buffer::Consty::test_constructor_vector() -> void {
+  ::std::vector<char> v;
+  v.resize(LENGTH);
+  ::std::copy(pcc, pcc+LENGTH, v.begin());
+  Subject t(v); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == v[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+
+#import std.max
+#import std.min
+auto tests::unit::c::buffer::Consty::test_iteration() -> void {
+  ::c::basic_buffer<char const> m(aNc);
+  ::c::basic_buffer<char const> c(aNcc);
+  CPPUNIT_ASSERT(m.size() == c.size());
+  CPPUNIT_ASSERT(!m.empty());
+  CPPUNIT_ASSERT(0 != m.size());
+  using iterator = ::c::basic_buffer<char const>::iterator; // <------------- test this
+  for (iterator mi(m.begin()), me(m.end()), ci(c.begin()), ce(c.end()); me != mi && ce != ci; mi++, ci++) {
+    char mvalue(*mi);
+    char cvalue(*ci);
+    char low = ::std::min(mvalue, cvalue);
+    char high = ::std::max(mvalue, cvalue);
+    static_assert('A' < 'a', "upper case not smaller than lower case");
+    auto lowercase = ::std::max(low, high);
+    auto uppercase = ::std::min(low, high);
+    CPPUNIT_ASSERT(lowercase - 'a' + 'A' == uppercase); // that is how they were constructed
+  }
+}
+
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+#import rigging.unit.suite.add
+auto tests::unit::c::buffer::Consty::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("consty");
+  series << call("constructor_default", &Consty::test_constructor_default)
+         << call("constructor_pointer_size", &Consty::test_constructor_pointer_size)
+         << call("constructor_manifest_array", &Consty::test_constructor_manifest_array)
+         << call("constructor_manifest_array_smaller", &Consty::test_constructor_manifest_array_smaller)
+         << call("constructor_manifest_array_too_big", &Consty::test_constructor_manifest_array_too_big)
+         << call("constructor_muting_buffer", &Consty::test_constructor_muting_buffer)
+         << call("constructor_muting_stringz", &Consty::test_constructor_muting_stringz)
+         << call("constructor_consty_stringz", &Consty::test_constructor_consty_stringz)
+         << call("constructor_muting_stringn", &Consty::test_constructor_muting_stringn)
+         << call("constructor_consty_stringn", &Consty::test_constructor_consty_stringn)
+         << call("constructor_muting_pair_size_first", &Consty::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Consty::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_pair_size_first", &Consty::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Consty::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_tuple_size_first", &Consty::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Consty::test_constructor_consty_tuple_size_second)
+         << call("constructor_muting_tuple_size_first", &Consty::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Consty::test_constructor_consty_tuple_size_second)
+         << call("constructor_array", &Consty::test_constructor_array)
+         << call("constructor_string", &Consty::test_constructor_string)
+         << call("constructor_string_view", &Consty::test_constructor_string_view)
+         << call("constructor_vector", &Consty::test_constructor_vector)
+         << call("iteration", &Consty::test_iteration)
+    ;
+  return series.release();
+}
+#endiv

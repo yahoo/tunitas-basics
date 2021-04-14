@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.msg.interface
+namespace sys::posix {
+  namespace packaging::sendmsg {
+    using namespace packaging::msg::interface;
+    namespace function {
+      inline auto sendmsg(File, Header<msghdr> const &, Flags = NONE) -> Result;
+    }
+    namespace native {
+      inline auto sendmsg(int fd, msghdr const &, Flags = NONE) -> Result;
+    }
+  }
+  using packaging::sendmsg::function::sendmsg;
+  namespace native { using packaging::sendmsg::native::sendmsg; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::sendmsg {
+  auto function::sendmsg(File fd, Header<msghdr> const &buf, Flags flags) -> Result { return native::sendmsg((int) fd, buf, flags); }
+  auto native::sendmsg(int fd, msghdr const &buf, Flags flags) -> Result { return idiomatic::syscall<size::Signed>(Syscall::SENDMSG, fd, &buf, (int)flags); }
+}
+#endiv

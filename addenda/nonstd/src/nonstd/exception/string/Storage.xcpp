@@ -1,0 +1,31 @@
+i// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.constructible.required.Stringable
+namespace nonstd::exception::string {
+  //
+  // Access the standard exceptions that construct by 'std::string const &'
+  //
+  // Concept:
+  //
+  //   These exceptions are constructible by the "standard" arguments, which include std::string by lvalue reference.
+  //   Instead we prefer to accent the New School which constructs the exceptions with a string::View.
+  //
+  //   The class name of the original standard exception is used as the key to the template
+  //   Contrast with new type...... exception::string::View<EXCEPTION>
+  //   Contrast with the type alias exception::$NAME<std::string> ... e.g. Logic<string>, Domain<string>, Invalid<string> ...etc...
+  //
+  // Design:
+  //
+  //   Use a type alias to get t the original type.
+  //
+  // Usage:
+  //
+  //   throw exception::string::Storage<std::logic_error>{...somehow...}; .......... same arguments as documented
+  //   throw exception::string::Storage<std::domain_error>{...somehow...}; ......... ibidem.
+  //   ...and so on...
+  //
+  // Here the constraint does all the work.
+  template<constructible::required::Stringable EXCEPTION> using Storage = EXCEPTION;
+}
+#endiv

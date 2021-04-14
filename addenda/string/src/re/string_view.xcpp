@@ -1,0 +1,39 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.required.String_View
+#import re.construct.String_View
+namespace re {
+  //
+  // Like std::basic_string_view
+  // but...
+  //    NO IMPLICIT construction from 'CHAR const *'
+  //    only EXPLICIT construction from 'CHAR const *'
+  // implicit disgorgement of the underlying basic_string_view
+  //
+  // The problem we're solving here is that the following is ambiguous
+  //     Declaration:
+  //         auto function(std::string) -> ANY;
+  //         auto function(std::string_view) -> ANY;
+  //      Ambiguous:
+  //          function("abcdef")
+  //
+  // The solution is to add more type wrapping, wrapping the wrapping wrappers.
+  //     Declaration:
+  //         auto function(re::string<std::string>) -> ANY;
+  //         auto function(re::string_view<std::string_view>) -> ANY;
+  //      Unambiguous:
+  //          function("abcdef") <----- will construct the std::string, will avoid the string_view
+  //
+  // yes, it's got a weird case sense, with etymology
+  //
+  //     Restring       is "re" of std::string
+  //     Restring_view  is the "re" (wrapping) of std::string_view
+  //
+  template<c::required::String_View VIEW> using string_view = construct::String_View<VIEW>;
+}
+#endiv

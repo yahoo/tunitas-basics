@@ -1,0 +1,4 @@
+// -*- c++ -*- f0446135-5773-4e7a-84b2-ae55c93c6ecb
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/wake.h>

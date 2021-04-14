@@ -1,0 +1,509 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.argv
+#import std.ostream
+#import sys.exits.Code
+#import sys.exits.constants
+#import std.string_literals
+namespace tests::execing {
+  auto main(c::argv) -> sys::exits::Code;
+  auto usage(std::ostream &, sys::exits::Code = sys::exits::CONFIGURATION) -> void;
+  namespace literals {
+    using namespace std::string_literals;
+    inline auto const NAME = "execing"s;
+  }
+  using literals::NAME;
+}
+#endiv
+#divert <cpp>
+auto main(int c, char *v[]) -> int { return tests::execing::main(c::argv(c, v)); }
+#import c.argv
+#import c.rest
+#import c.environv
+#import nonstd.exception.Quitting
+#import std.cerr
+#import std.cout
+#import std.deque
+#import std.string
+#import std.string_literals
+#import std.vector
+#import sys.exits.constants
+#import sys.posix.exec
+#import sys.posix.execp
+using namespace std::string_literals;
+#include <unistd.h> // for extern char **environ;
+#import tests.execing.fail
+#import std.invalid_argument
+namespace {
+  inline auto shave_front(c::argv av) -> c::argv {
+    if (av.empty()) {
+      throw std::invalid_argument{"empty argv"};
+    }
+    return c::argv{av.size()-1, av.data()+1};
+  }
+}
+auto tests::execing::main(c::argv main_commandline_argv) -> sys::exits::Code {
+  using Arguments = std::deque<std::string>;
+  Arguments main_commandline_arguments{main_commandline_argv.begin(), main_commandline_argv.end()};
+  try {
+    if (main_commandline_arguments.size() < 3) {
+      usage(std::cerr, sys::exits::CONFIGURATION);
+    }
+    main_commandline_arguments.pop_front();
+    auto syscall_name = main_commandline_arguments.front();
+    main_commandline_arguments.pop_front();
+    auto command = main_commandline_arguments.front();
+    main_commandline_arguments.pop_front();
+    if ("--usage"s == syscall_name || "--usage"s == syscall_name || "-h"s == syscall_name) {
+      usage(std::cout, sys::exits::OK);
+    } else if ('-' == syscall_name.front()) {
+      std::cerr << NAME << ": error, unknown option " << syscall_name << '\n';
+      throw nonstd::exception::Quitting{"unknown option", sys::exits::CONFIGURATION};
+    }
+    //
+    // All this is cut & paste, but it rhymes
+    // This is a tester, so we need to hit all the cases.
+    //
+    if constexpr (false) {
+    } else if ("exec-path-sargv"s == syscall_name || "exec"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      auto r = sys::posix::exec(command, sargv);
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("exec-path-sargv-senvv"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()};
+      }();
+      auto r = sys::posix::exec(command, sargv, senvv);
+      fail::process(r, syscall_name, command, sargv, senvv);
+    } else if ("exec-path-cargv-cenvv"s == syscall_name) {
+      c::argv cargv = shave_front(shave_front(main_commandline_argv));
+      c::environv cenvv{::environ};
+      auto r = sys::posix::execp(command, cargv, cenvv);
+      fail::process(r, syscall_name, command, cargv, cenvv);
+    } else if ("exec-path-string-series"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, sargv[0]);
+        break;
+      case 2:
+        r = sys::posix::exec(command, sargv[0], sargv[1]);
+        break;
+      case 3:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2]);
+        break;
+      case 4:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3]);
+        break;
+      case 5:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4]);
+        break;
+      case 6:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5]);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("exec-path-cstring-series"s == syscall_name) {
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, cargv[0]);
+        break;
+      case 2:
+        r = sys::posix::exec(command, cargv[0], cargv[1]);
+        break;
+      case 3:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2]);
+        break;
+      case 4:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3]);
+        break;
+      case 5:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4]);
+        break;
+      case 6:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5]);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+    } else if ("exec-path-string-series-cenvv"s == syscall_name) {
+      c::environv cenvv{::environ};
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, sargv[0], cenvv);
+        break;
+      case 2:
+        r = sys::posix::exec(command, sargv[0], sargv[1], cenvv);
+        break;
+      case 3:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], cenvv);
+        break;
+      case 4:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], cenvv);
+        break;
+      case 5:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], cenvv);
+        break;
+      case 6:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5], cenvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("exec-path-cstring-series-cenvv"s == syscall_name) {
+      c::environv cenvv{::environ};
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, cargv[0], cenvv);
+        break;
+      case 2:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cenvv);
+        break;
+      case 3:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cenvv);
+        break;
+      case 4:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cenvv);
+        break;
+      case 5:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cenvv);
+        break;
+      case 6:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5], cenvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+#warning "exec-path-string-series-senvv"s
+#if 0
+    } else if ("exec-path-string-series-senvv"s == syscall_name) {
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()}; 
+      }();
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, sargv[0], senvv);
+        break;
+      case 2:
+        r = sys::posix::exec(command, sargv[0], sargv[1], senvv);
+        break;
+      case 3:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], senvv);
+        break;
+      case 4:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], senvv);
+        break;
+      case 5:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], senvv);
+        break;
+      case 6:
+        r = sys::posix::exec(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5], senvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("exec-path-cstring-series-senvv"s == syscall_name) {
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()}; 
+      }();
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::exec(command, cargv[0], senvv);
+        break;
+      case 2:
+        r = sys::posix::exec(command, cargv[0], cargv[1], senvv);
+        break;
+      case 3:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], senvv);
+        break;
+      case 4:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], senvv);
+        break;
+      case 5:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], senvv);
+        break;
+      case 6:
+        r = sys::posix::exec(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5], senvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+#endif
+    } else if ("execp-path-sargv"s == syscall_name || "execp"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      auto r = sys::posix::execp(command, sargv);
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("execp-path-sargv-senvv"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()}; 
+      }();
+      auto r = sys::posix::execp(command, sargv, senvv);
+      fail::process(r, syscall_name, command, sargv, senvv);
+    } else if ("execp-path-cargv-cenvv"s == syscall_name) {
+      c::argv cargv = shave_front(shave_front(main_commandline_argv));
+      c::environv cenvv{::environ};
+      auto r = sys::posix::execp(command, cargv, cenvv);
+      fail::process(r, syscall_name, command, cargv, cenvv);
+    } else if ("execp-path-string-series"s == syscall_name) {
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, sargv[0]);
+        break;
+      case 2:
+        r = sys::posix::execp(command, sargv[0], sargv[1]);
+        break;
+      case 3:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2]);
+        break;
+      case 4:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3]);
+        break;
+      case 5:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4]);
+        break;
+      case 6:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5]);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("execp-path-cstring-series"s == syscall_name) {
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, cargv[0]);
+        break;
+      case 2:
+        r = sys::posix::execp(command, cargv[0], cargv[1]);
+        break;
+      case 3:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2]);
+        break;
+      case 4:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3]);
+        break;
+      case 5:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4]);
+        break;
+      case 6:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5]);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+    } else if ("execp-path-string-series-cenvv"s == syscall_name) {
+      c::environv cenvv{::environ};
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, sargv[0], cenvv);
+        break;
+      case 2:
+        r = sys::posix::execp(command, sargv[0], sargv[1], cenvv);
+        break;
+      case 3:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], cenvv);
+        break;
+      case 4:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], cenvv);
+        break;
+      case 5:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], cenvv);
+        break;
+      case 6:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5], cenvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("execp-path-cstring-series-cenvv"s == syscall_name) {
+      c::environv cenvv{::environ};
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, cargv[0], cenvv);
+        break;
+      case 2:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cenvv);
+        break;
+      case 3:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cenvv);
+        break;
+      case 4:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cenvv);
+        break;
+      case 5:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cenvv);
+        break;
+      case 6:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5], cenvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+#warning "execp-path-string-series-senvv"s
+#if 0
+    } else if ("execp-path-string-series-senvv"s == syscall_name) {
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()};
+      }();
+      auto sargv = std::vector<std::string>{main_commandline_arguments.begin(), main_commandline_arguments.end()};
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (sargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, sargv[0], senvv);
+        break;
+      case 2:
+        r = sys::posix::execp(command, sargv[0], sargv[1], senvv);
+        break;
+      case 3:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], senvv);
+        break;
+      case 4:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], senvv);
+        break;
+      case 5:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], senvv);
+        break;
+      case 6:
+        r = sys::posix::execp(command, sargv[0], sargv[1], sargv[2], sargv[3], sargv[4], sargv[5], senvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << sargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, sargv);
+    } else if ("execp-path-cstring-series-senvv"s == syscall_name) {
+      auto senvv = []() -> std::vector<std::string> {
+        c::environv cenvv{::environ};
+        return {cenvv.begin(), cenvv.end()};
+      }();
+      auto cargv = shave_front(shave_front(main_commandline_argv));
+      sys::call::Result r;
+      auto const LIMIT = 5;
+      switch (cargv.size()) {
+      case 1:
+        r = sys::posix::execp(command, cargv[0], senvv);
+        break;
+      case 2:
+        r = sys::posix::execp(command, cargv[0], cargv[1], senvv);
+        break;
+      case 3:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], senvv);
+        break;
+      case 4:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], senvv);
+        break;
+      case 5:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], senvv);
+        break;
+      case 6:
+        r = sys::posix::execp(command, cargv[0], cargv[1], cargv[2], cargv[3], cargv[4], cargv[5], senvv);
+        break;
+      default:
+        std::cerr << NAME << ": notice, there are " << cargv.size() << " elements of argv\n";
+        std::cerr << NAME << ": error, the limit is " << LIMIT << " for the inline variant of exec(2)\n";
+        throw nonstd::exception::Quitting{"too many", sys::exits::CONFIGURATION};
+      }
+      fail::process(r, syscall_name, command, cargv);
+#endif
+    }
+    std::cerr << NAME << ": error, unknown syscall " << syscall_name << '\n';
+    throw nonstd::exception::Quitting{"unknown syscall", sys::exits::CONFIGURATION};
+  } catch (nonstd::exception::Quitting const &q) {
+    q.stream() << q << '\n';
+    return q.code();
+  }
+}
+#import nonstd.exception.Quitting
+auto tests::execing::usage(std::ostream &outbound, sys::exits::Code code) -> void {
+  std::string bbbb = NAME;
+  for (auto &place : bbbb) {
+    place = ' ';
+  }
+  outbound << "usage: " << NAME << " [ --usage | --help | -h ]\n"
+           << "       " << bbbb << " <exec> filepath ...args...      (filepath is direct)\n"
+           << "       " << bbbb << " <execp> command ...args...      (command in $PATH)\n"
+           << "\n"
+           << "       " << bbbb << " <exec>  ::= exec-path-sargv, exec\n"
+           << "       " << bbbb << "             exec-path-sargv-senvv\n"
+           << "       " << bbbb << "             exec-path-cargv-cenvv\n"
+           << "       " << bbbb << "             exec-path-cstring-series\n"
+           << "       " << bbbb << "             exec-path-cstring-series-cenvv\n"
+           << "       " << bbbb << "             exec-path-stringz                   (the final argument is either stringz or environv)\n"
+           << "       " << bbbb << "             exec-path-stringz-environv\n"
+           << "       " << bbbb << "             exec-path-stringz-stringz\n"
+           << "       " << bbbb << "             exec-path-stringz-stringz-environv\n"
+           << "       " << bbbb << "\n"
+           << "       " << bbbb << " <execp> ::= same pattern\n"
+    ;
+  throw nonstd::exception::Quitting{"quitting", code};
+}
+#endiv

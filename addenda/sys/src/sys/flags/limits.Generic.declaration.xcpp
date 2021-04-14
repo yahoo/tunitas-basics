@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.required
+#import sys.required.Enumeration
+#import sys.required.Integral
+namespace sys::flags::limits {
+  //
+  // Most Limits<FLAGS> look like this
+  //
+  // Usage:
+  //
+  //   template<> struct Limits<Something>. :: public limits::Generic<CRTP, Something::Value> { };
+  // 
+  template<typename CONTAINER, required::Enumeration FLAG, required::Integral FLAGSET, unsigned WIDTH> struct Generic;
+}
+#endiv

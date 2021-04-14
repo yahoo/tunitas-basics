@@ -1,0 +1,146 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::log { class LOG; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.log.LOG
+#import va.list
+struct tests::unit::log::LOG : public cppunit::test::Fixture {
+  using Subject = ::sys::log::LOG;
+  auto test_object() -> void;
+  auto test_constants_facility() -> void;
+  auto test_constants_priority() -> void;
+  auto test_constants_options() -> void;
+  auto test_open() -> void;
+  auto test_close() -> void;
+  auto test_set() -> void;
+  auto test_format() -> void;
+  auto test_vformat() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto run_vformat(Subject::Priority, char const *format, va_list) -> void;
+  auto run_format(Subject::Priority, char const *format, ...) -> void;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::log {
+  auto LOG::test_object() -> void {
+    auto something = Subject::NOTICE;
+    CPPUNIT_ASSERT(sizeof (something));
+  }
+  auto LOG::test_constants_facility() -> void {
+    auto f = Subject::Facility{};
+    f = Subject::KERNEL;
+    f = Subject::KERN;
+    f = Subject::USER;
+    f = Subject::MAIL;
+    f = Subject::DAEMON;
+    f = Subject::AUTH;
+    f = Subject::AUTHPRIV;
+    f = Subject::SYSLOG;
+    f = Subject::PRINTER;
+    f = Subject::LPR;
+    f = Subject::NEWS;
+    f = Subject::UUCP;
+    f = Subject::CRON;
+    f = Subject::FTP;
+    f = Subject::LOCAL0;
+    f = Subject::LOCAL1;
+    f = Subject::LOCAL2;
+    f = Subject::LOCAL3;
+    f = Subject::LOCAL4;
+    f = Subject::LOCAL5;
+    f = Subject::LOCAL6;
+    f = Subject::LOCAL7;
+    CPPUNIT_ASSERT(sizeof (f));
+  }
+  auto LOG::test_constants_priority() -> void {
+    auto p = Subject::Priority{};
+    p = Subject::EMERGENCY;
+    p = Subject::EMERG;
+    p = Subject::ALERT;
+    p = Subject::CRITICAL;
+    p = Subject::CRIT;
+    p = Subject::ERROR;
+    p = Subject::ERR;
+    p = Subject::WARNING;
+    p = Subject::NOTICE;
+    p = Subject::INFORMATION;
+    p = Subject::INFO;
+    p = Subject::VERBOSE;
+    p = Subject::DEBUG;
+    CPPUNIT_ASSERT(sizeof (p));
+  }
+  auto LOG::test_constants_options() -> void {
+    auto o = Subject::Options();
+    o = Subject::PID;
+    o = Subject::CONSOLE;
+    o = Subject::CONS;
+    o = Subject::NODELAY;
+    o = Subject::ODELAY;
+    o = Subject::NDELAY;
+    o = Subject::NOWAIT;
+    o = Subject::PERROR;
+    CPPUNIT_ASSERT(sizeof (o));
+  }
+}
+#import sys.log.api
+namespace tests::unit::log {
+  auto LOG::test_open() -> void {
+    Subject::open("a.out"s, Subject::PID, Subject::USER);
+    Subject::open(std::string{"a.out"}, Subject::PID, Subject::USER);
+    Subject::open(c::str("a.out"s), Subject::PID, Subject::USER);
+    Subject::open("program", Subject::PID, Subject::USER);
+    Subject::open("program"s, Subject::PID, Subject::USER);
+    Subject::close();
+  }
+  auto LOG::test_close() -> void {
+    Subject::close();
+  }
+  auto LOG::test_set() -> void {
+    Subject::open(Subject::PID, Subject::USER);
+    set(upto(Subject::ALERT));
+    Subject::close();
+  }
+  auto LOG::test_format() -> void {
+    Subject::open(Subject::PID|Subject::NODELAY, Subject::USER);
+    Subject::set(upto(Subject::VERBOSE));
+    Subject::format(Subject::NOTICE, "GOOD string=\"%s\" char-'%c' int-%d float-%f", "string", 'c', 99, 567.890);
+    Subject::close();
+  }
+  auto LOG::run_format(Subject::Priority priority, char const *format, ...) -> void {
+    va_list ap;
+    va_start(ap, format);
+    run_vformat(priority, format, ap); // <--- test this
+    va_end(ap);
+  }
+  auto LOG::run_vformat(Subject::Priority priority, char const *format, va_list ap) -> void {
+    Subject::vformat(priority, format, ap); // <--- test this
+  }
+  auto LOG::test_vformat() -> void {
+    Subject::open(Subject::PID, Subject::USER);
+    Subject::set(upto(Subject::DEBUG));
+    run_format(Subject::NOTICE, "GOOD string=\"%s\" char-'%c' int-%d float-%f", "string", 'c', 99, 567.890);
+    Subject::close();
+  }
+}
+#import rigging.suite.io
+auto tests::unit::log::LOG::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("LOG");
+  series << call("object", &LOG::test_object)
+         << []() {
+              auto con = Stream{"constants"};
+              con << call("facility", &LOG::test_constants_facility)
+                  << call("priority", &LOG::test_constants_priority)
+                  << call("options", &LOG::test_constants_options)
+                  << END;
+              return move(con);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

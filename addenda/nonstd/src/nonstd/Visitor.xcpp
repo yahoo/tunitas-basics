@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd {
+  //
+  // The generic "visitor"
+  // As exhibited in https://en.cppreference.com/w/cpp/utility/variant/visit
+  //
+  // Usage:
+  //
+  //   using Both = std::variant<double, std::intmax_t>;
+  //   Both val = ...3 or 3.0...
+  //
+  //   auto vis = Visitor{[](double) { ... },
+  //                      [](std::intmax_t) { ... }};
+  //   auto ret = std::visit(vis, val);
+  //
+  template<typename... TYPES> struct Visitor : TYPES... { using TYPES::operator()...; };
+  template<typename... TYPES> Visitor(TYPES...) -> Visitor<TYPES...>;
+}
+#endiv

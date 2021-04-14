@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.reply.Record.declaration
+namespace tests::unit::reply { template<> class Record<NAPTR>; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.reply.Record.NAPTR
+#import tests.unit.assertion
+template<> class tests::unit::reply::Record<ares::NAPTR> : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::reply::Record<ares::NAPTR>;
+  static_assert(assertion::Is_Default_Constructible_Movable_Uncopyable<Subject>);
+  auto test_constructor_default() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_destructor() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto generate() -> Subject;
+};
+#endiv
+#divert <cpp>
+#import nonstd.exception.Unimplemented
+auto tests::unit::reply::Record<ares::NAPTR>::generate() -> Subject {
+  throw nonstd::exception::Unimplemented{__FUNCTION__, __FILE__, __LINE__};
+}
+auto tests::unit::reply::Record<ares::NAPTR>::test_constructor_default() -> void {
+  Subject subject; // <-------------------------------------------- test this
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::reply::Record<ares::NAPTR>::test_constructor_move() -> void {
+  Subject subject = generate(); // <------------------------------- test this
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::reply::Record<ares::NAPTR>::test_assignment_move() -> void {
+  Subject specimen = generate();
+  Subject subject;
+  subject = std::move(specimen); // <------------------------------- test this
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::reply::Record<ares::NAPTR>::test_destructor() -> void {
+  // Every constructor and assignment test already exercises the destructor.
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+auto tests::unit::reply::Record<ares::NAPTR>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Record<NAPTR>");
+  {
+    Stream con("constructor");
+    con << call("default", &Record::test_constructor_default)
+        << call("move", &Record::test_constructor_move)
+      ;
+    series << move(con);
+  } {
+    Stream ass("assignment");
+    ass << call("move", &Record::test_assignment_move)
+      ;
+    series << move(ass);
+  }
+  series << call("destructor", &Record::test_destructor)
+    ;
+  return finalize(series);
+}
+#endiv

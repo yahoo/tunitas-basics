@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.realpath
+#import sys.posix.getcwd
+auto tests::unit::posix::fixture::Fixture::test_realpath() -> void {
+  auto g = six::getcwd();
+  CPPUNIT_ASSERT(good(g));
+  std::string wd = value(g);
+  CPPUNIT_ASSERT(!wd.empty());
+  auto r = six::realpath(wd);
+  CPPUNIT_ASSERT(good(r));
+  CPPUNIT_ASSERT_EQUAL(wd, value(r));
+}
+#endiv

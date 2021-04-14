@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.basic_string_view
+#import nonstd.required.Dopelike
+#import nonstd.required.Spanlike
+namespace nonstd {
+  //
+  // Import std::basic_string_view, string_view, wstring_view
+  // Enable as basic_dope convertible from std::basic_string_view
+  //
+  using std::basic_string_view;
+  using std::string_view;
+  using std::wstring_view;
+  // constexpr auto basic_string_view<C,T>::data() const noexcept -> C const *; (it always returns a pointer-to-const)
+  template<typename CHAR, typename TRAITS> struct basic_dope_traits<basic_string_view<CHAR, TRAITS>> : public doping::Traits<CHAR const> { };
+  template<typename CHAR, typename TRAITS> struct span_traits<basic_string_view<CHAR, TRAITS>> : public spanning::Traits<CHAR const> { };
+}
+#endiv
+#divert <cpp>
+#import nonstd.basic_string_view
+namespace nonstd {
+  static_assert(required::Dopelike<std::string_view>);
+  static_assert(required::Spanlike<std::string_view>);
+}
+#endiv

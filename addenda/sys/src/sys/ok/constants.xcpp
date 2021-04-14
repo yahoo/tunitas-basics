@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::ok {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.ok.Access
+namespace sys::ok::constants {
+  inline constexpr Access EXISTS = Axis::EXISTS;
+  inline constexpr Access READABLE = Axis::READABLE;
+  inline constexpr Access WRITABLE = Axis::WRITABLE;
+  inline constexpr Access EXECUTABLE = Axis::EXECUTABLE;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr Access READ = Axis::READ;
+  inline constexpr Access WRITE = Axis::WRITE;
+  inline constexpr Access EXECUTE = Axis::EXECUTE;
+#pragma GCC diagnostic pop
+  //
+  inline constexpr Access F = Axis::F;
+  inline constexpr Access R = Axis::R;
+  inline constexpr Access W = Axis::W;
+  inline constexpr Access X = Axis::X;
+  inline constexpr Access RW = R | W;
+  inline constexpr Access RX = R | X;
+  inline constexpr Access WX = W | X;
+  inline constexpr Access RWX = R | W | X;
+}
+#endiv

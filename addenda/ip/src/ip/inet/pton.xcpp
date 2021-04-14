@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import re.string
+#import std.string
+#import ip.inet.result.Value
+namespace ip {
+  namespace inet {
+    // for pton, you have to choose the address family (there is no lazy default, like with aton)
+    template<typename ADDR> inline auto pton(re::string<c::const_stringz> hostname) -> result::Value<ADDR>;
+  }
+}
+#import ip.inet.pton.in4
+#import ip.inet.pton.in6
+#endiv
+#divert <ipp>
+template<typename ADDR> auto ip::inet::pton(re::string<c::const_stringz> hostname) -> result::Value<ADDR> {
+  static_assert(0 == sizeof (ADDR) && 0 != sizeof (ADDR), "specializations only");
+  return result::Value<ADDR>();
+}
+#endiv

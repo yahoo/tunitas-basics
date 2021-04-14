@@ -1,0 +1,119 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  $(lib_libsqlite_module_la) \
+  -lunit-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+# And CPPFLAGS, CXXFLAGS must remain available for the caller
+# no need to bitch about deprecated interfaces; we are testing those interfaces herein.
+$(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+$(check_bin_unit_OBJECTS): # NOT AM_LDFLAGS
+check_bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  \
+  obj/src/tests/unit/namespace.cpp \
+  obj/src/tests/unit/Gensym.cpp \
+  \
+  obj/src/tests/unit/api/namespace.cpp \
+  obj/src/tests/unit/api/Fixture.cpp \
+  obj/src/tests/unit/api/dispatch/namespace.cpp \
+  obj/src/tests/unit/api/dispatch/Fixture.cpp \
+  obj/src/tests/unit/api/dispatch/Sandbox.cpp \
+  obj/src/tests/unit/api/dispatch/Bind.cpp \
+  obj/src/tests/unit/api/dispatch/Column.cpp \
+  obj/src/tests/unit/api/dispatch/Parameter.cpp \
+  obj/src/tests/unit/api/dispatch/Result.cpp \
+  \
+  obj/src/tests/unit/column/namespace.cpp \
+  obj/src/tests/unit/column/Fixture.cpp \
+  obj/src/tests/unit/column/Shell.cpp \
+  obj/src/tests/unit/column/Column.cpp \
+  \
+  obj/src/tests/unit/config/namespace.cpp \
+  obj/src/tests/unit/config/Connection.cpp \
+  obj/src/tests/unit/config/Fixture.cpp \
+  obj/src/tests/unit/config/Session.cpp \
+  \
+  obj/src/tests/unit/connection/namespace.cpp \
+  obj/src/tests/unit/connection/Connection.cpp \
+  obj/src/tests/unit/connection/Fixture.cpp \
+  obj/src/tests/unit/connection/Shell.cpp \
+  \
+  obj/src/tests/unit/error/namespace.cpp \
+  obj/src/tests/unit/error/Fixture.cpp \
+  obj/src/tests/unit/error/Category.cpp \
+  obj/src/tests/unit/error/Code.cpp \
+  obj/src/tests/unit/error/Condition.cpp \
+  obj/src/tests/unit/error/Source.cpp \
+  \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  obj/src/tests/unit/exception/Prepared.cpp \
+  obj/src/tests/unit/exception/Status.cpp \
+  obj/src/tests/unit/exception/Statement.cpp \
+  obj/src/tests/unit/exception/Throwable.cpp \
+  obj/src/tests/unit/exception/Sandbox.cpp \
+  \
+  obj/src/tests/unit/flags/namespace.cpp \
+  obj/src/tests/unit/flags/Fixture.cpp \
+  \
+  obj/src/tests/unit/name/namespace.cpp \
+  obj/src/tests/unit/name/Fixture.cpp \
+  \
+  obj/src/tests/unit/open/namespace.cpp \
+  obj/src/tests/unit/open/Fixture.cpp \
+  \
+  obj/src/tests/unit/prepared/namespace.cpp \
+  obj/src/tests/unit/prepared/Fixture.cpp \
+  obj/src/tests/unit/prepared/BasicResult.cpp \
+  \
+  obj/src/tests/unit/query/namespace.cpp \
+  obj/src/tests/unit/query/Database.cpp \
+  obj/src/tests/unit/query/Fixture.cpp \
+  obj/src/tests/unit/query/Query.cpp \
+  obj/src/tests/unit/query/Inserter.cpp \
+  obj/src/tests/unit/query/Selecter.cpp \
+  obj/src/tests/unit/query/Updater.cpp \
+  obj/src/tests/unit/query/Lookup.cpp \
+  obj/src/tests/unit/query/lookup/namespace.cpp \
+  obj/src/tests/unit/query/lookup/Traits.cpp \
+  \
+  obj/src/tests/unit/session/namespace.cpp \
+  obj/src/tests/unit/session/Fixture.cpp \
+  \
+  obj/src/tests/unit/source/namespace.cpp \
+  obj/src/tests/unit/source/Fixture.cpp \
+  obj/src/tests/unit/source/Read.cpp \
+  obj/src/tests/unit/source/Cleanup.cpp \
+  obj/src/tests/unit/source/Tmpfile.cpp \
+  obj/src/tests/unit/source/Sandbox.cpp \
+  obj/src/tests/unit/source/Source.cpp \
+  \
+  obj/src/tests/unit/statement/namespace.cpp \
+  obj/src/tests/unit/statement/Fixture.cpp \
+  obj/src/tests/unit/statement/Shell.cpp \
+  obj/src/tests/unit/statement/Shell.Guard.cpp \
+  obj/src/tests/unit/statement/Statement.cpp \
+  \
+  obj/src/tests/unit/status/namespace.cpp \
+  obj/src/tests/unit/status/Fixture.cpp \
+  obj/src/tests/unit/status/Constants.cpp \
+  \
+  obj/src/tests/unit/transaction/namespace.cpp \
+  obj/src/tests/unit/transaction/Database.cpp \
+  obj/src/tests/unit/transaction/Fixture.cpp \
+  $(end)
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

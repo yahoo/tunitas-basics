@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::r
+  // PREFER namespace sys::r::constants
+  // PREFER sys::r::Resource
+  //        etc.
+  //
+  // Pairwise:
+  //
+  //   Resource <---> Usage
+  //
+  // Usage:
+  //
+  //   using RUSAGE = sys::posix::RUSAGE;
+  //   auto const w0 = RUSAGE::SELF;
+  //   auto const w1 = RUSAGE::CHILDREN;
+  //   auto const w2 = RUSAGE::THREAD;
+  //   auto recovered = sys::r::Usages{};
+  //   auto got = sys::posix::getrusage(RUSAGE::SELF, recovered);
+  //
+  struct RUSAGE;
+}
+#endiv
+#divert <hpp>
+#import sys.r.Usage
+#import sys.r.Usages
+#import sys.r.constants
+struct sys::posix::RUSAGE {
+  using Usage = r::Usage;
+  using Usages = r::Usages;
+  inline static constexpr auto SELF     = r::SELF;
+  inline static constexpr auto CHILDREN = r::CHILDREN;
+  inline static constexpr auto THREAD   = r::THREAD;
+  RUSAGE() = delete;
+  RUSAGE(RUSAGE const &) = delete;
+  auto operator=(RUSAGE const &) -> RUSAGE & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_RUSAGE.Usage
+static_assert(tests::usage::posix_RUSAGE::Usage<>);
+#endiv

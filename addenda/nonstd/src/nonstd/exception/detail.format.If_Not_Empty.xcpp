@@ -1,0 +1,79 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+#import nonstd.required.Compare_To_Nullptr
+namespace nonstd::exception::detail::format {
+  //
+  // If not empty then insert it (print it)
+  // see, the more general, ::format::ine(...)
+  // see, nearby, the less general detail::format::ine(...)
+  //
+  // WATCHOUT - this is nearly the same as ::format::ine(...) and the allied classes
+  // it exists because -lnonstd-module MUST NOT depend upon -lformat-module
+  // exactly the opposite dependence must obtain.  So the code is copied by cut & paste.
+  //
+  // If_Not_Empty is not as general and does not deal with the prophylactic nullptr wrapper classes.
+  // As such there are non-supported uses. 
+  //
+  // NON-USAGE:
+  //    std::cout << ine(quote(nullptr)); <--------------- instead use ::format::ine(...)
+  //    std::cout << ine(quote(std::string())); <--------- instead use ::format::ine(...)
+  //
+  // This thing only needs to work to guard __FUNCTION__ and __FILE__ type arguments (pointers)
+  //
+  // Insert one of three eventualities
+  //    (null)            ... when the value is manifestly nullptr
+  //    (empty)           ... when the value is not null, but has zero length
+  //    <value>           ... the pointed-at series itself; e.g. a zero-terminated string of characters
+  //
+  // Usage:
+  //    std::cout << ine(nullptr);
+  //    std::cout << ine(__FUNCTION__);
+  //    std::cout << ine(__FILE__);
+  //    auto const *something = "something";
+  //    std::cout << ine(something);
+  //
+  template<required::Character CHAR, required::Compare_To_Nullptr<CHAR> VALUE> class If_Not_Empty;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+namespace nonstd::exception::detail::format {
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Compare_To_Nullptr<CHAR> VALUE> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, If_Not_Empty<CHAR, VALUE> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+namespace nonstd::exception::detail {
+  template<required::Character CHAR, required::Compare_To_Nullptr<CHAR> VALUE> class format::If_Not_Empty {
+  public:
+    using Value = VALUE;
+    inline explicit If_Not_Empty(Value const &value) : value{value} { }
+  public:
+    Value const &value;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.string_view
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+namespace nonstd::exception::detail {
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Compare_To_Nullptr<CHAR> VALUE> auto format::operator<<(std::basic_ostream<CHAR, TRAITS> &o, If_Not_Empty<CHAR, VALUE> const &n) -> std::basic_ostream<CHAR, TRAITS> & {
+    auto extracted = (CHAR const *) n.value;
+    auto widen = [](std::basic_ostream<CHAR, TRAITS> &outbound, char const *literal) {
+      for (auto c : std::string_view{literal}) {
+        outbound << outbound.widen(c);
+      }
+    };
+    if (nullptr == extracted) {
+      widen(o, "(null)");
+    } else if (CHAR() == *extracted) {
+      widen(o, "(empty)");
+    } else {
+      o << extracted;
+    }
+    return o;
+  }
+}
+#endiv

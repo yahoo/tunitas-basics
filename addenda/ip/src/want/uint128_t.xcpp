@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import want.bigint
+namespace want {
+  //
+  // Acquire a definition for int128
+  //
+  using bigint::uint128_t;
+  //
+  // DO NOT
+  //    acquire a crude definition for operator<<(...)
+  //    that cuts corners and is not always correct.
+  // DO NOT
+  //    using cppunit/operator<<
+  //
+}
+#endiv

@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+//
+// Raise up the two 'initialize(...)' in 'namespace format::detail::funcall'
+// There are (at least?) two such functions to be raised up to 'namespace format'
+//
+#import format.detail.funcall.initialize
+namespace format {
+  //
+  // Usage #1:
+  //     Funcall<char const *> spec("f(", ",", ")");
+  //     finalize(initialize(out, spec) << "apple" << "banana" << "cherry");
+  //
+  // Usage #2:
+  //     finalize(initialize(out, "F(", ".", ")") << "apple" << "banana" << "cherry");
+  //
+  using detail::funcall::initialize;
+}
+#endiv

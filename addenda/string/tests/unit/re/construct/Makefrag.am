@@ -1,0 +1,8 @@
+tests_unit_re_construct_TESTS = \
+  tests/unit/re/construct/all.test \
+  tests/unit/re/construct/buffer.test \
+  tests/unit/re/construct/buffer.ith.test \
+  tests/unit/re/construct/string.test \
+  tests/unit/re/construct/string.ith.test \
+  tests/unit/re/construct/string_view.test \
+  $(end)

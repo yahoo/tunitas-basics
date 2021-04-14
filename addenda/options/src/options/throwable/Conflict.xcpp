@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  namespace throwable {
+    class Conflict;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import options.throwable.detail.Complaint
+#import sys.exits
+
+// A (configuration) conflict of some sort
+class options::throwable::Conflict : public detail::Complaint {
+  using Ancestor = detail::Complaint;
+public:
+  inline Conflict(stringz_type const &argv0, stringz_type const &complaint, sys::exits::Code = sys::exits::CONFIGURATION);
+  inline Conflict(Program const &, stringz_type const &complaint, sys::exits::Code = sys::exits::CONFIGURATION);
+  // You do not have to inherit (you can use this one right away)
+  ~Conflict() = default;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+options::throwable::Conflict::Conflict(stringz_type const &the_argv0, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_argv0, the_complaint, the_code) {
+  ;
+}
+
+options::throwable::Conflict::Conflict(Program const &the_program, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_program, the_complaint, the_code) {
+  ;
+}
+#divert </ipp>

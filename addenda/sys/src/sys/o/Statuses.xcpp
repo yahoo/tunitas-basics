@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.Status
+#import sys.flags.Flags
+#import std.underlying_type
+namespace sys::o {
+  //
+  // File status directives
+  //
+  // Usage:
+  //
+  //   auto c = Status::APPEND | Status::LARGEFILE | Status::TMPFILE;
+  //
+  using Statuses = flags::Flags<Status, std::underlying_type_t<Status>>;
+}
+#endiv
+#divert <hpp>
+namespace sys::o {
+  namespace packaging::statuses {
+    using Uf = std::underlying_type_t<Status>;
+    constexpr auto ALL = (O_APPEND|
+                          O_ASYNC|
+                          O_DIRECT|
+                          O_DSYNC|
+                          O_LARGEFILE|
+                          O_NOATIME|
+                          O_NONBLOCK|
+                          O_NDELAY|
+                          O_PATH|
+                          O_SYNC|
+                          O_TMPFILE);
+    namespace bundle {
+      inline constexpr auto operator|(Status a, Status b) -> Statuses { return Statuses{(Uf)a | (Uf)b}; }
+      inline constexpr auto operator&(Status a, Status b) -> Statuses { return Statuses{(Uf)a & (Uf)b}; }
+      inline constexpr auto operator~(Status b) -> Statuses           { return Statuses{ALL & ~(Uf)b}; }
+    }
+  }
+  // not helpful ---> using namespace packaging::statuses::bundle; <--- not helpful
+  using packaging::statuses::bundle::operator|;
+  using packaging::statuses::bundle::operator&;
+  using packaging::statuses::bundle::operator~;
+}
+#endiv

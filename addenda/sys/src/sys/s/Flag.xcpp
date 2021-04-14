@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #define values that establish the values of the enumeration elements
+#include <fcntl.h>
+#import mode_t
+namespace sys::s {
+  //
+  // The flags, with encodings suitable for composition as the bitmask Flags
+  // See how the underlying type is mode_t because the Flags wind up therein.
+  //
+  enum class Flag : mode_t {
+    // OLDSCHOOL
+    ISUID = S_ISUID,
+    ISGID = S_ISGID,
+    ISVTX = S_ISVTX,
+    IRUSR = S_IRUSR,
+    IWUSR = S_IWUSR,
+    IXUSR = S_IXUSR,
+    IRGRP = S_IRGRP,
+    IWGRP = S_IWGRP,
+    IXGRP = S_IXGRP,
+    IROTH = S_IROTH,
+    IWOTH = S_IWOTH,
+    IXOTH = S_IXOTH,
+    // New School (buy a vowel)
+    SETUID = ISUID,
+    SETGID = ISGID,
+    STICKY = ISVTX,
+    RUSER = IRUSR,
+    WUSER = IWUSR,
+    XUSER = IXUSR,
+    RGROUP = IRGRP,
+    WGROUP = IWGRP,
+    XGROUP = IXGRP,
+    ROTHER = IROTH,
+    WOTHER = IWOTH,
+    XOTHER = IXOTH,
+  };
+}
+#endiv

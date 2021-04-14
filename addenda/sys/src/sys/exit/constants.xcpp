@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::exit {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.exit.Code
+namespace sys::exit::constants {
+  //
+  // Try to to avoid.
+  // You likely want to use sys::exits::constants
+  //
+  inline constexpr auto SUCCESS = Code::SUCCESS;
+  inline constexpr auto FAILURE = Code::FAILURE;
+}
+#endiv

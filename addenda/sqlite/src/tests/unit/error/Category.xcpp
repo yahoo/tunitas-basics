@@ -1,0 +1,366 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::error {
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sqlite.error.Category
+#import std.string
+#import std.vector
+class tests::unit::error::Category : public cppunit::test::Fixture {
+public:
+  auto test_singleton() -> void;
+  auto test_name() -> void;
+  auto test_default_error_condition() -> void;
+  auto test_equivalent() -> void;
+  auto test_message() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.error.category
+#import sqlite.error.Category
+#import sqlite.error.Code
+#import sqlite.error.Category
+#import std.error_category
+#import std.error_code
+
+auto tests::unit::error::Category::test_singleton() -> void {
+  std::error_category const &cat = sqlite::error::category();
+  CPPUNIT_ASSERT(nullptr != cat.name());
+}
+
+#import std.string
+auto tests::unit::error::Category::test_name() -> void {
+  std::error_category const &cat = sqlite::error::category();
+  std::string actual = cat.name();
+  std::string expected = "sqlite";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import sqlite.error.Condition
+auto tests::unit::error::Category::test_default_error_condition() -> void {
+  std::error_category const &cat = ::sqlite::error::category();
+  using namespace sqlite::error;
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_OK) == std::error_condition(Condition::OK));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_ERROR) == std::error_condition(Condition::ERROR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_INTERNAL) == std::error_condition(Condition::INTERNAL));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_PERM) == std::error_condition(Condition::PERM));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_ABORT) == std::error_condition(Condition::ABORT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_BUSY) == std::error_condition(Condition::BUSY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_LOCKED) == std::error_condition(Condition::LOCKED));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOMEM) == std::error_condition(Condition::NOMEM));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_READONLY) == std::error_condition(Condition::READONLY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_INTERRUPT) == std::error_condition(Condition::INTERRUPT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CORRUPT) == std::error_condition(Condition::CORRUPT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOTFOUND) == std::error_condition(Condition::NOTFOUND));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_FULL) == std::error_condition(Condition::FULL));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CANTOPEN) == std::error_condition(Condition::CANTOPEN));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_PROTOCOL) == std::error_condition(Condition::PROTOCOL));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_EMPTY) == std::error_condition(Condition::EMPTY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_SCHEMA) == std::error_condition(Condition::SCHEMA));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_TOOBIG) == std::error_condition(Condition::TOOBIG));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_MISMATCH) == std::error_condition(Condition::MISMATCH));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_MISUSE) == std::error_condition(Condition::MISUSE));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOLFS) == std::error_condition(Condition::NOLFS));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_AUTH) == std::error_condition(Condition::AUTH));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_FORMAT) == std::error_condition(Condition::FORMAT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_RANGE) == std::error_condition(Condition::RANGE));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOTADB) == std::error_condition(Condition::NOTADB));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOTICE) == std::error_condition(Condition::NOTICE));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_WARNING) == std::error_condition(Condition::WARNING));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_ROW) == std::error_condition(Condition::ROW));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_DONE) == std::error_condition(Condition::DONE));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_READ) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SHORT_READ) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_WRITE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_FSYNC) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_DIR_FSYNC) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_TRUNCATE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_FSTAT) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_UNLOCK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_RDLOCK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_DELETE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_BLOCKED) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_NOMEM) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_ACCESS) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_CHECKRESERVEDLOCK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_LOCK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_CLOSE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_DIR_CLOSE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SHMOPEN) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SHMSIZE) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SHMLOCK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SHMMAP) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_SEEK) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_DELETE_NOENT) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_MMAP) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_GETTEMPPATH) == std::error_condition(Condition::IOERR));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_IOERR_CONVPATH) == std::error_condition(Condition::IOERR));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_LOCKED_SHAREDCACHE) == std::error_condition(Condition::LOCKED));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_BUSY_RECOVERY) == std::error_condition(Condition::BUSY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_BUSY_SNAPSHOT) == std::error_condition(Condition::BUSY));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CANTOPEN_NOTEMPDIR) == std::error_condition(Condition::CANTOPEN));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CANTOPEN_ISDIR) == std::error_condition(Condition::CANTOPEN));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CANTOPEN_FULLPATH) == std::error_condition(Condition::CANTOPEN));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CANTOPEN_CONVPATH) == std::error_condition(Condition::CANTOPEN));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CORRUPT_VTAB) == std::error_condition(Condition::CORRUPT));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_READONLY_RECOVERY) == std::error_condition(Condition::READONLY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_READONLY_CANTLOCK) == std::error_condition(Condition::READONLY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_READONLY_ROLLBACK) == std::error_condition(Condition::READONLY));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_READONLY_DBMOVED) == std::error_condition(Condition::READONLY));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_ABORT_ROLLBACK) == std::error_condition(Condition::ABORT));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_CHECK) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_COMMITHOOK) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_FOREIGNKEY) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_FUNCTION) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_NOTNULL) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_PRIMARYKEY) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_TRIGGER) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_UNIQUE) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_VTAB) == std::error_condition(Condition::CONSTRAINT));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_CONSTRAINT_ROWID) == std::error_condition(Condition::CONSTRAINT));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOTICE_RECOVER_WAL) == std::error_condition(Condition::NOTICE));
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_NOTICE_RECOVER_ROLLBACK) == std::error_condition(Condition::NOTICE));
+
+  CPPUNIT_ASSERT(cat.default_error_condition(SQLITE_WARNING_AUTOINDEX ) == std::error_condition(Condition::WARNING));
+}
+
+auto tests::unit::error::Category::test_equivalent() -> void {
+  std::error_category const &cat = ::sqlite::error::category();
+  using namespace sqlite::error;
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_OK, cat), SQLITE_OK));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_ERROR, cat), SQLITE_ERROR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_INTERNAL, cat), SQLITE_INTERNAL));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_PERM, cat), SQLITE_PERM));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_ABORT, cat), SQLITE_ABORT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_BUSY, cat), SQLITE_BUSY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_LOCKED, cat), SQLITE_LOCKED));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOMEM, cat), SQLITE_NOMEM));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_READONLY, cat), SQLITE_READONLY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_INTERRUPT, cat), SQLITE_INTERRUPT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CORRUPT, cat), SQLITE_CORRUPT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOTFOUND, cat), SQLITE_NOTFOUND));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_FULL, cat), SQLITE_FULL));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CANTOPEN, cat), SQLITE_CANTOPEN));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_PROTOCOL, cat), SQLITE_PROTOCOL));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_EMPTY, cat), SQLITE_EMPTY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_SCHEMA, cat), SQLITE_SCHEMA));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_TOOBIG, cat), SQLITE_TOOBIG));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_MISMATCH, cat), SQLITE_MISMATCH));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_MISUSE, cat), SQLITE_MISUSE));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOLFS, cat), SQLITE_NOLFS));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_AUTH, cat), SQLITE_AUTH));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_FORMAT, cat), SQLITE_FORMAT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_RANGE, cat), SQLITE_RANGE));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOTADB, cat), SQLITE_NOTADB));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOTICE, cat), SQLITE_NOTICE));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_WARNING, cat), SQLITE_WARNING));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_ROW, cat), SQLITE_ROW));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_DONE, cat), SQLITE_DONE));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_READ, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SHORT_READ, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_WRITE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_FSYNC, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_DIR_FSYNC, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_TRUNCATE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_FSTAT, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_UNLOCK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_RDLOCK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_DELETE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_BLOCKED, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_NOMEM, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_ACCESS, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_CHECKRESERVEDLOCK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_LOCK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_CLOSE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_DIR_CLOSE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SHMOPEN, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SHMSIZE, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SHMLOCK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SHMMAP, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_SEEK, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_DELETE_NOENT, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_MMAP, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_GETTEMPPATH, cat), SQLITE_IOERR));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_IOERR_CONVPATH, cat), SQLITE_IOERR));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_LOCKED_SHAREDCACHE, cat), SQLITE_LOCKED));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_BUSY_RECOVERY, cat), SQLITE_BUSY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_BUSY_SNAPSHOT, cat), SQLITE_BUSY));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CANTOPEN_NOTEMPDIR, cat), SQLITE_CANTOPEN));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CANTOPEN_ISDIR, cat), SQLITE_CANTOPEN));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CANTOPEN_FULLPATH, cat), SQLITE_CANTOPEN));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CANTOPEN_CONVPATH, cat), SQLITE_CANTOPEN));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CORRUPT_VTAB, cat), SQLITE_CORRUPT));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_READONLY_RECOVERY, cat), SQLITE_READONLY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_READONLY_CANTLOCK, cat), SQLITE_READONLY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_READONLY_ROLLBACK, cat), SQLITE_READONLY));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_READONLY_DBMOVED, cat), SQLITE_READONLY));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_ABORT_ROLLBACK, cat), SQLITE_ABORT));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_CHECK, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_COMMITHOOK, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_FOREIGNKEY, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_FUNCTION, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_NOTNULL, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_PRIMARYKEY, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_TRIGGER, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_UNIQUE, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_VTAB, cat), SQLITE_CONSTRAINT));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_CONSTRAINT_ROWID, cat), SQLITE_CONSTRAINT));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOTICE_RECOVER_WAL, cat), SQLITE_NOTICE));
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_NOTICE_RECOVER_ROLLBACK, cat), SQLITE_NOTICE));
+
+  CPPUNIT_ASSERT(cat.equivalent(std::error_code(SQLITE_WARNING_AUTOINDEX , cat), SQLITE_WARNING));
+}
+
+auto tests::unit::error::Category::test_message() -> void {
+  std::error_category const &cat = ::sqlite::error::category();
+  using namespace sqlite::error;
+
+  std::ostream &out(std::cerr);
+  out << cat.message(SQLITE_OK)
+    //
+      << cat.message(SQLITE_ERROR)
+      << cat.message(SQLITE_INTERNAL)
+      << cat.message(SQLITE_PERM)
+      << cat.message(SQLITE_ABORT)
+      << cat.message(SQLITE_BUSY)
+      << cat.message(SQLITE_LOCKED)
+      << cat.message(SQLITE_NOMEM)
+      << cat.message(SQLITE_READONLY)
+      << cat.message(SQLITE_INTERRUPT)
+      << cat.message(SQLITE_IOERR)
+      << cat.message(SQLITE_CORRUPT)
+      << cat.message(SQLITE_NOTFOUND)
+      << cat.message(SQLITE_FULL)
+      << cat.message(SQLITE_CANTOPEN)
+      << cat.message(SQLITE_PROTOCOL)
+      << cat.message(SQLITE_EMPTY)
+      << cat.message(SQLITE_SCHEMA)
+      << cat.message(SQLITE_TOOBIG)
+      << cat.message(SQLITE_CONSTRAINT)
+      << cat.message(SQLITE_MISMATCH)
+      << cat.message(SQLITE_MISUSE)
+      << cat.message(SQLITE_NOLFS)
+      << cat.message(SQLITE_AUTH)
+      << cat.message(SQLITE_FORMAT)
+      << cat.message(SQLITE_RANGE)
+      << cat.message(SQLITE_NOTADB)
+      << cat.message(SQLITE_NOTICE)
+      << cat.message(SQLITE_WARNING)
+    //
+      << cat.message(SQLITE_ROW)
+      << cat.message(SQLITE_DONE)
+    //
+      << cat.message(SQLITE_IOERR_READ)
+      << cat.message(SQLITE_IOERR_SHORT_READ)
+      << cat.message(SQLITE_IOERR_WRITE)
+      << cat.message(SQLITE_IOERR_FSYNC)
+      << cat.message(SQLITE_IOERR_DIR_FSYNC)
+      << cat.message(SQLITE_IOERR_TRUNCATE)
+      << cat.message(SQLITE_IOERR_FSTAT)
+      << cat.message(SQLITE_IOERR_UNLOCK)
+      << cat.message(SQLITE_IOERR_RDLOCK)
+      << cat.message(SQLITE_IOERR_DELETE)
+      << cat.message(SQLITE_IOERR_BLOCKED)
+      << cat.message(SQLITE_IOERR_NOMEM)
+      << cat.message(SQLITE_IOERR_ACCESS)
+      << cat.message(SQLITE_IOERR_CHECKRESERVEDLOCK)
+      << cat.message(SQLITE_IOERR_LOCK)
+      << cat.message(SQLITE_IOERR_CLOSE)
+      << cat.message(SQLITE_IOERR_DIR_CLOSE)
+      << cat.message(SQLITE_IOERR_SHMOPEN)
+      << cat.message(SQLITE_IOERR_SHMSIZE)
+      << cat.message(SQLITE_IOERR_SHMLOCK)
+      << cat.message(SQLITE_IOERR_SHMMAP)
+      << cat.message(SQLITE_IOERR_SEEK)
+      << cat.message(SQLITE_IOERR_DELETE_NOENT)
+      << cat.message(SQLITE_IOERR_MMAP)
+      << cat.message(SQLITE_IOERR_GETTEMPPATH)
+      << cat.message(SQLITE_IOERR_CONVPATH)
+    //
+      << cat.message(SQLITE_LOCKED_SHAREDCACHE)
+    //
+      << cat.message(SQLITE_BUSY_RECOVERY)
+      << cat.message(SQLITE_BUSY_SNAPSHOT)
+    //
+      << cat.message(SQLITE_CANTOPEN_NOTEMPDIR)
+      << cat.message(SQLITE_CANTOPEN_ISDIR)
+      << cat.message(SQLITE_CANTOPEN_FULLPATH)
+      << cat.message(SQLITE_CANTOPEN_CONVPATH)
+    //
+      << cat.message(SQLITE_CORRUPT_VTAB)
+    //
+      << cat.message(SQLITE_READONLY_RECOVERY)
+      << cat.message(SQLITE_READONLY_CANTLOCK)
+      << cat.message(SQLITE_READONLY_ROLLBACK)
+      << cat.message(SQLITE_READONLY_DBMOVED)
+    //
+      << cat.message(SQLITE_ABORT_ROLLBACK)
+    //
+      << cat.message(SQLITE_CONSTRAINT_CHECK)
+      << cat.message(SQLITE_CONSTRAINT_COMMITHOOK)
+      << cat.message(SQLITE_CONSTRAINT_FOREIGNKEY)
+      << cat.message(SQLITE_CONSTRAINT_FUNCTION)
+      << cat.message(SQLITE_CONSTRAINT_NOTNULL)
+      << cat.message(SQLITE_CONSTRAINT_PRIMARYKEY)
+      << cat.message(SQLITE_CONSTRAINT_TRIGGER)
+      << cat.message(SQLITE_CONSTRAINT_UNIQUE)
+      << cat.message(SQLITE_CONSTRAINT_VTAB)
+      << cat.message(SQLITE_CONSTRAINT_ROWID)
+    //
+      << cat.message(SQLITE_NOTICE_RECOVER_WAL)
+      << cat.message(SQLITE_NOTICE_RECOVER_ROLLBACK)
+    //
+      << cat.message(SQLITE_WARNING_AUTOINDEX)
+      << '\n';
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::error::Category::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Category");
+  s << call("singleton", &Category::test_singleton)
+    << call("name", &Category::test_name)
+    << call("default_error_condition", &Category::test_default_error_condition)
+    << call("equivalent", &Category::test_equivalent)
+    << call("message", &Category::test_message)
+    ;
+  return s.release();
+}
+#endiv

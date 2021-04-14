@@ -1,0 +1,237 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::run { class Pipe_From; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::run::Pipe_From : public cppunit::test::Fixture {
+public:
+  auto test_constructor_path() -> void;
+  auto test_constructor_exec_path() -> void;
+  auto test_constructor_path_name() -> void;
+  auto test_constructor_exec_path_name() -> void;
+  auto test_start() -> void;
+  auto test_read_stream() -> void;
+  auto test_read_string() -> void;
+  auto test_run() -> void;
+  auto test_wait() -> void;
+  template<unsigned COUNT> auto test_many() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct Source;
+  struct Horse;
+};
+namespace tests::unit::run {
+  template<> auto Pipe_From::test_many<0>() -> void;
+  template<> auto Pipe_From::test_many<1>() -> void;
+  template<> auto Pipe_From::test_many<2>() -> void;
+  template<> auto Pipe_From::test_many<3>() -> void;
+}
+#endiv
+#divert <cpp>
+#import tests.unit.run.Pipe_From.Horse
+#import tests.unit.run.Pipe_From.Source
+#import std.getline
+#import std.cerr
+namespace tests::unit::run {
+  auto Pipe_From::test_constructor_path() -> void {
+    Source j1{std::filesystem::path{"/bin/true"}};
+    Source j2{std::string{"/bin/true"}};
+    Source j3{"/bin/true"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+  }
+  auto Pipe_From::test_constructor_exec_path() -> void {
+    Source j1{Source::EXEC, std::filesystem::path{"/bin/true"}};
+    Source j2{Source::EXEC, std::string{"/bin/true"}};
+    Source j3{Source::EXEC, "/bin/true"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+    Source k1{Source::EXECP, std::filesystem::path{"false"}};
+    Source k2{Source::EXECP, std::string{"false"}};
+    Source k3{Source::EXECP, "false"};
+    CPPUNIT_ASSERT(sizeof (k1) == sizeof (k2) && sizeof (k2) == sizeof (k3));
+  }
+  auto Pipe_From::test_constructor_path_name() -> void {
+    Source j1{std::filesystem::path{"/bin/true"}, "veracity"};
+    Source j2{std::string{"/bin/true"}, "vérité"};
+    Source j3{"/bin/true", "verdad"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+  }
+  auto Pipe_From::test_constructor_exec_path_name() -> void {
+    Source j1{Source::EXEC, std::filesystem::path{"/bin/false"}, "veracity"};
+    Source j2{Source::EXEC, std::string{"/bin/false"}, "vérité"};
+    Source j3{Source::EXEC, "/bin/false", "verdad"};
+    CPPUNIT_ASSERT(sizeof (j1) == sizeof (j2) && sizeof (j2) == sizeof (j3));
+    Source k1{Source::EXECP, std::filesystem::path{"falsity"}};
+    Source k2{Source::EXECP, std::string{"false"}, "fausseté"};
+    Source k3{Source::EXECP, "falsedad"}; // is that really Spanish for "falsity"?  I blame translate.google.com
+    CPPUNIT_ASSERT(sizeof (k1) == sizeof (k2) && sizeof (k2) == sizeof (k3));
+  }
+  auto Pipe_From::test_start() -> void {
+    Horse subject;
+    auto started = subject.start(); // <------------- test this
+    CPPUNIT_ASSERT(ok(started));
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(!ok(waited)); // duplicate will fail
+  }
+  auto Pipe_From::test_read_stream() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    auto &inbound{subject.stream()}; // <----------- test this
+    std::string datetime;
+    auto got = (bool) std::getline(inbound, datetime);
+    CPPUNIT_ASSERT(got);
+    CPPUNIT_ASSERT(!datetime.empty());
+    std::cerr << "getline datetime recovered q(" << datetime << ")\n";
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(!ok(waited)); // duplicate will fail
+  }
+  auto Pipe_From::test_read_string() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    std::string datetime;
+    auto red = subject.read(datetime); // <------------ test this
+    CPPUNIT_ASSERT(ok(red));
+    CPPUNIT_ASSERT(!datetime.empty());
+    std::cerr << "read datetime recovered q(" << datetime << ")\n";
+    auto ran = subject.run();
+    CPPUNIT_ASSERT(ok(ran));
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(!ok(waited)); // duplicate will fail
+  }
+  auto Pipe_From::test_run() -> void {
+    Horse subject;
+    auto ran = subject.run();
+    if (!ok(ran)) {
+      std::cerr << "test_run, alone, fails with " << error_code(ran).message() << '\n';
+    }
+    CPPUNIT_ASSERT(ok(ran));
+  }
+  auto Pipe_From::test_wait() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    // NOT ---> auto ran = subject.run();
+    // NOT ---> CPPUNIT_ASSERT(ok(ran));
+    auto waited = subject.wait(); // <------------- test this
+    CPPUNIT_ASSERT(ok(waited));
+  }
+  template<> auto Pipe_From::test_many<0>() -> void {
+    // Exactly what it says.  It tests zero cases.
+    CPPUNIT_ASSERT(true);
+  }
+  template<> auto Pipe_From::test_many<1>() -> void {
+    Horse subject;
+    auto started = subject.start();
+    CPPUNIT_ASSERT(ok(started));
+    //
+    std::string datetime;
+    auto red = subject.read(datetime); // <------------ test this
+    CPPUNIT_ASSERT(ok(red));
+    CPPUNIT_ASSERT(!datetime.empty());
+    std::cerr << "many<1> read datetime recovered q(" << datetime << ")\n";
+    //
+    auto ran = subject.run(); // let it run out the rest of the way ... finishing with a wait(...)
+    CPPUNIT_ASSERT(ok(ran));
+    //
+    std::cerr << "many<1> second redundant wait will fail\n";
+    auto waited = subject.wait();
+    CPPUNIT_ASSERT(!ok(waited));
+  }
+  template<> auto Pipe_From::test_many<2>() -> void {
+    Horse subject0, subject1;
+    auto started0 = subject0.start();
+    auto started1 = subject1.start();
+    CPPUNIT_ASSERT(ok(started0));
+    CPPUNIT_ASSERT(ok(started1));
+    {
+      std::string datetime;
+      auto red = subject0.read(datetime); // <------------ test this
+      CPPUNIT_ASSERT(ok(red));
+      CPPUNIT_ASSERT(!datetime.empty());
+      std::cerr << "many<2.1> read datetime recovered q(" << datetime << ")\n";
+    } {
+      std::string datetime;
+      auto red = subject1.read(datetime); // <------------ test this
+      CPPUNIT_ASSERT(ok(red));
+      CPPUNIT_ASSERT(!datetime.empty());
+      std::cerr << "many<2.2> read datetime recovered q(" << datetime << ")\n";
+    }
+    // these run to completion and perform their own wait()
+    auto ran0 = subject0.run();
+    auto ran1 = subject1.run();
+    CPPUNIT_ASSERT(ok(ran0));
+    CPPUNIT_ASSERT(ok(ran1));
+    // these secondary redundant wait() will fail because the wait(2) has already collected the children
+    auto waited0 = subject0.wait();
+    auto waited1 = subject1.wait();
+    CPPUNIT_ASSERT(!ok(waited0));
+    CPPUNIT_ASSERT(!ok(waited1));
+  }
+  template<> auto Pipe_From::test_many<3>() -> void {
+    Horse subject[3];
+    for (auto &item : subject) {
+      auto started = item.start();
+      CPPUNIT_ASSERT(ok(started));
+    }
+    unsigned ith = 0;
+    for (auto &item : subject) {
+      ith++;
+      std::string datetime;
+      auto red = item.read(datetime);
+      CPPUNIT_ASSERT(ok(red));
+      CPPUNIT_ASSERT(!datetime.empty());
+      std::cerr << "many<3." << ith << "> read datetime recovered q(" << datetime << ")\n";
+    }
+    for (auto &item : subject) {
+      auto ran = item.run(); // run until completion, performing wait(2) on each in turn.
+      CPPUNIT_ASSERT(ok(ran));
+    }
+    for (auto &item : subject) {
+      auto waited = item.wait();
+      CPPUNIT_ASSERT(!ok(waited)); // these will fail because the children have already been collected
+    }
+  }
+}
+#import rigging.suite.io
+auto tests::unit::run::Pipe_From::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Pipe_From");
+  series << []() {
+              Stream sub{"constructor"};
+              sub << call("path", &Pipe_From::test_constructor_path)
+                  << call("exec,path", &Pipe_From::test_constructor_exec_path)
+                  << call("path,name", &Pipe_From::test_constructor_path_name)
+                  << call("exec,path,name", &Pipe_From::test_constructor_exec_path_name)
+                ;
+              return move(sub);
+            }()
+         << call("start", &Pipe_From::test_start)
+         << call("run", &Pipe_From::test_run)
+         << []() {
+              Stream sub{"read"};
+              sub  << call("straem", &Pipe_From::test_read_stream)
+                   << call("string", &Pipe_From::test_read_string)
+                ;
+              return move(sub);
+            }()
+         << call("wait", &Pipe_From::test_wait)
+         << []() {
+              Stream sub{"many"};
+              sub << call("0", &Pipe_From::test_many<0>) // oh come on!
+                  << call("1", &Pipe_From::test_many<1>)
+                  << call("2", &Pipe_From::test_many<2>)
+                  << call("3", &Pipe_From::test_many<3>)
+                ;
+              return move(sub);
+            }()      ;
+  return finalize(series);
+}
+#endiv

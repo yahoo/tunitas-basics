@@ -1,0 +1,162 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.6/02.maroon-iron-crow series/v0.6/03.red-mercury-goose series/v0.7/04.green-copper-heron; do
+#       increment=$(git log $branch | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# Counterfactual historiography, for when C:R:A is applied to the maintenance branches:
+# API 191  herein preparing for SCOLDING, Release 05 (Purple Tin Partridge) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 100  reserved for SCOLDing, Release 04 (Green Copper Heron), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API  62  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API  29  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# This module was not available in the Black Platinum Hen era.
+# API   0  reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+# API   0  used in all previous releases as C:R:A=0.0.0
+#
+# The C:R:A of libip-module.la may evolve separately from that of libinet-module.la
+lib_libip_module_la_CURRENT = 191
+lib_libip_module_la_REVISION = 0
+lib_libip_module_la_AGE = 
+lib_libip_module_la_CRA = $(lib_libip_module_la_CURRENT):$(lib_libip_module_la_REVISION):$(lib_libip_module_la_AGE)
+lib_libip_module_la_VERSION_INFO = -version-info $(lib_libip_module_la_CRA)
+
+lib_libip_module_la = lib/libip-module.la
+lib_libip_module_la_LIBADD = $(lib_libwant_la)
+lib_libip_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libip_module_la_VERSION_INFO)
+lib_libip_module_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libip_module_la_SOURCES))
+#
+# -Wno-cpp will shut up all the deprecation warnings and legacy compatibility warnings when building within the library
+#
+$(lib_libip_module_la_OBJECTS) : AM_CPPFLAGS+=-Wno-cpp
+lib_libip_module_la_SOURCES = \
+  obj/src/ip/namespace.cpp \
+  obj/src/ip/in.cpp \
+  obj/src/ip/in4.cpp \
+  obj/src/ip/in6.cpp \
+  obj/src/ip/Address.cpp \
+  obj/src/ip/hostport.cpp \
+  obj/src/ip/hostport.in4.cpp \
+  obj/src/ip/hostport.in6.cpp \
+  \
+  obj/src/ip/detail/namespace.cpp \
+  \
+  obj/src/ip/address/namespace.cpp \
+  obj/src/ip/address/cmp.cpp \
+  obj/src/ip/address/Comparable.cpp \
+  obj/src/ip/address/Comparable.in4.addr.cpp \
+  obj/src/ip/address/Comparable.in6.addr.cpp \
+  obj/src/ip/address/Comparable.VALUE.N.cpp \
+  \
+  obj/src/ip/as.cpp \
+  obj/src/ip/as.RESULT.Address.cpp \
+  obj/src/ip/as.RESULT.in4.addr_t.cpp \
+  obj/src/ip/as.RESULT.in4.addr.cpp \
+  obj/src/ip/as.RESULT.in4.cpp \
+  obj/src/ip/as.RESULT.in6.addr_t.cpp \
+  obj/src/ip/as.RESULT.in6.addr.cpp \
+  obj/src/ip/as.RESULT.in6.cpp \
+  obj/src/ip/as.RESULT.string.cpp \
+  \
+  obj/src/ip/endian/namespace.cpp \
+  obj/src/ip/endian/Integer.cpp \
+  obj/src/ip/endian/Order.cpp \
+  obj/src/ip/endian/host_order.cpp \
+  obj/src/ip/endian/network_order.cpp \
+  obj/src/ip/endian/reorder.cpp \
+  \
+  obj/src/ip/endian/required/namespace.cpp \
+  obj/src/ip/endian/required/Integer.cpp \
+  obj/src/ip/endian/required/Order.cpp \
+  \
+  obj/src/ip/endian/convert.cpp \
+  obj/src/ip/endian/Converter.cpp \
+  obj/src/ip/endian/converter/namespace.cpp \
+  obj/src/ip/endian/converter/Same.cpp \
+  obj/src/ip/endian/converter/Swap.cpp \
+  \
+  obj/src/ip/format/namespace.cpp \
+  obj/src/ip/format/colons.cpp \
+  obj/src/ip/format/dots.cpp \
+  obj/src/ip/format/detail/namespace.cpp \
+  obj/src/ip/format/detail/Colons.cpp \
+  obj/src/ip/format/detail/Dots.cpp \
+  obj/src/ip/format/detail/Formatter.cpp \
+  obj/src/ip/format/detail/Formatter.Optional.cpp \
+  obj/src/ip/format/detail/Formatter.Address.cpp \
+  \
+  obj/src/ip/format/required/namespace.cpp \
+  obj/src/ip/format/required/in4.cpp \
+  obj/src/ip/format/required/in6.cpp \
+  obj/src/ip/format/required/in.cpp \
+  \
+  obj/src/ip/required/namespace.cpp \
+  obj/src/ip/required/Address.cpp \
+  obj/src/ip/required/Port.cpp \
+  obj/src/ip/required/Sockaddr.cpp \
+  $(end)
+
+unready_LOST_CODE_MAYBE = \
+  obj/src/ip/block/Container.cpp \
+  obj/src/ip/detail/address64container.cpp \
+  obj/src/ip/detail/functions.cpp \
+  obj/src/ip/formatting/Formatter.cpp \
+  obj/src/ip/formatting/functions.cpp \
+  obj/src/ip/formatting/ngx.format.cpp \
+  obj/src/ip/IPv4/functions.cpp \
+  obj/src/ip/IPv4/RangeSet.cpp \
+  obj/src/ip/IPv4/SharedRangeSet.cpp \
+  obj/src/ip/IPv6/functions.cpp \
+  obj/src/ip/resolv/lookup.cpp \
+  $(end)
+
+$(lib_libip_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/ip/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $(lib_libip_module_la_SOURCES))
+	@test -e $@
+include $(scold_cxxdir)/ip/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/ip/dependencies.mk

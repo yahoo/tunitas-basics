@@ -1,0 +1,4 @@
+# these are synthesized by the configure step
+buildconfed.mk
+configured.mk
+extracted.mk

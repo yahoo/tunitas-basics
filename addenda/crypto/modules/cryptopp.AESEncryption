@@ -1,0 +1,4 @@
+// -*- c++ -*- 649dff22-904d-49ee-83ef-5f7d3f27a74e
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/aes.h>

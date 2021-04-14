@@ -1,0 +1,4 @@
+#divert <fpp>
+#import nonstd.path
+namespace [[deprecated]] path { using namespace ::nonstd::path; }
+#endiv

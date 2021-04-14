@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_enum
+#import std.is_class
+namespace sys::flags::required::flagset {
+  //
+  // The flagset-and-flag are thus.
+  // The flag is always an enumeration.  The flagset varies.
+  //
+  // Usage:
+  //
+  //   template<typename FLAG, typename FLAGSET> requires flagset::Class<FLAG, FLAGSET> auto function(...somehow...) -> void;
+  //
+  template<typename FLAG, typename FLAGSET> concept bool Class = std::is_enum_v<FLAG> && std::is_class_v<FLAGSET> && requires(FLAGSET flagset) {
+    typename FLAGSET::Value; // New School.  yup, gotta have that type as the implementation within the class.
+    { FLAGSET{} };
+  };
+}
+#endiv

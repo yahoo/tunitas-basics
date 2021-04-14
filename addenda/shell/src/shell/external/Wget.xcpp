@@ -1,0 +1,146 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell {
+  namespace external {
+    class Wget;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import c.const_stringz
+#import shell.Option
+#import shell.external.detail.Execable
+#import std.is_same
+#import std.string
+#import std.vector
+#import sys.exits.Code
+
+class shell::external::Wget : public detail::Execable {
+  using ancestor = detail::Execable;
+public:
+  Wget() = default;
+  // because /usr/bin/wget was run
+  using result_type = sys::exits::Code;
+  template<typename... VALUES> inline auto operator()(VALUES const &...) -> result_type;
+protected:
+  auto process(result_type) -> result_type;
+  template<typename VALUE, typename... VALUES> inline auto process(result_type, VALUE const &, VALUES const &...) -> result_type;
+public:
+  // Handles the strings-as-URL path components
+  using ancestor::accept;
+  // -H --span-hosts
+  bool span_hosts;
+  using span_hosts_option = Option<Wget, char, 'H', bool>;
+  inline auto accept(span_hosts_option const &) -> result_type;
+  // -k --convert-links
+  bool convert_links;
+  using convert_links_option = Option<Wget, char, 'k', bool>;
+  inline auto accept(convert_links_option const &) -> result_type;
+  // -K --backup-converted
+  bool backup_converted;
+  using backup_converted_option = Option<Wget, char, 'K', bool>;
+  inline auto accept(backup_converted_option const &) -> result_type;
+  // -E --adjust-extension
+  bool adjust_extension;
+  using adjust_extension_option = Option<Wget, char, 'E', bool>;
+  inline auto accept(adjust_extension_option const &) -> result_type;
+  // -A --accept
+  std::string accept_suffix;
+  using accept_suffix_option = Option<Wget, char, 'A', bool>;
+  inline auto accept(accept_suffix_option const &) -> result_type;
+  // --follow-tags
+  std::vector<std::string> follow_tags;
+  enum class Follow_Tags { TAG };
+  using follow_tags_option = Option<Wget, Follow_Tags, Follow_Tags::TAG, std::vector<std::string>>;
+  inline auto accept(follow_tags_option const &) -> result_type;
+  // -r --recursive
+  bool recursive;
+  using recursive_option = Option<Wget, char, 'r', bool>;
+  inline auto accept(recursive_option const &) -> result_type;
+  // -U --user-agent
+  std::string user_agent;
+  using user_agent_option = Option<Wget, char, 'U', std::string>;
+  inline auto accept(user_agent_option const &) -> result_type;
+  // --referer
+  std::string referer;
+  enum class Referer { TAG };
+  using referer_option = Option<Wget, Referer, Referer::TAG, std::string>;
+  inline auto accept(referer_option const &) -> result_type;
+  // -P--directory-prefix
+  std::string directory_prefix;
+  using directory_prefix_option = Option<Wget, char, 'P', std::string>;
+  inline auto accept(directory_prefix_option const &) -> result_type;
+  //
+  // An URL
+  //
+  inline auto accept(c::const_stringz &) -> result_type;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+template<typename... VALUES> auto shell::external::Wget::operator()(VALUES const &...args) -> result_type {
+  return process(result_type(), args...);
+}
+
+auto shell::external::Wget::process(result_type previous) -> result_type {
+  return ancestor::process(previous);
+}
+
+template<typename VALUE, typename... VALUES> auto shell::external::Wget::process(result_type previous, VALUE const &arg, VALUES const &...args) -> result_type {
+  auto step = previous | accept(arg);
+  return process(step, args...);
+}
+
+auto shell::external::Wget::accept(span_hosts_option const &o) -> result_type {
+  span_hosts = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(convert_links_option const &o) -> result_type {
+  convert_links = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(backup_converted_option const &o) -> result_type {
+  backup_converted = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(adjust_extension_option const &o) -> result_type {
+  adjust_extension = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(accept_suffix_option const &o) -> result_type {
+  accept_suffix = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(follow_tags_option const &o) -> result_type {
+  follow_tags = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(recursive_option const &o) -> result_type {
+  recursive = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(user_agent_option const &o) -> result_type {
+  user_agent = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(referer_option const &o) -> result_type {
+  referer = o.value;
+  return result_type();
+}
+
+auto shell::external::Wget::accept(directory_prefix_option const &o) -> result_type {
+  directory_prefix = o.value;
+  return result_type();
+}
+#divert </ipp>

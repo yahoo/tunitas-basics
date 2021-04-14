@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::at {
+  // For convenience, each is a standalone constant.
+  // They are bundled in a namespace for easy import elsewhere.
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.at.Flag
+#import sys.at.Flags
+namespace sys::at::constants {
+  inline constexpr auto NONE             = Flags{Flags::NONE};
+  inline constexpr auto SYMLINK_NOFOLLOW = Flags{Flag::SYMLINK_NOFOLLOW};
+  inline constexpr auto SYMLINK_FOLLOW   = Flags{Flag::SYMLINK_FOLLOW};
+  inline constexpr auto REMOVE_DIRECTORY = Flags{Flag::REMOVE_DIRECTORY};
+  inline constexpr auto NO_AUTOMOUNT     = Flags{Flag::NO_AUTOMOUNT};
+  inline constexpr auto EMPTY_PATH       = Flags{Flag::EMPTY_PATH};
+  inline constexpr auto EACCESS          = Flags{Flag::EACCESS};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto REMOVEDIR        = Flags{Flag::REMOVEDIR};
+#pragma GCC diagnostic pop
+}
+#import sys.at.Cwd
+namespace sys::at::constants {
+  inline constexpr auto FDCWD = Cwd::FDCWD;
+}
+#endiv

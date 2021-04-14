@@ -1,0 +1,310 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace error {
+      class Code;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.error.Palette
+class tests::unit::error::Code : public cppunit::test::Fixture, Palette {
+public:
+  // Unify the MI
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  auto test_construction() -> void;
+  auto test_universe() -> void;
+  auto test_ok() -> void;
+  auto test_failure() -> void;
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+  auto test_operator_insert() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import sys.error.E.constants
+auto tests::unit::error::Code::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::error::Code::tearDown() -> void {
+  Palette::tearDown();
+}
+#import sys.error.constants
+auto tests::unit::error::Code::test_construction() -> void {
+  ::sys::error::Code d;
+  ::sys::error::Code const success(::sys::error::E::SUCCESS); // legacy ... AVOID ... peer sys::posix::E::SUCCESS
+  CPPUNIT_ASSERT(success == d);
+  ::sys::error::Code const perm(::sys::error::PERM);
+  CPPUNIT_ASSERT(success != perm);
+}
+
+auto tests::unit::error::Code::test_universe() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  // utter the all
+  ::sys::error::Code v;
+  v = error::SUCCESS;
+  v = error::PERM;
+  v = error::NOENT;
+  v = error::SRCH;
+  v = error::INTR;
+  v = error::IO;
+  v = error::NXIO;
+  v = error::TOOBIG;
+  v = error::NOEXEC;
+  v = error::BADF;
+  v = error::CHILD;
+  v = error::AGAIN;
+  v = error::NOMEM;
+  v = error::ACCES;
+  v = error::FAULT;
+  v = error::NOTBLK;
+  v = error::BUSY;
+  v = error::EXIST;
+  v = error::XDEV;
+  v = error::NODEV;
+  v = error::NOTDIR;
+  v = error::ISDIR;
+  v = error::INVAL;
+  v = error::NFILE;
+  v = error::MFILE;
+  v = error::NOTTY;
+  v = error::TXTBSY;
+  v = error::FBIG;
+  v = error::NOSPC;
+  v = error::SPIPE;
+  v = error::ROFS;
+  v = error::MLINK;
+  v = error::PIPE;
+  v = error::DOM;
+  v = error::RANGE;
+  CPPUNIT_ASSERT(error::RANGE == v);
+}
+
+auto tests::unit::error::Code::test_ok() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  CPPUNIT_ASSERT(good(error::SUCCESS));
+  CPPUNIT_ASSERT(!good(error::PERM));
+  CPPUNIT_ASSERT(!good(error::NOENT));
+  CPPUNIT_ASSERT(!good(error::SRCH));
+  CPPUNIT_ASSERT(!good(error::INTR));
+  CPPUNIT_ASSERT(!good(error::IO));
+  CPPUNIT_ASSERT(!good(error::NXIO));
+  CPPUNIT_ASSERT(!good(error::TOOBIG));
+  CPPUNIT_ASSERT(!good(error::NOEXEC));
+  CPPUNIT_ASSERT(!good(error::BADF));
+  CPPUNIT_ASSERT(!good(error::CHILD));
+  CPPUNIT_ASSERT(!good(error::AGAIN));
+  CPPUNIT_ASSERT(!good(error::NOMEM));
+  CPPUNIT_ASSERT(!good(error::ACCES));
+  CPPUNIT_ASSERT(!good(error::FAULT));
+  CPPUNIT_ASSERT(!good(error::NOTBLK));
+  CPPUNIT_ASSERT(!good(error::BUSY));
+  CPPUNIT_ASSERT(!good(error::EXIST));
+  CPPUNIT_ASSERT(!good(error::XDEV));
+  CPPUNIT_ASSERT(!good(error::NODEV));
+  CPPUNIT_ASSERT(!good(error::NOTDIR));
+  CPPUNIT_ASSERT(!good(error::ISDIR));
+  CPPUNIT_ASSERT(!good(error::INVAL));
+  CPPUNIT_ASSERT(!good(error::NFILE));
+  CPPUNIT_ASSERT(!good(error::MFILE));
+  CPPUNIT_ASSERT(!good(error::NOTTY));
+  CPPUNIT_ASSERT(!good(error::TXTBSY));
+  CPPUNIT_ASSERT(!good(error::FBIG));
+  CPPUNIT_ASSERT(!good(error::NOSPC));
+  CPPUNIT_ASSERT(!good(error::SPIPE));
+  CPPUNIT_ASSERT(!good(error::ROFS));
+  CPPUNIT_ASSERT(!good(error::MLINK));
+  CPPUNIT_ASSERT(!good(error::PIPE));
+  CPPUNIT_ASSERT(!good(error::DOM));
+  CPPUNIT_ASSERT(!good(error::RANGE));
+}
+
+auto tests::unit::error::Code::test_failure() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  CPPUNIT_ASSERT(!failure(error::SUCCESS));
+  CPPUNIT_ASSERT(failure(error::PERM));
+  CPPUNIT_ASSERT(failure(error::NOENT));
+  CPPUNIT_ASSERT(failure(error::SRCH));
+  CPPUNIT_ASSERT(failure(error::INTR));
+  CPPUNIT_ASSERT(failure(error::IO));
+  CPPUNIT_ASSERT(failure(error::NXIO));
+  CPPUNIT_ASSERT(failure(error::TOOBIG));
+  CPPUNIT_ASSERT(failure(error::NOEXEC));
+  CPPUNIT_ASSERT(failure(error::BADF));
+  CPPUNIT_ASSERT(failure(error::CHILD));
+  CPPUNIT_ASSERT(failure(error::AGAIN));
+  CPPUNIT_ASSERT(failure(error::NOMEM));
+  CPPUNIT_ASSERT(failure(error::ACCES));
+  CPPUNIT_ASSERT(failure(error::FAULT));
+  CPPUNIT_ASSERT(failure(error::NOTBLK));
+  CPPUNIT_ASSERT(failure(error::BUSY));
+  CPPUNIT_ASSERT(failure(error::EXIST));
+  CPPUNIT_ASSERT(failure(error::XDEV));
+  CPPUNIT_ASSERT(failure(error::NODEV));
+  CPPUNIT_ASSERT(failure(error::NOTDIR));
+  CPPUNIT_ASSERT(failure(error::ISDIR));
+  CPPUNIT_ASSERT(failure(error::INVAL));
+  CPPUNIT_ASSERT(failure(error::NFILE));
+  CPPUNIT_ASSERT(failure(error::MFILE));
+  CPPUNIT_ASSERT(failure(error::NOTTY));
+  CPPUNIT_ASSERT(failure(error::TXTBSY));
+  CPPUNIT_ASSERT(failure(error::FBIG));
+  CPPUNIT_ASSERT(failure(error::NOSPC));
+  CPPUNIT_ASSERT(failure(error::SPIPE));
+  CPPUNIT_ASSERT(failure(error::ROFS));
+  CPPUNIT_ASSERT(failure(error::MLINK));
+  CPPUNIT_ASSERT(failure(error::PIPE));
+  CPPUNIT_ASSERT(failure(error::DOM));
+  CPPUNIT_ASSERT(failure(error::RANGE));
+}
+
+auto tests::unit::error::Code::test_operator_eq() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  CPPUNIT_ASSERT(error::SUCCESS == error::SUCCESS);
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::PERM)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOENT)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::SRCH)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::INTR)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::IO)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NXIO)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::TOOBIG)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOEXEC)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::BADF)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::CHILD)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::AGAIN)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOMEM)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::ACCES)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::FAULT)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOTBLK)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::BUSY)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::EXIST)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::XDEV)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NODEV)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOTDIR)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::ISDIR)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::INVAL)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NFILE)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::MFILE)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOTTY)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::TXTBSY)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::FBIG)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::NOSPC)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::SPIPE)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::ROFS)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::MLINK)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::PIPE)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::DOM)  );
+  CPPUNIT_ASSERT( !  (error::SUCCESS == error::RANGE)  );
+}
+
+auto tests::unit::error::Code::test_operator_ne() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  CPPUNIT_ASSERT( !  (error::SUCCESS != error::SUCCESS));
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::PERM)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOENT)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::SRCH)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::INTR)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::IO)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NXIO)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::TOOBIG)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOEXEC)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::BADF)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::CHILD)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::AGAIN)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOMEM)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::ACCES)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::FAULT)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOTBLK)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::BUSY)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::EXIST)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::XDEV)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NODEV)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOTDIR)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::ISDIR)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::INVAL)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NFILE)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::MFILE)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOTTY)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::TXTBSY)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::FBIG)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::NOSPC)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::SPIPE)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::ROFS)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::MLINK)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::PIPE)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::DOM)  );
+  CPPUNIT_ASSERT(    (error::SUCCESS != error::RANGE)  );
+}
+
+auto tests::unit::error::Code::test_operator_insert() -> void {
+  using sys::error::Code;
+  namespace error = sys::error;
+  // exhibit them
+  std::cout
+    << error::SUCCESS << '\n'
+    << error::PERM << '\n'
+    << error::NOENT << '\n'
+    << error::SRCH << '\n'
+    << error::INTR << '\n'
+    << error::IO << '\n'
+    << error::NXIO << '\n'
+    << error::TOOBIG << '\n'
+    << error::NOEXEC << '\n'
+    << error::BADF << '\n'
+    << error::CHILD << '\n'
+    << error::AGAIN << '\n'
+    << error::NOMEM << '\n'
+    << error::ACCES << '\n'
+    << error::FAULT << '\n'
+    << error::NOTBLK << '\n'
+    << error::BUSY << '\n'
+    << error::EXIST << '\n'
+    << error::XDEV << '\n'
+    << error::NODEV << '\n'
+    << error::NOTDIR << '\n'
+    << error::ISDIR << '\n'
+    << error::INVAL << '\n'
+    << error::NFILE << '\n'
+    << error::MFILE << '\n'
+    << error::NOTTY << '\n'
+    << error::TXTBSY << '\n'
+    << error::FBIG << '\n'
+    << error::NOSPC << '\n'
+    << error::SPIPE << '\n'
+    << error::ROFS << '\n'
+    << error::MLINK << '\n'
+    << error::PIPE << '\n'
+    << error::DOM << '\n'
+    << error::RANGE << '\n';
+}
+
+#import rigging.suite.io
+auto tests::unit::error::Code::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Code");
+  series << call("construction", &Code::test_construction)
+         << call("universe", &Code::test_universe)
+         << call("ok", &Code::test_ok)
+         << call("failure", &Code::test_failure)
+         << call("operator==", &Code::test_operator_eq)
+         << call("operator!=", &Code::test_operator_ne)
+         << call("operator<<", &Code::test_operator_insert)
+    ;
+  return finalize(series);
+}
+#divert </cpp>

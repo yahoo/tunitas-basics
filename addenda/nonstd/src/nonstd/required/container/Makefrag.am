@@ -1,0 +1,26 @@
+# This is a GNU -*- Makefile -*- fragment. For terms, see the LICENSE file at the top of the repository.
+obj_src_nonstd_required_container_SUBSOURCES = \
+  obj/src/nonstd/required/Iterable.cpp \
+  obj/src/nonstd/required/Iteratable.cpp \
+  obj/src/nonstd/required/Container.cpp \
+  obj/src/nonstd/required/container/namespace.cpp \
+  \
+  obj/src/nonstd/required/container/Type.cpp \
+  obj/src/nonstd/required/container/Basic.cpp \
+  obj/src/nonstd/required/container/Input.cpp \
+  obj/src/nonstd/required/container/Forward.cpp \
+  obj/src/nonstd/required/container/Bidirectional.cpp \
+  obj/src/nonstd/required/container/Undirected.cpp \
+  obj/src/nonstd/required/container/Random_Access.cpp \
+  obj/src/nonstd/required/container/Contiguous.cpp \
+  \
+  obj/src/nonstd/required/container/Holding.cpp \
+  obj/src/nonstd/required/container/Push_Back.cpp \
+  obj/src/nonstd/required/container/Push_Front.cpp \
+  \
+  obj/src/nonstd/required/container/Size.cpp \
+  \
+  obj/src/nonstd/required/container/Constie.cpp \
+  obj/src/nonstd/required/container/Const_Iterator.cpp \
+  obj/src/nonstd/required/container/Iterator.cpp \
+  $(end)

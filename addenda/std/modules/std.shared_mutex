@@ -1,0 +1,3 @@
+// -*- c++ -*- d2a4ce54-3f27-42a4-a17c-233110b787c1
+#pragma once
+#include <shared_mutex>

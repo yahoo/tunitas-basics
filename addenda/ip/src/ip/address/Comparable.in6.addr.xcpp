@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.in6
+#import ip.address.Comparable
+namespace ip {
+  namespace address {
+    template<> inline auto operator==<in6::addr const>(Comparable<in6::addr const> const &, Comparable<in6::addr const> const &) -> bool;
+    template<> inline auto operator==<in6::addr>(Comparable<in6::addr> const &, Comparable<in6::addr> const &) -> bool;
+  }
+}
+#endiv
+#divert <ipp>
+#import ip.address.cmp
+template<> auto ip::address::operator==<ip::in6::addr const>(Comparable<in6::addr const> const &a, Comparable<in6::addr const> const &b) -> bool {
+  // WATCHOUT - the word 's6_addr' is not really a field name, it is a #define
+  // see /usr/include/linux/in.h in which #define s6_addr __in6_u.__u6_addr8
+  ip::uint128_t const &ai = *reinterpret_cast<ip::uint128_t const *>(&a.value.s6_addr);
+  ip::uint128_t const &bi = *reinterpret_cast<ip::uint128_t const *>(&b.value.s6_addr);
+  return ai == bi;
+}
+
+template<> auto ip::address::operator==<ip::in6::addr>(Comparable<in6::addr> const &a, Comparable<in6::addr> const &b) -> bool {
+  // redo with more const (with more cowbell)
+  Comparable<in6::addr const> ca(a.value), cb(b.value);
+  return operator==(ca, cb);
+}
+#endiv

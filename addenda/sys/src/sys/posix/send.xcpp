@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.msg.interface
+namespace sys::posix {
+  namespace packaging::send {
+    using namespace packaging::msg::interface;
+    //
+    // Via send(2)
+    //   <quote>
+    //     Also, the following call
+    //       send(sockfd, buf, len, flags);
+    //     is equivalent to
+    //       sendto(sockfd, buf, len, flags, NULL, 0);
+    //   </quote>
+    //
+    // As such, there is no Syscall::SEND, only Syscall::SENDTO
+    //
+    //
+    // The [[in]] attributes don't add much value here because they are all [[in]]
+    //
+    namespace avoid {
+      inline auto send(int fd, [[in]] void const *, size_t, Flags = NONE) -> Result;
+    }
+    namespace function {
+      template<required::Octet OCTET>            inline auto send(File, [[in]] Dope<OCTET const>, Flags = NONE) -> Result;
+      template<typename TYPE>                    inline auto send(File, [[in]] TYPE const &, Flags = NONE) -> Result requires !required::Dopelike<TYPE>;
+      template<typename TYPE, size::Unsigned N>  inline auto send(File, [[in]] TYPE const (&)[N], Flags = NONE) -> Result requires !required::Dopelike<TYPE>;
+    }
+    namespace native {
+      template<required::Octet OCTET>            inline auto send(int, [[in]] Dope<OCTET const>, Flags = NONE) -> Result;
+      template<typename TYPE>                    inline auto send(int, [[in]] TYPE const &, Flags = NONE) -> Result requires !required::Dopelike<TYPE>;
+      template<typename TYPE, size::Unsigned N>  inline auto send(int, [[in]] TYPE const (&)[N], Flags = NONE) -> Result requires !required::Dopelike<TYPE>;
+    }
+  }
+  using packaging::send::function::send;
+  namespace native { using packaging::send::native::send; }
+  namespace avoid { using packaging::send::avoid::send; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.sendto
+namespace sys::posix::packaging::send {
+  auto avoid::send(int fd, void const *buf, size_t len, Flags fl) -> Result { return posix::avoid::sendto(fd, buf, len, fl, (sockaddr const *)0, 0lu); }
+  // function
+  template<required::Octet OCTET>            auto function::send(File fd, Dope<OCTET const> buf, Flags fl) -> Result                                   { return native::send((int)fd, buf, fl); }
+  template<typename TYPE>                    auto function::send(File fd, TYPE const &buf, Flags fl) -> Result requires !required::Dopelike<TYPE>      { return native::send((int)fd, buf, fl); }
+  template<typename TYPE, size::Unsigned N>  auto function::send(File fd, TYPE const (&buf)[N], Flags fl) -> Result requires !required::Dopelike<TYPE> { return native::send((int)fd, buf, fl); }
+  // native
+  template<required::Octet OCTET>            auto native::send(int fd, Dope<OCTET const> buf, Flags fl) -> Result                                   { return avoid::send(fd, buf.data(), buf.size(), fl); }
+  template<typename TYPE>                    auto native::send(int fd, TYPE const &buf, Flags fl) -> Result requires !required::Dopelike<TYPE>      { return avoid::send(fd, &buf, sizeof (buf), fl); }
+  template<typename TYPE, size::Unsigned N>  auto native::send(int fd, TYPE const (&buf)[N], Flags fl) -> Result requires !required::Dopelike<TYPE> { return avoid::send(fd, &buf[0], sizeof (buf), fl); }
+}
+#endiv

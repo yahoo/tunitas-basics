@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.exits.Code
+#import std.is_error_code_enum
+namespace sys::exits {
+  //
+  // Interface with the std::error_code system
+  //
+  // Usage:
+  //
+  //   #import sys.exits.error_code
+  //   sys::exits::Code code = ...something...
+  //   std::error_code ec{code};
+  //   std::cout << ec.message();
+  //
+}
+namespace std {
+  // WATCHOUT - sys::exits::Code is not actually an enum.
+  //            rather, it is a class pretending to be a constant of an enum.
+  template<> struct is_error_code_enum<sys::exits::Code>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_code_enum<sys::exits::Code> : public std::true_type { };
+#import std.error_code
+namespace sys::exits {
+  inline auto make_error_code(Code) -> std::error_code;
+}
+#endiv
+#divert <ipp>
+#import sys.exits.category
+auto sys::exits::make_error_code(Code code) -> std::error_code {
+  return std::error_code{(int) code, category()};
+}
+#endiv

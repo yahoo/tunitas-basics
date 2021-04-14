@@ -1,0 +1,6 @@
+// -*- c++ -*- 081a35e0-f133-4b33-bd0f-0be404521316
+#pragma once
+#include <cppunit/extensions/TestCaseDecorator.h>
+namespace cppunit::decorator {
+  using Case = CppUnit::TestCaseDecorator;
+}

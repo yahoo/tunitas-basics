@@ -1,0 +1,11 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.status.string
+namespace sqlite {
+  namespace error {
+    // string(...) exists over there so that ADL will find it.
+    // string(...) exists in here so that humans can find it -- "error string"
+    using status::string;
+  }
+}
+#endiv

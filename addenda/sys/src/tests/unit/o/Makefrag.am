@@ -1,0 +1,48 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_o_SOURCES_SET = \
+  obj/src/tests/unit/o/namespace.cpp \
+  obj/src/tests/unit/o/__library.cpp \
+  obj/src/tests/unit/o/Access.cpp \
+  obj/src/tests/unit/o/Composer.declaration.cpp \
+  obj/src/tests/unit/o/Composer.Options.Access.Status.cpp \
+  obj/src/tests/unit/o/Composer.Options.Create.Status.cpp \
+  obj/src/tests/unit/o/Composer.Options.Access.Create.Status.cpp \
+  obj/src/tests/unit/o/Composer.cpp \
+  obj/src/tests/unit/o/Create.cpp \
+  obj/src/tests/unit/o/Fixture.cpp \
+  obj/src/tests/unit/o/Flags.cpp \
+  obj/src/tests/unit/o/Options.declaration.cpp \
+  obj/src/tests/unit/o/Options.Access.Status.cpp \
+  obj/src/tests/unit/o/Options.Create.Status.cpp \
+  obj/src/tests/unit/o/Options.Access.Create.Status.cpp \
+  obj/src/tests/unit/o/Options.cpp \
+  obj/src/tests/unit/o/Palette.cpp \
+  obj/src/tests/unit/o/Status.cpp \
+  $(end)
+
+# WATCHOUT WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT WATCHOUT WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT
+# because tsts.unit.o looks like an object file, we have to treat it specially!
+# and because (module) tests.unit.o depends upon (module) tests we have to treat it specially as well
+#
+# gcc -no-install  obj/modules/fpp/tests.unit.o obj/src/tests/unit/namespace.cpp   -o obj/modules/fpp/tests.unit
+# gcc: error: unrecognized command line option ‘-no-install’
+# gcc -no-install  obj/modules/fpp/tests.unit.o obj/src/tests/unit/namespace.cpp   -o obj/modules/fpp/tests.unit
+# gcc: error: unrecognized command line option ‘-no-install’
+#
+$(scold_cxx_modulesdir)/tests.unit.o \
+$(scold_cxx_modulesdir)/ipp/tests.unit.o \
+$(scold_cxx_modulesdir)/hpp/tests.unit.o \
+$(scold_cxx_modulesdir)/fpp/tests.unit.o : $(scold_cxxdir)/tests/unit/o/namespace.cpp
+	$(HT_V_COLD) $(if $(DC),$(DC) $(DC_OPTIONS),$(bbDC) $(bbDC_OPTIONS)) src/tests/unit/o/namespace.xcpp
+	@test -e $@
+$(scold_cxx_modulesdir)/tests.unit \
+$(scold_cxx_modulesdir)/ipp/tests.unit \
+$(scold_cxx_modulesdir)/hpp/tests.unit \
+$(scold_cxx_modulesdir)/fpp/tests.unit : $(scold_cxxdir)/tests/unit/namespace.cpp
+	$(HT_V_COLD) $(if $(DC),$(DC) $(DC_OPTIONS),$(bbDC) $(bbDC_OPTIONS)) src/tests/unit/namespace.xcpp
+	@test -e $@

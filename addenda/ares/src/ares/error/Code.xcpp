@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.error.Condition
+namespace ares::error {
+  //
+  // The rich error code
+  // These error codes are for domain-specific problems of OpenSSL.
+  //
+  // And this being the modern age, where we are beyond those things,
+  // when possible, we buy a vowel and use longer canonical names rather than an idiosyncratic pidgin.
+  //
+  // The general mechanics of data invariant failures (out of memory, stack empty), etc,
+  // are signalled through exceptions anchored around ares::exception::Aspect
+  //
+  enum class Code
+    { SUCCESS = ARES_SUCCESS,
+      // See ares.h
+      // Server error codes
+      NODATA = ARES_ENODATA, // indicates no relevant answer
+#undef NO_DATA // from <netdb.h>
+      NO_DATA = NODATA,
+      FORMERR = ARES_EFORMERR,
+      FORM_ERROR = FORMERR,
+      SERVFAIL = ARES_ESERVFAIL,
+      SERVER_FAILURE = SERVFAIL,
+      NOTFOUND = ARES_ENOTFOUND,
+      NOT_FOUND = NOTFOUND,
+      NOTIMP = ARES_ENOTIMP,
+      NOT_IMPLEMENTED = NOTIMP,
+      REFUSED = ARES_EREFUSED,
+      // Locally generated error codes
+      BADQUERY = ARES_EBADQUERY,
+      BAD_QUERY = BADQUERY,
+      BADNAME = ARES_EBADNAME,
+      BAD_NAME = BADNAME,
+      BADFAMILY = ARES_EBADFAMILY,
+      BAD_FAMILY = BADFAMILY,
+      BADRESP = ARES_EBADRESP,
+      BAD_RESPONSE = BADRESP,
+      CONNREFUSED = ARES_ECONNREFUSED,
+      CONNECTION_REFUSED = CONNREFUSED,
+      TIMEOUT = ARES_ETIMEOUT,
+      OF = ARES_EOF,
+      END_OF_FILE = OF, // to belabor the point
+      FILE = ARES_EFILE,
+      NOMEM = ARES_ENOMEM,
+      DESTRUCTION = ARES_EDESTRUCTION,
+      BADSTR = ARES_EBADSTR,
+      BAD_STRING = BADSTR, // [[FIXTHIS]] what was a bad string?
+      // ares_getnameinfo error codes
+      BADFLAGS = ARES_EBADFLAGS,
+      BAD_FLAGS = BADFLAGS,
+      // ares_getaddrinfo error codes
+      NONAME = ARES_ENONAME,
+      NO_NAME = NONAME,
+      BADHINTS = ARES_EBADHINTS,
+      BAD_HINTS = BADHINTS,
+      // Uninitialized library error code
+      NOTINITIALIZED = ARES_ENOTINITIALIZED, //                  introduced in 1.7.0
+      NOT_INITIALIZED = NOTINITIALIZED,
+      // ares_library_init error codes
+      LOADIPHLPAPI = ARES_ELOADIPHLPAPI, // (Load IPHLP API)     introduced in 1.7.0  ("load internet protocol help" API perhaps?)
+      LOAD_INERNET_PROTOCOL_HELP_API = LOADIPHLPAPI,
+      ADDRGETNETWORKPARAMS = ARES_EADDRGETNETWORKPARAMS, //      introduced in 1.7.0
+      ADDRESS_GET_NETWORK_PARAMETERS = ADDRGETNETWORKPARAMS,
+      // More error codes
+      CANCELED = ARES_ECANCELLED,   // (American)                introduced in 1.7.0
+      CANCELLED = CANCELED }; //       (British)
+}
+#import std.is_error_code_enum
+namespace std {
+  template<> struct is_error_code_enum<ares::error::Code>;
+}
+#endiv
+#divert <hpp>
+template<> struct std::is_error_code_enum<ares::error::Code> : public std::true_type { };
+#import std.error_code
+namespace ares::error {
+  inline auto make_error_code(Code) -> std::error_code;
+}
+#endiv
+#divert <ipp>
+#import ares.error.category
+auto ares::error::make_error_code(Code code) -> std::error_code {
+  return std::error_code{(int) code, category()};
+}
+#endiv

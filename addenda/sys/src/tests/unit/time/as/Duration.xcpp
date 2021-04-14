@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::time::as { class Duration; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.time.duration
+class tests::unit::time::as::Duration : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void override;
+  auto tearDown() -> void override;
+  // we're testing sys::time::duration (std::chrono::duration), so this is that type
+  ::sys::time::duration since_then;
+  auto test_as_duration() -> void;
+  auto test_as_t() -> void;
+  auto test_as_spec() -> void;
+  auto test_as_val() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import unit.rigging.lhs
+using unit::rigging::lhs;
+#import unit.rigging.clear
+using unit::rigging::clear;
+using namespace sys::time;
+#import std.chrono.system_clock
+#import sys.time.as
+using namespace sys::time;
+auto tests::unit::time::as::Duration::setUp() -> void {
+  since_then = std::chrono::system_clock::now().time_since_epoch();
+  CPPUNIT_ASSERT(since_then.count() >= 1493693135784282910l);
+}
+auto tests::unit::time::as::Duration::tearDown() -> void {
+  lhs(since_then) = clear;
+}
+auto tests::unit::time::as::Duration::test_as_duration() -> void {
+  using ::sys::time::as;
+  auto vv = as<duration>(since_then);
+  CPPUNIT_ASSERT(vv >= as<duration>(as<t>(1480856273l)));
+}
+auto tests::unit::time::as::Duration::test_as_spec() -> void {
+  using ::sys::time::as;
+  auto vv = as<spec>(since_then);
+  CPPUNIT_ASSERT(vv.tv_sec >= 1480856087l);
+}
+auto tests::unit::time::as::Duration::test_as_t() -> void {
+  using ::sys::time::as;
+  auto vv = as<t>(since_then);
+  CPPUNIT_ASSERT(vv >= 1480856037l);
+}
+auto tests::unit::time::as::Duration::test_as_val() -> void {
+  using ::sys::time::as;
+  auto vv = as<val>(since_then);
+  CPPUNIT_ASSERT(vv.tv_sec >= 1480856065l);
+}
+#import rigging.suite.io
+auto tests::unit::time::as::Duration::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("duration");
+  series << call("duration", &Duration::test_as_duration)
+         << call("spec", &Duration::test_as_spec)
+         << call("t", &Duration::test_as_t)
+         << call("val", &Duration::test_as_val)
+    ;
+  return finalize(series);
+}
+#endiv

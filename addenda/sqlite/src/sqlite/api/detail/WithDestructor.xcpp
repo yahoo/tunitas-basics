@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      struct WithDestructor;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Destructor
+struct sqlite::api::detail::WithDestructor {
+  //
+  // A destructor is a void-returning function that accepts a pointer into the void.
+  //
+  // WATCHOUT - TRANSIENT is the only safe choice here unless you know something
+  // very detailed about the lifetime of the memory for text & blob types in bind<...>(...)
+  //
+  // That knowledge is a property of the control flow and call stack, not of the type system.
+  //
+  using destructor = Destructor<TRANSIENT>;
+};
+#endiv

@@ -1,0 +1,6 @@
+// -*- c++ -*- 32be395d-a5b7-47c6-99f9-8c7d36d743e2
+#pragma once
+#include <cppunit/portability/Stream.h>
+namespace cppunit::stream::output {
+  using Stream = CppUnit::OStream;
+}

@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::writer {
+  //
+  // The json::writer::Stream is hard to use
+  // The usage follows that certain example in <json/writer.h>
+  // Sure feels very Java-esque with lots of 'new' thrown in.
+  //
+  // Modern
+  //   json::writer::Stream            ... the built-styled
+  //
+  //   json::writer::Stream::Factory   ... the factory to get a new json::writer::Stream
+  //                                       Factory::newStreamWriter() const -> Stream *
+  //
+  //   json::writer::stream::Builder   ... not clear this should have been deprecated...
+  //   json::writer::builder::Stream   ... descendant of Stream::Factory
+  //                                       another factory (a "builder"), with build settings as a JSON object key-value
+  //                                       builder::newStreamWriter() const -> Stream *
+  //
+  // Old (deprecated)
+  //   json::writer::stream::Styled    ... the deprecated interface
+  //
+  // Usage:
+  //
+  //   auto writeToStdout(json::writer::Stream::Factory const &factory, json::Value const &value) -> void {
+  //     std::unique_ptr<json::writer::Stream> const writer(factory.newStreamWriter());
+  //     writer->write(value, &std::cout); ....................... indeed and yuk, you have to take a pointer-to-a-reference(ed) stream
+  //     std::cout << std::endl;  // add lf and flush
+  //   }
+  //
+  using Stream = ::Json::StreamWriter;
+}
+#endiv

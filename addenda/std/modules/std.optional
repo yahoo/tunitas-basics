@@ -1,0 +1,23 @@
+// -*- c++ -*- 31df4eca-aaaa-4968-bad1-7cad97802063
+#pragma once
+#if __cplusplus < 201411
+#error std::optional is not in C++11, is experimental in C++14, standard in C++17 (get thee to C++17)
+#elif 6 == __GNUC__ /*maybe gcc 7 supports more of C++17?*/
+// C++14
+// http://en.cppreference.com/w/cpp/experimental/optional
+// but even gcc-6.3.0 doesn't have C++17 fully supported
+//
+// see __cpp_lib_experimental_optional as 201411
+#include <experimental/optional>
+namespace std {
+  using experimental::optional;
+  using experimental::make_optional;
+  using experimental::nullopt_t;
+  using experimental::nullopt;
+  using experimental::bad_optional_access;
+}
+#else
+// C++17 as of 2016-03 see __cpp_lib_optional 201603
+// http://en.cppreference.com/w/cpp/utility/optional
+#include <optional>
+#endif

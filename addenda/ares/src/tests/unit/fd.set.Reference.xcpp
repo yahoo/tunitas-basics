@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::fd::set { class Reference; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.fd.set.Reference
+class tests::unit::fd::set::Reference : public cppunit::test::Fixture {
+public:
+  using Reads = ares::fd::set::Reference<ares::fd::set::Purpose::READ>;
+  using Writes = ares::fd::set::Reference<ares::fd::set::Purpose::WRITE>;
+  auto test_constructor() -> void;
+  auto test_repointer() -> void;
+  auto test_read() -> void;
+  auto test_write() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ares.fd.Set
+auto tests::unit::fd::set::Reference::test_constructor() -> void {
+  ::ares::fd::Set specimen;
+  Reads rfds{specimen};
+  Writes wfds{specimen};
+  CPPUNIT_ASSERT(sizeof (rfds) == sizeof (wfds)); // whatever
+}
+auto tests::unit::fd::set::Reference::test_repointer() -> void {
+  ::ares::fd::Set rspecimen, wspecimen;
+  Reads rfds{rspecimen};
+  Writes wfds{wspecimen};
+  CPPUNIT_ASSERT(rfds.repointer() != wfds.repointer());
+}
+auto tests::unit::fd::set::Reference::test_read() -> void {
+  ::ares::fd::Set rspecimen, wspecimen;
+  auto rrr = read(rspecimen);
+  auto www = write(wspecimen);
+  CPPUNIT_ASSERT(rrr->repointer() != www->repointer());
+}
+auto tests::unit::fd::set::Reference::test_write() -> void {
+  // Same test as test_read()
+  ::ares::fd::Set rspecimen, wspecimen;
+  auto rrr = read(rspecimen);
+  auto www = write(wspecimen);
+  CPPUNIT_ASSERT(rrr->repointer() != www->repointer());
+}
+#import rigging.suite.io
+auto tests::unit::fd::set::Reference::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Reference"};
+  series << call("constructor", &Reference::test_constructor)
+         << call("repointer", &Reference::test_repointer)
+         << call("read", &Reference::test_read)
+         << call("write", &Reference::test_write)
+    ;
+  return finalize(series);
+}
+#endiv

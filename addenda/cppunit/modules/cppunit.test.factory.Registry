@@ -1,0 +1,6 @@
+// -*- c++ -*- 6bd1e6fa-1d29-481e-a88b-3568fc7a8025
+#pragma once
+#include <cppunit/extensions/TestFactoryRegistry.h>
+namespace cppunit::test::factory {
+  using Registry = CppUnit::TestFactoryRegistry;
+}

@@ -1,0 +1,3 @@
+tests_ver_TESTS = \
+  tests/ver/case.test \
+  $(end)

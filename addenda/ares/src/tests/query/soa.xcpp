@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.argv
+#import sys.exits.Code
+namespace tests::query::soa {
+  auto main(c::argv) -> sys::exits::Code;
+}
+#endiv
+#divert <cpp>
+#import ares.time.durations // e.g. Milliseconds, Seconds, Kiloseconds, etc.
+#import ares.time.duration_cast
+auto main(int cc, char *vv[]) -> int { return tests::query::soa::main(c::argv(cc, vv)); }
+auto tests::query::soa::main(c::argv av) -> sys::exits::Code {
+  using namespace ares;
+  Library library;
+  auto chunnel = Channel{};
+  channel::Guard toolkeeper{chunnel};
+  auto const dnsclass = dns::IN;
+  auto const dnstype = dns::SOA;
+  auto ecode = sys::exits::OK;
+  auto const receive = [&ecode](error::Code code, Count timeouts, Buffer<std::byte const> buffer) -> void {
+                         if (error::Code::SUCCESS != code) {
+                           auto recode = std::error_code{code};
+                           std::cerr << "failed: " << recode.message() << '\n';
+                           ecode &= sys::exits::FAIL;
+                           return;
+                         }
+                         reply::Record<SOA> record;
+                         auto parsed = reply::parse<SOA>(std::nothrow, buffer, record);
+                         if (!ok(parsed)) {
+                           std::cerr << "failed: " << error_code(parsed).message() << '\n';
+                           ecode &= sys::exits::FAIL;
+                           return;
+                         };
+                         std::ostream &outbound{std::cout};
+                         auto seconds = [](auto const &ddd) -> unsigned { return ares::time::duration_cast<ares::time::Seconds>(ddd).count(); };
+                         outbound << record.serial() << ' '
+                                  << seconds(record.refresh()) << ' '
+                                  << seconds(record.expire()) << ' '
+                                  << seconds(record.minttl()) << ' '
+                                  << format::q(record.nsname()) << ' '
+                                  << format::q(record.host()) << ' '
+                                  << format::q(record.hostmaster()) << '\n';
+                         auto const timeouts_noun = Count{1} == timeouts ? "timeout" : "timeouts";
+                         outbound << "found: after " << underlying(timeouts) << ' ' << timeouts_noun << '\n';
+                       };
+  for (std::string qdn : c::rest(av)) {
+    std::cout << "query " << format::q(qdn) << '\n';
+    qq(chunnel, qdn, dnsclass, dnstype, receive);
+    fd::Sets readies;
+    for (auto ccc=selectable(chunnel, readies); !zero(ccc); ccc=selectable(chunnel, readies)) {
+      select(ccc, readies, timeout(chunnel, REASONABLE_TIMEOUT));
+      process(chunnel, readies);
+    }
+  }
+  return ecode;
+}
+#endiv

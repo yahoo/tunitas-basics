@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import nonstd.const_dope
+#import nonstd.uninitialized_zero
+#import sys.posix.write
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_write_function_1() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::write(fd, &buf[0], size);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_write_function_2() -> void {
+    auto const fd = id::File{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    nonstd::uninitialized_zero(buf);
+    auto const dope = nonstd::const_dope<char>{&buf[0], size};
+    auto writ = sys::posix::write(fd, dope);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_write_native_1() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    nonstd::uninitialized_zero(buf);
+    auto writ = sys::posix::native::write(fd, &buf[0], size);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_write_native_2() -> void {
+    auto const fd = int{-1};
+    char buf[10];
+    auto const size = sizeof (buf);
+    nonstd::uninitialized_zero(buf);
+    auto const dope = nonstd::const_dope<char>{&buf[0], size};
+    auto writ = sys::posix::native::write(fd, dope);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+#endiv

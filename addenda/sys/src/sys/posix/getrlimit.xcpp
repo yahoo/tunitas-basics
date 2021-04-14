@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.limit.interface
+namespace sys::posix {
+  namespace packaging::getrlimit {
+    using namespace packaging::limit::interface;
+    namespace function {
+      inline auto getrlimit(Limit, [[out]] rlimit &) -> Status;
+    }
+  }
+  using packaging::getrlimit::function::getrlimit;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::getrlimit {
+  auto function::getrlimit(Limit what, rlimit &recover) -> Status { return idiomatic::syscall<int>(Syscall::GETRLIMIT, (int)what, (rlimit *)&recover); }
+}
+#endiv

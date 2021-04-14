@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+namespace ish::tuple::detail::rebuild {
+  //
+  // Wow ... this was hard.
+  // See ish::tuple::rest(...) for how to operate this thing.
+  //
+  // Concept
+  //     constexpr auto const SIZE = std::tuple_size<TYPES...>::value;
+  //     Dispatcher<true, SIZE, 0u, TYPES...> dispatcher;
+  //     return dispatcher(subject)
+  //
+  // Initial conditions
+  //   SKIP      = true  skip the first element of the tuple
+  //   COUNTDOWN = SIZE  the size of the TYPES... package
+  //   POSITION  = 0u    start at position 0
+  //   TYPES...  = the parameter pack types
+  //
+  // Recurrence conditions
+  //   SKIP      = false  have skipped the first element of the tuple or Bundle
+  //   COUNTDOWN = decrementing unto 0
+  //   POSITION  = incrementing, used in std::get<POSITION>(...)
+  //   TYPES...  = ibidem.
+  //
+  // Termination conditions
+  //   SKIP      = false  have skipped the first element of the tuple
+  //   COUNTDOWN = 0, done at zero
+  //   POSITION  = returns the empty tuple<>, the empty Bundle<>
+  //   TYPES...  = ibidem.
+  //
+  template<bool SKIP, std::size_t COUNTDOWN, std::size_t POSITION, typename... TYPES> struct Dispatcher;
+  template<std::size_t COUNTDOWN, typename... TYPES>                       struct Dispatcher<true, COUNTDOWN, 0u, TYPES...>;
+  template<std::size_t COUNTDOWN, std::size_t POSITION, typename... TYPES> struct Dispatcher<false, COUNTDOWN, POSITION, TYPES...>;
+  template<std::size_t POSITION, typename... TYPES>                        struct Dispatcher<false, 0u, POSITION, TYPES...>;
+}
+#endiv
+#divert <hpp>
+#import std.tuple
+#import ish.tuple.Bundle
+#import ish.tuple.detail.rebuild.Result
+template<std::size_t COUNTDOWN, typename... TYPES> struct ish::tuple::detail::rebuild::Dispatcher<true, COUNTDOWN, 0u, TYPES...> {
+  inline auto operator()(Bundle<TYPES...> &&) const -> typename Result<1u, TYPES...>::bundle;
+private:
+  // prepare for supporting alternative tuple types overloaded on operator()(...)
+  template<typename OBJECT, typename SUBJECT> inline auto operate(SUBJECT &&anon) const -> OBJECT;
+};
+
+template<std::size_t COUNTDOWN, std::size_t POSITION, typename... TYPES> struct ish::tuple::detail::rebuild::Dispatcher<false, COUNTDOWN, POSITION, TYPES...> {
+  inline auto operator()(Bundle<TYPES...> &&) const -> typename Result<POSITION, TYPES...>::bundle;
+private:
+  // prepare for supporting alternative tuple types overloaded on operator()(...)
+  template<typename OBJECT, typename SUBJECT> inline auto operate(SUBJECT &&anon) const -> OBJECT;
+};
+
+template<std::size_t POSITION, typename... TYPES> struct ish::tuple::detail::rebuild::Dispatcher<false, 0u, POSITION, TYPES...> {
+  inline auto operator()(Bundle<TYPES...> &&) const -> typename Result<POSITION, TYPES...>::bundle;
+};
+#endiv
+#divert <ipp>
+template<std::size_t COUNTDOWN, typename... TYPES> template<typename OBJECT, typename SUBJECT> auto ish::tuple::detail::rebuild::Dispatcher<true, COUNTDOWN, 0u, TYPES...>::operate(SUBJECT &&anon) const -> OBJECT {
+  Dispatcher<false, COUNTDOWN-1, 1u, TYPES...> redo;
+  return redo(std::forward<SUBJECT>(anon));
+}
+
+template<std::size_t COUNTDOWN, typename... TYPES> auto ish::tuple::detail::rebuild::Dispatcher<true, COUNTDOWN, 0u, TYPES...>::operator()(Bundle<TYPES...> &&anon) const -> typename Result<1u, TYPES...>::bundle {
+  return operate<typename Result<1u, TYPES...>::bundle>(std::forward<Bundle<TYPES...>>(anon));
+}
+
+#import std.move
+#import ish.tuple.cons
+template<std::size_t COUNTDOWN, std::size_t POSITION, typename... TYPES> template<typename OBJECT, typename SUBJECT> auto ish::tuple::detail::rebuild::Dispatcher<false, COUNTDOWN, POSITION, TYPES...>::operate(SUBJECT &&anon) const -> OBJECT {
+  Dispatcher<false, COUNTDOWN-1, POSITION+1, TYPES...> redo;
+  auto car = std::get<POSITION>(std::forward<SUBJECT>(anon));
+  auto cdr = redo(std::forward<SUBJECT>(anon));
+  return cons(std::move(car), std::move(cdr));
+}
+
+template<std::size_t COUNTDOWN, std::size_t POSITION, typename... TYPES> auto ish::tuple::detail::rebuild::Dispatcher<false, COUNTDOWN, POSITION, TYPES...>::operator()(Bundle<TYPES...> &&anon) const -> typename Result<POSITION, TYPES...>::bundle {
+  return operate<typename Result<POSITION, TYPES...>::bundle>(std::forward<std::tuple<TYPES...>>(anon));
+}
+
+template<std::size_t POSITION, typename... TYPES> auto ish::tuple::detail::rebuild::Dispatcher<false, 0u, POSITION, TYPES...>::operator()(Bundle<TYPES...> &&) const -> typename Result<POSITION, TYPES...>::bundle {
+  static_assert(std::is_same<Bundle<>, typename Result<POSITION, TYPES...>::bundle>::value, "not an empty Bundle");
+  return Bundle<>();
+}
+#endiv

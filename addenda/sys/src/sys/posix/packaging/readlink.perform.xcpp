@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import std.ssize_t
+#import std.string
+#import sys.call.result.Value
+#include <climits> // NAME_MAX, BUF_SIZE
+#import sys.posix.packaging.required.readlink.Thunk
+namespace sys::posix::packaging::readlink {
+  //
+  // The thunk of perform(...) is one of the thunks from posix::readlink(...) or posix::readlinkat(...) nearby.
+  //
+  using Result = call::result::Value<std::string>;
+  using Size = std::size_t;
+  using SSize = std::ssize_t;
+  inline constexpr Size BUF_SIZE = NAME_MAX;
+  inline constexpr SSize sBUF_SIZE = BUF_SIZE;
+  template<required::readlink::Thunk THUNK> inline auto perform(THUNK) -> Result;
+}
+#endiv
+#divert <ipp>
+#import errno
+#import std.tuple
+namespace sys::posix::packaging {
+  template<required::readlink::Thunk THUNK> auto readlink::perform(THUNK thunk) -> Result  {
+    //
+    // Sourced from the Fedora 27 man page: man-pages-4.12-1.fc27.noarch
+    //
+    // readlink(2) and readlinkat(2), both, place the contents of the symbolic link
+    // pathname in the buffer buf, which has size bufsiz, and is expected to be NAME_MAX.
+    // The readlink(2) family does not append a null byte to buf.
+    // It will (silently) truncate the contents (to a length of bufsiz characters),
+    // in case the buffer is too small to hold all of the contents.
+    //
+    char buf[BUF_SIZE];
+    std::ssize_t size = thunk(buf, sizeof (buf));
+    auto [ok, errnum] = [size]() -> std::tuple<bool, int> {
+      auto const e0 = errno; // capture the value of errno before doing anything else
+      auto ok = 0 <= size && size <= sBUF_SIZE;
+      auto const e1 = e0 || ok ? e0 : ENAMETOOLONG;
+      return {ok, e1};
+    }();
+    auto payload = [ok, size, &buf]() -> std::string {
+                     if (ok) {
+                       return {&buf[0], &buf[size]};
+                     } else {
+                       return {};
+                     }
+                   };
+      return {ok, errnum, payload()};
+  }
+}
+#endiv

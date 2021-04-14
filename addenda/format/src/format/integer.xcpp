@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.required.Integer
+#import format.integral.Formatter
+namespace format {
+  //
+  // Format always as an integer.
+  // even for "integer" types that format otherwise.
+  //
+  // small: std::int8_t, std::uint8_t
+  // large: nonstd::int128_t, nonstd::uint128_t
+  //
+  template<required::Integer INTEGER> inline auto integer(INTEGER) -> integral::Formatter<INTEGER>;
+}
+#endiv
+#divert <ipp>
+template<format::required::Integer INTEGER> auto format::integer(INTEGER value) -> integral::Formatter<INTEGER> {
+  return integral::Formatter<INTEGER>(value);
+}
+#endiv

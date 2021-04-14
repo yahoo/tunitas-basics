@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_convertible
+#import std.string
+namespace nonstd::required {
+  //
+  // Is this type convertible to a (narrow) std::string?
+  // It is a fancy name for std::is_convertible
+  //
+  // Usage:
+  //
+  //   template<required::Stringable STRINGABLE> auto function(STRINGABLE) -> Something;
+  //
+  template<typename STRINGABLE> concept bool Stringable = std::is_convertible_v<STRINGABLE, std::string>;
+}
+#endiv
+#divert <cpp>
+// Of course, this is test code
+#import std.filesystem.path
+#import std.string
+#import std.wstring
+#import std.string_view
+#import c.const_stringz
+namespace nonstd::required {
+  static_assert(Stringable<std::string>);
+  static_assert(Stringable<std::filesystem::path>);
+  static_assert(!Stringable<std::wstring>);
+  static_assert(!Stringable<std::string_view>);
+  static_assert(!Stringable<c::const_stringz>);
+  static_assert(Stringable<char const *>);
+  static_assert(!Stringable<int>);
+}
+#endiv

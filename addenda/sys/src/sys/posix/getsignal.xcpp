@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.signal.interface
+namespace sys::posix {
+  namespace packaging::getsignal {
+    using namespace packaging::signal::interface;
+    namespace function {
+      inline auto getsignal(File) -> Returned;
+      inline auto getsignal(File, [[out]] Signal &) -> Status;
+    } 
+    namespace native {
+      inline auto getsignal(int fd) -> Returned;
+      inline auto getsignal(int fd, [[out]] Signal &) -> Status;
+    } 
+  }
+  using packaging::getsignal::function::getsignal;
+  namespace native { using packaging::getsignal::native::getsignal; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::getsignal {
+  auto function::getsignal(File fd) -> Returned            { return native::getsignal((int)fd); }
+  auto function::getsignal(File fd, Signal &arg) -> Status { return native::getsignal((int)fd, arg); }
+  //
+  auto native::getsignal(int fd) -> Returned {
+    auto called = posix::native::fcntl(fd, F::GETSIGNAL);
+    auto ok = good(called);
+    auto val = ok ? Signal(value(called)) : Signal{};
+    return {ok, error_num(called), val};
+  }
+  auto native::getsignal(int fd, Signal &arg) -> Status {
+    auto called = posix::native::fcntl(fd, F::GETSIGNAL);
+    auto const ok = good(called); 
+    if (ok) {
+      arg = Signal(value(called));
+    }
+    auto val = ok ? 0 : -1;
+    return {ok, error_num(called), val};
+  }
+}
+#endiv

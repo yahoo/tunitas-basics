@@ -1,0 +1,6 @@
+The SCOLD-surface of "System"-oriented capabilities in & around GNU and POSIX
+This module provides general and "little" capabilities.  The "bigger" capabilities
+are in other modules nearby.
+
+The sys.posix module provides POSIX-like capabilities specifically.
+The sys.time module provides time-oriented capabilities

@@ -1,0 +1,4 @@
+// -*- c++ -*- c106d991-114e-4e66-af86-fb02ac5287ee
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/trunhash.h>

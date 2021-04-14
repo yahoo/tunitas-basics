@@ -1,0 +1,117 @@
+#!/bin/bash
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Usage:
+#
+#   ./maintenance/nearby
+#   enable_dependency_tracking=no ./maintenance/nearby
+#   with_module_nonstd=/something/somewhere/module-nonstd ./maintenance/nearby
+#
+# Parameters
+#
+#   with_siblings .... defaults to to the local tree; e.g. /build/purple or /build/scold
+#   with_purple ...... is normally a constant; e.g. /build/purple for 05.purple-tin-partridge
+#   with_scold ....... is normally a constant; e.g. /build/scold
+#   with_nearby ...... is the baseline where most of the development lives; e.g. /build/scold
+#
+#   with_module_nonstd ...... finds module 'something' in purple if it exists, else nearby
+#   with_module_something ... finds module 'something' in nearby
+#
+#   with_submodules ... avoid.  don't use.  really.
+#
+cd ${0%/*}/.. || exit 70
+: ${with_siblings:=$(realpath ${0%/*}/../..)}
+# common development bifrucation for the era of 05.purple-tin-partridge
+# gracefully handle being in purple or in scold with "nearby" defaulting appropriately
+: ${with_purple:=/build/purple}
+: ${with_scold:=/build/scold}
+if [[ ${with_siblings?} == ${with_purple?} ]] ; then
+  : ${with_nearby:=${with_scold?}}
+else
+  : ${with_nearby:=${with_siblings?}}
+fi
+: ${with_submodules:=no}
+# because the standard cppunit-devel-1.14.0-8.fc31.x86_64 segfaults when GCC9 is used (even gcc-c++-9.3.1-2.fc31.x86_64)
+if [[ -d /exp/nonstd/cppunit ]] ; then
+    : ${enable_rpm_package_checking:=no} # because we are specifying the position in the filesystem
+    : ${with_nonstd_cppunit:=/exp/nonstd/cppunit}
+elif [[ -d /opt/nonstd/cppunit ]] ; then
+    : ${enable_rpm_package_checking:=no} # ibidem
+    : ${with_nonstd_cppunit:=/exp/nonstd/cppunit}
+else
+    echo "WATCHOUT - using standard cppunit"
+    echo "WATCHOUT - $(rpm -q cppunit-devel)"
+    echo "WATCHOUT - $(rpm -q gcc-c++)"
+    echo "WATCHOUT - $(type -p g++)"
+    : ${with_nonstd_cppunit:=no}
+fi 1>&2
+if false; then
+    # if you want to do this then say with_nonstd_gcc ./maintenance/nearby
+    if [[ -e /exp/local/bin/gcc ]] ; then
+        # if you have a nonstandard gcc installed then invoke as: with_nonstd_gcc=no ./maintenance/nearby
+        # otherwise the availability of the nonstd gcc means you want it, and the build needs to see -L/exp/local/lib64
+        #
+        # WATCHOUT - is your $PATH acquiring the approprite compiler?  /exp/local/bin/g++ or /usr/bin/g++
+        : ${with_nonstd_gcc:=/exp/local}
+    fi
+fi
+: ${with_hypogeal_twilight:=${with_nearby?}/hypogeal-twilight}
+: ${with_module_c:=${with_nearby?}/module-c}
+: ${with_module_nonstd:=${with_nearby?}/module-nonstd}
+: ${with_module_posix:=${with_nearby?}/module-posix}
+: ${with_module_rigging:=${with_nearby?}/module-rigging}
+: ${with_module_std:=${with_nearby?}/module-std}
+#
+# For convenience we acknowledge the existence of the "purple" work
+# special "ahead" work destined for branch 05.purple-tin-partridge.
+# important work but ephemeral
+if [[ -d ${with_purple?}/module-nonstd ]] ; then
+    : ${with_module_nonstd:=${with_purple?}/module-nonstd}
+else
+    : ${with_module_nonstd:=${with_nearby?}/module-nonstd}
+fi
+if [[ -x /usr/bin/nproc ]] ; then
+    : ${JOBFLAGS:=-j$(nproc)}
+fi
+always_CXXFLAGS=-Wno-pessimizing-move
+case ${enable_devel:-no} in
+( yes )
+    devel_CXXFLAGS='-ggdb -O0'
+    devel_LDFLAGS=-no-install  
+    ;;
+esac
+function make_flaggy() {
+    local CXXFLAGS="${always_CXXFLAGS:+ ${always_CXXFLAGS}} ${devel_CXXFLAGS:+ ${devel_CXXFLAGS}}"
+    local LDFLAGS="${always_LDFLAGS:+ ${always_LDFLAGS}} ${devel_LDFLAGS:+ ${devel_LDFLAGS}}"
+    make "$@" \
+         ${JOBFLAGS} \
+         ${CXXFLAGS:+CXXFLAGS="${CXXFLAGS}"} \
+         ${LDFLAGS:+LDFLAGS="${LDFLAGS}"} \
+         ${end}
+}
+eval \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    ${enable_configure_debug:+--enable-configure-debug=$enable_configure_debug} \
+    ${enable_configure_verbose:+--enable-configure-verbose=$enable_configure_verbose} \
+    --without-vernacular-doggerel \
+    ${enable_dependency_tracking:+--enable-dependency-tracking=$enable_dependency_tracking} \
+    ${enable_rpm_package_checking:+--enable-rpm-package-checking=$enable_rpm_package_checking} \
+    ${with_nearby:+--with-nearby=$with_nearby} \
+    ${with_siblings:+--with-siblings=$with_siblings} \
+    ${with_submodules:+--with-submodules=$with_submodules} \
+    --disable-mock-build ${comment:+required by older hypogeal-twilight v0.45.0-0.devel} \
+    ${with_nonstd_cppunit:+--with-nonstd-cppunit=$with_nonstd_cppunit} \
+    ${with_nonstd_gcc:+--with-nonstd-gcc=$with_nonstd_gcc} \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_nonstd_cppunit:+--with-nonstd-cppunit=${with_nonstd_cppunit?}} \
+    ${with_module_c:+--with-module-c=$with_module_c} \
+    ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \
+    ${with_module_posix:+--with-module-posix=$with_module_posix} \
+    ${with_module_rigging:+--with-module-rigging=$with_module_rigging} \
+    ${with_module_std:+--with-module-std=$with_module_std} \
+    ${end} &&
+make_flaggy &&
+make_flaggy check &&
+echo OK DONE

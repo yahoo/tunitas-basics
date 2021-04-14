@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.time.Duration
+namespace ares::time {
+  // We're representing real-world timeouts here... we don't need "days" "weeks" or "months"
+  using Hours        = duration::Basic<std::chrono::hours::period>;
+  using Kiloseconds  = duration::Basic<std::kilo>;
+  using Hectoseconds = duration::Basic<std::hecto>;
+  using Minutes      = duration::Basic<std::chrono::minutes::period>;
+  using Decaseconds  = duration::Basic<std::deca>;
+  using Seconds      = duration::Basic<std::chrono::seconds::period>;
+  using Deciseconds  = duration::Basic<std::deci>;
+  using Centiseconds = duration::Basic<std::centi>;
+  using Milliseconds = duration::Basic<std::milli>;
+  using Microseconds = duration::Basic<std::micro>;
+  using Nanoseconds  = duration::Basic<std::nano>;
+  // What do the system (library) calls need?
+  using Sleep = Seconds;
+  using Usleep = Microseconds;
+  using Select = Microseconds; // select(2) uses sys::time::val in microseconds
+  using Pselect = Nanoseconds; // pselect(2) uses sys::time::spec in nanoseconds
+}
+#endiv
+#divert <cpp>
+// This is test code
+namespace ares::time {
+  static_assert(sizeof (Seconds));
+  static_assert(sizeof (Milliseconds));
+  static_assert(sizeof (Microseconds));
+  static_assert(sizeof (duration::Basic<std::deca>)); // .... (comfortably) hold your breath
+  static_assert(sizeof (duration::Basic<std::hecto>)); // ... pairs of minutes
+  static_assert(sizeof (duration::Basic<std::kilo>)); // .... thirds of an hour
+}
+#endiv

@@ -1,0 +1,24 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+check_bin_pretty = check/bin/pretty
+check_bin_pretty_LDADD = \
+  $(lib_libjson_module_la) \
+  -lrigging-bench-module \
+  $(end)
+check_bin_pretty_LDFLAGS = $(CHECK_LDFLAGS_SET)
+check_bin_pretty_SOURCES = \
+  obj/src/tests/pretty/main.cpp \
+  obj/src/tests/pretty/namespace.cpp \
+  $(end)
+$(scold_cxxdir)/tests/pretty/dependencies.mk: $(check_bin_pretty_SOURCES)
+$(check_bin_pretty_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/pretty/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/pretty/dependencies.mk
+.PHONY: clean-dependencies
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/pretty/dependencies.mk

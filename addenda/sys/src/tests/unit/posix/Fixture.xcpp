@@ -1,0 +1,1991 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix
+namespace tests::unit::posix {
+  namespace fixture {
+    class Fixture;
+    namespace library = ::sys::posix;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.filesystem.path
+#import std.string
+struct tests::unit::posix::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_alarm() -> void;
+  auto test_pause() -> void;
+  //
+  auto test_accept() -> void;
+  auto test_accept4() -> void;
+  auto test_bind() -> void;
+  auto test_connect() -> void;
+  auto test_getpeername() -> void;
+  auto test_getsockname() -> void;
+  auto test_listen() -> void;
+  //
+  auto test_access_present() -> void;
+  auto test_access_missing() -> void;
+  auto test_eaccess_present() -> void;
+  auto test_eaccess_missing() -> void;
+  auto test_euidaccess_present() -> void;
+  auto test_euidaccess_missing() -> void;
+  // access_functions
+  auto test_exists_no() -> void;
+  auto test_exists_yes() -> void;
+  auto test_executable_no() -> void;
+  auto test_executable_yes() -> void;
+  auto test_readable_no() -> void;
+  auto test_readable_yes() -> void;
+  auto test_writable_no() -> void;
+  auto test_writable_yes() -> void;
+  //
+  auto test_chdir() -> void;
+  //
+  auto test_chmod() -> void;
+  auto test_chown_Uid() -> void;
+  auto test_chown_Gid() -> void;
+  auto test_chown_Uid_Gid() -> void;
+  auto test_chown_uid_gid() -> void;
+  //
+  // cloexec declared is down with fcntl series
+  auto test_close() -> void;
+  auto test_creat() -> void;
+  auto test_create() -> void;
+  auto test_daemon() -> void;
+  //
+  auto test_dup() -> void;
+  auto test_dup2() -> void;
+  auto test_dup3() -> void;
+  //
+  auto test_exec() -> void;
+  auto test_execp() -> void;
+  //
+  template<typename FD> auto exercise_faccessat(FD) -> void;
+  auto test_faccessat_int() -> void;
+  auto test_faccessat_File() -> void;
+  auto test_faccessat_Cwd() -> void;
+  auto test_faccessat_something() -> void;
+  //
+  auto test_fchdir() -> void;
+  //
+  template<typename FD> auto exercise_fchmod(FD) -> void;
+  auto test_fchmod_int() -> void;
+  auto test_fchmod_File() -> void;
+  auto test_fchmod_something() -> void;
+  //
+  template<typename FD> auto exercise_fchmodat(FD) -> void;
+  auto test_fchmodat_int() -> void;
+  auto test_fchmodat_File() -> void;
+  auto test_fchmodat_Cwd() -> void;
+  auto test_fchmodat_something() -> void;
+  //
+  template<typename FD> auto exercise_fchown_Uid(FD) -> void;
+  template<typename FD> auto exercise_fchown_Gid(FD) -> void;
+  template<typename FD> auto exercise_fchown_Uid_Gid(FD) -> void;
+  template<typename FD> auto exercise_fchown_uid_gid(FD) -> void;
+  auto test_fchown_int_uid_gid() -> void;
+  auto test_fchown_File_Uid() -> void;
+  auto test_fchown_File_Gid() -> void;
+  auto test_fchown_File_Uid_Gid() -> void;
+  auto test_fchown_File_uid_gid() -> void;
+  auto test_fchown_something() -> void;
+  //
+  template<typename FD> auto exercise_fchownat_Uid(FD) -> void;
+  template<typename FD> auto exercise_fchownat_Gid(FD) -> void;
+  template<typename FD> auto exercise_fchownat_Uid_Gid(FD) -> void;
+  template<typename FD> auto exercise_fchownat_uid_gid(FD) -> void;
+  auto test_fchownat_int_uid_gid() -> void;
+  auto test_fchownat_File_Uid() -> void;
+  auto test_fchownat_File_Gid() -> void;
+  auto test_fchownat_File_Uid_Gid() -> void;
+  auto test_fchownat_File_uid_gid() -> void;
+  auto test_fchownat_Cwd_Uid() -> void;
+  auto test_fchownat_Cwd_Gid() -> void;
+  auto test_fchownat_Cwd_Uid_Gid() -> void;
+  auto test_fchownat_Cwd_uid_gid() -> void;
+  auto test_fchownat_something() -> void;
+  //
+  // wow, this is a lot of little ones
+  auto test_fcntl() -> void;
+  auto test_fcntl_void() -> void;
+  auto test_fcntl_bool() -> void;
+  auto test_fcntl_int() -> void;
+  auto test_fcntl_Status() -> void;
+  auto test_fcntl_Options_Access_Status() -> void;
+  auto test_fcntl_Options_Create_Status() -> void;
+  auto test_fcntl_Options_Access_Create_Status() -> void;
+  auto test_fcntl_Flags() -> void;
+  auto test_fcntl_File() -> void;
+  auto test_fcntl_Size() -> void;
+  auto test_fcntl_Lock() -> void;
+  auto test_fcntl_Notifies() -> void;
+  auto test_fcntl_Seals() -> void;
+  auto test_fcntl_process_Process() -> void;
+  auto test_fcntl_process_Group() -> void;
+  auto test_fcntl_process_Either() -> void;
+  auto test_fcntl_Signal() -> void;
+  auto test_fcntl_out_flock() -> void;
+  auto test_fcntl_in_flock() -> void;
+  auto test_fcntl_out_flock64() -> void;
+  auto test_fcntl_in_flock64() -> void;
+  auto test_fcntl_out_f_owner_ex() -> void;
+  auto test_fcntl_in_f_owner_ex() -> void;
+  auto test_fcntl_out_int64() -> void;
+  auto test_fcntl_in_int64() -> void;
+  // fcntl cloexec (close-on-exec)
+  auto test_cloexec_get() -> void;
+  auto test_cloexec_set_on() -> void;
+  auto test_cloexec_set_off() -> void;
+  // fcntl dupfd
+  auto test_dupfd() -> void;
+  auto test_dupfd_cloexec() -> void;
+  // fcntl fd
+  auto test_getfd_1() -> void; 
+  auto test_getfd_2() -> void; 
+  auto test_setfd() -> void;
+  // fcntl fl
+  auto test_getfl_1() -> void; 
+  auto test_getfl_2() -> void; 
+  auto test_setfl() -> void;
+  // itimer (interval timer)
+  auto test_getitimer_returning() -> void;
+  auto test_getitimer_filling() -> void;
+  auto test_setitimer_returning() -> void;
+  auto test_setitimer_suppressing() -> void;
+  auto test_setitimer_filling() -> void;
+  auto test_unsetitimer_returning() -> void;
+  auto test_unsetitimer_suppressing() -> void;
+  auto test_unsetitimer_filling() -> void;
+  // fcntl lease
+  auto test_getlease_1() -> void;
+  auto test_getlease_2() -> void;
+  auto test_setlease() -> void;
+  // fcntl lk (process)
+  auto test_getlk_1() -> void;
+  auto test_getlk_2() -> void;
+  auto test_setlk() -> void;
+  auto test_setlkw() -> void;
+  // fcntl lk (ofd)
+  auto test_ofd_getlk_1() -> void;
+  auto test_ofd_getlk_2() -> void;
+  auto test_ofd_setlk() -> void;
+  auto test_ofd_setlkw() -> void;
+  // limit (resource limits)
+  auto test_getrlimit() -> void;
+  auto test_setrlimit() -> void;
+  auto test_prlimit() -> void;
+  // maybe or maybe not fcntl-based
+  auto test_lockf() -> void;
+  auto test_flock() -> void;
+  // fcntl lock
+  auto test_getlock_1() -> void;
+  auto test_getlock_2() -> void;
+  auto test_setlock() -> void;
+  auto test_setlock_waiting() -> void;
+  auto test_getlock_file_1() -> void;
+  auto test_getlock_file_2() -> void;
+  auto test_setlock_file() -> void;
+  auto test_setlock_file_waiting() -> void;
+  auto test_getlock_process_1() -> void;
+  auto test_getlock_process_2() -> void;
+  auto test_setlock_process() -> void;
+  auto test_setlock_process_waiting() -> void;
+  // fcntl notify
+  auto test_notify() -> void;
+  // fcntl owner
+  auto test_getown_1() -> void;
+  auto test_getown_2() -> void;
+  auto test_setown() -> void;
+  auto test_getown_ex_1() -> void;
+  auto test_getown_ex_2() -> void;
+  auto test_setown_ex() -> void;
+  auto test_getowner_1() -> void;
+  auto test_getowner_2() -> void;
+  auto test_setowner() -> void;
+  // fcntl pipe_size
+  auto test_getpipe_sz() -> void;
+  auto test_setpipe_sz() -> void;
+  auto test_getpipe_size() -> void;
+  auto test_setpipe_size() -> void;
+  // fcntl signal
+  auto test_getsig_1() -> void;
+  auto test_getsig_2() -> void;
+  auto test_setsig() -> void;
+  auto test_getsignal_1() -> void;
+  auto test_getsignal_2() -> void;
+  auto test_setsignal() -> void;
+  // fcntl seals
+  auto test_addseals() -> void;
+  auto test_getseals() -> void;
+  auto test_add_seals() -> void;
+  auto test_get_seals() -> void;
+  // fcntl readwrite_hint
+  auto test_get_rw_hint() -> void;
+  auto test_set_rw_hint() -> void;
+  auto test_getrwh() -> void;
+  auto test_setrwh() -> void;
+  auto test_getrwh_file() -> void;
+  auto test_setrwh_file() -> void;
+  auto test_getrwh_process() -> void;
+  auto test_setrwh_process() -> void;
+  //
+  // and back to our regular programming
+  // (alphabetial)
+  auto test_fork() -> void;
+  auto test_fstat() -> void;
+  auto test_fstatat() -> void;
+  auto test_getcwd() -> void; 
+  auto test_gethostname() -> void;
+  //
+  auto test_getgid() -> void;
+  auto test_getegid() -> void;
+  auto test_group_member() -> void;
+  //
+  auto test_getuid() -> void;
+  auto test_geteuid() -> void;  
+  //
+  auto test_getwd() -> void;
+  auto test_gmtime() -> void;
+  auto test_timegm() -> void;
+  auto test_ioctl_get() -> void;
+  auto test_ioctl_set() -> void;
+  auto test_ioctl_void() -> void;
+  auto test_isblk() -> void;
+  auto test_ischr() -> void;
+  auto test_isdir() -> void;
+  auto test_isfifo() -> void;
+  auto test_islnk() -> void;
+  auto test_isreg() -> void;
+  auto test_issock() -> void;
+  //
+  auto test_lchown_Uid() -> void;
+  auto test_lchown_Gid() -> void;
+  auto test_lchown_Uid_Gid() -> void;
+  auto test_lchown_uid_gid() -> void;
+  //
+  auto test_link() -> void;
+  auto test_linkat() -> void;
+  auto test_localtime() -> void;
+  auto test_timelocal() -> void;
+  auto test_mktime() -> void;
+  auto test_lseek() -> void;
+  auto test_lstat() -> void;
+  //
+  auto test_mkdir() -> void;
+  auto test_mkdirat() -> void;
+  auto test_mkdirp() -> void;
+  auto test_mkdirs() -> void;
+  //
+  auto test_mkdtemp() -> void; 
+  auto test_mkstemp() -> void; 
+  auto test_mktemp() -> void; 
+  auto test_open() -> void;
+  auto test_openat() -> void;
+  //
+  auto test_pipe_0arg() -> void;
+  auto test_pipe_1arg() -> void;
+  auto test_pipe2() -> void;
+  //
+  auto test_sleep_duration_1() -> void;
+  auto test_sleep_duration_2() -> void;
+  auto test_sleep_val_1() -> void;
+  auto test_sleep_val_2() -> void;
+  auto test_sleep_val_3() -> void;
+  auto test_sleep_spec_1() -> void;
+  auto test_sleep_spec_2() -> void;
+  auto test_sleep_spec_3() -> void;
+  \
+  auto test_usleep() -> void;
+  //
+  auto test_millisleep_duration_1() -> void;
+  auto test_millisleep_duration_2() -> void;
+  auto test_millisleep_val_1() -> void;
+  auto test_millisleep_val_2() -> void;
+  auto test_millisleep_val_3() -> void;
+  auto test_millisleep_spec_1() -> void;
+  auto test_millisleep_spec_2() -> void;
+  auto test_millisleep_spec_3() -> void;
+  //
+  auto test_microsleep_duration_1() -> void;
+  auto test_microsleep_duration_2() -> void;
+  auto test_microsleep_val_1() -> void;
+  auto test_microsleep_val_2() -> void;
+  auto test_microsleep_val_3() -> void;
+  auto test_microsleep_spec_1() -> void;
+  auto test_microsleep_spec_2() -> void;
+  auto test_microsleep_spec_3() -> void;
+  //
+  auto test_nanosleep_duration_1() -> void;
+  auto test_nanosleep_duration_2() -> void;
+  auto test_nanosleep_val_1() -> void;
+  auto test_nanosleep_val_2() -> void;
+  auto test_nanosleep_val_3() -> void;
+  auto test_nanosleep_spec_1() -> void;
+  auto test_nanosleep_spec_2() -> void;
+  auto test_nanosleep_spec_3() -> void;
+  //
+  auto test_read_function_1() -> void;
+  auto test_read_function_2() -> void;
+  auto test_read_native_1() -> void;
+  auto test_read_native_2() -> void;
+  //
+  auto test_readv_function_1() -> void;
+  auto test_readv_function_2() -> void;
+  auto test_readv_native_1() -> void;
+  auto test_readv_native_2() -> void;
+  //
+  auto test_pread_function_1() -> void;
+  auto test_pread_function_2() -> void;
+  auto test_pread_native_1() -> void;
+  auto test_pread_native_2() -> void;
+  //
+  auto test_preadv_function_1() -> void;
+  auto test_preadv_function_2() -> void;
+  auto test_preadv_native_1() -> void;
+  auto test_preadv_native_2() -> void;
+  //
+  auto test_preadv2_function_1() -> void;
+  auto test_preadv2_function_2() -> void;
+  auto test_preadv2_native_1() -> void;
+  auto test_preadv2_native_2() -> void;
+  //  
+  auto test_readlink() -> void;
+  auto test_readlinkat() -> void;
+  auto test_realpath() -> void;
+  //
+  auto test_recv_1() -> void;
+  auto test_recv_2() -> void;
+  auto test_recv_3() -> void;
+  auto test_recv_4() -> void;
+  auto test_recvfrom_0() -> void;
+  auto test_recvfrom_1() -> void;
+  auto test_recvfrom_2() -> void;
+  auto test_recvfrom_3() -> void;
+  auto test_recvfrom_4() -> void;
+  auto test_recvmsg() -> void;
+  auto test_recvmmsg() -> void;
+  //
+  auto test_remove_file() -> void;
+  auto test_remove_directory() -> void;
+  auto test_rename() -> void;
+  auto test_renameat() -> void;
+  auto test_rmdir() -> void;
+  auto test_rmdirat() -> void;
+  //
+  auto test_select() -> void;
+  auto test_select_read() -> void;
+  auto test_select_write() -> void;
+  auto test_select_except() -> void;
+  auto test_pselect() -> void;
+  //
+  auto test_send_1() -> void;
+  auto test_send_2() -> void;
+  auto test_send_3() -> void;
+  auto test_send_4() -> void;
+  auto test_sendmsg() -> void;
+  auto test_sendmmsg() -> void;
+  auto test_sendto_0() -> void;
+  auto test_sendto_1() -> void;
+  auto test_sendto_2() -> void;
+  auto test_sendto_3() -> void;
+  auto test_sendto_4() -> void;
+  //
+  auto test_setgid() -> void;
+  auto test_setegid() -> void;
+  auto test_setregid() -> void;
+  auto test_setresgid() -> void;
+  //
+  auto test_setuid() -> void;
+  auto test_seteuid() -> void;
+  auto test_setreuid() -> void;
+  auto test_setresuid() -> void;
+  //
+  auto test_socketpair_SOCK() -> void;
+  auto test_socketpair_sock() -> void;
+  //
+  auto test_socket_af_type() -> void;
+  auto test_socket_af_type_options() -> void;
+  auto test_socket_af_specification() -> void;
+  auto test_socket_af_type_pf() -> void;
+  auto test_socket_af_type_pf_options() -> void;
+  auto test_socket_af_type_options_pf() -> void;
+  auto test_socket_af_specification_pf() -> void;
+  //
+  auto test_socket_ip_type() -> void;
+  auto test_socket_ip_type_options() -> void;
+  auto test_socket_ip_specification() -> void;
+  auto test_socket_ip_type_ipproto() -> void;
+  auto test_socket_ip_type_ipproto_options() -> void;
+  auto test_socket_ip_type_options_ipproto() -> void;
+  auto test_socket_ip_specification_ipproto() -> void;
+  //
+  auto test_socket_un_type() -> void;
+  auto test_socket_un_type_options() -> void;
+  auto test_socket_un_specification() -> void;
+  auto test_socket_un_type_pf() -> void;
+  auto test_socket_un_type_pf_options() -> void;
+  auto test_socket_un_type_options_pf() -> void;
+  auto test_socket_un_specification_pf() -> void;
+  //
+  auto test_stat() -> void;
+  auto test_symlink() -> void;
+  auto test_symlinkat() -> void;
+  auto test_time() -> void;
+  auto test_tmpdir() -> void;
+  auto test_touch() -> void;
+  auto test_unlink() -> void;
+  auto test_unlinkat() -> void;
+  //
+  auto test_getrusage() -> void;
+  auto test_setrusage() -> void;
+  auto test_prusage() -> void;
+  //
+  auto test_wait() -> void;
+  auto test_wait2() -> void;
+  auto test_waitpid() -> void;
+  auto test_waitid() -> void;
+  auto test_wait3() -> void;
+  auto test_wait4() -> void;
+  //
+  auto test_write_function_1() -> void;
+  auto test_write_function_2() -> void;
+  auto test_write_native_1() -> void;
+  auto test_write_native_2() -> void;
+  //
+  auto test_writev_function_1() -> void;
+  auto test_writev_function_2() -> void;
+  auto test_writev_native_1() -> void;
+  auto test_writev_native_2() -> void;
+  //
+  auto test_pwrite_function_1() -> void;
+  auto test_pwrite_function_2() -> void;
+  auto test_pwrite_native_1() -> void;
+  auto test_pwrite_native_2() -> void;
+  //
+  auto test_pwritev_function_1() -> void;
+  auto test_pwritev_function_2() -> void;
+  auto test_pwritev_native_1() -> void;
+  auto test_pwritev_native_2() -> void;
+  //
+  auto test_pwritev2_function_1() -> void;
+  auto test_pwritev2_function_2() -> void;
+  auto test_pwritev2_native_1() -> void;
+  auto test_pwritev2_native_2() -> void;
+  //
+  auto test_iovec() -> void;
+  auto test_itimerval() -> void;
+  auto test_msghdr() -> void;
+  auto test_timeval() -> void;
+  auto test_timespec() -> void;
+  //
+  auto test_shutdown() -> void;
+  auto test_sockaddr() -> void;
+  auto test_sockaddr_in4() -> void;
+  auto test_sockaddr_in6() -> void;
+  auto test_sockaddr_un() -> void;
+  // new^2 ones
+  auto test_getpwuid() -> void;
+  auto test_getpwname() -> void;
+  auto test_endpwent() -> void;
+  auto test_Endent_passwd() -> void;
+  auto test_getgrgid() -> void;
+  auto test_getgrname() -> void;
+  auto test_endgrent() -> void;
+  auto test_Endent_group() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+protected:
+  // The hint is appended to the filename to remind you whence it came.
+  // The filepath is substantially constant (you don't care what it is because it does not exist)
+  static auto no_such_file_at_all(std::string hint = std::string{}) -> std::filesystem::path;
+  static auto const BOGUS_EUID = ::uid_t(99999u); 
+  static auto const BOGUS_RUID = 1+BOGUS_EUID;
+  static auto const BOGUS_SUID = 1+BOGUS_RUID;
+  struct Dummy;
+};
+#endiv
+#divert <ipp>
+// All test cases will need these, somehow
+#import std.string
+#import tests.guardian.Chmod
+#import tests.guardian.Cleanup_Descriptor
+#import tests.guardian.Cleanup_Spackled_Names
+#import tests.guardian.Close
+#import tests.guardian.Unlink
+#endiv
+#divert <cpp>
+auto tests::unit::posix::fixture::Fixture::no_such_file_at_all(std::string hint) -> std::filesystem::path {
+  auto base = "/tmp/t99.this.file.does.not.exist.reallly.really"s;
+  if (!hint.empty()) {
+    base += "_";
+    base += hint;
+  }
+  return base;
+}
+#import std.cerr
+#import sys.posix.AT
+#import sys.posix.FD
+#import sys.posix.O
+#import sys.posix.OK
+#import sys.posix.mktemp
+
+auto tests::unit::posix::fixture::Fixture::test_fork() -> void {
+  // See the tests for exec & execp
+  CPPUNIT_ASSERT(true);
+}
+#import sys.posix.tmpdir
+auto tests::unit::posix::fixture::Fixture::test_tmpdir() -> void {
+  std::string dir = six::tmpdir();
+  CPPUNIT_ASSERT(!dir.empty());
+}
+
+#import sys.posix.chmod
+#import sys.posix.creat
+#import sys.posix.mktemp
+
+auto tests::unit::posix::fixture::Fixture::test_bind() -> void {
+#warning WRITETHIS auto tests::unit::posix::fixture::Fixture::test_bind() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::fixture::Fixture::test_connect() -> void {
+#warning WRITETHIS auto tests::unit::posix::fixture::Fixture::test_connect() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::fixture::Fixture::test_getpeername() -> void {
+#warning WRITETHIS auto tests::unit::posix::fixture::Fixture::test_getpeername() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::fixture::Fixture::test_getsockname() -> void {
+#warning WRITETHIS auto tests::unit::posix::fixture::Fixture::test_getsockname() -> void
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.posix.Ambiguities
+#import tests.unit.posix.AF
+#import tests.unit.posix.AT
+#import tests.unit.posix.DN
+#import tests.unit.posix.Driver.FCNTL
+#import tests.unit.posix.Environment
+#import tests.unit.posix.Exec
+#import tests.unit.posix.Execp
+#import tests.unit.posix.E
+#import tests.unit.posix.EX
+#import tests.unit.posix.EXIT
+#import tests.unit.posix.F
+#import tests.unit.posix.FD
+#import tests.unit.posix.Fork
+#import tests.unit.posix.IPPROTO
+#import tests.unit.posix.ITIMER
+#import tests.unit.posix.LOCK
+#import tests.unit.posix.MSG
+#import tests.unit.posix.O
+#import tests.unit.posix.OK
+#import tests.unit.posix.P
+#import tests.unit.posix.PF
+#import tests.unit.posix.PSelect
+#import tests.unit.posix.RUSAGE
+#import tests.unit.posix.RLIMIT
+#import tests.unit.posix.Select
+#import tests.unit.posix.S
+#import tests.unit.posix.SEEK
+#import tests.unit.posix.SHUT
+#import tests.unit.posix.SOCK
+#import tests.unit.posix.W
+#import rigging.suite.io
+auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("posix");
+  series << add<AF>()
+         << add<AT>()
+         << add<DN>()
+         << add<E>()
+         << add<EX>()
+         << add<EXIT>()
+         << add<F>()
+         << add<FD>()
+         << add<IPPROTO>()
+         << add<ITIMER>()
+         << add<LOCK>()
+         << add<MSG>()
+         << add<O>()
+         << add<OK>()
+         << add<P>()
+         << add<PF>()
+         << add<RLIMIT>()
+         << add<RUSAGE>()
+         << add<S>()
+         << add<SEEK>()
+         << add<SHUT>()
+         << add<SOCK>()
+         << add<W>()
+         << END;
+  series << []() {
+              Stream the{"themes"};
+              the << []() {
+                       Stream chm{"access"};
+                       chm << call("faccessat", &Fixture::test_faccessat_something)
+                           << call("access", &Fixture::test_access_present)
+                           << call("eaccess", &Fixture::test_eaccess_present)
+                           << call("euidaccess", &Fixture::test_euidaccess_present)
+                         ;
+                       return move(chm);
+                     }()
+                  << []() {
+                       Stream at{"at"};
+                       at << call("faccessat", &Fixture::test_faccessat_something)
+                          << call("fchmodat", &Fixture::test_fchmodat_something)
+                          << call("fstatat", &Fixture::test_fstatat)
+                          << call("linkat", &Fixture::test_linkat)
+                          << call("mkdirat", &Fixture::test_mkdirat)
+                          << call("openat", &Fixture::test_openat)
+                          << call("readlinkat", &Fixture::test_readlinkat)
+                          << call("rmdirat", &Fixture::test_rmdirat)
+                          << call("symlinkat", &Fixture::test_symlinkat)
+                          << call("unlinkat", &Fixture::test_unlinkat)
+                         ;
+                       return move(at);
+                     }()
+                  << []() {
+                       Stream chm{"chmod"};
+                       chm << call("fchmodat", &Fixture::test_fchmodat_something)
+                           << call("fchmod", &Fixture::test_fchmod_something)
+                           << call("chmod", &Fixture::test_chmod)
+                         ;
+                       return move(chm);
+                     }()
+                  << []() {
+                       Stream cho{"chown"};
+                       cho << call("fchownat", &Fixture::test_fchownat_something)
+                           << call("fchown", &Fixture::test_fchown_something)
+                           << call("chown", &Fixture::test_chown_Uid_Gid) // ..... pick one arbitrarily
+                           << call("lchown", &Fixture::test_lchown_Uid_Gid) // ... ibidem.
+                         ;
+                       return move(cho);
+                     }()
+                ;
+              return move(the);
+            }()
+    ;
+  series << []() {
+              Stream data{"data_structures"};
+              data << call("iovec", &Fixture::test_iovec)
+                   << call("itimerval", &Fixture::test_itimerval)
+                   << call("itimerval", &Fixture::test_msghdr)
+                   << []() {
+                        Stream sa{"sockaddr"};
+                        sa << call("abstract", &Fixture::test_sockaddr)
+                           << call("in4", &Fixture::test_sockaddr_in4)
+                           << call("in6", &Fixture::test_sockaddr_in6)
+                           << call("un", &Fixture::test_sockaddr_un)
+                          ;
+                        return move(sa);
+                      }()
+                   << call("msghdr", &Fixture::test_msghdr)
+                   << END;
+              return move(data);
+            }()
+         << call("timeval", &Fixture::test_timeval)
+         << call("timespec", &Fixture::test_timespec)
+         << END;
+  series << []() {
+              Stream acc{"accept"};
+              acc << call("accept", &Fixture::test_accept)
+                  << call("accept4", &Fixture::test_accept4)
+                ;
+              return move(acc);
+            }()
+         << []() {
+              Stream fam{"access"};
+              fam << []() {
+                       Stream acc{"access"};
+                       acc << call("present", &Fixture::test_access_present)
+                           << call("missing", &Fixture::test_access_missing)
+                         ;
+                       return move(acc);
+                     }()
+                  << []() {
+                       Stream acc{"eaccess"};
+                       acc << call("present", &Fixture::test_eaccess_present)
+                           << call("missing", &Fixture::test_eaccess_missing)
+                         ;
+                       return move(acc);
+                     }()
+                  << []() {
+                       Stream acc{"euidaccess"};
+                       acc << call("present", &Fixture::test_euidaccess_present)
+                           << call("missing", &Fixture::test_euidaccess_missing)
+                         ;
+                       return move(acc);
+                     }()
+                  << []() {
+                       Stream fac{"faccessat"};
+                       fac << call("something", &Fixture::test_faccessat_something)
+                           << call("int", &Fixture::test_faccessat_int)
+                           << call("File", &Fixture::test_faccessat_File)
+                           << call("Cwd", &Fixture::test_faccessat_Cwd)
+                         ;
+                       return move(fac);
+                     }()
+                  << []() {
+                       Stream fun{"functions"};
+                       fun << []() {
+                                Stream sts{"exists"};
+                                sts << call("no", &Fixture::test_exists_no)
+                                    << call("yes", &Fixture::test_exists_yes)
+                                  ;
+                                return move(sts);
+                              }()
+                           << []() {
+                                Stream exe{"executable"};
+                                exe << call("no", &Fixture::test_executable_no)
+                                    << call("yes", &Fixture::test_executable_yes)
+                                  ;
+                                return move(exe);
+                              }()
+                           << []() {
+                                Stream rea{"readable"};
+                                rea << call("no", &Fixture::test_readable_no)
+                                    << call("yes", &Fixture::test_readable_yes)
+                                  ;
+                                return move(rea);
+                              }()
+                           << []() {
+                                Stream wri{"writable"};
+                                wri << call("no", &Fixture::test_writable_no)
+                                    << call("yes", &Fixture::test_writable_yes)
+                                  ;
+                                return move(wri);
+                              }()
+                         ;
+                       return move(fun);
+                     }()
+                ;
+              return move(fam);
+            }()
+         << call("alarm", &Fixture::test_alarm)
+         << END;
+  series << call("bind", &Fixture::test_bind)
+         << END;
+  series << []() {
+              Stream fam{"chdir"};
+              fam << call("chdir", &Fixture::test_chdir)
+                  << call("fchdir", &Fixture::test_fchdir)
+                  << END;
+              return move(fam);
+            }()
+         << []() {
+              Stream fam{"chmod"};
+              fam << call("chmod", &Fixture::test_chmod)
+                  << []() {
+                       Stream fch{"fchmod"};
+                       fch << call("something", &Fixture::test_fchmod_something)
+                           << call("int", &Fixture::test_fchmod_int)
+                           << call("File", &Fixture::test_fchmod_File)
+                           << END;
+                       return move(fch);
+                     }()
+                  << []() {
+                       Stream fch{"fchmodat"};
+                       fch << call("something", &Fixture::test_fchmodat_something)
+                           << call("int", &Fixture::test_fchmodat_int)
+                           << call("File", &Fixture::test_fchmodat_File)
+                           << call("Cwd", &Fixture::test_fchmodat_Cwd)
+                           << END;
+                       return move(fch);
+                     }()
+                  << END;
+              return move(fam);
+            }()
+         << []() {
+              Stream fam{"chown"};
+              fam << []() {
+                       Stream cho{"chown"};
+                       cho << call("Uid", &Fixture::test_chown_Uid)
+                           << call("Gid", &Fixture::test_chown_Gid)
+                           << call("Uid,Gid", &Fixture::test_chown_Uid_Gid)
+                           << call("uid,gid", &Fixture::test_chown_uid_gid)
+                           << END;
+                       return move(cho);
+                     }()
+                  << []() {
+                       Stream fch{"fchown"};
+                       fch << call("something", &Fixture::test_fchown_something)
+                           << call("int", &Fixture::test_fchown_int_uid_gid)
+                           << []() {
+                                Stream uid{"Uid"};
+                                uid << call("File", &Fixture::test_fchown_File_Uid)
+                                    << END;
+                                return move(uid);
+                              }()
+                           << []() {
+                                Stream gid{"Gid"};
+                                gid << call("File", &Fixture::test_fchown_File_Gid)
+                                    << END;
+                                return move(gid);
+                              }()
+                           << []() {
+                                Stream both{"Uid,Gid"};
+                                both << call("File", &Fixture::test_fchown_File_Uid_Gid)
+                                     << END;
+                                return move(both);
+                              }()
+                           << END;
+                       return move(fch);
+                     }()
+                  << []() {
+                       Stream fch{"fchownat"};
+                       fch << call("something", &Fixture::test_fchownat_something)
+                           << call("int", &Fixture::test_fchownat_int_uid_gid)
+                           << []() {
+                                Stream uid{"Uid"};
+                                uid << call("File", &Fixture::test_fchownat_File_Uid)
+                                    << call("Cwd", &Fixture::test_fchownat_Cwd_Uid)
+                                    << END;
+                                return move(uid);
+                              }()
+                           << []() {
+                                Stream gid{"Gid"};
+                                gid << call("File", &Fixture::test_fchownat_File_Gid)
+                                    << call("Cwd", &Fixture::test_fchownat_Cwd_Gid)
+                                    << END;
+                                return move(gid);
+                              }()
+                           << []() {
+                                Stream both{"Uid,Gid"};
+                                both << call("File", &Fixture::test_fchownat_File_Uid_Gid)
+                                     << call("Cwd", &Fixture::test_fchownat_Cwd_Uid_Gid)
+                                     << END;
+                                return move(both);
+                              }()
+                           << END;
+                       return move(fch);
+                     }()
+                  << END;
+              return move(fam);
+            }()
+         << call("close", &Fixture::test_close)
+         << []() {
+              Stream fam{"create"};
+              fam << call("creat", &Fixture::test_creat)
+                  << call("create", &Fixture::test_create)
+                  << END;
+              return move(fam);
+            }()
+         << call("connect", &Fixture::test_connect)
+         << []() {
+              Stream cwd{"cwd"};
+              cwd << call("getcwd", &Fixture::test_getcwd)
+                  << call("getwd", &Fixture::test_getwd)
+                  << END;
+              return move(cwd);
+            }()
+         << END;
+  series << call("daemon", &Fixture::test_daemon)
+         << []() {
+              Stream dup{"dup"};
+              dup << call("dup", &Fixture::test_dup)
+                  << call("dup2", &Fixture::test_dup2)
+                  << call("dup3", &Fixture::test_dup3)
+                  << END;
+              return move(dup);
+            }()
+         << END;
+  series << []() {
+              Stream end{"end"};
+              end << call("endpwent", &Fixture::test_endpwent)
+                  << call("endgrent", &Fixture::test_endgrent)
+                  << []() {
+                       Stream ent{"Endent"};
+                       ent << call("passwd", &Fixture::test_Endent_passwd)
+                           << call("group", &Fixture::test_Endent_group)
+                           << END;
+                       return move(ent);
+                     }()
+                  << END;
+              return move(end);
+            }()
+         << []() {
+              Stream exec{"exec"};
+              exec << call("execp", &Fixture::test_execp)
+                   << call("exec", &Fixture::test_exec)
+                   << END;
+              return move(exec);
+            }()
+         << END;
+  series << []() {
+              Stream fcn{"fcntl"};
+              // Also see tests::unit::posix::Fcntl
+              fcn << call("call", &Fixture::test_fcntl)
+                  << []() {
+                       Stream arg{"arguments"};
+                       arg << call("void", &Fixture::test_fcntl_void)
+                           << call("bool", &Fixture::test_fcntl_bool)
+                           << call("int", &Fixture::test_fcntl_int)
+                           << call("o::Status", &Fixture::test_fcntl_Status)
+                           << []() {
+                                Stream opt{"o::Options"};
+                                opt << call("Options<Access,Status>", &Fixture::test_fcntl_Options_Access_Status)
+                                    << call("Options<Create,Status>", &Fixture::test_fcntl_Options_Create_Status)
+                                    << call("Options<Access,Create,Status>", &Fixture::test_fcntl_Options_Access_Create_Status)
+                                    << END;
+                                return move(opt);
+                              }()
+                           << call("o::Flags", &Fixture::test_fcntl_Flags)
+                           << call("File", &Fixture::test_fcntl_File)
+                           << call("Size", &Fixture::test_fcntl_Size)
+                           << call("Lock", &Fixture::test_fcntl_Lock)
+                           << call("Notifies", &Fixture::test_fcntl_Notifies)
+                           << call("Seals", &Fixture::test_fcntl_Seals)
+                           << []() {
+                                Stream pro{"process"};
+                                pro << call("Process", &Fixture::test_fcntl_process_Process)
+                                    << call("Group", &Fixture::test_fcntl_process_Group)
+                                    << call("Either", &Fixture::test_fcntl_process_Either)
+                                    << END;
+                                return move(pro);
+                              }()
+                           << call("Signal", &Fixture::test_fcntl_Signal)
+                           << []() {
+                                Stream flo{"flock"};
+                                flo << call("out", &Fixture::test_fcntl_out_flock)
+                                    << call("in", &Fixture::test_fcntl_in_flock)
+                                    << END;
+                                return move(flo);
+                              }()
+                           << []() {
+                                Stream flo{"flock64"};
+                                flo << call("out", &Fixture::test_fcntl_out_flock64)
+                                    << call("in", &Fixture::test_fcntl_in_flock64)
+                                    << END;
+                                return move(flo);
+                              }()
+                           << []() {
+                                Stream own{"owner"};
+                                own << call("out", &Fixture::test_fcntl_out_f_owner_ex)
+                                    << call("in", &Fixture::test_fcntl_in_f_owner_ex)
+                                    << END;
+                                return move(own);
+                              }()
+                           << []() {
+                                Stream ent{"int64"};
+                                ent << call("out", &Fixture::test_fcntl_out_int64)
+                                    << call("in", &Fixture::test_fcntl_in_int64)
+                                    << END;
+                                return move(ent);
+                              }()
+                           << END;
+                       return move(arg);
+                     }()
+                  << []() {
+                       Stream fun{"functions"};
+                       fun << []() {
+                                Stream clo{"cloexec"};
+                                clo << call("get", &Fixture::test_cloexec_get)
+                                    << []() {
+                                         Stream set{"set"};
+                                         set << call("on", &Fixture::test_cloexec_set_on)
+                                             << call("off", &Fixture::test_cloexec_set_off)
+                                             << END;
+                                         return move(set);
+                                       }()
+                                    << END;
+                                return move(clo);
+                              }()
+                           << []() {
+                                Stream dfd{"dupfd"};
+                                dfd << call("dupfd", &Fixture::test_dupfd)
+                                    << call("dupfd_cloexec", &Fixture::test_dupfd_cloexec)
+                                    << END;
+                                return move(dfd);
+                              }()
+                           << []() {
+                                Stream fd{"fd"};
+                                fd << call("setfd", &Fixture::test_setfd)
+                                   << []() {
+                                        Stream get{"getfd"};
+                                        get << call("1", &Fixture::test_getfd_1)
+                                            << call("2", &Fixture::test_getfd_2)
+                                            << END;
+                                        return move(get);
+                                      }()
+                                   << END;
+                                return move(fd);
+                              }()
+                           << []() {
+                                Stream fl{"fl"};
+                                fl << call("setfl", &Fixture::test_setfl)
+                                   << []() {
+                                        Stream get{"getfl"};
+                                        get << call("1", &Fixture::test_getfl_1)
+                                            << call("2", &Fixture::test_getfl_2)
+                                            << END;
+                                        return move(get);
+                                      }()
+                                   << END;
+                                return move(fl);
+                              }()
+                           << []() {
+                                Stream lease{"lease"};
+                                lease << call("setlease", &Fixture::test_setlease)
+                                      << []() {
+                                           Stream get{"getlease"};
+                                           get << call("1", &Fixture::test_getlease_1)
+                                               << call("2", &Fixture::test_getlease_2)
+                                               << END;
+                                           return move(get);
+                                         }()
+                                      << END;
+                                return move(lease);
+                              }()
+                           << []() {
+                                Stream lf{"lockf-flock"};
+                                lf << call("lockf", &Fixture::test_lockf)
+                                   << call("flock", &Fixture::test_flock)
+                                   << END;
+                                return move(lf);
+                              }()
+                           << []() {
+                                Stream lock{"lock"};
+                                lock << []() {
+                                          Stream old{"(old)"};
+                                          old << []() {
+                                                   Stream lk{"lk"};
+                                                   lk << []() {
+                                                           Stream proc{"(process)"};
+                                                           proc << call("setlk", &Fixture::test_setlk)
+                                                                << call("setlkw", &Fixture::test_setlkw)
+                                                                << []() {
+                                                                     Stream get{"getlk"};
+                                                                     get << call("1", &Fixture::test_getlk_1)
+                                                                         << call("2", &Fixture::test_getlk_2)
+                                                                         << END;
+                                                                     return move(get);
+                                                                   }()
+                                                                << END;
+                                                           return move(proc);
+                                                         }()
+                                                      << []() {
+                                                           Stream ofd{"ofd"};
+                                                           ofd << call("ofd_setlk", &Fixture::test_ofd_setlk)
+                                                               << call("ofd_setlkw", &Fixture::test_ofd_setlkw)
+                                                               << []() {
+                                                                    Stream get{"ofd_getlk"};
+                                                                    get << call("1", &Fixture::test_ofd_getlk_1)
+                                                                        << call("2", &Fixture::test_ofd_getlk_2)
+                                                                        << END;
+                                                                    return move(get);
+                                                                  }()
+                                                               << END;
+                                                           return move(ofd);
+                                                         }()
+                                                      << END;
+                                                   return move(lk);
+                                                 }()
+                                              << END;
+                                          return move(old);
+                                        }()
+                                     << []() {
+                                          Stream orig{"(process)"};
+                                          orig << call("setlock", &Fixture::test_setlock)
+                                               << call("setlock_waiting", &Fixture::test_setlock_waiting)
+                                               << []() {
+                                                    Stream get{"getlock"};
+                                                    get << call("1", &Fixture::test_getlock_1)
+                                                        << call("2", &Fixture::test_getlock_2)
+                                                        << END;
+                                                    return move(get);
+                                                  }()
+                                               << END;
+                                          return move(orig);
+                                        }()
+                                     << []() {
+                                          Stream file{"file"};
+                                          file << call("setlock_file", &Fixture::test_setlock_file)
+                                               << call("setlock_file_waiting", &Fixture::test_setlock_file_waiting)
+                                               << []() {
+                                                    Stream get{"getlock_file"};
+                                                    get << call("1", &Fixture::test_getlock_file_1)
+                                                        << call("2", &Fixture::test_getlock_file_2)
+                                                        << END;
+                                                    return move(get);
+                                                  }()
+                                               << END;
+                                          return move(file);
+                                        }()
+                                     << []() {
+                                          Stream proc{"process"};
+                                          proc << call("setlock_process", &Fixture::test_setlock_process)
+                                               << call("setlock_process_waiting", &Fixture::test_setlock_process_waiting)
+                                               << []() {
+                                                    Stream get{"getlock_process"};
+                                                    get << call("1", &Fixture::test_getlock_process_1)
+                                                        << call("2", &Fixture::test_getlock_process_2)
+                                                        << END;
+                                                    return move(get);
+                                                  }()
+                                               << END;
+                                          return move(proc);
+                                        }()
+                                     << END;
+                                return move(lock);
+                              }()
+                           << []() {
+                                Stream ify{"notify"};
+                                ify << call("notify", &Fixture::test_notify)
+                                    << END;
+                                return move(ify);
+                              }()
+                           << []() {
+                                Stream own{"owner"};
+                                own << []() {
+                                         Stream old{"(old)"};
+                                         old << []() {
+                                                  Stream ba{"(basic)"};
+                                                  ba << call("setown", &Fixture::test_setown)
+                                                     << []() {
+                                                          Stream get{"getown"};
+                                                          get << call("1", &Fixture::test_getown_1)
+                                                              << call("2", &Fixture::test_getown_2)
+                                                              << END;
+                                                          return move(get);
+                                                        }()
+                                                     << END;
+                                                  return move(ba);
+                                                }()
+                                             << []() {
+                                                  Stream ex{"ex"};
+                                                  ex << call("setown_ex", &Fixture::test_setown_ex)
+                                                     << []() {
+                                                          Stream get{"getown_ex"};
+                                                          get << call("1", &Fixture::test_getown_ex_1)
+                                                              << call("2", &Fixture::test_getown_ex_2)
+                                                              << END;
+                                                          return move(get);
+                                                        }()
+                                                     << END;
+                                                  return move(ex);
+                                                }()
+                                             << END;
+                                         return move(old);
+                                       }()
+                                     << call("setowner", &Fixture::test_setowner)
+                                     << []() {
+                                          Stream get{"getowner"};
+                                          get << call("1", &Fixture::test_getowner_1)
+                                              << call("2", &Fixture::test_getowner_2)
+                                              << END;
+                                          return move(get);
+                                        }()
+                                     << END;
+                                return move(own);
+                              }()
+                           << []() {
+                                Stream ps{"pipe_size"};
+                                ps << []() {
+                                        Stream old{"(old)"};
+                                        old << call("getpipe_sz", &Fixture::test_getpipe_sz)
+                                            << call("setpipe_sz", &Fixture::test_setpipe_sz)
+                                            << END;
+                                        return move(old);
+                                      }()
+                                   << call("getpipe_size", &Fixture::test_getpipe_size)
+                                   << call("setpipe_size", &Fixture::test_setpipe_size)
+                                   << END;
+                                return move(ps);
+                              }()
+                           << []() {
+                                Stream see{"seals"};
+                                see << call("addseals", &Fixture::test_addseals)
+                                    << call("getseals", &Fixture::test_getseals)
+                                    << []() {
+                                         Stream old{"{old_school}"};
+                                         old << call("add_seals", &Fixture::test_add_seals)
+                                             << call("get_seals", &Fixture::test_get_seals)
+                                             << END;
+                                         return move(old);
+                                       }()
+                                    << END;
+                                return move(see);
+                              }()
+                           << []() {
+                                Stream sig{"signal"};
+                                sig << []() {
+                                         Stream old{"(old)"};
+                                         old << call("setsig", &Fixture::test_setsig)
+                                             << []() {
+                                                  Stream get{"getsig"};
+                                                  get << call("1", &Fixture::test_getsig_1)
+                                                      << call("2", &Fixture::test_getsig_2)
+                                                      << END;
+                                                  return move(get);
+                                                }()
+                                             << END;
+                                         return move(old);
+                                       }()
+                                    << call("setsignal", &Fixture::test_setsignal)
+                                    << []() {
+                                         Stream get{"getsignal"};
+                                         get << call("1", &Fixture::test_getsignal_1)
+                                             << call("2", &Fixture::test_getsignal_2)
+                                             << END;
+                                         return move(get);
+                                       }()
+                                    << END;
+                                return move(sig);
+                              }()
+                           << []() {
+                                Stream rwh{"rwh"};
+                                rwh << []() {
+                                         Stream old{"(old)"};
+                                         old << []() {
+                                                  Stream orig{"(process)"};
+                                                  orig << call("get_rw_hint", &Fixture::test_get_rw_hint)
+                                                       << call("set_rw_hint", &Fixture::test_set_rw_hint)
+                                                       << END;
+                                                  return move(orig);
+                                                }()
+                                             << END;
+                                         return move(old);
+                                       }()
+                                    << []() {
+                                         Stream orig{"(process)"};
+                                         orig << call("getrwh", &Fixture::test_getrwh)
+                                              << call("setrwh", &Fixture::test_setrwh)                                              
+                                              << END;
+                                         return move(orig);
+                                       }()
+                                    << []() {
+                                          Stream file{"file"};
+                                          file << call("getrwh_file", &Fixture::test_getrwh_file)
+                                               << call("setrwh_file", &Fixture::test_setrwh_file)
+                                               << END;
+                                          return move(file);
+                                        }()
+                                    << []() {
+                                         Stream proc{"process"};
+                                         proc << call("getrwh_process", &Fixture::test_getrwh_process)
+                                              << call("setrwh_process", &Fixture::test_setrwh_process)
+                                              << END;
+                                         return move(proc);
+                                       }()
+                                   << END;
+                                return move(rwh);
+                              }()
+                           << END;
+                       return move(fun);
+                     }()
+                  << END;
+              return move(fcn);
+            }()
+         << END;
+  series << call("fork", &Fixture::test_fork)
+         << END;
+  series << call("gethostname", &Fixture::test_gethostname)
+    // getcwd" is with "cwd
+    // getsockname is with "sock"
+    // getpeername" is with "sock
+    // getgid is under "gid"
+    // getuid is under "uid"
+         << []() {
+              Stream gid{"gid"};
+              gid << call("getgid", &Fixture::test_getgid)
+                  << call("getegid", &Fixture::test_getegid)
+                  << call("group_member", &Fixture::test_group_member)
+                  << call("setgid", &Fixture::test_setgid)
+                  << call("setegid", &Fixture::test_setegid)
+                  << call("setregid", &Fixture::test_setregid)
+                  << call("setresgid", &Fixture::test_setresgid)
+                  << END;
+              return move(gid);
+            }()
+         << []() {
+              Stream get{"group"};
+              get << call("getgruid", &Fixture::test_getgrgid)
+                  << call("getgrname", &Fixture::test_getgrname)
+                  << END;
+              return move(get);
+            }()
+         << END;
+  series << []() {
+              Stream ioc{"ioctl"};
+              ioc << call("get", &Fixture::test_ioctl_get)
+                  << call("set", &Fixture::test_ioctl_set)
+                  << call("void", &Fixture::test_ioctl_void)
+                  << END;
+              return move(ioc);
+            }()
+         << []() {
+              Stream it{"itimer"};
+              it << []() {
+                      auto get = Stream{"getitimer"};
+                      get << call("returning", &Fixture::test_getitimer_returning)
+                          << call("filling", &Fixture::test_getitimer_filling)
+                          << END;
+                      return move(get);
+                    }()
+                 << []() {
+                      auto set = Stream{"setitimer"};
+                      set << call("returning", &Fixture::test_setitimer_returning)
+                          << call("suppressing", &Fixture::test_setitimer_suppressing)
+                          << call("filling", &Fixture::test_setitimer_filling)
+                          << END;
+                      return move(set);
+                    }()
+                 << []() {
+                      auto set = Stream{"unsetitimer"};
+                      set << call("returning", &Fixture::test_unsetitimer_returning)
+                          << call("suppressing", &Fixture::test_unsetitimer_suppressing)
+                          << call("filling", &Fixture::test_unsetitimer_filling)
+                          << END;
+                      return move(set);
+                    }()
+                 << END;
+              return move(it);
+            }()
+         << END;
+  series << []() {
+              Stream cho{"lchown"};
+              cho << call("Uid", &Fixture::test_lchown_Uid)
+                  << call("Gid", &Fixture::test_lchown_Gid)
+                  << call("Uid,Gid", &Fixture::test_lchown_Uid_Gid)
+                  << call("uid,gid", &Fixture::test_lchown_uid_gid)
+                  << END;
+              return move(cho);
+            }()
+         << []() {
+              Stream lim{"limit"};
+              lim << call("getrlimit", &Fixture::test_getrlimit)
+                  << call("setrlimit", &Fixture::test_setrlimit)
+                  << call("prlimit", &Fixture::test_prlimit)
+                  << END;
+              return move(lim);
+            }()
+         << []() {
+              Stream lin{"link"};
+              lin << call("link", &Fixture::test_link)
+                  << call("linkat", &Fixture::test_linkat)
+                  << END;
+              return move(lin);
+            }()
+         << call("listen", &Fixture::test_listen)
+         << call("lseek", &Fixture::test_lseek)
+         << END;
+  series << []() {
+              Stream mkd{"mkdir"};
+              mkd << call("mkdir", &Fixture::test_mkdir)
+                  << call("mkdirat", &Fixture::test_mkdirat)
+                  << call("mkdirp", &Fixture::test_mkdirp)
+                  << call("mkdirs", &Fixture::test_mkdirs)
+                  << END;
+              return move(mkd);
+            }()
+         << []() {
+              Stream mk{"mktemp"};
+              mk << call("mkdtemp", &Fixture::test_mkdtemp)
+                 << call("mkstemp", &Fixture::test_mkstemp)
+                 << call("mktemp", &Fixture::test_mktemp)
+                 << END;
+              return move(mk);
+            }()
+         << END;
+  series << []() {
+              Stream open{"open"};
+              open << call("open", &Fixture::test_open)
+                   << call("openat", &Fixture::test_openat)
+                   << END;
+              return move(open);
+            }()
+         << END;
+  series << []() {
+              Stream get{"passwd"};
+              get << call("getpwuid", &Fixture::test_getpwuid)
+                  << call("getpwname", &Fixture::test_getpwname)
+                  << END;
+              return move(get);
+            }()
+         << []() {
+              Stream pipe{"pipe"};
+              pipe << []() {
+                        Stream one{"original"};
+                        one << call("0arg", &Fixture::test_pipe_0arg)
+                            << call("1arg", &Fixture::test_pipe_1arg)
+                            << END;
+                        return move(one);
+                      }()
+                   << call("pipe2", &Fixture::test_pipe2)
+                   << END;
+              return move(pipe);
+            }()
+         << call("pause", &Fixture::test_pause)
+         << END;
+  series << []() {
+              Stream red{"read"};
+              red << []() {
+                       Stream read{"read"};
+                       read << []() {
+                                 Stream fun{"function"};
+                                 fun << call("1", &Fixture::test_read_function_1)
+                                     << call("2", &Fixture::test_read_function_2)
+                                     << END;
+                                 return move(fun);
+                               }()
+                            << []() {
+                                 Stream nat{"native"};
+                                 nat << call("1", &Fixture::test_read_native_1)
+                                     << call("2", &Fixture::test_read_native_2)
+                                     << END;
+                                 return move(nat);
+                               }()
+                            << END;
+                       return move(read);
+                     }()
+                  << []() {
+                       Stream readv{"readv"};
+                       readv << []() {
+                                  Stream fun{"function"};
+                                  fun << call("1", &Fixture::test_readv_function_1)
+                                      << call("read2", &Fixture::test_readv_function_2)
+                                      << END;
+                                  return move(fun);
+                                }()
+                             << []() {
+                                  Stream nat{"native"};
+                                  nat << call("1", &Fixture::test_readv_native_1)
+                                      << call("2", &Fixture::test_readv_native_2)
+                                      << END;
+                                  return move(nat);
+                                }()
+                             << END;
+                       return move(readv);
+                     }()
+                  << []() {
+                       Stream pread{"pread"};
+                       pread << []() {
+                                  Stream fun{"function"};
+                                  fun << call("1", &Fixture::test_pread_function_1)
+                                      << call("2", &Fixture::test_pread_function_2)
+                                      << END;
+                                  return move(fun);
+                                }()
+                             << []() {
+                                  Stream nat{"native"};
+                                  nat << call("1", &Fixture::test_pread_native_1)
+                                      << call("2", &Fixture::test_pread_native_2)
+                                      << END;
+                                  return move(nat);
+                                }()
+                             << END;
+                       return move(pread);
+                     }()
+                  << []() {
+                       Stream preadv{"preadv"};
+                       preadv << []() {
+                                   Stream fun{"function"};
+                                   fun << call("1", &Fixture::test_preadv_function_1)
+                                       << call("2", &Fixture::test_preadv_function_2)
+                                       << END;
+                                   return move(fun);
+                                 }()
+                              << []() {
+                                   Stream nat{"native"};
+                                   nat << call("1", &Fixture::test_preadv_native_1)
+                                       << call("2", &Fixture::test_preadv_native_2)
+                                       << END;
+                                   return move(nat);
+                                 }()
+                              << END;
+                       return move(preadv);
+                     }()
+                  << []() {
+                       Stream preadv2{"preadv2"};
+                       preadv2 << []() {
+                                    Stream fun{"function"};
+                                    fun << call("1", &Fixture::test_preadv2_function_1)
+                                        << call("2", &Fixture::test_preadv2_function_2)
+                                        << END;
+                                    return move(fun);
+                                  }()
+                               << []() {
+                                    Stream nat{"native"};
+                                    nat << call("1", &Fixture::test_preadv2_native_1)
+                                        << call("2", &Fixture::test_preadv2_native_2)
+                                        << END;
+                                    return move(nat);
+                                  }()
+                               << END;
+                       return move(preadv2);
+                     }()
+                  << END;
+              return move(red);
+            }()
+         << []() {
+              Stream red{"readlink"};
+              red << call("readlink", &Fixture::test_readlink)
+                  << call("readlinkat", &Fixture::test_readlinkat)
+                  << END;
+              return move(red);
+            }()
+         << call("realpath", &Fixture::test_realpath)
+         << []() {
+              Stream rec{"recv"};
+              rec << []() {
+                       Stream sub{"recv"};
+                       sub << call("1", &Fixture::test_recvfrom_1)
+                           << call("2", &Fixture::test_recv_2)
+                           << call("3", &Fixture::test_recv_3)
+                           << call("4", &Fixture::test_recv_4)
+                           << END;
+                       return move(sub);
+                     }()
+                  << []() {
+                       Stream sub{"recvfrom"};
+                       sub << call("0", &Fixture::test_recvfrom_0)
+                           << call("1", &Fixture::test_recvfrom_1)
+                           << call("2", &Fixture::test_recvfrom_2)
+                           << call("3", &Fixture::test_recvfrom_3)
+                           << call("4", &Fixture::test_recvfrom_4)
+                           << END;
+                       return move(sub);
+                     }()
+                  << call("recvmsg", &Fixture::test_recvmsg)
+                  << call("recvmmsg", &Fixture::test_recvmmsg)
+                  << END;
+              return move(rec);
+            }()
+         << []() {
+              Stream rem{"remove"};
+              rem << call("file", &Fixture::test_remove_file)
+                  << call("directory", &Fixture::test_remove_directory)
+                  << END;
+              return move(rem);
+            }()
+         << []() {
+              Stream ren{"rename"};
+              ren << call("rename", &Fixture::test_rename)
+                  << call("renameat", &Fixture::test_renameat)
+                  << END;
+              return move(ren);
+            }()
+         << []() {
+              Stream rmd{"rmdir"};
+              rmd << call("rmdir", &Fixture::test_rmdir)
+                  << call("rmdirat", &Fixture::test_rmdirat)
+                  << END;
+              return move(rmd);
+            }()
+         << END;
+  series << []() {
+              Stream sel{"select"};
+              sel << call("select", &Fixture::test_select)
+                  << call("pselect", &Fixture::test_pselect)
+                  << []() {
+                       Stream ect{"functions"};
+                       ect
+                           << call("read", &Fixture::test_select_read)
+                           << call("write", &Fixture::test_select_write)
+                           << call("except", &Fixture::test_select_except)
+                           << END;
+                       return move(ect);
+                     }()
+                  << END;
+              return move(sel);
+            }()
+         << []() {
+              Stream sen{"send"};
+              sen << []() {
+                       Stream sub{"send"};
+                       sub << call("1", &Fixture::test_send_1)
+                           << call("2", &Fixture::test_send_2)
+                           << call("3", &Fixture::test_send_3)
+                           << call("4", &Fixture::test_send_4)
+                           << END;
+                       return move(sub);
+                     }()
+                  << []() {
+                       Stream sub{"sendto"};
+                       sub << call("0", &Fixture::test_sendto_0)
+                           << call("1", &Fixture::test_sendto_1)
+                           << call("2", &Fixture::test_sendto_2)
+                           << call("3", &Fixture::test_sendto_3)
+                           << call("4", &Fixture::test_sendto_4)
+                           << END;
+                       return move(sub);
+                     }()
+                  << call("sendmsg", &Fixture::test_sendmsg)
+                  << call("sendmmsg", &Fixture::test_sendmmsg)
+                  << END;
+              return move(sen);
+            }()
+         << call("shutdown", &Fixture::test_shutdown)
+         << []() {
+              Stream slup{"sleep"};
+              slup << []() {
+                        auto unit = Stream{"sleep"};
+                        unit << []() {
+                                  auto dur = Stream{"duration::Duration"};
+                                  dur << call("1", &Fixture::test_sleep_duration_1)
+                                      << call("2", &Fixture::test_sleep_duration_2)
+                                      << END;
+                                  return move(dur);
+                                }()
+                             << []() {
+                                  auto val = Stream{"time::Val"};
+                                  val << call("1", &Fixture::test_sleep_val_1)
+                                      << call("2", &Fixture::test_sleep_val_2)
+                                      << call("3", &Fixture::test_sleep_val_3)
+                                      << END;
+                                  return move(val);
+                                }()
+                             << []() {
+                                  auto spec = Stream{"time::Spec"};
+                                  spec << call("1", &Fixture::test_sleep_spec_1)
+                                       << call("2", &Fixture::test_sleep_spec_2)
+                                       << call("3", &Fixture::test_sleep_spec_3)
+                                       << END;
+                                  return move(spec);
+                                }()
+                             << END;
+                        return move(unit);
+                      }()
+                   << call("usleep", &Fixture::test_usleep)
+                   << []() {
+                        auto milli = Stream{"millisleep"};
+                        milli << []() {
+                                   auto dur = Stream{"duration::Duration"};
+                                   dur << call("1", &Fixture::test_millisleep_duration_1)
+                                       << call("2", &Fixture::test_millisleep_duration_2)
+                                       << END;
+                                   return move(dur);
+                                 }()
+                              << []() {
+                                   auto val = Stream{"time::Val"};
+                                   val << call("1", &Fixture::test_millisleep_val_1)
+                                       << call("2", &Fixture::test_millisleep_val_2)
+                                       << call("3", &Fixture::test_millisleep_val_3)
+                                       << END;
+                                   return move(val);
+                                 }()
+                              << []() {
+                                   auto spec = Stream{"time::Spec"};
+                                   spec << call("1", &Fixture::test_millisleep_spec_1)
+                                        << call("2", &Fixture::test_millisleep_spec_2)
+                                        << call("3", &Fixture::test_millisleep_spec_3)
+                                        << END;
+                                   return move(spec);
+                                 }()
+                              << END;
+                        return move(milli);
+                      }()
+                   << []() {
+                        auto micro = Stream{"microsleep"};
+                        micro << []() {
+                                   auto dur = Stream{"duration::Duration"};
+                                   dur << call("1", &Fixture::test_microsleep_duration_1)
+                                       << call("2", &Fixture::test_microsleep_duration_2)
+                                       << END;
+                                   return move(dur);
+                                 }()
+                              << []() {
+                                   auto val = Stream{"time::Val"};
+                                   val << call("1", &Fixture::test_microsleep_val_1)
+                                       << call("2", &Fixture::test_microsleep_val_2)
+                                       << call("3", &Fixture::test_microsleep_val_3)
+                                       << END;
+                                   return move(val);
+                                 }()
+                              << []() {
+                                   auto spec = Stream{"time::Spec"};
+                                   spec << call("1", &Fixture::test_microsleep_spec_1)
+                                        << call("2", &Fixture::test_microsleep_spec_2)
+                                        << call("3", &Fixture::test_microsleep_spec_3)
+                                        << END;
+                                   return move(spec);
+                                 }()
+                              << END;
+                        return move(micro);
+                      }()
+                   << []() {
+                        auto nano = Stream{"nanosleep"};
+                        nano << []() {
+                                   auto dur = Stream{"duration::Duration"};
+                                   dur << call("1", &Fixture::test_nanosleep_duration_1)
+                                       << call("2", &Fixture::test_nanosleep_duration_2)
+                                       << END;
+                                   return move(dur);
+                                 }()
+                              << []() {
+                                   auto spec = Stream{"time::Spec"};
+                                   spec << call("1", &Fixture::test_nanosleep_spec_1)
+                                        << call("2", &Fixture::test_nanosleep_spec_2)
+                                        << call("3", &Fixture::test_nanosleep_spec_3)
+                                        << END;
+                                   return move(spec);
+                                 }()
+                              << END;
+                        return move(nano);
+                      }()
+                   << END;
+              return move(slup);
+            }()
+         << []() {
+              Stream sock{"sock"};
+              sock << call("getpeername", &Fixture::test_getpeername)
+                   << call("getsockname", &Fixture::test_getsockname)
+                   << END;
+              return move(sock);
+            }()
+         << []() {
+              Stream sub{"socket"};
+              // In the name of "if you want the behavior, then have a test to exhibit it"
+              sub << []() {
+                       Stream af{"AF"};
+                       af << call("af,type", &Fixture::test_socket_af_type)
+                          << call("af,type,options", &Fixture::test_socket_af_type_options)
+                          << call("af,specification", &Fixture::test_socket_af_specification)
+                          << call("af,type,pf", &Fixture::test_socket_af_type_pf)
+                          << call("af,type,pf,options", &Fixture::test_socket_af_type_pf_options)
+                          << call("af,type,options,pf", &Fixture::test_socket_af_type_options_pf)
+                          << call("af,specification,pf", &Fixture::test_socket_af_specification_pf)
+                          << END;
+                       return move(af);
+                     }()
+                  << []() {
+                       Stream ip{"AF::IP"};
+                       ip << call("ip,type", &Fixture::test_socket_ip_type)
+                          << call("ip,type,options", &Fixture::test_socket_ip_type_options)
+                          << call("ip,specification", &Fixture::test_socket_ip_specification)
+                          << call("ip,type,ipproto", &Fixture::test_socket_ip_type_ipproto)
+                          << call("ip,type,ipproto,options", &Fixture::test_socket_ip_type_ipproto_options)
+                          << call("ip,type,options,ipproto", &Fixture::test_socket_ip_type_options_ipproto)
+                          << call("ip,specification,ipproto", &Fixture::test_socket_ip_specification_ipproto)
+                          << END;
+                       return move(ip);
+                     }()
+                  << []() {
+                       Stream un{"AF::UN"};
+                       un << call("un,type", &Fixture::test_socket_un_type)
+                          << call("un,type,options", &Fixture::test_socket_un_type_options)
+                          << call("un,specification", &Fixture::test_socket_un_specification)
+                          << call("un,type,ipproto", &Fixture::test_socket_un_type_pf)
+                          << call("un,type,pf,options", &Fixture::test_socket_un_type_pf_options)
+                          << call("un,type,options,pf", &Fixture::test_socket_un_type_options_pf)
+                          << call("un,specification,pf", &Fixture::test_socket_un_specification_pf)
+                          << END;
+                       return move(un);
+                     }()
+                  << END;
+              return move(sub);
+            }()
+         << []() {
+              Stream sub{"socketpair"};
+              sub << call("SOCK", &Fixture::test_socketpair_SOCK)
+                  << call("sock", &Fixture::test_socketpair_sock)
+                  << END;
+              return move(sub);
+            }()
+         << []() {
+              Stream stat{"stat"};
+              stat << call("fstat", &Fixture::test_fstat)
+                   << call("fstatat", &Fixture::test_fstatat)
+                   << call("lstat", &Fixture::test_lstat)
+                   << call("stat", &Fixture::test_stat)
+                   << []() {
+                        Stream fun{"functions"};
+                        fun << call("isblk", &Fixture::test_isblk)
+                            << call("ischr", &Fixture::test_ischr)
+                            << call("isdir", &Fixture::test_isdir)
+                            << call("isfifo", &Fixture::test_isfifo)
+                            << call("islnk", &Fixture::test_islnk)
+                            << call("isreg", &Fixture::test_isreg)
+                            << call("issock", &Fixture::test_issock)
+                            << END;
+                        return move(fun);
+                      }()
+                   << END;
+              return move(stat);
+            }()
+         << []() {
+              Stream sym{"symlink"};
+              sym << call("symlink", &Fixture::test_symlink)
+                  << call("symlinkat", &Fixture::test_symlinkat)
+                  << END;
+              return move(sym);
+            }()
+         << END;
+  series << call("time", &Fixture::test_time)
+         << []() {
+              Stream tm{"tm"};
+              tm << []() {
+                      Stream gm{"gm"};
+                      gm << call("gmtime", &Fixture::test_gmtime)
+                         << call("timegm", &Fixture::test_timegm)
+                         << call("mktime", &Fixture::test_mktime)
+                         << END;
+                      return move(gm);
+                    }()
+                 << []() {
+                      Stream loc{"local"};
+                      loc<< call("localtime", &Fixture::test_localtime)
+                         << call("timelocal", &Fixture::test_timelocal)
+                         << END;
+                      return move(loc);
+                    }()
+                 << END;
+              return move(tm);
+            }()
+         << call("tmpdir", &Fixture::test_tmpdir)
+         << call("touch", &Fixture::test_touch)
+         << END;
+  series << []() {
+              Stream uid{"uid"};
+              uid << call("getuid", &Fixture::test_getuid)
+                  << call("geteuid", &Fixture::test_geteuid)
+                  << call("setuid", &Fixture::test_setuid)
+                  << call("seteuid", &Fixture::test_seteuid)
+                  << call("setreuid", &Fixture::test_setreuid)
+                  << call("setresuid", &Fixture::test_setresuid)
+                  << END;
+              return move(uid);
+            }()
+         << []() {
+              Stream unl{"unlink"};
+              unl << call("unlink", &Fixture::test_unlink)
+                  << call("unlinkat", &Fixture::test_unlinkat)
+                  << END;
+              return move(unl);
+            }()
+         << []() {
+              Stream use{"usage"};
+              use << call("getrusage", &Fixture::test_getrusage)
+                // reminder: there is no "setrusage" or "prusage" ... think about it.
+                  << END;
+              return move(use);
+            }()
+         << END;
+  series << []() {
+              Stream wait{"wait"};
+              wait << call("wait", &Fixture::test_wait)
+                   << call("wait2", &Fixture::test_wait2)
+                   << call("waitid", &Fixture::test_waitid)
+                   << call("waitpid", &Fixture::test_waitpid)
+                   << call("wait3", &Fixture::test_wait3)
+                   << call("wait4", &Fixture::test_wait4)
+                   << END;
+              return move(wait);
+            }()
+         << []() {
+              Stream red{"write"};
+              red << []() {
+                       Stream write{"write"};
+                       write << []() {
+                                 Stream fun{"function"};
+                                 fun << call("1", &Fixture::test_write_function_1)
+                                     << call("2", &Fixture::test_write_function_2)
+                                     << END;
+                                 return move(fun);
+                               }()
+                            << []() {
+                                 Stream nat{"native"};
+                                 nat << call("1", &Fixture::test_write_native_1)
+                                     << call("2", &Fixture::test_write_native_2)
+                                     << END;
+                                 return move(nat);
+                               }()
+                            << END;
+                       return move(write);
+                     }()
+                  << []() {
+                       Stream writev{"writev"};
+                       writev << []() {
+                                  Stream fun{"function"};
+                                  fun << call("1", &Fixture::test_writev_function_1)
+                                      << call("2", &Fixture::test_writev_function_2)
+                                      << END;
+                                  return move(fun);
+                                }()
+                             << []() {
+                                  Stream nat{"native"};
+                                  nat << call("1", &Fixture::test_writev_native_1)
+                                      << call("2", &Fixture::test_writev_native_2)
+                                      << END;
+                                  return move(nat);
+                                }()
+                             << END;
+                       return move(writev);
+                     }()
+                  << []() {
+                       Stream pwrite{"pwrite"};
+                       pwrite << []() {
+                                  Stream fun{"function"};
+                                  fun << call("1", &Fixture::test_pwrite_function_1)
+                                      << call("2", &Fixture::test_pwrite_function_2)
+                                      << END;
+                                  return move(fun);
+                                }()
+                             << []() {
+                                  Stream nat{"native"};
+                                  nat << call("1", &Fixture::test_pwrite_native_1)
+                                      << call("2", &Fixture::test_pwrite_native_2)
+                                      << END;
+                                  return move(nat);
+                                }()
+                             << END;
+                       return move(pwrite);
+                     }()
+                  << []() {
+                       Stream pwritev{"pwritev"};
+                       pwritev << []() {
+                                   Stream fun{"function"};
+                                   fun << call("1", &Fixture::test_pwritev_function_1)
+                                       << call("2", &Fixture::test_pwritev_function_2)
+                                       << END;
+                                   return move(fun);
+                                 }()
+                              << []() {
+                                   Stream nat{"native"};
+                                   nat << call("1", &Fixture::test_pwritev_native_1)
+                                       << call("2", &Fixture::test_pwritev_native_2)
+                                       << END;
+                                   return move(nat);
+                                 }()
+                              << END;
+                       return move(pwritev);
+                     }()
+                  << []() {
+                       Stream pwritev2{"pwritev2"};
+                       pwritev2 << []() {
+                                    Stream fun{"function"};
+                                    fun << call("1", &Fixture::test_pwritev2_function_1)
+                                        << call("2", &Fixture::test_pwritev2_function_2)
+                                        << END;
+                                    return move(fun);
+                                  }()
+                               << []() {
+                                    Stream nat{"native"};
+                                    nat << call("1", &Fixture::test_pwritev2_native_1)
+                                        << call("2", &Fixture::test_pwritev2_native_2)
+                                        << END;
+                                    return move(nat);
+                                  }()
+                               << END;
+                       return move(pwritev2);
+                     }()
+                  << END;
+              return move(red);
+            }()
+         << END;
+  series << add<Environment>()
+         << add<Exec>()
+         << add<Execp>()
+         << add<Driver<FCNTL>>()
+         << add<Fork>()
+         << add<PSelect>()
+         << add<Select>()
+         << add<Ambiguities>()
+         << END;
+  return finalize(series);
+}
+#endiv

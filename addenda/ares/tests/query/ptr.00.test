@@ -1,0 +1,5 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 70
+set -e
+ptr hosts.${TEST_DOMAIN?}
+ptr services.${TEST_DOMAIN?}

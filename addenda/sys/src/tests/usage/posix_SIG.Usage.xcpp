@@ -1,0 +1,106 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_SIG.Usage
+//   static_assert(tests::usage::posix_SIG::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.SIG
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_SIG {
+  using sys::posix::SIG;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    template<typename SIG> concept bool Instance = requires(SIG) {
+      typename SIG::Handler;
+      typename SIG::Number;
+      requires model::Namespace_Object<SIG>;
+      //
+      { SIG::IGNORE } -> convertible_to<typename SIG::Handler>;
+      { SIG::DEFAULT } -> convertible_to<typename SIG::Handler>;
+      { SIG::ERROR } -> convertible_to<typename SIG::Handler>;
+      { SIG::IGN } -> convertible_to<typename SIG::Handler>;
+      { SIG::DFL } -> convertible_to<typename SIG::Handler>;
+      { SIG::ERR } -> convertible_to<typename SIG::Handler>;
+  // ISO C99 Signals
+      requires (int)SIG::INT == SIGINT;
+      requires (int)SIG::ILL == SIGILL;
+      requires (int)SIG::ABRT == SIGABRT;
+      requires (int)SIG::FPE == SIGFPE;
+      requires (int)SIG::SEGV == SIGSEGV;
+      requires (int)SIG::TERM == SIGTERM;
+  //
+      requires (int)SIG::HUP == SIGHUP;
+      requires (int)SIG::QUIT == SIGQUIT;
+      requires (int)SIG::TRAP == SIGTRAP;
+      requires (int)SIG::KILL == SIGKILL;
+      requires (int)SIG::BUS == SIGBUS;
+      requires (int)SIG::SYS == SIGSYS;
+      requires (int)SIG::PIPE == SIGPIPE;
+      requires (int)SIG::ALRM == SIGALRM;
+  //
+      requires (int)SIG::URG == SIGURG;
+      requires (int)SIG::STOP == SIGSTOP;
+      requires (int)SIG::TSTP == SIGTSTP;
+      requires (int)SIG::CONT == SIGCONT;
+      requires (int)SIG::CHLD == SIGCHLD;
+      requires (int)SIG::TTIN == SIGTTIN;
+      requires (int)SIG::TTOU == SIGTTOU;
+      requires (int)SIG::POLL == SIGPOLL;
+      requires (int)SIG::XCPU == SIGXCPU;
+      requires (int)SIG::XFSZ == SIGXFSZ;
+      requires (int)SIG::VTALRM == SIGVTALRM;
+      requires (int)SIG::PROF == SIGPROF;
+      requires (int)SIG::USR1 == SIGUSR1;
+      requires (int)SIG::USR2 == SIGUSR2;
+  //
+      requires (int)SIG::WINCH == SIGWINCH;
+  //
+      requires (int)SIG::IO == SIGIO;
+      requires (int)SIG::IOT == SIGIOT;
+      requires (int)SIG::CLD == SIGCLD;
+  //
+      requires (int)SIG::ZERO == 0;
+      requires (int)SIG::INTERACTIVE == SIGINT;
+      requires (int)SIG::ILLEGAL == SIGILL;
+      requires (int)SIG::ABORT == SIGABRT;
+      requires (int)SIG::FLOATING_POINT_EXCEPTION == SIGFPE;
+      requires (int)SIG::SEGMENTATION_VIOLATION == SIGSEGV;
+      requires (int)SIG::TERMINATE == SIGTERM;
+  //
+      requires (int)SIG::HANGUP == SIGHUP;
+      requires (int)SIG::BREAKPOINT == SIGTRAP;
+      requires (int)SIG::BUS_ERROR == SIGBUS;
+      requires (int)SIG::SYSTEM_CALL == SIGSYS;
+      requires (int)SIG::ALARM == SIGALRM;
+  //
+      requires (int)SIG::URGENT == SIGURG;
+      requires (int)SIG::TERMINAL_STOP == SIGTSTP;
+      requires (int)SIG::CONTINUE == SIGCONT;
+      requires (int)SIG::CHILD == SIGCHLD;
+      requires (int)SIG::TERMINAL_INPUT == SIGTTIN;
+      requires (int)SIG::TERMINAL_OUTPUT == SIGTTOU;
+      requires (int)SIG::EXCEEDED_CPU == SIGXCPU;
+      requires (int)SIG::EXCEEDED_FILE_SIZE == SIGXFSZ;
+      requires (int)SIG::VIRTUAL_TIMER_ALARM == SIGVTALRM;
+      requires (int)SIG::PROFILE_TIMER_EXPIRY == SIGPROF;
+      requires (int)SIG::USER1 == SIGUSR1;
+      requires (int)SIG::USER2 == SIGUSR2;
+  //
+      requires (int)SIG::WINDOW_SIZE_CHANGE == SIGWINCH;
+      //
+      { SIG::rtmin() } -> convertible_to<typename SIG::Number>;
+      { SIG::rtmax() } -> convertible_to<typename SIG::Number>;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<SIG>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

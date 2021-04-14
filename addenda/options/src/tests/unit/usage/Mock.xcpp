@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace usage {
+      class Mock;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import options.throwable.Usage
+class tests::unit::usage::Mock : public options::throwable::Usage {
+  using Ancestor = options::throwable::Usage;
+public:
+  using Ancestor::Usage;
+  auto unformatted() const -> std::string override final;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::usage::Mock::unformatted() const -> std::string {
+  return "usage mock [ --usage ]";
+}
+#endiv

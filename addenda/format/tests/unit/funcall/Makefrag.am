@@ -1,0 +1,3 @@
+tests_unit_funcall_TESTS = \
+  tests/unit/funcall/all.test \
+  $(end)

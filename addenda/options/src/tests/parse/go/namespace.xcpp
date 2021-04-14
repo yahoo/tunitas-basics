@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace parse {
+    // the namespace
+  }
+}
+#endiv
+#divert <hpp>
+#import c.argv
+#import tests.parse.Mode
+#import sys.exits.Code
+namespace tests {
+  namespace parse {
+    namespace go {
+      auto unstated(Mode, c::argv) -> sys::exits::Code;
+      auto eitherway(Mode, c::argv) -> sys::exits::Code;
+      auto shortingly(Mode, c::argv) -> sys::exits::Code;
+      auto longingly(Mode, c::argv) -> sys::exits::Code;
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#import options.argument.constants
+#import options.shortish.Specification
+#import options.longish.Specification
+
+namespace {
+
+  // Recall the syntax of POSIX getopt(3)
+  //   zero (0) following colon means "is a flag"         -> options::argument::NO
+  //   one (1) following colon means "requires a value"   -> options::argument::REQUIRED
+  //   two (1) following colon means "an optional value"  -> options::argument::OPTIONAL
+  options::shortish::Specification shortspec("ELSabcd:e:f::g::");
+  options::longish::Specification long_specification{
+    { "help", options::argument::NO, nullptr, (char) options::Code::HELP },
+    { "usage", options::argument::NO, nullptr, (char) options::Code::HELP },
+    { "either", options::argument::NO, nullptr, 'E' },
+    { "long-only", options::argument::NO, nullptr, 'L' },
+    { "short-only", options::argument::NO, nullptr, 'S' },
+    { "query", options::argument::REQUIRED, nullptr, 'q' },
+    { "apple", options::argument::NO, nullptr, 'a' },
+    { "banana", options::argument::NO, nullptr, 'b' },
+    { "cherry", options::argument::NO, nullptr, 'c' },
+    { "dog", options::argument::REQUIRED, nullptr, 'd' },
+    { "eagle", options::argument::REQUIRED, nullptr, 'e' },
+    { "frog", options::argument::OPTIONAL, nullptr, 'f' },
+    { "goat", options::argument::OPTIONAL, nullptr, 'g' },
+  };
+
+}
+
+#import tests.parse.go.detail
+#import options.longish.Getter
+#import options.longish.Step
+#import options.shortish.Getter
+#import options.shortish.Step
+
+auto tests::parse::go::unstated(Mode mode, c::argv av) -> sys::exits::Code {
+  using namespace options::longish;
+  // long and short, ignore complaints about over-specification
+  Getter get(shortspec, long_specification, av);
+  return detail::body<Getter, Step>(mode, get, detail::ComplainAboutRedundancies::IGNORE);
+}
+
+auto tests::parse::go::eitherway(Mode mode, c::argv av) -> sys::exits::Code {
+  using namespace options::longish;
+  // long and short, emit complaints about over-specification
+  Getter get(shortspec, long_specification, av);
+  return detail::body<Getter, Step>(mode, get, detail::ComplainAboutRedundancies::COMPLAIN);
+}
+
+auto tests::parse::go::shortingly(Mode mode, c::argv av) -> sys::exits::Code {
+  using namespace options::shortish;
+  // short only, complain if other modes are requested
+  Getter get(shortspec, av);
+  return detail::body<Getter, Step>(mode, get, detail::ComplainAboutRedundancies::COMPLAIN);
+}
+
+auto tests::parse::go::longingly(Mode mode, c::argv av) -> sys::exits::Code {
+  using namespace options::longish;
+  // long only, complain if other modes are requested
+  Getter get(long_specification, av);
+  return detail::body<Getter, Step>(mode, get, detail::ComplainAboutRedundancies::COMPLAIN);
+}
+#endiv

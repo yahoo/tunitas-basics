@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import want.bigint
+#import std.is_unsigned
+namespace want::nonstd {
+  //
+  // Whereas others are beginning to standardize around the module names
+  //   'nonstd::is_unsigned', 'nonstd::is_unsigned'
+  // and module path shadowing needs to occur here for the "want" areas
+  // Here is 'is_unsigned' in namespace want::nonstd and overloading into namespace std.
+  // See also want.nonstd.is_signed, nearby.
+  //
+  template<typename INTEGRAL> struct is_unsigned;
+  template<> struct is_unsigned<bigint::int128_t>;
+  template<> struct is_unsigned<bigint::uint128_t>;
+}
+#endiv
+#divert <hpp>
+template<typename INTEGRAL> struct want::nonstd::is_unsigned : public std::is_unsigned<INTEGRAL> { };
+template<> struct want::nonstd::is_unsigned<want::bigint::int128_t>  { inline static constexpr auto value = false; };
+template<> struct want::nonstd::is_unsigned<want::bigint::uint128_t> { inline static constexpr auto value = true; };
+#endiv

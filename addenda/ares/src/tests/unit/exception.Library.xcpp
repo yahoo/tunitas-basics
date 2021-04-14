@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception { class Library; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.exception.Library
+class tests::unit::exception::Library : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::exception::Library;
+  auto test_constructor_error_code() -> void;
+  auto test_constructor_error_code_reason() -> void;
+  auto test_constructor_code() -> void;
+  auto test_constructor_code_reason() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.error_code
+#import ares.error.Code
+#import std.string
+auto tests::unit::exception::Library::test_constructor_error_code() -> void {
+  Subject subject{std::error_code{::ares::error::Code::NODATA}};
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+auto tests::unit::exception::Library::test_constructor_error_code_reason() -> void {
+  Subject subject1{std::error_code{::ares::error::Code::NODATA}, "bad"};
+  CPPUNIT_ASSERT(nullptr != subject1.what());
+  Subject subject2{std::error_code{::ares::error::Code::NODATA}, std::string{"bad"}};
+  CPPUNIT_ASSERT(nullptr != subject2.what());
+}
+auto tests::unit::exception::Library::test_constructor_code() -> void {
+  Subject subject{::ares::error::Code::NODATA};
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+auto tests::unit::exception::Library::test_constructor_code_reason() -> void {
+  Subject subject1{::ares::error::Code::NODATA, "bad"};
+  CPPUNIT_ASSERT(nullptr != subject1.what());
+  Subject subject2{::ares::error::Code::NODATA, std::string{"bad"}};
+  CPPUNIT_ASSERT(nullptr != subject2.what());
+}
+#import rigging.suite.io
+auto tests::unit::exception::Library::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Library"};
+  {
+    Stream con{"constructor"};
+    con << call("error_code", &Library::test_constructor_error_code)
+        << call("error_code,reason", &Library::test_constructor_error_code_reason)
+        << call("code", &Library::test_constructor_code)
+        << call("code,reason", &Library::test_constructor_code_reason)
+      ;
+    series << move(con);
+  }
+  return finalize(series);
+}
+#endiv

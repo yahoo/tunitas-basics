@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.channel.Channel
+#import ares.time.durations
+#import std.optional
+namespace ares::channel {
+  //
+  // Compute the new timeout against both the channel and an (optional) fixed, declared, constant bound.
+  //
+  // Usage:
+  //
+  //   auto channel = Channel{...somehow...};
+  //   ...send off some queries...
+  //   ...
+  //   auto limit = time_bound(channel);
+  //   auto limit = time_bound(channel, 100ms);
+  //
+  inline auto time_bound(Channel &, std::optional<time::Duration> = std::optional<time::Duration>{}) -> time::Duration;
+}
+#endiv
+#divert <ipp>
+#import ares.channel.timeout
+auto ares::channel::time_bound(Channel &channel, std::optional<time::Duration> boundary) -> time::Duration {
+  if (boundary) {
+    return timeout(channel, *boundary);
+  } else {
+    return timeout(channel);
+  }
+}
+#endiv

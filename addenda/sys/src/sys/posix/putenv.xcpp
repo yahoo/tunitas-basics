@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringz
+#import sys.call.Result
+#import std.vector
+namespace sys::posix {
+  namespace packaging::putenv {
+    namespace function {
+      // strings are expected to be copy-on-write so passing by value is "cheap enough"
+      inline auto putenv(c::const_stringz name_eq_value) -> call::Result;
+      // vector<char> is not expected to have those properties, so pass-by-constreference is required.
+      inline auto putenv(std::vector<char> const &name_eq_value) -> call::Result;
+    }
+  }
+  using packaging::putenv::function::putenv;
+}
+#endiv
+#divert <ipp>
+#import errno
+#import std.move
+#import sys.posix.packaging.putenv.Semantic
+namespace sys::posix::packaging::putenv {
+  auto function::putenv(c::const_stringz name_eq_value) -> call::Result {
+    //
+    // The conformance here is to the more modern usage; expecting glibc to make its own copy.
+    //
+    // AND the prototype is `putenv(char *)' with no const, so we must make a copy from
+    // the provided c::const_stringz
+    //
+    Semantic<Policy::MOVEIN> semantic;
+    auto code = semantic(name_eq_value);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = 0 == code;
+    return {ok, errnum, code};
+  }
+  auto function::putenv(std::vector<char> const &name_eq_value) -> call::Result {
+    Semantic<Policy::MOVEIN> semantic;
+    auto code = semantic(name_eq_value);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = 0 == code;
+    return {ok, errnum, code};
+  }
+}
+#endiv

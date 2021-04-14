@@ -1,0 +1,13 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_dope_SUBSOURCES = \
+  obj/src/tests/unit/dope/namespace.cpp \
+  obj/src/tests/unit/dope/Fixture.cpp \
+  obj/src/tests/unit/dope/Generic.cpp \
+  obj/src/tests/unit/dope/bytewise/namespace.cpp \
+  obj/src/tests/unit/dope/bytewise/Fixture.cpp \
+  obj/src/tests/unit/dope/bytewise/Consty.cpp \
+  obj/src/tests/unit/dope/bytewise/Muting.cpp \
+  obj/src/tests/unit/dope/bytewise/Nullptr.cpp \
+  obj/src/tests/unit/dope/bytewise/Palette.cpp \
+  $(end)

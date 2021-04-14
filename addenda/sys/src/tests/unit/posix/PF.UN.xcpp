@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.PF>
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.PF.UN
+struct tests::unit::posix::PF::UN : public cppunit::test::Fixture {
+  using Generic = ::sys::posix::PF;
+  using Subject = ::sys::posix::PF::UN;
+  auto test_object() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.posix.PF
+namespace tests::unit::posix {
+  auto PF::UN::test_object() -> void {
+    CPPUNIT_ASSERT(sizeof (Subject::Protocol{}));
+  }
+  auto PF::UN::test_constants() -> void {
+    CPPUNIT_ASSERT(sizeof (Subject::UNSPECIFIED));
+    CPPUNIT_ASSERT((int)Generic::UNSPECIFIED == (int)Subject::UNSPECIFIED);
+    static_assert(Subject::Protocol{} == Subject::UNSPECIFIED);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::PF::UN::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("UN");
+  series << call("object", &UN::test_object)
+         << call("constants", &UN::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

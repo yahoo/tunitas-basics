@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ip.inet.result.Getnameinfo
+#import ip.inet.nameinfo
+namespace ip {
+  namespace inet {
+    namespace result {
+      template<> class Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.string
+namespace ip {
+  namespace inet {
+    namespace result {
+      // These are framed as "accessor-cast" operations
+
+      inline auto host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> const &) -> std::string const &;
+      inline auto host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &) -> std::string &;
+      inline auto host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &&) -> std::string &&;
+
+      inline auto service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> const &) -> std::string const &;
+      inline auto service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &) -> std::string &;
+      inline auto service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &&) -> std::string &&;
+    }
+  }
+}
+
+#import ip.inet.result.Value
+#import std.string
+#import std.tuple
+template<> class ip::inet::result::Getnameinfo<ip::inet::nameinfo::HOST, ip::inet::nameinfo::SERVICE> : public Value<std::tuple<std::string, std::string>, /*getnameinfo return value*/ int> {
+  using Ancestor = Value<std::tuple<std::string, std::string>, /*getnameinfo return value*/ int>;
+public:
+  inline Getnameinfo(bool ok, int errnum, Ancestor::value_type const &, int getnameinfo_return_value);
+  inline Getnameinfo(bool ok, int errnum, Ancestor::value_type &&, int getnameinfo_return_value);
+};
+#endiv
+#divert <ipp>
+#import std.forward
+#import std.get
+
+ip::inet::result::Getnameinfo<ip::inet::nameinfo::HOST, ip::inet::nameinfo::SERVICE>::Getnameinfo(bool arg_ok, int arg_errnum, Ancestor::value_type const &arg_value, int arg_getnameinfo_return_value)
+  : Ancestor(arg_ok, arg_errnum, arg_value, arg_getnameinfo_return_value) {
+  ;
+}
+
+ip::inet::result::Getnameinfo<ip::inet::nameinfo::HOST, ip::inet::nameinfo::SERVICE>::Getnameinfo(bool arg_ok, int arg_errnum, Ancestor::value_type &&anon, int arg_getnameinfo_return_value)
+  : Ancestor(arg_ok, arg_errnum, std::forward<Ancestor::value_type>(anon), arg_getnameinfo_return_value) {
+  ;
+}
+
+auto ip::inet::result::host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> const &r) -> std::string const & {
+  return std::get<0>(value(r));
+}
+
+auto ip::inet::result::host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &r) -> std::string & {
+  return std::get<0>(value(r));
+}
+
+auto ip::inet::result::host(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &&anon) -> std::string && {
+  return std::get<0>(value(std::forward<Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>>(anon)));
+}
+
+auto ip::inet::result::service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> const &r) -> std::string const & {
+  return std::get<1>(value(r));
+}
+
+auto ip::inet::result::service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &r) -> std::string & {
+  return std::get<1>(value(r));
+}
+
+auto ip::inet::result::service(Getnameinfo<nameinfo::HOST, nameinfo::SERVICE> &&anon) -> std::string && {
+  return std::get<1>(value(std::forward<Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>>(anon)));
+}
+#endiv
+

@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.argument.Pathname
+#import sys.call.Result
+namespace sys::posix {
+  inline auto chdir(call::argument::Pathname) -> call::Result;
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+#import chdir
+#import std.move
+auto sys::posix::chdir(call::argument::Pathname pathname) -> call::Result {
+  using result_type = call::Result;
+  auto val = ::chdir(pathname);
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = val >= 0;
+  result_type ret(ok, errnum, val);
+  return ret;
+}
+#endiv

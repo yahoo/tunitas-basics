@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import msghdr
+#import sys.posix.MSG
+#import sys.posix.sendmsg
+#import tests.unit.posix.Fixture.Dummy.Sockaddr
+auto tests::unit::posix::fixture::Fixture::test_sendmsg() -> void {
+  auto const fd = int{-1};
+  sockaddr_in6 const &sa = Dummy::Sockaddr<sockaddr_in6>{};
+  char const space[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  ::iovec const io[1] = { (void *)&space[0], sizeof (space) };
+  auto const io_size = sizeof (io) / sizeof (io[0]);
+  msghdr const buf = { (void *)&sa, sizeof (sa), (iovec *)&io[0], io_size, nullptr, 0lu, 0 };
+  auto sent = six::native::sendmsg(fd, buf, six::MSG::NONE);
+  CPPUNIT_ASSERT(!good(sent)); // ibidem. (bad fd)
+}
+#endiv

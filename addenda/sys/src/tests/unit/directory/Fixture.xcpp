@@ -1,0 +1,101 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace directory {
+      class Fixture;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::directory::Fixture : public cppunit::test::Fixture { 
+public: 
+  auto test_ls() -> void;
+  auto test_scan_1arg() -> void;
+  auto test_scan_2arg() -> void;
+  auto test_scan_3arg() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import sys.directory.Entry
+#import sys.directory.open
+#import sys.directory.read
+
+auto tests::unit::directory::Fixture::test_ls() -> void {
+  bool test_something = false;
+  using namespace sys::directory;
+  auto opened = open("/tmp");
+  CPPUNIT_ASSERT(ok(opened));
+  for (auto red = read<Entry>(value(opened)); ok(red); red = read<Entry>(value(opened))) {
+    Entry ee = value(red);
+    std::cout << "entry: qq|" << ee.name << "|\n";
+    test_something = true;
+  }
+  CPPUNIT_ASSERT(test_something);
+}
+
+#import sys.directory.scan
+#import sys.directory.Entry
+#import std.vector
+
+auto tests::unit::directory::Fixture::test_scan_1arg() -> void {
+  using ve = std::vector<::sys::directory::Entry>;
+  using ::sys::directory::scan;
+  auto scanned = scan<ve>("src/tests/unit/directory");
+  CPPUNIT_ASSERT(ok(scanned));
+  CPPUNIT_ASSERT(0 != value(scanned).size());
+}
+
+auto tests::unit::directory::Fixture::test_scan_2arg() -> void {
+  using ::sys::directory::Entry;
+  using ::sys::directory::scan;
+  using ve = std::vector<Entry>;
+  auto accept_all = [](Entry const &) -> bool {
+    return true;
+  };
+  auto scanned = scan<ve>("src/tests/unit/directory", accept_all);
+  CPPUNIT_ASSERT(ok(scanned));
+  CPPUNIT_ASSERT(0 != value(scanned).size());
+}
+
+#import std.less
+auto tests::unit::directory::Fixture::test_scan_3arg() -> void {
+  using ::sys::directory::Entry;
+  using ::sys::directory::scan;
+  using ve = std::vector<Entry>;
+  auto accept_all = [](Entry const &) -> bool {
+    return true;
+  };
+  std::less<::sys::directory::Entry> cmp;
+  auto scanned = scan<ve>("src/tests/unit/directory", accept_all, cmp);
+  CPPUNIT_ASSERT(ok(scanned));
+  CPPUNIT_ASSERT(0 != value(scanned).size());
+}
+
+#import tests.unit.directory.Entry
+#import tests.unit.directory.Scan
+#import tests.unit.directory.Stream
+#import rigging.suite.io
+auto tests::unit::directory::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  namespace suite = ::rigging::suite; // because sys::directory::Stream is visible
+  namespace testing = ::tests::unit::directory;
+  suite::Stream series("directory");
+  series << call("ls", &Fixture::test_ls)
+         << call("scan-1", &Fixture::test_scan_1arg)
+         << call("scan-2", &Fixture::test_scan_2arg)
+         << call("scan-3", &Fixture::test_scan_2arg)
+         << add<Entry>()
+         << add<testing::Stream>()
+         << add<Scan>()
+    ;
+  return finalize(series);
+}
+#divert </cpp>

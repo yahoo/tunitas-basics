@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.Basic_Quitting.Literals
+#endiv
+#divert <hpp>
+namespace nonstd::exception {
+  // cannot be noexcept
+  template<> inline auto Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::default_message() -> String;
+  template<> inline auto Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::severity_notice() -> String const &;
+  template<> inline auto Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::severity_error() -> String const &;
+  // noexcept
+  template<> inline auto Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::stream_notice() noexcept -> Stream &;
+  template<> inline auto Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::stream_error() noexcept -> Stream &;
+}
+#endiv
+#divert <ipp>
+template<> auto nonstd::exception::Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::default_message() -> String {
+  return L"quitting";
+}
+template<> auto nonstd::exception::Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::severity_notice() -> String const & {
+  static String const literal{L"notice"};
+  return literal;
+}
+template<> auto nonstd::exception::Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::severity_error() -> String const & {
+  static String const literal{L"error"};
+  return literal;
+}
+#import std.wcout
+template<> auto nonstd::exception::Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::stream_notice() noexcept -> Stream & {
+  return std::wcout;
+}
+#import std.wcerr
+template<> auto nonstd::exception::Basic_Quitting<wchar_t, std::char_traits<wchar_t>>::Literals::stream_error() noexcept -> Stream & {
+  return std::wcerr;
+}
+#endiv

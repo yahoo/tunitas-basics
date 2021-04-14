@@ -1,0 +1,276 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::endian {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import ip.endian.Integer // and Order
+#import tests.unit.ip.endian.Integer
+class tests::unit::ip::endian::Fixture : public cppunit::test::Fixture {
+public:
+  template<typename INTEGER> auto test_host_order_from_host_order() -> void;
+  template<typename INTEGER> auto test_host_order_from_network_order() -> void;
+  template<typename INTEGER> auto test_host_order_from_native() -> void;
+
+  template<typename INTEGER> auto test_network_order_from_host_order() -> void;
+  template<typename INTEGER> auto test_network_order_from_network_order() -> void;
+  template<typename INTEGER> auto test_network_order_from_native() -> void;
+
+  template<typename INTEGER> auto test_convert_same() -> void;
+  template<typename INTEGER> auto test_convert_swap() -> void;
+
+  static auto suite() -> cppunit::Test *;
+private:
+  using Order = ::ip::endian::Order;
+  struct lib {
+    // we want to test this library thingy
+    template<::ip::endian::required::Order OR, ::ip::endian::required::Integer UI> using Integer = ::ip::endian::Integer<OR, UI>;
+  };
+  struct rig {
+    // this is the test rigging for it
+    template<typename SUBJECT> using Integer = ::tests::unit::ip::endian::Integer<SUBJECT>;
+  };
+};
+
+#import ip // ::ip::uint32_t, ::ip::uint128_t
+namespace tests::unit::ip::endian {
+  template<> auto Fixture::test_host_order_from_network_order<::ip::uint32_t>() -> void;
+  template<> auto Fixture::test_host_order_from_network_order<::ip::uint128_t>() -> void;
+
+  template<> auto Fixture::test_network_order_from_host_order<::ip::uint32_t>() -> void;
+  template<> auto Fixture::test_network_order_from_host_order<::ip::uint128_t>() -> void;
+
+}
+#endiv
+#divert <tpp>
+#import ip // ::ip::uint32_t, ::ip::uint128_t
+#import ip.endian.Integer
+#import ip.endian.host_order
+#import ip.endian.network_order
+
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_host_order_from_host_order() -> void {
+  using ::ip::endian::host_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto specimen = INTEGER(99u);
+  Integer<Order::HOST, INTEGER> subject(specimen);
+  auto actual = host_order(subject); // <------------------------------------ test this (a no-op)
+  auto expected = subject;
+  using value_type = typename Integer<Order::HOST, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_host_order_from_native() -> void {
+  using ::ip::endian::host_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto specimen = INTEGER(99u);
+  auto subject = specimen;
+  auto actual = host_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::HOST, INTEGER>(specimen);
+  using value_type = typename Integer<Order::HOST, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_network_order_from_network_order() -> void {
+  using ::ip::endian::network_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto specimen = INTEGER(99u);
+  Integer<Order::NETWORK, INTEGER> subject(specimen);
+  auto actual = network_order(subject); // <------------------------------------ test this (a no-op)
+  auto expected = subject;
+  using value_type = typename Integer<Order::NETWORK, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+// OK
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+// OK
+#else
+#error neither big nor little endian - this should have been caught elsewhere
+#endif
+#import ip.endian.reorder
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_network_order_from_native() -> void {
+  using ::ip::endian::network_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto host_specimen = INTEGER(99u);
+#if __BYTE_ORDER == __BIG_ENDIAN
+  auto network_specimen = host_specimen;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  auto network_specimen = ::ip::endian::reorder<8*sizeof (INTEGER)>(host_specimen);
+#else
+#error FAIL
+#endif
+  auto subject = host_specimen;
+  auto actual = network_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::NETWORK, INTEGER>(network_specimen);
+  using value_type = typename Integer<Order::NETWORK, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+#endiv
+#divert <cpp>
+template<> auto tests::unit::ip::endian::Fixture::test_host_order_from_network_order<::ip::uint32_t>() -> void {
+  using INTEGER = ::ip::uint32_t;
+  using ::ip::endian::host_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto host_specimen = ::ip::uint32_t(0x12345678u);
+#if __BYTE_ORDER == __BIG_ENDIAN
+  auto network_specimen = host_specimen;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  auto network_specimen = 0x78563412u;
+#else
+#error FAIL
+#endif
+  Integer<Order::NETWORK, ::ip::uint32_t> subject(network_specimen);
+  auto actual = host_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::HOST, INTEGER>(host_specimen);
+  using value_type = typename Integer<Order::HOST, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+template<> auto tests::unit::ip::endian::Fixture::test_host_order_from_network_order<::ip::uint128_t>() -> void {
+  using INTEGER = ::ip::uint128_t;
+  using ::ip::endian::host_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto host_specimen = ::ip::uint128_t(0x123456789abcdef0lu)<<64 | 0x9abcdef012345678lu;
+#if __BYTE_ORDER == __BIG_ENDIAN
+  auto network_specimen = host_specimen;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  auto network_specimen = ::ip::uint128_t(0x78563412f0debc9alu)<<64 | 0xf0debc9a78563412lu;
+#else
+#error FAIL
+#endif
+  Integer<Order::NETWORK, ::ip::uint128_t> subject(network_specimen);
+  auto actual = host_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::HOST, INTEGER>(host_specimen);
+  using value_type = typename Integer<Order::HOST, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+template<> auto tests::unit::ip::endian::Fixture::test_network_order_from_host_order<::ip::uint32_t>() -> void {
+  using INTEGER = ::ip::uint32_t;
+  using ::ip::endian::network_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto host_specimen = ::ip::uint32_t(0x12345678u);
+#if __BYTE_ORDER == __BIG_ENDIAN
+  auto network_specimen = host_specimen;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  auto network_specimen = 0x78563412u;
+#else
+#error FAIL
+#endif
+  Integer<Order::HOST, ::ip::uint32_t> subject(host_specimen);
+  auto actual = network_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::NETWORK, INTEGER>(network_specimen);
+  using value_type = typename Integer<Order::NETWORK, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+template<> auto tests::unit::ip::endian::Fixture::test_network_order_from_host_order<::ip::uint128_t>() -> void {
+  using INTEGER = ::ip::uint128_t;
+  using ::ip::endian::network_order;
+  using ::ip::endian::Integer;
+  using ::ip::endian::Order;
+  auto host_specimen = ::ip::uint128_t(0x123456789abcdef0lu)<<64 | 0x9abcdef012345678lu;
+#if __BYTE_ORDER == __BIG_ENDIAN
+  auto network_specimen = host_specimen;
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+  auto network_specimen = ::ip::uint128_t(0x78563412f0debc9alu)<<64 | 0xf0debc9a78563412lu;
+#else
+#error FAIL
+#endif
+  Integer<Order::HOST, ::ip::uint128_t> subject(host_specimen);
+  auto actual = network_order(subject); // <------------------------------------- test this
+  auto expected = Integer<Order::NETWORK, INTEGER>(network_specimen);
+  using value_type = typename Integer<Order::NETWORK, INTEGER>::value_type;
+  CPPUNIT_ASSERT(((value_type) expected) == ((value_type) actual));
+}
+
+#import ip.endian.Order
+#import ip.endian.convert
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_convert_same() -> void {
+  namespace en = ::ip::endian;
+  {
+    en::Integer<en::Order::HOST, INTEGER> specimen(1);
+    auto actual = en::convert<en::Order::HOST, en::Order::HOST>(specimen);
+    auto expected = specimen;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    en::Integer<en::Order::NETWORK, INTEGER> specimen(2);
+    auto actual = en::convert<en::Order::NETWORK, en::Order::NETWORK>(specimen);
+    auto expected = specimen;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+#import ip.endian.reorder
+template<typename INTEGER> auto tests::unit::ip::endian::Fixture::test_convert_swap() -> void {
+  namespace en = ::ip::endian;
+  {
+    en::Integer<en::Order::NETWORK, INTEGER> specimen(1);
+    auto actual = (INTEGER) en::convert<en::Order::HOST, en::Order::NETWORK>(specimen);
+    auto expected = en::reorder<8*sizeof (INTEGER), INTEGER>(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    en::Integer<en::Order::HOST, INTEGER> specimen(2);
+    auto actual = (INTEGER) en::convert<en::Order::NETWORK, en::Order::HOST>(specimen);
+    auto expected = en::reorder<8*sizeof (INTEGER), INTEGER>(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+#import ip // ::ip::uint{8,16,32,64,128}_t
+#import tests.unit.ip.endian.Integer
+#import tests.unit.ip.endian.Reorder
+#import rigging.suite.io
+auto tests::unit::ip::endian::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("endian");
+  series
+    // uint32_t is in4::addr_t
+    << call("host_order_from_host_order<uint32_t>", &Fixture::test_host_order_from_host_order<::ip::uint32_t>)
+    << call("host_order_from_network_order<uint32_t>", &Fixture::test_host_order_from_network_order<::ip::uint32_t>)
+    << call("host_order_from_native<uint32_t>", &Fixture::test_host_order_from_native<::ip::uint32_t>)
+    << call("network_order_from_host_order<uint32_t>", &Fixture::test_network_order_from_host_order<::ip::uint32_t>)
+    << call("network_order_from_2network_order<uint32_t>", &Fixture::test_network_order_from_network_order<::ip::uint32_t>)
+    << call("network_order_from_native<uint32_t>", &Fixture::test_network_order_from_native<::ip::uint32_t>)
+    // uint128_t is in6::addr_t
+    << call("host_order_from_host_order<uint128_t>", &Fixture::test_host_order_from_host_order<::ip::uint128_t>)
+    << call("host_order_from_network_order<uint128_t>", &Fixture::test_host_order_from_network_order<::ip::uint128_t>)
+    << call("host_order_from_native<uint128_t>", &Fixture::test_host_order_from_native<::ip::uint128_t>)
+    << call("network_order_from_host_order<uint128_t>", &Fixture::test_network_order_from_host_order<::ip::uint128_t>)
+    << call("network_order_from_2network_order<uint128_t>", &Fixture::test_network_order_from_network_order<::ip::uint128_t>)
+    << call("network_order_from_native<uint128_t>", &Fixture::test_network_order_from_native<::ip::uint128_t>)
+    // convert
+    << call("convert_same<uint8_t>", &Fixture::test_convert_same<std::uint8_t>)
+    << call("convert_swap<uint8_t>", &Fixture::test_convert_swap<std::uint8_t>)
+    // Is this overkill or what?
+    << add<rig::Integer<lib::Integer<Order::NETWORK, ::ip::uint8_t>>>()
+    << add<rig::Integer<lib::Integer<Order::HOST, ::ip::uint8_t>>>()
+    << add<rig::Integer<lib::Integer<Order::NETWORK, ::ip::uint16_t>>>()
+    << add<rig::Integer<lib::Integer<Order::HOST, ::ip::uint16_t>>>()
+    << add<rig::Integer<lib::Integer<Order::NETWORK, ::ip::uint32_t>>>()
+    << add<rig::Integer<lib::Integer<Order::HOST, ::ip::uint32_t>>>()
+    << add<rig::Integer<lib::Integer<Order::NETWORK, ::ip::uint64_t>>>()
+    << add<rig::Integer<lib::Integer<Order::HOST, ::ip::uint64_t>>>()
+    << add<rig::Integer<lib::Integer<Order::NETWORK, ::ip::uint128_t>>>()
+    << add<rig::Integer<lib::Integer<Order::HOST, ::ip::uint128_t>>>()
+    // There is no Reorder<8>
+    << add<Reorder<16>>()
+    << add<Reorder<32>>()
+    << add<Reorder<64>>()
+    << add<Reorder<128>>()
+    ;
+  return finalize(series);
+}
+#endiv

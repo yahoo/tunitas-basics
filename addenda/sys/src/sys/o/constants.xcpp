@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::o {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.o.Access
+#import sys.o.Accesses
+namespace sys::o::constants {
+  // The "access" is a modality; there are no composition operators among them.
+  inline constexpr auto READ      = Accesses{Access::READ};
+  inline constexpr auto WRITE     = Accesses{Access::WRITE};
+  inline constexpr auto READWRITE = Accesses{Access::READWRITE};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("instead, prefer o::READ")]]      inline constexpr auto RD        = Accesses{Access::RD};
+  [[deprecated("instead, prefer o::WRITE")]]     inline constexpr auto WR        = Accesses{Access::WR};
+  [[deprecated("instead, prefer o::READWRITE")]] inline constexpr auto RDWR      = Accesses{Access::RDWR};
+  [[deprecated("instead, prefer o::READ")]]      inline constexpr auto RDONLY    = Accesses{Access::RDONLY};
+  [[deprecated("instead, prefer o::WRITE")]]     inline constexpr auto WRONLY    = Accesses{Access::WRONLY};
+  [[deprecated("instead, prefer o::READ")]]      inline constexpr auto READONLY  = Accesses{Access::READONLY};
+  [[deprecated("instead, prefer o::WRITE")]]     inline constexpr auto WRITEONLY = Accesses{Access::WRITEONLY};
+#pragma GCC diagnostic pop
+}
+#import sys.o.Create
+#import sys.o.Creates
+namespace sys::o::constants {
+  inline constexpr auto NOCREATE            = Creates{Create::NONE}; // [[FIXTHIS?]] ... use "NONE" or "EXISTS"?
+  inline constexpr auto CLOSE_ON_EXEC       = Creates{Create::CLOSE_ON_EXEC};
+  inline constexpr auto CREATE              = Creates{Create::CREATE};
+  inline constexpr auto DIRECTORY           = Creates{Create::DIRECTORY};
+  inline constexpr auto EXCLUSIVE           = Creates{Create::EXCLUSIVE};
+  inline constexpr auto NO_CONTROL_TERMINAL = Creates{Create::NO_CONTROL_TERMINAL};
+  inline constexpr auto NOFOLLOW            = Creates{Create::NOFOLLOW};
+  inline constexpr auto TRUNCATE            = Creates{Create::TRUNCATE};
+  [[deprecating(not_yet)]] inline constexpr auto CLOEXEC = Creates{Create::CLOEXEC};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("buy a vowel! instead, prefer o::CREATE")]]                  inline constexpr auto CREAT  = Creates{Create::CREAT};
+  [[deprecated("buy a vowel! instead, prefer o::EXCLUSIVE")]]               inline constexpr auto EXCL   = Creates{Create::EXCL};
+  [[deprecated("say it out loud! instead, prefer o::NO_CONTROL_TERMINAL")]] inline constexpr auto NOCTTY = Creates{Create::NOCTTY};
+  [[deprecated("buy a vowel! instead, prefer o::TRUNCATE")]]                inline constexpr auto TRUNC  = Creates{Create::TRUNC};
+#pragma GCC diagnostic pop
+}
+#import sys.o.Status
+#import sys.o.Statuses
+namespace sys::o::constants {
+  // For convenience, each is a standalone constant
+  inline constexpr auto NONE      = Statuses{Status::NONE};
+  inline constexpr auto APPEND    = Statuses{Status::APPEND};
+  inline constexpr auto ASYNC     = Statuses{Status::ASYNC};
+  inline constexpr auto DIRECT    = Statuses{Status::DIRECT};
+  inline constexpr auto DSYNC     = Statuses{Status::DSYNC};
+  inline constexpr auto LARGEFILE = Statuses{Status::LARGEFILE};
+  inline constexpr auto NOATIME   = Statuses{Status::NOATIME};
+  inline constexpr auto NONBLOCK  = Statuses{Status::NONBLOCK};
+  inline constexpr auto PATH      = Statuses{Status::PATH};
+  inline constexpr auto SYNC      = Statuses{Status::SYNC};
+  inline constexpr auto TMPFILE   = Statuses{Status::TMPFILE};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("instead prefer o::NONBLOCK")]] inline constexpr auto NDELAY    = Statuses{Status::NDELAY};
+#pragma GCC diagnostic pop
+}
+#endiv

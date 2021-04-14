@@ -1,0 +1,8 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+namespace uuid {
+  namespace time {
+    // Some time extraction from the uuid
+  }
+}
+#endiv

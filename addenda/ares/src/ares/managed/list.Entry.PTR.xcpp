@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.list.Entry.declaration
+namespace ares::managed::list {
+  //
+  // A single PTR RR (Pointer)
+  //
+  // There is no such specialization of this kind.
+  // The reply::Record<PTR> manages the names directly.
+  //
+  // Usage: see reply::Record<PTR>
+  //
+  template<> struct Entry<PTR> = delete;
+}
+#endiv

@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Spanlike
+#import std.numeric_limits
+#import std.span
+namespace nonstd {
+  //
+  // Either std::span or a rude hack of such
+  // https://en.cppreference.com/w/cpp/container/span awaits C++20
+  //
+  // WATCHOUT - you cannot (yet) use these to hold allocated objects because the ancestry in basic_dope
+  // means that the pointers mix among allocated objects and static memory from the EMPTEE system
+  //
+  // Usage:
+  //
+  //   as stated
+  //
+#if 9 < __GNUC_
+  template<typename TYPE, std::size_t SIZE = std::dynamic_extent> using span = std::span<UNIT, SIZE>;
+#else
+#define __nonstd_span_supplied_herein__
+  template<typename TYPE, std::size_t = std::numeric_limits<std::size_t>::max()> class span;
+#endif
+  template<typename UNIT, std::size_t SIZE> struct span_traits<span<UNIT, SIZE>> : public spanning::Traits<UNIT> { };
+}
+#endiv
+#divert <hpp>
+#ifdef __nonstd_span_supplied_herein__
+#import nonstd.basic_dope
+// An incomplete and partial implementation of std::span
+// [[FIXME]] adopt one of the reference implementations
+template<typename TYPE, std::size_t> class nonstd::span : private basic_dope<TYPE> {
+  using ancestor = basic_dope<TYPE>;
+public:
+  span() = default;
+  // old_school (only)
+  using value_type = typename ancestor::Value;
+  using element_type = TYPE;
+  using size_type = std::size_t;
+  using difference_type = std::ptrdiff_t;
+  using pointer = element_type *;
+  using reference = element_type &;
+  using ancestor::basic_dope;
+  using ancestor::empty;
+  using ancestor::size;
+  using ancestor::data;
+};
+#endif
+#endiv

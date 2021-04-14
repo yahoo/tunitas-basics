@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+#import sys.call.result.Value
+namespace sys::posix {
+  namespace packaging::gethostname_function {
+    using Result = call::result::Value<std::string>;
+    auto gethostname() -> Result;
+  }
+  using packaging::gethostname_function::gethostname;
+}
+#endiv
+#divert <cpp>
+//
+// This is a nasty one.
+//
+// From gethostname(3)
+//
+// 1. SUSv2 guarantees that "Host names are limited to 255 bytes".
+//    POSIX.1-2001 guarantees that "Host names (not including the terminating null byte)
+//    are limited to HOST_NAME_MAX bytes".  On Linux, HOST_NAME_MAX is defined with the
+//    value 64, which has been the limit since Linux 1.0 (earlier kernels imposed a limit
+//    of 8 bytes).
+// 2. If the null-terminated hostname is too large to fit, then the name is truncated,
+//    and no error is returned (but see NOTES below). POSIX.1-2001 says that if such
+//    truncation occurs, then it is unspecified whether the returned buffer includes
+//    a terminating null byte.
+// 3. The GNU C library does not employ the gethostname() system call; instead, it implements
+//    gethostname() as a library function that calls uname(2) and copies up to len bytes
+//    from the returned nodename field into name. Having performed the copy, the function
+//    then checks if the length of the nodename was greater than or equal to len, and if
+//    it is, then the function returns -1 with errno set to ENAMETOOLONG; in this case,
+//    a terminating null byte is not included in the returned name.
+//
+// ...WOW...
+//
+// require HOST_NAME_MAX which   is probably 64
+// require _POSIX_HOST_NAME_MAX  is probably 255
+#include <limits.h>
+
+#import std.max
+namespace sys::posix::packaging::gethostname_function {
+#if 7 <= __GNUC__
+  using std::max;
+}
+#else
+// in gcc 4.8, std::max is not constexpr ... so we make it so
+/// gcc (GCC) 4.8.3 20140911 (Red Hat 4.8.3-7)
+template<typename T> inline constexpr auto max(T a, T b) -> T {
+  return a > b ? a : b;
+}
+#endif
+#include <cerrno>
+#import gethostname
+#import std.move
+#import std.size_t
+auto sys::posix::packaging::gethostname_function::gethostname() -> Result {
+  constexpr std::size_t BUF_BASIC_SIZE = max(HOST_NAME_MAX, _POSIX_HOST_NAME_MAX);
+  char buf[BUF_BASIC_SIZE+1];
+  int r = ::gethostname(buf, sizeof (buf));
+  buf[BUF_BASIC_SIZE] = '\0'; // ahem, see above.
+  auto errnum = errno; // capture the value of errno before doing anything else
+  bool b = 0 == r;
+  std::string host = b ? std::string(buf) : std::string();
+  Result ret(b, errnum, std::move(host));
+  return ret;
+}
+#endiv

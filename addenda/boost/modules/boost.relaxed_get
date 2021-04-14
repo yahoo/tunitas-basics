@@ -1,0 +1,3 @@
+// -*- c++ -*- ebfe730b-d2bd-4470-9084-16047ee01378
+#pragma once
+#include "boost/variant/get.hpp"

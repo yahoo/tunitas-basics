@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys
+namespace sys::error {
+  inline namespace [[deprecated("avoid. instead reference as namespace sys::e::constants")]] constants  { }
+  namespace [[deprecated("avoid. instead reference as namespace sys::e, for example as sys::e::Code")]] e {
+    inline namespace [[deprecated("avoid. instead reference as namespace sys::e::constants")]] constants  { }
+  }
+  namespace [[deprecated("avoid. instead reference as namespace sys::e, for example as sys::e::Code")]] E {
+    inline namespace [[deprecated("avoid. instead reference as namespace sys::e::constants or the struct sys::posix::E")]] constants  { }
+  }
+}
+#endiv

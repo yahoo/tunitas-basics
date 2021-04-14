@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#if 10 < __GNUC__
+#include <std.same_as>
+namespace nonstd::required {
+  template<typename CANDIDATE, typename BASE> concept Same = std::same_as<CANDIDATE, BASE>;
+}
+#else
+#import std.is_same
+namespace nonstd::required {
+  // Cribbing from the suggested implemetnation at https://en.cppreference.com/w/cpp/concepts/same_as
+  namespace detail::Same::assembly {
+    template<typename CANDIDATE, typename BASE> concept Match_Leftward = std::is_same_v<CANDIDATE, BASE>;
+    template<typename CANDIDATE, typename BASE> concept Same = Match_Leftward<CANDIDATE, BASE> && Match_Leftward<BASE, CANDIDATE>;
+  }
+  using detail::Same::assembly::Same;
+}
+#endif
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace nonstd::required;
+    static_assert(Same<int, int>);
+    static_assert(!Same<char, char const>);
+    static_assert(!Same<char, int>);
+    static_assert(!Same<int *, char *>);
+  }
+}
+#endiv

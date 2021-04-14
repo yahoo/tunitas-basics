@@ -1,0 +1,20 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../Makefrag.am; included in the top-level Makefile.am
+src_sys_f_SOURCES_SET = \
+  obj/src/sys/f/namespace.cpp \
+  obj/src/sys/f/as.cpp \
+  obj/src/sys/f/constants.cpp \
+  obj/src/sys/f/Command.cpp \
+  obj/src/sys/f/Function.cpp \
+  obj/src/sys/f/Owner.cpp \
+  obj/src/sys/f/Seal.cpp \
+  obj/src/sys/f/Seals.cpp \
+  obj/src/sys/f/Wait.cpp \
+  obj/src/sys/f/layer.Which.cpp \
+  \
+  obj/src/sys/f/required/namespace.cpp \
+  obj/src/sys/f/required/Seals.cpp \
+  obj/src/sys/f/required/Owner.cpp \
+  $(end)

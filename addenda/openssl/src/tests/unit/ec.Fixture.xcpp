@@ -1,0 +1,95 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ec { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::ec::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Key() -> void;
+  auto test_usage_Group() -> void;
+  auto test_generate_Group() -> void;
+  auto test_generate_Name() -> void;
+  auto test_generate_many() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import openssl.ec.Key
+auto tests::unit::ec::Fixture::test_usage_Key() -> void {
+  namespace ec = ::openssl::ec;
+  {
+    ec::Key key;
+    CPPUNIT_ASSERT(nullptr != key.get());
+  }
+  {
+    ec::Group group{ec::group::Name::PRIME256V1};
+    ec::Key key;
+    key.set_group(std::move(group));
+    CPPUNIT_ASSERT(nullptr != key.get());
+    CPPUNIT_ASSERT(nullptr == group.get());
+  }
+  {
+    ec::Group group{ec::group::Name::PRIME256V1};
+    ec::Key key;
+    key.set_group(std::move(group));
+    key.generate_key();
+    CPPUNIT_ASSERT(nullptr != key.get());
+    CPPUNIT_ASSERT(nullptr == group.get());
+  }
+}
+#import openssl.ec.Group
+auto tests::unit::ec::Fixture::test_usage_Group() -> void {
+  namespace ec = ::openssl::ec;
+  ec::Group group{ec::group::Name::PRIME256V1};
+  ec::Key key;
+  key.set_group(std::move(group));
+  CPPUNIT_ASSERT(nullptr != key.get());
+  CPPUNIT_ASSERT(nullptr == group.get());
+}
+#import openssl.ec.generate
+auto tests::unit::ec::Fixture::test_generate_Group() -> void {
+  using namespace ::openssl::ec;
+  auto key = generate(Group{group::Name::PRIME256V1});
+  CPPUNIT_ASSERT(nullptr != key.get());
+}
+auto tests::unit::ec::Fixture::test_generate_Name() -> void {
+  using namespace ::openssl::ec;
+  auto key = generate(group::Name::PRIME256V1);
+  CPPUNIT_ASSERT(nullptr != key.get());
+}
+auto tests::unit::ec::Fixture::test_generate_many() -> void {
+  using namespace ::openssl::ec;
+  for (int i{0}, e{200}; e != i; ++i) {
+    auto key = generate(group::Name::PRIME256V1);
+    CPPUNIT_ASSERT(nullptr != key.get());
+  }
+}
+#import tests.unit.ec.Key
+#import tests.unit.ec.Group
+#import rigging.suite.io
+auto tests::unit::ec::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("ec");
+  {
+    Stream use("usage");
+    use << call("key", &Fixture::test_usage_Key)
+        << call("group", &Fixture::test_usage_Group)
+      ;
+    series << move(use);
+  } {
+    Stream use("generate");
+    use << call("Group", &Fixture::test_generate_Group)
+        << call("Name", &Fixture::test_generate_Name)
+        << call("many", &Fixture::test_generate_many)
+      ;
+    series << move(use);
+  }
+  series << add<Group>()
+         << add<Key>()
+    ;
+  return finalize(series);
+}
+#endiv

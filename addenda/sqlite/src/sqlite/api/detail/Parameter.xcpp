@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename VALUE> struct Parameter;
+    } 
+  }
+}
+// builtins
+#entail sqlite.api.detail.Parameter.bool
+#entail sqlite.api.detail.Parameter.double
+#entail sqlite.api.detail.Parameter.int32
+#entail sqlite.api.detail.Parameter.int64
+// recall: no 'int unsigned' variants because SQLite does not support such.
+
+// "C" data types
+#entail sqlite.api.detail.Parameter.const_buffer
+#entail sqlite.api.detail.Parameter.const_stringn
+#entail sqlite.api.detail.Parameter.const_stringz
+
+// STL data types
+#entail sqlite.api.detail.Parameter.basic_string
+#entail sqlite.api.detail.Parameter.string
+#entail sqlite.api.detail.Parameter.wstring
+#entail sqlite.api.detail.Parameter.vector
+#entail sqlite.api.detail.Parameter.vector.char
+
+// SQLite data types
+#entail sqlite.api.detail.Parameter.Null
+#entail sqlite.api.detail.Parameter.Value
+#entail sqlite.api.detail.Parameter.Value.PROTECTED
+#endiv
+#divert <hpp>
+#import sqlite.api.detail
+#import sqlite.api.detail.Result
+template<typename VALUE> struct sqlite::api::detail::Parameter
+  : private sqlite::detail::ResultSFINAE<VALUE> // private, so the unspecialized template is useless
+  , public sqlite::detail::specialization_is_invalid
+{ };
+#endiv

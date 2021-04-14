@@ -1,0 +1,337 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd
+namespace tests::unit::nonstd {
+  namespace fixture {
+    class Fixture;
+    namespace library = ::nonstd;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import tests.unit.nonstd.float16.Palette
+struct tests::unit::nonstd::fixture::Fixture : public cppunit::test::Fixture, float16::Palette {
+  auto test_endian() -> void;
+  auto test_int128_t() -> void;
+  auto test_uint128_t() -> void;
+  auto test_minimum() -> void;
+  auto test_maximum() -> void;
+  auto test_is_integral() -> void;
+  auto test_is_signed() -> void;
+  auto test_is_unsigned() -> void;
+  auto test_make_unsigned() -> void;
+  auto test_make_unsigned_t() -> void;
+  auto test_to_underlying() -> void;
+  auto test_to_signed_same() -> void;
+  auto test_to_signed_good() -> void;
+  auto test_to_signed_fail() -> void;
+  auto test_to_unsigned_same() -> void;
+  auto test_to_unsigned_good() -> void;
+  auto test_to_unsigned_fail() -> void;
+  auto test_float16_t() -> void;
+  auto test_float32_t() -> void;
+  auto test_float64_t() -> void;
+  auto test_required_Character() -> void;
+  auto test_required_Character_Traits() -> void;
+  auto test_Visitor() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.cerr
+#import std.string_literals
+using namespace std::string_literals;
+#import nonstd.endian
+auto tests::unit::nonstd::fixture::Fixture::test_endian() -> void {
+  using ::nonstd::endian;
+  CPPUNIT_ASSERT(endian::little == endian::native || endian::big == endian::native);
+}
+#import nonstd.int128    // prove it works
+#import nonstd.int128_t  // redundant
+#import nonstd.uint128_t // redundant
+auto tests::unit::nonstd::fixture::Fixture::test_int128_t() -> void {
+  ::nonstd::int128_t v0 = 0;
+  CPPUNIT_ASSERT(0 == v0);
+  ::nonstd::int128_t v1 = 1;
+  CPPUNIT_ASSERT(1 == v1);
+  ::nonstd::int128_t vm1 = -1;
+  CPPUNIT_ASSERT(-1 == vm1);
+}
+auto tests::unit::nonstd::fixture::Fixture::test_uint128_t() -> void {
+  ::nonstd::uint128_t v0 = 0;
+  CPPUNIT_ASSERT(0 == v0);
+  ::nonstd::uint128_t v1 = 1;
+  CPPUNIT_ASSERT(1 == v1);
+}
+#import nonstd.minimum
+auto tests::unit::nonstd::fixture::Fixture::test_minimum() -> void {
+  using ::nonstd::minimum;
+  {
+    auto actual = minimum(1, 1);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = minimum(1, 2);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = minimum(2, 1);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = minimum(1, 2, 3);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = minimum(3, 2, 1);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = minimum(12015, 26402, 7864, 32510, 31991, 28544, 19445, 30779, 6123, 28649, 12133, 12702, 6217, 2932, 1, 28086, 2267, 30945, 4223, 4397, 13569, 32515, 21052, 26118, 20110, 20006, 24232, 31084, 22391);
+    auto expected = 1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+#import nonstd.maximum
+auto tests::unit::nonstd::fixture::Fixture::test_maximum() -> void {
+  using ::nonstd::maximum;
+  {
+    auto actual = maximum(-1, -1);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = maximum(-1, -2);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = maximum(-2, -1);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = maximum(-1, -2, -3);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = maximum(-3, -2, -1);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    auto actual = maximum(-12015, -26402, -7864, -32510, -31991, -28544, -19445, -30779, -6123, -28649, -12133, -12702, -6217, -2932, -1, -28086, -2267, -30945, -4223, -4397, -13569, -32515, -21052, -26118, -20110, -20006, -24232, -31084, -22391);
+    auto expected = -1;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+#import nonstd.integers
+#import nonstd.is_integral
+auto tests::unit::nonstd::fixture::Fixture::test_is_integral() -> void {
+  using namespace ::nonstd::integers;
+  using ::nonstd::is_integral;
+  // signed
+  CPPUNIT_ASSERT(is_integral<int8_t>::value);
+  CPPUNIT_ASSERT(is_integral<int16_t>::value);
+  CPPUNIT_ASSERT(is_integral<int32_t>::value);
+  CPPUNIT_ASSERT(is_integral<int64_t>::value);
+  CPPUNIT_ASSERT(is_integral<int128_t>::value);
+  // unsigned
+  CPPUNIT_ASSERT(is_integral<uint8_t>::value);
+  CPPUNIT_ASSERT(is_integral<uint16_t>::value);
+  CPPUNIT_ASSERT(is_integral<uint32_t>::value);
+  CPPUNIT_ASSERT(is_integral<uint64_t>::value);
+  CPPUNIT_ASSERT(is_integral<uint128_t>::value);
+}
+#import nonstd.is_signed
+auto tests::unit::nonstd::fixture::Fixture::test_is_signed() -> void {
+  using namespace ::nonstd::integers;
+  using ::nonstd::is_signed;
+  // signed
+  CPPUNIT_ASSERT(is_signed<int8_t>::value);
+  CPPUNIT_ASSERT(is_signed<int16_t>::value);
+  CPPUNIT_ASSERT(is_signed<int32_t>::value);
+  CPPUNIT_ASSERT(is_signed<int64_t>::value);
+  CPPUNIT_ASSERT(is_signed<int128_t>::value);
+  // unsigned
+  CPPUNIT_ASSERT(!is_signed<uint8_t>::value);
+  CPPUNIT_ASSERT(!is_signed<uint16_t>::value);
+  CPPUNIT_ASSERT(!is_signed<uint32_t>::value);
+  CPPUNIT_ASSERT(!is_signed<uint64_t>::value);
+  CPPUNIT_ASSERT(!is_signed<uint128_t>::value);
+}
+#import nonstd.is_unsigned
+auto tests::unit::nonstd::fixture::Fixture::test_is_unsigned() -> void {
+  using namespace ::nonstd::integers;
+  using ::nonstd::is_unsigned;
+  // signed
+  CPPUNIT_ASSERT(!is_unsigned<int8_t>::value);
+  CPPUNIT_ASSERT(!is_unsigned<int16_t>::value);
+  CPPUNIT_ASSERT(!is_unsigned<int32_t>::value);
+  CPPUNIT_ASSERT(!is_unsigned<int64_t>::value);
+  CPPUNIT_ASSERT(!is_unsigned<int128_t>::value);
+  // unsigned
+  CPPUNIT_ASSERT(is_unsigned<uint8_t>::value);
+  CPPUNIT_ASSERT(is_unsigned<uint16_t>::value);
+  CPPUNIT_ASSERT(is_unsigned<uint32_t>::value);
+  CPPUNIT_ASSERT(is_unsigned<uint64_t>::value);
+  CPPUNIT_ASSERT(is_unsigned<uint128_t>::value);
+}
+#import nonstd.make_unsigned
+auto tests::unit::nonstd::fixture::Fixture::test_make_unsigned() -> void {
+  using namespace ::nonstd::integers;
+  using ::nonstd::is_unsigned;
+  using ::nonstd::make_unsigned;
+  // signed
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<int8_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<int16_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<int32_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<int64_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<int128_t>::type>::value);
+  // unsigned
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<uint8_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<uint16_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<uint32_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<uint64_t>::type>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned<uint128_t>::type>::value);
+}
+#import nonstd.make_unsigned_t
+auto tests::unit::nonstd::fixture::Fixture::test_make_unsigned_t() -> void {
+  using namespace ::nonstd::integers;
+  using ::nonstd::is_unsigned;
+  using ::nonstd::make_unsigned_t;
+  // signed
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<int8_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<int16_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<int32_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<int64_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<int128_t>>::value);
+  // unsigned
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<uint8_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<uint16_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<uint32_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<uint64_t>>::value);
+  CPPUNIT_ASSERT(is_unsigned<make_unsigned_t<uint128_t>>::value);
+}
+#import nonstd.float16.literals
+#import nonstd.float16_t
+auto tests::unit::nonstd::fixture::Fixture::test_float16_t() -> void {
+  using namespace ::nonstd::float16::literals;
+  ::nonstd::float16_t subject(1.23);
+  CPPUNIT_ASSERT(1.20_h < subject && subject < 1.30_h);
+}
+#import nonstd.float32_t
+auto tests::unit::nonstd::fixture::Fixture::test_float32_t() -> void {
+  using namespace ::nonstd::float16::literals;
+  ::nonstd::float32_t subject = 1.23f;
+  CPPUNIT_ASSERT(1.22f < subject && subject < 1.24f);
+}
+#import nonstd.float64_t
+auto tests::unit::nonstd::fixture::Fixture::test_float64_t() -> void {
+  using namespace ::nonstd::float16::literals;
+  ::nonstd::float64_t subject = 1.2345678l;
+  CPPUNIT_ASSERT(1.2345677l < subject);
+  CPPUNIT_ASSERT(subject < 1.2345680l);
+  CPPUNIT_ASSERT(1.2345677l < subject && subject < 1.2345680l);
+}
+#import nonstd.required.Character
+auto tests::unit::nonstd::fixture::Fixture::test_required_Character() -> void {
+  using ::nonstd::required::Character;
+  static_assert(Character<char>);
+  static_assert(Character<wchar_t>);
+  static_assert(Character<char16_t>);
+  static_assert(Character<char32_t>);
+  static_assert(!Character<int>);
+  static_assert(!Character<std::string>);
+}
+#import nonstd.required.Character_Traits
+#import std.char_traits
+auto tests::unit::nonstd::fixture::Fixture::test_required_Character_Traits() -> void {
+  using ::nonstd::required::Character_Traits;
+  static_assert(Character_Traits<std::char_traits<char>>);
+  static_assert(Character_Traits<std::char_traits<wchar_t>>);
+  static_assert(Character_Traits<std::char_traits<char16_t>>);
+  static_assert(Character_Traits<std::char_traits<char32_t>>);
+  static_assert(!Character_Traits<int>);
+  static_assert(!Character_Traits<std::string>);
+}
+#import nonstd.Visitor
+#import std.variant
+#import std.visit
+auto tests::unit::nonstd::fixture::Fixture::test_Visitor() -> void {
+  using ::nonstd::Visitor;
+  using Both = std::variant<double, std::intmax_t>;
+  Both val = Both{3l};
+  auto vis = Visitor{[](double v) { return 2 * v; },
+                     [](std::intmax_t v) { return 3.0 * v; }};
+  auto ret = std::visit(vis, val);
+  CPPUNIT_ASSERT_EQUAL(9.0, ret);
+}
+#import tests.unit.nonstd.copy.Fixture
+#import tests.unit.nonstd.float16.Fixture
+#import tests.unit.nonstd.int128.Fixture
+#import tests.unit.nonstd.half.Fixture
+#import tests.unit.nonstd.lock.Fixture
+#import tests.unit.nonstd.move.Fixture
+#import tests.unit.nonstd.numeric_limits.Fixture
+#import rigging.suite.io
+auto tests::unit::nonstd::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using rigging::suite::move; // because we have an occluding 'namespace move'
+  auto series = Stream{"nonstd"};
+  series << []() {
+              auto use = Stream{"usage"};
+              use << []() {
+                       auto req = Stream{"required"};
+                       req << call("Character", &Fixture::test_required_Character)
+                           << call("Character_Traits", &Fixture::test_required_Character_Traits)
+                           << END;
+                       return move(req);
+                     }()
+                  << END;
+              return move(use);
+            }()
+         << call("endian", &Fixture::test_endian)
+         << call("int128_t", &Fixture::test_int128_t)
+         << call("uint128_t", &Fixture::test_uint128_t)
+         << call("minimum", &Fixture::test_minimum)
+         << call("maximum", &Fixture::test_maximum)
+         << call("float16_t", &Fixture::test_float16_t)
+         << call("float32_t", &Fixture::test_float32_t)
+         << call("float64_t", &Fixture::test_float64_t)
+         << call("is_integral", &Fixture::test_is_integral)
+         << call("is_signed", &Fixture::test_is_signed)
+         << call("is_unsigned", &Fixture::test_is_unsigned)
+         << call("make_unsigned", &Fixture::test_make_unsigned)
+         << call("make_unsigned_t", &Fixture::test_make_unsigned_t)
+         << call("to_underlying_t", &Fixture::test_to_underlying)
+         << []{
+              auto to = Stream{"to_signed"};
+              to << call("same", &Fixture::test_to_signed_same)
+                 << call("good", &Fixture::test_to_signed_good)
+                 << call("fail", &Fixture::test_to_signed_fail)
+                 << END;
+              return move(to);
+            }()
+         << []{
+              auto to = Stream{"to_unsigned"};
+              to << call("same", &Fixture::test_to_unsigned_same)
+                 << call("good", &Fixture::test_to_unsigned_good)
+                 << call("fail", &Fixture::test_to_unsigned_fail)
+                 << END;
+              return move(to);
+            }()
+         << add<half::Fixture>()
+         << add<numeric_limits::Fixture>()
+         << add<move::Fixture>()
+         << add<copy::Fixture>()
+         << add<int128::Fixture>()
+         << add<float16::Fixture>()
+         << call("Visitor", &Fixture::test_Visitor)
+         << add<lock::Fixture>()
+         << END;
+  return finalize(series);
+}
+#endiv

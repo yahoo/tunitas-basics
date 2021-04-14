@@ -1,0 +1,184 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix {
+  namespace packaging::wait4 {
+    using namespace packaging::wait::interface;
+    namespace function { using namespace bundle::wait4::function; }
+    namespace native { using namespace bundle::wait4::native; }
+  }
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::wait4 {
+  //
+  // From wait4(2) of man-pages-4.16-3.fc29.noarch
+  //
+  // <quote>
+  //   Other than the use of the rusage argument, the following wait3() call:
+  //
+  //       wait3(wstatus, options, rusage);
+  //
+  //     is equivalent to:
+  //
+  //       waitpid(-1, wstatus, options);
+  //
+  //   Similarly, the following wait4() call:
+  //
+  //       wait4(pid, wstatus, options, rusage);
+  //
+  //   is equivalent to:
+  //
+  //       waitpid(pid, wstatus, options);
+  //
+  //   In other words, wait3() waits of any child,
+  //   while wait4() can be used to select a specific child, or children, on which to wait.
+  // </quote>
+  //
+  // If you are looking for the flexibility surrounding recovering the [[out]] arguments
+  // through the use of std::optional then use the overloaded 'wait' interface to access wait3(2).
+  //
+  namespace function {
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options = Options{}) -> both::Returned;
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> [[signature("original ordering")]] inline auto wait4(MATCHED, [[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    //
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> inline auto wait4(MATCHED, [[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> [[signature("original ordering")]] inline auto wait4(MATCHED, status::Unfilled, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> [[signature("original ordering")]] inline auto wait4(MATCHED, [[out]] status::Filled &, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    template<identifier::Indicated MATCHED> [[signature("original ordering")]] inline auto wait4(MATCHED, status::Unfilled, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    //
+    template<> inline auto wait4(id::Either, [[in]] Options) -> both::Returned;
+    template<> inline auto wait4(id::Either, [[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+    template<> inline auto wait4(id::Either, [[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+    template<> inline auto wait4(id::Either, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+    template<> [[signature("original ordering")]] inline auto wait4(id::Either, [[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    //
+    template<> inline auto wait4(id::Either, [[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned;
+    template<> inline auto wait4(id::Either, [[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned;
+    template<> inline auto wait4(id::Either, [[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned;
+    template<> [[signature("original ordering")]] inline auto wait4(id::Either, status::Unfilled, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    template<> [[signature("original ordering")]] inline auto wait4(id::Either, [[out]] status::Filled &, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    template<> [[signature("original ordering")]] inline auto wait4(id::Either, status::Unfilled, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+  }
+  namespace native {
+    inline auto wait4(pid_t, [[in]] Options = Options{}) -> both::Returned;
+    inline auto wait4(pid_t, [[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+    inline auto wait4(pid_t, [[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+    inline auto wait4(pid_t, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait4(pid_t, [[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    //
+    inline auto wait4(pid_t, [[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned;
+    inline auto wait4(pid_t, [[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned;
+    inline auto wait4(pid_t, [[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait4(pid_t, status::Unfilled, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait4(pid_t, [[out]] status::Filled &, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait4(pid_t, status::Unfilled, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+  }
+}
+namespace sys::posix {
+  using packaging::wait4::function::wait4;
+  namespace native { using packaging::wait4::native::wait4; }
+}
+#endiv
+#divert <ipp>
+#import nonstd.Visitor
+#import std.visit // [[FIXTHIS]] move to nonstd.visit when convenient
+#import sys.posix.packaging.wait4.returned
+namespace sys::posix::packaging::wait4 {
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options) -> both::Returned                                                         { return returned::wait4<id::Process>(match, options); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, status::Filled &sutats) -> usages::Returned                               { return returned::wait4<id::Process>(match, options, sutats); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, usages::Filled &segasu) -> status::Returned                               { return returned::wait4<id::Process>(match, options, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned   { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned   { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned  { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, status::Unfilled sutats, Options options, usages::Filled &segasu) -> identifier::Returned  { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, status::Filled &sutats, Options options, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  template<function::identifier::Indicated MATCHED> auto function::wait4(MATCHED match, status::Unfilled sutats, Options options, usages::Unfilled segasu) -> identifier::Returned { return returned::wait4<id::Process>(match, options, sutats, segasu); }
+  namespace function {
+    namespace {
+      using nonstd::Visitor;
+      using std::visit;
+    }
+    template<> auto wait4(id::Either match, Options options) -> both::Returned {
+      auto vv = Visitor{[options](id::Process match) { return wait4(match, options); },
+                        [options](id::Group match)   { return wait4(match, options); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, Options options, usages::Filled &segasu) -> status::Returned {
+      auto vv = Visitor{[options, &segasu](id::Process match) { return wait4(match, options, segasu); },
+                        [options, &segasu](id::Group match)   { return wait4(match, options, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, Options options, status::Filled &sutats) -> usages::Returned {
+      auto vv = Visitor{[options, &sutats](id::Process match) { return wait4(match, options, sutats); },
+                        [options, &sutats](id::Group match)   { return wait4(match, options, sutats); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, &sutats, &segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, &sutats, &segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, &sutats, &segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, &sutats, &segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    //
+    template<> auto wait4(id::Either match, Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, sutats, &segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, sutats, &segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, &sutats, segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, &sutats, segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, sutats, segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, sutats, segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, status::Unfilled sutats, Options options, usages::Filled &segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, sutats, &segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, sutats, &segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, status::Filled &sutats, Options options, usages::Unfilled segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, &sutats, segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, &sutats, segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+    template<> auto wait4(id::Either match, status::Unfilled sutats, Options options, usages::Unfilled segasu) -> identifier::Returned {
+      auto vv = Visitor{[options, sutats, segasu](id::Process match) { return wait4(match, options, sutats, segasu); },
+                        [options, sutats, segasu](id::Group match)   { return wait4(match, options, sutats, segasu); }};
+      return visit(vv, match);
+    }
+  }    
+  //
+  auto native::wait4(pid_t match, Options options) -> both::Returned                                                         { return returned::wait4<pid_t>(match, options); }
+  auto native::wait4(pid_t match, Options options, status::Filled &sutats) -> usages::Returned                               { return returned::wait4<pid_t>(match, options, sutats); }
+  auto native::wait4(pid_t match, Options options, usages::Filled &segasu) -> status::Returned                               { return returned::wait4<pid_t>(match, options, segasu); }
+  auto native::wait4(pid_t match, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned   { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned   { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned  { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, status::Unfilled sutats, Options options, usages::Filled &segasu) -> identifier::Returned  { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, status::Filled &sutats, Options options, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+  auto native::wait4(pid_t match, status::Unfilled sutats, Options options, usages::Unfilled segasu) -> identifier::Returned { return returned::wait4<pid_t>(match, options, sutats, segasu); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_wait4.Usage
+static_assert(tests::usage::posix_wait4::Usage<>);
+#endiv

@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.endian
+namespace nonstd {
+  using std::endian;
+}
+#if !defined(__cpp_lib_endian) || (__cpp_lib_endian < __cplusplus)
+#include <endian.h>
+namespace nonstd {
+  enum class endian {
+    little,
+    big,
+    #if defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && defined(__BIG_ENDIAN)
+      #if __BYTE_ORDER == __LITTLE_ENDIAN
+          native = little
+      #elif __BYTE_ORDER == __BIG_ENDIAN
+          native = big
+      #else
+      // PDP-endian or other unknown, unexpected form
+      #error Neither little nor big endian, will not proceed.
+      #endif
+    #endif
+  };
+}
+#endif
+#endiv

@@ -1,0 +1,223 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.options.Options.declaration
+#import sys.o.Access
+#import sys.o.Create
+#import sys.o.Status
+namespace sys::o::options {
+  //
+  // The composition of the Accesses, Creates and Statuses
+  //
+  // The options is a function-argument call-site object (you SHOULD not use it for any data storage)
+  //
+  // Usage:
+  //
+  //   auto fd = ...somehow...
+  //
+  //   auto ed = something(pathname, O::READ | O::APPEND | O::EXCLUSIVE)
+  //   auto ed = something(pathname, O::READ | O::APPEND | O::EXCLUSIVE)
+  //
+  template<> class Options<Access, Create, Status>;
+}
+#endiv
+#divert <hpp>
+#import sys.o.options.Composer.Options.Access.Create.Status
+#import sys.o.Accesses
+#import sys.o.Creates
+#import sys.o.Statuses
+#import sys.o.options.Options.Access.Status
+#import sys.o.options.Options.Create.Status
+namespace sys::o::options {
+  template<> class Options<Access, Create, Status> : public Composer<Options<Access, Create, Status>> {
+    using Ancestor = Composer<Options<Access, Create, Status>>;
+  public:
+    constexpr Options() : Ancestor{typename Ancestor::Value{}} { }
+    constexpr explicit Options(typename Ancestor::Value value) : Ancestor{value} { }
+    using Ancestor::Composer;
+    // NONEED auto operator=(Options const &) -> Options & = default;
+    // WRONG --- creates ambiguities --> auto operator=(Ancestor a) -> Options & { Ancestor::value = (typename Ancestor::Value) a; return *this; }
+    inline constexpr auto operator&=(Options s) -> Options & { Ancestor::value &= (typename Ancestor::Value) s; return *this; }
+    inline constexpr auto operator|=(Options s) -> Options & { Ancestor::value |= (typename Ancestor::Value) s; return *this; }
+    inline constexpr auto operator~() -> Options & { Ancestor::value = ~Ancestor::value; return *this; }
+    inline constexpr explicit operator typename Ancestor::Value() const { return Ancestor::value; } // this one is explicit, the ancestor's is implicit
+    inline friend constexpr auto operator==(Options const &a, Options const &b) -> bool { return a.value == b.value; }
+    inline friend constexpr auto operator!=(Options const &a, Options const &b) -> bool { return a.value != b.value; }
+    // composition
+    inline friend constexpr auto operator|(Options a, Options b) -> Options { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Access a, Options b) -> Options        { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Accesses a, Options b) -> Options      { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Create a, Options b) -> Options        { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Creates a, Options b) -> Options       { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Status a, Options b) -> Options        { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Statuses a, Options b) -> Options      { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Options<Access,Status> a, Options b) -> Options { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    inline friend constexpr auto operator|(Options<Create,Status> a, Options b) -> Options { return Options{(typename Options::Value)a | (typename Options::Value)b}; }
+    // extraction
+    inline friend constexpr auto operator&(Options a, Options b) -> Options { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Access a, Options b) -> Options        { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Accesses a, Options b) -> Options      { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Create a, Options b) -> Options        { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Creates a, Options b) -> Options       { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Status a, Options b) -> Options        { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Statuses a, Options b) -> Options      { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Options<Access,Status> a, Options b) -> Options { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    inline friend constexpr auto operator&(Options<Create,Status> a, Options b) -> Options { return Options{(typename Options::Value)a & (typename Options::Value)b}; }
+    // inversion
+    inline friend constexpr auto contains(Options a, Options b) -> bool { return (typename Options::Value)b == (typename Options::Value)(b & a); }
+  };
+}
+namespace sys::o {
+  namespace options {
+    inline constexpr auto operator|(Access a, Create b) -> Options<Access,Create,Status>    { return Options<Access,Create,Status>{(typename Accesses::Value)a | (typename Creates::Value)b}; }
+    inline constexpr auto operator|(Create a, Access b) -> Options<Access,Create,Status>    { return Options<Access,Create,Status>{(typename Creates::Value)a | (typename Accesses::Value)b}; }
+    inline constexpr auto operator|(Accesses a, Creates b) -> Options<Access,Create,Status> { return Options<Access,Create,Status>{(typename Accesses::Value)a | (typename Creates::Value)b}; }
+    inline constexpr auto operator|(Creates a, Accesses b) -> Options<Access,Create,Status> { return Options<Access,Create,Status>{(typename Creates::Value)a | (typename Accesses::Value)b}; }
+    //
+    inline constexpr auto operator&(Access a, Create b) -> Options<Access,Create,Status>    { return Options<Access,Create,Status>{(typename Accesses::Value)a & (typename Creates::Value)b}; }
+    inline constexpr auto operator&(Create a, Access b) -> Options<Access,Create,Status>    { return Options<Access,Create,Status>{(typename Creates::Value)a & (typename Accesses::Value)b}; }
+    inline constexpr auto operator&(Accesses a, Creates b) -> Options<Access,Create,Status> { return Options<Access,Create,Status>{(typename Accesses::Value)a & (typename Creates::Value)b}; }
+    inline constexpr auto operator&(Creates a, Accesses b) -> Options<Access,Create,Status> { return Options<Access,Create,Status>{(typename Creates::Value)a & (typename Accesses::Value)b}; }
+  }
+  using options::operator|;
+  using options::operator&;
+}
+#endiv
+#divert <cpp>
+#import nonstd.convertible_to
+#import sys.o.constants
+namespace {
+  namespace tests {
+    using namespace sys::o;
+    using namespace options;
+    namespace usage {
+      using namespace constants;
+      using nonstd::convertible_to;
+      using Subject = Options<Access,Create,Status>;
+      template<typename OPTIONS> concept bool Construction = requires(OPTIONS, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { OPTIONS{a} };
+        { OPTIONS{aa} };
+        { OPTIONS{c} };
+        { OPTIONS{cc} };
+        { OPTIONS{s} };
+        { OPTIONS{ss} };
+        { OPTIONS{as} };
+        { OPTIONS{cs} };
+        { OPTIONS{acs} };
+      };
+      template<typename OPTIONS> concept bool Assignment = requires(OPTIONS lval, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { lval = a } -> convertible_to<Subject>;
+        { lval = aa } -> convertible_to<Subject>;
+        { lval = c } -> convertible_to<Subject>;
+        { lval = cc } -> convertible_to<Subject>;
+        { lval = s } -> convertible_to<Subject>;
+        { lval = ss } -> convertible_to<Subject>;
+        { lval = as } -> convertible_to<Subject>;
+        { lval = cs } -> convertible_to<Subject>;
+        { lval = acs } -> convertible_to<Subject>;
+      };
+      template<typename OPTIONS> concept bool Assignment_OR = requires(OPTIONS lval, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { lval |= a } -> convertible_to<Subject>;
+        { lval |= aa } -> convertible_to<Subject>;
+        { lval |= c } -> convertible_to<Subject>;
+        { lval |= cc } -> convertible_to<Subject>;
+        { lval |= s } -> convertible_to<Subject>;
+        { lval |= ss } -> convertible_to<Subject>;
+        { lval |= as } -> convertible_to<Subject>;
+        { lval |= cs } -> convertible_to<Subject>;
+        { lval |= acs } -> convertible_to<Subject>;
+      };
+      template<typename OPTIONS> concept bool Assignment_AND = requires(OPTIONS lval, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { lval &= a } -> convertible_to<Subject>;
+        { lval &= aa } -> convertible_to<Subject>;
+        { lval &= c } -> convertible_to<Subject>;
+        { lval &= cc } -> convertible_to<Subject>;
+        { lval &= s } -> convertible_to<Subject>;
+        { lval &= ss } -> convertible_to<Subject>;
+        { lval &= as } -> convertible_to<Subject>;
+        { lval &= cs } -> convertible_to<Subject>;
+        { lval &= acs } -> convertible_to<Subject>;
+      };
+      template<typename OPTIONS> concept bool Operator_OR = requires(OPTIONS const rval, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { rval | a } -> convertible_to<Subject>;
+        { a | rval } -> convertible_to<Subject>;
+        { rval | aa } -> convertible_to<Subject>;
+        { aa | rval } -> convertible_to<Subject>;
+        { rval | c } -> convertible_to<Subject>;
+        { c | rval } -> convertible_to<Subject>;
+        { rval | cc } -> convertible_to<Subject>;
+        { cc | rval } -> convertible_to<Subject>;
+        { rval | s } -> convertible_to<Subject>;
+        { s | rval } -> convertible_to<Subject>;
+        { rval | ss } -> convertible_to<Subject>;
+        { ss | rval } -> convertible_to<Subject>;
+        { rval | as } -> convertible_to<Subject>;
+        { as | rval } -> convertible_to<Subject>;
+        { rval | cs } -> convertible_to<Subject>;
+        { cs | rval } -> convertible_to<Subject>;
+        { rval | acs } -> convertible_to<Subject>;
+        { acs | rval } -> convertible_to<Subject>;
+        // special
+        { aa | cc } -> convertible_to<Subject>;
+        { cc | aa } -> convertible_to<Subject>;
+        { aa | ss } -> convertible_to<Subject>;
+        { ss | aa } -> convertible_to<Subject>;
+        { cc | ss } -> convertible_to<Subject>;
+        { ss | cc } -> convertible_to<Subject>;
+        // super special
+        { a | c } -> convertible_to<Subject>;
+        { c | a } -> convertible_to<Subject>;
+        { a | s } -> convertible_to<Subject>;
+        { s | a } -> convertible_to<Subject>;
+        { c | s } -> convertible_to<Subject>;
+        { s | c } -> convertible_to<Subject>;
+      };
+      template<typename OPTIONS> concept bool Operator_AND = requires(OPTIONS const rval, Options<Access,Create,Status> acs, Options<Access,Status> as, Options<Create,Status> cs, Access a, Accesses aa, Create c, Creates cc, Status s, Status ss) {
+        { rval & a } -> convertible_to<Subject>;
+        { a & rval } -> convertible_to<Subject>;
+        { rval & aa } -> convertible_to<Subject>;
+        { aa & rval } -> convertible_to<Subject>;
+        { rval & c } -> convertible_to<Subject>;
+        { c & rval } -> convertible_to<Subject>;
+        { rval & cc } -> convertible_to<Subject>;
+        { cc & rval } -> convertible_to<Subject>;
+        { rval & s } -> convertible_to<Subject>;
+        { s & rval } -> convertible_to<Subject>;
+        { rval & ss } -> convertible_to<Subject>;
+        { ss & rval } -> convertible_to<Subject>;
+        { rval & as } -> convertible_to<Subject>;
+        { as & rval } -> convertible_to<Subject>;
+        { rval & cs } -> convertible_to<Subject>;
+        { cs & rval } -> convertible_to<Subject>;
+        { rval & acs } -> convertible_to<Subject>;
+        { acs & rval } -> convertible_to<Subject>;
+        // special
+        { aa & cc } -> convertible_to<Subject>;
+        { cc & aa } -> convertible_to<Subject>;
+        { aa & ss } -> convertible_to<Subject>;
+        { ss & aa } -> convertible_to<Subject>;
+        { cc & ss } -> convertible_to<Subject>;
+        { ss & cc } -> convertible_to<Subject>;
+        // super special
+        { a & c } -> convertible_to<Subject>;
+        { c & a } -> convertible_to<Subject>;
+        { a & s } -> convertible_to<Subject>;
+        { s & a } -> convertible_to<Subject>;
+        { c & s } -> convertible_to<Subject>;
+        { s & c } -> convertible_to<Subject>;
+      };
+      template<typename OPTIONS> concept bool Usage = requires(OPTIONS) {
+        requires std::is_same_v<OPTIONS, Options<Access,Create,Status>>;
+        requires Construction<OPTIONS>;
+        requires Assignment<OPTIONS>;
+        requires Assignment_OR<OPTIONS>;
+        requires Assignment_AND<OPTIONS>;
+        requires Operator_OR<OPTIONS>;
+        requires Operator_AND<OPTIONS>;
+      };
+    }
+    using usage::Usage;
+    static_assert(Usage<Options<Access,Create,Status>>);
+  }
+}
+#endiv

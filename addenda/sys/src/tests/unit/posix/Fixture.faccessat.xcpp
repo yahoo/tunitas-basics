@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <tpp>
+#import sys.posix.faccessat
+#import sys.posix.AT
+#import sys.posix.OK.Mode
+namespace tests::unit::posix::fixture {
+  template<typename FD> auto Fixture::exercise_faccessat(FD fd) -> void {
+    using AT = six::AT;
+    using OK = six::OK;
+    auto a = six::faccessat(fd, "nosuch", OK::F, AT::NONE);
+    CPPUNIT_ASSERT(!good(a));
+  }
+}
+#endiv
+#divert <cpp>
+auto tests::unit::posix::fixture::Fixture::test_faccessat_int() -> void {
+  using AT = six::AT;
+  using OK = six::OK;
+  //
+  // special ---\ (here)
+  //            |
+  //            v
+  auto a = six::native::faccessat(-1, "nosuch", OK::F, AT::NONE);
+  CPPUNIT_ASSERT(!good(a));
+}
+#import sys.fd.Descriptor
+#import sys.id.File
+#import sys.at.Cwd
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_faccessat_File() -> void { exercise_faccessat(::sys::id::File{-1}); }
+  auto Fixture::test_faccessat_Cwd() -> void  { exercise_faccessat(::sys::at::Cwd::FDCWD); }
+}
+#import std.cerr
+#import sys.posix.open
+#import sys.posix.openat
+#import sys.posix.unlinkat
+auto tests::unit::posix::fixture::Fixture::test_faccessat_something() -> void {
+  using O = six::O;
+  using AT = six::AT;
+  using OK = six::OK;
+  auto t = nat::open("/tmp", O::DIRECTORY|O::RDONLY);
+  guardian::Close guard0(value(t));
+  std::string file_exists = "t99.tests.unit.posix.test.EXISTS-via-faccessat";
+  six::unlinkat(value(t), file_exists, AT::NONE);
+  auto c = nat::openat(value(t), file_exists, O::CREATE|O::WRONLY, 0666);  // <--------- test this
+  guardian::Close guard1(value(c));
+  CPPUNIT_ASSERT(good(c));
+  auto a = six::faccessat(value(t), file_exists, OK::F, AT::NONE);
+  CPPUNIT_ASSERT(good(a));
+  auto u = six::unlinkat(value(t), file_exists, AT::NONE);
+  if (!good(u)) {
+    std::cerr << "DEBUG: expecting to unlink " << file_exists << " but unlinkat(2) failed because " << error_code(u).message() << '\n';
+  }
+  CPPUNIT_ASSERT(good(u));
+}
+#endiv

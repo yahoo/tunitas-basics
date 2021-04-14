@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import slurp.file.read
+namespace file {
+  namespace slurp {
+    //
+    // deprecated ---> ::file::slurp::read
+    // current ------> ::slurp::file::read
+    //
+    using ::slurp::file::read;
+  }
+}
+#endiv

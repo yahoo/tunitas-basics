@@ -1,0 +1,3 @@
+// -*- c++ -*- 6806f3df-a020-4d47-b7b4-a868c04f101e
+#pragma once
+#include <memory>

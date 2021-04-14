@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.OK
+#import sys.posix.access
+#import sys.posix.mktemp
+#import sys.posix.rename
+#import sys.posix.touch
+#import sys.posix.unlink
+auto tests::unit::posix::fixture::Fixture::test_rename() -> void {
+  using OK = six::OK;
+  auto m = six::mktemp("/tmp/t99.tests.unit.posix.rename.XXXXXX");
+  CPPUNIT_ASSERT(good(m));
+  std::string const specimen_a = value(m).native() + ".a";
+  std::string const specimen_b = value(m).native() + ".b";
+  guardian::Cleanup_Spackled_Names cleanup0{specimen_a};
+  guardian::Cleanup_Spackled_Names cleanup1{specimen_b};
+  auto c = six::touch(specimen_a, 0666);
+  CPPUNIT_ASSERT(good(c));
+  auto r = six::rename(specimen_a, specimen_b); // <------------- test this
+  CPPUNIT_ASSERT(good(r)); // <------------------------------- show your work
+  auto aa = six::access(specimen_a, OK::F);
+  CPPUNIT_ASSERT(!good(aa));
+  auto ab = six::access(specimen_b, OK::F);
+  CPPUNIT_ASSERT(good(ab));
+  auto ua = six::unlink(specimen_a);
+  CPPUNIT_ASSERT(!good(ua)); // this one is gone now, having been renamed.
+  auto ub = six::unlink(specimen_b);
+  CPPUNIT_ASSERT(good(ub)); // this one exists to be removed.
+}
+#endiv

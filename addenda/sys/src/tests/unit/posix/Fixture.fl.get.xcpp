@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.O
+#import sys.posix.getfl
+#import sys.posix.open
+#import sys.posix.mktemp
+#import sys.posix.setfl
+auto tests::unit::posix::fixture::Fixture::test_getfl_1() -> void {
+  int fd = -1;
+  auto r = nat::getfl(fd); // <------------------ test this
+  CPPUNIT_ASSERT(!good(r));
+  // what might we assert about the value?
+}
+auto tests::unit::posix::fixture::Fixture::test_getfl_2() -> void {
+  using O = six::O;
+  int fd = -1;
+  guardian::Close guard(fd);
+  auto t = six::mktemp("/tmp/t99.tests.unit.posix.getfl.XXXXXX");
+  CPPUNIT_ASSERT(good(t));
+  std::string tempfile = value(t);
+  auto f = nat::open(tempfile, O::RDONLY|O::CREATE);
+  CPPUNIT_ASSERT(good(f));
+  fd = value(f);
+  auto s = nat::setfl(fd, O::NOATIME);
+  CPPUNIT_ASSERT(good(s));
+  auto g = nat::getfl(fd); // <----------------- test this
+  CPPUNIT_ASSERT(good(g));
+  auto flags = value(g);
+  // fd DOES have cloexec set
+  CPPUNIT_ASSERT( contains(flags, O::NOATIME) );
+}
+#endiv

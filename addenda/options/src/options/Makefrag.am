@@ -1,0 +1,132 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.11/01.black-platinum-hen series/v0.12/02.maroon-iron-crow series/v0.12/03.red-mercury-goose series/v0.13/04.green-copper-heron; do
+#       increment=$(git log $branch | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# API 346  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 252  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 167  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 83   reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+lib_liboptions_module_la_CURRENT = 348
+lib_liboptions_module_la_REVISION = 0
+lib_liboptions_module_la_AGE = 95
+lib_liboptions_module_la_CRA = $(lib_liboptions_module_la_CURRENT):$(lib_liboptions_module_la_REVISION):$(lib_liboptions_module_la_AGE)
+lib_liboptions_module_la_VERSION_INFO = -version-info $(lib_liboptions_module_la_CRA)
+
+lib_liboptions_module_la = lib/liboptions-module.la
+lib_liboptions_module_la_LIBADD = $(nothing)
+lib_liboptions_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_liboptions_module_la_VERSION_INFO)
+lib_liboptions_module_la_MODULES = $(call HT_SOURCEStoMODULES, $(lib_liboptions_module_la_SOURCES))
+lib_liboptions_module_la_SOURCES = \
+  obj/src/options/namespace.cpp \
+  obj/src/options/Boolean.cpp \
+  obj/src/options/Code.cpp \
+  obj/src/options/Filename.cpp \
+  obj/src/options/Integer.cpp \
+  obj/src/options/logging.cpp \
+  obj/src/options/Program.cpp \
+  obj/src/options/Version.cpp \
+  \
+  obj/src/options/argument/namespace.cpp \
+  obj/src/options/argument/constants.cpp \
+  obj/src/options/argument/Code.cpp \
+  \
+  obj/src/options/config/namespace.cpp \
+  obj/src/options/config/Generic.cpp \
+  obj/src/options/config/logging.cpp \
+  \
+  obj/src/options/detail/namespace.cpp \
+  obj/src/options/detail/getopt/namespace.cpp \
+  obj/src/options/detail/getopt/Caller.cpp \
+  obj/src/options/detail/getopt/Guard.cpp \
+  obj/src/options/detail/getopt/State.cpp \
+  obj/src/options/detail/stream/namespace.cpp \
+  obj/src/options/detail/stream/header.cpp \
+  \
+  obj/src/options/indicator/namespace.cpp \
+  obj/src/options/indicator/constants.cpp \
+  obj/src/options/indicator/Code.cpp \
+  \
+  obj/src/options/longish/namespace.cpp \
+  obj/src/options/longish/Getter.cpp \
+  obj/src/options/longish/Specification.cpp \
+  obj/src/options/longish/Step.cpp \
+  \
+  obj/src/options/longish/detail/namespace.cpp \
+  obj/src/options/longish/detail/Option.cpp \
+  \
+  obj/src/options/shortish/namespace.cpp \
+  obj/src/options/shortish/Getter.cpp \
+  obj/src/options/shortish/Specification.cpp \
+  obj/src/options/shortish/Step.cpp \
+  \
+  obj/src/options/throwable/namespace.cpp \
+  obj/src/options/throwable/Conflict.cpp \
+  obj/src/options/throwable/Problem.cpp \
+  obj/src/options/throwable/Usage.cpp \
+  obj/src/options/throwable/Version.cpp \
+  \
+  obj/src/options/throwable/detail/namespace.cpp \
+  obj/src/options/throwable/detail/Complaint.cpp \
+  obj/src/options/throwable/detail/Exception.cpp \
+  \
+  obj/src/options/version/namespace.cpp \
+  obj/src/options/version/String.cpp \
+  $(end)
+$(scold_cxxdir)/options/dependencies.mk: $(lib_liboptions_module_la_SOURCES)
+$(lib_liboptions_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/options/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/options/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/options/dependencies.mk

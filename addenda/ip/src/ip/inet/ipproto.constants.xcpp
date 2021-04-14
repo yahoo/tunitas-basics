@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.inet.ipproto.Type
+#import sys.ip.proto.constants
+namespace ip::inet::ipproto {
+  //
+  // Thes constants.
+  // If you need a richer set then you need to drop down to use sys::posix::ipproto::Type
+  static_assert(sizeof (Type::NONE));
+  static_assert(sizeof (Type::UDP));
+  static_assert(sizeof (Type::TCP));
+}
+#endiv
+#divert <cpp>
+#import ip.inet.ipproto.Type
+#import sys.ip.proto.Protocol
+#import std.is_same
+// To make the point entirely clear.
+static_assert(std::is_same_v<sys::ip::proto::Protocol, ip::inet::ipproto::Type>);
+#endiv

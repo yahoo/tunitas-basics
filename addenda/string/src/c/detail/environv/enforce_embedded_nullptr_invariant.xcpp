@@ -1,0 +1,24 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+namespace c {
+  namespace detail {
+    namespace environv {
+      // Whereas as<...>(...) is a conversion operation,
+      // the new data invariant of environv must be respected.
+      // These throw std::invalid_argument if the element at [N] is not nullptr
+      template<typename CONTAINER> inline auto enforce_embedded_nullptr_invariant(CONTAINER const &) -> void;
+      template<typename ITERATOR> inline auto enforce_embedded_nullptr_invariant(ITERATOR start, ITERATOR finish) -> void;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.enforce_termination_invariant
+template<typename CONTAINER> auto c::detail::environv::enforce_embedded_nullptr_invariant(CONTAINER const &container) -> void {
+  return enforce_termination_invariant(EMBEDDED(), container.begin(), container.end(), nullptr, "nullptr");
+}
+
+template<typename ITERATOR> auto c::detail::environv::enforce_embedded_nullptr_invariant(ITERATOR start, ITERATOR finish) -> void {
+  return enforce_termination_invariant(EMBEDDED(), start, finish, nullptr, "nullptr");
+}
+#divert </ipp>

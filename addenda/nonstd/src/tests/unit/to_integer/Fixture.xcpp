@@ -1,0 +1,113 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd
+namespace tests::unit::to_integer {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::nonstd;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::to_integer::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_call_them_all() -> void;
+  template<typename INTEGER> auto test_call_them_each() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import nonstd.to_integer
+#import nonstd.basic_string_view // expected to have basic_dope_traits<basic_string_view<CHAR, TRAITS>>
+namespace tests::unit::to_integer::fixture {
+  template<typename INTEGER> auto Fixture::test_call_them_each() -> void {
+    auto const specimen = "19"sv;
+    //
+    // Do they throw?  Do they return good (they should return good)
+    //
+    CPPUNIT_ASSERT(good(library::to_integer<INTEGER>(specimen)));
+  }
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::to_integer::fixture {
+  auto Fixture::test_call_them_all() -> void {
+    auto const specimen = "19"sv;
+    //
+    // Do they throw?  Do they return good (they should return good)
+    //
+    CPPUNIT_ASSERT(good(library::to_integer<char signed>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<char unsigned>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int short signed>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int short unsigned>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int signed>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int unsigned>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int long signed>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int long unsigned>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int long long signed>(specimen)));
+    CPPUNIT_ASSERT(good(library::to_integer<int long long unsigned>(specimen)));
+  }
+}
+#import nonstd.int128_t
+#import nonstd.uint128_t
+#import tests.unit.to_integer.Native
+#import tests.unit.to_integer.Modern
+#import tests.unit.to_integer.Widen
+#import tests.unit.to_integer.Locale
+#import tests.unit.to_integer.Validator
+#import tests.unit.to_integer.Dispatcher
+#import tests.unit.to_integer.sto.Fixture
+#import rigging.suite.io
+auto tests::unit::to_integer::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  auto suite = Stream{"to_integer"};
+  suite << []{
+             auto use = Stream{"usage"};
+             use << call("call-them-all", &Fixture::test_call_them_all)
+                 << []{
+                      auto each = Stream{"each"};
+                      each << call("char signed", &Fixture::test_call_them_each<char signed>)
+                           << call("char unsigned", &Fixture::test_call_them_each<char unsigned>)
+                           << call("int short signed", &Fixture::test_call_them_each<int short signed>)
+                           << call("int short unsigned", &Fixture::test_call_them_each<int short unsigned>)
+                           << call("int signed", &Fixture::test_call_them_each<int signed>)
+                           << call("int unsigned", &Fixture::test_call_them_each<int unsigned>)
+                           << call("int long signed", &Fixture::test_call_them_each<int long signed>)
+                           << call("int long unsigned", &Fixture::test_call_them_each<int long unsigned>)
+                           << call("int long long signed", &Fixture::test_call_them_each<int long long signed>)
+                           << call("int long long unsigned", &Fixture::test_call_them_each<int long long unsigned>)
+                           << END;
+                      return move(each);
+                    }()             
+                 << END;
+             return move(use);
+           }()
+        << add<Native>()
+        << add<Modern>()
+        << add<Widen>()
+        << add<Locale>()
+        << add<Validator>()
+        << []() {
+             Stream dis{"dispatcher"};
+             dis << add<Dispatcher<char unsigned>>()
+                 << add<Dispatcher<char signed>>()
+                 << add<Dispatcher<int short unsigned>>()
+                 << add<Dispatcher<int short signed>>()
+                 << add<Dispatcher<int unsigned>>()
+                 << add<Dispatcher<int signed>>()
+                 << add<Dispatcher<int long unsigned>>()
+                 << add<Dispatcher<int long signed>>()
+                 << add<Dispatcher<int long long unsigned>>()
+                 << add<Dispatcher<int long long signed>>()
+                 << add<Dispatcher<nonstd::uint128_t>>()
+                 << add<Dispatcher<nonstd::int128_t>>()
+                 << END;
+             return move(dis);
+           }()
+        << add<sto::Fixture>()
+        << END;
+  return finalize(suite);
+}
+#endiv

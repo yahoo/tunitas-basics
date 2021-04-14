@@ -1,0 +1,5 @@
+# sure ... ./bin should always exist
+.libs
+# the test driver itself
+unit
+# end

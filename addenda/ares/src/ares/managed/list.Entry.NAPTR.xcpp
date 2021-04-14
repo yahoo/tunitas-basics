@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.list.Entry.declaration
+namespace ares::managed::list {
+  //
+  // A single NAPTR RR (Name Authority Pointer)
+  //
+  // Usage: see reply::Record<NAPTR> and managed::List<Entry<NAPTR>>
+  //
+  template<> struct Entry<NAPTR>;
+}
+#endiv
+#divert <hpp>
+#import ares.unmanaged.Structure
+#import ares.managed.list.entry.Basis
+#import ares.required.Spanlike
+#import std.string
+namespace ares::managed::list {
+  template<> struct Entry<NAPTR> : public entry::Basis<unmanaged::Structure<NAPTR>::List_Item> {
+    using ancestor = entry::Basis<unmanaged::Structure<NAPTR>::List_Item>; // declaring ancestor::Unmanaged
+  public:
+    inline explicit Entry(Unmanaged const *);
+    inline auto order() const -> Order; 
+    inline auto preference() const -> Preference;
+    // These are supposed to be enumerations framed up, but not yet codified as integers, they are strings of characters (bytes)
+    template<required::Spanlike SPANLIKE> auto flags() const -> SPANLIKE;
+    template<required::Spanlike SPANLIKE> auto service() const -> SPANLIKE;
+    [[deprecated("instead use pattern()")]] inline auto regexp() const -> std::string;
+    template<required::Spanlike SPANLIKE> [[deprecated("instead use use pattern()")]] auto regexp() const -> SPANLIKE;
+    inline auto pattern() const -> std::string;
+    template<required::Spanlike SPANLIKE> auto pattern() const -> SPANLIKE;
+    inline auto replacement() const -> std::string;
+    template<required::Spanlike SPANLIKE> auto replacement() const -> SPANLIKE;
+  private:
+    // [[FIXTHIS]] here for the convenience but move it out to namespace scope
+    inline static auto ucstrlen(unsigned char *) -> Size;
+  };
+}
+#endiv
+#divert <ipp>
+#import nonstd.span
+#import strlen
+namespace ares::managed::list {
+  Entry<NAPTR>::Entry(Unmanaged const *un) : ancestor{un} { }
+  auto Entry<NAPTR>::order() const -> Order { return Order{unmanaged->order}; }
+  auto Entry<NAPTR>::preference() const -> Preference { return Preference{unmanaged->preference}; }
+  auto Entry<NAPTR>::ucstrlen(unsigned char *s) -> Size { return strlen(reinterpret_cast<char const *>(s)); }
+  template<required::Spanlike SPANLIKE> auto Entry<NAPTR>::flags() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(unmanaged->flags), ucstrlen(unmanaged->flags)};
+  }
+  template<required::Spanlike SPANLIKE> auto Entry<NAPTR>::service() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(unmanaged->service), ucstrlen(unmanaged->service)};
+  }
+  auto Entry<NAPTR>::regexp() const -> std::string { return pattern(); }
+  template<required::Spanlike SPANLIKE> auto Entry<NAPTR>::regexp() const -> SPANLIKE { return pattern<SPANLIKE>(); }
+  auto Entry<NAPTR>::pattern() const -> std::string {
+    auto spun = pattern<nonstd::span<char const>>();
+    return std::string{spun.data(), spun.size()};
+  }
+  template<required::Spanlike SPANLIKE> auto Entry<NAPTR>::pattern() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(unmanaged->regexp), ucstrlen(unmanaged->regexp)};
+  }
+  auto Entry<NAPTR>::replacement() const -> std::string {
+    auto spun = replacement<nonstd::span<char const>>();
+    return std::string{spun.data(), spun.size()};
+  }
+  template<required::Spanlike SPANLIKE> auto Entry<NAPTR>::replacement() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(unmanaged->replacement), strlen(unmanaged->replacement)};
+  }
+}
+#endiv

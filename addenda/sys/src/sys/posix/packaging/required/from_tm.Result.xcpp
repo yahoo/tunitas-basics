@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.from_tm.interface
+#import std.is_same
+namespace sys::posix::packaging::required::from_tm {
+  //
+  // The possible result types
+  //
+  // Usage:
+  //
+  //   Hack the Spew (the usual).
+  //
+  namespace implementation {
+    using namespace packaging::from_tm::interface;
+    using std::is_same_v;
+    template<typename RESULT> concept bool Result = is_same_v<RESULT, Old> || is_same_v<RESULT, Point>;
+  }
+  using implementation::Result;
+}
+#endiv
+#divert <cpp>
+#import sys.time.point
+#import sys.time.t
+#import sys.time.tm
+namespace {
+  namespace tests {
+    using namespace sys::posix::packaging::required::from_tm;
+    static_assert(Result<sys::time::point>);
+    static_assert(Result<sys::time::t>);
+    static_assert(!Result<sys::time::tm>);
+    static_assert(!Result<double>);
+  }
+}
+#endiv

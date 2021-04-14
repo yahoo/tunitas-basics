@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.required.Loadable
+#import sys.call.argument.Stringface
+namespace openssl::io {
+  //
+  // For backwards compatibility; avoid.
+  //
+  namespace packaging::load::function {
+    using Filepath = sys::call::argument::Stringface;
+    template<required::Loadable RESULT> [[deprecated("instead use openssl::pem::load<RESULT>(Filepath)")]] inline auto load(Filepath) -> RESULT;
+  }
+  using packaging::load::function::load;
+}
+#endiv
+#divert <ipp>
+#import openssl.pem.load
+namespace openssl::io::packaging::load {
+  template<required::Loadable RESULT> auto function::load(Filepath filepath) -> RESULT {
+    return pem::load<RESULT>(filepath);
+  }
+}
+#endiv
+

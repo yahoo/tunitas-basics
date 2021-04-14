@@ -1,0 +1,230 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace prepared {
+      class BasicResult;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::prepared::BasicResult : public cppunit::test::Fixture {
+public:
+  auto test_construction_Statement() -> void;
+  auto test_construction_Shell() -> void;
+  auto test_ok() -> void;
+  auto test_check_1arg() -> void;
+  auto test_check_2arg() -> void;
+  auto test_end() -> void;
+  auto test_code() -> void;
+  auto test_value_move() -> void;
+  auto test_value_forward() -> void;
+  auto test_remaining() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.prepared.BasicResult
+#import sqlite.Statement
+#import sqlite.status.Code
+#import std.move
+
+auto tests::unit::prepared::BasicResult::test_construction_Statement() -> void {
+  using T1 = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+  char const rest[] = "select 99;";
+  ::sqlite::Statement statement1;
+  T1 t1(T1::adl_type(), sqlite::status::OK, std::move(statement1), rest);
+  CPPUNIT_ASSERT(ok(t1));
+}
+
+auto tests::unit::prepared::BasicResult::test_construction_Shell() -> void {
+  using T1 = ::sqlite::prepared::BasicResult<::sqlite::statement::Shell, char const *>;
+  char const rest[] = "select 99;";
+  ::sqlite::statement::Shell shell;
+  T1 t1(T1::adl_type(), sqlite::status::ERROR, std::move(shell), rest);
+  CPPUNIT_ASSERT(!ok(t1));
+}
+
+auto tests::unit::prepared::BasicResult::test_ok() -> void {
+  {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::OK, std::move(statement), rest);
+    CPPUNIT_ASSERT(ok(t));
+  } {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::ERROR, std::move(statement), rest);
+    CPPUNIT_ASSERT(!ok(t));
+  }
+}
+
+auto tests::unit::prepared::BasicResult::test_check_1arg() -> void {
+  try {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::OK, std::move(statement), rest);
+    check(t); // <---- test this
+    CPPUNIT_ASSERT(true);
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::ERROR, std::move(statement), rest);
+    check(t); // <---- test this
+    CPPUNIT_ASSERT(false);
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::prepared::BasicResult::test_check_2arg() -> void {
+  try {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::OK, std::move(statement), rest);
+    check(t ,"okay"); // <---- test this
+    CPPUNIT_ASSERT(true);
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+    ::sqlite::Statement statement;
+    char const rest[] = "select 99;";
+    T t(T::adl_type(), sqlite::status::ERROR, std::move(statement), rest);
+    check(t, "BAD-BAD"); // <---- test this
+    CPPUNIT_ASSERT(false);
+  } catch (sqlite::exception::Generic const &e) {
+    CPPUNIT_ASSERT(true);
+    CPPUNIT_ASSERT(std::string("BAD-BAD") == e.what());
+  }
+}
+
+auto tests::unit::prepared::BasicResult::test_end() -> void {
+  using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+  char const rest[] = "select 99;";
+  char const done[] = "";
+  ::sqlite::Statement statement1;
+  T t1(T::adl_type(), sqlite::status::OK, std::move(statement1), rest);
+  CPPUNIT_ASSERT(!end(t1));
+  ::sqlite::Statement statement2;
+  T t2(T::adl_type(), sqlite::status::OK, std::move(statement2), done);
+  CPPUNIT_ASSERT(end(t2));
+  ::sqlite::Statement statement3;
+  T t3(T::adl_type(), sqlite::status::ERROR, std::move(statement3), done);
+  CPPUNIT_ASSERT(!end(t3));
+}
+
+auto tests::unit::prepared::BasicResult::test_code() -> void {
+  using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+  char const rest[] = "select 99;";
+  ::sqlite::Statement statement1;
+  T t1(T::adl_type(), sqlite::status::OK, std::move(statement1), rest);
+  CPPUNIT_ASSERT(sqlite::status::OK == code(t1));
+  ::sqlite::Statement statement2;
+  T t2(T::adl_type(), sqlite::status::Code::ABORT, std::move(statement2), rest);
+  CPPUNIT_ASSERT(sqlite::status::Code::ABORT == code(t2));
+  ::sqlite::Statement statement3;
+  T t3(T::adl_type(), sqlite::status::DONE, std::move(statement3), rest);
+  CPPUNIT_ASSERT(sqlite::status::DONE == code(t3));
+}
+
+#import sqlite.Application
+#import sqlite.Connection
+#import sqlite.open.Name
+#import sqlite.open.Flags
+auto tests::unit::prepared::BasicResult::test_value_move() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  { auto r = conn.open(Name::MEMORY, flags);
+    CPPUNIT_ASSERT(ok(r)); }
+  { auto r = conn.prepare<sqlite::Statement>("select 99");
+    CPPUNIT_ASSERT(ok(r));
+    sqlite::Statement statement = std::move(value(r)); // <-------- test this
+    CPPUNIT_ASSERT(statement.is_prepared());
+    decltype(statement.step()) stepped;
+    do {
+      stepped = statement.step();
+      CPPUNIT_ASSERT(row(stepped) || okdone(stepped));
+    } while (!okdone(stepped)); }
+}
+
+#import std.forward
+namespace {
+  auto actually_doing(sqlite::Statement &&anon) -> void {
+    CPPUNIT_ASSERT(anon.is_prepared());
+    sqlite::Statement statement = std::forward<sqlite::Statement>(anon);
+    CPPUNIT_ASSERT(statement.is_prepared());
+    // We're expecting one row
+    decltype(statement.step()) stepped;
+    do {
+      stepped = statement.step();
+      CPPUNIT_ASSERT(row(stepped) || okdone(stepped)); // <--- test this
+    } while (!okdone(stepped));
+  }
+
+  auto doing2(sqlite::Statement &&anon) -> void {
+    actually_doing(std::forward<sqlite::Statement>(anon)); // <--- test this
+  }
+
+  auto doing1(sqlite::Statement &&anon) -> void {
+    doing2(std::forward<sqlite::Statement>(anon)); // <--- test this
+  }
+}
+
+auto tests::unit::prepared::BasicResult::test_value_forward() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  { auto r = conn.open(Name::MEMORY, flags);
+    CPPUNIT_ASSERT(ok(r)); }
+  { auto r = conn.prepare<sqlite::Statement>("select 99");
+    CPPUNIT_ASSERT(ok(r));
+    doing1(std::move(value(r))); } // <-------- test this
+}
+
+auto tests::unit::prepared::BasicResult::test_remaining() -> void {
+  using T = ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *>;
+  ::sqlite::Statement statement;
+  char const rest[] = "select 99;";
+  T t(T::adl_type(), sqlite::status::OK, std::move(statement), rest);
+  CPPUNIT_ASSERT(&rest[0] == remaining(t));
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::prepared::BasicResult::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("BasicResult");
+  s << call("construction-Statement", &BasicResult::test_construction_Statement)
+    << call("construction-Shell", &BasicResult::test_construction_Shell)
+    << call("ok", &BasicResult::test_ok)
+    << call("check-1arg", &BasicResult::test_check_1arg)
+    << call("check-2arg", &BasicResult::test_check_2arg)
+    << call("end", &BasicResult::test_end)
+    << call("code", &BasicResult::test_code)
+    << call("value-move", &BasicResult::test_value_move)
+    << call("value-forward", &BasicResult::test_value_forward)
+    << call("remaining", &BasicResult::test_remaining)
+    ;
+  return s.release();
+}
+#endiv

@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.x509.Req
+#import openssl.pem.from_string_view.declaration
+namespace openssl::pem::packaging::from_string_view::function {
+  //
+  // Load the certificate signing request (a.k.a. csr, req) from the string_view.
+  // Throws on failure to recover the csr from the string_view.
+  // [[FIXTHIS]] provide a (less-,non-)throwing variant which returns an outcome.
+  //
+  // Usage:
+  //
+  //   auto const pem = std::string_view{...somehow...};
+  //   auto req = from_string_view<x509::Req>(pem);
+  //
+  template<> inline auto from_string_view<x509::Req>(std::string_view pemmican) -> x509::Req;
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+namespace openssl::pem::packaging::from_string_view {
+  template<> auto function::from_string_view<x509::Req>(std::string_view pemmican) -> x509::Req {
+    using Reader = std::function<X509_REQ *(BIO *)>;
+    Reader const reader = [](BIO *in) { 
+                            // See the commentariat in Load.declaration.xcpp
+                            auto const indirect_x = nullptr;
+                            auto const callback_function = nullptr;
+                            auto const callback_data = nullptr;;
+                            return PEM_read_bio_X509_REQ(in, indirect_x, callback_function, callback_data);
+                          };
+    return detail::copy_read<x509::Req>(pemmican, reader);
+  }
+}
+#endiv

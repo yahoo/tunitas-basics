@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.getwd
+#import sys.posix.fchdir
+#import sys.directory.Stream
+auto tests::unit::posix::fixture::Fixture::test_fchdir() -> void {
+  sys::directory::Stream dot(".");
+  CPPUNIT_ASSERT(dot.is_open());
+  int dot_fd = sys::directory::fd(dot.dir());
+  sys::directory::Stream tmp("/tmp");
+  CPPUNIT_ASSERT(tmp.is_open());
+  int tmp_fd = sys::directory::fd(tmp.dir());
+  auto chthere = six::fchdir(tmp_fd); // <--------- test this
+  CPPUNIT_ASSERT(good(chthere));
+  auto regotwd = six::getwd();
+  CPPUNIT_ASSERT(good(regotwd));
+  std::string repwd = value(regotwd);
+  CPPUNIT_ASSERT("/tmp" == repwd);
+  auto chback = six::fchdir(dot_fd); // <------ test this (go back)
+  CPPUNIT_ASSERT(good(chback));
+}
+#endiv

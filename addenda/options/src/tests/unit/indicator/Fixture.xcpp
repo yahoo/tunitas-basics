@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::indicator {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::indicator::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_compatibility_hoisting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.Code // not options.indicator.Code (we're testing compatibility hoisting)
+auto tests::unit::indicator::Fixture::test_compatibility_hoisting() -> void {
+  CPPUNIT_ASSERT(end(::options::Code::END));
+  CPPUNIT_ASSERT(end(::options::indicator::Code::END));
+  CPPUNIT_ASSERT(erroneous(::options::Code::MISSING));
+  CPPUNIT_ASSERT(erroneous(::options::indicator::Code::MISSING));
+  CPPUNIT_ASSERT(erroneous(::options::Code::UNKNOWN));
+  CPPUNIT_ASSERT(erroneous(::options::indicator::Code::UNKNOWN));
+}
+
+#import tests.unit.indicator.Code
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::indicator::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("indicator");
+  s << call("compatibility-hoisting", &Fixture::test_compatibility_hoisting)
+    << add<Code>()
+    ;
+  return finalize(s);
+}
+#endiv

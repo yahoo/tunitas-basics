@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// New in org::semver v2 API, the array[3] is now 'Triple'
+//
+// org::semver::v2
+//   String is a string (vector) of version numbers 0..UNBOUNDED
+//   Triple is an array[3] of such version numbers.
+//
+// v2 is inlined and "current"
+//
+// Usage:
+//
+//   auto t = org::semver::Triple{1,2,3};
+//
+#import org.semver.v2.Triple
+#endiv

@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace words {
+    class Usage;
+  }
+}
+#endiv
+#divert <hpp>
+#import options.Program
+#import options.throwable.Usage
+#import sys.exits.Code
+#import sys.exits.constants
+#import std.string
+class tests::words::Usage : public options::throwable::Usage {
+  using Ancestor = options::throwable::Usage;
+public:
+  inline explicit Usage(options::Program const &, sys::exits::Code = sys::exits::OK);
+  auto unformatted() const -> std::string override final;
+};
+#endiv
+#divert <ipp>
+tests::words::Usage::Usage(options::Program const &arg_program, sys::exits::Code arg_code)
+  : Ancestor(arg_program, arg_code) {
+  ;
+}
+#endiv
+#divert <cpp>
+auto tests::words::Usage::unformatted() const -> std::string {
+  return ("usage ${NAME} [ --usage ] [ --verbose ]\n"
+          "      ${____} [ --output=database.sqlite ]\n"
+          "      ${____} [ --row-insertion-limit=NUMBER ]    (zero means infinite, limit the rows to be inserted)\n"
+          "      ${____} ... word-file ..  .                 (for example /usr/share/dict/words)\n");
+}
+#endiv

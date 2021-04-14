@@ -1,0 +1,81 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  $(lib_libjson_module_la) \
+  -lrigging-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+# And CPPFLAGS, CXXFLAGS must remain available for the caller
+# no need to bitch about deprecated interfaces; we are testing those interfaces herein.
+$(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+$(check_bin_unit_OBJECTS): # NOT AM_LDFLAGS
+check_bin_unit_MODULES = $(call SCOLD_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  \
+  obj/src/tests/unit/as/namespace.cpp \
+  obj/src/tests/unit/as/Fixture.cpp \
+  \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  \
+  obj/src/tests/unit/features/namespace.cpp \
+  obj/src/tests/unit/features/Fixture.cpp \
+  \
+  obj/src/tests/unit/Generator.cpp \
+  obj/src/tests/unit/generator/namespace.cpp \
+  obj/src/tests/unit/generator/Symbol.cpp \
+  obj/src/tests/unit/generator/Number.cpp \
+  obj/src/tests/unit/generator/Readerlike.cpp \
+  obj/src/tests/unit/generator/State.cpp \
+  \
+  obj/src/tests/unit/lexical_cast/namespace.cpp \
+  obj/src/tests/unit/lexical_cast/Fixture.cpp \
+  \
+  obj/src/tests/unit/parse/namespace.cpp \
+  obj/src/tests/unit/parse/Fixture.cpp \
+  \
+  obj/src/tests/unit/reader/namespace.cpp \
+  obj/src/tests/unit/reader/Fixture.cpp \
+  obj/src/tests/unit/reader/Reader.cpp \
+  obj/src/tests/unit/reader/Simple.cpp \
+  obj/src/tests/unit/reader/Result.cpp \
+  \
+  obj/src/tests/unit/string/namespace.cpp \
+  obj/src/tests/unit/string/Fixture.cpp \
+  \
+  obj/src/tests/unit/to/namespace.cpp \
+  obj/src/tests/unit/to/Fixture.cpp \
+  obj/src/tests/unit/to/String.cpp \
+  obj/src/tests/unit/to/Value.cpp \
+  \
+  obj/src/tests/unit/value/namespace.cpp \
+  obj/src/tests/unit/value/Fixture.cpp \
+  obj/src/tests/unit/value/ToString.cpp \
+  \
+  obj/src/tests/unit/writer/namespace.cpp \
+  obj/src/tests/unit/writer/Compact.cpp \
+  obj/src/tests/unit/writer/Fixture.cpp \
+  obj/src/tests/unit/writer/Fast.cpp \
+  obj/src/tests/unit/writer/Pretty.cpp \
+  obj/src/tests/unit/writer/Stream.cpp \
+  obj/src/tests/unit/writer/Styled.cpp \
+  obj/src/tests/unit/writer/stream/namespace.cpp \
+  obj/src/tests/unit/writer/stream/Builder.cpp \
+  obj/src/tests/unit/writer/stream/Styled.cpp \
+  $(end)
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk
+.PHONY: clean-dependencies
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

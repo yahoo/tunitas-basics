@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward slurp.directory.named.Result
+#import sys.call.result.Value
+namespace slurp::directory::named {
+  // Unclear if we should standardize on this as a template type alias or not ...
+  template<typename CONTAINER> using __Result_nothrow = sys::call::result::Value<Result<CONTAINER>>;
+}
+#endiv
+#divert <hpp>
+namespace slurp::directory::named {
+  //
+  // Of course, and also, see the accessors from sys::call::result::Value<...>
+  //     ok(...) -> bool
+  //     error_code(...) -> std::error_code
+  //     value(...) -> Result<CONTAINER>
+  //
+
+  template<typename CONTAINER> inline auto name(__Result_nothrow<CONTAINER> const &) -> std::string const &;
+  template<typename CONTAINER> inline auto entries(__Result_nothrow<CONTAINER> const &) -> CONTAINER const &;
+
+  template<typename CONTAINER> auto name(__Result_nothrow<CONTAINER> &&) -> std::string;
+  template<typename CONTAINER> auto entries(__Result_nothrow<CONTAINER> &&) -> CONTAINER;
+}
+#endiv
+#divert <ipp>
+#import slurp.directory.named.Result
+template<typename CONTAINER> auto slurp::directory::named::name(__Result_nothrow<CONTAINER> const &res) -> std::string const & {
+  return name(value(res));
+}
+
+#import std.forward
+template<typename CONTAINER> auto slurp::directory::named::name(__Result_nothrow<CONTAINER> &&anon) -> std::string {
+  return name(value(std::forward<__Result_nothrow<CONTAINER>>(anon)));
+}
+
+template<typename CONTAINER> auto slurp::directory::named::entries(__Result_nothrow<CONTAINER> const &res) -> CONTAINER const & {
+  return entries(value(res));
+}
+
+#import std.forward
+template<typename CONTAINER> auto slurp::directory::named::entries(__Result_nothrow<CONTAINER> &&anon) -> CONTAINER {
+  return entries(value(std::forward<__Result_nothrow<CONTAINER>>(anon)));
+}
+#endiv

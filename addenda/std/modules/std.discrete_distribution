@@ -1,0 +1,3 @@
+// -*- c++ -*- ce37915a-83c4-445f-8802-8b393745910b
+#pragma once
+#include <random>

@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.exec.Collector.declaration
+#import c.basic_environv
+namespace sys::posix::packaging::exec {
+  template<typename CHAR> class Collector<c::basic_environv<CHAR>>;
+}
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.exec.Collector.basic_stringz
+#import c.basic_stringz
+namespace sys::posix::packaging::exec {
+  template<typename CHAR> class Collector<c::basic_environv<CHAR>> : public Collector<c::basic_stringz<CHAR>> {
+    using ancestor = Collector<c::basic_stringz<CHAR>>;
+  public:
+    //                               <----- penultimate ----->     ultimate
+    // Collector<Environv> collector(stringz, stringz, stringz ... environv)
+    using ultimate_type = c::basic_environv<CHAR>;
+    template<typename... PRECEEDING> Collector(PRECEEDING const &..., ultimate_type const &);
+    using environ_pointer = CHAR const *const *;
+    environ_pointer envv;
+  private:
+    inline auto treat_ultimate(c::basic_environv<CHAR> const &) -> void;
+  };
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import c.as
+#import std.reverse_iterator
+#import std.copy
+#import std.back_insert_iterator
+namespace sys::posix::packaging::exec {
+  template<typename CHAR> template<typename... PRECEEDING> Collector<c::basic_environv<CHAR>>::Collector(PRECEEDING const &...preceeding, ultimate_type const &ultimate)
+    : ancestor()
+    , envv() {
+    treat_ultimate(ultimate);
+    peel(preceeding...);
+  }
+  template<typename CHAR> auto Collector<c::basic_environv<CHAR>>::treat_ultimate(ultimate_type const &value) -> void {
+    envv = c::as<c::basic_environv<CHAR>>(value);
+  }
+}
+#endiv

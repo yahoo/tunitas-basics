@@ -1,0 +1,15 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_f_SOURCES_SET = \
+  obj/src/tests/unit/f/namespace.cpp \
+  obj/src/tests/unit/f/Fixture.cpp \
+  obj/src/tests/unit/f/Function.cpp \
+  obj/src/tests/unit/f/Lock.cpp \
+  obj/src/tests/unit/f/Owner.cpp \
+  obj/src/tests/unit/f/Seal.cpp \
+  obj/src/tests/unit/f/Seals.cpp \
+  $(end)

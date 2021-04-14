@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::fd { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::fd::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Set() -> void;
+  auto test_usage_Sets() -> void;
+  auto test_usage_set_Reference() -> void;
+  auto test_usage_count() -> void;
+  auto test_usage_select() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ares.fd.Set
+auto tests::unit::fd::Fixture::test_usage_Set() -> void {
+  ::ares::fd::Set set;
+  CPPUNIT_ASSERT(sizeof (set)); // yup, there it is!
+}
+#import ares.fd.Sets
+auto tests::unit::fd::Fixture::test_usage_Sets() -> void {
+  ::ares::fd::Sets sets;
+  CPPUNIT_ASSERT(sizeof (sets.reads) == sizeof (sets.writes)); // there they are!
+}
+#import ares.fd.set.Reference
+auto tests::unit::fd::Fixture::test_usage_set_Reference() -> void {
+  using namespace ::ares::fd::set;
+  ::ares::fd::Set sss;
+  Reference<Purpose::READ> readref{sss};
+  Reference<Purpose::WRITE> writeref{sss};
+  CPPUNIT_ASSERT(readref.repointer() == writeref.repointer());
+}
+#import ares.fd.count
+#import ares.fd.Sets
+#import ares.Channel
+auto tests::unit::fd::Fixture::test_usage_count() -> void {
+  ::ares::Channel channel;
+  ::ares::fd::Sets rw;
+  auto ccc = ares::fd::count(channel, rw);
+  CPPUNIT_ASSERT(0 <= (unsigned) ccc);
+}
+#import ares.fd.count
+#import ares.fd.Sets
+#import ares.Channel
+#import ares.fd.select
+auto tests::unit::fd::Fixture::test_usage_select() -> void {
+  ::ares::Channel channel;
+  ::ares::fd::Sets rw;
+  auto ccc = ares::fd::count(channel, rw);
+  auto selected = select(ccc, rw); // the Select fixture will test all possible combinations
+  CPPUNIT_ASSERT(ok(selected)); // there are no sockets ready and no timeout
+}
+#import tests.unit.fd.Set
+#import tests.unit.fd.Sets
+#import tests.unit.fd.set.Reference
+#import tests.unit.fd.Count
+#import tests.unit.fd.Select
+#import rigging.suite.io
+auto tests::unit::fd::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"fd"};
+  {
+    Stream use{"usage"};
+    use << call("Set", &Fixture::test_usage_Set)
+        << call("Sets", &Fixture::test_usage_Sets)
+        << call("set.Reference", &Fixture::test_usage_set_Reference)
+        << call("count", &Fixture::test_usage_count)
+        << call("select", &Fixture::test_usage_select)
+      ;
+    series << move(use);
+  }
+  series << add<Set>()
+     << add<Sets>()
+         << add<set::Reference>()
+         << add<Count>()
+         << add<Select>()
+    ;
+  return finalize(series);
+}
+#endiv

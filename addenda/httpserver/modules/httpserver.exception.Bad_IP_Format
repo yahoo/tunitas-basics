@@ -1,0 +1,6 @@
+// -*- c++ -*- 0c097abb-952e-4083-ac74-2bfd608cf312
+#pragma once
+#include <httpserver>
+namespace httpserver::exception {
+  using Bad_IP_Format = httpserver::http::bad_ip_format_exception;
+}

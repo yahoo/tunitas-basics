@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Dopelike
+#import nonstd.required.Spanlike
+namespace nonstd::required {
+  //
+  // Spanish ... either Spanlike or Dopelike
+  //
+  // Spanlike uses old_school names and does not acknowledge new New_School names
+  //      it may have static or dynamic extents.
+  //
+  // Dopelike uses New School names and does not acknowledge the old_school names
+  //     substantially useful for nonstd::basic_span<T> only.
+  //     only dynamic extent supplied by the type itself
+  //
+  //
+  template<typename SPAN> concept bool Spanish = (Spanlike<SPAN> || Dopelike<SPAN>) && requires(SPAN span) {
+    // The two concepts differ only in type names that are available within
+    // The two have the same members, returning basically the same thing
+    { span.size() };
+    { span.empty() };
+    { span.data() };
+  };
+}
+#endiv

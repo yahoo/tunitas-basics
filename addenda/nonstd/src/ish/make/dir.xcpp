@@ -1,0 +1,24 @@
+// -*- c++ -*- in the SCOLD stylings which are so popular these days
+#divert <hpp>
+#import std.string
+#import std.allocator
+namespace ish {
+  namespace make {
+    //
+    // Like GNU Make's $(dir ...)
+    //
+    inline auto dir(std::string const &) -> std::string;
+    template<template<typename V, typename A> class CONTAINER> inline auto dir(CONTAINER<std::string, std::allocator<std::string>> const &) -> CONTAINER<std::string, std::allocator<std::string>>;
+  }
+}
+#endiv
+#divert <ipp>
+#import ish.shell.dirname
+auto ish::make::dir(std::string const &path) -> std::string {
+  return shell::dirname(path);
+}
+
+template<template<typename V, typename A> class CONTAINER> auto ish::make::dir(CONTAINER<std::string, std::allocator<std::string>> const &source) -> CONTAINER<std::string, std::allocator<std::string>> {
+  return shell::dirname(source);
+}
+#endiv

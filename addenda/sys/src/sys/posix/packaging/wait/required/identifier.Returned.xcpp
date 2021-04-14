@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.required.process.Process
+namespace sys::posix::packaging::wait::required::identifier {
+  //
+  // Any process identifier is returnable in Title Case (Process) case or lower case (pid_t).
+  // But never process groups,
+  //           process symbols ("self" or "all").
+  //
+  // Usage:
+  //
+  //   template<required::identifier::Returned RETURNED> auto wait() -> Output<WAIT2, Unmatched, RETURNED>;
+  //
+  template<typename PROCESS> concept bool Returned = sys::id::required::process::Process<PROCESS>;
+}
+#endiv
+#divert <cpp>
+#import sys.id.Process
+#import sys.id.process.Group
+#import sys.id.Wait
+#import pid_t
+#import id_t
+namespace {
+  namespace tests {
+    using namespace sys::posix::packaging::wait::required::identifier;
+    // Examples
+    static_assert(Returned<sys::id::Process>);
+    static_assert(Returned<sys::id::process::Process>);
+    static_assert(Returned<pid_t>);
+    // Not such
+    static_assert(!Returned<sys::id::process::Group>);
+    static_assert(!Returned<sys::id::Wait>);
+    static_assert(!Returned<id_t>);
+  }
+}
+#endiv

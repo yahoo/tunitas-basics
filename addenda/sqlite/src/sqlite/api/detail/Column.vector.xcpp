@@ -1,0 +1,24 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+#forward sqlite.api.detail.Column
+#import std.vector
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename CHAR, typename ALLOC> struct Column<std::vector<CHAR, ALLOC>>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Column
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+template<typename CHAR, typename ALLOC>
+struct sqlite::api::detail::Column<std::vector<CHAR, ALLOC>>
+  // This is private so the general Column<std::vector<CHAR, ALLOC>> is useless
+  // The specializations for std::vector<char> are not invalid.
+  : private sqlite::detail::ResultSFINAE<std::vector<CHAR, ALLOC>>
+  , public sqlite::detail::specialization_is_invalid
+{ };
+#endiv

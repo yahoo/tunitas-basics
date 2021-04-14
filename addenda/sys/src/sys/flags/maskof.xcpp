@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.flags.required.Flagset
+namespace sys::flags {
+  //
+  // When the FLAG is really just a mask value, e.g. (bitset-mask) 0x100 not (bit-index) 8.
+  // The FLAG type is encoded as bitmask with a single bit.
+  // See downcastof for more commentariat.
+  //
+  // Exceptions:
+  //
+  //   throws invalid_argument if multiple bits are set.
+  //
+  // Usage:
+  //
+  //    auto flag = maskof<Flag>(flags);
+  //
+  template<typename FLAG, typename FLAGSET> inline auto maskof(FLAGSET, unsigned start, unsigned finish) -> FLAG requires required::Flagset<FLAG, FLAGSET>;
+}
+#endiv
+#divert <ipp>
+#import sys.flags.downcastof
+template<typename FLAG, typename FLAGSET> auto sys::flags::maskof(FLAGSET flagset, unsigned start, unsigned finish) -> FLAG requires required::Flagset<FLAG, FLAGSET> { return downcastof<downcastas::MASK, FLAG>(flagset, start, finish); }
+#endiv

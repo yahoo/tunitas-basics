@@ -1,0 +1,113 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace posix {
+      namespace exec {
+        class Const_Stringz;
+      }
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.call.Result
+class tests::unit::posix::exec::Const_Stringz : public cppunit::test::Fixture {
+public:
+  auto test_arg() -> void;
+  auto test_arg_envv() -> void;
+  auto test_argv() -> void;
+  auto test_argv_envv() -> void;
+  auto test_vararg_args_only() -> void;
+  auto test_vararg_args_end_envv() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import sys.posix.exec
+#import sys.posix.fork
+#import tests.unit.posix.exec.complain
+
+auto tests::unit::posix::exec::Const_Stringz::test_arg() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    complain(exec("/bin/date", "date"));
+  }
+}
+
+auto tests::unit::posix::exec::Const_Stringz::test_arg_envv() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    c::const_environv empty;
+    complain(exec("/bin/date", "date", empty));
+  }
+}
+
+auto tests::unit::posix::exec::Const_Stringz::test_argv() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    char argv0[] = "date";
+    char *base[] = { argv0, nullptr };
+    c::const_argv argv(sizeof (base)/sizeof (base[0])-1, base);
+    complain(exec("/bin/date", argv));
+  }
+}
+
+auto tests::unit::posix::exec::Const_Stringz::test_argv_envv() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    char argv0[] = "date";
+    char *base[] = { argv0, nullptr };
+    c::const_argv argv(sizeof (base)/sizeof (base[0])-1, base);
+    char var0[] = "VAR0=zero";
+    char var1[] = "VAR1=one";
+    char *vars[] = { var0, var1, nullptr };
+    c::const_environv envv(vars);
+    complain(exec("/bin/date", argv, envv));
+  }
+}
+
+auto tests::unit::posix::exec::Const_Stringz::test_vararg_args_only() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    using csz = c::const_stringz;
+    complain(exec("/bin/echo", csz("echo"), csz("echo-dater"), csz("echo-truthful"), csz("echo-truthiness")));
+  }
+}
+
+auto tests::unit::posix::exec::Const_Stringz::test_vararg_args_end_envv() -> void {
+  using ::sys::posix::fork;
+  using ::sys::posix::exec;
+  if (is_child(fork())) {
+    char var0[] = "VAR0=zero";
+    char var1[] = "VAR1=one";
+    char *vars[] = { var0, var1, nullptr };
+    c::const_environv envv(vars);
+    using csz = c::const_stringz;
+    complain(exec("/bin/echo", csz("echo"), "echo-dater", csz("echo-datie"), csz("echo-dateliness"), envv));
+  }
+}
+
+#import rigging.suite.io
+auto tests::unit::posix::exec::Const_Stringz::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("const_stringz");
+  series << call("arg", &Const_Stringz::test_arg)
+         << call("arg_envv", &Const_Stringz::test_arg_envv)
+         << call("argv", &Const_Stringz::test_argv)
+         << call("argv_envv", &Const_Stringz::test_argv_envv)
+         << call("vararg_args_only", &Const_Stringz::test_vararg_args_only)
+         << call("vararg_args_end_envv", &Const_Stringz::test_vararg_args_end_envv)
+    ;
+  return finalize(series);
+}
+#divert </cpp>

@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import want.nonstd.required.Among
+#import ip.in4 // in4::addr, addr_t
+#import ip.in6 // in6::addr, addr_t
+namespace ip::required {
+  //
+  // Either kind of addr or addr_t
+  //
+  // Usage:
+  //
+  //   template<required::Address> struct Thing;
+  //
+  template<typename ADDRESS> concept bool Address = want::nonstd::required::Among<ADDRESS, in4::addr, in4::addr_t, in6::addr, in6::addr_t>;
+}
+#endiv

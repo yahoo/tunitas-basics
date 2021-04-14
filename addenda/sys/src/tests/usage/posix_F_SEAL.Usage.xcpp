@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix.f.seal.Usage
+//   using namespace tests::usage::posix::f::seal;
+//   static_assert(Usage<sys::posix::F::SEAL>);
+//
+#import nonstd.convertible_to
+#import sys.posix.F.SEAL
+#import tests.model.Namespace_Object
+#import tests.model.Namespace_Object_Flags
+#import tests.usage.countof
+namespace tests::usage::posix_F_SEAL {
+  using sys::posix::F;
+  namespace [[detail]] packaging {
+    using nonstd::convertible_to;
+    template<typename SEAL> concept bool Instance = requires(SEAL) {
+      typename SEAL::Seal;
+      typename SEAL::Seals;
+      requires model::Namespace_Object<SEAL>;
+      requires model::Namespace_Object_Flags<SEAL, typename SEAL::Seal, typename SEAL::Seals>;
+      requires (int)SEAL::NONE == 0;
+      requires (int)SEAL::SEAL == F_SEAL_SEAL;
+      requires (int)SEAL::SHRINK == F_SEAL_SHRINK;
+      requires (int)SEAL::GROW == F_SEAL_GROW;
+      requires (int)SEAL::WRITE == F_SEAL_WRITE;
+      requires requires(SEAL, typename SEAL::Seal ify, typename SEAL::Seals ies) {
+#if 202003L < __cplusplus
+        { SEAL::template as<typename SEAL::Seals>(ify) } -> convertible_to<typename SEAL::Seals>;
+        { SEAL::template as<typename SEAL::Seal>(ify) } -> convertible_to<typename SEAL::Seal>;
+        { SEAL::template as<typename SEAL::Seals>(ies) } -> convertible_to<typename SEAL::Seals>;
+        { SEAL::template as<typename SEAL::Seal>(ies) } -> convertible_to<typename SEAL::Seal>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { SEAL::template as<typename SEAL::Seals>(ify) } -> typename SEAL::Seals;
+        { SEAL::template as<typename SEAL::Seal>(ify) } -> typename SEAL::Seal;
+        { SEAL::template as<typename SEAL::Seals>(ies) } -> typename SEAL::Seals;
+        { SEAL::template as<typename SEAL::Seal>(ies) } -> typename SEAL::Seal;
+#endif
+      };
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<F::SEAL>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

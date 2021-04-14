@@ -1,0 +1,291 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::id { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::id::Fixture : public cppunit::test::Fixture {
+  auto test_User() -> void;
+  auto test_Group() -> void;
+  auto test_File() -> void;
+  auto test_Signal() -> void;
+  auto test_Process() -> void;
+  auto test_process_Thread() -> void;
+  auto test_process_Process() -> void;
+  auto test_process_Group() -> void;
+  auto test_process_Either() -> void;
+  auto test_process_Any() -> void;
+  auto test_Wait() -> void;
+  auto test_wait_Type() -> void;
+  auto test_is_thread_Thread() -> void;
+  auto test_is_process_Thread() -> void;
+  auto test_is_group_Thread() -> void;
+  auto test_is_thread_Process() -> void;
+  auto test_is_process_Process() -> void;
+  auto test_is_group_Process() -> void;
+  auto test_is_thread_Group() -> void;
+  auto test_is_process_Group() -> void;
+  auto test_is_group_Group() -> void;
+  auto test_is_thread_Any() -> void;
+  auto test_is_process_Any() -> void;
+  auto test_is_group_Any() -> void;
+  auto test_is_process_Either() -> void;
+  auto test_is_group_Either() -> void;
+  static auto suite() -> cppunit::Test *;
+  enum class Castable { M1 = 0x1, M2 = 0x2, M3 = 0x4, M4 = 0x8 };
+};
+#endiv
+#divert <cpp>
+#import sys.id.User
+auto tests::unit::id::Fixture::test_User() -> void {
+  using Subject = ::sys::id::User;
+  auto subject0 = Subject{};
+  auto subject1 = Subject(-1);
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.Group
+auto tests::unit::id::Fixture::test_Group() -> void {
+  using Subject = ::sys::id::Group;
+  auto subject0 = Subject{};
+  auto subject1 = Subject(-1);
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.File
+auto tests::unit::id::Fixture::test_File() -> void {
+  using Subject = ::sys::id::File;
+  auto subject0 = Subject{};
+  auto subject1 = Subject(-1);
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.Signal
+auto tests::unit::id::Fixture::test_Signal() -> void {
+  using Subject = ::sys::id::Signal;
+  auto subject0 = Subject{};
+  auto subject1 = Subject{15};
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.Process
+auto tests::unit::id::Fixture::test_Process() -> void {
+  using Subject = ::sys::id::Process;
+  auto subject0 = Subject{};
+  auto subject1 = Subject{-1};
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.process.Thread
+auto tests::unit::id::Fixture::test_process_Thread() -> void {
+  using Subject = ::sys::id::process::Thread;
+  auto subject0 = Subject{};
+  auto subject1 = Subject{-1};
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.process.Process
+auto tests::unit::id::Fixture::test_process_Process() -> void {
+  using Subject = ::sys::id::process::Process;
+  auto subject0 = Subject{};
+  auto subject1 = Subject{-1};
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.process.Group
+auto tests::unit::id::Fixture::test_process_Group() -> void {
+  using Subject = ::sys::id::process::Group;
+  auto subject0 = Subject{};
+  auto subject1 = Subject{-1};
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.process.Either
+auto tests::unit::id::Fixture::test_process_Either() -> void {
+  using ::sys::id::process::Group;
+  using ::sys::id::process::Process;
+  using Subject = ::sys::id::process::Either;
+  auto subject0 = Subject{};
+  auto subject_p1p = Subject{Process{1}};
+  auto subject_p1m = Subject{Process{-1}};
+  auto subject_g1p = Subject{Group{1}};
+  auto subject_g1m = Subject{Group{-1}};
+  CPPUNIT_ASSERT(subject0 != subject_p1p);
+  CPPUNIT_ASSERT(subject0 != subject_g1p);
+  CPPUNIT_ASSERT(subject_p1p != subject_p1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_g1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_g1p);
+  CPPUNIT_ASSERT(subject_p1m != subject_g1m);
+}
+#import sys.id.process.Any
+auto tests::unit::id::Fixture::test_process_Any() -> void {
+  using ::sys::id::process::Thread;
+  using ::sys::id::process::Group;
+  using ::sys::id::process::Process;
+  using Subject = ::sys::id::process::Any;
+  auto subject0 = Subject{};
+  auto subject_t1p = Subject{Thread{1}};
+  auto subject_t1m = Subject{Thread{-1}};
+  auto subject_p1p = Subject{Process{1}};
+  auto subject_p1m = Subject{Process{-1}};
+  auto subject_g1p = Subject{Group{1}};
+  auto subject_g1m = Subject{Group{-1}};
+  CPPUNIT_ASSERT(subject0 != subject_p1p);
+  CPPUNIT_ASSERT(subject0 != subject_g1p);
+  CPPUNIT_ASSERT(subject_p1p != subject_t1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_g1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_p1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_g1m);
+  CPPUNIT_ASSERT(subject_p1p != subject_g1p);
+  CPPUNIT_ASSERT(subject_p1m != subject_g1m);
+}
+#import sys.id.Wait
+auto tests::unit::id::Fixture::test_Wait() -> void {
+  using Subject = ::sys::id::Wait;
+  auto subject0 = Subject{};
+  auto subject1 = Subject(-1);
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.wait.Type
+auto tests::unit::id::Fixture::test_wait_Type() -> void {
+  using Subject = ::sys::id::wait::Type;
+  auto subject0 = Subject::PROCESS;
+  auto subject1 = Subject::GROUP;
+  CPPUNIT_ASSERT(subject0 != subject1);
+}
+#import sys.id.process.Thread
+#import sys.id.process.Group
+#import sys.id.process.Process
+namespace tests::unit::id {
+  auto Fixture::test_is_thread_Thread() -> void {
+    auto that = ::sys::id::process::Thread{};
+    CPPUNIT_ASSERT(is_thread(that));
+  }
+  auto Fixture::test_is_process_Thread() -> void {
+    auto that = ::sys::id::process::Thread{};
+    CPPUNIT_ASSERT(!is_process(that));
+  }
+  auto Fixture::test_is_group_Thread() -> void {
+    auto that = ::sys::id::process::Thread{};
+    CPPUNIT_ASSERT(!is_group(that));
+  }
+  auto Fixture::test_is_thread_Process() -> void {
+    auto that = ::sys::id::process::Process{};
+    CPPUNIT_ASSERT(!is_thread(that));
+  }
+  auto Fixture::test_is_process_Process() -> void {
+    auto that = ::sys::id::process::Process{};
+    CPPUNIT_ASSERT(is_process(that));
+  }
+  auto Fixture::test_is_group_Process() -> void {
+    auto that = ::sys::id::process::Process{};
+    CPPUNIT_ASSERT(!is_group(that));
+  }
+  auto Fixture::test_is_thread_Group() -> void {
+    auto that = ::sys::id::process::Group{};
+    CPPUNIT_ASSERT(!is_thread(that));
+  }
+  auto Fixture::test_is_process_Group() -> void {
+    auto that = ::sys::id::process::Group{};
+    CPPUNIT_ASSERT(!is_process(that));
+  }
+  auto Fixture::test_is_group_Group() -> void {
+    auto that = ::sys::id::process::Group{};
+    CPPUNIT_ASSERT(is_group(that));
+  }
+  auto Fixture::test_is_thread_Any() -> void {
+    using namespace ::sys::id::process;
+    auto that = Any{Thread{}};
+    CPPUNIT_ASSERT(is_thread(that));
+    auto other = Any{Group{}};
+    CPPUNIT_ASSERT(!is_thread(other));
+  }
+  auto Fixture::test_is_process_Any() -> void {
+    using namespace ::sys::id::process;
+    auto that = Any{Process{}};
+    CPPUNIT_ASSERT(is_process(that));
+    auto other = Any{Group{}};
+    CPPUNIT_ASSERT(!is_process(other));
+  }
+  auto Fixture::test_is_group_Any() -> void {
+    using namespace ::sys::id::process;
+    auto that = Any{Group{}};
+    CPPUNIT_ASSERT(is_group(that));
+    auto other = Any{Thread{}};
+    CPPUNIT_ASSERT(!is_group(other));
+  }
+  auto Fixture::test_is_process_Either() -> void {
+    using namespace ::sys::id::process;
+    auto that = Either{Process{}};
+    CPPUNIT_ASSERT(is_process(that));
+    auto other = Either{Group{}};
+    CPPUNIT_ASSERT(!is_process(other));
+  }
+  auto Fixture::test_is_group_Either() -> void {
+    using namespace ::sys::id::process;
+    auto that = Either{Group{}};
+    CPPUNIT_ASSERT(is_group(that));
+    auto other = Either{Process{}};
+    CPPUNIT_ASSERT(!is_group(other));
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::id {
+  auto Fixture::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    Stream series{"id"};
+    series << call("User", &Fixture::test_User)
+           << call("Group", &Fixture::test_Group)
+           << call("File", &Fixture::test_File)
+           << call("Signal", &Fixture::test_Signal)
+           << call("Process", &Fixture::test_Process)
+           << []() {
+                Stream proc{"process"};
+                proc << call("Thread", &Fixture::test_process_Thread)
+                     << call("Process", &Fixture::test_process_Process)
+                     << call("Group", &Fixture::test_process_Group)
+                     << call("Either", &Fixture::test_process_Either)
+                     << call("Any", &Fixture::test_process_Any)
+                     << END;
+                return move(proc);
+              }()
+           << call("Wait", &Fixture::test_Wait)
+           << []() {
+                Stream wait{"wait"};
+                wait << call("Type", &Fixture::test_wait_Type)
+                     << END;
+                return move(wait);
+              }()
+           << []() {
+                Stream is{"is"};
+                is << []() {
+                        Stream gr{"group"};
+                        gr << call("Group", &Fixture::test_is_group_Group)
+                           << call("Process", &Fixture::test_is_group_Process)
+                           << call("Thread", &Fixture::test_is_group_Thread)
+                           << call("Either", &Fixture::test_is_group_Either)
+                           << call("Any", &Fixture::test_is_group_Any)
+                           << END;
+                        return move(gr);
+                      }()
+                   << []() {
+                        Stream pr{"process"};
+                        pr << call("Group", &Fixture::test_is_process_Group)
+                           << call("Process", &Fixture::test_is_process_Process)
+                           << call("Thread", &Fixture::test_is_process_Thread)
+                           << call("Either", &Fixture::test_is_process_Either)
+                           << call("Any", &Fixture::test_is_process_Any)
+                           << END;
+                        return move(pr);
+                      }()
+                   << []() {
+                        Stream th{"thread"};
+                        th << call("Group", &Fixture::test_is_thread_Group)
+                           << call("Process", &Fixture::test_is_thread_Process)
+                           << call("Thread", &Fixture::test_is_thread_Thread)
+                           << call("Any", &Fixture::test_is_thread_Any)
+                           << END;
+                        return move(th);
+                      }()
+                   << END;
+                return move(is);
+              }()
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

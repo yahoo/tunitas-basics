@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.at.interface
+namespace sys::posix {
+  namespace packaging::unlinkat {
+    using namespace packaging::at::interface;
+    namespace function {
+      using Position = argument::Position<File>;
+      inline auto unlinkat(Position, Pathname, Flags) -> result::Status;
+    }
+    namespace native {
+      using Position = argument::Position<int>;
+      inline auto unlinkat(Position, Pathname, Flags) -> result::Status;
+    }
+  }
+  using packaging::unlinkat::function::unlinkat;
+  namespace native { using packaging::unlinkat::native::unlinkat; }
+}
+using sys::posix::unlinkat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::unlinkat {
+  auto function::unlinkat(Position directory, Pathname pathname, Flags flags) -> result::Status { return native::unlinkat(directory, move(pathname), flags); }
+  auto native::unlinkat(Position directory, Pathname pathname, Flags flags) -> result::Status   { return idiomatic::syscall<int>(Syscall::UNLINKAT, (int)directory, (char const *)pathname, (int)flags); }
+}
+#endiv

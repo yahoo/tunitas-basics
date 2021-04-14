@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include "json/writer.h"
+namespace json {
+  //
+  // Writer - is an abstract class for writers.
+  //     "And really, this is an implementation detail."
+  //
+  // This interface is deprecated; instead use (the more complicated)
+  // Complex:
+  //   json::writer::Stream
+  //   json::writer::stream::Builder
+  // Simple:
+  //   json::writer::Compact
+  //   json::writer::Pretty
+  //
+  // So json::Writer becomes deprecated.
+  // And we want to suppress the (implementation detail) of the base level deprecation.
+  //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  using Writer [[deprecated]] = ::Json::Writer;
+#pragma GCC diagnostic pop
+}
+#endiv

@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::w {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.w.Options
+namespace sys::w::constants {
+  inline constexpr auto NONE      = Options{Options::NONE};
+  inline constexpr auto CONTINUED = Options{Option::CONTINUED};
+  inline constexpr auto EXITED    = Options{Option::EXITED};
+  inline constexpr auto NOHANG    = Options{Option::NOHANG};
+  inline constexpr auto NOWAIT    = Options{Option::NOWAIT};
+  inline constexpr auto STOPPED   = Options{Option::STOPPED};
+  inline constexpr auto UNTRACED  = Options{Option::UNTRACED};
+}
+#endiv

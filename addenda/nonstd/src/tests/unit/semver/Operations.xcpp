@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::semver {
+  //
+  // Operations common to all the test fixtures of semver
+  // Descendants only.
+  // A mixin.
+  //
+  // Usage:
+  //
+  //   class some::Fixture : public cppunit::test::Fixture, public Operations {
+  //     ...usual stuff...
+  //   };
+  //
+  class Operations;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import nonstd.required.iterator.Input
+class tests::unit::semver::Operations {
+protected:
+  ~Operations() = default;
+public:
+  //
+  // A to_string operation (by another name)
+  // 
+  template<typename SUBJECT> static auto s(SUBJECT const &) -> std::string;
+  //
+  // A lexicographic comparison (by another name)
+  //
+  template<nonstd::required::iterator::Input IT1, nonstd::required::iterator::Input  IT2> static auto lc(IT1 first1, IT1 last1, IT2 first2, IT2 last2) -> bool; 
+};
+#endiv
+#divert <tpp>
+#import std.ostringstream
+namespace tests::unit::semver {
+  template<nonstd::required::iterator::Input IT1, nonstd::required::iterator::Input IT2> auto Operations::lc(IT1 first1, IT1 last1, IT2 first2, IT2 last2) -> bool {
+    for ( ; (first1 != last1) && (first2 != last2); first1++, first2++ ) {
+      if (*first1 < *first2) return true;
+      if (*first2 < *first1) return false;
+    }
+    return (first1 == last1) && (first2 != last2);
+  }
+  template<typename SUBJECT> auto Operations::s(SUBJECT const &subject) -> std::string {
+    std::ostringstream buf;
+    buf << subject; // <---------------------- this tests operator<< of the SUBJECT as found by ADL
+    return buf.str();
+  }
+}
+#endiv

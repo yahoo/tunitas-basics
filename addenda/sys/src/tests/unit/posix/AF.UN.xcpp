@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.AF>
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.AF.UN
+struct tests::unit::posix::AF::UN : public cppunit::test::Fixture {
+  using Generic = ::sys::posix::AF;
+  using Subject = ::sys::posix::AF::UN;
+  auto test_object() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.posix.AF
+namespace tests::unit::posix {
+  auto AF::UN::test_object() -> void {
+    CPPUNIT_ASSERT(sizeof (Subject::Address));
+  }
+  auto AF::UN::test_constants() -> void {
+    CPPUNIT_ASSERT((int)Generic::LOCAL == (int)Subject::LOCAL);
+    CPPUNIT_ASSERT((int)Generic::UNIX == (int)Subject::UNIX);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::AF::UN::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("UN");
+  series << call("object", &UN::test_object)
+         << call("constants", &UN::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

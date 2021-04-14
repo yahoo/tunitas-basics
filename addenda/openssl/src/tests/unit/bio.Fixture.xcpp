@@ -1,0 +1,124 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::bio { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::bio::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_File() -> void;
+  auto test_usage_String() -> void;
+  auto test_usage_Mode() -> void;
+  auto test_file_new() -> void;
+  auto test_file_read() -> void;
+  auto test_file_write() -> void;
+  auto test_string_new() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import openssl.bio.File
+#import openssl.bio.new_file
+#import std.ios
+auto tests::unit::bio::Fixture::test_usage_File() -> void {
+  using ::openssl::bio::File;
+  using ::openssl::bio::new_file;
+  // This will work, of course.
+  File in = new_file("/dev/null", std::ios::in);
+  File out = new_file("/dev/null", std::ios::out);
+  BIO_puts(out.get(), "Hello World\n");
+  // This will fail (of course
+  try {
+    File in = new_file("/dev/null/is/not/a/directory", std::ios::in);
+    CPPUNIT_ASSERT(false);
+  } catch (...) {
+    CPPUNIT_ASSERT(true);
+  }  
+}
+#import openssl.bio.String
+auto tests::unit::bio::Fixture::test_usage_String() -> void {
+  using ::openssl::bio::String;
+  // This will work, of course.
+  String in;
+  auto to = to_string(in);
+  CPPUNIT_ASSERT(to.empty());
+}
+#import openssl.bio.Mode
+#import openssl.bio.Mode.tests.Access
+auto tests::unit::bio::Fixture::test_usage_Mode() -> void {
+  using ::openssl::bio::Mode;
+  Mode r{"r"};
+  CPPUNIT_ASSERT("r"s == openssl::bio::Mode::tests::Access(r).mode());
+  Mode w{"w"};
+  CPPUNIT_ASSERT("w"s == Mode::tests::Access{w}.mode());
+  Mode in{std::ios::in};
+  CPPUNIT_ASSERT("r"s == Mode::tests::Access{in}.mode());
+  Mode out{std::ios::out};
+  CPPUNIT_ASSERT("w"s == Mode::tests::Access{out}.mode());
+}
+#import openssl.bio.new_file
+#import getpid
+#import sys.posix.unlink
+#import std.filesystem.path
+auto tests::unit::bio::Fixture::test_file_new() -> void {
+  struct Guard {
+    std::filesystem::path const new_filename;
+    Guard() : new_filename{"/tmp/tests.unit.bio.Fixture.test_file_new." + std::to_string(getpid())} { }
+    ~Guard() { sys::posix::unlink(new_filename); }
+    Guard(Guard const &) = delete;
+  } guard;
+  // This throws on failure (it should not fail)
+  ::openssl::bio::File subject = ::openssl::bio::new_file(guard.new_filename, std::ios::out);
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import openssl.bio.read_file
+auto tests::unit::bio::Fixture::test_file_read() -> void {
+  // This throws on failure (it should not fail)
+  ::openssl::bio::File subject = ::openssl::bio::read_file("/proc/cpuinfo");
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import openssl.bio.write_file
+auto tests::unit::bio::Fixture::test_file_write() -> void {
+  // This throws on failure (it should not fail)
+  ::openssl::bio::File subject = ::openssl::bio::write_file("/dev/null");
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import openssl.bio.new_string
+auto tests::unit::bio::Fixture::test_string_new() -> void {
+  ::openssl::bio::String subject = ::openssl::bio::new_string();
+  CPPUNIT_ASSERT(0 != sizeof (subject));
+}
+#import tests.unit.bio.File
+#import tests.unit.bio.String
+#import rigging.suite.io
+auto tests::unit::bio::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("bio");
+  {
+    Stream use("usage");
+    use << call("File", &Fixture::test_usage_File)
+        << call("Mode", &Fixture::test_usage_Mode)
+        << call("String", &Fixture::test_usage_String)
+    ;
+    series << move(use);
+  } {
+    Stream fil("file");
+    fil << call("new", &Fixture::test_file_new)
+        << call("read", &Fixture::test_file_read)
+        << call("write", &Fixture::test_file_write)
+      ;
+    series << move(fil);
+  } {
+    Stream str("string");
+    str << call("new", &Fixture::test_string_new)
+      ;
+    series << move(str);
+  }
+  series << add<File>()
+         << add<String>()
+    ;
+  return finalize(series);
+}
+#endiv

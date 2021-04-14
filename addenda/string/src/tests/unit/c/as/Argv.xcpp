@@ -1,0 +1,108 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::as {
+  class Argv;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.as.Palette
+class tests::unit::c::as::Argv : public cppunit::test::Fixture, Palette<WORDS> { 
+public: 
+  Argv() = default;
+
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  auto test_argv_consty() -> void;
+  auto test_argv_muting() -> void;
+  auto test_array_char_pointer_consty() -> void;
+  auto test_array_char_pointer_muting() -> void;
+  auto test_basic_argv_consty() -> void;
+  auto test_basic_argv_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import c.as
+
+auto tests::unit::c::as::Argv::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::as::Argv::tearDown() -> void {
+  Palette::tearDown();
+}
+
+#import c.argv
+#import c.const_argv
+#import c.as
+auto tests::unit::c::as::Argv::test_argv_muting() -> void {
+  ::c::argv av = ::c::as<::c::argv>(bac);
+  prove_is_same(av, bac);
+  ::c::const_argv cav = ::c::as<::c::const_argv>(bac);
+  prove_is_same(cav, bac);
+  prove_is_same(cav, av);
+}
+
+auto tests::unit::c::as::Argv::test_argv_consty() -> void {
+  ::c::const_argv cav = ::c::as<::c::const_argv>(bacc);
+  prove_is_same(cav, bacc);
+}
+
+auto tests::unit::c::as::Argv::test_array_char_pointer_muting() -> void {
+  ::c::argv av = ::c::as<::c::argv>(apc);
+  prove_is_same(av, apc);
+  ::c::const_argv cav = ::c::as<::c::const_argv>(apc);
+  prove_is_same(cav, apc);
+  prove_is_same(cav, av);
+}
+
+auto tests::unit::c::as::Argv::test_array_char_pointer_consty() -> void {
+  ::c::const_argv cav = ::c::as<::c::const_argv>(apcc);
+  prove_is_same(cav, apcc);
+}
+
+auto tests::unit::c::as::Argv::test_basic_argv_consty() -> void {
+  //
+  // Interface:
+  //   template<typename RESULT, typename CHAR> auto as(basic_argv<CHAR const> const &) -> RESULT;
+  //   template<typename RESULT, typename CHAR> auto as(basic_argv<CHAR> const &) -> RESULT;
+  //
+  // Concept:
+  //   as<basic_argv<char const>>(basic_argv<char>) ..... cast to const
+  //   as<basic_argv<char>>(basic_argv<char>) ........... identity transform
+  //
+  using consty_type = ::c::basic_argv<char const>; // <-------- consty
+  consty_type again = ::c::as<consty_type>(bac);
+  prove_is_same(again, bac);
+} 
+
+auto tests::unit::c::as::Argv::test_basic_argv_muting() -> void {
+  using muting_type = ::c::basic_argv<char>; // <-------------- muting
+  muting_type again = ::c::as<muting_type>(bac);
+  prove_is_same(again, bac);
+}
+
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+auto tests::unit::c::as::Argv::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("argv");
+  series << call("argv_consty", &Argv::test_argv_consty)
+         << call("argv-muting", &Argv::test_argv_muting)
+         << call("array_char_pointer-consty", &Argv::test_array_char_pointer_consty)
+         << call("array_char_pointer-muting", &Argv::test_array_char_pointer_muting)
+         << call("basic_argv-consty", &Argv::test_basic_argv_consty)
+         << call("basic_argv-muting", &Argv::test_basic_argv_muting)
+    ;
+  return series.release();
+}
+#divert </cpp>

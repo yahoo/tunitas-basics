@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::exception {
+  //
+  // Signal an unexpected occurrence (in data)
+  //
+  //   NOT the function-file-line descendants
+  //   NOT Unreachable --- which the could be expected; the compiler could have told us
+  //   NOT Unimplemented - which could reasonably be expected
+  //
+  // Unexpected is a runtime error because some mid-tier invariant failed.
+  // e.g. a [[noreturn]] function actually returned;
+  //      syscall exec(...) returned a success - ok(execed)
+  //
+  // Don't use for natural error processing that can reasonably occur
+  // e.g. a fallthru in a switch
+  //      syscall exec(...) returned with a failure - !ok(execed).
+  //
+  // Usage:
+  //
+  //   auto hot_take = "because, that's why"sv;
+  //   throw Unexpected{hot_take};
+  //
+  //   auto deep_thought = "reasons ye know not of"s;
+  //   throw Unexpected{deep_thought};
+  //
+  class [[nodiscard]] Unexpected;
+}
+#endiv
+#divert <hpp>
+#import nonstd.exception.Runtime
+#import nonstd.basic_string_view
+class nonstd::exception::Unexpected : public Runtime<string_view> {
+  using Ancestor = Runtime<string_view>;
+public:
+  using Ancestor::View;
+};
+#endiv

@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.argv
+#import sys.exits.Code
+namespace tests::query::a {
+  auto main(c::argv) -> sys::exits::Code;
+}
+#endiv
+#divert <cpp>
+#import tests.query.address
+auto main(int cc, char *vv[]) -> int {
+  return tests::query::address::main<ares::A, ares::dns::A>(c::argv(cc, vv));
+}
+#endiv

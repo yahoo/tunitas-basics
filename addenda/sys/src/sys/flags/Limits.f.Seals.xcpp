@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.declaration
+#forward sys.f.Seals
+namespace sys::flags {
+  //
+  // The limits of the F Seals
+  //
+  // Usage:
+  //
+  //   you know.
+  //
+  template<> struct Limits<f::Seals>;
+}
+#endiv
+#divert <hpp>
+#import sys.f.Seal
+namespace sys::flags {
+  template<> struct Limits<f::Seals> : public limits::Generic<f::Seals, f::Seal, std::underlying_type_t<f::Seal>, 8*sizeof (std::underlying_type_t<f::Seal>)> { };
+}
+#endiv
+#divert <ipp>
+#import sys.f.Seals
+#endiv

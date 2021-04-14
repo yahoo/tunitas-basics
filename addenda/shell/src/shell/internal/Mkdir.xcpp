@@ -1,0 +1,158 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell {
+  namespace internal {
+    class Mkdir;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import c.const_stringz
+#import shell.Option
+#import std.string
+#import std.vector
+#import sys.exits.Code
+class shell::internal::Mkdir {
+public:
+  Mkdir() = default;
+  // as if /bin/mkdir was run (pretend to get an exit code of the thing)
+  using result_type = sys::exits::Code;
+  template<typename... ARGUMENTS> inline auto operator()(ARGUMENTS const &...) -> result_type;
+protected:
+  inline auto process(result_type) -> result_type;
+  template<typename ARGUMENT, typename... ARGUMENTS> inline auto process(result_type, ARGUMENT const &, ARGUMENTS const &...) -> result_type;
+public:
+  bool exists_ok;
+  using exists_ok_option = Option<Mkdir, char, 'i', bool>;
+  inline auto accept(exists_ok_option const &) -> result_type;
+  bool make_parents;
+  using make_parents_option = Option<Mkdir, char, 'p', bool>;
+  inline auto accept(make_parents_option const &) -> result_type;
+  // Actually make this directory right here, right now
+  inline auto accept(c::const_stringz const &) -> result_type;
+protected:
+  inline auto operate_parents(std::string const &) -> result_type;
+  inline auto operate_parents(std::string &&) -> result_type;
+  auto operate_parents(std::vector<std::string> const &) -> result_type;
+  auto operate_single(c::const_stringz const &) -> result_type;
+  inline static auto has_slashes(c::const_stringz const &) -> bool;
+  static auto split(std::string &&) -> std::vector<std::string>;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+auto shell::internal::Mkdir::accept(exists_ok_option const &o) -> result_type {
+  exists_ok = o.value;
+  return result_type();
+}
+
+auto shell::internal::Mkdir::accept(make_parents_option const &o) -> result_type {
+  make_parents = o.value;
+  return result_type();
+}
+
+auto shell::internal::Mkdir::accept(c::const_stringz const &value) -> result_type {
+  if (make_parents && has_slashes(value)) {
+    std::string redo(value.begin(), value.end());
+    return operate_parents(std::move(redo));
+  } else {
+    return operate_single(value);
+  }
+}
+
+template<typename... ARGUMENTS> auto shell::internal::Mkdir::operator()(ARGUMENTS const &...args) -> result_type {
+  return process(result_type(), args...);
+}
+
+auto shell::internal::Mkdir::process(result_type previous) -> result_type {
+  return previous;
+}
+
+template<typename ARGUMENT, typename... ARGUMENTS> auto shell::internal::Mkdir::process(result_type previous, ARGUMENT const &arg, ARGUMENTS const &...args) -> result_type {
+  auto step = previous | accept(arg);
+  return process(step, args...);
+}
+
+auto shell::internal::Mkdir::operate_parents(std::string const &multi_path) -> result_type {
+  std::vector<std::string> components = split(std::string(multi_path));
+  return operate_parents(components);
+}
+
+auto shell::internal::Mkdir::operate_parents(std::string &&multi_path) -> result_type {
+  std::vector<std::string> components = split(std::forward<decltype(multi_path)>(multi_path));
+  return operate_parents(components);
+}
+
+auto shell::internal::Mkdir::has_slashes(c::const_stringz const &path) -> bool {
+  for (auto c : path) {
+    if ('/' == c) {
+      return true;
+    }
+  }
+  return false;
+}
+#divert </ipp>
+#divert <cpp>
+#import ish.cxx.rest
+#import std.string
+#import sys.exits.constants
+auto shell::internal::Mkdir::operate_parents(std::vector<std::string> const &components) -> result_type {
+  if (components.empty()) {
+    return sys::exits::OK;
+  } else {
+    using ish::cxx::rest;
+    std::string path = components.front();
+    result_type ret = operate_single(path);
+    for (auto const &component : rest(components)) {
+      path += '/';
+      path += component;
+      ret = operate_single(path);
+    }
+    return ret;
+  }
+}
+
+#import std.errc
+#import sys.exits.constants
+#import sys.posix.mkdir
+auto shell::internal::Mkdir::operate_single(c::const_stringz const &value) -> result_type {
+  auto mkdir = sys::posix::mkdir(value, 0777);
+  if (ok(mkdir)) {
+    return sys::exits::OK;
+  } else {
+    auto why = error_code(mkdir);
+    if (std::errc::file_exists == why) {
+      return exists_ok ? sys::exits::OK : sys::exits::CANTCREATE;
+    }
+    return sys::exits::ONE;
+  }
+}
+
+#import std.istringstream
+#import std.move
+#import std.streamsize
+auto shell::internal::Mkdir::split(std::string &&path) -> std::vector<std::string> {
+  std::istringstream in(std::forward<decltype(path)>(path));
+  std::vector<std::string> ret;
+  std::vector<char> buf;
+  // No component can be bigger than this!
+  buf.reserve(path.size()+1);
+  while (in.getline(buf.data(), buf.size(), '/')) {
+    // The '/' has been seen and nulled, so the length is one less
+    std::streamsize length = in.gcount() - 1;
+    if (length) {
+      std::string piece(buf.data(), buf.data()+length);
+      ret.push_back(std::move(piece));
+    }
+  }
+  std::streamsize leftovers = in.gcount();
+  if (leftovers) {
+    std::string piece(buf.data(), buf.data()+leftovers);
+    ret.push_back(std::move(piece));
+  }
+  return ret;
+}
+#divert </cpp>

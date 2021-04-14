@@ -1,0 +1,3 @@
+# sure ... ./bin should always exist
+.libs
+# end

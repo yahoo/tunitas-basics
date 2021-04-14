@@ -1,0 +1,74 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sqlite.api.lob.Getter
+#forward sqlite // for sqlite::column_index
+#forward sqlite.api.unguarded // for sqlite::api::unguarded::Statement
+namespace sqlite {
+  namespace api {
+    namespace lob {
+      template<typename MEMORY, typename SQLITE_MEMORY> class Getter<unguarded::Statement, MEMORY, SQLITE_MEMORY>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import std.function
+#forward sqlite.api.lob.Result
+template<typename MEMORY, typename SQLITE_MEMORY> struct sqlite::api::lob::Getter<sqlite::api::unguarded::Statement, MEMORY, SQLITE_MEMORY> {
+public:
+  using whence_type = api::unguarded::Statement;
+  using thence_type = column_index;
+  // Without pattern, SQLite uses 'char' 'char unsigned' and 'void' for the memory value_type
+  using get_data_function = std::function<SQLITE_MEMORY const */*function*/(whence_type *, thence_type)>;
+  // WATCHOUT - SQLite API returns sizes as "int" which means < 4GB
+  using get_size_function = std::function<int /*function*/(whence_type *, thence_type)>;
+  inline constexpr Getter(get_data_function, get_size_function);
+  using memory_type = MEMORY const;
+  using memory_pointer = memory_type *;
+  using size_type = std::size_t;
+  // Insert a gratuitous ADL type to allow ADL to operate
+  using result_type = Result<memory_pointer, size_type>;
+  inline auto operator()(whence_type *, thence_type) const -> result_type;
+  inline auto data(whence_type *, thence_type) const -> memory_pointer;
+  inline auto size(whence_type *, thence_type) const -> size_type;
+private:
+  get_data_function get_data;
+  get_size_function get_size;
+};
+
+template<typename MEMORY, typename SQLITE_MEMORY> constexpr sqlite::api::lob::Getter<sqlite::api::unguarded::Statement, MEMORY, SQLITE_MEMORY>::Getter(get_data_function arg_get_data, get_size_function arg_get_size)
+  : get_data(arg_get_data)
+  , get_size(arg_get_size) {
+  ;
+}
+#endiv
+#divert <ipp>
+#import sqlite.api.lob.Result
+#import std.tuple_element
+template<typename MEMORY, typename SQLITE_MEMORY> auto sqlite::api::lob::Getter<sqlite::api::unguarded::Statement, MEMORY, SQLITE_MEMORY>::operator()(whence_type *whence, thence_type thence) const -> result_type {
+  // First force to the "data" representation; e.g. blob, blob16, text, text16
+  auto data = get_data(whence, thence); // <---------------------------------- DIFFERENCE: two-arg call with (whence, thence)
+  // Then get the byte count that was developed
+  std::size_t size = get_size(whence, thence);
+  memory_pointer fixup = reinterpret_cast<memory_pointer>(data);
+  using adl_type = typename std::tuple_element<0, result_type>::type;
+  adl_type a = adl_type();
+  return result_type(a, fixup, size);
+}
+
+template<typename MEMORY, typename SQLITE_MEMORY> auto sqlite::api::lob::Getter<sqlite::api::unguarded::Statement, MEMORY, SQLITE_MEMORY>::data(whence_type *whence, thence_type thence) const -> memory_pointer {
+  // First force to the "data" representation; e.g. blob, blob16, text, text16
+  auto data = get_data(whence, thence); // <---------------------------------- DIFFERENCE: two-arg call with (whence, thence)
+  // for 'blob' it is somewhat motivated that "data" is a pointer into the const void, but there is real space out there, so 'char const' it becomes
+  memory_pointer fixup = static_cast<memory_pointer>(data);
+  return fixup;
+}
+
+template<typename MEMORY, typename SQLITE_MEMORY> auto sqlite::api::lob::Getter<sqlite::api::unguarded::Statement, MEMORY, SQLITE_MEMORY>::size(whence_type *whence, thence_type thence) const -> size_type {
+  // WATCHOUT - unchecked - you should have called data(...) first to get the SQLite
+  // casting system (memory preparation) to develop the memory area before you ask for the count
+  std::size_t size = get_size(whence, thence); // <---------------------------------- DIFFERENCE: two-arg call with (whence, thence)
+  return size;
+}
+#endiv

@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.wait.required.Constraint
+namespace sys::call::result::wait {
+  //
+  // The specializations of Value for wait.
+  // Must be a unique type to enable ADL.
+  //
+  // Specializations:
+  //
+  //   Value<Process>                   Value<pid_t>
+  //   Value<Process, Status>           Value<pid_t, Status>
+  //   Value<Process, Siginfo>          Value<pid_t, Siginfo>
+  //   Value<Process, Usages>           Value<pid_t, Usages>
+  //   Value<Process, Status, Usages>   Value<pid_t, Status, Usages>
+  //
+  template<typename... TYPES> requires required::Constraint<TYPES...> struct Value;
+}
+#endiv

@@ -1,0 +1,81 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.basic_environv
+#import c.required.Character
+namespace c {
+  template<required::Character CHAR> class basic_environv<CHAR const>;
+}
+#endiv
+#divert <hpp>
+#import c.detail.UnboundVector.Stringz
+#import c.detail.Stringz
+#import std.size_t
+#import std.vector
+template<c::required::Character CHAR> class c::basic_environv<CHAR const> : public detail::UnboundVector<detail::Stringz<CHAR const>> {
+  using ancestor = detail::UnboundVector<detail::Stringz<CHAR const>>;
+public:
+  basic_environv() = default;
+  // the vector must to have a nullptr sentinel to indicate the termination
+  template<std::size_t N> inline basic_environv(typename ancestor::value_type const (&)[N]);
+  inline basic_environv(typename ancestor::const_data_type);
+  // These will throw if there is no nullptr sentinel at the end of the container
+  template<typename ALLOC> inline basic_environv(std::vector<CHAR const *, ALLOC> const &); 
+  // reminder: the rval-reference here is required to get access to nonconst std::vector<CHAR *, ALLOC>::data()
+  template<typename ALLOC> inline basic_environv(std::vector<CHAR *, ALLOC> const &); 
+  inline basic_environv(basic_environv<CHAR>);
+  // The size computed in O(N) against the nullptr sentinel
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#import std.is_same
+static_assert(std::is_same<char const *, c::basic_environv<char const>::const_value_type>::value, "FAIL: c::basic_environv<char const>::const_value_type is a surprise");
+static_assert(std::is_same<char const *const *, c::basic_environv<char const>::const_data_type>::value, "FAIL: c::basic_environv<char const>::const_data_type is a surprise");
+static_assert(std::is_same<char const *, c::basic_environv<char const>::value_type>::value, "FAIL: c::basic_environv<char const>::value_type is a surprise");
+static_assert(std::is_same<char const *const *, c::basic_environv<char const>::data_type>::value, "FAIL: c::basic_environv<char const>::data_type is a surprise");
+#import std.is_constructible
+// TO(FROM)
+static_assert(std::is_constructible<c::basic_environv<char const>, char const *const *>::value, "FAIL: basic_environv<char const> is not constructible from 'char const *const *'");
+static_assert(std::is_constructible<c::basic_environv<char const>, char *const *>::value, "FAIL: basic_environv<char const> is not constructible from 'char *const *'");
+static_assert(std::is_constructible<c::basic_environv<char const>, char **>::value, "FAIL: basic_environv<char const> is not constructible from 'char **'");
+#import std.is_convertible
+// FROM -> TO
+static_assert(std::is_convertible<char const *const *, c::basic_environv<char const>>::value, "FAIL: 'char const *const *' is not convertible to basic_environv<char const>");
+static_assert(std::is_convertible<char *const *, c::basic_environv<char const>>::value, "FAIL: 'char *const *' is not convertible to basic_environv<char const>");
+static_assert(std::is_convertible<char **, c::basic_environv<char const>>::value, "FAIL: 'char **' is not convertible to basic_environv<char const>");
+#endiv
+#divert <ipp>
+#import c.basic_environv
+#import c.detail.environv.enforce_terminating_nullptr_invariant
+template<c::required::Character CHAR> template<std::size_t N> c::basic_environv<CHAR const>::basic_environv(typename ancestor::value_type const (&subject)[N])
+  : ancestor(subject) {
+  detail::environv::enforce_terminating_nullptr_invariant(subject, subject+N);
+}
+
+template<c::required::Character CHAR> c::basic_environv<CHAR const>::basic_environv(typename ancestor::const_data_type subject)
+  : ancestor(subject) {
+  // Can't (safely) enforce the terminating nullptr invariant, so we just hope.  Hope is the method.
+  ;
+}
+
+#import c.detail.environv.enforce_terminating_nullptr_invariant
+template<c::required::Character CHAR> template<typename ALLOC> c::basic_environv<CHAR const>::basic_environv(std::vector<CHAR const *, ALLOC> const &subject)
+  : ancestor(subject.data()) {
+  detail::environv::enforce_terminating_nullptr_invariant(subject.begin(), subject.end());
+}
+
+template<c::required::Character CHAR> template<typename ALLOC> c::basic_environv<CHAR const>::basic_environv(std::vector<CHAR *, ALLOC> const &subject)
+  : ancestor(subject.data()) {
+  detail::environv::enforce_terminating_nullptr_invariant(subject.begin(), subject.end());
+}
+
+template<c::required::Character CHAR> c::basic_environv<CHAR const>::basic_environv(basic_environv<CHAR> subject)
+  : ancestor(subject.data()) {
+  ;
+}
+#endiv

@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::exception {
+  //
+  // The cast between types failed.
+  // This is like dynamic_cast<RESULT>(TYPE), but pertains to JSON semantics.
+  //
+  // Usage:
+  //
+  //   throw Cast{"no boolean sense", typeid(double)};
+  //   throw Cast{"not an array", typeid(struct ::Something)};
+  //
+  class Cast;
+}
+#endiv
+#divert <hpp>
+#import json.exception.Messaging
+#import std.type_info
+#import std.string
+class json::exception::Cast: public Messaging {
+  using Ancestor = Messaging;
+public:
+  // reminder: std::type_info is the structure returned by the typeid(EXPR) operator.
+  inline explicit Cast(std::string const &explanation, std::type_info const &);
+  inline explicit Cast(std::string &&, std::type_info const &);
+  inline auto type_info() const -> std::type_info const &;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+protected:
+  std::type_info const &offending_type_info;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+namespace json::exception {
+  Cast::Cast(std::string const &explanation, std::type_info const &type_info)
+    : Ancestor(explanation)
+    , offending_type_info(type_info) { }
+  Cast::Cast(std::string &&explanation, std::type_info const &type_info)
+    : Ancestor(std::forward<std::string>(explanation))
+    , offending_type_info(type_info)
+  { }
+  auto Cast::type_info() const -> std::type_info const & {
+    return offending_type_info;
+  }
+}
+#endiv

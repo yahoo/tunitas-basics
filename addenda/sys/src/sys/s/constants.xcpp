@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::s {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.s.Bit
+#import sys.s.Bits
+#import sys.s.Flag
+#import sys.s.Flags
+namespace sys::s::constants {
+  // A Single Stanza (a trio of bits)
+  inline constexpr auto N   = Bits{Bits::NONE};
+  inline constexpr auto R   = Bits{Bit::R};
+  inline constexpr auto W   = Bits{Bit::W};
+  inline constexpr auto X   = Bits{Bit::X};
+  inline constexpr auto RW  = Bits{Bit::R | Bit::W};
+  inline constexpr auto RX  = Bits{Bit::R | Bit::X};
+  inline constexpr auto WX  = Bits{Bit::W | Bit::X};
+  inline constexpr auto RWX = Bits{Bit::R | Bit::W | Bit::X};
+  // OLDSCHOOL
+  inline constexpr auto ISUID = Flags{Flag::ISUID};
+  inline constexpr auto ISGID = Flags{Flag::ISGID};
+  inline constexpr auto ISVTX = Flags{Flag::ISVTX};
+  inline constexpr auto IRUSR = Flags{Flag::IRUSR};
+  inline constexpr auto IWUSR = Flags{Flag::IWUSR};
+  inline constexpr auto IXUSR = Flags{Flag::IXUSR};
+  inline constexpr auto IRGRP = Flags{Flag::IRGRP};
+  inline constexpr auto IWGRP = Flags{Flag::IWGRP};
+  inline constexpr auto IXGRP = Flags{Flag::IXGRP};
+  inline constexpr auto IROTH = Flags{Flag::IROTH};
+  inline constexpr auto IWOTH = Flags{Flag::IWOTH};
+  inline constexpr auto IXOTH = Flags{Flag::IXOTH};
+  // New School
+  inline constexpr auto NONE = Flags{Flags::NONE};
+  inline constexpr auto SETUID = Flags{Flag::SETUID};
+  inline constexpr auto SETGID = Flags{Flag::SETGID};
+  inline constexpr auto STICKY = Flags{Flag::STICKY};
+  inline constexpr auto RUSER = Flags{Flag::RUSER};
+  inline constexpr auto WUSER = Flags{Flag::WUSER};
+  inline constexpr auto XUSER = Flags{Flag::XUSER};
+  inline constexpr auto RGROUP = Flags{Flag::RGROUP};
+  inline constexpr auto WGROUP = Flags{Flag::WGROUP};
+  inline constexpr auto XGROUP = Flags{Flag::XGROUP};
+  inline constexpr auto ROTHER = Flags{Flag::ROTHER};
+  inline constexpr auto WOTHER = Flags{Flag::WOTHER};
+  inline constexpr auto XOTHER = Flags{Flag::XOTHER};
+}
+#endiv

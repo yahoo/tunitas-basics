@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.iov.interface
+namespace sys::posix {
+  namespace packaging::pwritev {
+    using namespace packaging::iov::interface;
+    namespace function {
+      inline auto pwritev(File, [[in]] io::Vec const *, Count, Offset) -> Result;
+      inline auto pwritev(File, [[in]] io::Vector<io::Vec const>, Offset) -> Result;
+    }
+    namespace native {
+      inline auto pwritev(int fd, [[in]] io::Vec const *, Count, Offset) -> Result;
+      inline auto pwritev(int fd, [[in]] io::Vector<io::Vec const>, Offset) -> Result;
+    }
+  }
+  using packaging::pwritev::function::pwritev;
+  namespace native { using packaging::pwritev::native::pwritev; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.writev
+namespace sys::posix::packaging::pwritev {
+  auto function::pwritev(File fd, io::Vec const *vec, Count count, Offset offset) -> Result { return posix::writev(fd, vec, count, offset); }
+  auto function::pwritev(File fd, io::Vector<io::Vec const> vec, Offset offset) -> Result   { return posix::writev(fd, vec, offset); }
+  //
+  auto native::pwritev(int fd, io::Vec const *vec, Count count, Offset offset) -> Result    { return posix::native::writev(fd, vec, count, offset); }
+  auto native::pwritev(int fd, io::Vector<io::Vec const> vec, Offset offset) -> Result      { return posix::native::writev(fd, vec, offset); }
+}
+#endiv

@@ -1,0 +1,131 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace source {
+      class Source;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::source::Source : public cppunit::test::Fixture {
+public:
+  auto test_ignoring() -> void;
+  auto test_visiting_each_statement() -> void;
+  auto test_visiting_the_result() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.source.Sandbox
+#import sqlite.source
+
+auto tests::unit::source::Source::test_ignoring() -> void {
+  Sandbox sandbox;
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, "select 1;"))); // <----------------------- test this
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, "select 1; select 1, 2;"))); // <---------- test ths
+  char const *c1 = (R"sql(create table t99(t text);)sql"
+                    R"sql(insert into t99(t))sql"
+                    R"sql(values)sql"
+                    R"sql(("apple"),)sql"
+                    R"sql(("banana"),)sql"
+                    R"sql(("cherry"))sql"
+                    R"sql(;)sql");
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, c1))); // <-------------------------------- test this
+  char const *c2 = (R"sql(insert into t99(t))sql"
+                    R"sql(values)sql"
+                    R"sql(("dog"),)sql"
+                    R"sql(("eagle"),)sql"
+                    R"sql(("frog"))sql"
+                    R"sql(;)sql");
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, c2))); // <-------------------------------- test this
+  char const *c3 = (R"sql(select *from t99;)sql");
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, c3))); // <----- this will have some rows to ignore
+}
+
+auto tests::unit::source::Source::test_visiting_each_statement() -> void {
+  Sandbox sandbox;
+  char const *c1 = (R"sql(create table t99(t text);)sql"
+                    R"sql(insert into t99(t) values ("apple");)sql"
+                    R"sql(insert into t99(t) values ("banana");)sql"
+                    R"sql(insert into t99(t) values ("cherry");)sql"
+                    R"sql(insert into t99(t) values ("dog");)sql"
+                    R"sql(insert into t99(t) values ("eagle");)sql"
+                    R"sql(insert into t99(t) values ("frog");)sql"
+                    R"sql(insert into t99(t) values ("goat");)sql"
+                    R"sql(insert into t99(t) values ("harpie");)sql"
+                    R"sql(select 1, "row";)sql");
+  unsigned count = 0;
+  auto treat = [&count](sqlite::statement::Shell &shell) -> sqlite::status::Code {
+    count++;
+    std::cerr << "treating in source_visiting_each_statement with count=" << count << "\n";
+    return sqlite::status::Code::OK;
+  };
+  CPPUNIT_ASSERT(ok(sqlite::source(sandbox.conn, c1, treat))); // <---------------------------------- test this
+  // WATCHOUT - the 'treat' is not called for any statement that does not return rows.
+  // none of the above statements return any rows.  They all return DONE on first step.
+  CPPUNIT_ASSERT(1 == count);
+}
+
+#import sqlite.Column
+#import sqlite.prepared.Result
+#import sqlite.statement.Shell
+#import std.move
+#import std.ostream
+#import std.cout
+auto tests::unit::source::Source::test_visiting_the_result() -> void {
+  Sandbox sandbox;
+  char const *c1 = (R"sql(create table t99(t text, uuid text);)sql"
+                    R"sql(insert into t99(t, uuid) values ("apple", "6651733e-a12b-42ff-8732-2894b34974a0");)sql"
+                    R"sql(insert into t99(t, uuid) values ("banana", "8cb73439-3e5b-4620-83d3-b38bda955513");)sql"
+                    R"sql(insert into t99(t, uuid) values ("cherry", "fe4888de-c7c6-4016-8103-6e3bd256d529");)sql"
+                    R"sql(insert into t99(t, uuid) values ("dog", "3c20e1aa-1f74-4b6f-add8-221e2c6a33db");)sql"
+                    R"sql(insert into t99(t, uuid) values ("eagle", "515ec95a-b2ce-4a53-83e5-b09d811f1a90");)sql"
+                    R"sql(insert into t99(t, uuid) values ("frog", "4dad7450-45ee-4e8a-9892-bff147f82949");)sql"
+                    R"sql(insert into t99(t, uuid) values ("goat", "789f926e-296b-45ea-b411-1166bfee7857");)sql"
+                    R"sql(insert into t99(t, uuid) values ("harpie", "f4dea5b8-ad5e-4231-851c-693a80f8f26f");)sql"
+                    R"sql(select * from t99;)sql");
+  unsigned count = 0;
+  auto treat = [&count](sqlite::prepared::Result<sqlite::statement::Shell> &bundle) -> sqlite::status::Code {
+    count++;
+    std::ostream &out(std::cerr);
+    out << "treating in source_visiting_the_result count=" << count << "\n";
+    CPPUNIT_ASSERT(ok(bundle));
+    sqlite::statement::Shell shell = std::move(value(bundle));
+    while (row(shell.step())) {
+      char const *separator = "row: ";
+      for (sqlite::column_index i(0), e(shell.column_count()); e != i; ++i) {
+        sqlite::Column value(shell, i);
+        out << separator << value;
+        separator = ", ";
+      }
+      out << '\n';
+    }
+    out << "returning OK\n";
+    return sqlite::status::Code::OK;
+  };
+  auto sourced = sqlite::source(sandbox.conn, c1, treat); // <------------------------- test this
+  CPPUNIT_ASSERT(ok(sourced));
+  // There are ten statements above.
+  // The 'treat' will be called for each statement, as prepared.
+  CPPUNIT_ASSERT(10 == count);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::source::Source::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("source");
+  s << call("ignoring", &Source::test_ignoring)
+    << call("visiting_each_statment", &Source::test_visiting_each_statement)
+    << call("visiting_the_result", &Source::test_visiting_the_result)
+    ;
+  return s.release();
+}
+#endiv

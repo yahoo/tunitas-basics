@@ -1,0 +1,129 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string_literals
+#import openssl
+namespace tests::crt {
+  using namespace std::string_literals;
+  using namespace openssl;
+}
+#endiv
+#divert <hpp>
+#import c.argv
+#import std.ostream
+#import sys.exits.Code
+#import std.filesystem.path
+namespace tests::crt {
+  auto const NAME = "crt"s;
+  auto main(c::argv) -> sys::exits::Code;
+ auto usage(std::ostream &, sys::exits::Code) -> sys::exits::Code;
+   namespace packaging::process::function {
+    using Filepath = std::filesystem::path;
+    using Code = sys::exits::Code;
+    auto process(Filepath const &ca_key, Filepath const &ca_crt, Filepath const &csr) -> Code;
+  }
+  using packaging::process::function::process;
+}
+#endiv
+#divert <cpp>
+#import c.rest
+#import format.q
+#import std.cerr
+#import std.cout
+#import std.exception
+#import sys.exits.constants
+auto tests::crt::main(c::argv av) -> sys::exits::Code try {
+  auto vv = c::rest(av);
+  for (; !vv.empty(); vv=c::rest(vv)) {
+    std::string syntax=vv.front();
+    if (syntax.empty()) {
+      std::cerr << NAME << ": error, inappropriate empty word\n";
+      return sys::exits::CONFIG;
+    } else if ("--"s == syntax) {
+      break;
+    } else if ("--usage"s == syntax || "--help"s == syntax || "-h" == syntax) {
+      return usage(std::cout, sys::exits::OK);
+    } else if ('-' == syntax.front()) {
+      std::cerr << NAME << ": error, invalid option " << format::q(syntax) << " (use --usage to see the options)\n";
+      return sys::exits::CONFIG;
+    } else {
+      break;
+    }
+  }
+  if (3 != vv.size()) {
+    std::cerr << NAME << ": error, requires exactly three files, being the ca's keyfile, the ca's certificate and the proposed certificate signing request (CSR)\n";
+    return sys::exits::CONFIG;
+  }
+  auto ca_key_filepath = std::filesystem::path{vv.front()};
+  vv = c::rest(vv);
+  auto ca_crt_filepath = std::filesystem::path{vv.front()};
+  vv = c::rest(vv);
+  auto csr_filepath = std::filesystem::path{vv.front()};
+  vv = c::rest(vv);
+  return process(ca_key_filepath, ca_crt_filepath, csr_filepath);
+} catch (std::exception const &e) {
+  std::cerr << NAME << ": unexpected problem " << e.what() << '\n';
+  return sys::exits::SOFTWARE;
+}
+auto tests::crt::usage(std::ostream &outbound, sys::exits::Code code) -> sys::exits::Code {
+  outbound << "usage: " << NAME << " [...options...] [--] ca.key.pem ca.crt.pem csr.pem\n"
+           << "\n"
+           << "Files:\n"
+           << "  ca.key.pem                      the Certificate Authority (secret) key file\n"
+           << "  ca.crt.pem                      the Certificate Authority (public) certificate file\n"
+           << "  csr.pem                         your Certificate Signing Requst (CSR)\n"
+           << "\n"
+           << "General Options:\n"
+           << "  --usage, --help, -h             this usage&help message\n";
+    ;
+      return sys::exits::OK;
+  return code;
+}
+#import openssl.evp.PKey
+#import openssl.error.Code
+#import openssl.pem.load
+#import openssl.pem.to_string
+#import openssl.x509.Crt
+#import openssl.x509.serial.generate
+#import openssl.time.now
+#import openssl.time.literals
+#import std.error_code
+#import std.system_error
+#import std.string_view_literals
+#import sys.posix.exists
+#import tests.present
+auto tests::crt::packaging::process::function::process(Filepath const &keyfile, Filepath const &crtfile, Filepath const &csrfile) -> Code try {
+  using namespace ::openssl;
+  auto ca_key = pem::load<evp::PKey>(keyfile);
+  auto ca_crt = pem::load<x509::Crt>(crtfile);
+  auto their_csr = pem::load<x509::Req>(csrfile);
+  x509::Crt their_crt;
+  their_crt.set_version(x509::crt::Version{2}); // x509v3
+  their_crt.set_serialNumber(x509::serial::generate());
+  their_crt.set_issuer_name(ca_crt.get_subject_name());
+  their_crt.set_subject_name(their_csr.get_subject_name()); // [[FIXTHIS]] validate these fields before signing anything!
+  using namespace openssl::time::literals;
+  auto const now = openssl::time::now();
+  auto const timespan = 2_years;
+  their_crt.set_notBefore(now);
+  their_crt.set_notAfter(now + timespan);
+  their_crt.set_pubkey(their_csr.get_pubkey());
+  their_crt.sign(ca_key, EVP_sha256());
+  std::cout << pem::to_string(their_crt);
+  return sys::exits::OK;
+} catch (std::error_code const &ec) {
+  if (error::Code::PEM != ec) {
+    throw;
+  }
+  std::cerr << NAME << ": error, bad PEM encoding among the input files\n";
+  return sys::exits::FAIL;
+} catch (std::system_error const &ec) {
+  auto &outbound{std::cerr};
+  outbound << NAME << ": error, " << ec.what() << " among the files\n"
+           << "  [in]ca key: " << keyfile << " is " << present(keyfile) << '\n'
+           << "  [in]ca crt: " << crtfile << " is " << present(crtfile) << '\n'
+           << "  [in]csr:    " << csrfile << " is " << present(csrfile) << '\n'
+    ;
+  return sys::exits::FAIL;
+}
+#endiv

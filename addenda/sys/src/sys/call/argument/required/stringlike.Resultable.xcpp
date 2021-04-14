@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.argument.required.stringlike.Is_Resultable
+namespace sys::call::argument::required::stringlike {
+  //
+  // In support of the implementation details of "stringlike."
+  //
+  // Is the "stringish" result type a possible result of 
+  //   detail::as1<RESULT>(ARGUMENT const &) -> RESULT;
+  //   detail::as2<RESULT>(ARGUMENT const &) -> RESULT;
+  //
+  // The test is wrapped up in a concept so that it can be conveniently used as a template requirement.
+  // But the actual specification is delegated off to a specialized structure.
+  //
+  template<typename STRINGY> concept bool Resultable = Is_Resultable<STRINGY>::value;
+}
+#endiv

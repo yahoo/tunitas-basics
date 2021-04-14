@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::path::filename::trimmer {
+  //
+  // A wrapper against which overloading can occur.
+  // The class is expected to be produced by nearby free function.
+  //
+  // Usage:
+  //     using nonstd::path::filename::trim;
+  //     trim(subject) << some_action(...arguments...)
+  //
+  // All the magic happens in operator<<
+  //
+  class Workbench;
+}
+#endiv
+#divert <hpp>
+#import std.string
+class nonstd::path::filename::trimmer::Workbench {
+  // The workbench is light and fluffy enough to be copied around by value.
+  // It is produced as the result of functions; e.g. trim(...) so value semantics is required.
+public:
+  inline explicit Workbench(std::string &subject);
+  std::string &subject;
+};
+#endiv
+#divert <ipp>
+nonstd::path::filename::trimmer::Workbench::Workbench(std::string &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+#endiv

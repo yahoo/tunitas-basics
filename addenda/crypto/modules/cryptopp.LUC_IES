@@ -1,0 +1,4 @@
+// -*- c++ -*- 5a91a42b-f3db-49c6-9721-c695fc564b42
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/luc.h>

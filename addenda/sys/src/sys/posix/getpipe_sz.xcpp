@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.pipe.interface
+namespace sys::posix {
+  namespace packaging::getpipe_sz {
+    using namespace packaging::pipe::interface;
+    using namespace bundle::control;
+    namespace function {
+      [[deprecated("buy a vowel, prefer getpipe_size(File)")]] inline auto getpipe_sz(File) -> Returned;
+    }
+    namespace native {
+      [[deprecated("buy a vowel, prefer getpipe_size(int fd)")]] inline auto getpipe_sz(int fd) -> Returned;
+    }
+  }
+  using packaging::getpipe_sz::function::getpipe_sz;
+  namespace native { using packaging::getpipe_sz::native::getpipe_sz; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getpipe_size
+namespace sys::posix::packaging::getpipe_sz {
+  auto function::getpipe_sz(File fd) -> Returned { return posix::getpipe_size(fd); }
+  auto native::getpipe_sz(int fd) -> Returned  { return posix::native::getpipe_size(fd); }
+}
+#endiv

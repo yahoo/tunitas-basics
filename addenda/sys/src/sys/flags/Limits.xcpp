@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.at.Flags
+#import sys.flags.Limits.dn.Notifies
+#import sys.flags.Limits.f.Seals
+#import sys.flags.Limits.fd.Flags
+#import sys.flags.Limits.msg.Flags
+#import sys.flags.Limits.ok.Access
+#import sys.flags.Limits.s.Bits
+#import sys.flags.Limits.s.Flags
+#import sys.flags.Limits.template
+#import sys.flags.Limits.w.Options
+#endiv

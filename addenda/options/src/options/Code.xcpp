@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import options.indicator.Code
+namespace options {
+  //
+  // For legacy compatibility as the indicator codes move into a lower namespace
+  //
+  //    options::Code <-> options::indicator::Code
+  //
+  using indicator::Code;
+}
+#endiv
+#divert <hpp>
+namespace options {
+  //
+  // though ADL will find them must fine in their home namespace
+  //
+  using indicator::end;
+  using indicator::erroneous;
+  using indicator::more;
+}
+#endiv

@@ -1,0 +1,52 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import std.is_same
+#import std.size_t
+#import c.basic_stringz
+#import c.required.Managed
+namespace c::required {
+  //
+  // Prove that BINARY can hold binary data
+  //
+  //    auto data() const -> CHAR const *
+  //    auto size() const -> std::size_t
+  //
+  // Remember it as a concept for recognizing the BINARY SQL data
+  // A BINARY is NOT a 'char const *' with an implicit '\0' terminator.
+  //
+  template<typename ITEM> concept bool Binary = requires(ITEM item) {
+    typename ITEM::value_type;
+    requires Managed<ITEM>; 
+    // Because basic_stringz cannot store '\0' characters (the '\0' is the terminator sentinel)
+    // ... basic_buffer, basic_stringn can support embedded '\0'
+    requires !(std::is_same<ITEM, c::basic_stringz<typename ITEM::value_type>>::value ||
+               std::is_same<ITEM, c::basic_stringz<typename ITEM::value_type const>>::value);
+  };
+}
+#endiv
+#divert <hpp>
+//
+// Not all qualify
+//
+#import c.buffer
+static_assert(c::required::Binary<c::buffer>, "fail");
+#import c.const_buffer
+static_assert(c::required::Binary<c::const_buffer>, "fail");
+#import c.stringn
+static_assert(c::required::Binary<c::stringn>, "fail");
+#import c.const_stringn
+static_assert(c::required::Binary<c::const_stringn>, "fail");
+#import c.stringz
+static_assert(!c::required::Binary<c::stringz>, "fail");
+#import c.const_stringz
+static_assert(!c::required::Binary<c::const_stringz>, "fail");
+#import std.string
+static_assert(c::required::Binary<std::string>, "fail");
+#import std.string_view
+static_assert(c::required::Binary<std::string_view>, "fail");
+#endiv

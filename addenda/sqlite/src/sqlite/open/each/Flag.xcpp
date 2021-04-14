@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #define values that establish the values of the enumeration elements
+#include <sqlite3.h>
+namespace sqlite::open::each {
+  enum class Flag
+  { READONLY          = SQLITE_OPEN_READONLY,         // 0x00000001  - Ok for sqlite3_open_v2()
+    READWRITE         = SQLITE_OPEN_READWRITE,        // 0x00000002  - Ok for sqlite3_open_v2()
+    CREATE            = SQLITE_OPEN_CREATE,           // 0x00000004  - Ok for sqlite3_open_v2()
+    DELETEONCLOSE     = SQLITE_OPEN_DELETEONCLOSE,    // 0x00000008  - VFS only
+    EXCLUSIVE         = SQLITE_OPEN_EXCLUSIVE,        // 0x00000010  - VFS only
+    AUTOPROXY         = SQLITE_OPEN_AUTOPROXY,        // 0x00000020  - VFS only
+    URI               = SQLITE_OPEN_URI,              // 0x00000040  - Ok for sqlite3_open_v2()
+    MEMORY            = SQLITE_OPEN_MEMORY,           // 0x00000080  - Ok for sqlite3_open_v2()
+    MAIN_DB           = SQLITE_OPEN_MAIN_DB,          // 0x00000100  - VFS only
+    TEMP_DB           = SQLITE_OPEN_TEMP_DB,          // 0x00000200  - VFS only
+    TRANSIENT_DB      = SQLITE_OPEN_TRANSIENT_DB,     // 0x00000400  - VFS only
+    MAIN_JOURNAL      = SQLITE_OPEN_MAIN_JOURNAL,     // 0x00000800  - VFS only
+    TEMP_JOURNAL      = SQLITE_OPEN_TEMP_JOURNAL,     // 0x00001000  - VFS only
+    SUBJOURNAL        = SQLITE_OPEN_SUBJOURNAL,       // 0x00002000  - VFS only
+    MASTER_JOURNAL    = SQLITE_OPEN_MASTER_JOURNAL,   // 0x00004000  - VFS only
+    NOMUTEX           = SQLITE_OPEN_NOMUTEX,          // 0x00008000  - Ok for sqlite3_open_v2()
+    FULLMUTEX         = SQLITE_OPEN_FULLMUTEX,        // 0x00010000  - Ok for sqlite3_open_v2()
+    SHAREDCACHE       = SQLITE_OPEN_SHAREDCACHE,      // 0x00020000  - Ok for sqlite3_open_v2()
+    PRIVATECACHE      = SQLITE_OPEN_PRIVATECACHE,     // 0x00040000  - Ok for sqlite3_open_v2()
+    WAL               = SQLITE_OPEN_WAL };            // 0x00080000  - VFS only
+}
+#endiv
+#divert <hpp>
+namespace sqlite::open::each {
+  inline constexpr auto flag(Flag) -> Flag;        // An identity transform.
+  inline constexpr auto is_flag(Flag) -> bool;     // Ibidem.  A triviality.
+
+  // And surfaced as constants for convenience;
+  // ... it's not clear you'll ever need these (see the Flags of namespace sqlite::open)
+  constexpr auto const READONLY       = Flag::READONLY;
+  constexpr auto const READWRITE      = Flag::READWRITE;
+  constexpr auto const CREATE         = Flag::CREATE;
+  constexpr auto const DELETEONCLOSE  = Flag::DELETEONCLOSE;
+  constexpr auto const EXCLUSIVE      = Flag::EXCLUSIVE;
+  constexpr auto const AUTOPROXY      = Flag::AUTOPROXY;
+  constexpr auto const URI            = Flag::URI;
+  constexpr auto const MEMORY_DB      = Flag::MEMORY; // avoid the conflict with Name::MEMORY
+  constexpr auto const MAIN_DB        = Flag::MAIN_DB;
+  constexpr auto const TEMP_DB        = Flag::TEMP_DB;
+  constexpr auto const TRANSIENT_DB   = Flag::TRANSIENT_DB;
+  constexpr auto const MAIN_JOURNAL   = Flag::MAIN_JOURNAL;
+  constexpr auto const TEMP_JOURNAL   = Flag::TEMP_JOURNAL;
+  constexpr auto const SUBJOURNAL     = Flag::SUBJOURNAL;
+  constexpr auto const MASTER_JOURNAL = Flag::MASTER_JOURNAL;
+  constexpr auto const NOMUTEX        = Flag::NOMUTEX;
+  constexpr auto const FULLMUTEX      = Flag::FULLMUTEX;
+  constexpr auto const SHAREDCACHE    = Flag::SHAREDCACHE;
+  constexpr auto const PRIVATECACHE   = Flag::PRIVATECACHE;
+  constexpr auto const WAL            = Flag::WAL;
+  // not a flag, not really...  think about it; "reserved" is a boundary, as a bitmask.
+  constexpr auto const RESERVED       = (Flag)(0x00F00000);
+}
+
+constexpr auto sqlite::open::each::flag(Flag f) -> Flag {
+  return f;
+}
+
+constexpr auto sqlite::open::each::is_flag(Flag) -> bool {
+  return true; // yup, it's a flag
+}
+#endiv
+

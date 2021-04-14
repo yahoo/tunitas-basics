@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_class
+#import std.is_enum
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+#import tests.model.Namespace_Object
+namespace tests::model {
+  //
+  // The POSIX system (namespace sys::posix)) has certain large objects that act as packaged namespaces.
+  // They have flags.
+  // Ensure they are appropriately decorated so they can be used as data types.
+  //
+  // Usage:
+  //
+  //   struct sys::posix::SOMETHING {
+  //     using Flag = ...somehow...
+  //     using Flags = ...somehow...
+  //     ... declarations...
+  //     ...definitions...
+  //     SOMETHING() = delete;
+  //     SOMETHING(SOMETHING const &) = delete;
+  //     auto operator=(SOMETHING const &) -> SOMETHING & = delete;
+  //   };
+  //
+  //   static_assert(Namespace_Object_Flags<SOMETHING, Something::Flag, Something::Flags>);
+  //   static_assert(Namespace_Object_Flags<SOMETHING, Something::Bit, Something::Bits>);
+  //   static_assert(Namespace_Object_Flags<SOMETHING, Something::Candy, Something::Dessert>);
+  //   static_assert(Namespace_Object_Flags<SOMETHING, Something::Salad, Something::Appetizer>);
+  //
+  namespace [[detail]] namespace_object_flags {
+    using namespace std;
+    template<typename FLAG> concept bool Flag = requires(FLAG) {
+      requires is_enum_v<FLAG> || is_class_v<FLAG>;
+    };
+    template<typename FLAGS> concept bool Flags = requires(FLAGS) {
+      requires is_enum_v<FLAGS> || is_class_v<FLAGS>;
+      requires is_default_constructible_v<FLAGS>;
+      requires is_copy_constructible_v<FLAGS>;
+      requires is_copy_assignable_v<FLAGS>;
+    };
+    template<typename OBJECT, typename FLAG, typename FLAGS> concept bool Namespace_Object_Flags = Flag<FLAG> && Flags<FLAGS> && Namespace_Object<OBJECT>;
+  }
+  using namespace_object_flags::Namespace_Object_Flags;
+}
+#endiv

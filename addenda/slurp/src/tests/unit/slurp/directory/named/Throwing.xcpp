@@ -1,0 +1,73 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::slurp::directory::named {
+  class Throwing;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::slurp::directory::named::Throwing : public cppunit::test::Fixture {
+public:
+  auto test_slurp_tmp() -> void;
+  auto test_slurp_something() -> void;
+  auto test_slurp_erroneous() -> void;
+  auto test_returnable() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.directory.named.read
+#import std.cerr
+#import std.exception
+#import std.string
+#import std.vector
+
+auto tests::unit::slurp::directory::named::Throwing::test_slurp_tmp() -> void {
+  try {
+    std::string subject_directory_by_name = "/tmp";
+    auto red = ::slurp::directory::named::read<std::vector<std::string>>(subject_directory_by_name);
+    // can't look at errno because it can be arbitrary, not necessarily 0==success
+    CPPUNIT_ASSERT_EQUAL(subject_directory_by_name, name(red));
+    // /tmp is not empty
+    CPPUNIT_ASSERT(!entries(red).empty());
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+auto tests::unit::slurp::directory::named::Throwing::test_slurp_something() -> void {
+  try {
+    std::string subject_directory_by_name = "/etc";
+    auto red = ::slurp::directory::named::read<std::vector<std::string>>(subject_directory_by_name);
+    CPPUNIT_ASSERT_EQUAL(std::string("/etc"), name(red));
+    CPPUNIT_ASSERT(!entries(red).empty());
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(false);
+  } 
+}
+
+auto tests::unit::slurp::directory::named::Throwing::test_slurp_erroneous() -> void {
+  try {
+    auto red = ::slurp::directory::named::read<std::vector<std::string>>("/does/not/exist/at/all/no/way");
+    // we don't check for or care what the payload is...
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::slurp::directory::named::Throwing::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Throwing");
+  s << call("tmp", &Throwing::test_slurp_tmp)
+    << call("something", &Throwing::test_slurp_something)
+    << call("errnoneous", &Throwing::test_slurp_erroneous)
+    ;
+  return s.release();
+}
+#endiv

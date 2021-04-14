@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::msg { class Constants; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::msg::Constants : public cppunit::test::Fixture {
+public:
+  auto test_msg_Flag() -> void;
+  auto test_msg() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.msg
+#import sys.msg.Flag
+#import sys.msg.Flags
+auto tests::unit::msg::Constants::test_msg_Flag() -> void {
+  namespace msg = ::sys::msg; // avoid the containing test namespace
+  auto mm = msg::Flag{};
+  mm = msg::Flag::CMSG_CLOEXEC;
+  mm = msg::Flag::CONFIRM;
+  mm = msg::Flag::CTRUNC;
+  mm = msg::Flag::DONTROUTE;
+  mm = msg::Flag::NOSIGNAL;
+  mm = msg::Flag::DONTWAIT;
+  mm = msg::Flag::EOR;
+  mm = msg::Flag::ERRQUEUE;
+  mm = msg::Flag::MORE;
+  mm = msg::Flag::OOB;
+  mm = msg::Flag::PEEK;
+  mm = msg::Flag::TRUNC;
+  mm = msg::Flag::WAITALL;
+  // there, uttered them all
+  CPPUNIT_ASSERT(msg::Flags::NONE != mm);
+}
+#import sys.msg.constants
+auto tests::unit::msg::Constants::test_msg() -> void {
+  using namespace ::sys::msg;
+  Flags mm;
+  mm = CMSG_CLOEXEC;
+  mm = CONFIRM;
+  mm = CTRUNC;
+  mm = DONTROUTE;
+  mm = NOSIGNAL;
+  mm = DONTWAIT;
+  mm = EOR;
+  mm = MORE;
+  mm = OOB;
+  mm = PEEK;
+  mm = TRUNC;
+  mm = WAITALL;
+  // There, uttered them all [[FIXTHIS]] how do we know this?
+  CPPUNIT_ASSERT(NONE != mm);
+}
+#import rigging.suite.io
+auto tests::unit::msg::Constants::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("constants");
+  series << call("msg::Flag", &Constants::test_msg_Flag)
+         << call("msg", &Constants::test_msg)
+    ;
+  return finalize(series);
+}
+#endiv

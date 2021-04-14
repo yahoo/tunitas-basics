@@ -1,0 +1,8 @@
+// -*- c++ -*- 00a016ec-e4ce-47b9-9dc8-4b684c32daad
+#pragma once
+#include <cppunit/TestAssert.h>
+namespace cppunit {
+  namespace traits {
+    template<typename TYPE> using Assertion = CppUnit::assertion_traits<TYPE>;
+  }
+}

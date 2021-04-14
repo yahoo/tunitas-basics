@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Enumeration
+#import sys.required // cascade namespace required
+namespace sys::wait::no {
+  //
+  // Filler for "flavored" nullptr
+  //
+  // Usage:
+  //
+  //   Hack the Spew
+  //
+  namespace required { using namespace sys::required; } // in lieu of the full ceremony with sys.wait.required
+  namespace filler {
+    template<required::Enumeration> struct Filler; 
+    enum class Status { };
+    enum class Info { };
+    enum class Usages { };
+  }
+  using Status = filler::Filler<filler::Status>;
+  using Info = filler::Filler<filler::Info>;
+  using Usages = filler::Filler<filler::Usages>;
+}
+#endiv
+#divert <hpp>
+namespace sys::wait::no {
+  template<required::Enumeration ENUMERATION> struct filler::Filler {
+    using Flavor = ENUMERATION;
+    Filler() = default;
+  };
+}
+#endiv

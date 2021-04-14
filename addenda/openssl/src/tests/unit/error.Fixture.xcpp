@@ -1,0 +1,78 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::error { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::error::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Condition() -> void;
+  auto test_Code() -> void;
+  auto test_Category() -> void;
+  auto test_category() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.error_condition
+#import openssl.error.Condition
+auto tests::unit::error::Fixture::test_Condition() -> void {
+  using ::openssl::error::Condition;
+  // This tests that type-enabled constructor via std::is_error_condition_enum
+  CPPUNIT_ASSERT(Condition::SUCCESS == std::error_condition{Condition::SUCCESS});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_condition{Condition::FAILURE});
+}
+#import std.error_code
+#import openssl.error.Code
+#import openssl.error.Condition
+auto tests::unit::error::Fixture::test_Code() -> void {
+  using ::openssl::error::Condition;
+  using ::openssl::error::Code;
+  // This tests that type-enabled constructor via std::is_error_code_enum
+  CPPUNIT_ASSERT(Condition::SUCCESS == std::error_code{Code::SUCCESS});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::FAILURE});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::EC});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::EVP});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::PEM});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::RSA});
+  CPPUNIT_ASSERT(Condition::FAILURE == std::error_code{Code::X509});
+}
+#import openssl.error.category
+#import openssl.error.Category
+auto tests::unit::error::Fixture::test_Category() -> void {
+  using namespace ::openssl::error;
+  auto const &c = category();
+  {
+    CPPUNIT_ASSERT(nullptr != c.name());
+  } {
+    CPPUNIT_ASSERT(Condition::SUCCESS == c.default_error_condition((int) Code::SUCCESS));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::FAILURE));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::EC));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::EVP));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::PEM));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::RSA));
+    CPPUNIT_ASSERT(Condition::FAILURE == c.default_error_condition((int) Code::X509));
+  }
+  for (int i{-100}, e{100}; e != i; ++i) {
+    auto m = c.message(i);
+    CPPUNIT_ASSERT(!m.empty());
+  }
+}
+auto tests::unit::error::Fixture::test_category() -> void {
+  auto const &c = ::openssl::error::category();
+  CPPUNIT_ASSERT(nullptr != c.name());
+}
+#import rigging.suite.io
+auto tests::unit::error::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("error");
+  series << call("Code", &Fixture::test_Code)
+        << call("Condition", &Fixture::test_Condition)
+        << call("Category", &Fixture::test_Category)
+        << call("category", &Fixture::test_category)
+    ;
+  return finalize(series);
+}
+#endiv

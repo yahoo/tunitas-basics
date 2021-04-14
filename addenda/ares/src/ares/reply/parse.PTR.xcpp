@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.reply.parse.declaration
+#import ares.reply.Record.PTR
+namespace ares::reply {
+  //
+  // Specialization to parse a PTR record.
+  // Usage: see parse.declaration.xcpp
+  //
+  template<> inline auto parse<PTR>(std::nothrow_t, Buffer<std::byte const>, [[fill, inout]] Record<PTR> &) noexcept -> Success;
+}
+#endiv
+#divert <ipp>
+#import ip.in6
+// was ip.inet.AF.Family
+#import ip.inet.AF // AF::INET6 of AF::Family
+#import std.bind
+#import std.placeholders
+namespace ares::reply {
+  template<> auto parse<PTR>(std::nothrow_t no, Buffer<std::byte const> buffer, Record<PTR> &record) noexcept -> Success try {
+    //
+    // Whereas:  A PTR record need not be associated with any address at all.
+    // Question: Why does the address need to be pushed in here?
+    // Answer:   The IP address, even in the (C-)ares C-native API is just copied into the unmanaged::Host (struct ::hostent).
+    //           It is not actually recovered from the return DNS packet; there is no such thing.  So we elide it here.
+    // Therefore: we place zeroes therein.
+    // This also occurs in ::ares_parse_ns_reply.
+    //
+    using namespace std::placeholders;
+    auto dummy_address = ip::in6::addr{};
+    [[sloppy("int signed size")]] int dummy_length = sizeof (dummy_address);
+    auto dummy_family = (int)ip::inet::AF::INET6;
+    detail::Function<PTR> parser{std::bind(::ares_parse_ptr_reply, _1, _2, &dummy_address, dummy_length, dummy_family, _3)};
+    return detail::parse<PTR>(buffer, record, parser);
+  } catch (...) {
+    // This is the least worst-fitting error code that covers what just happened (an unexpected exception while parsing a response)
+    return Success{std::error_code{error::Code::BAD_RESPONSE}};
+  }
+}
+#endiv

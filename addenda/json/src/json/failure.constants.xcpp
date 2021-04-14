@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import json.failure
+namespace json::failure {
+  //
+  // Literals for use in signalling which error return policy to use.
+  //
+  // Usage:
+  //
+  //    #include json.failure.constants
+  //    auto f = function(THROWING, ...arguments...);
+  //    auto f = function(RETURNING, ...arguments...);
+  //
+  // The manifest constants are always UPPER CASE.
+  constexpr auto THROWING = Throwing{};
+  constexpr auto RETURNING = Returning{};
+  // The use of lower-case is deprecated, even though the standard library does it it in 'std::nothrow'
+  [[deprecated("instead use json::failure::THROWING")]] constexpr auto thrown = Throwing{};
+  [[deprecated("instead use json::failure::RETURNING")]] constexpr auto returned = Returning{};
+}
+#endiv

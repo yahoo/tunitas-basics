@@ -1,0 +1,184 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ares { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::ares::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Buffer() -> void;
+  auto test_Count() -> void;
+  auto test_dns_Type() -> void;
+  auto test_dns_Class() -> void;
+  auto test_Success() -> void;
+  template<typename TYPE> auto test_Outcome() -> void;
+  auto test_version() -> void;
+  // show the overloads are not ambiguous
+  auto test_overload_selectable() -> void;
+  auto test_overload_process() -> void;
+  auto test_overload_timeout() -> void;
+  auto test_overload_time_bound() -> void;
+  auto test_overload_run() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import ares.Outcome
+#import std.error_code
+#import ares.error.Code
+namespace tests::unit::ares {
+  template<typename TYPE> auto Fixture::test_Outcome() -> void {
+    auto goodval = TYPE{};
+    auto good = ::ares::Outcome<TYPE>{goodval};
+    CPPUNIT_ASSERT(ok(good));
+    auto bad = ::ares::Outcome<TYPE>{std::error_code{::ares::error::Code::NOTIMP}};
+    CPPUNIT_ASSERT(!ok(bad));
+  }
+}
+#endiv
+#divert <cpp>
+#import ares.Buffer
+auto tests::unit::ares::Fixture::test_Buffer() -> void {
+  using ::ares::Buffer;
+  using Subject_const_byte = Buffer<std::byte const>; 
+  using Subject_byte = Buffer<std::byte>; 
+  using Subject_const_char = Buffer<char const>; 
+  using Subject_char = Buffer<char>; 
+  using Subject_const_unsigned_char = Buffer<unsigned char const>; 
+  using Subject_unsigned_char = Buffer<unsigned char>; 
+  using Subject_const_signed_char = Buffer<signed char const>; 
+  using Subject_signed_char = Buffer<signed char>; 
+  // Shutup the warning about the unused type aliases
+  auto const sizeof_something = (sizeof (Subject_const_byte) +
+                                 sizeof (Subject_byte) +
+                                 sizeof (Subject_const_char) +
+                                 sizeof (Subject_char) +
+                                 sizeof (Subject_const_unsigned_char) +
+                                 sizeof (Subject_unsigned_char) +
+                                 sizeof (Subject_const_signed_char) +
+                                 sizeof (Subject_signed_char));
+  CPPUNIT_ASSERT(0 != sizeof_something);
+}
+#import ares.Count
+auto tests::unit::ares::Fixture::test_Count() -> void {
+  using Subject = ::ares::Count;
+  auto const s0 = Subject{};
+  auto const s1 = Subject{1};
+  CPPUNIT_ASSERT(0u == (unsigned) s0);
+  CPPUNIT_ASSERT(1u == (unsigned) s1);
+  CPPUNIT_ASSERT(zero(s0));
+  CPPUNIT_ASSERT(!zero(s1));
+}
+#import ares.dns.Class
+auto tests::unit::ares::Fixture::test_dns_Class() -> void {
+  using Subject = ::ares::dns::Class;
+  auto const d0 = Subject(0);
+  auto const d1 = ns_c_in;
+  auto const d2 = ns_c_2;
+  CPPUNIT_ASSERT(d0 != d1);
+  CPPUNIT_ASSERT(d1 != d2);
+}
+#import ares.dns.Type
+auto tests::unit::ares::Fixture::test_dns_Type() -> void {
+  using Subject = ::ares::dns::Type;
+  auto const d0 = Subject(0);
+  auto const d1 = ns_t_a;
+  auto const d2 = ns_t_ns;
+  CPPUNIT_ASSERT(d0 != d1);
+  CPPUNIT_ASSERT(d1 != d2);
+}
+#import ares.Success
+#import ares.error.Code
+#import std.error_code
+auto tests::unit::ares::Fixture::test_Success() -> void {
+  auto good = ::ares::Success{::ares::SUCCESS};
+  CPPUNIT_ASSERT(ok(good));
+  auto bad = ::ares::Success{std::error_code{::ares::error::Code::NOTIMP}};
+  CPPUNIT_ASSERT(!ok(bad));
+}
+#import ares.version
+auto tests::unit::ares::Fixture::test_version() -> void {
+  auto subject = ::ares::version();
+  CPPUNIT_ASSERT(!std::get<0>(subject).empty());
+  CPPUNIT_ASSERT(::ares::Version{0} != std::get<1>(subject));
+}
+#import ares.Channel
+#import ares.fd.Set
+#import ares.fd.Sets
+#import ares.selectable
+auto tests::unit::ares::Fixture::test_overload_selectable() -> void {
+  ::ares::Channel channel;
+  ::ares::fd::Set r, w;
+  ::ares::fd::Sets rw;
+  auto c0 = selectable(channel, r, w);
+  auto c1 = selectable(channel, rw);
+  CPPUNIT_ASSERT(sizeof(c0) + sizeof (c1));
+}
+#import ares.process
+auto tests::unit::ares::Fixture::test_overload_process() -> void {
+  ::ares::Channel channel;
+  ::ares::fd::Set r, w;
+  process(channel, r, w);
+  ::ares::fd::Sets rw;
+  process(channel, rw);
+}
+#import ares.timeout
+auto tests::unit::ares::Fixture::test_overload_timeout() -> void {
+  ::ares::Channel channel;
+  auto d0 = timeout(channel);
+  auto d1 = timeout(channel, 10s);
+  CPPUNIT_ASSERT(sizeof(d0) + sizeof (d1));
+}
+#import ares.time_bound
+auto tests::unit::ares::Fixture::test_overload_time_bound() -> void {
+  ::ares::Channel channel;
+  auto d0 = time_bound(channel);
+  auto d1 = time_bound(channel, 10s);
+  using Maybe = std::optional<::ares::time::Duration>;
+  auto d2 = time_bound(channel, Maybe{});
+  CPPUNIT_ASSERT(sizeof(d0) + sizeof (d1) + sizeof (d2));
+}
+#import ares.run
+auto tests::unit::ares::Fixture::test_overload_run() -> void {
+  ::ares::Channel channel;
+  auto repeat = ::ares::Count{10};
+  auto each = 10s;
+  run(channel);
+  run(channel, repeat, each);
+}
+#import rigging.suite.io
+auto tests::unit::ares::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"ares"};
+  series << call("Buffer", &Fixture::test_Buffer)
+         << call("Count", &Fixture::test_Count)
+         << call("Success", &Fixture::test_Success)
+    ;
+  {
+    Stream dns{"dns"};
+    dns << call("Class", &Fixture::test_dns_Class)
+        << call("Type", &Fixture::test_dns_Type)
+      ;
+    series << move(dns);
+  } {
+    Stream out{"Outcome"};
+    out << call("bool", &Fixture::test_Outcome<bool>)
+        << call("char", &Fixture::test_Outcome<char>)
+        << call("string", &Fixture::test_Outcome<std::string>)
+    ;
+    series << move(out);
+  } {
+    Stream ove{"overload"};
+    ove << call("selectable", &Fixture::test_overload_selectable)
+        << call("process", &Fixture::test_overload_process)
+        << call("timeout", &Fixture::test_overload_timeout)
+        << call("time_bound", &Fixture::test_overload_time_bound)
+        << call("run", &Fixture::test_overload_run)
+    ;
+    series << move(ove);
+  }
+  return finalize(series);
+}
+#endiv

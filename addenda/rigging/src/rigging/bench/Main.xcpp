@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::bench {
+  //
+  // Basic test bench upon the unit test rigging, upon CPP Unit
+  // 
+  // Usage: 
+  //
+  //     #import rigging.bench.Main
+  //     auto main(int argc, char *argv[]) -> int {
+  //         rigging::bench::Main main(some::Fixture::suite(),
+  //                                   some_other::Fixture::suite(),
+  //                                   and_another::Fixture::suite(),
+  //                                   and_yet_more::Fixture::suite());
+  //         return main(argc, argv);
+  //     }
+  //
+  class Main;
+}
+#endiv
+#divert <hpp>
+#import rigging.unit.test.Bench
+#import rigging.bench.detail.Mode
+class rigging::bench::Main {
+public:
+  inline Main();
+  template<typename... TESTS> inline explicit Main(cppunit::Test *, TESTS *...);
+  auto operator()(int argc, char *argv[]) -> int;
+protected:
+  unit::test::Bench bench;
+  detail::Mode mode;
+  auto emit_usage(std::ostream &) -> void;
+};
+#endiv
+#divert <ipp>
+#import std.clog
+rigging::bench::Main::Main()
+  : bench(std::clog) {
+  ;
+}
+
+template<typename... TESTS> rigging::bench::Main::Main(cppunit::Test *test, TESTS *...tests)
+  : Main(tests...) {
+  // n.b. this has the effect of adding them in inverse order to the argument list
+  bench.addTest(test);
+}
+#endiv
+#divert <cpp>
+#import std.string
+#import std.clog
+#import std.cerr
+#import std.exception
+#import std.ostream
+#import rigging.unit.Exit
+#import rigging.unit.exit.constants
+auto rigging::bench::Main::operator()(int argc, char *argv[]) -> int {
+  using rigging::unit::Exit;
+  namespace EX = rigging::unit::exit;
+  try {
+    if (2 != argc) {
+      std::cerr << "Error: you must specify the name of the test suite to call\n";
+      throw EX::USAGE;
+    }
+    Exit exit;
+    std::string test_name(argv[1]);
+    // n.b. the bench is was already set up at construction time
+    exit &= this->bench.run(test_name);
+    if (mode.verbose) {
+      std::clog << exit << '\n';
+    }
+    return exit;
+  } catch (Exit const &exit) {
+    // This was expected
+    if (EX::USAGE == exit) {
+      emit_usage(std::clog);
+    }
+    return exit;
+  } catch (std::exception const &e) {
+    // This was not expected
+    std::cerr << "Error: " << e.what() << '\n';
+    return EX::SOFTWARE;
+  }
+}
+
+auto rigging::bench::Main::emit_usage(std::ostream &out) -> void {
+  out << "usage: unit { --list | <suite-name> }\n";
+}
+#endiv

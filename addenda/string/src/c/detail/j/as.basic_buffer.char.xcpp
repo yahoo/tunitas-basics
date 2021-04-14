@@ -1,0 +1,30 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_buffer
+#import std.size_t
+namespace c {
+  namespace detail {
+    // buffer (a pointer, with a length); not '\0'-terminated
+    template<typename CHAR> inline auto as(CHAR const *, std::size_t) -> basic_buffer<CHAR const>;
+    template<typename CHAR> inline auto as(CHAR *, std::size_t) -> basic_buffer<CHAR>;
+
+    // reminder: subsumes the consty case (where CHAR is 'char' and where 'char const')
+    template<typename CHAR, std::size_t N> inline auto as(CHAR (&)[N]) -> basic_buffer<CHAR>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CHAR> auto c::detail::as(CHAR const *buf, std::size_t buf_size) -> basic_buffer<CHAR const> {
+  basic_buffer<CHAR const> ret(buf, buf_size);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::as(CHAR *buf, std::size_t buf_size) -> basic_buffer<CHAR> {
+  basic_buffer<CHAR> ret(buf, buf_size);
+  return ret;
+}
+
+template<typename CHAR, std::size_t N> auto as(CHAR (&buf)[N]) -> basic_buffer<CHAR> {
+  basic_buffer<CHAR> ret(buf, N);
+}
+#divert </ipp>

@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in4 // ip::in4::addr_t
+#forward ip.inet.xhs.address.Lhs.declaration
+namespace ip::inet::xhs::address {
+  template<> class Lhs<in4::addr_t>;
+}
+#endiv
+#divert <hpp>
+template<> class ip::inet::xhs::address::Lhs<ip::in4::addr_t> {
+public:
+  using subject_type = in4::addr_t;
+  inline explicit Lhs(subject_type &);
+  Lhs(Lhs const &) = default;
+  auto operator=(Lhs const &) -> Lhs & = default;
+  Lhs(Lhs &&) = default;
+  auto operator=(Lhs &&) -> Lhs & = default;
+  inline auto operator=(in4::addr_t) -> Lhs &;
+  inline auto operator=(in4::addr const &) -> Lhs &;
+protected:
+  subject_type &subject;
+};
+#endiv
+#divert <ipp>
+ip::inet::xhs::address::Lhs<ip::in4::addr_t>::Lhs(subject_type &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+
+auto ip::inet::xhs::address::Lhs<ip::in4::addr_t>::operator=(in4::addr_t rhs) -> Lhs & {
+  subject = rhs;
+  return *this;
+}
+
+#import ip.endian.reorder
+auto ip::inet::xhs::address::Lhs<ip::in4::addr_t>::operator=(in4::addr const &rhs) -> Lhs & {
+  subject = endian::reorder<32>(rhs.s_addr);
+  return *this;
+}
+#endiv
+

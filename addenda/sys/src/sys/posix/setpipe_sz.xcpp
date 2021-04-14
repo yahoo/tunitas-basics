@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.pipe.interface
+namespace sys::posix {
+  namespace packaging::setpipe_sz {
+    using namespace packaging::pipe::interface;
+    using namespace bundle::control;
+    namespace function {
+      [[deprecated("buy a vowel, prefer setpipe_size(File, Size)")]] inline auto setpipe_sz(File, [[in]] Size) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer setpipe_size(File, Size)")]] inline auto setpipe_sz(int fd, [[in]] Size) -> Status;
+    }
+  }
+  using packaging::setpipe_sz::function::setpipe_sz;
+  namespace native { using packaging::setpipe_sz::native::setpipe_sz; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.setpipe_size
+namespace sys::posix::packaging::setpipe_sz {
+  auto function::setpipe_sz(File fd, Size arg) -> Status { return posix::setpipe_size(fd, arg); }
+  auto native::setpipe_sz(int fd, Size arg) -> Status    { return posix::native::setpipe_size(fd, arg); }
+}
+#endiv

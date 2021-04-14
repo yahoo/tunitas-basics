@@ -1,0 +1,11 @@
+// -*- c++ -*- 053c7bed-616b-4877-89b4-06911a84c7eb
+#pragma once
+#include <httpserver>
+namespace httpserver::http {
+  //
+  // [[FIXTHIS]] - bad design, improper use of a class.
+  // Indeed this is a class, with static functions, not a namespace.
+  // It contains namespace stuff: types, constants, functions.
+  //
+  using utils = httpserver::http::http_utils;
+}

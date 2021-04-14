@@ -1,0 +1,18 @@
+// -*- c++ -*- 6b5a51b4-c9f6-4d97-8391-e7df3217d5b5
+#pragma once
+#include <cppunit/TestResult.h>
+namespace cppunit {
+  //
+  // (new) cppunit::Router
+  // (old) CppUnit::TestResult
+  //
+  // a.k.a. "router"
+  //     or "controller"
+  //     or "event manager"
+  //
+  // Because even though it is called a "test result" in the class name
+  // everywhere it is referenced is described as merely a controller or
+  // event manager.  It is an result (event) router.
+  //
+  using Router = CppUnit::TestResult;
+}

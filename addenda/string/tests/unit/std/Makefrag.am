@@ -1,0 +1,3 @@
+tests_unit_std_TESTS = \
+  tests/unit/std/cases.test \
+  $(end)

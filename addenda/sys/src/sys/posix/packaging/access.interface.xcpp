@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.path.interface
+#import sys.ok.Access
+namespace sys::posix::packaging::access::interface {
+  //
+  // Scope:
+  //
+  //   namespace access::interface <---> access, eaccess, euidaccess
+  //   namespace at::interface <-------> the "at" series, especially faccessat
+  //
+  inline namespace arguments { using namespace path::mostly::arguments; };
+  using ok::Access;
+  namespace result = path::mostly::result;
+}
+#endiv
+#divert <ipp>
+#import sys.id.User
+#import sys.id.Group
+#import std.tuple
+namespace sys::posix::packaging::access::implementation {
+  using id::User;
+  using id::Group;
+  using Quad = std::tuple<User, Group, User, Group>;
+  using Granted = std::tuple<int, int>;
+}
+#endiv

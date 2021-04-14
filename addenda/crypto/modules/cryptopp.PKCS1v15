@@ -1,0 +1,4 @@
+// -*- c++ -*- 8ec468cc-f17d-4539-92c0-9ec8e20a5ed9
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/pkcspad.h>

@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::pem { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::pem::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_something() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::pem::Fixture::test_something() -> void {
+  // what to test? (all the good tests are in the subtree)
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.pem.Load
+#import tests.unit.pem.Convert
+#import tests.unit.pem.To_String
+#import tests.unit.pem.pub.To_String
+#import tests.unit.pem.From_String
+#import tests.unit.pem.From_String_View
+#import openssl.evp.PKey
+#import openssl.x509.Req
+#import openssl.x509.Crt
+#import rigging.suite.io
+auto tests::unit::pem::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("pem");
+  series << call("something", &Fixture::test_something)
+         << add<Load>()
+         << add<Convert>()
+         << add<To_String>()
+    ;
+  {
+    Stream pub("pub");
+    pub << add<pub::To_String>()
+      ;
+    series << move(pub);
+  }
+  series << add<From_String>()
+         << add<From_String_View>()
+    ;
+  return finalize(series);
+}
+#endiv

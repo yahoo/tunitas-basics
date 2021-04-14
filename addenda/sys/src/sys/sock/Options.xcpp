@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Flags
+#import sys.sock.Option
+namespace sys::sock {
+  //
+  // A bitmask of the (singular) Option
+  // Constructed with operators and casts
+  //
+  // This is a class so that we can get the implicit constructor promotion from Option to Options.
+  //
+  namespace options {
+    using Single = Option;
+    // WATCHOUT - this can't be defaulted.
+    // It must be 'signed int' so that Options::Value will match the POSIX-specified system call signatures
+    using Carrier = int;
+  }
+  using Options = flags::Flags<options::Single, options::Carrier>;
+}
+#endiv
+#divert <hpp>
+#import std.underlying_type
+#import sys.sock.Type // type::FIELD_BITMASK
+namespace sys::sock {
+  namespace packaging::options {
+    using Uf = std::underlying_type_t<Option>;
+    namespace bundle {
+      inline constexpr auto operator|(Option a, Option b) -> Options { return Options{(Uf) a | (Uf)b}; }
+      inline constexpr auto operator&(Option a, Option b) -> Options { return Options{(Uf) a & (Uf)b}; }
+      inline constexpr auto operator~(Option o) -> Options {
+        // tricky: invert the option itself, but then clear out the low bits of the type.
+        return Options{(Uf)~type::FIELD_BITMASK & ~(Uf)o};
+      }
+    }
+  }
+  // NOT HELPFUL ---> using namespace packaging::options::bundle; <--- NOT HELPFUL ENOUGH
+  // In order for ADL to find these, we need to have a declaration positioned (not just visibility)
+  using packaging::options::bundle::operator|;
+  using packaging::options::bundle::operator&;
+  using packaging::options::bundle::operator~;
+} 
+#endiv

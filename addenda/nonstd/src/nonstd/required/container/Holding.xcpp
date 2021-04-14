@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Type
+#import std.is_same
+namespace nonstd::required::container {
+  namespace holding { }
+  //
+  // A Container, that holds a particular type.
+  //
+  template<typename CONTAINER, typename ELEMENT> concept bool Holding = requires(CONTAINER container, ELEMENT element) {
+    requires Type<CONTAINER>;
+    typename CONTAINER::value_type;
+    requires std::is_same<typename CONTAINER::value_type, ELEMENT>::value;
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Holding<vector<string>, string>);
+    static_assert(Holding<string, char>);
+  }
+}
+#endiv

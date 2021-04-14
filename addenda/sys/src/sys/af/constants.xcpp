@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::af {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.net.Network
+#import sys.af.Family
+namespace sys::af::constants {
+  inline constexpr auto UNSPECIFIED = Family<net::Network::UNSPECIFIED>;
+  inline constexpr auto UNIX = Family<net::Network::UNIX>;
+  inline constexpr auto LOCAL = Family<net::Network::LOCAL>;
+  inline constexpr auto INET4 = Family<net::Network::INET4>;
+  inline constexpr auto INET6 = Family<net::Network::INET6>;
+  inline constexpr auto IPX = Family<net::Network::IPX>;
+  inline constexpr auto NETLINK = Family<net::Network::NETLINK>;
+  inline constexpr auto X25 = Family<net::Network::X25>;
+  inline constexpr auto AX25 = Family<net::Network::AX25>;
+  inline constexpr auto ATMPVC = Family<net::Network::ATMPVC>;
+  inline constexpr auto APPLETALK = Family<net::Network::APPLETALK>;
+  inline constexpr auto PACKET = Family<net::Network::PACKET>;
+  inline constexpr auto ALGORITHM = Family<net::Network::ALGORITHM>;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto UNSPEC = Family<net::Network::UNSPEC>;
+  inline constexpr auto INET = Family<net::Network::INET>;
+  inline constexpr auto ALG = Family<net::Network::ALG>;
+#pragma GCC diagnostic pop
+}
+#endiv

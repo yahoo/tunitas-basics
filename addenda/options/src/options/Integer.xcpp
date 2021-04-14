@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  class Integer;
+}
+#endiv
+#divert <hpp>
+#import std.swap
+namespace std {
+  inline auto swap(options::Integer &, options::Integer &) -> void;
+}
+
+namespace options {
+  inline auto operator==(Integer const &, Integer const &) -> bool;
+  inline auto operator!=(Integer const &, Integer const &) -> bool;
+}
+
+#import std.int64_t
+class options::Integer {
+  // like 'std::int64_t' but default-initializes to zero
+public:
+  inline Integer();
+  inline explicit Integer(std::int64_t value);
+  Integer(Integer const &) = default;
+  inline auto operator=(std::int64_t value) -> Integer &;
+  inline auto operator=(Integer const &) -> Integer & = default;
+  inline operator std::int64_t() const;
+protected:
+  std::int64_t value;
+  friend auto options::operator==(Integer const &, Integer const &) -> bool;
+  friend auto std::swap(Integer &, Integer &) -> void;
+};
+#endiv
+#divert <ipp>
+auto std::swap(options::Integer &a, options::Integer &b) -> void {
+  std::swap(a.value, b.value);
+}
+
+auto options::operator==(Integer const &b, Integer const &a) -> bool {
+  return a.value == b.value;
+}
+
+auto options::operator!=(Integer const &a, Integer const &b) -> bool {
+  return !operator==(a, b);
+}
+
+options::Integer::Integer()
+  : value(false) {
+  ;
+}
+
+options::Integer::Integer(std::int64_t arg_value)
+  : value(arg_value) {
+  ;
+}
+ 
+auto options::Integer::operator=(std::int64_t arg_value) -> Integer & {
+  Integer arg(arg_value);
+  std::swap(arg, *this);
+  return *this;
+}
+
+options::Integer::operator std::int64_t() const {
+  return value;
+}
+#endiv

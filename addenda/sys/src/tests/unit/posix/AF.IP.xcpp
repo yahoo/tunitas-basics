@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.AF>
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.AF.IP
+struct tests::unit::posix::AF::IP : public cppunit::test::Fixture {
+  using Generic = ::sys::posix::AF;
+  using Subject = ::sys::posix::AF::IP;
+  auto test_object() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto AF::IP::test_object() -> void {
+    CPPUNIT_ASSERT(sizeof (Subject::Address<Subject::V4>));
+    CPPUNIT_ASSERT(sizeof (Subject::Address<Subject::V6>));
+  }
+  auto AF::IP::test_constants() -> void {
+    CPPUNIT_ASSERT((int)Generic::INET4 == (int)Subject::INET4);
+    CPPUNIT_ASSERT((int)Generic::INET6 == (int)Subject::INET6);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::AF::IP::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("IP");
+  series << call("object", &IP::test_object)
+         << call("constants", &IP::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

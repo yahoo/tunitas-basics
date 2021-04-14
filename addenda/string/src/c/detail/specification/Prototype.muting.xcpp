@@ -1,0 +1,127 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.detail.specification.Indirection
+#import c.detail.specification.Mutability
+#forward c.detail.specification.Prototype
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> struct Prototype<Indirection<Mutability::YES, CORE, VALUE>>;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> class Prototype<Indirection<Mutability::YES, CORE, VALUE>> : public Indirection<Mutability::YES, CORE, VALUE> {
+	using ancestor = Indirection<Mutability::YES, CORE, VALUE>;
+      public:
+	// DO NOT ----> Prototype() = default <----
+        // as that will create a constructor that does not initialize the POD member (the pointer)
+	inline Prototype();
+	inline explicit Prototype(typename ancestor::value_type []);
+      protected:
+	// You have to inherit to operationalize this
+	~Prototype() = default; // definitely not virtual
+      private:
+	// The { end, size, empty } must be defined in the descendant; definitely not virtual
+	// Because there is no termination condition, there no end, size or empty
+      public:
+	inline operator typename ancestor::const_data_type() const;
+	inline operator typename ancestor::data_type();
+	inline auto data() const -> typename ancestor::const_data_type;
+	inline auto data() -> typename ancestor::data_type;
+	inline auto begin() const -> typename ancestor::const_iterator;
+	// NOT HERE end() const -> const_iterator; (this must be implemented in the descendant)
+	inline auto begin() -> typename ancestor::iterator;
+	// NOT HERE end() -> iterator; (this must be implemented in the descendant)
+	inline auto operator[](std::size_t) const -> typename ancestor::const_value_type;
+	inline auto operator[](std::size_t) -> typename ancestor::value_type &;
+	inline auto front() const -> typename ancestor::const_value_type;
+	inline auto front() -> typename ancestor::value_type &;
+      protected:
+	typename ancestor::data_type held;
+      public:
+	struct tests { struct Suite; };
+	friend struct tests::Suite;
+      };
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#include <cassert>
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> Prototype<Indirection<Mutability::YES, CORE, VALUE>>::Prototype()
+	: held(&ancestor::EMPTY[0]) {
+	;
+      }
+
+      template<typename CORE, typename VALUE> Prototype<Indirection<Mutability::YES, CORE, VALUE>>::Prototype(typename ancestor::value_type subject[])
+	: held(nullptr == subject ? &ancestor::EMPTY[0] : subject) {
+	;
+      }
+
+      template<typename CORE, typename VALUE> Prototype<Indirection<Mutability::YES, CORE, VALUE>>::operator typename ancestor::const_data_type() const {
+        assert(nullptr != held);
+	return held;
+      }
+
+      template<typename CORE, typename VALUE> Prototype<Indirection<Mutability::YES, CORE, VALUE>>::operator typename ancestor::data_type() {
+        assert(nullptr != held);
+	return held;
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::data() const -> typename ancestor::const_data_type {
+        assert(nullptr != held);
+	return held;
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::data() -> typename ancestor::data_type {
+        assert(nullptr != held);
+	return held;
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::begin() -> typename ancestor::iterator {
+        assert(nullptr != held);
+	return &held[0];
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::begin() const -> typename ancestor::const_iterator {
+        assert(nullptr != held);
+	return &held[0];
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::operator[](std::size_t index) const -> typename ancestor::const_value_type {
+	// Unchecked!  Uncheckable (in constant time). Good luck with it.
+	return held[index];
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::operator[](std::size_t index) -> typename ancestor::value_type & {
+	// Unchecked!  Uncheckable. Good luck with it.
+	return held[index];
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::front() const -> typename ancestor::const_value_type {
+	// Unchecked!  Uncheckable (in constant time). Good luck with it.
+	return held[0u];
+      }
+
+      template<typename CORE, typename VALUE> auto Prototype<Indirection<Mutability::YES, CORE, VALUE>>::front() -> typename ancestor::value_type & {
+	// Unchecked!  Uncheckable. Good luck with it.
+	return held[0u];
+      }
+    }
+  }
+}
+#divert </ipp>

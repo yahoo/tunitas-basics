@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    class Gensym;
+  }
+}
+#endiv
+#divert <hpp>
+#import c.const_stringz
+#import std.string
+class tests::unit::Gensym {
+public:
+  Gensym();
+  Gensym(c::const_stringz basis);
+  auto operator()() -> std::string;
+private:
+  std::string basis;
+  static std::uint64_t global_serial_number;
+};
+#endiv
+#divert <cpp>
+std::uint64_t tests::unit::Gensym::global_serial_number = 0;
+
+tests::unit::Gensym::Gensym()
+  : basis("t99") {
+  ;
+}
+
+tests::unit::Gensym::Gensym(c::const_stringz arg)
+  : basis(arg.empty() ? "nullptr" : arg.data()) {
+  ;
+}
+
+#import std.ostringstream
+auto tests::unit::Gensym::operator()() -> std::string {
+  std::ostringstream buf;
+  buf << basis << '_' << global_serial_number++;
+  return buf.str();
+}
+#endiv
+

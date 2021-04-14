@@ -1,0 +1,16 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+//
+// Overloading on the return type of the function
+//
+//         json.to.String.ARGUMENT
+//                 |      |
+//                 v      v
+// #import json.to.Value.ARGUMENT <------- return a Value given an ARGUMENT
+//                                         i.e. a conversion constructor
+//
+#entail json.to.String.ARGUMENT
+#entail json.to.String.char_pointer
+#entail json.to.String.char_array
+#entail json.to.String.String
+#endiv

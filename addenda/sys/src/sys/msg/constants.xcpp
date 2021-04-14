@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::msg {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.msg.Flag
+#import sys.msg.Flags
+namespace sys::msg::constants {
+  inline constexpr auto NONE = Flags{Flags::NONE};
+  inline constexpr auto BATCH = Flags{Flag::BATCH};
+  inline constexpr auto CMSG_CLOEXEC = Flags{Flag::CMSG_CLOEXEC};
+  inline constexpr auto CONFIRM = Flags{Flag::CONFIRM};
+  inline constexpr auto CTRUNCATE = Flags{Flag::CTRUNCATE};
+  inline constexpr auto DONTROUTE = Flags{Flag::DONTROUTE};
+  inline constexpr auto DONTWAIT = Flags{Flag::DONTWAIT};
+  inline constexpr auto EOR = Flags{Flag::EOR};
+  inline constexpr auto ERRQUEUE = Flags{Flag::ERRQUEUE};
+  inline constexpr auto FASTOPEN = Flags{Flag::FASTOPEN};
+  inline constexpr auto FIN = Flags{Flag::FIN};
+  inline constexpr auto MORE = Flags{Flag::MORE};
+  inline constexpr auto NOSIGNAL = Flags{Flag::NOSIGNAL};
+  inline constexpr auto OOB = Flags{Flag::OOB};
+  inline constexpr auto PEEK = Flags{Flag::PEEK};
+  inline constexpr auto PROXY = Flags{Flag::PROXY};
+  inline constexpr auto RST = Flags{Flag::RST};
+  inline constexpr auto SYN = Flags{Flag::SYN};
+  inline constexpr auto TRUNCATE = Flags{Flag::TRUNCATE};
+#ifdef __USE_GNU
+  inline constexpr auto TRYHARD = Flags{Flag::TRYHARD}; // pesky.
+#endif
+  inline constexpr auto WAITALL = Flags{Flag::WAITALL};
+  inline constexpr auto WAITFORONE = Flags{Flag::WAITFORONE};
+  inline constexpr auto ZEROCOPY = Flags{Flag::ZEROCOPY};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto CTRUNC = Flags{Flag::CTRUNC};
+  inline constexpr auto TRUNC = Flags{Flag::TRUNC};
+#pragma GCC diagnostic pop
+}
+#endiv

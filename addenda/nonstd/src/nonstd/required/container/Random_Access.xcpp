@@ -1,0 +1,24 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Undirected
+namespace nonstd::required::container {
+  //
+  // Is this type a container that has an Random_Access iterator?
+  // a.k.a. An Undirected container.
+  //
+  template<typename CONTAINER> [[deprecated("instead prefer nonstd::required::container::Undirected<CONTAINER>")]] concept Random_Access = Undirected<CONTAINER>;
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Random_Access<vector<string>>);
+    static_assert(Random_Access<string>);
+  }
+}
+#endiv

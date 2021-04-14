@@ -1,0 +1,10 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.iterator.Basic
+namespace nonstd::required::iterator {
+  //
+  // Prefer the newer nomenclature which rhymes well with container::Basic<CONTAINER>
+  //
+  template<typename ITERATOR> [[deprecated("instead prefer nonstd::required::iterator::Basic<ITERATOR>")]] concept Basis = Basic<ITERATOR>;
+}
+#endiv

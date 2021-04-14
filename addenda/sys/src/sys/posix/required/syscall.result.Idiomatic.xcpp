@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Value
+#import sys.posix.required.syscall.result.Stylized
+namespace sys::posix::required::syscall::result {
+  //
+  // What is the (common) idiomatic result of a system call?
+  //   usually simply 'int' in the idiomatic style (negative is failure, zero is success, positive is success payload)
+  //   contained in sys::call::result::Value<PAYLOAD>
+  //
+  // Usage:
+  //
+  //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
+  //
+  namespace [[detail]] idiomatic {
+    template<typename PAYLOAD> concept bool Idiomatic = stylized::Result<call::result::Value<PAYLOAD>, PAYLOAD>;
+  }
+  using idiomatic::Idiomatic;
+}
+#endiv
+#divert <cpp>
+#import size_t
+#import ssize_t
+#import uid_t
+#import gid_t
+#import pid_t
+#import mode_t
+#import std.size_t
+#import std.ssize_t
+#import sys.id.File
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace sys;
+    using sys::posix::required::syscall::result::Idiomatic;
+    static_assert(Idiomatic<int>);
+    static_assert(Idiomatic<std::ssize_t>);
+    static_assert(Idiomatic<std::size_t>);
+    static_assert(Idiomatic<size_t>);
+    static_assert(Idiomatic<ssize_t>);
+    static_assert(Idiomatic<uid_t>);
+    static_assert(Idiomatic<gid_t>);
+    static_assert(Idiomatic<pid_t>);
+    static_assert(Idiomatic<mode_t>);
+    // What else can a system call return?
+    static_assert(Idiomatic<id::File>);
+    // The return of the wait(...) faily is special via the Stylistic<RESULT>
+  }
+}
+#endiv

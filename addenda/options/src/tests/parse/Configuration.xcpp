@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace parse {
+    class Configuration;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+namespace tests {
+  namespace parse {
+    auto operator<<(std::ostream &, Configuration const &) -> std::ostream &;
+  }
+}
+
+#import std.string
+#import std.vector
+class tests::parse::Configuration {
+public:
+  inline Configuration();
+  // The argv[0], made all pretty
+  std::string NAME;
+  // The progam options
+  bool apple;
+  bool banana;
+  bool cherry;
+  std::string dog;
+  std::string eagle;
+  std::string frog;
+  std::string goat;
+  // The remaining words after the options are processed
+  std::vector<std::string> args;
+  // usually empty as the query comes from series in the args
+  std::string query;
+  static Configuration SINGLETON;
+};
+#endiv
+#divert <cpp>
+// A global variable; constructed sometime before main(...) is entered
+tests::parse::Configuration tests::parse::Configuration::SINGLETON;
+
+#import std.boolalpha
+auto tests::parse::operator<<(std::ostream &o, Configuration const &c) -> std::ostream & {
+  // ... because JSON is fun
+  o << std::boolalpha
+    << "{apple:" << c.apple
+    << ",banana:" << c.banana
+    << ",cherry:" << c.cherry
+    << ",dog:\"" << c.dog << "\""
+    << ",eagle:\"" << c.eagle << "\""
+    << ",frog:\"" << c.frog << "\""
+    << ",goat:\"" << c.goat << "\""
+    << "}";
+  if (!c.query.empty()) {
+    o << "query=" << c.query << '\n';
+  }
+  return o;
+}
+
+tests::parse::Configuration::Configuration()
+  : NAME("a.out") // old school
+  , apple(false)
+  , banana(false)
+  , cherry(false) {
+  // The POD types do not have a default initializer, so we have to do it for them
+  // everything else has a reasonable default constructor
+  ;
+}
+#endiv

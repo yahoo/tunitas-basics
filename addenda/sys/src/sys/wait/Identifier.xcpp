@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import id_t // (process group) being the native representation of pid_t; there being no distinct "pgid_t"
+namespace sys::wait {
+  //
+  // either <----> id_t <-------> Wait
+  // process <---> pid_t <------> process::Process
+  // group <-----> pgid_t <-----> process::Group      n.b. pgid_t is not an actual type
+  // thread <----> pid_t <------> process::Thread
+  //
+  // And yet to work with variant process-or-group identifiers or thread-or-process-or-group
+  //
+  //                   ...    ...                                prefer id::process::Thread
+  //                   prefer id::process::Process               prefer id::process::Process
+  //                   prefer id::process::Group                 prefer id::process::Group
+  //                   prefer id::process::Either                prefer id::process::Any
+  //
+  // id_t can be a pid_t (positive) or a pgid_t (negative; there is no pgid_t type)
+  // to wit:
+  //    id  < -1    meaning wait for any child process whose process group ID is equal to the absolute value of pid.
+  //    id == -1    meaning wait for any child process.
+  //    id ==  0    meaning wait for any child process whose process group ID is equal to that of the calling process.
+  //    id  >  0    meaning wait for the child whose process ID is equal to the value of pid.
+  //
+  enum Identifier : id_t;
+}
+#endiv
+#divert <hpp>
+#import std.tuple
+#import sys.p.Type
+namespace sys::wait {
+  inline auto identify(Identifier) -> std::tuple<p::Type, id_t>;
+  inline auto identify(id_t) -> std::tuple<p::Type, id_t>;
+}
+#endiv
+#divert <ipp>
+#import pid_t
+#import std.underlying_type
+#import std.is_signed
+#import std.is_unsigned
+namespace sys {
+  auto wait::identify(Identifier id) -> std::tuple<p::Type, id_t> { return identify((std::underlying_type_t<Identifier>) id); }
+  auto wait::identify(id_t id) -> std::tuple<p::Type, id_t> {
+    using P = p::Type;
+    // WATCHOUT - this all depends upon casting magic and the sign bit being preserved in coercion
+    static_assert(std::is_signed_v<pid_t>);
+    static_assert(std::is_unsigned_v<id_t>);
+    auto ty = id_t(-1) == id ? P::ALL : pid_t(id) > 0 ? P::PROCESS : P::GROUP;
+    return {ty, id};
+  }
+}
+#endiv

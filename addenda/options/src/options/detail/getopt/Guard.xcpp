@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  namespace detail {
+    namespace getopt {
+      class Guard;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import options.detail.getopt.State
+class options::detail::getopt::Guard {
+public:
+  inline explicit Guard(State &state);
+  Guard(Guard const &) = delete;
+  auto operator=(Guard const &) -> void = delete;
+  inline ~Guard();
+protected:
+  State &state;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+#import options.detail.getopt.State
+
+options::detail::getopt::Guard::Guard(State &the_state)
+  : state(the_state) {
+  state.put_down();
+}
+
+options::detail::getopt::Guard::~Guard() {
+  state.pick_up();
+}
+#divert </ipp>

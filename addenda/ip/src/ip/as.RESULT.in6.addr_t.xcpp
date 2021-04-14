@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+#import ip.Address
+namespace ip {
+  template<typename RESULT> inline auto as(in6::addr_t) -> RESULT;
+  template<> inline auto as<in6::addr_t>(in6::addr_t) -> in6::addr_t;
+  template<> inline auto as<in6::addr>(in6::addr_t) -> in6::addr;
+  template<> inline auto as<std::string>(in6::addr_t) -> std::string;
+  template<> inline auto as<Address>(in6::addr_t) -> Address;
+}
+#endiv
+#divert <ipp>
+template<typename RESULT> auto ip::as(in6::addr_t) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "specializations only");
+  return RESULT();
+}
+
+template<> auto ip::as<ip::in6::addr_t>(in6::addr_t address) -> in6::addr_t {
+  return address;
+}
+
+#import ip.inet.lhs
+template<> auto ip::as<ip::in6::addr>(in6::addr_t address) -> in6::addr {
+  in6::addr ret;
+  inet::lhs(ret) = address;
+  return ret;
+}
+
+#import ip.as.RESULT.in6.addr
+template<> auto ip::as<std::string>(in6::addr_t address) -> std::string {
+  return as<std::string>(as<in6::addr>(address));
+}
+
+template<> auto ip::as<ip::Address>(in6::addr_t address) -> Address {
+  return Address{address};
+}
+#endiv

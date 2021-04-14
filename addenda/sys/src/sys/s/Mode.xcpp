@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::s {
+  //
+  // This set of twelve bits is normally called "mode" because of st_mode and ... history.
+  // Alternatively (ambiguously?): sys::call::arguments::Permimssions
+  //
+  // Like mode_t, but convert-constructs from a variety of sources
+  // Can be reasonably used for permanent storage.
+  //
+  // Whereas ::mode_t is ambiguous because it is an integer type.
+  // we want some sort of flavored type which can accept conversion from a wide range of other types.
+  //
+  // Usage:
+  //
+  //   auto mode = Mode{0777};
+  //   auto mode = Mode{Triple{RWX, RWX, ___}};
+  //   auto mode = Mode{Quad{SSV, RWX, RWX, ___}};
+  //
+  class Mode;
+}
+#endiv
+#divert <hpp>
+#import mode_t
+#forward sys.s.Triple
+#forward sys.s.Quad
+#import sys.s.Flags
+class sys::s::Mode {
+public:
+  using Value = mode_t;
+  using Flags = s::Flags;
+  using Triple = s::Triple;
+  using Quad = s::Quad;
+  inline Mode();
+  inline [[implicit]] Mode(mode_t);
+  inline [[implicit]] Mode(Flags const &);
+  inline [[implicit]] Mode(Triple const &);
+  inline [[implicit]] Mode(Quad const &);
+  inline explicit operator Value() const;
+protected:
+  Value value;
+};
+#endiv
+#divert <ipp>
+#import sys.s.Flags
+#import sys.s.Triple
+#import sys.s.Quad
+namespace sys::s {
+  Mode::Mode() : value{0u} { }
+  Mode::Mode(Value value) : value{value} { }
+  Mode::Mode(Flags const &flags) : value{(Value)flags} { }
+  Mode::Mode(Triple const &triple) : value{(Value)triple.as<Mode>()} { }
+  Mode::Mode(Quad const &quad) : value{(Value)quad.as<Mode>()} { }
+  Mode::operator Value() const { return value; }
+}
+#endiv

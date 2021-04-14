@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import json.value.Type
+namespace json::value {
+  constexpr Type const JSONNULL = ::Json::nullValue;    // 'null' value
+  constexpr Type const INT = ::Json::intValue;          // signed integer value
+  constexpr Type const UINT = ::Json::uintValue;        // unsigned integer value
+  constexpr Type const REAL = ::Json::realValue;        // double value
+  constexpr Type const STRING = ::Json::stringValue;    // UTF-8 string value
+  constexpr Type const BOOLEAN = ::Json::booleanValue;  // bool value
+  constexpr Type const ARRAY = ::Json::arrayValue;      // array value (ordered list)
+  constexpr Type const OBJECT = ::Json::objectValue;    // object value (collection of name/value pairs).
+}
+#endiv

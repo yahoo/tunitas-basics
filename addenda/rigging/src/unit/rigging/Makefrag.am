@@ -1,0 +1,52 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# This library (dso) is here for (backward) compatiblity and to capture
+# a dependency on the (vibrant) -lrigging-unit-module.
+# As such, there are are no "real" sources, using declaration trickery.
+#
+# The C:R:A number is ganged to the successor librigging-bench-module
+lib_libunit_rigging_module_la_VERSION_INFO = $(lib_librigging_unit_module_la_VERSION_INFO)
+
+lib_libunit_rigging_module_la = lib/libunit-rigging-module.la
+lib_libunit_rigging_module_la_LIBADD = -lrigging-unit-module
+lib_libunit_rigging_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libunit_rigging_module_la_VERSION_INFO)
+lib_libunit_rigging_module_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libunit_rigging_module_la_SOURCES))
+lib_libunit_rigging_module_la_SOURCES = \
+  obj/src/unit/rigging/namespace.cpp \
+  obj/src/unit/rigging/Buffer.cpp \
+  obj/src/unit/rigging/clear.cpp \
+  obj/src/unit/rigging/detail.Lhs.cpp \
+  obj/src/unit/rigging/exit.constants.cpp \
+  obj/src/unit/rigging/exit.cpp \
+  obj/src/unit/rigging/Exit.cpp \
+  obj/src/unit/rigging/lhs.cpp \
+  obj/src/unit/rigging/Stringz.cpp \
+  obj/src/unit/rigging/suite.add.cpp \
+  obj/src/unit/rigging/suite.call.cpp \
+  obj/src/unit/rigging/suite.Containerizer.cpp \
+  obj/src/unit/rigging/suite.Iterator.cpp \
+  obj/src/unit/rigging/suite.Stream.cpp \
+  obj/src/unit/rigging/suite.Traverser.cpp \
+  obj/src/unit/rigging/suite.Visitor.cpp \
+  obj/src/unit/rigging/suite.cpp \
+  obj/src/unit/rigging/test.Bench.cpp \
+  obj/src/unit/rigging/test.Case.cpp \
+  obj/src/unit/rigging/test.Fixture.cpp \
+  obj/src/unit/rigging/test.Map.cpp \
+  obj/src/unit/rigging/test.Runner.cpp \
+  obj/src/unit/rigging/test.Subcase.Functor.cpp \
+  obj/src/unit/rigging/test.Subcase.cpp \
+  obj/src/unit/rigging/test.cpp \
+  obj/src/unit/rigging/Usage.cpp \
+  $(end)
+$(scold_cxxdir)/unit/rigging/dependencies.mk: $(lib_libunit_rigging_module_la_SOURCES)
+$(lib_libunit_rigging_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/unit/rigging/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/unit/rigging/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/unit/rigging/dependencies.mk

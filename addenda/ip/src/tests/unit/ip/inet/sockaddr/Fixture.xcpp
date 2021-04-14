@@ -1,0 +1,383 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::inet::sockaddr { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::ip::inet::sockaddr::Fixture : public cppunit::test::Fixture {
+public:
+  //
+  // Blik ... twelve combinations to test.
+  //
+  auto test_Rhs_in4_family() -> void;
+  auto test_Rhs_in4_address() -> void;
+  auto test_Rhs_in4_port() -> void;
+  //
+  auto test_Rhs_in6_family() -> void;
+  auto test_Rhs_in6_address() -> void;
+  auto test_Rhs_in6_port() -> void;
+  //
+  auto test_Lhs_in4_family() -> void;
+  auto test_Lhs_in4_address() -> void;
+  auto test_Lhs_in4_port() -> void;
+  //
+  auto test_Lhs_in6_family() -> void;
+  auto test_Lhs_in6_address() -> void;
+  auto test_Lhs_in6_port() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ip.as
+#import tests.unit.make.constructors
+
+#import want.cppunit.int128
+using ::want::cppunit::operator<<;
+
+#import ip.inet.sockaddr.Rhs
+#import ip.inet.family
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in4_family() -> void {
+  using ::ip::inet::family;
+  using ::ip::inet::sockaddr::FAMILY;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<FAMILY, in4::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::inet::AF::Family fa = rsa; // <----------------------- test this
+  auto actual = fa;
+  auto expected = specimen_family;
+  CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+}
+#import ip.inet.address
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in4_address() -> void {
+  using ::ip::inet::address;
+  using ::ip::inet::sockaddr::ADDRESS;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<ADDRESS, in4::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::in4::addr_t at = rsa; // <----------------------------- test this
+  auto actual = at;
+  auto expected = specimen_addr;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+#import ip.inet.port
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in4_port() -> void {
+  using ::ip::inet::port;
+  using ::ip::inet::sockaddr::PORT;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<PORT, in4::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::in::port_t po = rsa; // <--------------------------- test this
+  auto actual = po;
+  auto expected = (::ip::in::port_t) host_order(specimen_port);
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in6_family() -> void {
+  using ::ip::inet::family;
+  using ::ip::inet::sockaddr::FAMILY;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(127, 0, 0, 1);
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<FAMILY, in6::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::inet::AF::Family fa = rsa; // <----------------------- test this
+  auto actual = fa;
+  auto expected = specimen_family;
+  CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in6_address() -> void {
+  using ::ip::inet::address;
+  using ::ip::inet::sockaddr::ADDRESS;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<ADDRESS, in6::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::in6::addr_t at = rsa; // <----------------------------- test this
+  auto actual = at;
+  auto expected = specimen_addr;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Rhs_in6_port() -> void {
+  using ::ip::inet::port;
+  using ::ip::inet::sockaddr::PORT;
+  using ::ip::inet::sockaddr::Rhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<PORT, in6::sockaddr> rsa(sa); // <-------------------- test this
+  ::ip::in::port_t po = rsa; // <--------------------------- test this
+  auto actual = po;
+  auto expected = (::ip::in::port_t) host_order(specimen_port);
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import ip.inet.sockaddr.Lhs
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in4_family() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::Lhs;
+  using ::ip::inet::sockaddr::FAMILY;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  auto other_family = ::ip::inet::AF::INET6;
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<FAMILY, in4::sockaddr> rsa(sa);
+  {
+    ::ip::inet::AF::Family fa = rsa;
+    auto actual = fa;
+    auto expected = specimen_family;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+  Lhs<FAMILY, in4::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_family; // <------------------------------------ test this
+  {
+    ::ip::inet::AF::Family fa = rsa;
+    auto actual = fa;
+    auto expected = other_family;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in4_address() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::ADDRESS;
+  using ::ip::inet::sockaddr::Lhs;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  auto other_address = make::in4_addr_t(127, 0, 0, 2);
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<ADDRESS,in4::sockaddr> rsa(sa);
+  {
+    ::ip::in4::addr_t at = rsa;
+    auto actual = at;
+    auto expected = specimen_addr;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  Lhs<ADDRESS, in4::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_address; // <------------------------------------ test this
+  {
+    ::ip::in4::addr_t at = rsa;
+    auto actual = at;
+    auto expected = other_address;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in4_port() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::PORT;
+  using ::ip::inet::sockaddr::Lhs;
+  namespace in4 = ::ip::in4;
+  auto specimen_family = ::ip::inet::AF::INET4;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in4_addr_t(127, 0, 0, 1);
+  auto other_port = ::ip::endian::host_order<::ip::in::port_t>(54321);
+  CPPUNIT_ASSERT(54321u == other_port); // yup, host order.
+  in4::sockaddr sa;
+  sa.sin_family = (int)(specimen_family);
+  sa.sin_port = specimen_port;
+  sa.sin_addr = ::ip::as<::ip::in4::addr>(specimen_addr);
+  Rhs<PORT, in4::sockaddr> rsa(sa);
+  {
+    ::ip::in::port_t po = rsa;
+    auto actual = po;
+    auto expected = (::ip::in::port_t) host_order(specimen_port);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  Lhs<PORT, in4::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_port; // <------------------------------------ test this
+  {
+    ::ip::in::port_t po = rsa;
+    auto actual = po;
+    auto expected = (::ip::in::port_t) ::ip::endian::host_order<::ip::in::port_t>(other_port);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in6_family() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::FAMILY;
+  using ::ip::inet::sockaddr::Lhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+  auto other_family = ::ip::inet::AF::INET4;
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<FAMILY, in6::sockaddr> rsa(sa);
+  {
+    ::ip::inet::AF::Family fa = rsa;
+    auto actual = fa;
+    auto expected = specimen_family;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+  Lhs<FAMILY, in6::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_family; // <------------------------------------ test this
+  {
+    ::ip::inet::AF::Family fa = rsa;
+    auto actual = fa;
+    auto expected = other_family;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in6_address() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::ADDRESS;
+  using ::ip::inet::sockaddr::Lhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+  auto other_address = make::in4_addr_t(0lu, 2lu); // almost home
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<ADDRESS, in6::sockaddr> rsa(sa);
+  {
+    ::ip::in6::addr_t at = rsa;
+    auto actual = at;
+    auto expected = specimen_addr;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  Lhs<ADDRESS, in6::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_address; // <------------------------------------ test this
+  {
+    ::ip::in6::addr_t at = rsa;
+    auto actual = at;
+    auto expected = other_address;
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+}
+auto tests::unit::ip::inet::sockaddr::Fixture::test_Lhs_in6_port() -> void {
+  using ::ip::inet::sockaddr::Rhs;
+  using ::ip::inet::sockaddr::PORT;
+  using ::ip::inet::sockaddr::Lhs;
+  namespace in6 = ::ip::in6;
+  auto specimen_family = ::ip::inet::AF::INET6;
+  auto specimen_port = ::ip::endian::network_order<::ip::in::port_t>(12345);
+  auto specimen_addr = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+  auto other_port = ::ip::endian::host_order<::ip::in::port_t>(54321);
+  CPPUNIT_ASSERT(54321u == other_port); // yup, host order.
+  in6::sockaddr sa;
+  sa.sin6_family = (int)(specimen_family);
+  sa.sin6_port = specimen_port;
+  sa.sin6_addr = ::ip::as<::ip::in6::addr>(specimen_addr);
+  Rhs<PORT,in6::sockaddr> rsa(sa);
+  {
+    ::ip::in::port_t po = rsa;
+    auto actual = po;
+    auto expected = (::ip::in::port_t) host_order(specimen_port);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  Lhs<PORT, in6::sockaddr> lsa(sa); // <-------------------- test this
+  lsa = other_port; // <------------------------------------ test this
+  {
+    ::ip::in::port_t po = rsa;
+    auto actual = po;
+    auto expected = (::ip::in::port_t) host_order(other_port);
+    CPPUNIT_ASSERT_EQUAL((int)expected, (int)actual);
+  }
+}
+
+#import tests.unit.ip.inet.sockaddr.Family
+#import tests.unit.ip.inet.sockaddr.Address
+#import tests.unit.ip.inet.sockaddr.Port
+#import rigging.suite.io
+auto tests::unit::ip::inet::sockaddr::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("sockaddr");
+  {
+    Stream rhs("rhs");
+    {
+      Stream in4("Rhs<in4::sockaddr>");
+      in4 << call("family", &Fixture::test_Rhs_in4_family)
+          << call("address", &Fixture::test_Rhs_in4_address)
+          << call("port", &Fixture::test_Rhs_in4_port)
+        ;
+      rhs << move(in4);
+    } {
+      Stream in6("Rhs<in6::sockaddr>");
+      in6 << call("family", &Fixture::test_Rhs_in6_family)
+          << call("address", &Fixture::test_Rhs_in6_address)
+          << call("port", &Fixture::test_Rhs_in6_port)
+        ;
+      rhs << move(in6);
+    }
+    series << move(rhs);
+  } {
+    Stream lhs("lhs");
+    {
+      Stream in4("Lhs<in4::sockaddr>");
+      in4 << call("family", &Fixture::test_Lhs_in4_family)
+          << call("address", &Fixture::test_Lhs_in4_address)
+          << call("port", &Fixture::test_Lhs_in4_port)
+        ;
+      lhs << move(in4);
+    } {
+      Stream in6("Lhs<in6::sockaddr>");
+      in6 << call("family", &Fixture::test_Lhs_in6_family)
+          << call("address", &Fixture::test_Lhs_in6_address)
+          << call("port", &Fixture::test_Lhs_in6_port)
+        ;
+      lhs << move(in6);
+    }
+    series << move(lhs);
+  }
+  series << add<Family>()
+         << add<Address>()
+         << add<Port>()
+    ;
+  return finalize(series);
+}
+#endiv

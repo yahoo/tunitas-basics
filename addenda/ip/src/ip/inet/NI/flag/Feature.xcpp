@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <module-ip/netdb.h> // for the "NI_"-prefixed manifest constants
+namespace ip {
+  namespace inet {
+    namespace NI {
+      namespace flag {
+        enum class Feature
+          { NONE = 0,
+            NAMEREQD,
+            DGRAM,
+            NOFQDN,
+            NUMERICHOST,
+            NUMERICSERV,
+            IDN,
+            IDN_ALLOW_UNASSIGNED,
+            IDN_USE_STD3_ASCII_RULES };
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+namespace ip {
+  namespace inet {
+    namespace NI {
+      namespace flag {
+        // For convenience, they are exposed as constants
+        constexpr auto const NONE = Feature::NONE;
+        constexpr auto const NAMEREQD = Feature::NAMEREQD;
+        constexpr auto const DGRAM = Feature::DGRAM;
+        constexpr auto const NOFQDN = Feature::NOFQDN;
+        constexpr auto const NUMERICHOST = Feature::NUMERICHOST;
+        constexpr auto const NUMERICSERV = Feature::NUMERICSERV;
+        constexpr auto const IDN = Feature::IDN;
+        constexpr auto const IDN_ALLOW_UNASSIGNED = Feature::IDN_ALLOW_UNASSIGNED;
+        constexpr auto const IDN_USE_STD3_ASCII_RULES = Feature::IDN_USE_STD3_ASCII_RULES;
+      
+        inline constexpr auto is_flag(Feature) -> bool;
+
+        // see as<...>(...) nearby
+
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+constexpr auto ip::inet::NI::flag::is_flag(Feature) -> bool {
+  // by definition
+  return true;
+}
+#endiv

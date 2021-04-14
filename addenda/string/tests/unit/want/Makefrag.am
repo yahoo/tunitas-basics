@@ -1,0 +1,4 @@
+tests_unit_want_TESTS = \
+  tests/unit/want/cases.test \
+  tests/unit/want/printable.crudely.as_string.test \
+  $(end)

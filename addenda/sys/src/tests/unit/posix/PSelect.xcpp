@@ -1,0 +1,142 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class PSelect; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::posix::PSelect : public cppunit::test::Fixture {
+public:
+  //
+  auto test_r() -> void;
+  auto test_rt() -> void;
+  auto test_rts() -> void;
+  //
+  auto test_rw() -> void;
+  auto test_rwt() -> void;
+  auto test_rwts() -> void;
+  //
+  auto test_rwx() -> void;
+  auto test_rwxt() -> void;
+  auto test_rwxts() -> void;
+  //
+  auto test_mr() -> void;
+  auto test_mrt() -> void;
+  auto test_mrts() -> void;
+  //
+  auto test_mrw() -> void;
+  auto test_mrwt() -> void;
+  auto test_mrwts() -> void;
+  //
+  auto test_mrwx() -> void;
+  auto test_mrwxt() -> void;
+  auto test_mrwxts() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.posix.pselect
+#import sys.fd.Set
+#import sys.fd.read
+#import sys.fd.write
+#import sys.fd.except
+auto tests::unit::posix::PSelect::test_r() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_r() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rts() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rw() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rw() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rwt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rwt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rwts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rwts() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rwx() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rwx() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rwxt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rwxt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_rwxts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_rwxts() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mr() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mr() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrts() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrw() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrw() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrwt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrwt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrwts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrwts() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrwx() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrwx() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrwxt() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrwxt() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::posix::PSelect::test_mrwxts() -> void {
+#warning WRITETHIS auto tests::unit::posix::PSelect::test_mrwxts() -> void
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+auto tests::unit::posix::PSelect::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("PSelect");
+  series << call("read", &PSelect::test_r)
+         << call("read,timeout", &PSelect::test_rt)
+         << call("read,timeout,signal", &PSelect::test_rts)
+         << call("read,write", &PSelect::test_rw)
+         << call("read,write,timeout", &PSelect::test_rwt)
+         << call("read,write,timeout,signal", &PSelect::test_rwts)
+         << call("read,write,except", &PSelect::test_rwx)
+         << call("read,write,except,timeout", &PSelect::test_rwxt)
+         << call("read,write,except,timeout,signal", &PSelect::test_rwxts)
+         << call("max,read", &PSelect::test_mr)
+         << call("max,read,timeout", &PSelect::test_mrt)
+         << call("max,read,timeout,signal", &PSelect::test_mrts)
+         << call("max,read,write", &PSelect::test_mrw)
+         << call("max,read,write,timeout", &PSelect::test_mrwt)
+         << call("max,read,write,timeout,signal", &PSelect::test_mrwts)
+         << call("max,read,write,except", &PSelect::test_mrwx)
+         << call("max,read,write,except,timeout", &PSelect::test_mrwxt)
+         << call("max,read,write,except,timeout,signal", &PSelect::test_mrwxts)
+    ;
+  return finalize(series);
+}
+#endiv

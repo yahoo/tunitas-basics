@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.guardian.required // cascade
+#import sys.required.Descriptor
+namespace tests::guardian {
+  //
+  // Cleanup an open file descriptor
+  // Specializations only.
+  //
+  // The descriiptor is captured by an lvalue reference.
+  // Either as an old_school (native) int or as a New School id::File.
+  //
+  // Usage:
+  //
+  //     int fd = open(...filename..., O::RDONLY);
+  //     Cleanup_Descriptor<int> cleanup(fd)
+  //
+  template<required::Descriptor> class Cleanup_Descriptor;
+}
+#endiv

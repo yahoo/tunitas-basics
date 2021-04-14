@@ -1,0 +1,39 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.api.detail.Dispatch
+#import sqlite.Null
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<> inline auto Dispatch<Null>::bind(unguarded::Statement *, bind_index, Bind<Null>::argument_type) -> Bind<Null>::result_type;
+      template<> inline auto Dispatch<Null>::column(unguarded::Statement *, column_index) -> Column<Null>::result_type;
+      template<> inline auto Dispatch<Null>::result(unguarded::Function *, typename Result<value_type>::argument_type) -> typename Result<value_type>::result_type;
+      template<> inline auto Dispatch<Null>::parameter(unguarded::Value *) -> typename Parameter<value_type>::result_type;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+
+template<> auto sqlite::api::detail::Dispatch<sqlite::Null>::bind(unguarded::Statement *statement, bind_index idx, Null) -> Bind<Null>::result_type {
+  return (status::Code)::sqlite3_bind_null(statement, idx);
+}
+
+#import sqlite.Type
+template<> auto sqlite::api::detail::Dispatch<sqlite::Null>::column(unguarded::Statement *statement, column_index idx) -> Column<Null>::result_type {
+  return Type::SQLNULL == (Type)::sqlite3_column_type(statement, idx);
+}
+
+#import std.is_same
+template<> auto sqlite::api::detail::Dispatch<sqlite::Null>::result(unguarded::Function *function, typename Result<value_type>::argument_type value) -> Result<value_type>::result_type {
+  static_assert(std::is_same<void, Result<value_type>::result_type>::value, "not void");
+  static_assert(std::is_same<void, decltype(::sqlite3_result_null(function))>::value, "not void");
+  ::sqlite3_result_null(function);
+}
+
+#import sqlite.Type
+template<> auto sqlite::api::detail::Dispatch<sqlite::Null>::parameter(unguarded::Value *value) -> typename Parameter<value_type>::result_type {
+  return Type::SQLNULL == (Type)::sqlite3_value_type(value);
+}
+#endiv

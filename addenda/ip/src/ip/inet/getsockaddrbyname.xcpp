@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import re.string
+#import ip.in // ip::in::port_t
+#import ip.inet.result.Value
+#import std.string
+namespace ip {
+  namespace inet {
+    //
+    // acquire a sockaddr on the first address presented by getaddrinfo.
+    //
+    template<typename SOCKADDR> auto getsockaddrbyname(re::string<c::const_stringz> hostname, in::port_t port) -> result::Value<SOCKADDR>;
+  }
+}
+#endiv
+#divert <tpp>
+#import ip.inet.zero
+#import ip.inet.family
+#import ip.inet.port
+#import ip.inet.address
+#import std.move
+#import ip.inet.getaddrinfo
+#import ip.inet.addrinfo.Specification
+#import ip.inet.traits.Sockaddr
+template<typename SOCKADDR> auto ip::inet::getsockaddrbyname(re::string<c::const_stringz> hostname, in::port_t service) -> result::Value<SOCKADDR> {
+  using Result = result::Value<SOCKADDR>;
+  auto const address_family = traits::Sockaddr<SOCKADDR>::family();
+  auto r = getaddrinfo<addrinfo::HOST>(hostname, addrinfo::Specification() | address_family);
+  if (!ok(r)) {
+    return Result{false, error_num(r), SOCKADDR()};
+  }
+  SOCKADDR sa;
+  zero(sa);
+  family(sa) = address_family;
+  port(sa) = service;
+  address(sa) = value(r).front().template addr<SOCKADDR>(); // yeah ... just pick the first one, arbitrarily [broken for multi-addressed]
+  return Result{true, 0, std::move(sa)};
+}
+#endiv

@@ -1,0 +1,11 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.basic_string_view
+namespace c {
+  //
+  // DELETE - Functionally, similar to std::basic_string_view::c_str()
+  // DELETE - but you must not use it that way because there is no guaranteed '\0' terminator.
+  //
+  template<typename CHAR, typename TRAITS> inline auto str(std::basic_string_view<CHAR, TRAITS> const &) -> CHAR const * = delete;
+}
+#divert </hpp>

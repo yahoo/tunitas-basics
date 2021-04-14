@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::writer { class Pretty; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::writer::Pretty : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_constructor() -> void;
+  auto test_write() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import json.writer.Pretty
+auto tests::unit::writer::Pretty::test_constructor() -> void {
+  ::json::writer::Pretty w;
+  // that's it (show it constructed)
+  CPPUNIT_ASSERT(sizeof (w));
+}
+#import tests.unit.Generator
+auto tests::unit::writer::Pretty::test_write() -> void {
+  ::json::writer::Pretty w;
+  tests::unit::Generator generate;
+  auto g = generate();
+  auto s = w.write(g);
+  CPPUNIT_ASSERT(!s.empty());
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::writer::Pretty::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  using ::unit::rigging::suite::Stream;
+  Stream series("Pretty");
+  series << call("constructor", &Pretty::test_constructor)
+         << call("write", &Pretty::test_write)
+    ;
+  return series.release();
+}
+#endiv

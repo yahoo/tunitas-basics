@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Size.declaration
+#import sys.call.result.Value.template
+#import error_t
+namespace sys::call::result {
+  //
+  // like std::tuple_size, but works directly on the value
+  //
+  // Usage:
+  //
+  //     using v99 = Value<std::string, int>;
+  //     constexpr auto const v99_size = Size<v99>::value;
+  //     static_assert(2 == v99_size);
+  //
+  //     using v88 = Value<int>;
+  //     constexpr auto const v88_size = Size<v88>::value;
+  //     static_assert(1 == v88_size);
+  //
+  //     using v77 = Value<void>;
+  //     constexpr auto const v77_size = Size<v77>::value;
+  //     static_assert(0 == v77_size);
+  //
+  template<typename VALUE, typename... VALUES> struct Size<Value<VALUE, VALUES...>>;
+}
+#endiv
+#divert <hpp>
+#import std.tuple_size
+namespace sys::call {
+  template<typename VALUE, typename... VALUES> struct result::Size<result::Value<VALUE, VALUES...>> {
+    static constexpr auto const value = std::tuple_size<std::tuple<bool, error_t, VALUE, VALUES...>>::value-2;
+  };
+}
+#endiv

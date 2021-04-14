@@ -1,0 +1,14 @@
+// -*- c++ -*- b769fba1-08e0-4953-947c-e374dc969dcf
+#pragma once
+#include <httpserver>
+//
+// Introduce the namespace (others may wish to 
+//
+// Usage:
+//
+//   #import httpserver.http
+//   namespace yourapp::yourspace {
+//     namespace http = httpserver::http;
+//   }
+//
+namespace httpserver::http { }

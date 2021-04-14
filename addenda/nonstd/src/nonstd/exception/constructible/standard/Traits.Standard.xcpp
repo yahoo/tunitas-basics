@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.constructible.standard.Traits.template
+namespace nonstd::exception::constructible::standard {
+  template<> struct Traits<std::exception>;
+  template<> struct Traits<std::future_error>;
+  //
+  template<> struct Traits<std::regex_error>;
+  //
+  template<> struct Traits<std::bad_optional_access>;
+  template<> struct Traits<std::bad_variant_access>;
+  //
+  template<> struct Traits<std::bad_typeid>;
+  template<> struct Traits<std::bad_cast>;
+  template<> struct Traits<std::bad_any_cast>;
+  template<> struct Traits<std::bad_weak_ptr>;
+  template<> struct Traits<std::bad_function_call>;
+  template<> struct Traits<std::bad_alloc>;
+  template<> struct Traits<std::bad_exception>;
+  //
+  // C++23
+  template<> struct Traits<std::tx_exception>;
+  template<> struct Traits<std::nonexistent_local_time>;
+  template<> struct Traits<std::ambiguous_local_time>;
+  template<> struct Traits<std::format_error>;
+  template<> struct Traits<std::bad_array_new_length>;
+  //
+  // problematic
+  // [[FIXTHIS]] find another way ... don't want to (can't ) buy all of iostreams to get std.ios_base just to get template<> struct
+}
+#endiv
+#divert <hpp>
+namespace nonstd::exception::constructible::standard {
+  template<> struct Traits<std::exception>    : public traits::Standard { };
+  template<> struct Traits<std::future_error> : public traits::Standard { };
+  //
+  template<> struct Traits<std::regex_error> : public traits::Standard { };
+  //
+  template<> struct Traits<std::bad_optional_access> : public traits::Standard { };
+  template<> struct Traits<std::bad_variant_access>  : public traits::Standard { };
+  //
+  template<> struct Traits<std::bad_typeid>        : public traits::Standard { };
+  template<> struct Traits<std::bad_cast>          : public traits::Standard { };
+  template<> struct Traits<std::bad_any_cast>      : public traits::Standard { };
+  template<> struct Traits<std::bad_weak_ptr>      : public traits::Standard { };
+  template<> struct Traits<std::bad_function_call> : public traits::Standard { };
+  template<> struct Traits<std::bad_alloc>         : public traits::Standard { };
+  template<> struct Traits<std::bad_exception>     : public traits::Standard { };
+  //
+  // C++23
+  template<> struct Traits<std::tx_exception>           : public traits::Standard { };
+  template<> struct Traits<std::nonexistent_local_time> : public traits::Standard { };
+  template<> struct Traits<std::ambiguous_local_time>   : public traits::Standard { };
+  template<> struct Traits<std::format_error>           : public traits::Standard { };
+  template<> struct Traits<std::bad_array_new_length>   : public traits::Standard { };
+}
+#endiv

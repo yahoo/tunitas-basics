@@ -1,0 +1,190 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::argv {
+  //
+  // The point of this test is to show what happens when nullptr is given
+  // Answer: nothing bad,
+  //         because the invariant trailing nullptr cannot be violated.
+  //         because for the nullptr case, an immutable dummy element is substituted
+  //
+  template<typename ARGV> class Nullptr;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import c.basic_argv
+#import std.remove_pointer
+template<typename ARGV> class tests::unit::c::argv::Nullptr : public cppunit::test::Fixture { 
+public: 
+  auto test_default_constructor() -> void;
+  auto test_copy_constructor_from_default() -> void;
+  auto test_copy_constructor_from_full() -> void;
+  auto test_constructor_from_const_manifest_array() -> void;
+  auto test_constructor_from_nonconst_manifest_array() -> void;
+  auto test_EVERY_OTHER_constructor() -> void;
+  auto test_nonconst_to_const_conversion_constructor() -> void;
+  auto test_const_to_const_conversion_constructor() -> void;
+  //
+  static auto suite() -> cppunit::Test *;
+  //
+  using Subject = ARGV; // ...................................... c::basic_argv<char>    c::basic_argv<char const>
+  using Data = typename ARGV::data_type; // ..................... char **                char const *const *
+  using Value = typename ARGV::value_type; // ................... char *                 char const *
+  using Char = typename std::remove_pointer<Value>::type; // .... char                   char const
+private:
+  static constexpr auto const nullptr_dammit = (typename Subject::data_type)(nullptr);
+};
+#endiv
+#divert <tpp>
+#import std.cerr
+#import std.invalid_argument
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_default_constructor() -> void {
+  Subject t;
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_copy_constructor_from_default() -> void {
+  Subject original;
+  Subject t(original);
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_copy_constructor_from_full() -> void {
+  Subject original;
+  Subject t(original);
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_constructor_from_const_manifest_array() -> void {
+#warning WRITETHIS - template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_constructor_from_const_manifest_array() -> void does not test that constructor
+  try {
+    // template<::std::size_t N> basic_argv(typename ancestor::value_type const (&argv)[N]);
+    Subject t(0, nullptr_dammit); // FIXME - this does not test that constructor
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_constructor_from_nonconst_manifest_array() -> void {
+#warning WRITETHIS - template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_constructor_from_nonconst_manifest_array() -> void does not test that constructor
+  try {
+    // template<::std::size_t N> basic_argv(typename ancestor::value_type const (&argv)[N]);
+    Subject t(0, nullptr_dammit); // FIXME - this does not test that constructor
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_EVERY_OTHER_constructor() -> void {
+#warning FIXTHIS -- make these individual tests in template<typename _> auto Nullptr<_>::test_EVERY_OTHER_constructor() -> void
+  try {
+    // basic_argv(::std::size_t count, typename ancestor::const_data_type argv);
+    Subject t(0, nullptr);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // /*implicit*/ basic_argv(::std::pair<::std::size_t, CHAR **> const &);
+    ::std::pair<::std::size_t, Data> p(0, nullptr);
+    Subject t(p);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // /*implicit*/ basic_argv(::std::pair<::std::size_t, CHAR const *const *> const &); [[FIXTHIS]] -- this does not test this constructor
+    ::std::pair<::std::size_t, Data> p(0, nullptr);
+    Subject t(p);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // /*implicit*/ basic_argv(::std::tuple<::std::size_t, CHAR **> const &); [[FIXTHIS]] -- this does not test this constructor
+    ::std::tuple<::std::size_t, Data> u(0, nullptr);
+    Subject t(u);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // /*implicit*/ basic_argv(::std::tuple<::std::size_t, CHAR const *const *> const &); [[FIXTHIS]] -- this does not test this constructor
+    ::std::tuple<::std::size_t, Data> u(0, nullptr);
+    Subject t(u);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // template<typename ALLOC> /*implicit*/ basic_argv(::std::vector<CHAR *, ALLOC> const &);
+    ::std::vector<Char *> v;
+    Subject t(v);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    // template<typename ALLOC> /*implicit*/ basic_argv(::std::vector<CHAR const *, ALLOC> const &);
+    ::std::vector<Char *> v;
+    Subject t(v);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+#import std.is_const
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_const_to_const_conversion_constructor() -> void {
+  if constexpr (std::is_const<Char>::value) {
+      try {
+        // /*implicit*/ basic_argv(basic_argv<CHAR> const &);
+        ::c::basic_argv<char const> a(0, nullptr);
+        Subject t(a);
+        CPPUNIT_ASSERT(t.empty());
+      } catch (std::invalid_argument const &e) {
+        CPPUNIT_ASSERT(false);
+      }
+    }
+}
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::test_nonconst_to_const_conversion_constructor() -> void {
+  try {
+    // /*implicit*/ basic_argv(basic_argv<CHAR> const &);
+    ::c::basic_argv<char> a(0, nullptr);
+    Subject t(a);
+    CPPUNIT_ASSERT(t.empty());
+  } catch (std::invalid_argument const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+#import std.type_info
+#import std.string_literals
+#import rigging.suite.io
+template<typename _> auto tests::unit::c::argv::Nullptr<_>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::suite;
+  Stream series("Nullptr<"s + typeid(Subject).name() + ">"s);
+  series << call("default", &Nullptr::test_default_constructor)
+         << call("copy-from-default", &Nullptr::test_copy_constructor_from_default)
+         << call("copy-from-full", &Nullptr::test_copy_constructor_from_full)
+         << call("const-manifest-array", &Nullptr::test_constructor_from_const_manifest_array)
+         << call("nonconst-manifest-array", &Nullptr::test_constructor_from_nonconst_manifest_array)
+         << call("EVERY_OTHER", &Nullptr::test_EVERY_OTHER_constructor)
+         << call("nonconst-to-const-conversion", &Nullptr::test_nonconst_to_const_conversion_constructor)
+         << call("const-to-const-conversion", &Nullptr::test_const_to_const_conversion_constructor)
+    ;
+  return finalize(series);
+}
+#endiv
+

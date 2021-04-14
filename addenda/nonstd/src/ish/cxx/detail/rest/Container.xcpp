@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ish.cxx.required.Loopable
+namespace ish::cxx::detail::rest {
+  //
+  // Behavior: the begin()..end() skips over the front() member of the wrapped container
+  //
+  // Usage:
+  //     std::cout << thing.front();
+  //     for (auto const &i : Container<CONTAINER>(thing)) {
+  //       std::cout << ',' << i;
+  //     }
+  //
+  // See rest(...) which is nearby
+  //
+  template<required::Loopable CONTAINER> class Container;
+}
+#entail ish.cxx.detail.rest.Container.consty
+#entail ish.cxx.detail.rest.Container.muting
+#endiv

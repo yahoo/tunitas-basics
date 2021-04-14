@@ -1,0 +1,34 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.detail
+namespace c {
+  namespace detail {
+    namespace argv {
+      // There are no class name declarations in here (yet)
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace argv {
+      // Don't enforce it, just compute it
+      template<typename CONTAINER> inline auto size_after_discounting_final_nullptr(CONTAINER const &) -> std::size_t;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+template<typename CONTAINER> auto c::detail::argv::size_after_discounting_final_nullptr(CONTAINER const &subject) -> std::size_t {
+  // Recall: the final element of the container must be nullptr
+  // YET: const_argv<...> and argv<...> will report begin/end as discounting that element
+  return subject.empty() ? 0u : (subject.size()-1);
+}
+#endiv

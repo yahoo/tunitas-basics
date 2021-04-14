@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Ambiguities
+#endiv
+#divert <cpp>
+#import sys.posix.pipe // <---------- these three are ambiguous?
+#import sys.posix.cloexec // <------- together?
+#import sys.posix.close // <--------- really?
+auto tests::unit::posix::Ambiguities::test_case_pipefit() -> void {
+  CPPUNIT_ASSERT(true);
+}
+#endiv

@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#forward sys.posix.iovec
+#import sys.posix.zero.template
+#import nonstd.dope
+#import nonstd.span
+namespace sys::posix::packaging::zero::implementation::interface {
+  inline auto zero(iovec &) -> void;
+  template<std::size_t N> inline auto zero(iovec (&)[N]) -> void;
+  inline auto zero(iovec *, std::size_t) -> void;
+  inline auto zero(nonstd::dope<iovec>) -> void;
+  inline auto zero(nonstd::span<iovec>) -> void;
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::zero::implementation {
+  auto interface::zero(iovec &io) -> void                              { uninitialized_zero(io); }
+  template<std::size_t N> auto interface::zero(iovec (&io)[N]) -> void { uninitialized_zero(io); }
+  auto interface::zero(iovec *io, std::size_t n) -> void               { uninitialized_zero(io, n); }
+  auto interface::zero(nonstd::dope<iovec> ope) -> void                { uninitialized_zero(ope.data(), ope.size()); }
+  auto interface::zero(nonstd::span<iovec> pan) -> void                { uninitialized_zero(pan.data(), pan.size()); }
+}
+#endiv

@@ -1,0 +1,9 @@
+SCOLD-style wrapping of (lib)httpserver
+See https://github.com/etr/libhttpserver
+
+The wrapping and packaging herein is licensed GPLv3.
+See the LICENSE file nearby.
+
+You will need the usual compilation tools.
+Also:
+dnf install -y {libmicrohttpd,libhttpserver}{,-devel} libmicrohttpd-doc gnutls{,-c++,-devel}

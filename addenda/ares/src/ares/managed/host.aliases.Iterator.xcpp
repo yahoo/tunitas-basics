@@ -1,0 +1,99 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host::aliases {
+  //
+  // The iterator over the host aliases.
+  // When returning, synthesize a std::string
+  // But provide for synthesizing a zero-alloc cheaper spanlike, including a std::string_view.
+  // 
+  // Usage: see host::Aliases
+  //
+  //    ...as usual...
+  //
+  class Iterator;
+}
+#import ares.managed.host.aliases.Iterator.iterator_traits
+#endiv
+#divert <hpp>
+namespace ares::managed::host::aliases {
+  inline auto swap(Iterator &, Iterator &) noexcept -> void;
+  inline auto operator==(Iterator const &, Iterator const &) -> bool;
+  inline auto operator!=(Iterator const &, Iterator const &) -> bool;
+}
+#import ares.required.Spanlike
+#forward ares.managed.host.Aliases
+#import c.const_argv
+class ares::managed::host::aliases::Iterator {
+  using Subiterator = c::const_argv::const_iterator;
+  inline explicit Iterator(Subiterator);
+  friend class host::Aliases;
+public:
+  using Value = std::string; // ... New School
+  using value_type = Value; // .... old_school
+  inline Iterator();
+  // Throws if the iterator equals end(); unspecified what happens if the iterator is after the end
+  inline auto operator*() const -> std::string;
+  inline auto get() const -> std::string;
+  template<required::Spanlike SPANLIKE> inline auto get() const -> SPANLIKE;
+  // These operations are unchecked (and uncheckable)
+  inline auto operator++() -> Iterator &;
+  inline auto operator++(int) -> Iterator;
+  inline auto operator--() -> Iterator &;
+  inline auto operator--(int) -> Iterator;
+private:
+  Subiterator subiterator;
+  friend auto aliases::swap(Iterator &, Iterator &) noexcept -> void;
+  friend auto aliases::operator==(Iterator const &, Iterator const &) -> bool;
+};
+#endiv
+#divert <ipp>
+#import std.swap
+namespace ares::managed::host {
+  auto aliases::swap(Iterator &a, Iterator &b) noexcept -> void { std::swap(a.subiterator, b.subiterator); }
+  auto aliases::operator==(Iterator const &a, Iterator const &b) -> bool { return a.subiterator == b.subiterator; }
+  auto aliases::operator!=(Iterator const &a, Iterator const &b) -> bool { return !operator==(a, b); }
+}
+#import ares.exception.Null
+#import nonstd.span
+#import strlen
+namespace ares::managed::host::aliases {
+  Iterator::Iterator()
+    : subiterator{nullptr}
+  { }
+  Iterator::Iterator(Subiterator sub)
+    : subiterator{sub}
+  { }
+  auto Iterator::operator*() const -> Value { return get(); }
+  auto Iterator::get() const -> Value {
+    auto spun = get<nonstd::span<char const>>();
+    return Value{spun.data(), spun.size()};
+  }
+  template<required::Spanlike SPANLIKE> auto Iterator::get() const -> SPANLIKE {
+    if (nullptr == subiterator || nullptr == *subiterator) {
+      throw exception::Null{};
+    }
+    auto name = *subiterator;
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(name), strlen(name)};
+  }
+  auto Iterator::operator++() -> Iterator & {
+    ++subiterator; // n.b. this is unchecked
+    return *this;
+  }
+  auto Iterator::operator++(int) -> Iterator {
+    Iterator old{*this};
+    operator++();
+    return old;
+  }
+  auto Iterator::operator--() -> Iterator & {
+    --subiterator; // n.b. this is unchecked
+    return *this;
+  }
+  auto Iterator::operator--(int) -> Iterator {
+    Iterator old{*this};
+    operator--();
+    return old;
+  }
+}
+#import ares.managed.host.Aliases // match the #forward, above
+#endiv

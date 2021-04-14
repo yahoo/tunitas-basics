@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.mkstemp
+auto tests::unit::posix::fixture::Fixture::test_mkstemp() -> void {
+  auto r = six::mkstemp("/tmp/t99.tests.unit.posix.mkstemp.XXXXXX");
+  CPPUNIT_ASSERT(good(r));
+  guardian::Close guard(sys::call::result::get<0>(r));
+  guardian::Cleanup_Spackled_Names cleanup{sys::call::result::get<1>(r).native()};
+  auto const v = value(r);
+  std::cout << "mkstemp " << v << '\n';
+}
+#endiv

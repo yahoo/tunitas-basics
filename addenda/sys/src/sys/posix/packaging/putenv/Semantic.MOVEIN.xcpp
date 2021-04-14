@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.putenv.Semantic.declaration
+namespace sys::posix::packaging::putenv {
+  template<> struct Semantic<Policy::MOVEIN>;
+}
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.required
+#import nonstd.required.Stringview
+namespace sys::posix::packaging::putenv {
+  template<> struct Semantic<Policy::MOVEIN> {
+    // prepares the buffer and calls ::putenv
+    template<required::Stringview STRINGVIEW> auto operator()(STRINGVIEW const &name_eq_value) -> int;
+  };
+}
+#endiv
+#divert <ipp>
+#import putenv
+#import sys.posix.packaging.putenv.copy
+namespace sys::posix::packaging::putenv {
+  template<required::Stringview STRINGVIEW> auto Semantic<Policy::MOVEIN>::operator()(STRINGVIEW const &name_eq_value) -> int {
+    // putenv takes our copy, and uses it.
+    // We must supply a string for it to use.
+    return ::putenv(copy(name_eq_value));
+  }
+}
+#endiv

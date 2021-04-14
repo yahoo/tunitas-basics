@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.x509.Crt
+#import openssl.pem.from_string_view.declaration
+namespace openssl::pem::packaging::from_string_view::function {
+  //
+  // Load the certificate (a.k.a. crt) from the string_view.
+  // Throws on failure to load the certificate from the string_view.
+  // [[FIXTHIS]] provide a (less-,non-)throwing variant which returns an outcome.
+  //
+  // Usage:
+  //
+  //   auto const pem = std::string_view{...somehow...};
+  //   auto crt = from_string_view<x509::Crt>(pem);
+  //
+  template<> inline auto from_string_view<x509::Crt>(std::string_view pemmican) -> x509::Crt;
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+namespace openssl::pem::packaging::from_string_view {
+  template<> auto function::from_string_view<x509::Crt>(std::string_view pemmican) -> x509::Crt {
+    using Reader = std::function<X509 *(BIO *)>;
+    Reader const reader = [](BIO *in) { 
+                            // See the commentariat in Load.declaration.xcpp
+                            auto const indirect_x = nullptr;
+                            auto const callback_function = nullptr;
+                            auto const callback_data = nullptr;;
+                            return PEM_read_bio_X509(in, indirect_x, callback_function, callback_data);
+                          };
+    return detail::copy_read<x509::Crt>(pemmican, reader);
+  }
+}
+#endiv

@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace want {
+      namespace iterator {
+        class OutputStream;
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.size_t
+class tests::unit::want::iterator::OutputStream : public cppunit::test::Fixture {
+  using ancestor = cppunit::test::Fixture;
+public:
+  auto test_usage() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import want.iterator.OutputStream
+#import std.copy
+#import std.ostringstream
+#import std.string
+#import std.vector
+auto tests::unit::want::iterator::OutputStream::test_usage() -> void {
+  using v = std::vector<std::string>;
+  auto specimen = v{"apple", "banana", "cherry"};
+  std::ostringstream buf;
+  ::want::iterator::OutputStream<std::string, char> oi(buf, "{", "}");
+  std::copy(specimen.begin(), specimen.end(), oi);
+  std::string const expected = "{apple}{banana}{cherry}";
+  std::string const actual = buf.str();
+  CPPUNIT_ASSERT(actual == expected);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::want::iterator::OutputStream::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("OutputStream");
+  s << call("usage", &OutputStream::test_usage)
+    ;
+  return s.release();
+}
+#endiv

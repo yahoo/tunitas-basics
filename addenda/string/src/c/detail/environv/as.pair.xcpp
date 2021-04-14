@@ -1,0 +1,35 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_environv
+#import std.pair
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace environv {
+      template<typename CHAR> inline auto as(std::pair<CHAR const *const *, std::size_t> const &) -> basic_environv<CHAR const>;
+      template<typename CHAR> inline auto as(std::pair<CHAR **, std::size_t> const &) -> basic_environv<CHAR const>;
+      template<typename CHAR> inline auto as(std::pair<CHAR **, std::size_t> &) -> basic_environv<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.environv
+template<typename CHAR> auto c::detail::environv::as(std::pair<CHAR const *const *, std::size_t> const &par) -> basic_environv<CHAR const> {
+  enforce_terminating_nullptr_invariant(&par.first[0], &par.first[par.second]);
+  basic_environv<CHAR const> ret(par.second, par.first);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::environv::as(std::pair<CHAR **, std::size_t> const &par) -> basic_environv<CHAR const> {
+  enforce_terminating_nullptr_invariant(&par.first[0], &par.first[par.second]);
+  basic_environv<CHAR const> ret(par.second, par.first);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::environv::as(std::pair<CHAR **, std::size_t> &par) -> basic_environv<CHAR> {
+  enforce_terminating_nullptr_invariant(&par.first[0], &par.first[par.second]);
+  basic_environv<CHAR> ret(par.second, par.first);
+  return ret;
+}
+#divert </ipp>

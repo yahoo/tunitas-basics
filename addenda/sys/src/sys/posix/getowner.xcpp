@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.owner.interface
+namespace sys::posix {
+  namespace packaging::getowner {
+    using namespace packaging::owner::interface;
+    using namespace bundle::getowner;
+    namespace function {
+      template<required::f::Owner PAYLOAD> inline auto getowner(File) -> ba::Returned<PAYLOAD>;
+      inline auto getowner(File, [[out]] ba::Argument &) -> Status;
+      inline auto getowner(File, [[out]] ex::Argument &) -> Status;
+    }
+    namespace native {
+      template<required::f::Owner PAYLOAD> inline auto getowner(int fd) -> ba::Returned<PAYLOAD>;
+      inline auto getowner(int fd, [[out]] ba::Argument &) -> Status;
+      inline auto getowner(int fd, [[out]] ex::Argument &) -> Status;
+    }
+  }
+  using packaging::getowner::function::getowner;
+  namespace native { using packaging::getowner::native::getowner; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::getowner {
+  template<required::f::Owner PAYLOAD> auto function::getowner(File fd) -> ba::Returned<PAYLOAD> { return native::getowner<PAYLOAD>((int)fd); }
+  auto function::getowner(File fd, ba::Argument &arg) -> Status { return native::getowner((int)fd, arg); }
+  auto function::getowner(File fd, ex::Argument &arg) -> Status { return native::getowner((int)fd, arg); }
+  template<required::f::Owner PAYLOAD> auto native::getowner(int fd) -> ba::Returned<PAYLOAD> {
+    PAYLOAD res;
+    auto got = getowner(fd, res);
+    return {good(got), error_num(got), res};
+  }
+  auto native::getowner(int fd, ba::Argument &arg) -> Status {
+    auto called = posix::native::fcntl(fd, F::GETOWNER);
+    auto ok = good(called);
+    if (ok) {
+      using namespace id::process;
+      auto const recovered = value(called);
+      auto const is_process_id = recovered >= 0;
+      arg = is_process_id ? Either{Process{recovered}} : Either{Group{recovered}};
+    }
+    return {ok, error_num(called), ok ? 0 : -1};
+  }
+  auto native::getowner(int fd, ex::Argument &arg) -> Status { return posix::native::fcntl(fd, F::GETOWNER_EX, arg); }
+}
+#endiv

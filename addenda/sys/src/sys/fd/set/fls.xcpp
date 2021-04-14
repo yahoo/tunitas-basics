@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.required.Set
+#forward sys.fd.set.Set
+#import sys.fd.set.Reference
+#import std.optional
+namespace sys::fd::set {
+  //
+  // Find the last set in the Set.
+  // Detailed commentariat is in ffs.xcpp
+  //
+  // Returns int because select(2), pselect(2) are defined to accept that.
+  //
+  //   -1   to signal no bit is set ........... see the commentariat in ffs.xcpp
+  //   >= 0 to signal which bit bit is set .... see the commentariat in ffs.xcpp
+  //
+  // Usage:
+  //
+  //   suto min = fls(reads, writes, excepts);
+  //
+  inline auto find_last_set(Set const &) -> int;
+  template<Purpose PURPOSE> inline auto find_last_set(Reference<PURPOSE> const &) -> int;
+  template<Purpose PURPOSE> inline auto find_last_set(std::optional<Reference<PURPOSE>> const &) -> int;
+  template<required::set::Any FIRST, typename... REST> inline auto find_last_set(FIRST const &last, REST const &...rest) -> int
+    requires (true && ... && required::set::Any<REST>);
+   template<typename... THEM> inline auto fls(THEM const &...them) -> int
+     requires (true && ... && required::set::Any<THEM>)
+   { return find_last_set(them...); }
+}
+#endiv
+#divert <ipp>
+#import std.max
+#import nonstd.range.reverse
+#import sys.fd.set.Set
+#import sys.fd.set.Reference
+namespace sys::fd {
+  template<set::Purpose PURPOSE> auto set::find_last_set(std::optional<Reference<PURPOSE>> const &specimen) -> int {
+    return !specimen ? -1 : find_last_set(specimen->get());
+  }
+  template<set::Purpose PURPOSE> auto set::find_last_set(Reference<PURPOSE> const &specimen) -> int {
+    return find_last_set(*specimen);
+  }
+  auto set::find_last_set(Set const &specimen) -> int {
+    for (auto rhs : nonstd::range::reverse(specimen)) {
+      if (rhs) { return rhs.index(); }
+    }
+    return -1;
+  }
+  template<required::set::Any FIRST, typename... REST>  auto set::find_last_set(FIRST const &first, REST const &...rest) -> int
+    requires (true && ... && required::set::Any<REST>) {
+    return std::max(find_last_set(first), find_last_set(rest...));
+  }
+}
+#endiv

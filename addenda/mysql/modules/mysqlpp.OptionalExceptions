@@ -1,0 +1,3 @@
+// -*- c++ -*- 75a27926-3f8e-4b84-b8fc-eeeab9462932
+#pragma once
+#include "mysql++/noexceptions.h"

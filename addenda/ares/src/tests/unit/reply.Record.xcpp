@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.reply.Record.declaration
+#import tests.unit.reply.Record.AAAA
+#import tests.unit.reply.Record.A
+#import tests.unit.reply.Record.MX
+#import tests.unit.reply.Record.NAPTR
+#import tests.unit.reply.Record.NS
+#import tests.unit.reply.Record.PTR
+#import tests.unit.reply.Record.SOA
+#import tests.unit.reply.Record.SRV
+#import tests.unit.reply.Record.TXT
+#import tests.unit.reply.Record.URI
+#endiv

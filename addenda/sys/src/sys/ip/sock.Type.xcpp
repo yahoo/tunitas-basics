@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.Type
+namespace sys::ip::sock {
+  //
+  // A vastly reduced selection of sys::sock::Type
+  //
+  // Scope:
+  //
+  //   ip::socket
+  //   ip::socketpair
+  //
+  // Usage:
+  //
+  //   auto sd = ip::socket(LOCAL, ip::sock::Kind<DATAGRAM>, LOCAL);
+  //   auto sd2 = ip::socketpair(UNIX, ip::sock::Kind<STREAM>, UNIX);
+  // 
+  enum class Type;
+}
+namespace sys::ip::sock::type {
+  template<sys::sock::Type> struct Traits;
+  template<> struct Traits<sys::sock::Type::STREAM>;
+  template<> struct Traits<sys::sock::Type::DATAGRAM>;
+  template<> struct Traits<sys::sock::Type::RAW>;
+}
+#endiv
+#divert <hpp>
+#import std.false_type
+#import std.true_type
+namespace sys::ip::sock {
+  template<sys::sock::Type> struct type::Traits : public std::false_type { };
+  namespace type {
+    template<> struct Traits<sys::sock::Type::STREAM> : public std::true_type { };
+    template<> struct Traits<sys::sock::Type::DATAGRAM> : public std::true_type { };
+    template<> struct Traits<sys::sock::Type::RAW> : public std::true_type { };
+  }
+}
+#endiv

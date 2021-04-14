@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.argument.Fixture
+#import tests.unit.config.Fixture
+#import tests.unit.indicator.Fixture
+#import tests.unit.longish.Fixture
+#import tests.unit.options.Fixture
+#import tests.unit.program.Fixture
+#import tests.unit.shortish.Fixture
+#import tests.unit.string.Fixture
+#import tests.unit.usage.Fixture
+#import tests.unit.version.Fixture
+
+#import unit.rigging.Exit
+#import unit.rigging.exit.constants
+#import unit.rigging.test.Bench
+namespace EX = unit::rigging::exit;
+
+#import std.string
+#import std.clog
+#import std.exception
+#import std.ostream
+
+namespace ur = unit::rigging;
+namespace urt = ur::test;
+namespace EX = ur::exit;
+
+namespace {
+  
+  struct Mode {
+    bool debug;
+    bool verbose;
+    Mode()
+      : debug(true)
+      , verbose(true) {
+      ;
+    }
+  } MODE;
+
+  auto emit_usage(std::ostream &) -> void;
+}
+
+auto main(int argc, char **argv) -> int {
+  try {
+    if (2 != argc) {
+      std::cerr << "Error: you must specify the name of the test suite to call\n";
+      throw EX::USAGE;
+    }
+
+    std::string test_name(argv[1]);
+
+    urt::Bench bench(std::clog);
+    bench.addTest(tests::unit::argument::Fixture::suite());
+    bench.addTest(tests::unit::config::Fixture::suite());
+    bench.addTest(tests::unit::indicator::Fixture::suite());
+    bench.addTest(tests::unit::longish::Fixture::suite());
+    bench.addTest(tests::unit::options::Fixture::suite());
+    bench.addTest(tests::unit::program::Fixture::suite());
+    bench.addTest(tests::unit::shortish::Fixture::suite());
+    bench.addTest(tests::unit::string::Fixture::suite());
+    bench.addTest(tests::unit::usage::Fixture::suite());
+    bench.addTest(tests::unit::version::Fixture::suite());
+  
+    ur::Exit exit;
+    exit &= bench.run(test_name);
+
+    if (MODE.verbose) {
+      std::clog << exit << '\n';
+    }
+    return exit;
+  } catch (ur::Exit const &exit) {
+    // This was expected
+    if (EX::USAGE == exit) {
+      emit_usage(std::clog);
+    }
+    return exit;
+  } catch (std::exception const &e) {
+    // This was not expected
+    std::cerr << "Error: " << e.what() << '\n';
+    return EX::SOFTWARE;
+  }
+}
+
+namespace {
+
+  auto emit_usage(std::ostream &out) -> void {
+    out << "usage: unit { --list | <suite-name> }\n";
+  }
+
+}
+#endiv

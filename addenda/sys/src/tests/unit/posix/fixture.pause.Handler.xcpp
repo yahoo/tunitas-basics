@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix::fixture::pause {
+  //
+  // See Fixture::test_pause()
+  //
+  class Handler;
+}
+#endiv
+#divert <hpp>
+struct tests::unit::posix::fixture::pause::Handler {
+  struct Guard {
+    inline Guard(bool &);
+    inline ~Guard();
+  };
+  static bool *alarmed;
+  static auto handle(int) -> void;
+};
+#endiv
+#divert <ipp>
+namespace tests::unit::posix::fixture::pause {
+  Handler::Guard::Guard(bool &lhs) { alarmed = &lhs; }
+  Handler::Guard::~Guard() { alarmed = nullptr; }
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::posix::fixture::pause {
+  bool *Handler::alarmed{};
+  auto Handler::handle(int) -> void {
+    if (alarmed) {
+      *alarmed = true;
+    }
+  }
+}
+#endiv

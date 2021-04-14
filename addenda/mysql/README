@@ -1,0 +1,16 @@
+The SCOLD module stubs for 'namespace mysqlpp'
+
+For historical reasons...
+
+When: mysql++
+Their conceptual component name is 'MySQL++' (with the mixed case).
+Their base package is named 'mysql++' (and yet the soname is 'mysqlpp').
+Our SCOLD package is named 'module-mysql++'.
+The nonstandard installation prefix is '/opt/mysql++'.
+
+When: mysqlpp
+Their DSO SONAME is 'mysqlpp' as in -lmysqlpp and libmysqlpp.so and libmysqlpp.so.$C.$R.$A.
+Their C++ namespace identifier is 'mysqlpp' as in 'namespace mysqlpp'.
+Our C++ namespace identifier is the same.
+Our BASH identifier is 'mysqlpp'.
+Our RPMBUILD condition identifier is 'nonstd_mysqlpp'.

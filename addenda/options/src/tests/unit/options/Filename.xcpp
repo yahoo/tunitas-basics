@@ -1,0 +1,156 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace options {
+      class Filename;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::options::Filename : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_constructor_default() -> void;
+  auto test_constructor_2arg() -> void;
+  auto test_get_dirname() -> void;
+  auto test_set_dirname() -> void;
+  auto test_get_basename() -> void;
+  auto test_set_basename() -> void;
+  auto test_get_fullpath() -> void;
+  auto test_set_fullpath() -> void;
+  auto test_set_fullpath_pathologies() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.Filename
+
+auto tests::unit::options::Filename::test_constructor_default() -> void {
+  ::options::Filename f;
+  // Whee! It constructed (but not helpful, as such)
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::options::Filename::test_constructor_2arg() -> void {
+  ::options::Filename f(".", "file");
+  CPPUNIT_ASSERT_EQUAL(std::string("./file"), f.fullpath());
+}
+
+auto tests::unit::options::Filename::test_get_basename() -> void {
+  ::options::Filename f(".", "file");
+  std::string actual = f.basename(); // <-------- test this
+  std::string expected = "file";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::options::Filename::test_set_basename() -> void {
+  ::options::Filename f(".", "file");
+  {
+    std::string actual = f.basename();
+    std::string expected = "file";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  f.basename("another-file"); // <----------- test this
+  {
+    std::string actual = f.basename();
+    std::string expected = "another-file";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+auto tests::unit::options::Filename::test_get_dirname() -> void {
+  ::options::Filename f(".", "file");
+  std::string actual = f.dirname(); // <-------- test this
+  std::string expected = ".";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::options::Filename::test_set_dirname() -> void {
+  ::options::Filename f(".", "file");
+  {
+    std::string actual = f.dirname();
+    std::string expected = ".";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  f.dirname("etc"); // <----------- test this
+  {
+    std::string actual = f.dirname();
+    std::string expected = "etc";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+auto tests::unit::options::Filename::test_get_fullpath() -> void {
+  ::options::Filename motd("/etc", "motd");
+  std::string actual = motd.fullpath();
+  std::string expected = "/etc/motd";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::options::Filename::test_set_fullpath() -> void {
+  ::options::Filename motd;
+  motd = "/etc/motd";
+  std::string actual = motd.fullpath();
+  std::string expected = "/etc/motd";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::options::Filename::test_set_fullpath_pathologies() -> void {
+  {
+    ::options::Filename specimen;
+    specimen = "";
+    std::string actual = specimen.fullpath();
+    std::string expected = ".";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    ::options::Filename specimen;
+    specimen = "/";
+    std::string actual = specimen.fullpath();
+    std::string expected = "/";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    ::options::Filename specimen;
+    specimen = "//";
+    std::string actual = specimen.fullpath();
+    std::string expected = "//";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    ::options::Filename specimen;
+    specimen = "/a";
+    std::string actual = specimen.fullpath();
+    std::string expected = "/a";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    ::options::Filename specimen;
+    specimen = "a/";
+    std::string actual = specimen.fullpath();
+    std::string expected = "a/";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::options::Filename::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Filename");
+  s << call("constructor_default", &Filename::test_constructor_default)
+    << call("constructor_2arg", &Filename::test_constructor_2arg)
+    << call("get-dirname", &Filename::test_get_dirname)
+    << call("set-dirname", &Filename::test_set_dirname)
+    << call("get-basename", &Filename::test_get_basename)
+    << call("set-basename", &Filename::test_set_basename)
+    << call("get-fullpath", &Filename::test_get_fullpath)
+    << call("set-fullpath", &Filename::test_set_fullpath)
+    << call("set-fullpath-pathologies", &Filename::test_set_fullpath_pathologies)
+    ;
+  return finalize(s);
+}
+#endiv

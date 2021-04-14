@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An X.509 Extension (EXTENSION)
+  //
+  // Usage:
+  //
+  //   auto name = NID_basic_constraints;
+  //   auto value = "CA:TRUE,pathlen:10";
+  //   Extension ext = extension::config(name, value);
+  //
+  class Extension;
+}
+#endiv
+#divert <hpp>
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_EXTENSION
+#import openssl.x509.extension.config
+#import openssl.types
+#forward openssl.stack.Traits // traits::Revalorization
+class openssl::x509::Extension : public managed::Pointer<X509_EXTENSION> {
+  using ancestor = managed::Pointer<X509_EXTENSION>;
+  struct config {
+    using Name = re::string<c::const_stringz>;
+    using Value = re::string<c::const_stringz>;
+    using NID = int;
+  };
+  friend auto x509::extension::packaging::config::function::config(config::Name, config::Value) -> Extension;
+  friend auto x509::extension::packaging::config::function::config(config::NID, config::Value) -> Extension;
+  friend class stack::traits::Revalorization<Extension, EXTENSION>;
+  inline explicit Extension(X509_EXTENSION *, ancestor::Deleter const & = ancestor::Deleter{ancestor::Deleter::DELETING});
+public:
+  inline Extension();
+};
+#endiv
+#divert <ipp>
+#import openssl.error.Code
+#import std.error_code
+#import openssl.functions
+namespace openssl::x509 {
+  Extension::Extension()
+    : ancestor{X509_EXTENSION_new(), ancestor::Deleter{ancestor::Deleter::DELETING}}
+  { }
+  Extension::Extension(X509_EXTENSION *ext, ancestor::Deleter const &del)
+    : ancestor{ext, del}
+  { }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+namespace openssl::x509 {
+  static_assert(std::is_default_constructible<Extension>::value);
+  static_assert(!std::is_copy_constructible<Extension>::value);
+  static_assert(std::is_move_constructible<Extension>::value);
+  static_assert(!std::is_copy_assignable<Extension>::value);
+  static_assert(std::is_move_assignable<Extension>::value);
+}
+#endiv

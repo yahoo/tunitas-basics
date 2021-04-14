@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.owner.interface
+namespace sys::posix {
+  namespace packaging::setown {
+    using namespace packaging::owner::interface;
+    using namespace bundle::setowner::basic;
+    namespace function {
+      [[deprecated("buy a vowel, prefer setowner(File, Owner)")]] inline auto setown(File, [[in]] Argument) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer setowner(File, Owner)")]] inline auto setown(int fd, [[in]] Argument) -> Status;
+    } 
+  }
+  using packaging::setown::function::setown;
+  namespace native { using packaging::setown::native::setown; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.setowner
+namespace sys::posix::packaging::setown {
+  auto function::setown(File fd, Argument arg) -> Status { return posix::setowner(fd, arg); }
+  auto native::setown(int fd, Argument arg) -> Status    { return posix::native::setowner(fd, arg); }
+}
+#endiv

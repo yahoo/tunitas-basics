@@ -1,0 +1,27 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+#forward sqlite.api.detail.Bind
+#import std.vector
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename CHAR, typename ALLOC> struct Bind<std::vector<CHAR, ALLOC>>;
+    } 
+  }
+}
+// And also buy the known specializations
+#entail sqlite.api.detail.Bind.string
+#entail sqlite.api.detail.Bind.wstring
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Bind
+#import sqlite.status.Code
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+template<typename CHAR, typename ALLOC>
+struct sqlite::api::detail::Bind<std::vector<CHAR, ALLOC>>
+  : private sqlite::detail::ResultSFINAE<status::Code>
+  , public sqlite::detail::pass_by_const_reference<std::vector<CHAR, ALLOC>>
+  , public sqlite::detail::specialization_is_invalid
+{ };
+#endiv

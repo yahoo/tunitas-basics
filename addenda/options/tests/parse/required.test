@@ -1,0 +1,13 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 1
+
+cd ${0%/*}
+set -e
+
+test beagle = "$(parse --dog=beagle dog)"
+test "" = "$(parse --apple dog)"
+
+test bald = "$(parse --eagle bald eagle)"
+test golden = "$(parse -e golden eagle)"
+
+test "" = "$(parse --dog hound goat)"

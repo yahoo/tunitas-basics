@@ -1,0 +1,11 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.connection.message
+namespace sqlite {
+  namespace error {
+    // message(...) exists over there so that ADL will find it.
+    // message(...) exists in here so that humans can find it -- "error message" given a connection::Shell
+    using connection::message;
+  }
+}
+#endiv

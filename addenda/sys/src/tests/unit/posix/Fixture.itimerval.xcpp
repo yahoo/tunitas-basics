@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.posix.Fixture
+#import sys.posix.itimerval  // <----------------------------- test this (exists)
+#import sys.posix.clear.itimerval // <------------------------ test this (exists)
+#import sys.posix.zero.itimerval // <------------------------- test this (exists)
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_itimerval() -> void {
+    using Subject = ::sys::posix::itimerval; //<-------------- test this
+    auto subject = Subject{};
+    // ADL won't find these because itimerval is really ::itimerval
+    ::sys::posix::clear(subject);
+    ::sys::posix::zero(subject);
+    CPPUNIT_ASSERT(true);
+  }
+}
+#endiv

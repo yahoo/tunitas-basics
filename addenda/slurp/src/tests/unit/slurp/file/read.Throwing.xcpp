@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Octet
+namespace tests::unit::slurp::file::read {
+  template<nonstd::required::Octet OCTET> class Throwing;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.vector
+template<nonstd::required::Octet OCTET> class tests::unit::slurp::file::read::Throwing : public cppunit::test::Fixture {
+public:
+  using Octet = OCTET;
+  using Container = std::vector<Octet>; // either std::vector or std::deque
+  auto test_failure() -> void;
+  auto test_nothing() -> void;
+  auto test_something() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import slurp.file.read
+#import std.system_error
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Throwing<_>::test_failure() -> void {
+  try {
+    //
+    // testing this ----------------\\\\\\\\\\\\\\\ (here)
+    //                              |||||||||||||||
+    //                              vvvvvvvvvvvvvvv <--- with no nothrow (so throwing) --->
+    auto contained = ::slurp::file::read<Container>("/pretty/sure/this/file/does/not/exist");
+    CPPUNIT_ASSERT(false);
+  } catch (std::system_error const &) {
+    CPPUNIT_ASSERT(true);
+  }    
+}
+#import std.empty
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Throwing<_>::test_nothing() -> void {
+  try {
+    auto contained = ::slurp::file::read<Container>("/dev/null");
+    CPPUNIT_ASSERT(std::empty(contained));
+  } catch (std::system_error const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Throwing<_>::test_something() -> void {
+  try {
+    auto contained = ::slurp::file::read<Container>("/etc/group");
+    CPPUNIT_ASSERT(!std::empty(contained));
+  } catch (std::system_error const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+#import rigging.suite.io
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Throwing<_>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("read<"s + typeid(Octet).name() + ">[[throwing]]"s);
+  series << call("failure", &Throwing::test_failure)
+         << call("nothing", &Throwing::test_nothing)
+         << call("something", &Throwing::test_something)
+    ;
+  return finalize(series);
+}
+#endiv

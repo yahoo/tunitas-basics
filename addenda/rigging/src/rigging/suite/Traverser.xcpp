@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::suite {
+  class Traverser;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import std.function
+#import rigging.suite.Visitor
+class rigging::suite::Traverser {
+public:
+  inline explicit Traverser(cppunit::Test *node);
+  inline auto operator()(std::function<void (cppunit::Test *)>) const -> void;
+  inline auto operator()(Visitor &) const -> void;
+protected:
+  cppunit::Test *node;
+};
+#endiv
+#divert <ipp>
+rigging::suite::Traverser::Traverser(cppunit::Test *arg_node)
+  : node(arg_node) {
+  ;
+}
+#import rigging.suite.Containerizer
+auto rigging::suite::Traverser::operator()(std::function<void (cppunit::Test *)> visitor) const -> void {
+  Containerizer container(node);
+  for (auto subnode : container) {
+    visitor(subnode);
+  }
+}
+
+auto rigging::suite::Traverser::operator()(Visitor &visitor) const -> void {
+  Containerizer container(node);
+  for (auto subnode : container) {
+    visitor(subnode);
+  }
+}
+#endiv
+

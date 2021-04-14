@@ -1,0 +1,3 @@
+The SCOLD-surface of the GNU and POSIX getopt module within glibc.
+#include <getopt.h>
+

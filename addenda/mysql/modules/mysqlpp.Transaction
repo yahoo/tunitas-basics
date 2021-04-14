@@ -1,0 +1,3 @@
+// -*- c++ -*- aed7c8a2-2f02-4a08-96b7-55fecaf908b8
+#pragma once
+#include "mysql++/transaction.h"

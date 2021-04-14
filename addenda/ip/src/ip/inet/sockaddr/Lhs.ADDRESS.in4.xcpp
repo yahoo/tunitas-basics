@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ip.inet.sockaddr.Lhs.declaration
+namespace ip::inet::sockaddr {
+  template<> class Lhs<ADDRESS, in4::sockaddr>;
+}
+#endiv
+#divert <hpp>
+#import ip.inet.sockaddr.Xhs.in4
+#import ip.inet.addrinfo.Value
+template<> class ip::inet::sockaddr::Lhs<ip::inet::sockaddr::ADDRESS, ip::in4::sockaddr> : public Xhs<in4::sockaddr, IN4> {
+  using Ancestor = Xhs<in4::sockaddr, IN4> ;
+public:
+  using Ancestor::Xhs;
+  inline operator address::Structure const &() const { return Ancestor::get_addr(); } // ....... always in network order
+  inline auto operator=(address::Structure const &) -> Lhs &;
+  inline operator address::Integer() const { return Ancestor::get_addr_t(); } // ............... always in host order
+  inline auto operator=(address::Integer) -> Lhs &;
+  inline auto operator=(addrinfo::Value const &) -> Lhs &;
+};
+#endiv
+#divert <ipp>
+#import ip.inet.lhs
+auto ip::inet::sockaddr::Lhs<ip::inet::sockaddr::ADDRESS, ip::in4::sockaddr>::operator=(address::Integer address) -> Lhs & {
+  inet::lhs(subject.sin_addr) = address;
+  return *this;
+}
+auto ip::inet::sockaddr::Lhs<ip::inet::sockaddr::ADDRESS, ip::in4::sockaddr>::operator=(address::Structure const &address) -> Lhs & {
+  subject.sin_addr = address;
+  return *this;
+}
+auto ip::inet::sockaddr::Lhs<ip::inet::sockaddr::ADDRESS, ip::in4::sockaddr>::operator=(addrinfo::Value const &value) -> Lhs & {
+  subject.sin_addr = value.addr<in4::sockaddr>();
+  return *this;
+}
+#endiv

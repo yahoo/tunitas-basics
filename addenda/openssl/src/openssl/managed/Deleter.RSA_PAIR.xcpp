@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.managed.Deleter
+#import openssl.types // RSA (sic), openssl::RSA_PAIR
+namespace openssl::managed {
+  template<> struct Deleter<rsa::PAIR>;
+}
+#endiv
+#divert <hpp>
+template<> struct openssl::managed::Deleter<openssl::rsa::PAIR> {
+  using Value = rsa::PAIR;
+  inline auto operator()(Value *) const -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+auto openssl::managed::Deleter<openssl::rsa::PAIR>::operator()(Value *value) const -> void {
+  if (value) {
+    RSA_free(value);
+  }
+}
+#endiv

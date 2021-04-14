@@ -1,0 +1,164 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ok { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.ok.Axis
+#import sys.ok.Access
+struct tests::unit::ok::Fixture : public cppunit::test::Fixture {
+  using Access = ::sys::ok::Access;
+  using Axis = ::sys::ok::Axis;
+  auto test_Axis() -> void;
+  auto test_Access() -> void;
+  auto test_constants() -> void;
+  auto test_as() -> void;
+  auto test_calls() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto syscall(Access) -> void;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::ok {
+  auto Fixture::syscall(Access) -> void {
+    // That this was callable at all was the test
+    CPPUNIT_ASSERT(true);
+  }
+}
+namespace tests::unit::ok {
+  auto Fixture::test_Axis() -> void {
+    using Subject = Axis;
+    auto subject = Subject{};
+    subject = Axis::F;
+    subject = Axis::R;
+    subject = Axis::W;
+    subject = Axis::X;
+    CPPUNIT_ASSERT(subject != Subject{});
+  }
+  auto Fixture::test_Access() -> void {
+    using Subject = Access;
+    auto subject = Subject{};
+    subject |= Axis::EXISTS;
+    subject |= Axis::READABLE;
+    subject |= Axis::WRITABLE;
+    subject |= Axis::EXECUTABLE;
+    CPPUNIT_ASSERT(subject != Subject{});
+  }
+}
+#import sys.ok.constants
+namespace tests::unit::ok {
+  auto Fixture::test_constants() -> void {
+    using namespace ::sys::ok::constants;
+    auto subject = Access{};
+    subject = F;
+    CPPUNIT_ASSERT_EQUAL(0, (int)subject);
+    subject = EXISTS;
+    CPPUNIT_ASSERT_EQUAL(0, (int)subject);
+    subject = R;
+    CPPUNIT_ASSERT_EQUAL(4, (int)subject);
+    subject = READABLE;
+    CPPUNIT_ASSERT_EQUAL(4, (int)subject);
+    subject = W;
+    CPPUNIT_ASSERT_EQUAL(2, (int)subject);
+    subject = WRITABLE;
+    CPPUNIT_ASSERT_EQUAL(2, (int)subject);
+    subject = X;
+    CPPUNIT_ASSERT_EQUAL(1, (int)subject);
+    subject = EXECUTABLE;
+    CPPUNIT_ASSERT_EQUAL(1, (int)subject);
+    subject = F | F;
+    CPPUNIT_ASSERT_EQUAL(0, (int)subject);
+    subject = F | R | W | X;
+    CPPUNIT_ASSERT_EQUAL(7, (int)subject);
+    subject = R | W;
+    CPPUNIT_ASSERT_EQUAL(6, (int)subject);
+    subject = R | X;
+    CPPUNIT_ASSERT_EQUAL(5, (int)subject);
+    subject = W | X;
+    CPPUNIT_ASSERT_EQUAL(3, (int)subject);
+    subject = R | W | X;
+    CPPUNIT_ASSERT_EQUAL(7, (int)subject);
+    CPPUNIT_ASSERT(subject != Access{});
+  }
+}
+#import sys.ok.as
+#import std.exception
+namespace tests::unit::ok {
+  auto Fixture::test_as() -> void {
+    using namespace ::sys::ok::constants;
+    using ::sys::ok::as;
+    {
+      try {
+        auto something = Access{Axis::F};
+        as<Axis>(something); // ............. there are no bits to turn into an Axis (flag) 
+        CPPUNIT_ASSERT(false);
+      } catch (std::exception const &) {
+        CPPUNIT_ASSERT(true);
+      }
+      auto r = as<Axis>(Access{Axis::R});
+      CPPUNIT_ASSERT(Axis::R == r);
+      auto w = as<Axis>(Access{Axis::W});
+      CPPUNIT_ASSERT(Axis::W == w);
+      auto x = as<Axis>(Access{Axis::X});
+      CPPUNIT_ASSERT(Axis::X == x);
+    } {
+      // Indeed, these are the identity transform.
+      { auto expected = Access{Axis::F};
+        auto actual = as<Access>(expected);
+        CPPUNIT_ASSERT(expected == actual); }
+      { auto expected = Access{Axis::R};
+        auto actual = as<Access>(expected);
+        CPPUNIT_ASSERT(expected == actual); }
+      { auto expected = Access{Axis::W};
+        auto actual = as<Access>(expected);
+        CPPUNIT_ASSERT(expected == actual); }
+      { auto expected = Access{Axis::X};
+        auto actual = as<Access>(expected);
+        CPPUNIT_ASSERT(expected == actual); }
+    }
+  }
+}
+namespace tests::unit::ok {
+  auto Fixture::test_calls() -> void {
+    using namespace ::sys::ok::constants;
+    syscall(F);
+    syscall(EXISTS);
+    syscall(R);
+    syscall(READABLE);
+    syscall(W);
+    syscall(WRITABLE);
+    syscall(X);
+    syscall(EXECUTABLE);
+    syscall(F | F);
+    syscall(F | R | W | X);
+    syscall(R | W);
+    syscall(R | X);
+    syscall(W | X);
+    syscall(R | W | X);
+  }
+}
+#import tests.unit.ok.adl.Axis
+#import tests.unit.ok.adl.Access
+#import rigging.suite.io
+auto tests::unit::ok::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("ok");
+  series << call("Axis", &Fixture::test_Axis)
+         << call("Access", &Fixture::test_Access)
+         << call("constants", &Fixture::test_constants)
+         << call("as", &Fixture::test_as)
+         << call("calls", &Fixture::test_calls)
+         << []() {
+              Stream ad{"adl"};
+              ad << add<adl::Axis>()
+                 << add<adl::Access>()
+                ;
+              return move(ad);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

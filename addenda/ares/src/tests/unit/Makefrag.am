@@ -1,0 +1,98 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  $(lib_libares_module_la) \
+  -lrigging-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+check_bin_unit_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  obj/src/tests/unit/assertion.cpp \
+  \
+  obj/src/tests/unit/ares.Fixture.cpp \
+  \
+  obj/src/tests/unit/channel.Fixture.cpp \
+  obj/src/tests/unit/channel.Channel.cpp \
+  obj/src/tests/unit/channel.option.Fixture.cpp \
+  obj/src/tests/unit/channel.option.Blob.cpp \
+  obj/src/tests/unit/channel.option.Set.cpp \
+  obj/src/tests/unit/channel.option.Saved.cpp \
+  \
+  obj/src/tests/unit/count.Fixture.cpp \
+  obj/src/tests/unit/error.Fixture.cpp \
+  \
+  obj/src/tests/unit/exception.Fixture.cpp \
+  obj/src/tests/unit/exception.Invariant.cpp \
+  obj/src/tests/unit/exception.Null.cpp \
+  obj/src/tests/unit/exception.Library.cpp \
+  obj/src/tests/unit/exception.System.cpp \
+  \
+  obj/src/tests/unit/fd.Fixture.cpp \
+  obj/src/tests/unit/fd.Set.cpp \
+  obj/src/tests/unit/fd.Sets.cpp \
+  obj/src/tests/unit/fd.set.Reference.cpp \
+  obj/src/tests/unit/fd.Count.cpp \
+  obj/src/tests/unit/fd.Select.cpp \
+  \
+  obj/src/tests/unit/library.Fixture.cpp \
+  obj/src/tests/unit/library.Library.cpp \
+  obj/src/tests/unit/library.Allocator.cpp \
+  obj/src/tests/unit/library.Features.cpp \
+  \
+  obj/src/tests/unit/managed.Fixture.cpp \
+  obj/src/tests/unit/managed.Record.declaration.cpp \
+  obj/src/tests/unit/managed.Record.cpp \
+  obj/src/tests/unit/managed.Record.A.cpp \
+  obj/src/tests/unit/managed.Record.AAAA.cpp \
+  obj/src/tests/unit/managed.Record.MX.cpp \
+  obj/src/tests/unit/managed.Record.NAPTR.cpp \
+  obj/src/tests/unit/managed.Record.NS.cpp \
+  obj/src/tests/unit/managed.Record.PTR.cpp \
+  obj/src/tests/unit/managed.Record.TXT.cpp \
+  obj/src/tests/unit/managed.Record.SOA.cpp \
+  obj/src/tests/unit/managed.Record.SRV.cpp \
+  obj/src/tests/unit/managed.Record.URI.cpp \
+  \
+  obj/src/tests/unit/query.Fixture.cpp \
+  obj/src/tests/unit/query.Fixture.Function.void.cpp \
+  obj/src/tests/unit/query.Fixture.Function.State.cpp \
+  obj/src/tests/unit/query.Fixture.Query.cpp \
+  obj/src/tests/unit/query.Fixture.State.cpp \
+  \
+  obj/src/tests/unit/reply.Fixture.cpp \
+  obj/src/tests/unit/reply.Record.declaration.cpp \
+  obj/src/tests/unit/reply.Record.cpp \
+  obj/src/tests/unit/reply.Record.A.cpp \
+  obj/src/tests/unit/reply.Record.AAAA.cpp \
+  obj/src/tests/unit/reply.Record.MX.cpp \
+  obj/src/tests/unit/reply.Record.NAPTR.cpp \
+  obj/src/tests/unit/reply.Record.NS.cpp \
+  obj/src/tests/unit/reply.Record.PTR.cpp \
+  obj/src/tests/unit/reply.Record.SOA.cpp \
+  obj/src/tests/unit/reply.Record.SRV.cpp \
+  obj/src/tests/unit/reply.Record.TXT.cpp \
+  obj/src/tests/unit/reply.Record.URI.cpp \
+  \
+  obj/src/tests/unit/time.Fixture.cpp \
+  \
+  obj/src/tests/unit/unmanaged.Fixture.cpp \
+  obj/src/tests/unit/unmanaged.Uri.cpp \
+  \
+  obj/src/tests/unit/want.Fixture.cpp \
+  $(end)
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk #       automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/tests/unit/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

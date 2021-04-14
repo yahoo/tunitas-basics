@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::regex::error {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import nonstd.regex.error.Code
+#import std.regex_constants
+namespace nonstd::regex::error::constants {
+  namespace implementation {
+    using namespace std::regex_constants;
+    namespace interface {
+      inline constexpr auto COLLATE = error_collate;
+      inline constexpr auto CTYPE = error_ctype;
+      inline constexpr auto ESCAPE = error_escape;
+      inline constexpr auto BACKREF = error_backref;
+      inline constexpr auto BRACK = error_brack;
+      inline constexpr auto PAREN = error_paren;
+      inline constexpr auto BRACE = error_brace;
+      inline constexpr auto BADBRACE = error_badbrace;
+      inline constexpr auto RANGE = error_range;
+      inline constexpr auto SPACE = error_space;
+      inline constexpr auto BADREPEAT = error_badrepeat;
+      inline constexpr auto COMPLEXITY = error_complexity;
+      inline constexpr auto STACK = error_stack;
+    }
+  }
+  using namespace implementation::interface;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace nonstd::regex::error::constants;
+    // Prove the (all) names are visible
+    static_assert(sizeof (COLLATE));
+  }
+}
+#endiv

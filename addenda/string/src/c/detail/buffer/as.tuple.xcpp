@@ -1,0 +1,32 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_buffer
+#import std.tuple
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace buffer {
+      template<typename CHAR> inline auto as(std::tuple<CHAR const *, std::size_t> const &) -> basic_buffer<CHAR const>;
+      template<typename CHAR> inline auto as(std::tuple<CHAR *, std::size_t> const &) -> basic_buffer<CHAR const>;
+      template<typename CHAR> inline auto as(std::tuple<CHAR *, std::size_t> &) -> basic_buffer<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import std.get
+template<typename CHAR> auto c::detail::buffer::as(std::tuple<CHAR const *, std::size_t> const &tup) -> basic_buffer<CHAR const> {
+  basic_buffer<CHAR const> ret(std::get<0>(tup), std::get<1>(tup));
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::buffer::as(std::tuple<CHAR *, std::size_t> const &tup) -> basic_buffer<CHAR const> {
+  basic_buffer<CHAR const> ret(std::get<0>(tup), std::get<1>(tup));
+  return tup;
+}
+
+template<typename CHAR> auto c::detail::buffer::as(std::tuple<CHAR *, std::size_t> const &tup) -> basic_buffer<CHAR> {
+  basic_buffer<CHAR> ret(std::get<0>(tup), std::get<1>(tup));
+  return tup;
+}
+#divert </ipp>

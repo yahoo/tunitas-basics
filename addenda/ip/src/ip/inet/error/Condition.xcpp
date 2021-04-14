@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.inet.EAI.Code
+namespace ip {
+  namespace inet {
+    namespace error {
+      using Condition = inet::EAI::Code;
+      // a.k.a. the "errc" enumeration
+      // a.k.a. the "error condition" value
+      //
+      // Recall that the more specific "error code" value
+      // is the blending of sys::error::Code (errno)
+      //               and inet::error::Condition (the inet::EAI::Code)
+      // inet::error::Code performs this blending & separation act
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+#import std.is_error_condition_enum
+namespace std {
+  template<> struct is_error_condition_enum<ip::inet::error::Condition> : public true_type { };
+}
+
+#import std.error_condition
+namespace ip {
+  namespace inet {
+    namespace EAI {
+      // Similar to std::make_error_condition.
+      // Yet ADL must find it here.  
+      inline auto make_error_condition(Code) noexcept -> std::error_condition;
+    }
+    namespace error {
+      // but we wish to pretend it is here
+      using EAI::make_error_condition;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import ip.inet.error.network_category
+auto ip::inet::EAI::make_error_condition(Code c) noexcept -> std::error_condition {
+  return std::error_condition(static_cast<int>(c), error::network_category());
+}
+#endiv

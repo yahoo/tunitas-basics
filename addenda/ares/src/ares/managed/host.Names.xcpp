@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host {
+  //
+  // Elide the name and the aliases together into one unified name set.
+  //
+  // Const semantics only; value-generating on access, just like Aliases.
+  // Shallow copy semantics; but it's const semantics so there is no point
+  // Move semantics: default.
+  // No destruction; the containing List manages that; being List<Entry<HOST4>>, List<Entry<HOST6>>.
+  // 
+  // Usage: see host::Aspect<host::Names>
+  //
+  class Names;
+}
+#endiv
+#divert <hpp>
+#import c.const_argv
+#import std.size_t
+#forward ares.managed.host.names.Iterator
+struct ares::managed::host::Names {
+  inline Names();
+  inline Names(char const *name, char const *const *aliases);
+  inline auto empty() const -> bool { return false; }
+  inline auto size() const -> std::size_t;
+  using const_iterator = names::Iterator;
+  using iterator = const_iterator;
+  inline auto begin() const -> const_iterator;
+  inline auto end() const -> const_iterator;
+private:
+  char const *name;
+  char const *const *aliases;
+};
+#endiv
+#divert <ipp>
+#import ares.managed.host.names.Iterator
+#import std.distance
+#import std.next
+namespace ares::managed::host {
+  Names::Names()
+    : name{nullptr}
+    , aliases{nullptr}
+  { }
+  Names::Names(char const *name, char const *const *aliases)
+    : name{name}
+    , aliases{aliases}
+  { }
+  auto Names::size() const -> std::size_t {
+    return std::distance(begin(), end());
+  }
+  auto Names::begin() const -> const_iterator {
+    // WATCHOUT - we do NOT want the true begin iterator; it duplicates name and aliaes[0]
+    return std::next(const_iterator{-1, name, aliases});
+  }
+  auto Names::end() const -> const_iterator {
+    return const_iterator{}; // a universal "end" iterator on the ForwardIterator
+  }
+}
+#endiv

@@ -1,0 +1,34 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#forward sqlite.prepared.BasicResult
+#import std.string
+namespace sqlite {
+  namespace prepared {
+    namespace detail {
+      // Throw the exception.
+      // Break the type dependency cycle by going outline
+      template<typename STATEMENT, typename CONTINUATION> auto throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> &subject, std::string const &explanation) -> void;
+      template<typename STATEMENT, typename CONTINUATION> auto throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> &subject, std::string const &explanation, std::string const &unprepared_sql_statement) -> void;
+      template<typename STATEMENT, typename CONTINUATION> auto throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> /*not-xhs*/ &subject, std::string &&explanation, std::string &&unprepared_sql_statement) -> void;
+    }
+  }
+}
+#endiv
+#divert <tpp>
+#import sqlite.exception.Prepared
+#import std.move
+// The full type of Prepared<...> and BasicResult<...> is required herein.
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::prepared::detail::throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> &subject, std::string const &explanation) -> void {
+  throw exception::Prepared<STATEMENT, CONTINUATION>(std::move(subject), explanation);
+}
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::prepared::detail::throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> &subject, std::string const &explanation, std::string const &unprepared_sql_statement) -> void {
+  throw exception::Prepared<STATEMENT, CONTINUATION>(std::move(subject), explanation, unprepared_sql_statement);
+}
+
+#import std.forward
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::prepared::detail::throw_exception_Prepared(BasicResult<STATEMENT, CONTINUATION> /*not-xhs*/ &subject, std::string &&explanation, std::string &&unprepared_sql_statement) -> void {
+  throw exception::Prepared<STATEMENT, CONTINUATION>(std::move(subject), std::forward<std::string>(explanation), std::forward<std::string>(unprepared_sql_statement));
+}
+#endiv

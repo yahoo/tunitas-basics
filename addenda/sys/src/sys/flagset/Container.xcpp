@@ -1,0 +1,145 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.required.Enumeration
+#import sys.required.Integer
+#import sys.flagset.required.Pluralizer
+// Turns out there are only two possible Pluralizers, which are Cast and Shift.
+// The Pluralizer concept requires that bhet complete type of the functor be available
+// So here they are, always and everywhere:
+#include <hpp/sys.flagset.Cast>
+#include <hpp/sys.flagset.Shift>
+namespace sys::flagset {
+  //
+  // The flagset Container (template) is an implementation detail.
+  //
+  // Whereas Unix (Linux) is filled full of those "little languages" made out of flags and sets of flags in a bitmask-int.
+  // There is a need to provide for a common recipe, commonly tested, to create, compose and minipulate the flagsets.
+  // They are *almost* std::bitset<...> except for the type richness of the enum Flag, and whether the enum is ordinal or mask-based
+  // Herein, for S.C.O.L.D. we want a "type rich" experience.
+  //
+  // For historical reasons, most of them are based around signed 32-bit integers because that was the fashion in that day.
+  //
+  // This is a class so that it can package up types and functions.
+  // The Flag template instance MUST be used as a type alias in order for the magic of ADL to work with class-scoped functions.
+  // And a few residual definitions are needed at the enum's scope to bootstrap into the flagset.
+  //
+  // Usage:
+  //
+  //   enum Token { ...somehow... };
+  //   using Tokens = flagset::Container<Token, int, Cast<Token, int>>;
+  //   constexpr auto operator&(Token, Token) -> Tokens;
+  //   constexpr auto operator|(Token, Token) -> Tokens;
+  //   constexpr auto operator~(Token) -> Tokens;
+  //
+  //   auto t = Tokens{};
+  //   auto t = Tokens::NONE;
+  //   auto t = Tokens{} | Tokens{};
+  //   auto t = Tokens{} & Tokens{};
+  //   auto t = ~Tokens{};
+  //
+  template<required::Enumeration SINGLE, required::Integer CARRIER, required::Pluralizer<SINGLE, CARRIER> PLURALIZER> struct Container;
+}
+#endiv
+#divert <hpp>
+#import std.is_same
+#import sys.flags.Limits
+namespace sys {
+  template<required::Enumeration SINGLE, required::Integer CARRIER, flagset::required::Pluralizer<SINGLE, CARRIER> PLURALIZER> struct flagset::Container {
+  private:
+    using Pluralizer = PLURALIZER;
+    enum Empty { };
+  public:
+    using Flag = SINGLE;
+    using Flags = Container; // because historically thats what they were called (the plural of the singular 'Flag')
+    using Limits = flags::Limits<Container>;
+    inline static Empty const NONE = Empty{};
+    using Value = CARRIER;
+    inline constexpr Container() : value{0} { }
+    inline constexpr Container(Empty) : value{0} { }
+    inline constexpr Container(Flag f) : value{Pluralizer::promote(f)} { }
+    inline constexpr explicit Container(Value f) : value{f} { }
+    inline constexpr explicit operator Value() const { return value; }
+    inline auto operator=(Flag) -> Container &;
+    auto operator=(Container const &) -> Container & = default;
+    inline auto operator|=(Flag) -> Container &;
+    inline auto operator|=(Container) -> Container &;
+    inline auto operator&=(Flag) -> Container &;
+    inline auto operator&=(Container) -> Container &;
+    // This allows Container::NONE == something for something in Container or Flag
+    friend inline constexpr auto operator==(Empty a, Empty b) -> bool { return operator==(Container{a}, Container{b}); }
+    friend inline constexpr auto operator==(Empty a, Container b) -> bool { return operator==(Container{a}, Container{b}); }
+    friend inline constexpr auto operator==(Container a, Empty b) -> bool { return operator==(Container{a}, Container{b}); }
+    friend inline constexpr auto operator!=(Empty a, Empty b) -> bool { return operator!=(Container{a}, Container{b}); }
+    friend inline constexpr auto operator!=(Empty a, Container b) -> bool { return operator!=(Container{a}, Container{b}); }
+    friend inline constexpr auto operator!=(Container a, Empty b) -> bool { return operator!=(Container{a}, Container{b}); }
+    friend inline constexpr auto operator|(Empty a, Empty b) -> Container { return operator|(Container{a}, Container{b}); }
+    friend inline constexpr auto operator|(Empty a, Flag b) -> Container { return operator|(Container{a}, Container{b}); }
+    friend inline constexpr auto operator|(Flag a, Empty b) -> Container { return operator|(Container{a}, Container{b}); }
+    friend inline constexpr auto operator&(Empty a, Empty b) -> Container { return operator&(Container{a}, Container{b}); }
+    friend inline constexpr auto operator&(Empty a, Flag b) -> Container { return operator&(Container{a}, Container{b}); }
+    friend inline constexpr auto operator&(Flag a, Empty b) -> Container { return operator&(Container{a}, Container{b}); }
+    friend inline constexpr auto operator~(Empty e) -> Container { return Container{Value(~(Value)e)}; }
+    // normal promotion among Empty, Flag & Container
+    friend inline constexpr auto operator==(Container a, Container b) -> bool { return (Value) a == (Value) b; }
+    friend inline constexpr auto operator!=(Container a, Container b) -> bool { return !operator==(a, b); }
+    friend inline constexpr auto operator|(Container a, Container b) -> Container { return Container{Value((Value) a | (Value) b)}; }
+    friend inline constexpr auto operator|(Flag a, Container b) -> Container { return Container{Container{a} | b}; }
+    friend inline constexpr auto operator|(Container a, Flag b) -> Container { return Container{a | Container{b}}; }
+    friend inline constexpr auto operator&(Container a, Container b) -> Container { return Container{Value((Value) a & (Value) b)}; }
+    friend inline constexpr auto operator&(Flag a, Container b) -> Container { return Container{Container{a} & b}; }
+    friend inline constexpr auto operator&(Container a, Flag b) -> Container { return Container{a & Container{b}}; }
+    inline constexpr auto operator~() const -> Container { return Container{Value(~value)}; }
+    friend inline constexpr auto contains(Container a, Flag b) -> bool { return contains(a, Container{b}); }
+    friend inline constexpr auto contains(Container a, Container b) -> bool { return b == (a & b); }
+    // WATCHOUT - use Container(...) herein not Container{...} so that narrowing conversions don't cause warnings
+    //             e.g. Container<Enumeration, unsigned char>
+    inline static constexpr auto meet(Flag a, Flag b) -> Container { return Container(Pluralizer::promote(a) & Pluralizer::promote(b)); }
+    inline static constexpr auto join(Flag a, Flag b) -> Container { return Container(Pluralizer::promote(a) | Pluralizer::promote(b)); }
+    inline static constexpr auto complement(Flag a) -> Container { return ~Container(Pluralizer::promote(a)); }
+    inline static constexpr auto complement(Container a) -> Container { return Container(~(Value) a); }
+  protected:
+    Value value;
+    //
+    // All these declarations do is enforce the obligation (documented above) that the SINGLE enum
+    // has ADL-visible operations for operator|, operator&, operator~ and contains()...
+    //
+#if 0 // NOPE ... these will likely not be true until *after* <hpp> finishes
+    static_assert(std::is_same_v<Container, decltype(Flag{} | Flag{})>); //         constexpr operator&(...)
+    static_assert(std::is_same_v<Container, decltype(Flag{} & Flag{})>); //         constexpr operator|(...)
+    static_assert(std::is_same_v<Container, decltype(~Flag{})>); //                 constexpr operator~(...)
+    static_assert(std::is_same_v<bool, decltype(contains(Flag{}, Flag{}))>); // constexpr contains(...)
+#endif
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::flagset {
+  // Yuk.  Wouldn't it have been more convenient to code these *within* the class declaration?
+  template<required::Enumeration S, required::Integer C, required::Pluralizer<S, C> P> auto Container<S,C,P>::operator=(Flag rhs) -> Container & {
+    auto &lhs{*this};
+    lhs = Container{rhs};
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integer C, required::Pluralizer<S, C> P> auto Container<S,C,P>::operator|=(Container rhs) -> Container & {
+    auto &lhs{*this};
+    lhs = lhs | rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integer C, required::Pluralizer<S, C> P> auto Container<S,C,P>::operator|=(Flag rhs) -> Container & {
+    auto &lhs{*this};
+    lhs = lhs | rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integer C, required::Pluralizer<S, C> P> auto Container<S,C,P>::operator&=(Container rhs) -> Container & {
+    auto &lhs{*this};
+    lhs = lhs & rhs;
+    return lhs;
+  }
+  template<required::Enumeration S, required::Integer C, required::Pluralizer<S, C> P> auto Container<S,C,P>::operator&=(Flag rhs) -> Container & {
+    auto &lhs{*this};
+    lhs = lhs & rhs;
+    return lhs;
+  }
+}
+#endiv

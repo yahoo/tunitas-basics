@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.constructible.School.template
+#import nonstd.exception.constructible.School.string.Storage
+#import nonstd.exception.constructible.School.string.View
+//
+// There is no "one #import buys them all" for the non-standard ones.
+// That would be way to expensive.
+//
+// NOT IMPORTING
+//   #import nonstd.exception.constructible.School.std.filesystem.filesystem_error
+// Because it is every heavy, bringing in the whole of the std::fileystem world
+// Rhyming with the separable -lstd_fs, you must explicitly #import such.
+//
+#endiv

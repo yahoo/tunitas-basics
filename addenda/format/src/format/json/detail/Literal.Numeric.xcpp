@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.basic_ostream
+#forward format.json.detail.Literal
+#import format.json.required.Numeric
+namespace format::json::detail {
+  //
+  // the stream is expected to already be in std::dec and std::defaultfloat format
+  // mentioned by template friend declarations in the class template Literal
+  template<typename CHAR, typename TRAITS, typename NUMERIC> inline auto operator_ltlt(std::basic_ostream<CHAR, TRAITS> &, NUMERIC const &) -> std::basic_ostream<CHAR, TRAITS> & requires required::Numeric<NUMERIC>;
+}
+#endiv
+#divert <ipp>
+#import format.json.detail.Literal
+template<typename CHAR, typename TRAITS, typename NUMERIC> auto format::json::detail::operator_ltlt(std::basic_ostream<CHAR, TRAITS> &o, NUMERIC const &literal) -> std::basic_ostream<CHAR, TRAITS> & requires format::json::required::Numeric<NUMERIC> {
+  // These are trivial ... as C++ style literals and JSON-style numeric literals are "the same" (enough).
+  //
+  // decision: do not reset the stream on every insert operation (the caller must establish the stream in the correct operating mode)
+  //    o << std::dec << std::defaultfloat
+  //
+  return o << literal;
+}
+#endiv

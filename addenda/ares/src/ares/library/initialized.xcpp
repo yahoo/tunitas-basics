@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.Success
+namespace ares::library {
+  //
+  // Is the library initialized?
+  //
+  inline auto is_initialized() -> bool;
+  inline auto initialized() -> Success;
+}
+#endiv
+#divert <ipp>
+#import std.error_code
+#import ares.error.Code
+namespace ares {
+  auto library::is_initialized() -> bool {
+    return ok(initialized());
+  }
+  auto library::initialized() -> Success {
+    //
+    // WATCHOUT - the C API ::ares_library_initialized() does not return an C-type-integer-is-a-boolean.
+    // WATCHOUT - the C API return integer-as-error-code (a status) with either ARES_SUCCESS or ARES_ENOTINITIALIZED
+    // You just have to know... the type system doesn't help you in C.
+    //
+    auto api = ::ares_library_initialized();
+    return ARES_SUCCESS == api ? Success{SUCCESS} : Success{std::error_code{error::Code::NOTINITIALIZED}};
+  }
+}
+#endiv

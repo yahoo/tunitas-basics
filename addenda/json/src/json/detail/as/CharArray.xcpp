@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json {
+  namespace detail {
+    namespace as {
+      template<typename RESULT> struct CharArray;
+    }
+  }
+}
+//                  CharArray----\ (returning)
+//                               |
+//                               |
+//                               v
+#entail json.detail.as.CharArray.string
+#entail json.detail.as.CharArray.String
+#entail json.detail.as.CharArray.Value
+#endiv
+#divert <hpp>
+#import std.size_t
+template<typename RESULT> struct json::detail::as::CharArray {
+  template<std::size_t N> inline auto operator()(char const (&)[N]) -> RESULT;
+};
+#endiv
+#divert <ipp>
+template<typename RESULT> template<std::size_t N> auto json::detail::as::CharArray<RESULT>::operator()(char const (&)[N]) -> RESULT {
+  static_assert(0 != sizeof (RESULT) && 0 == sizeof (RESULT), "only specializations");
+  return RESULT();
+}
+#endiv

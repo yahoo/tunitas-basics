@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.basic_ostream
+#import std.char_traits
+#import std.is_pointer
+#import std.is_same
+#import std.remove_const
+#import std.remove_pointer
+#import format.json.required.Character
+namespace format::json::required {
+  namespace stringlike {
+    // The implementation details for composition into required::Stringlike<STRINGLIKE>
+    template<typename BASE> struct assoc_stream {
+      // Success:
+      //   BASE == char const (&)[7]
+      //   BASE = char const *const
+      // Fail (SFNAE-acceptable)
+      //   BASE == std::string
+      using char_type = typename std::remove_const<typename std::remove_pointer<typename std::remove_extent<typename std::remove_reference<typename std::remove_const<BASE>::type>::type>::type>::type>::type;
+      using stream_type = std::basic_ostream<char_type, std::char_traits<char_type>>;
+    };
+    template<typename ARRAY> concept bool Array =
+      ((std::is_array<ARRAY>::value
+        || std::is_array<typename std::remove_reference<ARRAY>::type>::value)
+       && Character<typename assoc_stream<ARRAY>::char_type>)
+      && requires(ARRAY array, typename assoc_stream<ARRAY>::stream_type &outbound) {
+      outbound << array;
+    };
+    template<typename POINTER> concept bool Pointer = 
+                  (std::is_pointer<POINTER>::value && Character<typename std::remove_const<typename std::remove_pointer<POINTER>::type>::type>)
+                  && requires(POINTER pointer) {
+      typename assoc_stream<POINTER>::stream_type;
+    } && 
+    requires (POINTER pointer, typename assoc_stream<POINTER>::stream_type &outbound) {
+        outbound << pointer;
+      };
+    template<typename OBJECT> concept bool Object = requires(OBJECT object, std::basic_ostream<typename std::remove_const<typename OBJECT::value_type>::type, std::char_traits<typename std::remove_const<typename OBJECT::value_type>::type>> &outbound) {
+      typename OBJECT::value_type;
+      outbound << object;
+    };
+  }
+  template<typename STRINGLIKE> concept bool Stringlike = stringlike::Array<STRINGLIKE> || stringlike::Pointer<STRINGLIKE> || stringlike::Object<STRINGLIKE>;
+}
+
+#import std.string
+#import std.string_view
+#import c.stringz
+#import c.const_stringz
+namespace format::json::required {
+  static_assert(std::is_array<std::remove_reference<decltype("")>::type>::value, "fail");
+  static_assert(Character<stringlike::assoc_stream<decltype("")>::char_type>, "fail");
+  static_assert(stringlike::Array<decltype("")>, "fail");
+
+  static_assert(std::is_pointer<char const *>::value, "fail");
+  static_assert(Character<std::remove_const<std::remove_pointer<char const *>::type>::type>, "fail");
+  static_assert(stringlike::Pointer<char const *>, "fail");
+
+  static_assert(Stringlike<decltype("")>, "fail");
+  static_assert(Stringlike<char const *>, "fail");
+  static_assert(Stringlike<std::string>, "fail");
+  static_assert(Stringlike<std::string_view>, "fail");
+  static_assert(Stringlike<c::stringz>, "fail");
+  static_assert(Stringlike<c::const_stringz>, "fail");
+}
+#endiv

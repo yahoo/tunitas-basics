@@ -1,0 +1,13 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+//
+// A triviality is the only possibility for the casting.
+// For conversion, use json::to(...)
+//
+//          json.as.RESULT.ARGUMENT
+//                 |      |
+//                 v      v
+// #import json.as.Value.Value <------- return a Value given Value; i.e. the identity
+//
+#entail json.as.Value.Value
+#endiv

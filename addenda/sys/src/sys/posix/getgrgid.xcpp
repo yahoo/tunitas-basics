@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.getgr
+#import sys.id.Group
+#import gid_t
+namespace sys::posix {
+  //
+  // Get a group file entry, by gid
+  // Is thread safe.
+  //
+  // Usage:
+  //
+  //   gid_t some_gid{...somehow...};
+  //   auto got = getgrgid(some_gid);
+  //   if (ok(got)) {
+  //      auto ptr = value(std::move(got));
+  //      ...use ptr->gr_gid...
+  //      ...etc...
+  //   } else {
+  //      std::cerr << "could not get " << some_gid << " because " << error_code(got).message() << '\n';
+  //   }
+  //
+  inline auto getgrgid(id::Group) -> packaging::getgr::Result;
+  namespace native {
+    inline auto getgrgid(gid_t) -> packaging::getgr::Result;
+  }
+}
+#endiv
+#divert <ipp>
+auto sys::posix::getgrgid(id::Group gid) -> packaging::getgr::Result { return native::getgrgid((gid_t) gid); }
+#import std.move
+#import errno
+#import group
+#import getgrgid_r
+auto sys::posix::native::getgrgid(gid_t gid) -> packaging::getgr::Result {
+  using namespace packaging::getgr;
+  using std::move;
+  Pointer ptr{new Buffer{}};
+  ::group *result{nullptr};  
+  auto r = [&ptr, gid, &result]() {
+	     auto g = ptr.get();
+	     return ::getgrgid_r(gid, g->entry(), g->data(), g->size(), &result);
+	   }();
+  auto errnum = errno; // capture as soon as practical
+  auto b = 0 == r && nullptr != result;
+  if (!b) {
+    ptr.reset();
+  }
+  return {move(b), move(errnum), move(ptr), move(result), move(r)};
+}
+#endiv

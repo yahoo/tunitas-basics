@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.key
+namespace ares::managed::list {
+  //
+  // The entries of lists
+  // Specializations only.
+  //
+  // Usage: in List<ENTRY>
+  //
+  template<List_Entry ENTRY> struct Entry;
+}
+#endiv

@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_DN.Usage
+//   static_assert(tests::usage::posix_DN::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.DN
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_DN {
+  using sys::posix::DN;
+  namespace [[detail]] packaging {
+    using nonstd::convertible_to;
+    template<typename DN> concept bool Instance = requires(DN) {
+      typename DN::Notify;
+      typename DN::Notifies;
+      requires model::Namespace_Object<DN>;
+      requires (int)DN::NONE == 0;
+      requires (int)DN::ACCESS == DN_ACCESS;
+      requires (int)DN::MODIFY == DN_MODIFY;
+      requires (int)DN::CREATE == DN_CREATE;
+      requires (int)DN::DELETE == DN_DELETE;
+      requires (int)DN::RENAME == DN_RENAME;
+      requires (int)DN::MULTISHOT == DN_MULTISHOT;
+      requires requires(DN, typename DN::Notify ify, typename DN::Notifies ies) {
+#if 202003L < __cplusplus
+        { DN::template as<typename DN::Notify>(ify) } -> convertible_to<typename DN::Notify>;
+        { DN::template as<typename DN::Notifies>(ify) } -> convertible_to<typename DN::Notifies>;
+        { DN::template as<typename DN::Notify>(ies) } -> convertible_to<typename DN::Notify>;
+        { DN::template as<typename DN::Notifies>(ies) } -> convertible_to<typename DN::Notifies>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { DN::template as<typename DN::Notify>(ify) } -> typename DN::Notify;
+        { DN::template as<typename DN::Notifies>(ify) } -> typename DN::Notifies;
+        { DN::template as<typename DN::Notify>(ies) } -> typename DN::Notify;
+        { DN::template as<typename DN::Notifies>(ies) } -> typename DN::Notifies;
+#endif
+      };
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<DN>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

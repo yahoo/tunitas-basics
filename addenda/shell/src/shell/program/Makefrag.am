@@ -1,0 +1,72 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+#
+# [[FIXTHIS]] should this be a monolithinc shared library at all?
+lib_libshell_program_la_CURRENT = $(lib_libshell_module_la_CURRENT)
+lib_libshell_program_la_REVISION = $(lib_libshell_module_la_REVISION)
+lib_libshell_program_la_AGE = $(lib_libshell_module_la_AGE)
+lib_libshell_program_la_CRA = $(lib_libshell_module_la_CRA)
+lib_libshell_program_la_VERSION_INFO = -version-info $(lib_libshell_module_la_CRA)
+
+lib_libshell_program_la = lib/libshell-program.la
+lib_libshell_program_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libshell_program_la_VERSION_INFO)
+lib_libshell_program_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libshell_program_la_SOURCES))
+lib_libshell_program_la_LIBADD = \
+  -lshell-module \
+  $(end)
+lib_libshell_program_la_SOURCES = \
+  $(lib_libshell_program_la_LEGACY_SOURCES_SET) \
+  obj/src/shell/program/namespace.cpp \
+  obj/src/shell/program/Program.declaration.cpp \
+  obj/src/shell/program/Program.NSUPDATE.cpp \
+  obj/src/shell/program/Program.DIFF.cpp \
+  obj/src/shell/program/Program.cpp \
+  $(end)
+lib_libshell_program_la_LEGACY_SOURCES_SET = \
+  obj/src/shell/run/Program.cpp \
+  obj/src/shell/run/Program.NSUPDATE.cpp \
+  $(end)
+$(scold_cxxdir)/shell/program/dependencies.mk: $(lib_libshell_program_la_SOURCES)
+$(lib_libshell_program_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/shell/program/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/shell/program/dependencies.mk
+clean-local::
+	rm -f $(scold_cxxdir)/shell/program/dependencies.mk

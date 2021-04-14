@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward format.json.detail.Literal
+#import std.basic_ostream
+#import std.is_same
+#import format.json.required.Character
+namespace format::json::detail {
+  // You can't have a literal "character" in JSON.  You can have a string of length 1 however.  Use that.
+  template<typename CHAR, typename TRAITS> inline auto operator_ltlt(std::basic_ostream<CHAR, TRAITS> &, CHAR) -> std::basic_ostream<CHAR, TRAITS> & requires required::Character<CHAR> = delete;
+  // These are integers
+  template<typename CHAR, typename TRAITS> inline auto operator_ltlt(std::basic_ostream<CHAR, TRAITS> &, char signed) -> std::basic_ostream<CHAR, TRAITS> &;
+  template<typename CHAR, typename TRAITS> inline auto operator_ltlt(std::basic_ostream<CHAR, TRAITS> &, char unsigned) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+#import format.json.detail.Literal.Numeric
+template<typename CHAR, typename TRAITS> auto format::json::detail::operator_ltlt(std::basic_ostream<CHAR, TRAITS> &o, char signed literal) -> std::basic_ostream<CHAR, TRAITS> & {
+  return o << Literal<int signed>(literal);
+}
+
+template<typename CHAR, typename TRAITS> auto format::json::detail::operator_ltlt(std::basic_ostream<CHAR, TRAITS> &o, char unsigned literal) -> std::basic_ostream<CHAR, TRAITS> & {
+  return o << Literal<int unsigned>(literal);
+}
+#endiv

@@ -1,0 +1,35 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+lib_libstream_la = lib/libstream.la
+lib_libstream_la_LIBADD = $(none)
+lib_libstream_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+lib_libstream_la_MODULES = $(call HT_SOURCEStoMODULES, $(lib_libstream_la_SOURCES))
+lib_libstream_la_SOURCES = \
+  obj/src/stream/namespace.cpp \
+  obj/src/stream/Nullbuf.cpp \
+  obj/src/stream/null.cpp \
+  \
+  obj/src/stream/input.cpp \
+  \
+  obj/src/stream/output.cpp \
+  obj/src/stream/output.iterator.Bracketing.cpp \
+  obj/src/stream/output.iterator.Prefixing.cpp \
+  obj/src/stream/output.iterator.Suffixing.cpp \
+  obj/src/stream/output.iterator.cpp \
+  \
+  obj/src/stream/required.cpp \
+  obj/src/stream/required.Character_Traits.cpp \
+  obj/src/stream/required.Character.cpp \
+  obj/src/stream/required.Decoration.cpp \
+  $(end)
+$(scold_cxxdir)/stream/dependencies.mk: $(lib_libstream_la_SOURCES)
+$(lib_libstream_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/stream/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/stream/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/stream/dependencies.mk

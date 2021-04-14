@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sys.directory.Entry
+#import std.less
+namespace std {
+  template<> struct less<::sys::directory::Entry>;
+}
+#endiv
+#divert <hpp>
+template<> struct std::less<::sys::directory::Entry> {
+  using first_argument_type = ::sys::directory::Entry;
+  using second_argument_type = ::sys::directory::Entry;
+  using result_type = bool;
+  inline auto operator()(first_argument_type const &, second_argument_type const &) -> result_type;
+};
+#endiv
+#divert <ipp>
+#import sys.directory.Entry
+auto std::less<::sys::directory::Entry>::operator()(first_argument_type const &a, second_argument_type const &b) -> result_type {
+  std::less<std::string> redo;
+  return redo(a.name, b.name);
+}
+#endiv

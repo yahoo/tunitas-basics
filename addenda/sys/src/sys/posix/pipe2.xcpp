@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.pipe.interface
+namespace sys::posix {
+  //
+  // The pipe2(...) name because everyone remembers that.
+  // The real work is in the overloads of pipe(...)
+  //
+  // Usage:
+  //
+  //   auto piped = sys::posix::pipe2(O::CLOEXEC | O::DIRECT | O::NONBLOCK)
+  //   if (ok(piped)) {
+  //     std::cerr << "bad " << error_message(piped) << '\n';
+  //   } else {
+  //     auto rfd = read_side(piped);
+  //     auto wfd = write_side(piped);
+  //   }
+  //
+  namespace packaging::pipe2 {
+    using namespace packaging::pipe::interface;
+    using namespace bundle::create;
+    namespace function {
+      inline auto pipe2(fd::Flags) -> Returned<File>;
+      inline auto pipe2(fd::Flags, [[out]] File &read, [[out]] File &write) -> Status;
+      inline auto pipe2(fd::Flags, [[out]] File read_write[2]) -> Status;
+      //
+      inline auto pipe2(o::Flags) -> Returned<File>;
+      inline auto pipe2(o::Flags, [[out]] File &read, [[out]] File &write) -> Status;
+      inline auto pipe2(o::Flags, [[out]] File read_write[2]) -> Status;
+    }
+    namespace native {
+      inline auto pipe2(fd::Flags) -> Returned<int>;
+      inline auto pipe2(fd::Flags, int &read, int &write) -> Status;
+      inline auto pipe2(fd::Flags, int read_write[2]) -> Status;
+      //
+      inline auto pipe2(o::Flags) -> Returned<int>;
+      inline auto pipe2(o::Flags, int &read, int &write) -> Status;
+      inline auto pipe2(o::Flags, int read_write[2]) -> Status;
+    }
+  }
+  using packaging::pipe2::function::pipe2;
+  namespace native { using packaging::pipe2::native::pipe2; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.pipe
+namespace sys::posix::packaging::pipe2 {
+  auto function::pipe2(fd::Flags flags) -> Returned<File>                                  { return posix::pipe(flags); }
+  auto function::pipe2(fd::Flags flags, [[out]] File &read, [[out]] File &write) -> Status { return posix::pipe(flags, read, write); }
+  auto function::pipe2(fd::Flags flags, [[out]] File read_write[2]) -> Status              { return posix::pipe(flags, read_write); }
+  //
+  auto function::pipe2(o::Flags flags) -> Returned<File>                                  { return posix::pipe(flags); }
+  auto function::pipe2(o::Flags flags, [[out]] File &read, [[out]] File &write) -> Status { return posix::pipe(flags, read, write); }
+  auto function::pipe2(o::Flags flags, [[out]] File read_write[2]) -> Status              { return posix::pipe(flags, read_write); }
+  //
+  auto native::pipe2(fd::Flags flags) -> Returned<int>                 { return posix::native::pipe(flags); }
+  auto native::pipe2(fd::Flags flags, int &read, int &write) -> Status { return posix::native::pipe(flags, read, write); }
+  auto native::pipe2(fd::Flags flags, int read_write[2]) -> Status     { return posix::native::pipe(flags, read_write); }
+  //
+  auto native::pipe2(o::Flags flags) -> Returned<int>                 { return posix::native::pipe(flags); }
+  auto native::pipe2(o::Flags flags, int &read, int &write) -> Status { return posix::native::pipe(flags, read, write); }
+  auto native::pipe2(o::Flags flags, int read_write[2]) -> Status     { return posix::native::pipe(flags, read_write); }
+}
+#endiv

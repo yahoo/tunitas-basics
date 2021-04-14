@@ -1,0 +1,199 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::managed { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::managed::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_basic_Addr4() -> void;
+  auto test_basic_Addr6() -> void;
+  auto test_basic_Host() -> void;
+  auto test_basic_Mx() -> void;
+  auto test_basic_Naptr() -> void;
+  auto test_basic_Ptr() -> void;
+  auto test_basic_Soa() -> void;
+  auto test_basic_Srv() -> void;
+  auto test_basic_Txt() -> void;
+  auto test_basic_Uri() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#warning WRITETHIS
+#if 0
+#import tests.unit.managed.construct
+auto tests::unit::managed::Fixture::test_basic_Addr4() -> void {
+  ::ares::unmanaged::Addr4 raw{nullptr, 0x0'7f0'00'00'01, 3600u};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(ip::in4::addr_t{0x7f000001} == ip::as<ip::in6::addr_t>(subject.address()));
+  CPPUNIT_ASSERT(ares::time::duration_cast<::ares::time::Seconds>(1hr) == subject.ttl());
+}
+#import ares.time.duration
+auto tests::unit::managed::Fixture::test_basic_Addr6() -> void {
+  ::ares::unmanaged::Addr6 raw{nullptr, {{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 }}, 3600u};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(ip::in6::addr_t{0x1} == ip::as<ip::in6::addr_t>(subject.address()));
+  CPPUNIT_ASSERT(ares::time::duration_cast<::ares::time::Seconds>(1hr) == subject.ttl());
+}
+#import ares.managed.Host
+auto tests::unit::managed::Fixture::test_basic_Host() -> void {
+  char raw_name[] = "a0.example.com";
+  char raw_alias1[] = "a1.example.com";
+  char raw_alias2[] = "a2.example.com";
+  char *raw_aliases[] = { &raw_alias1[0], &raw_alias1[1], nullptr };
+  auto const raw_aliases_count = sizeof (raw_aliases) / sizeof (raw_aliases[0]) - 1u;
+  char raw_address1[] = "127.0.0.1";
+  char raw_address2[] = "::1";
+  char *raw_addresses[] = { &raw_address1[0], &raw_address2[1], nullptr };
+  auto const raw_addresses_count = sizeof (raw_addresses) / sizeof (raw_addresses[0]) - 1u;
+  ::ares::unmanaged::Host raw{&raw_name[0], &raw_aliases[0], raw_aliases_count, /* any?*/ 0, raw_addresses_count, &raw_addresses[0]};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_name} == subject.name());
+  CPPUNIT_ASSERT(std::string{raw_aliases[0]} == subject.aliases()[0]);
+  CPPUNIT_ASSERT(std::string{raw_aliases[1]} == subject.aliases()[1]);
+  CPPUNIT_ASSERT(raw_aliases_count == subject.aliases().size());
+  CPPUNIT_ASSERT(std::string{raw_addresses[0]} == subject.addresses()[0]);
+  CPPUNIT_ASSERT(std::string{raw_addresses[1]} == subject.addresses()[1]);
+  CPPUNIT_ASSERT(raw_addresses_count == subject.addresses().size());
+}
+#import ares.managed.Mx
+auto tests::unit::managed::Fixture::test_basic_Mx() -> void {
+  char raw_host[] = "example.com";
+  ::ares::unmanaged::Mx raw{nullptr, raw_host, 1};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_host} == subject.host());
+  CPPUNIT_ASSERT(1u == subject.priority());
+}
+#import ares.managed.Naptr
+auto tests::unit::managed::Fixture::test_basic_Naptr() -> void {
+  auto cook1 = [](nonstd::span<std::byte const> span) -> std::string {
+                 auto begin = reinterpret_cast<char const *>(span.data());
+                 auto end = begin + span.size();
+                 return std::string{begin, end};
+               };
+  auto cook1 = [](unsigned char *start, unsigned char *finish) -> std::string {
+                 auto begin = reinterpret_cast<char const *>(start);
+                 auto end = reinterpret_cast<char const *>(finish);
+                 return std::string{begin, end};
+               };
+  unsigned char raw_flags[] = "U";
+  unsigned char raw_service[] = "E2U+sip";
+  unsigned char raw_regexp[] =  "^.*$";
+  char raw_replacement[] = "sip:customer-service@example.com";
+  ::ares::unmanaged::Naptr raw{nullptr, &raw_flags[0], &raw_service[0], &raw_regexp[0], &raw_replacement[0], 1, 2}
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(cook2(&raw_flags[0], &raw_flags[sizeof (raw_flags)]) == cook1(subject.flags()));
+  CPPUNIT_ASSERT(cook2(&raw_service[0], &raw_service[sizeof (raw_service)]) == cook1(subject.service()));
+  CPPUNIT_ASSERT(cook2(&raw_regex[0], &raw_regex[sizeof (raw_regex)]) == cook1(subject.regexp()));
+  CPPUNIT_ASSERT(std::string{raw_replacement} == subject.replacement());
+  CPPUNIT_ASSERT(1u == subject.order());
+  CPPUNIT_ASSERT(2u == subject.priority());
+}
+#import ares.managed.Ptr
+auto tests::unit::managed::Fixture::test_basic_Ptr() -> void {
+  char raw_name[] = "a0.example.com";
+  char raw_alias1[] = "a1.example.com";
+  char raw_alias2[] = "a2.example.com";
+  char *raw_aliases[] = { &raw_alias1[0], &raw_alias1[1], nullptr };
+  auto const raw_aliases_count = sizeof (raw_aliases) / sizeof (raw_aliases[0]) - 1u;
+  char raw_address1[] = "127.0.0.1";
+  char raw_address2[] = "::1";
+  char *raw_addresses[] = { &raw_address1[0], &raw_address2[1], nullptr };
+  auto const raw_addresses_count = sizeof (raw_addresses) / sizeof (raw_addresses[0]) - 1u;
+  ::ares::unmanaged::Host raw{&raw_name[0], &raw_aliases[0], raw_aliases_count, /* any?*/ 0, raw_addresses_count, &raw_addresses[0]};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_name} == subject.name());
+  CPPUNIT_ASSERT(std::string{raw_aliases[0]} == subject.aliases()[0]);
+  CPPUNIT_ASSERT(std::string{raw_aliases[1]} == subject.aliases()[1]);
+  CPPUNIT_ASSERT(raw_aliases_count == subject.aliases().size());
+  CPPUNIT_ASSERT(std::string{raw_addresses[0]} == subject.addresses()[0]);
+  CPPUNIT_ASSERT(std::string{raw_addresses[1]} == subject.addresses()[1]);
+  CPPUNIT_ASSERT(raw_addresses_count == subject.addresses().size());
+}
+#import ares.managed.Soa
+auto tests::unit::managed::Fixture::test_basic_Soa() -> void {
+  char raw_hostmaster[] = "master.example.com";
+  ::ares::unmanaged::Soa raw{nullptr, &raw_hostmaster[0], 1, 2, 3, 4, 5};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_hostmaster} == subject.hostmaster());
+  CPPUNIT_ASSERT(1u == subject.serial());
+  CPPUNIT_ASSERT(2s == subject.refresh());
+  CPPUNIT_ASSERT(3s == subject.retry());
+  CPPUNIT_ASSERT(4s == subject.expire());
+  CPPUNIT_ASSERT(5s == subject.minttl());
+}
+#import ares.managed.Srv
+auto tests::unit::managed::Fixture::test_basic_Srv() -> void {
+  char raw_host[] = "example.com";
+  ::ares::unmanaged::Srv raw{nullptr, raw_host, 1, 2, 9090};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_host} == subject.host());
+  CPPUNIT_ASSERT(1u == subject.priority());
+  CPPUNIT_ASSERT(2u == subject.weight());
+  CPPUNIT_ASSERT(9090u == subject.port());
+}
+#import ares.managed.Txt
+auto tests::unit::managed::Fixture::test_basic_Txt() -> void {
+  char raw_txt[] = "Cliche vice meh, iPhone literally portland prism lumbersexual truffaut bicycle rights pug.";
+  auto raw_txt_size = sizeof (raw_txt)-1;
+  ::ares::unmanaged::Txt raw{nullptr, &raw_txt[0], raw_txt_size};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_txt} == subject.txt());
+  CPPUNIT_ASSERT(1u == subject.priority());
+}
+#import ares.managed.Uri
+auto tests::unit::managed::Fixture::test_basic_Uri() -> void {
+  char raw_uri[] = "https://example.com";
+  ::ares::unmanaged::Uri raw{nullptr, &raw_uri[0], 1, 2};
+  auto subject = ::ares::managed::tests::Access::construct(raw);
+  CPPUNIT_ASSERT(std::string{raw_uri} == subject.uri());
+  CPPUNIT_ASSERT(1u == subject.priority());
+  CPPUNIT_ASSERT(2u == subject.weight());
+}
+#endif
+#import tests.unit.managed.Record
+#import rigging.suite.io
+auto tests::unit::managed::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("managed");
+#warning #if 0
+#if 0
+  {
+    Stream bas("basic");
+    bas << call("Addr4", &Fixture::test_basic_Addr4)
+        << call("Addr6", &Fixture::test_basic_Addr6)
+        << call("Host", &Fixture::test_basic_Host)
+        << call("Mx", &Fixture::test_basic_Mx)
+        << call("Naptr", &Fixture::test_basic_Naptr)
+        << call("Soa", &Fixture::test_basic_Soa)
+        << call("Srv", &Fixture::test_basic_Srv)
+        << call("Txt", &Fixture::test_basic_Txt)
+        << call("Uri", &Fixture::test_basic_Uri)
+      ;
+    series << move(bas);
+  }
+  namespace rigging = tests::unit::managed;
+  namespace testing = ares::reply;;
+  series
+
+    << add<Addr4>()
+         << add<Addr6>()
+         << add<Host>()
+         << add<rigging::Record<testing::Record<::ares::A>>()
+         << add<rigging::Record<testing::Record<::ares::AAAA>>()
+         << add<rigging::Record<testing::Record<::ares::MX>>()
+         << add<rigging::Record<testing::Record<::ares::NAPTR>>()
+         << add<rigging::Record<testing::Record<::ares::NS>>()
+         << add<rigging::Record<testing::Record<::ares::PTR>>()
+         << add<rigging::Record<testing::Record<::ares::SOA>>()
+         << add<rigging::Record<testing::Record<::ares::SRV>>()
+         << add<rigging::Record<testing::Record<::ares::TXT>>()
+         << add<rigging::Record<testing::Record<::ares::URI>>()
+    ;
+#endif
+  return finalize(series);
+}
+#endiv

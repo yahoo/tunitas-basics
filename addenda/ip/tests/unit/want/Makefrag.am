@@ -1,0 +1,3 @@
+tests_unit_want_TESTS = \
+  tests/unit/want/all.test \
+  $(end)

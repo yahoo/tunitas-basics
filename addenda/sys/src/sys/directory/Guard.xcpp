@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys {
+  namespace directory {
+    template<typename GUARDED> class Guard;
+  }
+}
+#entail sys.directory.Guard.DIR
+#entail sys.directory.Guard.open.Result
+#endiv
+#divert <hpp>
+template<typename GUARDED> class sys::directory::Guard {
+public:
+  using guarded_type = GUARDED;
+  inline explicit Guard(guarded_type &subject);
+  inline ~Guard();
+  Guard(Guard const &) = delete;
+  auto operator=(Guard const &) -> Guard & = delete;
+private:
+  guarded_type &subject;
+};
+#endiv
+#divert <ipp>
+template<typename GUARDED> sys::directory::Guard<GUARDED>::Guard(guarded_type &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+
+template<typename GUARDED> sys::directory::Guard<GUARDED>::~Guard() {
+  static_assert(0 == sizeof (GUARDED) && 0 != sizeof (GUARDED), "only specializations");
+}
+#endiv

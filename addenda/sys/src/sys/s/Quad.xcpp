@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::s {
+  namespace quad { struct Quad; }
+  using quad::Quad;
+}
+#endiv
+#divert <hpp>
+#import std.tuple
+#import sys.s.Bits
+#import sys.s.Mode
+namespace sys::s {
+  class quad::Quad : public std::tuple<Bits, Bits, Bits, Bits> {
+    using Ancestor = std::tuple<Bits, Bits, Bits, Bits>;
+  public:
+    Quad() = default;
+    using Ancestor::tuple;
+    template<typename RESULT> auto as() const -> RESULT = delete;
+    enum Axis { SPECIAL, USER, GROUP, OTHER };
+    template<Axis> inline auto get() const -> Bits const &;
+    template<Axis> inline auto get() -> Bits &;
+    template<Axis AXIS> inline friend auto get(Quad &&that) -> Bits; // later moved to namesspace scope
+  };
+  namespace quad {
+    template<> inline auto Quad::as<Triple>() const -> Triple;
+    template<> inline auto Quad::as<Quad>() const -> Quad;
+    template<> inline auto Quad::as<Mode>() const -> Mode;
+  }
+}
+#endiv
+#divert <ipp>
+#import std.forward
+#import std.get
+namespace sys::s {
+  template<quad::Quad::Axis AXIS> auto quad::get(Quad &&that) -> Bits && { return std::get<AXIS>(std::forward<typename Quad::Ancestor>(that)); }
+  namespace quad {
+    template<Quad::Axis AXIS> auto Quad::get() const -> Bits const & { return std::get<AXIS>(static_cast<Ancestor const &>(*this)); }
+    template<Quad::Axis AXIS> auto Quad::get() -> Bits &             { return std::get<AXIS>(static_cast<Ancestor &>(*this)); }
+    template<> auto Quad::as<Triple>() const -> Triple { return {get<USER>(), get<GROUP>(), get<OTHER>()}; }
+    template<> auto Quad::as<Quad>() const -> Quad { return *this; }
+    template<> auto Quad::as<Mode>() const -> Mode {
+      auto const special = (Bits::Value) get<SPECIAL>() << 9;
+      auto const user = (Bits::Value) get<USER>() << 6;
+      auto const group = (Bits::Value) get<GROUP>() << 3;
+      auto const other = (Bits::Value) get<OTHER>() << 0;
+      return {special | user | group | other};
+    }
+  }
+}
+#endiv

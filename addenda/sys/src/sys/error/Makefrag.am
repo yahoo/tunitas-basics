@@ -1,0 +1,46 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+# This is a [[deprecated]] compatibility library.
+# the C:R:A follows that of the core library
+lib_libsys_error_module_la_CURRENT = $(lib_libsys_module_la_CURRENT)
+lib_libsys_error_module_la_REVISION = $(lib_libsys_module_la_REVISION)
+lib_libsys_error_module_la_AGE = $(lib_libsys_module_la_AGE)
+lib_libsys_error_module_la_CRA = $(lib_libsys_error_module_la_CURRENT):$(lib_libsys_error_module_la_REVISION):$(lib_libsys_error_module_la_AGE)
+lib_libsys_error_module_la_VERSION_INFO = -version-info $(lib_libsys_error_module_la_CRA)
+
+# libsys-error has been subsumed into libsys
+# For compatibility, the use of -lsys-error-module entails -lsys-module
+lib_libsys_error_module_la = lib/libsys-error-module.la
+lib_libsys_error_module_la_LIBADD = -lsys-module
+lib_libsys_error_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libsys_error_module_la_VERSION_INFO)
+lib_libsys_error_module_la_MODULES = 
+lib_libsys_error_module_la_SOURCES = $(empty) $(unused)
+
+# These are included in ../Makefrag.am as part of libsys.la
+src_sys_error_SOURCES_SET = \
+  obj/src/sys/error/namespace.cpp \
+  obj/src/sys/error/Condition.cpp \
+  obj/src/sys/error/Code.cpp \
+  obj/src/sys/error/Category.cpp \
+  obj/src/sys/error/category.cpp \
+  $(src_sys_error_SOURCES_DEPRECATION_SET) \
+  $(end)
+src_sys_error_SOURCES_DEPRECATION_SET = \
+  obj/src/sys/error/constants.cpp \
+  obj/src/sys/error/api471.Code.cpp \
+  obj/src/sys/error/E.cpp \
+  obj/src/sys/error/E.Code.cpp \
+  obj/src/sys/error/E.constants.cpp \
+  obj/src/sys/error/e.cpp \
+  obj/src/sys/error/e.Code.cpp \
+  obj/src/sys/error/e.constants.cpp \
+  $(end)
+obj_src_sys_error_OBJECTS_DEPRECATION_SET_o = $(patsubst %.cpp,%.o,$(src_sys_error_SOURCES_DEPRECATION_SET))
+obj_src_sys_error_OBJECTS_DEPRECATION_SET_lo = $(patsubst %.cpp,%.lo,$(src_sys_error_SOURCES_DEPRECATION_SET))
+# Shut up the warnings about certain modules-as-includes being deprecated going forward.
+# Those messages are for downstream; we are building ourselves and don't need to hear that always and everywhere.
+$(obj_src_sys_error_OBJECTS_DEPRECATION_SET_o) : CPPFLAGS+=-Wno-cpp
+$(obj_src_sys_error_OBJECTS_DEPRECATION_SET_lo) : CPPFLAGS+=-Wno-cpp
+#$(info DEBUG $(obj_src_sys_error_OBJECTS_DEPRECATION_SET_o) : CPPFLAGS+=-Wno-cpp)
+#$(info DEBUG $(obj_src_sys_error_OBJECTS_DEPRECATION_SET_lo) : CPPFLAGS+=-Wno-cpp)

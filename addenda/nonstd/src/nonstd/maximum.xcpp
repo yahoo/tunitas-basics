@@ -1,0 +1,22 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+namespace nonstd {
+  //
+  // The multi-argument maximum
+  //
+  template<typename TYPE, typename ...TYPES> inline constexpr auto maximum(TYPE, TYPES...) -> TYPE;
+
+  // n.b. There is no way to do type promotion here , so everything has to be the same type
+  //      If you have problems, then fix your call sites to ensure that all types are "the same"
+  template<typename TYPE> inline constexpr auto maximum(TYPE, TYPE) -> TYPE;
+}
+template<typename TYPE, typename ...TYPES> constexpr auto nonstd::maximum(TYPE a, TYPES ...rest) -> TYPE {
+    return maximum(a, maximum(rest...));
+}
+// recall: can't name this "max" because of the 3-arg variant of std::max
+// recall: the 3-arg form of std::max(TYPE, TYPE, Compare) 
+#import std.max
+template<typename TYPE> constexpr auto nonstd::maximum(TYPE a, TYPE b) -> TYPE {
+  return std::max(a, b);
+}
+#endiv

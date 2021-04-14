@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.fcntl.interface
+namespace sys::posix {
+  //
+  // reminder: does not return O::Flags, just FD::Flags (use operator+ to promote); see getfl(...) nearby.
+  //
+  namespace packaging::getfd {
+    using namespace packaging::fcntl::interface;
+    using Result = result::Flags;
+    namespace function {
+      inline auto getfd(File) -> Result;
+    } 
+    namespace native {
+      inline auto getfd(int fd) -> Result;
+    } 
+  }
+  using packaging::getfd::function::getfd;
+  namespace native { using packaging::getfd::native::getfd; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::getfd {
+  auto function::getfd(File fd) -> Result { return native::getfd((int)fd); }
+  auto native::getfd(int fd) -> Result {
+    auto raw = posix::native::fcntl(fd, F::GETFD);
+    return {good(raw), error_num(raw), FD::Flags{value(raw)}};
+  }
+}
+#endiv

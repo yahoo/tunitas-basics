@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+#import sys.posix.packaging.wait.portability.Checkpoint
+namespace sys::posix::packaging::waitpid {
+  using namespace packaging::wait::interface;
+  namespace [[detail]] returned {
+    using namespace bundle::waitpid::returned;
+    namespace portability = packaging::wait::portability;
+  }
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::waitpid::returned {
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto waitpid(MATCHED, Options, status::Filled &) -> identifier::Returned<RETURNED> requires portability::Checkpoint<RETURNED>;
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto waitpid(MATCHED, Options, status::Unfilled) -> identifier::Returned<RETURNED> requires portability::Checkpoint<RETURNED>;
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto waitpid(MATCHED, Options) -> status::Returned<RETURNED> requires portability::Checkpoint<RETURNED>;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+#import sys.posix.packaging.wait4.returned
+namespace sys::posix::packaging::waitpid {
+  //
+  // <quote ref="man:waitpid(2)" ref="man-pages-4.16-3.fc29.noarch">
+  //   On some architectures, there is no waitpid() system call;
+  //   instead, this interface is implemented via a C library wrapper function that calls wait4(2).
+  // <quote>
+  //
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::waitpid(MATCHED matched, Options options) -> status::Returned<RETURNED> requires portability::Checkpoint<RETURNED> {
+    auto sutats = Status{};
+    auto called = [matched, options, &sutats]() {
+#ifdef SYS_waitpid
+                    return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAITPID, (pid_t)matched, &sutats, (int)options);
+#else
+                    return posix::packaging::wait4::returned::wait4<RETURNED>(matched, options, sutats, {});
+#endif
+                  }();
+    return {good(called), error_num(called), value(called), sutats};
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::waitpid(MATCHED matched, Options options, status::Filled &sutats) -> identifier::Returned<RETURNED> requires portability::Checkpoint<RETURNED> {
+#ifdef SYS_waitpid
+    return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAITPID, (pid_t)matched, &sutats, (int)options);
+#else
+    return posix::packaging::wait4::returned::wait4<RETURNED>(matched, options, sutats, {});
+#endif
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::waitpid(MATCHED matched, Options options, status::Unfilled) -> identifier::Returned<RETURNED> requires portability::Checkpoint<RETURNED> {
+#ifdef SYS_waitpid
+    return stylized::syscall<identifier::Process<RETURNED>>(Syscall::WAITPID, (pid_t)matched, (int *)0, (int)options);
+#else
+    return posix::packaging::wait4::returned::wait4<RETURNED>(matched, options, {}, {});
+#endif
+  }
+}
+#endiv

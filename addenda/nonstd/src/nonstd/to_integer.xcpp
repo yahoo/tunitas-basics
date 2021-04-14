@@ -1,0 +1,84 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.Outcome
+#import nonstd.required.Integer
+#import nonstd.required.Dopelike
+namespace nonstd {
+  //
+  // Convert a string to an integer, returning an outcome
+  //
+  // to_integer(...) follows the theme of to_string.
+  //                 returns an outcome
+  //                 on error, returns std::error_code variant
+  //                 never throws 
+  //
+  // sto(...)        follows the theme of stoi, stol, stoll, stou[sic], stoul, stoull
+  //                 returns a value or doesn't return.
+  //                 on error, throws a std::exception descendant
+  //                 
+  // Whereas ISO C++ 17 has really messed up the integral type conversions.
+  // You want not only to be able to recognize the token in an infinite stream,
+  // but also to know that there isn't "extra junk" after the token.
+  // Both are valid use cases.  One-and-done; and One-and-continue
+  //
+  //    Specimen    -> One-and-Done    One-and-Continue
+  //    123\0       -> ok 123          123 <done>
+  //    123 abc\0   -> error           123 <following> e.g. test for whitespace
+  //    123abc\0    -> error           123 <following> e.g. test-for-whitespace
+  //
+  // There are many ways to do it as the seers have shown:
+  // https://www.fluentcpp.com/2018/07/27/how-to-efficiently-convert-a-string-to-an-int-in-c/
+  // <nb>the benchmarking methodology has problems; and doesn't explain <em>why</em> the observed effect occurs</nb>
+  //
+  // None of the C++ ones have the punch of the C variants and many have lost the incrementality of the C API.
+  // The point being that they neither completely signal via exceptions nor do they signal via out-parameters.
+  // You have to check both!  And pundits and commentarians are noticing.
+  //
+  // http://0x80.pl/notesen/2018-03-16-awful-part-of-cpp.html; Wojciech Muła, In <em>His Blog</em>, 2018-03-16.
+  //
+  // And they don't work with dope-shaped things; e.g. string_view, basic_dope, etc.
+  //
+  // strtol <-------- all these have different names and aren't robust on small unsigned bounds checking
+  // stol <---------- all these have different names
+  // from_chars <---- a template, but there are so many ways to check for failure.
+  //
+  // Fortunately, we have namespace nonstd.
+  //
+  // Return:
+  //   the outcome
+  //     success -> the value
+  //     error   -> std::error_code in the nonstd::error::to_integer Code & Category
+  //
+  // Exceptions:
+  //   none.
+  //
+  // Usage:
+  //
+  //   auto s = std::string{...};
+  //   auto i = to_integer<unsigned char>(s);
+  //   auto i = to_integer<int short unsigned>(s);
+  //   auto i = to_integer<int unsigned>(s);
+  //   auto i = to_integer<int unsigned long>(s);
+  //   auto i = to_integer<int unsigned long long>(s);
+  //   auto i = to_integer<uint128_t>(s);
+  //
+  //   auto sv = std::string_view{...} or any std::vector<char> or std::dope<char> or dope-shaped type.
+  //   auto i = to_integer<signed char>(sv);
+  //   auto i = to_integer<int short signed>(sv);
+  //   auto i = to_integer<int signed>(sv);
+  //   auto i = to_integer<int signed long>(sv);
+  //   auto i = to_integer<int signed long long>(sv);
+  //   auto i = to_integer<int128_t>(sv);
+  //
+  // The default base of 0 means that the base will be guessed from the luser's syntax at runtime.
+  template<required::Integer INTEGER, required::Dopelike DOPE> inline auto to_integer(DOPE const &, int base = 0) noexcept -> Outcome<INTEGER>;
+}
+#endiv
+#divert <ipp>
+#import nonstd.detail.to_integer.Dispatcher
+template<nonstd::required::Integer INTEGER, nonstd::required::Dopelike DOPE> auto nonstd::to_integer(DOPE const &dope, int base) noexcept -> nonstd::Outcome<INTEGER> {
+  detail::to_integer::Dispatcher<INTEGER> dispatch;
+  return dispatch.to_integer(dope, base);
+}
+#endiv

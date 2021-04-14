@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import sys.r.Limit
+#import sys.r.Limits
+namespace sys::r::required::paired {
+  //
+  // Are these paired?
+  //
+  template<typename INDEX, typename INFORMATION> concept bool Limits = (std::is_same_v<INDEX, r::Limit> ||
+                                                                        std::is_same_v<INFORMATION, r::Limits>);
+}
+#endiv

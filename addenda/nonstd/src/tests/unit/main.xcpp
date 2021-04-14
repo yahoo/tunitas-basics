@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenace see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import rigging.bench.Main
+#import tests.unit.dope.Fixture
+#import tests.unit.error.Fixture
+#import tests.unit.exception.Fixture
+#import tests.unit.filesystem.Fixture
+#import tests.unit.initialized.Fixture
+#import tests.unit.ish.Fixture
+#import tests.unit.iterator.Fixture
+#import tests.unit.iomanip.Fixture
+#import tests.unit.mvr.Fixture
+#import tests.unit.nonstd.Fixture
+#import tests.unit.outcome.Fixture
+#import tests.unit.path.Fixture
+#import tests.unit.range.Fixture
+#import tests.unit.required.Fixture
+#import tests.unit.regex.Fixture
+#import tests.unit.semver.Fixture
+#import tests.unit.sto.Fixture
+#import tests.unit.stream.Fixture
+#import tests.unit.to_integer.Fixture
+#import tests.unit.uninitialized.Fixture
+#import tests.unit.want.Fixture
+auto main(int argc, char *argv[]) -> int {
+  using namespace rigging::bench;
+  using namespace tests::unit;
+  namespace nonstd = tests::unit::nonstd;
+  Main remain(dope::Fixture::suite(),
+              error::Fixture::suite(),
+              exception::Fixture::suite(),
+              filesystem::Fixture::suite(),
+              initialized::Fixture::suite(),
+              ish::Fixture::suite(),
+              iterator::Fixture::suite(),
+              mvr::Fixture::suite(),
+              nonstd::Fixture::suite(),
+              outcome::Fixture::suite(),
+              path::Fixture::suite(),
+              range::Fixture::suite(),
+              required::Fixture::suite(),
+              regex::Fixture::suite(),
+              semver::Fixture::suite(),
+              sto::Fixture::suite(),
+              stream::Fixture::suite(),
+              iomanip::Fixture::suite(),
+              uninitialized::Fixture::suite(),
+              to_integer::Fixture::suite(),
+              want::Fixture::suite());
+  return remain(argc, argv);
+}
+#endiv

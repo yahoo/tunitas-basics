@@ -1,0 +1,136 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+src_tests_query_check_PROGRAMS_SET = \
+  $(check_bin_a) \
+  $(check_bin_aaaa) \
+  $(check_bin_mx) \
+  $(check_bin_naptr) \
+  $(check_bin_ns) \
+  $(check_bin_ptr) \
+  $(check_bin_soa) \
+  $(check_bin_srv) \
+  $(check_bin_txt) \
+  $(check_bin_uri) \
+  $(end)
+src_tests_query_check_LTLIBRARIES_SET = \
+  $(lib_libtest_query_la) \
+  $(end)
+src_tests_query_SOURCES_SET = \
+  $(lib_libtest_query_la_SOURCES) \
+  $(check_bin_a_SOURCES) \
+  $(check_bin_aaaa_SOURCES) \
+  $(check_bin_mx_SOURCES) \
+  $(check_bin_naptr_SOURCES) \
+  $(check_bin_ns_SOURCES) \
+  $(check_bin_ptr_SOURCES) \
+  $(check_bin_soa_SOURCES) \
+  $(check_bin_srv_SOURCES) \
+  $(check_bin_txt_SOURCES) \
+  $(check_bin_uri_SOURCES) \
+  $(end)
+src_tests_query_MODULES_SET = \
+  $(lib_libtest_query_la_MODULES) \
+  $(check_bin_a_MODULES) \
+  $(check_bin_aaaa_MODULES) \
+  $(check_bin_mx_MODULES) \
+  $(check_bin_naptr_MODULES) \
+  $(check_bin_ns_MODULES) \
+  $(check_bin_ptr_MODULES) \
+  $(check_bin_soa_MODULES) \
+  $(check_bin_srv_MODULES) \
+  $(check_bin_txt_MODULES) \
+  $(check_bin_uri_MODULES) \
+  $(end)
+src_tests_query_OBJECTS_SET = \
+  $(lib_libtest_query_la_OBJECTS) \
+  $(check_bin_a_OBJECTS) \
+  $(check_bin_aaaa_OBJECTS) \
+  $(check_bin_mx_OBJECTS) \
+  $(check_bin_naptr_OBJECTS) \
+  $(check_bin_ns_OBJECTS) \
+  $(check_bin_ptr_OBJECTS) \
+  $(check_bin_soa_OBJECTS) \
+  $(check_bin_srv_OBJECTS) \
+  $(check_bin_txt_OBJECTS) \
+  $(check_bin_uri_OBJECTS) \
+  $(end)
+
+lib_libtest_query_la = lib/libtest-query.la
+lib_libtest_query_la_LIBADD = $(nothing)
+lib_libtest_query_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libtest_query_la_SOURCES))
+lib_libtest_query_la_SOURCES = \
+  obj/src/tests/query/namespace.cpp \
+  obj/src/tests/query/address.cpp \
+  $(end)
+
+check_bin_a = check/bin/a
+check_bin_a_LDADD = $(lib_libares_module_la)
+check_bin_a_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_a_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_a_SOURCES))
+check_bin_a_SOURCES = obj/src/tests/query/a.cpp 
+
+check_bin_aaaa = check/bin/aaaa
+check_bin_aaaa_LDADD = $(lib_libares_module_la)
+check_bin_aaaa_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_aaaa_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_aaaa_SOURCES))
+check_bin_aaaa_SOURCES = obj/src/tests/query/aaaa.cpp 
+
+check_bin_mx = check/bin/mx
+check_bin_mx_LDADD = $(lib_libares_module_la)
+check_bin_mx_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_mx_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_mx_SOURCES))
+check_bin_mx_SOURCES = obj/src/tests/query/mx.cpp 
+
+check_bin_naptr = check/bin/naptr
+check_bin_naptr_LDADD = $(lib_libares_module_la)
+check_bin_naptr_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_naptr_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_naptr_SOURCES))
+check_bin_naptr_SOURCES = obj/src/tests/query/naptr.cpp 
+
+check_bin_ns = check/bin/ns
+check_bin_ns_LDADD = $(lib_libares_module_la)
+check_bin_ns_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_ns_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_ns_SOURCES))
+check_bin_ns_SOURCES = obj/src/tests/query/ns.cpp 
+
+check_bin_ptr = check/bin/ptr
+check_bin_ptr_LDADD = $(lib_libares_module_la)
+check_bin_ptr_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_ptr_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_ptr_SOURCES))
+check_bin_ptr_SOURCES = obj/src/tests/query/ptr.cpp 
+
+check_bin_soa = check/bin/soa
+check_bin_soa_LDADD = $(lib_libares_module_la)
+check_bin_soa_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_soa_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_soa_SOURCES))
+check_bin_soa_SOURCES = obj/src/tests/query/soa.cpp 
+
+check_bin_srv = check/bin/srv
+check_bin_srv_LDADD = $(lib_libares_module_la)
+check_bin_srv_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_srv_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_srv_SOURCES))
+check_bin_srv_SOURCES = obj/src/tests/query/srv.cpp 
+
+check_bin_txt = check/bin/txt
+check_bin_txt_LDADD = $(lib_libares_module_la)
+check_bin_txt_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_txt_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_txt_SOURCES))
+check_bin_txt_SOURCES = obj/src/tests/query/txt.cpp 
+
+check_bin_uri = check/bin/uri
+check_bin_uri_LDADD = $(lib_libares_module_la)
+check_bin_uri_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+check_bin_uri_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_uri_SOURCES))
+check_bin_uri_SOURCES = obj/src/tests/query/uri.cpp 
+$(scold_cxxdir)/tests/query/dependencies.mk: $(src_tests_query_SOURCES_SET)
+$(src_tests_query_SOURCES_SET) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/query/dependencies.mk: # GNU make in normal operations
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/query/dependencies.mk #       automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/tests/query/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/query/dependencies.mk

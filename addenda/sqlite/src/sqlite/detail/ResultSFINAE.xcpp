@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace detail {
+    // SFINAE = Substitution Failure Is Not An Error
+    template<typename RESULT> struct ResultSFINAE;
+  }
+}
+#endiv
+#divert <hpp>
+template<typename RESULT> struct sqlite::detail::ResultSFINAE {
+  //
+  // The typedef is public so it is useable depending upon
+  // how the descendant class inherits from ResultSFINAE<RESULT>
+  //
+  //    disallowed --->   private ResultSFINAE<RESULT>
+  //    allowed    --->   public ResultSFINAE<RESULT>
+  //
+  using result_type = RESULT;
+};
+#endiv

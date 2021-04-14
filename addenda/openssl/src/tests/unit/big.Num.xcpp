@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::big { class Num; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.big.Num
+class tests::unit::big::Num : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::big::Num;
+  auto test_constructor_default() -> void;
+  auto test_constructor_conversion() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_assignment_conversion() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::big::Num::test_constructor_default() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::big::Num::test_constructor_conversion() -> void {
+  Subject subject{33};
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import std.move
+auto tests::unit::big::Num::test_constructor_move() -> void {
+  Subject specimen{33};
+  Subject subject{std::move(specimen)};
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::big::Num::test_assignment_move() -> void {
+  Subject specimen{33};
+  Subject subject;
+  subject = std::move(specimen);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::big::Num::test_assignment_conversion() -> void {
+  Subject subject;
+  subject = 44;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import rigging.suite.io
+auto tests::unit::big::Num::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Num");
+  {
+    Stream con("constructor");
+    con << call("default", &Num::test_constructor_default)
+        << call("conversion", &Num::test_constructor_conversion)
+        << call("move", &Num::test_constructor_move)
+      ;
+    series << move(con);
+  } {
+    Stream ass("assignment");
+    ass << call("move", &Num::test_assignment_move)
+        << call("assignment", &Num::test_assignment_conversion)
+      ;
+    series << move(ass);
+  }
+  return finalize(series);
+}
+#endiv

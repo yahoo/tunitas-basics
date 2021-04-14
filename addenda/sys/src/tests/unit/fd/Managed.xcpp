@@ -1,0 +1,219 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::fd { class Managed; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.fd.Managed
+#import sys.id.File
+#import sys.posix.O
+class tests::unit::fd::Managed : public cppunit::test::Fixture {
+public:
+  using Subject = ::sys::fd::Managed;
+  using File = ::sys::id::File;
+  using O = ::sys::posix::O;
+  auto test_constructor_default() -> void;
+  auto test_constructor_adopt_int() -> void;
+  auto test_constructor_adopt_File() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_close() -> void;
+  auto test_is_open() -> void;
+  auto test_release_default() -> void;
+  auto test_release_int() -> void;
+  auto test_release_File() -> void;
+  auto test_get_default() -> void;
+  auto test_get_int() -> void;
+  auto test_get_File() -> void;
+  auto test_reset_default() -> void;
+  auto test_reset_int() -> void;
+  auto test_reset_File() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::fd::Managed::test_constructor_default() -> void {
+  auto subject = Subject{}; // <------------------------- test this
+  CPPUNIT_ASSERT(!subject.is_open());
+}
+#import sys.posix.open
+auto tests::unit::fd::Managed::test_constructor_adopt_int() -> void {
+  auto opened = sys::posix::native::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  int raw_fd = value(opened);
+  auto subject = Subject{raw_fd}; // <------------------ test this
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_constructor_adopt_File() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  File raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd}; // <------------------ test this
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_constructor_move() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto original = Subject{raw_fd};
+  CPPUNIT_ASSERT(original.is_open());
+  auto subject = Subject{move(original)}; // <----------- test this
+  CPPUNIT_ASSERT(!original.is_open());
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_assignment_move() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto original = Subject{raw_fd};
+  CPPUNIT_ASSERT(original.is_open());
+  Subject subject;
+  subject = Subject{move(original)}; // <----------- test this
+  CPPUNIT_ASSERT(!original.is_open());
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_close() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  CPPUNIT_ASSERT(subject.is_open());
+  subject.close(); // <--------------------------------- test this
+  CPPUNIT_ASSERT(!subject.is_open());
+}
+auto tests::unit::fd::Managed::test_is_open() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  CPPUNIT_ASSERT(subject.is_open()); // <--------------- test this
+}
+auto tests::unit::fd::Managed::test_get_default() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto fd = subject.get(); // <--------------- test this
+  CPPUNIT_ASSERT(File{-1} != fd);
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_get_int() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto fd = subject.get<int>(); // <--------------- test this
+  CPPUNIT_ASSERT(int{-1} != fd);
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_get_File() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto fd = subject.get<File>(); // <--------------- test this
+  CPPUNIT_ASSERT(File{-1} != fd);
+  CPPUNIT_ASSERT(subject.is_open());
+}
+auto tests::unit::fd::Managed::test_reset_default() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  subject.reset(); // <------------------------------ test this
+  CPPUNIT_ASSERT(!subject.is_open());
+}
+auto tests::unit::fd::Managed::test_reset_int() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  subject.reset(int{-1}); // <------------------------------ test this
+  CPPUNIT_ASSERT(!subject.is_open());
+}
+auto tests::unit::fd::Managed::test_reset_File() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  subject.reset(File{-1}); // <------------------------------ test this
+  CPPUNIT_ASSERT(!subject.is_open());
+}
+auto tests::unit::fd::Managed::test_release_default() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto doomed = Subject{subject.release()}; // <--------------- test this
+  CPPUNIT_ASSERT(!subject.is_open());
+  CPPUNIT_ASSERT(doomed.is_open());
+}
+auto tests::unit::fd::Managed::test_release_int() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto doomed = Subject{subject.release<int>()}; // <--------------- test this
+  CPPUNIT_ASSERT(!subject.is_open());
+  CPPUNIT_ASSERT(doomed.is_open());
+}
+auto tests::unit::fd::Managed::test_release_File() -> void {
+  auto opened = sys::posix::open("/dev/null", O::READONLY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto raw_fd = File{value(opened)};
+  auto subject = Subject{raw_fd};
+  auto doomed = Subject{subject.release<File>()}; // <--------------- test this
+  CPPUNIT_ASSERT(!subject.is_open());
+  CPPUNIT_ASSERT(doomed.is_open());
+}
+#import rigging.suite.io
+auto tests::unit::fd::Managed::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Managed");
+  series << []() {
+              Stream con("constructor");
+              con << call("default", &Managed::test_constructor_default)
+                  << call("int", &Managed::test_constructor_adopt_int)
+                  << call("File", &Managed::test_constructor_adopt_File)
+                  << call("move", &Managed::test_constructor_move)
+                ;
+              return move(con);
+            }()
+         << []() {
+              Stream ass("assignment");
+              ass << call("move", &Managed::test_assignment_move)
+                ;
+              return move(ass);
+            }()
+         << call("close", &Managed::test_close)
+         << call("is_open", &Managed::test_is_open)
+         << []() {
+              Stream res{"reset"};
+              res << call("default", &Managed::test_reset_default)
+                  << call("int", &Managed::test_reset_int)
+                  << call("File", &Managed::test_reset_File)
+                ;
+              return move(res);
+            }()
+         << []() {
+              Stream rel{"release"};
+              rel << call("default", &Managed::test_release_default)
+                  << call("int", &Managed::test_release_int)
+                  << call("File", &Managed::test_release_File)
+                ;
+              return move(rel);
+            }()
+         << []() {
+              Stream get{"get"};
+              get << call("default", &Managed::test_get_default)
+                  << call("int", &Managed::test_get_int)
+                  << call("File", &Managed::test_get_File)
+                ;
+              return move(get);
+            }()
+    ;
+  return finalize(series);
+}
+#endiv

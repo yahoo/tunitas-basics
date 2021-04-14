@@ -1,0 +1,64 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::call::result {
+  class Value;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::call::result::Value : public cppunit::test::Fixture { 
+public: 
+  auto test_Value_bool() -> void;
+  auto test_Value_int() -> void;
+  auto test_Value_container() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import std.string_literals
+#import sys.call.result.Value
+auto tests::unit::call::result::Value::test_Value_bool() -> void {
+  {
+    bool const val = false;
+    sys::call::result::Value<bool> r(true, 33, val);
+    CPPUNIT_ASSERT(ok(r));
+    CPPUNIT_ASSERT(33 == errnum(r));
+    CPPUNIT_ASSERT(val == value(r));
+  } {
+    std::string const val = "snowpack";
+    sys::call::result::Value<std::string> r(true, 99, val);
+    CPPUNIT_ASSERT(ok(r));
+    CPPUNIT_ASSERT(99 == errnum(r));
+    CPPUNIT_ASSERT(val == value(r));
+  }
+}
+auto tests::unit::call::result::Value::test_Value_int() -> void {
+  int val = 99;
+  sys::call::result::Value<int> r(true, 0, val);
+  CPPUNIT_ASSERT(ok(r));
+  CPPUNIT_ASSERT(99 == value(r));
+}
+#import std.set
+auto tests::unit::call::result::Value::test_Value_container() -> void {
+  std::set<int> val{1, 3, 5, 7, 9};
+  sys::call::result::Value<std::set<int>> r(true, 0, val);
+  CPPUNIT_ASSERT(ok(r));
+  CPPUNIT_ASSERT(5 == value(r).size());
+}
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+#import rigging.unit.suite.add
+auto tests::unit::call::result::Value::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  using ::rigging::unit::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Value");
+  series << call("bool", &Value::test_Value_bool)
+         << call("int", &Value::test_Value_int)
+         << call("container", &Value::test_Value_container)
+    ;
+  return finalize(series);
+}
+#endiv

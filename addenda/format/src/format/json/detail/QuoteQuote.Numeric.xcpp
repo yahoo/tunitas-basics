@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import format.json.detail.QuoteQuote
+#import format.json.required.Numeric
+#import std.basic_ostream
+namespace format::json::detail {
+  template<typename CHAR, typename TRAITS, typename NUMERIC> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, QuoteQuote<NUMERIC> const &) -> std::basic_ostream<CHAR, TRAITS> & requires required::Numeric<NUMERIC>;
+}
+#endiv
+#divert <ipp>
+#import format.json.detail.QuoteQuote
+template<typename CHAR, typename TRAITS, typename NUMERIC> auto format::json::detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, QuoteQuote<NUMERIC> const &q) -> std::basic_ostream<CHAR, TRAITS> & requires required::Numeric<NUMERIC> {
+  if (o) {
+    CHAR const QQ('"');
+    //
+    // policy: NOT reconfiguring the stream to use std:;, std::defaultfloat
+    //         ... it is up to the caller ot do t hat.
+    //
+    // whereas numbers cannot have unsafe characters in them, by definition, emit them directly.
+    o << QQ << q.value << QQ;
+  }
+  return o;
+}
+#endiv

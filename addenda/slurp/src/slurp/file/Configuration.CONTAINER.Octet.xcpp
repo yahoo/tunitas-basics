@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward slurp.file.Configuration.declaration
+#import nonstd.required.Octet
+#import nonstd.required.Allocator
+namespace slurp::file {
+  // e.g. CONTAINER = std::vector
+  template<template<typename, typename> class CONTAINER, nonstd::required::Octet OCTET, nonstd::required::Allocator ALLOC> struct Configuration<CONTAINER<OCTET, ALLOC>>;
+}
+#endiv
+#divert <hpp>
+#import slurp.file.istream.Iterator
+#import std.back_insert_iterator
+template<template<typename, typename> class CONTAINER, nonstd::required::Octet OCTET, nonstd::required::Allocator ALLOC> struct slurp:: file::Configuration<CONTAINER<OCTET, ALLOC>> {
+  // New School
+  using Container = CONTAINER<OCTET, ALLOC>;
+  using Element = typename Container::value_type;
+  using Input = istream::Iterator<Element>;
+  using Output = std::back_insert_iterator<Container>;
+  // old_school
+  using container_type = Container;
+  using element_type = Element;
+  using input_iterator = Input;
+  using output_iterator = Output;
+};
+#endiv

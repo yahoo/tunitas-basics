@@ -1,0 +1,64 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+namespace nonstd {
+  //
+  // Is it like a std::basic_dope?
+  // Contrast Dopelike & Spanlike
+  //
+  // The requirements for a "dope vector" are just base-and-bounds.
+  // Participation in the concept is enabled by a traits class.
+  // Specializations declared with the candidates provide the enablement.
+  //
+  // Where the names are part of the public interface, they use "snake case" to rhyme with
+  // the STL classes that they align with.  e.g. basic_string. basic_string_view, iterator_traits
+  // Where the names are not part of the public interface, the SCOLD Naming Convention is used.
+  //
+  namespace doping {
+    // These need to appear at <fpp> because they are mentioned in the required concept.
+    template<typename UNIT> struct Traits {
+      using Value = UNIT;
+      using Data = UNIT *;
+      using Size = std::size_t;
+    };
+    template<typename UNIT> struct Traits<UNIT const> {
+      using Value = UNIT;
+      using Data = UNIT const *;
+      using Size = std::size_t;
+    };
+  }
+  template<typename DOPE> struct basic_dope_traits; // specialized in basic_dope.xcpp at <fpp>
+  namespace required {
+    template<typename DOPELIKE> concept bool Dopelike = requires(DOPELIKE like) {
+      typename basic_dope_traits<DOPELIKE>::Value;
+      typename basic_dope_traits<DOPELIKE>::Data;
+      typename basic_dope_traits<DOPELIKE>::Size;
+      // An indexing operator need not be supplied, just the rudimentary base+bound scheme.
+      { like.size() } -> typename basic_dope_traits<DOPELIKE>::Size;
+      { like.empty() } -> bool;
+      { like.data() } -> typename basic_dope_traits<DOPELIKE>::Data;
+    };
+  }
+}
+#endiv
+#divert <cpp>
+#import std.string
+#import std.string_view
+#import std.vector
+#import nonstd.dope
+#import nonstd.const_dope
+namespace nonstd::required {
+  // Testify!
+  //
+  // OK: uses "new school" type names Value, Data, Size
+  static_assert(Dopelike<basic_dope<char>>);
+  static_assert(Dopelike<basic_dope<char const>>);
+  //
+  // NOT: uses "old school" type names value_type, <no such>, size_type
+  static_assert(!Dopelike<std::string>);
+  static_assert(!Dopelike<std::string_view>);
+  static_assert(!Dopelike<std::vector<char>>);
+  static_assert(!Dopelike<std::vector<char>>);
+}
+#endiv

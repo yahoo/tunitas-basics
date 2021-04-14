@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::stack { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::stack::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Stack() -> void;
+  auto test_usage_Stack0() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::stack::Fixture::test_usage_Stack() -> void {
+#warning WRITETHIS auto tests::unit::stack::Fixture::test_usage_Stack() -> void
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::stack::Fixture::test_usage_Stack0() -> void {
+#warning WRITETHIS auto tests::unit::stack::Fixture::test_usageStack0() -> void
+  CPPUNIT_ASSERT(true);
+}
+#import openssl.x509.Extension
+#import openssl.x509.Extension0
+#import openssl.x509.Revoked
+#import openssl.x509.Revoked0
+#import tests.unit.stack.Stack
+#import tests.unit.stack.Stack0
+#import rigging.suite.io
+auto tests::unit::stack::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("stack");
+  {
+    Stream use("usage");
+    use << call("Stack", &Fixture::test_usage_Stack)
+        << call("Stack0", &Fixture::test_usage_Stack0)
+    ;
+    series << move(use);
+  }
+  namespace rig = tests::unit::stack;
+  series << add<rig::Stack<::openssl::Stack<::openssl::x509::Extension>>>()
+         << add<rig::Stack0<::openssl::Stack0<::openssl::x509::Extension0>>>()
+         << add<rig::Stack<::openssl::Stack<::openssl::x509::Revoked>>>()
+         << add<rig::Stack0<::openssl::Stack0<::openssl::x509::Revoked0>>>()
+    ;
+  return finalize(series);
+}
+#endiv

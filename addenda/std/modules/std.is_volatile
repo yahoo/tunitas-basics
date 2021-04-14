@@ -1,0 +1,3 @@
+// -*- c++ -*- 525fa184-7091-49f0-ace1-50a4ede2fc91
+#pragma once
+#include <type_traits>

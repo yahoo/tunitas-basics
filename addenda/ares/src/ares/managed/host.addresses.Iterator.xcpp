@@ -1,0 +1,86 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.key
+namespace ares::managed::host::addresses {
+  //
+  // The iterator over the host addresses, of a particular genre (IPv4 or IPv6).
+  // 
+  // Usage: see host::Addresses<ADDR4>, host::Addresses<ADDR6>
+  //
+  template<Address_Genre> class Iterator;
+}
+#import ares.managed.host.addresses.Iterator.iterator_traits
+#endiv
+#divert <hpp>
+namespace ares::managed::host::addresses {
+  template<Address_Genre GENRE> inline auto swap(Iterator<GENRE> &, Iterator<GENRE> &) noexcept -> void;
+  template<Address_Genre GENRE> inline auto operator==(Iterator<GENRE> const &, Iterator<GENRE> const &) -> bool;
+  template<Address_Genre GENRE> inline auto operator!=(Iterator<GENRE> const &, Iterator<GENRE> const &) -> bool;
+}
+#forward ares.managed.host.Addresses
+#import ares.managed.host.addresses.Traits
+#import c.const_vector
+namespace ares::managed::host {
+  template<Address_Genre THE_GENRE> class addresses::Iterator {
+    using Subiterator = c::const_vector::const_iterator;
+    inline explicit Iterator(Subiterator);
+    inline static constexpr auto GENRE = THE_GENRE;
+    friend class host::Addresses<GENRE>;
+  public:
+    using Value = Traits<GENRE>; // ... New School
+    using value_type = Value; // ...... old_school
+    inline Iterator();
+    // Throws if the iterator equals end(); unspecified what happens if the iterator is after the end
+    inline auto operator*() const -> Value const &;
+    // These operations are unchecked (and uncheckable)
+    inline auto operator++() -> Iterator &;
+    inline auto operator++(int) -> Iterator;
+    inline auto operator--() -> Iterator &;
+    inline auto operator--(int) -> Iterator;
+  private:
+    Subiterator subiterator;
+    friend auto addresses::swap<>(Iterator &, Iterator &) noexcept -> void;
+    friend auto addresses::operator==<>(Iterator const &, Iterator const &) -> bool;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.swap
+namespace ares::managed::host {
+  template<Address_Genre GENRE> auto addresses::swap(Iterator<GENRE> &a, Iterator<GENRE> &b) noexcept -> void { return std::swap(a.subiterator, b.subiterator); }
+  template<Address_Genre GENRE> auto addresses::operator==(Iterator<GENRE> const &a, Iterator<GENRE> const &b) -> bool { return a.subiterator == b.subiterator; }
+  template<Address_Genre GENRE> auto addresses::operator!=(Iterator<GENRE> const &a, Iterator<GENRE> const &b) -> bool { return !operator=(a, b); }
+}
+#import ares.exception.Null
+namespace ares::managed::host::addresses {
+  template<Address_Genre _> Iterator<_>::Iterator()
+    : subiterator{nullptr}
+  { }
+  template<Address_Genre _> auto Iterator<_>::operator*() const -> Value const & {
+    if (nullptr == subiterator || nullptr == *subiterator) {
+      throw exception::Null{};
+    }
+    return *subiterator;
+  }
+  template<Address_Genre _> auto Iterator<_>::operator++() -> Iterator & {
+    ++subiterator; // n.b. this is unchecked
+    return *this;
+  }
+  template<Address_Genre _> auto Iterator<_>::operator++(int) -> Iterator {
+    Iterator old{*this};
+    operator++();
+    return old;
+  }
+  template<Address_Genre _> auto Iterator<_>::operator--() -> Iterator & {
+    --subiterator; // n.b. this is unchecked
+    return *this;
+  }
+  template<Address_Genre _> auto Iterator<_>::operator--(int) -> Iterator {
+    Iterator old{*this};
+    operator--();
+    return old;
+  }
+}
+#import ares.managed.host.Addresses // match the #forward, above
+#endiv

@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.rsa.Bits
+#forward openssl.rsa.Pair
+namespace openssl::rsa {
+  //
+  // Generate an RSA Pair
+  //
+  inline auto generate(Bits) -> Pair;
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+#import openssl.big.Num
+#import openssl.error.Code
+#import openssl.rsa.Pair
+#import std.error_code
+#import std.move
+auto openssl::rsa::generate(Bits bits) -> Pair {
+  //
+  // https://www.openssl.org/docs/manmaster/man3/RSA_generate_key.html
+  //   <quote>RSA_generate_key_ex() generates a 2-prime RSA key pair and stores it in the RSA structure provided in rsa.
+  //   The pseudo-random number generator must be seeded prior to calling RSA_generate_key_ex().</quote>
+  //
+  // int RSA_generate_key_ex(RSA *rsa, int bits, BIGNUM *e, BN_GENCB *cb);
+  // RSA *RSA_generate_key(int num, unsigned long e, void (*callback)(int, int, void *), void *callback_data);
+  //
+  // https://en.wikipedia.org/wiki/65,537
+  //   <quote>65537 is commonly used as a public exponent in the RSA cryptosystem.
+  //   Because it is the Fermat number Fn = 2^2^n + 1 with n = 4, the common shorthand is "F4" or "F4".</quote>
+  //
+  // https://www.openssl.org/docs/man1.0.2/man1/genrsa.html
+  //  genrsa -F4|-3
+  //  the public exponent to use, either 65537 or 3. The default is 65537.
+  //
+  auto standard_exponent = true ? RSA_F4 : RSA_3;
+  if constexpr (true) {
+    Pair pair;
+    BN_GENCB *callback = nullptr;
+    big::Num exponent{standard_exponent};
+    auto ok = RSA_generate_key_ex(pair.get(), (int) bits, exponent.get(), callback);
+    if (!ok) {
+      throw std::error_code{error::Code::RSA};
+    }
+    return pair;
+  } else {
+    auto const exponent = standard_exponent;
+    auto const callback_function = nullptr;
+    auto const callback_data = nullptr;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    // n.b. this call was deprecated in 0.9.8 (you should see the deprecation warning)
+    return Pair{RSA_generate_key((int)bits, exponent, callback_function, callback_data)};
+#pragma GCC diagnostic pop
+  }
+}
+#endiv

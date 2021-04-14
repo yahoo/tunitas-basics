@@ -1,0 +1,12 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_r_SOURCES_SET = \
+  obj/src/tests/unit/r/namespace.cpp \
+  obj/src/tests/unit/r/Fixture.cpp \
+  obj/src/tests/unit/r/limit.Fixture.cpp \
+  obj/src/tests/unit/r/usage.Fixture.cpp \
+  $(end)

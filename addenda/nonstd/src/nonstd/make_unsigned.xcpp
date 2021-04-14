@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd {
+  //
+  // make_unsigned, but for a broader range of nonstd integer numbers.
+  //
+  // http://en.cppreference.com/w/cpp/types/make_unsigned
+  //
+  // make_unsigned<T>::type
+  // make_unsigned_t<T>
+  //
+  // Reminder: cv-qualifications are not dropped.
+  template<typename NUMBER> struct make_unsigned;
+  template<typename NUMBER> using make_unsigned_t = typename make_unsigned<NUMBER>::type;
+}
+#entail nonstd.make_unsigned.int128
+#endiv
+#divert <hpp>
+#import std.make_unsigned
+template<typename NUMBER> struct nonstd::make_unsigned : public std::make_unsigned<NUMBER> { };
+#endiv

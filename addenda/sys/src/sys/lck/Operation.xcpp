@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <fcntl.h> // availability as doumented in fcntl(2)
+namespace sys::lck {
+  //
+  // The lock and lease operation enumeration
+  // Suitable for getlease(3) and F::GETLEASE
+  //          for setlease(3) and F::SETLEASE
+  // Suitable for all the various process-associated and file-associated locks
+  //          for getlock(3) and F::GETLOCK
+  //          for setlock(3) and F::GETLOCK
+  //          for getlock_process(3) ...blah blah blah...
+  //          for setlock_process(3)
+  //          for getlock_file(3)
+  //          for setlock_file(3)
+  //
+  // Usage:
+  //
+  //   see sys::lock::Operation
+  //   see sys::lease::Operation
+  //
+  template<typename TAG> struct [[detail]] Operation {
+    enum class [[detail]] Series {
+      READ     = F_RDLCK,
+      WRITE    = F_WRLCK,
+      UNLOCK   = F_UNLCK,
+      END      = UNLOCK, // prefer; either lock or lease
+      ENDLEASE = UNLOCK, // use in the appropriate context
+      ENDLOCK  = UNLOCK, // ibidem
+      RD [[deprecated("spell it out! instead, prefer Operation::READ")]]   = READ,
+      WR [[deprecated("spell it out! instead, prefer Operation::WRITE")]]  = WRITE,
+      UN [[deprecated("spell it out! instead, prefer Operation::UNLOCK")]] = UNLOCK,
+    };
+  };
+}
+#endiv

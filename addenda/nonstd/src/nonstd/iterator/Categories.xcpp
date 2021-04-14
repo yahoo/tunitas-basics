@@ -1,0 +1,10 @@
+// -*- c++ -*- C++23+ with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.iterator.category.Output
+#import nonstd.iterator.category.Input
+#import nonstd.iterator.category.Forward
+#import nonstd.iterator.category.Bidirectional
+#import nonstd.iterator.category.Undirected // ...... The New Way
+#import nonstd.iterator.category.Random_Access // ... for convenience and (standards-) compatibility
+#import nonstd.iterator.category.Contiguous
+#endiv

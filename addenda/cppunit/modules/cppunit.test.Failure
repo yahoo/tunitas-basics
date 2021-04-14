@@ -1,0 +1,8 @@
+// -*- c++ -*- daa5384a-a230-4b61-a953-603ae3b807f7
+#pragma once
+#include <cppunit/TestFailure.h>
+namespace cppunit {
+  namespace test {
+    using Failure = CppUnit::TestFailure;
+  }
+}

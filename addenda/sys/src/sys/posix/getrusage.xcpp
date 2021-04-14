@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.usage.interface
+namespace sys::posix {
+  namespace packaging::getrusage {
+    using namespace packaging::usage::interface;
+    namespace function {
+      inline auto getrusage(Usage, [[out]] rusage &) -> Status;
+    }
+  }
+  using packaging::getrusage::function::getrusage;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::getrusage {
+  auto function::getrusage(Usage resource, rusage &fill) -> Status { return idiomatic::syscall<int>(Syscall::GETRUSAGE, (int) resource, (rusage *) &fill); }
+}
+#endiv

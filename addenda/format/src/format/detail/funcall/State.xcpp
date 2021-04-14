@@ -1,0 +1,125 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail::funcall {
+  //
+  // Usage:
+  //     State<char const *> spec("f(", ",", ")");
+  //     finalize(initialize(out, spec) << "apple" << "banana" << "cherry");
+  //
+  template<typename HEAD, typename SEPARATOR = HEAD, typename TAIL = SEPARATOR> class State;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail::funcall {
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, State<HEAD, SEPARATOR, TAIL> const &) -> std::basic_ostream<CHAR, TRAITS> & = delete;
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, State<HEAD, SEPARATOR, TAIL> &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+template<typename HEAD, typename SEPARATOR, typename TAIL> class format::detail::funcall::State {
+public:
+  using head_type = HEAD;
+  using separator_type = SEPARATOR;
+  using tail_type = TAIL;
+  inline explicit State(head_type const &, separator_type const &, tail_type const &);
+  inline auto reset() -> void;
+  inline auto head() const -> head_type const &;
+  inline auto separator() const -> separator_type const &;
+  inline auto tail() const -> tail_type const &;
+  inline auto is_open() const -> bool;
+  inline auto is_arguments() const -> bool;
+  inline auto is_close() const -> bool;
+  inline auto is_done() const -> bool;
+  inline auto operator++() -> State &;
+  inline auto operator++(int) -> State;
+protected:
+  enum class Phase { OPEN, ARGUMENTS, CLOSE, DONE };
+  Phase phase;
+  head_type head_value;
+  separator_type separator_value;
+  tail_type tail_value;
+};
+#endiv
+#divert <ipp>
+template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto format::detail::funcall::operator<<(std::basic_ostream<CHAR, TRAITS> &o, State<HEAD, SEPARATOR, TAIL> &f) -> std::basic_ostream<CHAR, TRAITS> & {
+  if (o) {
+    if (f.is_open()) {
+      f++;
+      o << f.head();
+    } else if (f.is_arguments()) {
+      // no f++
+      o << f.separator();
+    } else if (f.is_close()) {
+      f++;
+      o << f.tail();
+    }
+  }
+  return o;
+}
+
+template<typename H, typename S, typename T> format::detail::funcall::State<H, S, T>::State(head_type const &arg_head, separator_type const &arg_separator, tail_type const &arg_tail)
+  : phase(Phase::OPEN)
+  , head_value(arg_head)
+  , separator_value(arg_separator)
+  , tail_value(arg_tail) {
+  ;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::reset() -> void {
+  phase = Phase::OPEN;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::head() const -> head_type const & {
+  return head_value;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::separator() const -> separator_type const & {
+  return separator_value;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::tail() const -> tail_type const & {
+  return tail_value;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::is_open() const -> bool {
+  return phase == Phase::OPEN;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::is_arguments() const -> bool {
+  return phase == Phase::ARGUMENTS;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::is_close() const -> bool {
+  return phase == Phase::CLOSE;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::is_done() const -> bool {
+  return phase == Phase::DONE;
+}
+
+#import std.invalid_argument
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::operator++() -> State & {
+  switch (phase) {
+  case Phase::OPEN:
+    phase = Phase::ARGUMENTS;
+    break;
+  case Phase::ARGUMENTS:
+    phase = Phase::CLOSE;
+    break;
+  case Phase::CLOSE:
+    phase = Phase::DONE;
+    break;
+  case Phase::DONE:
+  default:
+    throw std::invalid_argument("operator++ on DONE");
+  }
+  return *this;
+}
+
+template<typename H, typename S, typename T> auto format::detail::funcall::State<H, S, T>::operator++(int) -> State {
+  State old(*this);
+  operator++();
+  return old;
+}
+#endiv

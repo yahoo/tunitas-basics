@@ -1,0 +1,42 @@
+#!/bin/sh
+
+function make_unsigned() {
+    local prenumber=$1
+    local number=$(expr "$prenumber" : '^\([0-9]*\)u*')
+    local -a M=( $( (
+                echo "($number/2^96) % 2^32" ;
+                echo "($number/2^64) % 2^32" ;
+                echo "($number/2^32) % 2^32" ;
+                echo "($number/2^00) % 2^32" ) | bc) )
+    echo "{ uiconstant(${M[0]}lu, ${M[1]}lu, ${M[2]}lu, ${M[3]}lu), \"$number\" },"
+}
+
+function make_signed() {
+    local prenumber=$1
+    local sign
+    case $prenumber in
+        ( -* ) sign=-1;;
+        ( * ) sign=1;;
+    esac
+    local number=$(expr "$prenumber" : '^-*\([0-9]*\)s*')
+    local -a M=( $( (
+                echo "($number/2^96) % 2^32" ;
+                echo "($number/2^64) % 2^32" ;
+                echo "($number/2^32) % 2^32" ;
+                echo "($number/2^00) % 2^32" ) | bc) )
+    echo "{ siconstant($sign, ${M[0]}lu, ${M[1]}lu, ${M[2]}lu, ${M[3]}lu), \"$number\" },"
+}
+
+function make() {
+    local number=$1
+    case $number in
+        ( -* | *s ) make_signed $number ;;
+        ( * ) make_unsigned $number ;;
+    esac
+}
+
+# Concept
+# 1. generate some literals with bc (dc) using math expressions; e.g. 2^128-3
+# 2. convert to pre-literal constexpr expressions on stdin
+#
+while read number ; do make $number ; done

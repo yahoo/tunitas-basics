@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.copy
+#import std.is_copy_constructible
+namespace nonstd {
+  //
+  // A rhyming of std::move, but performs the copy constructor.
+  // This is a flourish.
+  //
+  using std::copy;
+  template<typename TYPE> auto copy(TYPE const &) -> TYPE requires std::is_copy_constructible_v<TYPE>;
+}
+#endiv
+#divert <ipp>
+template<typename TYPE> auto nonstd::copy(TYPE const &original) -> TYPE requires std::is_copy_constructible_v<TYPE> {
+  return TYPE{original};
+}
+#endiv

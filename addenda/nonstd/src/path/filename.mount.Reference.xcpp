@@ -1,0 +1,4 @@
+#divert <fpp>
+#import nonstd.path.filename.mount.Reference
+namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] mount { using ::nonstd::path::filename::mount::Reference; } } }
+#endiv

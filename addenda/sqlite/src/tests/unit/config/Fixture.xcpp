@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace config {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::config::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_unsafe_nop() -> void;
+  auto test_safe_nop() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.api.config
+#import sqlite.api.unguarded
+
+auto tests::unit::config::Fixture::test_unsafe_nop() -> void {
+  try {
+    CPPUNIT_ASSERT(ok(sqlite::api::initialize()));
+    auto code = sqlite::config::session::Code::NOP; // <-------------------- DIFFERENT
+    auto status = sqlite::api::unguarded::unsafe::config(code); // <-------- testing this (unguarded AND unsafe)
+    CPPUNIT_ASSERT(ok(status));
+    CPPUNIT_ASSERT(ok(sqlite::api::shutdown()));
+  } catch (...) {
+    sqlite::api::shutdown();
+  }
+}
+
+auto tests::unit::config::Fixture::test_safe_nop() -> void {
+  try {
+    CPPUNIT_ASSERT(ok(sqlite::api::initialize()));
+    auto code = sqlite::config::session::NOP::VALUE; // <--- DIFFERENT
+    auto status = sqlite::api::config(code); // <----------- testing this
+    CPPUNIT_ASSERT(ok(status));
+    CPPUNIT_ASSERT(ok(sqlite::api::shutdown()));
+  } catch (...) {
+    sqlite::api::shutdown();
+  }
+}
+
+#import tests.unit.config.Session
+#import tests.unit.config.Connection
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::config::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("config");
+  s << call("safe-nop", &Fixture::test_unsafe_nop)
+    << call("unsafe-nop", &Fixture::test_safe_nop)
+    << add(Session::suite())
+    << add(Connection::suite());
+    ;
+  return s.release();
+}
+#endiv

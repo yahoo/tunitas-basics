@@ -1,0 +1,3 @@
+tests_unit_byte_TESTS = \
+  tests/unit/byte/all.test \
+  $(end)

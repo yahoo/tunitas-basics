@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.constructible.School.template
+#import nonstd.exception.constructible.standard.Traits.std.filesystem.filesystem_error
+#include <hpp/nonstd.exception.constructible.standard.Traits.std.filesystem.filesystem_error> // we need the complete type with the traits defined therein
+#import std.filesystem.filesystem_error
+#import std.string_view
+#import std.string
+namespace nonstd::exception::constructible {
+  template<> struct School<std::filesystem::filesystem_error, std::string_view>;
+  template<> struct School<std::filesystem::filesystem_error, std::string>;
+}
+#endiv
+#divert <hpp>
+#import nonstd.exception.constructible.School.string.View
+#import nonstd.exception.constructible.School.string.Storage
+namespace nonstd::exception::constructible {
+  template<> struct School<std::filesystem::filesystem_error, std::string_view> { using Type = string::View<std::filesystem::filesystem_error>; };
+  template<> struct School<std::filesystem::filesystem_error, std::string>      { using Type = std::filesystem::filesystem_error; };
+}
+#endiv

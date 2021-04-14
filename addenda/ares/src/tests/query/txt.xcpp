@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.argv
+#import sys.exits.Code
+namespace tests::query::txt {
+  auto main(c::argv) -> sys::exits::Code;
+}
+#endiv
+#divert <cpp>
+auto main(int cc, char *vv[]) -> int { return tests::query::txt::main(c::argv(cc, vv)); }
+auto tests::query::txt::main(c::argv av) -> sys::exits::Code {
+  using namespace ares;
+  Library library;
+  auto chunnel = Channel{};
+  channel::Guard toolkeeper{chunnel};
+  auto const dnsclass = dns::IN;
+  auto const dnstype = dns::TXT;
+  auto ecode = sys::exits::OK;
+  auto const receive = [&ecode](error::Code code, Count timeouts, Buffer<std::byte const> buffer) -> void {
+                         if (error::Code::SUCCESS != code) {
+                           auto recode = std::error_code{code};
+                           std::cerr << "failed: " << recode.message() << '\n';
+                           ecode &= sys::exits::FAIL;
+                           return;
+                         }
+                         reply::Record<TXT> records;
+                         auto parsed = reply::parse<TXT>(std::nothrow, buffer, records);
+                         if (!ok(parsed)) {
+                           std::cerr << "failed: " << error_code(parsed).message() << '\n';
+                           ecode &= sys::exits::FAIL;
+                           return;
+                         };
+                         std::ostream &outbound{std::cout};
+                         for (auto const &record : records) {
+                           outbound << format::q(record.txt()) << '\n';
+                         }
+                         // [[FIXTHIS]] there was (English) grammar::plural(...)
+                         auto const records_noun = 1 == records.size() ? "record" : "records";
+                         auto const timeouts_noun = Count{1} == timeouts ? "timeout" : "timeouts";
+                         outbound << "found: " << records.size() << " " << records_noun << " after " << underlying(timeouts) << ' ' << timeouts_noun << '\n';
+                       };
+  for (std::string qdn : c::rest(av)) {
+    std::cout << "query " << format::q(qdn) << '\n';
+    qq(chunnel, qdn, dnsclass, dnstype, receive);
+    fd::Sets readies;
+    for (auto ccc=selectable(chunnel, readies); !zero(ccc); ccc=selectable(chunnel, readies)) {
+      select(ccc, readies, timeout(chunnel, REASONABLE_TIMEOUT));
+      process(chunnel, readies);
+    }
+  }
+  return ecode;
+}
+#endiv

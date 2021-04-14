@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sleep.interface
+namespace sys::posix {
+  //
+  // Follows usleep(3)
+  // Follows microsleep(...)
+  //
+  // Noted
+  //
+  //   (on Linux) extern "C" usleep(...) is implemented somehow
+  //   and so do we herein (implement it somehow, that is).
+  //
+  // Precision:
+  //
+  //   The sleep is specified in precision of microseconds.
+  //   For finer precision use an nanosleep(2) directly.
+  //
+  // Returns:
+  //
+  //   a normal syscall status code.
+  //   it does NOT return the time remaining in the dormant interval
+  //
+  namespace packaging::usleep {
+    using namespace packaging::sleep;
+    namespace interface {
+      using namespace packaging::sleep::interface;
+      namespace required = packaging::sleep::interface::required;
+      template<required::Integer REP, required::Ratio RATIO> inline auto usleep(duration::Duration<REP, RATIO> const &) -> result::Status;
+      inline auto usleep(time::Val const &) -> result::Status;
+      inline auto usleep(time::Spec const &) -> result::Status;
+    }
+  }
+  using packaging::usleep::interface::usleep;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.sleep.coerce
+#import sys.posix.packaging.sleep.status
+namespace sys::posix::packaging::usleep {
+  auto interface::usleep(time::Spec const &interval) -> result::Status { return status(coerce<duration::Microseconds>(interval)); }
+  auto interface::usleep(time::Val const &interval) -> result::Status  { return status(coerce<duration::Microseconds>(interval)); }
+  template<interface::required::Integer REP, interface::required::Ratio RATIO> auto interface::usleep(duration::Duration<REP, RATIO> const &interval) -> result::Status { return status(coerce<duration::Microseconds>(interval)); }
+}
+#endiv

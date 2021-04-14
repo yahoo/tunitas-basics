@@ -1,0 +1,62 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.Result
+#import sys.call.result.pipe.Value
+#import sys.f.Seals
+#import sys.fd.Flag
+#import sys.fd.Flags
+#import sys.id.File
+#import sys.o.Options
+#import sys.posix.required.rebundled // for fd::required<-->required::fd
+#import sys.posix.packaging.required // cascade namespace required
+#import sys.fd.required.Unmanaged
+namespace sys::posix::packaging::pipe::interface {
+  //
+  // This is a much simpler and much less noisy interface than packaging::fcntl::interface
+  //
+  namespace fd {
+    // obviously, only NONE or CLOEXEC
+    using Flag = sys::fd::Flag;
+    using Flags = sys::fd::Flags;
+  }
+  namespace o {
+    // reasonably, only O::NONE or O::CLOEXEC    from the o::Creates series
+    //             or O::DIRECT or O::NONBLOCK  from the o::Status series
+    //             NOT any of the o::Access series.
+    using Flags = sys::o::Options<sys::o::Create, sys::o::Status>;
+  }
+  using id::File;
+  using Size = std::size_t;
+  namespace result {
+    using Status = call::Result;
+    using Size = call::result::Value<Size>;
+    template<required::fd::Unmanaged FD> using Pipe = call::result::pipe::Value<FD>;
+  }
+  namespace bundle {
+    // Of course, bundling is an implementation detail to make the interface declarations cogent.
+    namespace create {
+      using Argument = id::File;
+      template<required::fd::Unmanaged FD> using Returned = result::Pipe<FD>;
+      using Status = result::Status;
+    }
+    namespace control {
+      // The fcntl controls for getpipe_size(3), setpipe_size(3)
+      using Argument = Size;
+      using Returned = result::Size;
+      using Status = result::Status;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.F
+#import sys.posix.FD
+#import sys.posix.O
+#import sys.posix.fcntl
+namespace sys::posix::packaging::pipe::interface {
+  using posix::F;
+  using posix::FD;
+  using posix::O;
+}
+#endiv

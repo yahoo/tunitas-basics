@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_SHUT.Usage
+//   static_assert(tests::usage::posix_SHUT::Usage<sys::posix::SHUT>);
+//
+#import sys.posix.SHUT
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_SHUT {
+  using sys::posix::SHUT;
+  namespace [[detail]] packaging {
+    template<typename SHUT> concept bool Instance = requires(SHUT) {
+      typename SHUT::Type;
+      requires model::Namespace_Object<SHUT>;
+      requires (int)SHUT::READ == SHUT_RD;
+      requires (int)SHUT::WRITE == SHUT_WR;
+      requires (int)SHUT::READWRITE == SHUT_RDWR;
+      requires (int)SHUT::RD == SHUT_RD;
+      requires (int)SHUT::WR == SHUT_WR;
+      requires (int)SHUT::RDWR == SHUT_RDWR;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<SHUT>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

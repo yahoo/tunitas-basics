@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.constructible.required.From
+#import nonstd.exception.constructible.required.Stringable
+namespace nonstd::exception::constructible {
+  //
+  // A tabular definition of new-vs-old
+  // Template indirection recording the standard exceptions
+  // Specializations only
+  //
+  // Concept:
+  // 
+  //   New School constructs with a std::string_view passed by value            (std::string_view)
+  //   old_school constructs with a std::string      passed by lvalue reference (std::string const &)
+  //
+  // Design:
+  //
+  //   Use a type aliase for the old school
+  //   Use a class (necessarily) for the New School.
+  //
+  // Usage:
+  //
+  //   The namespaces have type aliases
+  //   e.g. for std::domain_error
+  //
+  //   substd::exception::Domain is a type alias
+  //   nonstd::exception::Domain is a subtype
+  //
+  template<required::Stringable, required::From> struct School;
+}
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- aecc1289-61af-4516-9e22-e05fb8bed84a
+#pragma once
+#include <sys/signal.h>
+#include <sys/wait.h>

@@ -1,0 +1,64 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.flags.required.flagset.Class
+#import sys.flags.required.flagset.Enumeration
+#import sys.flags.required.flagset.Integral
+#import std.tuple
+namespace sys::flags {
+  //
+  // Assess whether exactly one bit is on or not.
+  // Return the index of the first bit set (starting from little endian side)
+  // [[FIXTHIS]] the C++20 era library has an explicit function that deals with this.
+  //
+  // Decision: zero is not "a flag".  Can't say that enuf.
+  // If you want to support the zero value being a "legal" flag then you must test for that explicitly.
+  //
+  // Usage:
+  //
+  //    auto something::something::dark_side::is_flag(Flags s) -> bool { return 1 == std::get<0>(flags::get_flag<Flag>(s, 0, 7)) }
+  //    auto something::something::dark_side::flagof(Flags s) -> Flag  { return std::get<1>(flags::get_flag<Flag>(s, 8, 15); }
+  //
+  template<typename FLAG, typename FLAGSET> inline auto get_flag(FLAGSET, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Class<FLAG, FLAGSET>;
+  template<typename FLAG, typename FLAGSET> inline auto get_flag(FLAGSET, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Enumeration<FLAG, FLAGSET>;
+  template<typename FLAG, typename FLAGSET> inline auto get_flag(FLAGSET, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Integral<FLAG, FLAGSET>;
+}
+#endiv
+#divert <ipp>
+#import std.underlying_type
+template<typename FLAG, typename FLAGSET> auto sys::flags::get_flag(FLAGSET flagset, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Class<FLAG, FLAGSET> {
+  using Underlying = typename FLAGSET::Value;
+  return get_flag<FLAG>(Underlying{flagset}, start, finish);
+}
+template<typename FLAG, typename FLAGSET> auto sys::flags::get_flag(FLAGSET flagset, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Enumeration<FLAG, FLAGSET> {
+  using Underlying = typename std::underlying_type_t<FLAGSET>;
+  return get_flag<FLAG>(Underlying(flagset), start, finish);
+}
+#import std.min
+#import std.max
+template<typename FLAG, typename FLAGSET> auto sys::flags::get_flag(FLAGSET flagset, unsigned start, unsigned finish) -> std::tuple<unsigned, FLAG, FLAG> requires required::flagset::Integral<FLAG, FLAGSET> {
+  if (0 == flagset) {
+    // If you were worried about this because the encoding specified that 0 "was a flag" then you need
+    // to have check this before calling is_flag.  The case of zero flags is demonstrably false; "is not a flag."
+    return {0u, FLAG{}, FLAG{}};
+  }
+  constexpr auto BYTE_COUNT = sizeof (FLAGSET);
+  using Size = decltype(BYTE_COUNT);
+  constexpr auto BITS_PER_BYTE = 8u;  // [[FIXTHIS]] get to nonstd::unit::Bit, Byte, etc.
+  constexpr auto BIT_COUNT = BITS_PER_BYTE * BYTE_COUNT;
+  unsigned count = 0;
+  auto first_flag = FLAG{};
+  auto first_mask = FLAG{};
+  // WATCHOUT ensure the loop terminates when wildly bad values crop up; e.g. finish < start
+  for (auto e{std::min<Size>(finish, BIT_COUNT)}, i{std::min<Size>(start, e)}; e != i; ++i) {
+    auto const mask = FLAGSET(1)<<i;
+    if (flagset == (mask & flagset)) {
+      if (0 == count++) {
+        first_flag = FLAG(i); // avoid the narrowing conversion when is_signed_v<underlying_type_t<FLAG>>
+        first_mask = FLAG(1<<i);
+      }
+    }
+  }
+  return {count, first_flag, first_mask};
+}
+#endiv

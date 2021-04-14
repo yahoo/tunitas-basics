@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// A husk for pipe-to execution.
+// This one is used to exercise the constructors.
+// As such, it provides direct access ot the ancestor's constructors.
+//
+// Usage:
+//
+//   Same as shell::run::Pipe_To
+//
+#include <tests.unit.run.Pipe_To>
+#endiv
+#divert <hpp>
+#import shell.run.Pipe_To
+class tests::unit::run::Pipe_To::Sink : public ::shell::run::Pipe_To {
+  using Ancestor = ::shell::run::Pipe_To;
+public:
+  using Ancestor::Pipe_To; // direct access to the ancestor's constructors.
+  // and no other new behaviors (no other fields or member functions)
+};
+#endiv

@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+#import std.is_same
+namespace sys::posix {
+  template<typename VALUE> inline auto ioctl(int fd, unsigned long key_name) -> call::result::Value<VALUE>;
+  template<typename VALUE> inline auto ioctl(int fd, unsigned long key_name, VALUE const &setting) -> call::Result;
+  template<> inline auto ioctl<void>(int fd, unsigned long key_name) -> call::result::Value<void>;
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+#import ioctl
+#import std.move
+template<typename VALUE> auto sys::posix::ioctl(int fd, unsigned long key_name) -> call::result::Value<VALUE> {
+  using Result = call::result::Value<VALUE>;
+  VALUE captured = VALUE();
+  int val = ::ioctl(fd, key_name, &captured);
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = val >= 0;
+  return Result{ok, errnum, captured};
+}
+
+template<typename VALUE> auto sys::posix::ioctl(int fd, unsigned long key_name, VALUE const &setting) -> call::Result {
+  using Result = call::Result;
+  int val = ::ioctl(fd, key_name, &setting);
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = val >= 0;
+  return Result{ok, errnum, val};
+}
+
+template<> auto sys::posix::ioctl<void>(int fd, unsigned long key_name) -> call::result::Value<void> {
+  using Result = call::result::Value<void>;
+  int val = ::ioctl(fd, key_name);
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = val >= 0;
+  return Result{ok, errnum};
+}
+#endiv

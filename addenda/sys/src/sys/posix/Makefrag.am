@@ -1,0 +1,626 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.11/01.black-platinum-hen series/v0.12/02.maroon-iron-crow series/v0.12/03.red-mercury-goose series/v0.13/04.green-copper-heron; do
+#       increment=$(git log $branch | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# API 452  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 320  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 200  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 81   reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+# reminder: here the C:R:A does NOT follow the core module, but drifts away from it slowly
+lib_libsys_posix_module_la_CURRENT = 474
+lib_libsys_posix_module_la_REVISION = 0
+lib_libsys_posix_module_la_AGE = 2
+lib_libsys_posix_module_la_CRA = $(lib_libsys_posix_module_la_CURRENT):$(lib_libsys_posix_module_la_REVISION):$(lib_libsys_posix_module_la_AGE)
+lib_libsys_posix_module_la_VERSION_INFO = -version-info $(lib_libsys_posix_module_la_CRA)
+
+lib_libsys_posix_module_la = lib/libsys-posix-module.la
+lib_libsys_posix_module_la_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET) -Wno-cpp # shut up our own warnings, (whatever they are)
+lib_libsys_posix_module_la_LIBADD = \
+  $(lib_libsys_log_la) \
+  $(lib_libwant_la) \
+  $(end)
+lib_libsys_posix_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libsys_posix_module_la_VERSION_INFO)
+lib_libsys_posix_module_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libsys_posix_module_la_SOURCES))
+lib_libsys_posix_module_la_SOURCES = \
+  obj/src/sys/posix/namespace.cpp \
+  obj/src/sys/posix/packaging/namespace.cpp \
+  $(src_sys_entry_SOURCES_SET) \
+  $(src_sys_posix_AF_SOURCES_SET) \
+  $(src_sys_posix_AT_SOURCES_SET) \
+  $(src_sys_posix_clear_SOURCES_SET) \
+  $(src_sys_posix_DN_SOURCES_SET) \
+  $(src_sys_posix_E_SOURCES_SET) \
+  $(src_sys_posix_EX_SOURCES_SET) \
+  $(src_sys_posix_EXIT_SOURCES_SET) \
+  $(src_sys_posix_F_SOURCES_SET) \
+  $(src_sys_posix_FD_SOURCES_SET) \
+  $(src_sys_posix_gid_SOURCES_SET) \
+  $(src_sys_posix_getent_pw_SOURCES_SET) \
+  $(src_sys_posix_getent_gr_SOURCES_SET) \
+  $(src_sys_posix_IPPROTO_SOURCES_SET) \
+  $(src_sys_posix_ITIMER_SOURCES_SET) \
+  $(src_sys_posix_LOCK_SOURCES_SET) \
+  $(src_sys_posix_MSG_SOURCES_SET) \
+  $(src_sys_posix_O_SOURCES_SET) \
+  $(src_sys_posix_OK_SOURCES_SET) \
+  $(src_sys_posix_P_SOURCES_SET) \
+  $(src_sys_posix_packaging_SOURCES_SET) \
+  $(src_sys_posix_PF_SOURCES_SET) \
+  $(src_sys_posix_Rseries_SOURCES_SET) \
+  $(src_sys_posix_required_SOURCES_SET) \
+  $(src_sys_posix_struct_SOURCES_SET) \
+  $(src_sys_posix_S_SOURCES_SET) \
+  $(src_sys_posix_SEEK_SOURCES_SET) \
+  $(src_sys_posix_SHUT_SOURCES_SET) \
+  $(src_sys_posix_SIG_SOURCES_SET) \
+  $(src_sys_posix_SOCK_SOURCES_SET) \
+  $(src_sys_posix_sockaddr_SOURCES_SET) \
+  $(src_sys_posix_sockaddr_traits_SOURCES_SET) \
+  $(src_sys_posix_uid_SOURCES_SET) \
+  $(src_sys_posix_W_SOURCES_SET) \
+  $(src_sys_posix_zero_SOURCES_SET) \
+  \
+  obj/src/sys/posix/accept.cpp \
+  obj/src/sys/posix/accept4.cpp \
+  obj/src/sys/posix/access.cpp \
+  obj/src/sys/posix/eaccess.cpp \
+  obj/src/sys/posix/euidaccess.cpp \
+  obj/src/sys/posix/alarm.cpp \
+  obj/src/sys/posix/bind.cpp \
+  obj/src/sys/posix/chdir.cpp \
+  obj/src/sys/posix/chmod.cpp \
+  obj/src/sys/posix/chown.cpp \
+  obj/src/sys/posix/lchown.cpp \
+  obj/src/sys/posix/fchown.cpp \
+  obj/src/sys/posix/fchownat.cpp \
+  obj/src/sys/posix/clearenv.cpp \
+  obj/src/sys/posix/close.cpp \
+  obj/src/sys/posix/connect.cpp \
+  obj/src/sys/posix/creat.cpp \
+  obj/src/sys/posix/create.cpp \
+  obj/src/sys/posix/daemon.cpp \
+  obj/src/sys/posix/dup2.cpp \
+  obj/src/sys/posix/dup3.cpp \
+  obj/src/sys/posix/dup.cpp \
+  obj/src/sys/posix/exec.const_stringz.cpp \
+  obj/src/sys/posix/exec.cpp \
+  obj/src/sys/posix/execp.const_stringz.cpp \
+  obj/src/sys/posix/execp.cpp \
+  obj/src/sys/posix/execp.string.cpp \
+  obj/src/sys/posix/exec.string.cpp \
+  obj/src/sys/posix/executable.cpp \
+  obj/src/sys/posix/exists.cpp \
+  $(src_sys_posix_fcntl_SOURCES_SET) \
+  obj/src/sys/posix/faccessat.cpp \
+  obj/src/sys/posix/fchdir.cpp \
+  obj/src/sys/posix/fchmodat.cpp \
+  obj/src/sys/posix/fchmod.cpp \
+  obj/src/sys/posix/fork.cpp \
+  obj/src/sys/posix/fstatat.cpp \
+  obj/src/sys/posix/fstat.cpp \
+  obj/src/sys/posix/getcwd.cpp \
+  obj/src/sys/posix/getenv.cpp \
+  obj/src/sys/posix/gethostname.cpp \
+  obj/src/sys/posix/getpeername.cpp \
+  obj/src/sys/posix/getsockname.cpp \
+  obj/src/sys/posix/getwd.cpp \
+  obj/src/sys/posix/gmtime.cpp \
+  obj/src/sys/posix/timegm.cpp \
+  obj/src/sys/posix/ioctl.cpp \
+  $(src_sys_posix_is_SOURCES_SET) \
+  $(src_sys_posix_itimer_SOURCES_SET) \
+  $(src_sys_posix_limit_SOURCES_SET) \
+  obj/src/sys/posix/linkat.cpp \
+  obj/src/sys/posix/link.cpp \
+  obj/src/sys/posix/listen.cpp \
+  obj/src/sys/posix/localtime.cpp \
+  obj/src/sys/posix/timelocal.cpp \
+  obj/src/sys/posix/lseek.cpp \
+  obj/src/sys/posix/lstat.cpp \
+  obj/src/sys/posix/mkdirat.cpp \
+  obj/src/sys/posix/mkdir.cpp \
+  obj/src/sys/posix/mkdirp.cpp \
+  obj/src/sys/posix/mkdirs.cpp \
+  obj/src/sys/posix/mktemp.cpp \
+  obj/src/sys/posix/mkdtemp.cpp \
+  obj/src/sys/posix/mkstemp.cpp \
+  obj/src/sys/posix/mktime.cpp \
+  obj/src/sys/posix/openat.cpp \
+  obj/src/sys/posix/open.cpp \
+  obj/src/sys/posix/pause.cpp \
+  obj/src/sys/posix/pipe.cpp \
+  obj/src/sys/posix/pipe2.cpp \
+  obj/src/sys/posix/putenv.cpp \
+  $(src_sys_posix_read_SOURCES_SET) \
+  obj/src/sys/posix/readable.cpp \
+  obj/src/sys/posix/readlink.cpp \
+  obj/src/sys/posix/readlinkat.cpp \
+  obj/src/sys/posix/realpath.cpp \
+  obj/src/sys/posix/renameat.cpp \
+  obj/src/sys/posix/rename.cpp \
+  obj/src/sys/posix/recv.cpp \
+  obj/src/sys/posix/recvfrom.cpp \
+  obj/src/sys/posix/recvmsg.cpp \
+  obj/src/sys/posix/recvmmsg.cpp \
+  obj/src/sys/posix/send.cpp \
+  obj/src/sys/posix/sendmsg.cpp \
+  obj/src/sys/posix/sendmmsg.cpp \
+  obj/src/sys/posix/sendto.cpp \
+  $(src_sys_posix_select_SOURCES_SET) \
+  obj/src/sys/posix/signal.cpp \
+  $(src_sys_posix_sleep_SOURCES_SET) \
+  obj/src/sys/posix/remove.cpp \
+  obj/src/sys/posix/rmdirat.cpp \
+  obj/src/sys/posix/rmdir.cpp \
+  obj/src/sys/posix/secure_getenv.cpp \
+  obj/src/sys/posix/setenv.cpp \
+  obj/src/sys/posix/shutdown.cpp \
+  obj/src/sys/posix/socket.cpp \
+  obj/src/sys/posix/ip.socket.cpp \
+  obj/src/sys/posix/un.socket.cpp \
+  obj/src/sys/posix/socket4.cpp \
+  obj/src/sys/posix/socketpair.cpp \
+  obj/src/sys/posix/stat.cpp \
+  obj/src/sys/posix/symlinkat.cpp \
+  obj/src/sys/posix/symlink.cpp \
+  obj/src/sys/posix/Syscall.cpp \
+  obj/src/sys/posix/syscall.cpp \
+  obj/src/sys/posix/time.cpp \
+  obj/src/sys/posix/tmpdir.cpp \
+  obj/src/sys/posix/touch.cpp \
+  obj/src/sys/posix/unlinkat.cpp \
+  obj/src/sys/posix/unlink.cpp \
+  obj/src/sys/posix/unsetenv.cpp \
+  $(src_sys_posix_usage_SOURCES_SET) \
+  $(src_sys_posix_wait_SOURCES_SET) \
+  $(src_sys_posix_write_SOURCES_SET) \
+  obj/src/sys/posix/writable.cpp \
+  $(end)
+
+src_sys_posix_AF_SOURCES_SET = \
+  obj/src/sys/posix/AF.cpp \
+  obj/src/sys/posix/AF.IP.cpp \
+  obj/src/sys/posix/AF.IN.cpp \
+  obj/src/sys/posix/AF.UN.cpp \
+  $(src_sys_posix_AF_SOURCES_SET_deprecating) \
+  $(end)
+src_sys_posix_AF_SOURCES_SET_deprecating = \
+  obj/src/sys/posix/AF.Type.cpp \
+  obj/src/sys/posix/AF.constants.cpp \
+  $(end)
+src_sys_posix_AT_SOURCES_SET = \
+  obj/src/sys/posix/AT.cpp \
+  $(src_sys_posix_AT_SOURCES_SET_deprecating) \
+  $(end)
+src_sys_posix_AT_SOURCES_SET_deprecating = \
+  obj/src/sys/posix/AT.constants.cpp \
+  obj/src/sys/posix/AT.Cwd.cpp \
+  obj/src/sys/posix/AT.Flag.cpp \
+  obj/src/sys/posix/AT.Flags.cpp \
+  $(end)
+src_sys_posix_clear_SOURCES_SET = \
+  obj/src/sys/posix/clear.cpp \
+  obj/src/sys/posix/clear.iovec.cpp \
+  obj/src/sys/posix/clear.itimerval.cpp \
+  obj/src/sys/posix/clear.msghdr.cpp \
+  obj/src/sys/posix/clear.mmsghdr.cpp \
+  obj/src/sys/posix/clear.sockaddr.cpp \
+  obj/src/sys/posix/clear.sockaddr_in4.cpp \
+  obj/src/sys/posix/clear.sockaddr_in6.cpp \
+  obj/src/sys/posix/clear.sockaddr_un.cpp \
+  obj/src/sys/posix/clear.timespec.cpp \
+  obj/src/sys/posix/clear.timeval.cpp \
+  $(end)
+src_sys_posix_DN_SOURCES_SET = \
+  obj/src/sys/posix/DN.cpp \
+  $(end)
+src_sys_posix_E_SOURCES_SET = \
+  obj/src/sys/posix/E.cpp \
+  $(end)
+src_sys_posix_EX_SOURCES_SET = \
+  obj/src/sys/posix/EX.cpp \
+  $(end)
+src_sys_posix_EXIT_SOURCES_SET = \
+  obj/src/sys/posix/EXIT.cpp \
+  $(end)
+src_sys_posix_F_SOURCES_SET = \
+  obj/src/sys/posix/F.cpp \
+  obj/src/sys/posix/F.OWNER.cpp \
+  obj/src/sys/posix/F.SEAL.cpp \
+  obj/src/sys/posix/F._SEAL_.cpp \
+  $(src_sys_posix_F_SOURCES_SET_deprecating)\
+  $(end)
+src_sys_posix_F_SOURCES_SET_deprecating = \
+  obj/src/sys/posix/F.constants.cpp \
+  obj/src/sys/posix/F.Command.cpp \
+  obj/src/sys/posix/F.DN.cpp \
+  $(end)
+src_sys_posix_FD_SOURCES_SET = \
+  obj/src/sys/posix/FD.cpp \
+  $(src_sys_posix_FD_SOURCES_SET_deprecating) \
+  $(end)
+src_sys_posix_FD_SOURCES_SET_deprecating = \
+  obj/src/sys/posix/FD.constants.cpp \
+  obj/src/sys/posix/FD.as.cpp \
+  obj/src/sys/posix/FD.flag.as.cpp \
+  obj/src/sys/posix/FD.Flag.cpp \
+  obj/src/sys/posix/FD.Flags.cpp \
+  obj/src/sys/posix/FD.flag.cpp \
+  obj/src/sys/posix/FD.flag.Flag.cpp \
+  $(end)
+src_sys_posix_fcntl_SOURCES_SET = \
+  obj/src/sys/posix/fcntl.cpp \
+  \
+  obj/src/sys/posix/cloexec.cpp \
+  obj/src/sys/posix/dupfd.cpp \
+  obj/src/sys/posix/dupfd_cloexec.cpp \
+  \
+  obj/src/sys/posix/getfd.cpp \
+  obj/src/sys/posix/setfd.cpp \
+  \
+  obj/src/sys/posix/getfl.cpp \
+  obj/src/sys/posix/setfl.cpp \
+  \
+  obj/src/sys/posix/getlk.cpp \
+  obj/src/sys/posix/setlk.cpp \
+  obj/src/sys/posix/setlkw.cpp \
+  \
+  obj/src/sys/posix/getlease.cpp \
+  obj/src/sys/posix/setlease.cpp \
+  \
+  obj/src/sys/posix/lockf.cpp \
+  obj/src/sys/posix/flock.cpp \
+  \
+  obj/src/sys/posix/getlock.cpp \
+  obj/src/sys/posix/setlock.cpp \
+  obj/src/sys/posix/setlock_waiting.cpp \
+  \
+  obj/src/sys/posix/notify.cpp \
+  \
+  obj/src/sys/posix/getown.cpp \
+  obj/src/sys/posix/setown.cpp \
+  \
+  obj/src/sys/posix/getown_ex.cpp \
+  obj/src/sys/posix/setown_ex.cpp \
+  \
+  obj/src/sys/posix/getowner.cpp \
+  obj/src/sys/posix/setowner.cpp \
+  \
+  obj/src/sys/posix/ofd_getlk.cpp \
+  obj/src/sys/posix/ofd_setlk.cpp \
+  obj/src/sys/posix/ofd_setlkw.cpp \
+  \
+  obj/src/sys/posix/getlock_file.cpp \
+  obj/src/sys/posix/setlock_file.cpp \
+  obj/src/sys/posix/setlock_file_waiting.cpp \
+  \
+  obj/src/sys/posix/getlock_process.cpp \
+  obj/src/sys/posix/setlock_process.cpp \
+  obj/src/sys/posix/setlock_process_waiting.cpp \
+  \
+  obj/src/sys/posix/getpipe_sz.cpp \
+  obj/src/sys/posix/setpipe_sz.cpp \
+  \
+  obj/src/sys/posix/getpipe_size.cpp \
+  obj/src/sys/posix/setpipe_size.cpp \
+  \
+  obj/src/sys/posix/get_rw_hint.cpp \
+  obj/src/sys/posix/set_rw_hint.cpp \
+  obj/src/sys/posix/getrwh.cpp \
+  obj/src/sys/posix/setrwh.cpp \
+  obj/src/sys/posix/getrwh_file.cpp \
+  obj/src/sys/posix/setrwh_file.cpp \
+  obj/src/sys/posix/getrwh_process.cpp \
+  obj/src/sys/posix/setrwh_process.cpp \
+  \
+  obj/src/sys/posix/getseals.cpp \
+  obj/src/sys/posix/addseals.cpp \
+  obj/src/sys/posix/get_seals.cpp \
+  obj/src/sys/posix/add_seals.cpp \
+  \
+  obj/src/sys/posix/getsig.cpp \
+  obj/src/sys/posix/setsig.cpp \
+  \
+  obj/src/sys/posix/getsignal.cpp \
+  obj/src/sys/posix/setsignal.cpp \
+  $(end)
+src_sys_posix_getent_pw_SOURCES_SET = \
+  obj/src/sys/posix/endpwent.cpp \
+  obj/src/sys/posix/getpwname.cpp \
+  obj/src/sys/posix/getpwnam.cpp \
+  obj/src/sys/posix/getpwuid.cpp \
+  obj/src/sys/posix/packaging/getpw.cpp \
+  $(end)
+src_sys_posix_getent_gr_SOURCES_SET = \
+  obj/src/sys/posix/endgrent.cpp \
+  obj/src/sys/posix/getgrname.cpp \
+  obj/src/sys/posix/getgrnam.cpp \
+  obj/src/sys/posix/getgrgid.cpp \
+  obj/src/sys/posix/packaging/getgr.cpp \
+  $(end)
+src_sys_posix_gid_SOURCES_SET = \
+  obj/src/sys/posix/packaging/gid.cpp \
+  \
+  obj/src/sys/posix/getgid.cpp \
+  obj/src/sys/posix/getegid.cpp \
+  obj/src/sys/posix/getresgid.cpp \
+  obj/src/sys/posix/group_member.cpp \
+  \
+  obj/src/sys/posix/setgid.cpp \
+  obj/src/sys/posix/setegid.cpp \
+  obj/src/sys/posix/setregid.cpp \
+  obj/src/sys/posix/setresgid.cpp \
+  $(end)
+src_sys_posix_IPPROTO_SOURCES_SET = \
+  obj/src/sys/posix/IPPROTO.cpp \
+  obj/src/sys/posix/IPPROTO.Type.cpp \
+  obj/src/sys/posix/IPPROTO.constants.cpp \
+  $(end)
+src_sys_posix_ITIMER_SOURCES_SET = \
+  obj/src/sys/posix/ITIMER.cpp \
+  $(end)
+src_sys_posix_is_SOURCES_SET = \
+  obj/src/sys/posix/isblk.cpp \
+  obj/src/sys/posix/ischr.cpp \
+  obj/src/sys/posix/isdir.cpp \
+  obj/src/sys/posix/isfifo.cpp \
+  obj/src/sys/posix/islnk.cpp \
+  obj/src/sys/posix/isreg.cpp \
+  obj/src/sys/posix/issock.cpp \
+  $(end)
+src_sys_posix_itimer_SOURCES_SET = \
+  obj/src/sys/posix/getitimer.cpp \
+  obj/src/sys/posix/setitimer.cpp \
+  obj/src/sys/posix/unsetitimer.cpp \
+  $(end)
+src_sys_posix_limit_SOURCES_SET = \
+  obj/src/sys/posix/getrlimit.cpp \
+  obj/src/sys/posix/setrlimit.cpp \
+  obj/src/sys/posix/prlimit.cpp \
+  $(end)
+src_sys_posix_LOCK_SOURCES_SET = \
+  obj/src/sys/posix/FLOCK.cpp \
+  obj/src/sys/posix/LEASE.cpp \
+  obj/src/sys/posix/LOCK.cpp \
+  obj/src/sys/posix/_LOCK_.cpp \
+  obj/src/sys/posix/LOCKF.cpp \
+  $(end)
+src_sys_posix_MSG_SOURCES_SET = \
+  obj/src/sys/posix/MSG.cpp \
+  obj/src/sys/posix/MSG.constants.cpp \
+  obj/src/sys/posix/MSG.Flag.cpp \
+  obj/src/sys/posix/MSG.Flags.cpp \
+  $(end)
+src_sys_posix_O_SOURCES_SET = \
+  obj/src/sys/posix/O.cpp \
+  obj/src/sys/posix/O.Flags.cpp \
+  $(end)
+src_sys_posix_OK_SOURCES_SET = \
+  obj/src/sys/posix/OK.cpp \
+  obj/src/sys/posix/OK.Mode.cpp \
+  obj/src/sys/posix/OK.as.cpp \
+  $(end)
+src_sys_posix_P_SOURCES_SET = \
+  obj/src/sys/posix/P.cpp \
+  \
+  obj/src/sys/posix/P.Type.cpp \
+  $(end)
+src_sys_posix_PF_SOURCES_SET = \
+  obj/src/sys/posix/PF.cpp \
+  obj/src/sys/posix/PF.IP.cpp \
+  obj/src/sys/posix/PF._IP_.cpp \
+  obj/src/sys/posix/PF.UN.cpp \
+  \
+  obj/src/sys/posix/PF.Type.cpp \
+  obj/src/sys/posix/PF.constants.cpp \
+  $(end)
+src_sys_posix_Rseries_SOURCES_SET = \
+  obj/src/sys/posix/RLIMIT.cpp \
+  obj/src/sys/posix/RUSAGE.cpp \
+  $(end)
+src_sys_posix_read_SOURCES_SET = \
+  obj/src/sys/posix/read.cpp \
+  obj/src/sys/posix/readv.cpp \
+  obj/src/sys/posix/pread.cpp \
+  obj/src/sys/posix/preadv.cpp \
+  obj/src/sys/posix/preadv2.cpp \
+  $(end)
+src_sys_posix_required_SOURCES_SET = \
+  obj/src/sys/posix/required/namespace.cpp \
+  obj/src/sys/posix/required/Sockaddr.cpp \
+  obj/src/sys/posix/required/syscall.Argument.cpp \
+  obj/src/sys/posix/required/syscall.Result.cpp \
+  obj/src/sys/posix/required/syscall.result.Idiomatic.cpp \
+  obj/src/sys/posix/required/syscall.result.Stylized.cpp \
+  obj/src/sys/posix/required/rebundled.cpp \
+  $(end)
+src_sys_posix_S_SOURCES_SET = \
+  obj/src/sys/posix/Mode.cpp \
+  obj/src/sys/posix/S.cpp \
+  obj/src/sys/posix/S.Flag.cpp \
+  obj/src/sys/posix/S.Flags.cpp \
+  obj/src/sys/posix/S.Subflags.cpp \
+  $(end)
+src_sys_posix_select_SOURCES_SET = \
+  obj/src/sys/posix/pselect.cpp \
+  obj/src/sys/posix/select.cpp \
+  $(end)
+src_sys_posix_SEEK_SOURCES_SET = \
+  obj/src/sys/posix/SEEK.cpp \
+  $(end)
+src_sys_posix_SHUT_SOURCES_SET = \
+  obj/src/sys/posix/SHUT.cpp \
+  obj/src/sys/posix/SHUT.Type.cpp \
+  $(end)
+src_sys_posix_SIG_SOURCES_SET = \
+  obj/src/sys/posix/SIG.cpp \
+  $(end)
+src_sys_posix_sleep_SOURCES_SET = \
+  obj/src/sys/posix/sleep.cpp \
+  obj/src/sys/posix/usleep.cpp \
+  obj/src/sys/posix/millisleep.cpp \
+  obj/src/sys/posix/microsleep.cpp \
+  obj/src/sys/posix/nanosleep.cpp \
+  $(end)
+src_sys_posix_SOCK_SOURCES_SET = \
+  obj/src/sys/posix/SOCK.cpp \
+  obj/src/sys/posix/SOCK.constants.cpp \
+  $(end)
+src_sys_posix_sockaddr_SOURCES_SET = \
+  obj/src/sys/posix/sockaddr.cpp \
+  obj/src/sys/posix/sockaddr_in4.cpp \
+  obj/src/sys/posix/sockaddr_in6.cpp \
+  obj/src/sys/posix/sockaddr_in.cpp \
+  obj/src/sys/posix/sockaddr_un.cpp \
+  $(end)
+src_sys_posix_sockaddr_traits_SOURCES_SET = \
+  obj/src/sys/posix/sockaddr_traits/namespace.cpp \
+  obj/src/sys/posix/sockaddr_traits/in4.cpp \
+  obj/src/sys/posix/sockaddr_traits/in6.cpp \
+  obj/src/sys/posix/sockaddr_traits/un.cpp \
+  $(end)
+src_sys_posix_struct_SOURCES_SET = \
+  obj/src/sys/posix/iovec.cpp \
+  obj/src/sys/posix/itimerval.cpp \
+  obj/src/sys/posix/msghdr.cpp \
+  obj/src/sys/posix/mmsghdr.cpp \
+  obj/src/sys/posix/timespec.cpp \
+  obj/src/sys/posix/timeval.cpp \
+  $(end)
+src_sys_posix_uid_SOURCES_SET = \
+  obj/src/sys/posix/packaging/uid.cpp \
+  \
+  obj/src/sys/posix/getuid.cpp \
+  obj/src/sys/posix/geteuid.cpp \
+  obj/src/sys/posix/getresuid.cpp \
+  \
+  obj/src/sys/posix/setuid.cpp \
+  obj/src/sys/posix/seteuid.cpp \
+  obj/src/sys/posix/setreuid.cpp \
+  obj/src/sys/posix/setresuid.cpp \
+  $(end)
+src_sys_posix_usage_SOURCES_SET = \
+  obj/src/sys/posix/getrusage.cpp \
+  $(end)
+src_sys_posix_W_SOURCES_SET = \
+  obj/src/sys/posix/W.cpp \
+  \
+  obj/src/sys/posix/W.Options.cpp \
+  obj/src/sys/posix/W.as.cpp \
+  $(end)
+src_sys_posix_wait_SOURCES_SET = \
+  obj/src/sys/posix/wait.cpp \
+  obj/src/sys/posix/wait2.cpp \
+  obj/src/sys/posix/waitpid.cpp \
+  obj/src/sys/posix/waitid.cpp \
+  obj/src/sys/posix/wait3.cpp \
+  obj/src/sys/posix/wait4.cpp \
+  $(end)
+src_sys_posix_write_SOURCES_SET = \
+  obj/src/sys/posix/write.cpp \
+  obj/src/sys/posix/writev.cpp \
+  obj/src/sys/posix/pwrite.cpp \
+  obj/src/sys/posix/pwritev.cpp \
+  obj/src/sys/posix/pwritev2.cpp \
+  $(end)
+src_sys_posix_zero_SOURCES_SET = \
+  obj/src/sys/posix/zero.template.cpp \
+  obj/src/sys/posix/zero.iovec.cpp \
+  obj/src/sys/posix/zero.itimerval.cpp \
+  obj/src/sys/posix/zero.msghdr.cpp \
+  obj/src/sys/posix/zero.mmsghdr.cpp \
+  obj/src/sys/posix/zero.sockaddr.cpp \
+  obj/src/sys/posix/zero.sockaddr_in4.cpp \
+  obj/src/sys/posix/zero.sockaddr_in6.cpp \
+  obj/src/sys/posix/zero.sockaddr_un.cpp \
+  obj/src/sys/posix/zero.timeval.cpp \
+  obj/src/sys/posix/zero.timespec.cpp \
+  obj/src/sys/posix/zero.cpp \
+  $(end)
+$(scold_cxxdir)/sys/posix/dependencies.mk: $(lib_libsys_posix_module_la_SOURCES)
+$(lib_libsys_posix_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/sys/posix/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/sys/posix/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/sys/posix/dependencies.mk
+
+lib_libsys_posix_module_la_SOURCES_DECLARED = $(patsubst obj/%.cpp,%.xcpp,$(lib_libsys_posix_module_la_SOURCES))
+lib_libsys_posix_module_la_SOURCES_DISCOVERED = $(wildcard src/sys/posix/*.xcpp src/sys/posix/*/*.xcpp)
+lib_libsys_posix_module_la_SOURCES_ORPHANED = $(filter-out $(lib_libsys_posix_module_la_SOURCES_DECLARED), $(lib_libsys_posix_module_la_SOURCES_DISCOVERED))
+# WATCHOUT - if this is a hard error then the Makefile will not automatically rebuild to incorporate the new files
+$(if $(lib_libsys_posix_module_la_SOURCES_ORPHANED),$(warning these files are not listed for compilation $(lib_libsys_posix_module_la_SOURCES_ORPHANED)))
+
+#
+# WATCHOUT WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT WATCHOUT WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT  WATCHOUT
+# because sys.posix.required.o looks like an object file, we have to treat it specially!
+# and because (module) sys.posix.required.o depends upon (module) sys.posix.required we have to treat it specially as well
+#
+# gcc -no-install  obj/modules/fpp/sys.posix.required.o obj/src/sys/posix/required/namespace.cpp   -o obj/modules/fpp/sys/posix/required
+# gcc: error: unrecognized command line option ‘-no-install’
+# make[1]: *** No rule to make target 'obj/modules/fpp/sys/posix/required', needed by 'obj/modules/hpp/sys/posix/required'.  Stop.
+# # make[1]: *** Waiting for unfinished jobs....
+#
+$(scold_cxx_modulesdir)/sys.posix.required.o \
+$(scold_cxx_modulesdir)/ipp/sys.posix.required.o \
+$(scold_cxx_modulesdir)/hpp/sys.posix.required.o \
+$(scold_cxx_modulesdir)/fpp/sys.posix.required.o : $(scold_cxxdir)/sys/posix/required/o.cpp
+	$(HT_V_COLD) $(if $(DC),$(DC) $(DC_OPTIONS),$(bbDC) $(bbDC_OPTIONS)) src/sys/posix/required/o.xcpp
+	@test -e $@
+$(scold_cxx_modulesdir)/sys.posix.required \
+$(scold_cxx_modulesdir)/ipp/sys.posix.required \
+$(scold_cxx_modulesdir)/hpp/sys.posix.required \
+$(scold_cxx_modulesdir)/fpp/sys.posix.required : $(scold_cxxdir)/sys/posix/required/namespace.cpp
+	$(HT_V_COLD) $(if $(DC),$(DC) $(DC_OPTIONS),$(bbDC) $(bbDC_OPTIONS)) src/sys/posix/required/namespace.xcpp
+	@test -e $@

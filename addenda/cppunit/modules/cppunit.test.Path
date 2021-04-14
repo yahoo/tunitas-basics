@@ -1,0 +1,8 @@
+// -*- c++ -*- 64515e6d-4999-465b-bc23-5095446e3c8d
+#pragma once
+#include <cppunit/TestPath.h>
+namespace cppunit {
+  namespace test {
+    using Path = CppUnit::TestPath;
+  }
+}

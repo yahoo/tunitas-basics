@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.O
+#import sys.posix.getfl
+#import sys.posix.mktemp
+#import sys.posix.open
+#import sys.posix.setfl
+auto tests::unit::posix::fixture::Fixture::test_setfl() -> void {
+  using O = six::O;
+  auto m = six::mktemp("/tmp/t99.tests.unit.posix.setfl.XXXXXX");
+  CPPUNIT_ASSERT(good(m));
+  guardian::Cleanup_Spackled_Names cleaner{value(m)};
+  auto o = nat::open(value(m), O::CREATE|O::WRONLY, 0666);
+  CPPUNIT_ASSERT(good(o));
+  guardian::Close closer(value(o));
+  auto s = nat::setfl(value(o), O::APPEND); // <------------------- test this
+  CPPUNIT_ASSERT(good(s));
+  auto g = nat::getfl(value(o)); // <------------------- test this
+  CPPUNIT_ASSERT(good(g));
+  CPPUNIT_ASSERT(contains(value(g), O::APPEND));
+}  
+#endiv

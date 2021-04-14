@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// https://wiki.scold-lang.org/page/nonstd.required.iterator.Undirected
+#import nonstd.required.iterator.Bidirectional
+#import nonstd.undirected_iterator_tag
+namespace nonstd::required::iterator {
+  //
+  // A undirected iterator
+  //
+  // Most of https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator
+  // But we prefer "undirected" intead of "random acces"
+  // See the commentariat in nonstd.iterator.category.Undirected
+  //
+  template<typename ITERATOR> concept bool Undirected = Bidirectional<ITERATOR> && requires(ITERATOR iterator) {
+    requires is_base_of_v<undirected_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>;
+    { iterator < iterator } -> bool;
+    { iterator <= iterator } -> bool;
+    { iterator > iterator } -> bool;
+    { iterator >= iterator } -> bool;
+#if 0
+    // [[FIXTHIS]] Why not?  Where does this break?
+    requires requires(ITERATOR iterator, typename iterator_traits<ITERATOR>::difference delta) {
+      { iterator + delta } -> ITERATOR;
+      { delta + iterator } -> ITERATOR;
+      { iterator - delta } -> ITERATOR;
+      { iterator += delta } -> ITERATOR &;
+      { iterator -= delta } -> ITERATOR &;
+      { iterator - iterator } -> typename iterator_traits<ITERATOR>::difference;
+      { iterator[delta] } -> typename iterator_traits<ITERATOR>::reference;
+      { iterator[delta] = typename iterator_traits<ITERATOR>::value_type{} } ->  -> typename iterator_traits<ITERATOR>::reference;
+    };
+#endif
+  };
+}
+#endiv

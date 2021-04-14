@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.options.required.Names
+#forward sys.o.Options
+#import tests.unit.o // ............. WATCHOUT we expect this to fail to load
+#import tests.unit.o.__library // ... but must manually get this (see the commentariat therein)
+namespace tests::unit::o {
+  //
+  // Test rigging for the Options<NAMES...>
+  // Descendants only.
+  // These have to be specializations, otherwise ... what's the point?
+  //
+  template<typename OPTIONS> struct Options;
+  template<typename... NAMES> requires ::sys::o::options::required::Names<NAMES...> class Options<library::Options<NAMES...>>;
+}
+#endiv
+#divert <hpp>
+// Every specialization will need (most of) these
+#import sys.o.Access
+#import sys.o.Create
+#import sys.o.Status
+#import sys.o.Options
+#endiv

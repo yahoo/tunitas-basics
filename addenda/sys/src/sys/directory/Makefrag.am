@@ -1,0 +1,119 @@
+# -*- Makefile -*-
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.11/01.black-platinum-hen series/v0.12/02.maroon-iron-crow series/v0.12/03.red-mercury-goose series/v0.13/04.green-copper-heron; do
+#       increment=$(git log $branch | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# API 452  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 320  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 200  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 81   reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+# reminder: here the C:R:A does NOT follow the core module, but drifts away from it slowly
+lib_libsys_directory_module_la_CURRENT = 454
+lib_libsys_directory_module_la_REVISION = 0
+lib_libsys_directory_module_la_AGE = 0
+lib_libsys_directory_module_la_CRA = $(lib_libsys_directory_module_la_CURRENT):$(lib_libsys_directory_module_la_REVISION):$(lib_libsys_directory_module_la_AGE)
+lib_libsys_directory_module_la_VERSION_INFO = -version-info $(lib_libsys_directory_module_la_CRA)
+
+# [[FIXTHIS]] why shouldn't this be entailed into libsys-posix?
+lib_libsys_directory_module_la = lib/libsys-directory-module.la
+lib_libsys_directory_module_la_LIBADD = \
+  $(lib_libwant_la) \
+  -lstring-module \
+  $(end)
+lib_libsys_directory_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libsys_directory_module_la_VERSION_INFO)
+lib_libsys_directory_module_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libsys_directory_module_la_SOURCES))
+lib_libsys_directory_module_la_SOURCES = \
+  $(lib_libsys_directory_module_la_GENERATED_SOURCES) \
+  $(lib_libsys_directory_module_la_HANDCODED_SOURCES) \
+  $(end)
+lib_libsys_directory_module_la_GENERATED_SOURCES = \
+  $(end)
+lib_libsys_directory_module_la_HANDCODED_SOURCES = \
+  obj/src/sys/directory/namespace.cpp \
+  obj/src/sys/directory/DIR.cpp \
+  obj/src/sys/directory/close.cpp \
+  obj/src/sys/directory/open.cpp \
+  obj/src/sys/directory/read.cpp \
+  obj/src/sys/directory/scan.cpp \
+  obj/src/sys/directory/Entry.cpp \
+  obj/src/sys/directory/Entry.less.cpp \
+  obj/src/sys/directory/Entry.less_equal.cpp \
+  obj/src/sys/directory/Entry.greater.cpp \
+  obj/src/sys/directory/Entry.greater_equal.cpp \
+  obj/src/sys/directory/Guard.cpp \
+  obj/src/sys/directory/Guard.DIR.cpp \
+  obj/src/sys/directory/Guard.open.Result.cpp \
+  obj/src/sys/directory/Stream.cpp \
+  obj/src/sys/directory/Type.cpp \
+  \
+  obj/src/sys/directory/detail/namespace.cpp \
+  \
+  obj/src/sys/directory/detail/close/namespace.cpp \
+  obj/src/sys/directory/detail/close/Result.cpp \
+  \
+  obj/src/sys/directory/detail/open/namespace.cpp \
+  obj/src/sys/directory/detail/open/Result.cpp \
+  \
+  obj/src/sys/directory/detail/read/namespace.cpp \
+  obj/src/sys/directory/detail/read/Result.cpp \
+  \
+  obj/src/sys/directory/detail/scan/namespace.cpp \
+  obj/src/sys/directory/detail/scan/Result.cpp \
+  $(end)
+$(scold_cxxdir)/sys/directory/dependencies.mk: $(lib_libsys_directory_module_la_SOURCES)
+$(lib_libsys_directory_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/sys/directory/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/sys/directory/dependencies.mk # automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/sys/dependencies.mk #     automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/sys/directory/dependencies.mk

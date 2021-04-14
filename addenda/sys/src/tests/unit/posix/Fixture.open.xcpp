@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import std.string
+#import sys.posix.open
+#import sys.posix.unlink
+#import sys.posix.O
+auto tests::unit::posix::fixture::Fixture::test_open() -> void {
+  using O = six::O;
+  std::string const file_exists = "/tmp/t99.tests.unit.posix.test.EXISTS-by-opening";
+  six::unlink(file_exists);
+  auto c = nat::open(file_exists, O::CREATE|O::WRONLY, 0666);  // <--------- test this
+  guardian::Close guard(value(c));
+  CPPUNIT_ASSERT(good(c));
+  auto u = six::unlink(file_exists);
+  CPPUNIT_ASSERT(good(u));
+}
+#endiv

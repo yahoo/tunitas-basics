@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell::program {
+  //
+  // Named Programs
+  //
+  // Usage: (scenario #1)
+  //
+  //   auto prog = Program<SOME_NAME>{...};
+  //   prog.run();
+  //
+  // Usage: (scenario #2)
+  //
+  //   auto prog = Program<SOME_NAME>{...};
+  //   prog.start();
+  //   prog.stream() << "say something";
+  //   prog.wait();
+  //
+  template<typename NAMENESS> class Program;
+}
+#endiv

@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.char_traits
+#import nonstd.stream.required.Character
+#import nonstd.stream.required.Character_Traits
+namespace nonstd::stream::output::iterator {
+  //
+  // A suffixing output stream iterator
+  // (recall that std::ostream_iterator is suffixing; so class' behavior is the same as that of std::ostream_iterator<...>)
+  //
+  // Usage:
+  //
+  //     auto start = ...iterator...
+  //     auto finish = ...iterator...;
+  //     Suffixing<int, char> sink('[', std::cout, ']');
+  //     std::copy(start, finish, sink);
+  //
+  template<typename VALUE, typename SUFFIX, required::Character CHAR = char, required::Character_Traits TRAITS = std::char_traits<CHAR>> class Suffixing;
+}
+#endiv
+#divert <hpp>
+#import nonstd.stream.output.iterator.detail.Core
+#import nonstd.stream.output.iterator.detail.Decoration
+#import nonstd.stream.output.iterator.detail.Empty
+namespace nonstd::stream::output {
+  template<typename VALUE, typename SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> class iterator::Suffixing : public detail::Core<Suffixing<VALUE, SUFFIX, CHAR, TRAITS>, detail::Empty, VALUE, detail::Decoration<SUFFIX>, CHAR, TRAITS> {
+    using ancestor = detail::Core<Suffixing, detail::Empty, VALUE, detail::Decoration<SUFFIX>, CHAR, TRAITS>;
+  public:
+    inline Suffixing(typename ancestor::stream_argument_type, typename ancestor::suffix_argument_type);
+    using ancestor::operator=;
+  };
+}
+#endiv
+#divert <ipp>
+namespace nonstd::stream::output::iterator {
+  template<typename VALUE, typename SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> Suffixing<VALUE, SUFFIX, CHAR, TRAITS>::Suffixing(typename ancestor::stream_argument_type outbound, typename ancestor::suffix_argument_type suffix)
+    : ancestor(typename ancestor::prefix_type::value_type(), outbound, suffix) {
+    ;
+  }
+}
+#endiv

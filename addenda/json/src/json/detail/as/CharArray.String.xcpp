@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward json.detail.as.CharArray
+#import json.String
+namespace json {
+  namespace detail {
+    namespace as {
+      struct CharArray<json::String>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+template<> struct json::detail::as::CharArray<json::String> {
+  template<std::size_t N> inline auto operator()(char const (&array)[N]) -> json::String;
+};
+#endiv
+#divert <ipp>
+#import std.move
+template<std::size_t N> auto json::detail::as::CharArray<json::String>::operator()(char const (&array)[N]) -> json::String {
+  // DO NOT use ---> std::string cooked(&array[0], &array[N])
+  // as that adds the \0 at the end fo the array right into the string.
+  std::string parboiled(&array[0]);
+  json::String boiled(tag::String(), std::move(parboiled));
+  return std::move(boiled);
+}
+#endiv

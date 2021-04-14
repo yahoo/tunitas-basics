@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rusage
+#import sys.r.Usage // used as the uniqueness key
+#import sys.detail.Initialized
+namespace sys::r {
+  //
+  // The resource usages definition
+  // By default, is self-initializing
+  // ADL-friendly.
+  //
+  // Pairwise:
+  //
+  //   Usage <---> Usages
+  //   the 'who' argument to getrusage(2)
+  //
+  // Usage:
+  //
+  //   auto usage = sys::r::Usage{};
+  //   auto got = sys::posix::getrusage(RUSAGE::SELF, usage);
+  //
+  using Usages = sys::detail::Initialized<rusage, Usage>;
+}
+#endiv

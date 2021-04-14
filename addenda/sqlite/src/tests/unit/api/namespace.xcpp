@@ -1,0 +1,10 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace api {
+      // The API test fixtures
+    }
+  }
+}
+#endiv

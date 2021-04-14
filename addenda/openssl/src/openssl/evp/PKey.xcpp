@@ -1,0 +1,100 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::evp {
+  //
+  // A Key Pair
+  // [[FIXTHIS]] Avoiding wholly-unmotivated renaming at this point
+  //
+  class PKey;
+}
+#endiv
+#divert <hpp>
+#import openssl.ec.Key
+#import openssl.rsa.Pair
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.EVP_PKEY
+#import openssl.pem.load.declaration
+#import openssl.pem.from_string_view.declaration
+#import openssl.System
+#import openssl.types
+#forward openssl.x509.Crt
+#forward openssl.x509.Req
+#forward openssl.evp.PKey0
+class openssl::evp::PKey : public managed::Pointer<EVP_PKEY> {
+  using ancestor = managed::Pointer<EVP_PKEY>;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::load::detail::open_read_close(Filepath, std::function<POINTER *(BIO *)>) -> RESULT;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::from_string_view::detail::copy_read(std::string_view, std::function<POINTER *(BIO *)>) -> RESULT;
+  friend class x509::Crt;
+  friend class x509::Req;
+protected:
+  inline explicit PKey(EVP_PKEY *);
+public:
+  inline PKey();
+  inline operator PKey0() const;
+  [[deprecated("instead use system()")]] inline auto base_id() const -> int;
+  inline auto system() const -> System;
+  inline auto set(ec::Key const &) -> void;
+  inline auto set(ec::Key &&) -> void = delete;
+  inline auto assign(ec::Key) -> void;
+  inline auto set(rsa::Pair const &) -> void;
+  inline auto set(rsa::Pair &&) -> void = delete;
+  inline auto assign(rsa::Pair) -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.evp.PKey0
+#import openssl.ec.Key
+#import openssl.rsa.Pair
+namespace openssl::evp {
+  PKey::PKey()
+    : ancestor{EVP_PKEY_new()}
+  { }
+  PKey::PKey(EVP_PKEY *key)
+    : ancestor{key}
+  { }
+  PKey::operator PKey0() const {
+    return PKey0{get()};
+  }
+  auto PKey::base_id() const -> int {
+    return EVP_PKEY_base_id(get());
+  }
+  auto PKey::system() const -> System {
+    return System{EVP_PKEY_base_id(get())};
+  }
+  auto PKey::set(ec::Key const &key) -> void {
+    auto ok = EVP_PKEY_set1_EC_KEY(get(), key.get());
+    if (!ok) {
+      throw std::error_code{error::Code::EVP};
+    }
+  }
+  //
+  // From https://www.openssl.org/docs/man1.1.0/man3/EVP_PKEY_set1_RSA.html
+  //   <quote>
+  //     EVP_PKEY_assign_RSA(), EVP_PKEY_assign_DSA(), EVP_PKEY_assign_DH() and EVP_PKEY_assign_EC_KEY() also set the referenced key to key however these use the supplied key internally and so key will be freed when the parent pkey is freed.
+  //     <snip/>
+  //     In accordance with the OpenSSL naming convention the key obtained from or assigned to the pkey using the 1 functions must be freed as well as pkey.
+  //   </quote>
+  //
+  auto PKey::assign(ec::Key key) -> void {
+    auto ok = EVP_PKEY_assign_EC_KEY(get(), key.get());
+    if (!ok) {
+      throw std::error_code{error::Code::EVP};
+    }
+    key.release();
+  }
+  auto PKey::set(rsa::Pair const &pair) -> void {
+    auto ok = EVP_PKEY_set1_RSA(get(), pair.get());
+    if (!ok) {
+      throw std::error_code{error::Code::EVP};
+    }
+  }
+  auto PKey::assign(rsa::Pair pair) -> void {
+    auto ok = EVP_PKEY_assign_RSA(get(), pair.get());
+    if (!ok) {
+      throw std::error_code{error::Code::EVP};
+    }
+    pair.release();
+  }
+}
+#endiv

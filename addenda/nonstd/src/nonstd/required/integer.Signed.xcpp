@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.is_signed // to capture the is_signed sense of the bignums
+#include <hpp/nonstd.is_signed>
+#import nonstd.required.character.Type
+#import std.is_floating_point
+namespace nonstd::required::integer {
+  //
+  // What constitutes an signed integer?
+  //
+  // n.b. definitionally, the "character" types are not integers.
+  // There are "large" integers out there (bignums
+  //
+  template<typename INTEGER> concept bool Signed = is_signed<INTEGER>::value && !character::Type<INTEGER> && !std::is_floating_point<INTEGER>::value;
+}
+#endiv
+#divert <cpp>
+#import nonstd.integers
+namespace {
+  namespace tests {
+    using namespace nonstd::required::integer;
+    using namespace nonstd::integers;
+    // signed
+    static_assert(Signed<int8_t>);
+    static_assert(Signed<int16_t>);
+    static_assert(Signed<int32_t>);
+    static_assert(Signed<int64_t>);
+    static_assert(Signed<int128_t>);
+    // unsigned
+    static_assert(!Signed<uint8_t>);
+    static_assert(!Signed<uint16_t>);
+    static_assert(!Signed<uint32_t>);
+    static_assert(!Signed<uint64_t>);
+    static_assert(!Signed<uint128_t>);
+    // and the "not an integer" ones.
+    static_assert(not Signed<long double>);
+    static_assert(not Signed<double>);
+    static_assert(not Signed<float>);
+    static_assert(not Signed<char>);
+    static_assert(not Signed<wchar_t>);
+    static_assert(not Signed<char32_t>);
+    static_assert(not Signed<char16_t>);
+#if 9 < __GNUC__
+    static_assert(not Signed<char8_t>);
+#endif
+  }
+}
+#endiv

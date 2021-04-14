@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.string.View.template
+//
+#import nonstd.exception.string.View.Logic
+#import nonstd.exception.string.View.Bound // a.k.a. "out of range" (a bound{,ary} was transgressed)
+#import nonstd.exception.string.View.Domain
+// NOT  nonstd.exception.string.View.Future
+#import nonstd.exception.string.View.Invalid
+#import nonstd.exception.string.View.Length
+//
+#import nonstd.exception.string.View.Runtime
+#import nonstd.exception.string.View.Range
+#import nonstd.exception.string.View.Overflow
+#import nonstd.exception.string.View.Underflow
+#if 0
+#import nonstd.exception.string.View.System
+#import nonstd.exception.string.View.Stream // ios_base::failure
+#import nonstd.exception.string.View.Filesystem
+#endif
+//
+// These do not have a stringy constructor so there is no viewy constructor
+//
+// extra-language aggregates
+// NOT  nonstd.exception.string.View.Any
+// NOT  nonstd.exception.string.View.Optional
+// NOT  nonstd.exception.string.View.Variant
+//
+// Some package (the thinking being that regular expressions should never have been in the standard library in the first instance)
+// NOT   nonstd.exception.string.View.Regex
+//
+// The runtime system
+// NOT   nonstd.exception.string.View.Typeid
+// NOT   nonstd.exception.string.View.Cast
+// NOT   nonstd.exception.string.View.Any_Cast
+// NOT   nonstd.exception.string.View.Weak_Pointer
+// NOT   nonstd.exception.string.View.Alloc
+// NOT   nonstd.exception.string.View.Array_New_Length
+// NOT   nonstd.exception.string.View.Function_Call
+#endiv

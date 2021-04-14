@@ -1,0 +1,3 @@
+tests_tac_TESTS = \
+  tests/tac/case.test \
+  $(end)

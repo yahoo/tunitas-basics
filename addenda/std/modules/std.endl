@@ -1,0 +1,3 @@
+// -*- c++ -*- 443f43a5-e560-4cdf-b627-6cb772ed1f17
+#pragma once
+#include <ostream>

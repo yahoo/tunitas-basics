@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.managed.Deleter
+#import openssl.types // BIGNUM
+namespace openssl::managed {
+  template<> struct Deleter<BIGNUM>;
+}
+#endiv
+#divert <hpp>
+template<> struct openssl::managed::Deleter<BIGNUM> {
+  using Value = BIGNUM;
+  inline auto operator()(Value *) const -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+auto openssl::managed::Deleter<BIGNUM>::operator()(Value *value) const -> void {
+  if (value) {
+    BN_free(value);
+  }
+}
+#endiv

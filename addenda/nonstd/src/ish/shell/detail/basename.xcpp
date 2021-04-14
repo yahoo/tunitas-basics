@@ -1,0 +1,38 @@
+// -*- c++ -*- in the SCOLD styling which is so popular these days
+#divert <hpp>
+#import std.string
+namespace ish {
+  namespace shell {
+    namespace detail {
+      inline auto basename(std::string const &, std::string::size_type last) -> std::string;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#include <cassert>
+#import std.out_of_range
+auto ish::shell::detail::basename(std::string const &path, std::string::size_type final) -> std::string {
+  //
+  // First, trim of any trailing '/' because that is what /bin/basename does
+  // Witness:
+  //   $ basename a/b/file.c////
+  //   file.c
+  //
+  if ( ! (0 < final && final < path.size()) ) {
+    throw std::out_of_range{"basename"};
+  }
+  while (final > 0 && '/' == path[final]) {
+    final--;
+  }
+  std::string::size_type slash = path.rfind('/', final);
+  if (std::string::npos == slash) {
+    return path;
+  } else {
+    //
+    // Specimen: banana/apple////
+    //
+    return path.substr(slash+1, final-(slash+1)+1);
+  }
+}
+#endiv

@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::guardian {
+  //
+  // Guardian of the tests  for chmod
+  //
+  // Unlink the file name
+  // Close the file fd
+  //
+  // Usage:
+  //
+  //   Hack the Spew
+  //
+  struct Chmod;
+}
+#endiv
+#divert <hpp>
+#import tests.guardian.Close
+#import tests.guardian.Unlink
+#import std.string
+class tests::guardian::Chmod {
+public:
+  inline explicit Chmod(std::string const &arg_filename, int arg_fd);
+  ~Chmod() = default;
+  Chmod(Chmod const &) = delete;
+  auto operator=(Chmod const &) -> Chmod & = delete;
+protected:
+  // a filename, to be unlinked upon destruction
+  Unlink filename;
+  Close fd;
+};
+#endiv
+#divert <ipp>
+namespace tests::guardian {
+  Chmod::Chmod(std::string const &arg_filename, int arg_fd)
+    : filename(arg_filename)
+    , fd(arg_fd)
+  { }
+}
+#endiv

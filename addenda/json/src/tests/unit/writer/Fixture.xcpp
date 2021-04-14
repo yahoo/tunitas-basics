@@ -1,0 +1,130 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::writer { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::writer::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_abstract() -> void;
+  auto test_fast() -> void;
+  auto test_stream() -> void;
+  auto test_styled() -> void;
+  auto test_stream_builder() -> void;
+  auto test_stream_styled() -> void;
+  auto test_operator_insert() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // we will test deprecated declarations
+#import tests.unit.Generator
+#import json.Writer
+#import json.writer.Fast
+auto tests::unit::writer::Fixture::test_abstract() -> void {
+  Generator generate;
+  ::json::writer::Fast concrete;
+  ::json::Writer &abstract = concrete;
+  std::cout << abstract.write(generate()) << '\n';
+  CPPUNIT_ASSERT(true);
+}
+#import json.writer.Fast
+auto tests::unit::writer::Fixture::test_fast() -> void {
+  Generator generate;
+  ::json::writer::Fast w;
+  std::cout << w.write(generate()) << '\n';
+  CPPUNIT_ASSERT(true);
+}
+#import json.writer.Stream
+#import json.writer.stream.Builder
+#import std.unique_ptr
+#import tests.unit.Generator
+auto tests::unit::writer::Fixture::test_stream() -> void {
+  // Wow this is a hard interface to use...
+  // The recipe is listed in jsoncpp/writer.h
+  ::json::writer::stream::Builder builder;
+  std::unique_ptr<::json::writer::Stream> holder(builder.newStreamWriter());
+  ::json::writer::Stream &w(*holder); // <---------- test the Ancestor's interface
+  Generator generate;
+  w.write(generate(), &std::cout);
+  std::cout << '\n';
+  CPPUNIT_ASSERT(true);
+}
+#import json.writer.Styled
+auto tests::unit::writer::Fixture::test_styled() -> void {
+  Generator generate;
+  ::json::writer::Styled w;
+  std::cout << w.write(generate()) << '\n';
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.Generator
+auto tests::unit::writer::Fixture::test_operator_insert() -> void {
+  Generator generate;
+  std::cout << generate() << '\n'; // <----------- operator<<(std::ostream &, json::Value const &)
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.Generator
+#import json.writer.stream.Builder
+#import json.writer.Stream
+#import std.unique_ptr
+auto tests::unit::writer::Fixture::test_stream_builder() -> void {
+  // A recipe, as copied from json/writer.h
+  tests::unit::Generator generate;
+  ::json::Value value = generate();
+  ::json::writer::stream::Builder builder;
+  builder["commentStyle"] = "None";
+  builder["indentation"] = "   ";  // or whatever you like
+  std::unique_ptr<::json::writer::Stream> writer(builder.newStreamWriter());
+  std::ostream &out(std::cout);
+  writer->write(value, &out);
+  out << std::endl; 
+  CPPUNIT_ASSERT(true);
+}
+#import json.writer.stream.Styled
+auto tests::unit::writer::Fixture::test_stream_styled() -> void {
+  tests::unit::Generator generate;
+  ::json::Value value = generate();
+  ::json::writer::stream::Styled w;
+  w.write(std::cout, value);
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.writer.Compact
+#import tests.unit.writer.Fast
+#import tests.unit.writer.Pretty
+#import tests.unit.writer.Stream
+#import tests.unit.writer.Styled
+#import tests.unit.writer.stream.Builder
+#import tests.unit.writer.stream.Styled
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::writer::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  using ::unit::rigging::suite::Stream;
+  Stream series("writer");
+  series << call("abstract", &Fixture::test_abstract)
+         << call("fast", &Fixture::test_fast)
+         << call("stream", &Fixture::test_stream)
+         << call("styled", &Fixture::test_styled)
+         << call("stream-builder", &Fixture::test_stream_builder)
+         << call("stream-styled", &Fixture::test_stream_styled)
+         << call("operator<<", &Fixture::test_operator_insert)
+         << add(writer::Compact::suite())
+         << add(writer::Pretty::suite())
+         << add(writer::Stream::suite())
+         << add(writer::stream::Builder::suite())
+         << add(writer::stream::Styled::suite())
+    ;
+  {
+    Stream dep("deprecated");
+    dep << add(writer::Fast::suite())
+        << add(writer::Styled::suite())
+      ;
+    series << add(dep.release());
+  }
+  return series.release();
+}
+#endiv

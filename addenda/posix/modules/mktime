@@ -1,0 +1,4 @@
+// -*- c++ -*- c5d0c11c-b65c-41f8-b144-8d2e0f3be15d
+#pragma once
+// See timelocal, nearby
+#include <time.h>

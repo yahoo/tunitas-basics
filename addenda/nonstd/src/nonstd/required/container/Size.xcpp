@@ -1,0 +1,35 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.size_t
+#import std.empty // <hpp/std.empty> as necessary
+#import std.size
+#import nonstd.required.container.Basic
+namespace nonstd::required::container {
+  //
+  // Is this type a container that has a size capability?
+  // Recognizing that computing the size may exhaust the container.
+  // 
+  // Usage:
+  //
+  //   template<required::container::Sized CONTAINER> struct Something;
+  //
+  template<typename CONTAINER> concept Size = requires(CONTAINER container) {
+    requires Basic<CONTAINER>;
+    { std::size(container) } -> std::size_t;
+    { std::empty(container) } -> bool;
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Size<vector<string>>);
+    static_assert(Size<string>);
+  }
+}
+#endiv

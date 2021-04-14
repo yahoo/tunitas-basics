@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import std.int64_t
+#import std.uint64_t
+#import nonstd.int128_t
+#import nonstd.uint128_t
+namespace tests::unit::nonstd::int128 {
+  template<typename INTEGER> concept bool Big_Integer = std::is_same<::nonstd::int128_t, INTEGER>::value || std::is_same<::nonstd::uint128_t, INTEGER>::value;
+  template<typename INTEGER> concept bool Small_Integer = std::is_same<std::int64_t, INTEGER>::value || std::is_same<std::uint64_t, INTEGER>::value;
+  template<Big_Integer BIG, Small_Integer SMALL, unsigned STRIDE = 5> struct Traits;
+}
+#endiv
+#divert <hpp>
+#import std.is_signed
+#import std.is_unsigned
+#import std.numeric_limits
+namespace tests::unit::nonstd {
+  template<int128::Big_Integer BIG, int128::Small_Integer SMALL, unsigned STRIDE> class int128::Traits : private std::numeric_limits<BIG> {
+    // keep the early names short to ease the casting of literals
+    using big = BIG;
+    using big_limits = std::numeric_limits<big>;
+    using small = SMALL;
+    using small_limits = std::numeric_limits<small>;
+    static constexpr auto stride() -> small { return STRIDE; }
+    static_assert(STRIDE < 1000, "fail, be reasonable");
+    static_assert(std::is_unsigned<small>::value == std::is_unsigned<big>::value, "fail");
+    static_assert(std::is_signed<small>::value == std::is_signed<big>::value, "fail");
+  public:
+    using int_type = big;
+    using native_integer_type = small; // be judicious, the whole point here is the (big) int type
+    static constexpr auto min() -> int_type { return big_limits::min(); }
+    static constexpr auto max() -> int_type { return big_limits::max(); }
+    //
+    // Literals for the values computed below are expected to be in the EXPECTATIONS map
+    // Integer<Traits<BIG, SMALL, STRIDE>>::EXPECTATIONS
+    //
+    static constexpr auto low_min() -> int_type { return big_limits::min(); }
+    static constexpr auto low_max() -> int_type { return low_min() + big(stride()); }
+    static constexpr auto zerospan_min() -> int_type { return big_limits::min(); }
+    static constexpr auto zerospan_max() -> int_type { return zerospan_min() + big(stride()); }
+    static constexpr auto crossover_min() -> int_type { return small_limits::max() - big(stride()); }
+    static constexpr auto crossover_max() -> int_type { return crossover_min() + big(2*stride()); }
+    static constexpr auto high_min() -> int_type { return big_limits::max() - stride(); }
+    static constexpr auto high_premax() -> int_type { return big_limits::max()-1; }
+    static constexpr auto high_max() -> int_type { return big_limits::max(); }
+  };
+}
+#endiv

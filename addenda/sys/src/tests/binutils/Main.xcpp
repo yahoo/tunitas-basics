@@ -1,0 +1,126 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.binutils.required.Syscall_Result
+namespace tests::binutils {
+  //
+  // The "main" program for a (simple) system call caller.
+  //
+  // Usage:
+  //
+  //   auto main(int c, char *v[]) -> int }
+  //     Main<sys::exit::Code> remain([](c::const_argv av) { return syscall(av[1], av[2]); });
+  //     return remain(c, v);
+  //   }
+  //   
+  //   auto main(int c, char *v[]) -> int }
+  //     Main<bool> remain([](c::const_argv av) { return syscall(av[1], av[2]); });
+  //     return remain(c, v);
+  //   }
+  //
+  template<required::Syscall_Result RESULT> class Main;
+}
+#endiv
+#divert <hpp>
+#import c.const_argv
+#import std.function
+#import std.string
+#import sys.call.Result
+#import sys.exits.Code
+namespace tests::binutils {
+  template<required::Syscall_Result RESULT> class Main {
+  public:
+    using Name = std::string;
+    using Result = RESULT;
+    using Function = std::function<Result (c::const_argv)>;
+    inline Main(Name, Function);
+    inline auto operator()(int, char const *[]) -> int;
+    auto operator()(c::const_argv) -> sys::exits::Code; 
+  protected:
+    auto call(c::const_argv) -> sys::exits::Code;  // the specializations
+    auto want_help(c::const_argv) -> bool;
+    std::string name;
+    Function function;
+    bool verbose_mode;
+    auto verbout() const -> std::ostream &;
+  };
+}
+#entail tests.binutils.Main.bool
+#entail tests.binutils.Main.exits.Code
+#entail tests.binutils.Main.call.result.Value.int
+#entail tests.binutils.Main.call.result.Value.string
+#endiv
+#divert <ipp>
+#import std.cerr
+namespace tests::binutils {
+  template<required::Syscall_Result _> Main<_>::Main(Name name, Function function)
+    : name(name)
+    , function(function)
+    , verbose_mode(true) { }
+  template<required::Syscall_Result _> auto Main<_>::operator()(int c, char const *v[]) -> int {
+    return operator()(c::const_argv(c, v));
+  }
+  template<required::Syscall_Result _> auto Main<_>::verbout() const -> std::ostream & {
+    return std::cerr;
+  }
+}
+#endiv
+#divert <tpp>
+#import nonstd.exception.Quitting
+#import std.cerr
+#import std.exception
+#import std.make_ostream_joiner
+#import sys.exits.constants
+#import tests.binutils.exception.Generic
+namespace tests::binutils {
+  template<required::Syscall_Result _> auto Main<_>::operator()(c::const_argv av) -> sys::exits::Code {
+    try {
+      if (want_help(av)) {
+        std::cerr << name << ": notice, these simple syscall testers give no detailed help, use the man page\n";
+        return sys::exits::OK;
+      }
+      if (verbose_mode) {
+        verbout() << "run: " << name << ' ';
+        std::copy(av.begin()+1, av.end(), std::make_ostream_joiner(verbout(), ' '));
+        verbout() << '\n';
+      }
+      return call(av);
+    } catch (exception::Generic const &e) {
+      // This is the test rig talking to itself.
+      std::cerr << name << ": error, " << e.what() << '\n';
+      return sys::exits::TWO;
+    } catch (nonstd::exception::Quitting const &q) {
+      std::cerr << q << '\n';
+      return q.code();
+    } catch (std::exception const &e) {
+      // This is unexpected, so a little more ceremony around it is necessary.
+      std::cerr << name << ": error, an unexpected exception saying '" << e.what() << "'\n";
+      return sys::exits::TWO;
+    }
+  }
+}
+#import std.string_literals
+#import std.string
+namespace tests::binutils {
+  template<required::Syscall_Result _> auto Main<_>::want_help(c::const_argv av) -> bool {
+    using namespace std::string_literals;
+    // [[FIXTHIS]] ... there's no point in parsing for more than --help here as argv is constant
+    if (av.size() < 2) {
+      return false;
+    }
+    std::string const word = av[1];
+    if (word.empty()) {
+      return false;
+    }
+    if ("-h"s == word || "--help"s == word || "--usage"s == word) {
+      return true;
+    }
+    if ('-' == word.front()) {
+      std::cerr << name << ": notice, the only known options being --usage, --help\n";
+      std::cerr << name << ": error, unknown option " << word << "\n";
+      throw nonstd::exception::Quitting(sys::exits::USAGE);
+    }
+    return false;
+  }
+}
+#endiv

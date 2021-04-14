@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.exits.Condition
+#import std.is_error_condition_enum
+namespace sys::exits {
+  //
+  // Interface with the std::error_condition system
+  //
+  // Usage:
+  //
+  //   #import sys.exits.error_condition
+  //   sys::exits::Condition condition = ...something...
+  //   std::error_condition ec{condition};
+  //   std::cout << ec.message();
+  //
+}
+namespace std {
+  template<> struct is_error_condition_enum<sys::exits::Condition>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_condition_enum<sys::exits::Condition> : public std::true_type { };
+#import std.error_condition
+namespace sys::exits {
+  inline auto make_error_condition(Condition) -> std::error_condition;
+}
+#endiv
+#divert <ipp>
+#import sys.exits.category
+auto sys::exits::make_error_condition(Condition condition) -> std::error_condition {
+  return std::error_condition{(int) condition, category()};
+}
+#endiv

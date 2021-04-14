@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_EX.Usage
+//   static_assert(tests::usage::posix_EX::Usage<>);
+//
+#import sys.posix.EX
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_EX {
+  using sys::posix::EX;
+  namespace [[detail]] packaging {
+    namespace ex = sys::ex; // sys::ex::constants and sys::exits::constants are the same thing
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    template<typename EX> concept bool Instance = requires(EX) {
+      typename EX::Code;
+      requires model::Namespace_Object<EX>;
+      requires (int)EX::OK == EX_OK;
+      requires (int)EX::GOOD == EX_OK;
+      requires (int)EX::FAIL == 1;
+      requires (int)EX::ZERO == EX_OK;
+      requires (int)EX::ONE == 1;
+      requires (int)EX::TWO == 2;
+      requires (int)EX::USAGE == EX_USAGE;
+      requires (int)EX::DATAERR == EX_DATAERR;
+      requires (int)EX::NOINPUT == EX_NOINPUT;
+      requires (int)EX::NOUSER == EX_NOUSER;
+      requires (int)EX::NOHOST == EX_NOHOST;
+      requires (int)EX::UNAVAILABLE == EX_UNAVAILABLE;
+      requires (int)EX::SOFTWARE == EX_SOFTWARE;
+      requires (int)EX::OSERR == EX_OSERR;
+      requires (int)EX::OSFILE == EX_OSFILE;
+      requires (int)EX::CANTCREATE == EX_CANTCREAT;
+      requires (int)EX::TEMPFAIL == EX_TEMPFAIL;
+      requires (int)EX::PROTOCOL == EX_PROTOCOL;
+      requires (int)EX::NOPERM == EX_NOPERM;
+      requires (int)EX::CONFIG == EX_CONFIG;
+      requires (int)EX::CANTCREAT == EX_CANTCREAT;
+      requires (int)EX::CANTREMOVE == ex::CANTREMOVE;
+      requires (int)EX::NOGROUP == ex::NOGROUP;
+      requires (int)EX::UNIMPLEMENTED == ex::UNIMPLEMENTED;
+      requires (int)EX::UNCOMMITTED == ex::UNCOMMITTED;
+      requires (int)EX::NOGOLDEN == ex::NOGOLDEN;
+      requires (int)EX::NOOUTPUT == ex::NOOUTPUT;
+      requires (int)EX::NOCOMMAND == ex::NOCOMMAND;
+    };
+#pragma GCC diagnostic pop
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<EX>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.File
+#import sys.call.Result
+#import sys.call.result.Value
+#import sys.posix.packaging.at.interface
+#import sys.posix.packaging.stat.Buffer
+namespace sys::posix::packaging::stat::interface {
+  //
+  // Usage:
+  //
+  //   namespace sys::posix {
+  //     namespace packaging::stat {
+  //       using namespace packaging::stat::interface;
+  //       namespace function {
+  //         ...declare... auto stat(Pathname) -> Result;
+  //         ...declare... auto statat(Position<File> Pathname, ...others...) -> Result;
+  //       }
+  //       namespace native {
+  //         ...declare... auto statat(Position<int>, Pathname ...others...) -> Result;
+  //       }
+  //     }
+  //
+  inline namespace argument {
+    using namespace at::interface::argument;
+  }
+  using namespace argument;
+  using id::File;
+  using stat::Buffer;
+  namespace result {
+    using namespace at::interface::result;
+    using Buffer = call::result::Value<Buffer, int>;
+  }
+}
+#endiv

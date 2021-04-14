@@ -1,0 +1,195 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::exception::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_usage_Exception() -> void;
+  auto test_usage_Generic() -> void;
+  auto test_usage_Runtime() -> void;
+  auto test_usage_Logic() -> void;
+  auto test_usage_Cast() -> void;
+  auto test_usage_Syntax() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  template<typename FIRST, typename SECOND, typename BUILDER> static auto exercise_throwing(bool first, bool second, BUILDER) -> void;
+  template<typename EXCEPTION> static auto exercise_constructors() -> void;
+};
+#import json.exception.Cast
+#import json.exception.Syntax
+namespace tests::unit::exception {
+  template<> auto Fixture::exercise_constructors<::json::exception::Cast>() -> void;
+  template<> auto Fixture::exercise_constructors<::json::exception::Syntax>() -> void;
+}
+#endiv
+#divert <tpp>
+#import std.move
+#import std.exception
+#import std.is_same
+namespace tests::unit::exception {
+  template<typename FIRST, typename SECOND, typename BUILDER> auto Fixture::exercise_throwing(bool first, bool second, BUILDER builder) -> void {
+    if constexpr (std::is_same<FIRST, SECOND>::value) {
+      try {
+        builder();
+        CPPUNIT_ASSERT(false);
+      } catch (FIRST const &) {
+        CPPUNIT_ASSERT(first);
+      }
+    } else {
+      try {
+        builder();
+        CPPUNIT_ASSERT(false);
+      } catch (FIRST const &) {
+        CPPUNIT_ASSERT(first);
+      } catch (SECOND const &) {
+        CPPUNIT_ASSERT(second);
+      }
+    }
+  }
+  template<typename EXCEPTION> auto Fixture::exercise_constructors() -> void {
+    using Subject = EXCEPTION;
+    try {
+      Subject copy_conversion{"bad"s};
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(true);
+    }
+    try {
+      Subject move_conversion{std::move("bad"s)};
+      throw move_conversion;
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(true);
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#import json.Exception
+auto tests::unit::exception::Fixture::test_usage_Exception() -> void {
+  exercise_constructors<::json::Exception>();
+  ::json::Exception example{"what?"};
+  CPPUNIT_ASSERT(nullptr != example.what());
+  exercise_throwing<::json::Exception, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(false, true, [&example]() { throw example; });
+}
+#import json.exception.Generic
+auto tests::unit::exception::Fixture::test_usage_Generic() -> void {
+  exercise_constructors<::json::exception::Generic>();
+  ::json::exception::Generic example("ungood");
+  CPPUNIT_ASSERT(nullptr != example.what());
+  exercise_throwing<::json::Exception, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(false, true, [&example]() { throw example; });
+}
+#import std.runtime_error
+#import json.exception.Runtime
+auto tests::unit::exception::Fixture::test_usage_Runtime() -> void {
+  exercise_constructors<::json::exception::Runtime>();
+  ::json::exception::Runtime example("ungood");
+  CPPUNIT_ASSERT(nullptr != example.what());
+  exercise_throwing<::json::exception::Runtime, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::std::runtime_error, std::exception>(false, true, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(false, true, [&example]() { throw example; });
+}
+#import std.logic_error
+#import json.exception.Logic
+auto tests::unit::exception::Fixture::test_usage_Logic() -> void {
+  exercise_constructors<::json::exception::Logic>();
+  ::json::exception::Logic example("ungood");
+  CPPUNIT_ASSERT(nullptr != example.what());
+  exercise_throwing<::json::exception::Logic, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::std::logic_error, std::exception>(false, true, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(false, true, [&example]() { throw example; });
+}
+#import json.exception.Cast
+auto tests::unit::exception::Fixture::test_usage_Cast() -> void {
+  exercise_constructors<::json::exception::Cast>();
+  json::exception::Cast example("uncastable", typeid(Fixture));
+  CPPUNIT_ASSERT(nullptr != example.what());
+  CPPUNIT_ASSERT(!example.message().empty());
+  CPPUNIT_ASSERT(nullptr != example.type_info().name());
+  exercise_throwing<::json::exception::Cast, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(true, false, [&example]() { throw example; });
+}
+#import json.to
+#import json.exception.Syntax
+#import json.String
+auto tests::unit::exception::Fixture::test_usage_Syntax() -> void {
+  exercise_constructors<::json::exception::Syntax>();
+  auto syntax = ::json::to(::json::STRING(), R"json({"apple";1})json");
+  json::exception::Syntax example("BAD", syntax);
+  CPPUNIT_ASSERT(nullptr != example.what());
+  CPPUNIT_ASSERT(!example.message().empty());
+  exercise_throwing<::json::exception::Syntax, std::exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Generic, json::Exception>(true, false, [&example]() { throw example; });
+  exercise_throwing<::json::exception::Messaging, json::exception::Generic>(true, false, [&example]() { throw example; });
+}
+template<> auto tests::unit::exception::Fixture::exercise_constructors<::json::exception::Cast>() -> void {
+  using Subject = ::json::exception::Cast;
+  try {
+    Subject copy_conversion{"bad"s, typeid(Fixture)};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    Subject move_conversion{std::move("bad"s), std::move(typeid(std::string))};
+    throw move_conversion;
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+template<> auto tests::unit::exception::Fixture::exercise_constructors<::json::exception::Syntax>() -> void {
+  using Subject = ::json::exception::Syntax;
+  auto syntax = ::json::to(::json::STRING(), R"json({"apple";1})json");
+  try {
+    Subject copy_conversion{"bad"s};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    Subject move_conversion{std::move("bad"s)};
+    throw move_conversion;
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    Subject copy_conversion{"bad"s, syntax};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    auto copy_of_syntax = syntax;
+    Subject move_conversion{std::move("bad"s), std::move(copy_of_syntax)};
+    throw move_conversion;
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("exception");
+  {
+    Stream use("usage");
+    use << call("Exception", &Fixture::test_usage_Exception)
+        << call("Generic", &Fixture::test_usage_Generic)
+        << call("Runtime", &Fixture::test_usage_Runtime)
+        << call("Logic", &Fixture::test_usage_Logic)
+        << call("Cast", &Fixture::test_usage_Cast)
+        << call("Syntax", &Fixture::test_usage_Syntax)
+      ;
+    series << move(use);
+  }
+  return finalize(series);
+}
+#endiv

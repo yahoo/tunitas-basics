@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::af { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.net.Network
+struct tests::unit::af::Fixture : public cppunit::test::Fixture {
+  using Network = ::sys::net::Network;
+  auto test_Type() -> void;
+  auto test_Family() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.af.Type
+#import sys.af.Family
+auto tests::unit::af::Fixture::test_Type() -> void {
+  CPPUNIT_ASSERT(::sys::af::Type{} == ::sys::af::Family<Network::UNSPECIFIED>);
+}
+#import sys.af.Family
+auto tests::unit::af::Fixture::test_Family() -> void {
+  using namespace ::sys::af;
+  CPPUNIT_ASSERT(Type{AF_UNSPEC} == Family<Network::UNSPECIFIED>);
+  CPPUNIT_ASSERT(Type{AF_UNIX} == Family<Network::UNIX>);
+  CPPUNIT_ASSERT(Type{AF_LOCAL} == Family<Network::LOCAL>);
+  CPPUNIT_ASSERT(Type{AF_INET} == Family<Network::INET4>);
+  CPPUNIT_ASSERT(Type{AF_INET6} == Family<Network::INET6>);
+  CPPUNIT_ASSERT(Type{AF_IPX} == Family<Network::IPX>);
+  CPPUNIT_ASSERT(Type{AF_NETLINK} == Family<Network::NETLINK>);
+  CPPUNIT_ASSERT(Type{AF_X25} == Family<Network::X25>);
+  CPPUNIT_ASSERT(Type{AF_AX25} == Family<Network::AX25>);
+  CPPUNIT_ASSERT(Type{AF_ATMPVC} == Family<Network::ATMPVC>);
+  CPPUNIT_ASSERT(Type{AF_APPLETALK} == Family<Network::APPLETALK>);
+  CPPUNIT_ASSERT(Type{AF_ALG} == Family<Network::ALGORITHM>);
+  CPPUNIT_ASSERT(Type{AF_PACKET} == Family<Network::PACKET>);
+}
+#import sys.af.constants
+auto tests::unit::af::Fixture::test_constants() -> void {
+  using ::sys::af::Type;
+  using namespace ::sys::af::constants;
+  CPPUNIT_ASSERT(Type{AF_UNSPEC} == UNSPECIFIED);
+  CPPUNIT_ASSERT(Type{AF_UNIX} == UNIX);
+  CPPUNIT_ASSERT(Type{AF_LOCAL} == LOCAL);
+  CPPUNIT_ASSERT(Type{AF_INET} == INET4);
+  CPPUNIT_ASSERT(Type{AF_INET6} == INET6);
+  CPPUNIT_ASSERT(Type{AF_IPX} == IPX);
+  CPPUNIT_ASSERT(Type{AF_NETLINK} == NETLINK);
+  CPPUNIT_ASSERT(Type{AF_X25} == X25);
+  CPPUNIT_ASSERT(Type{AF_AX25} == AX25);
+  CPPUNIT_ASSERT(Type{AF_ATMPVC} == ATMPVC);
+  CPPUNIT_ASSERT(Type{AF_APPLETALK} == APPLETALK);
+  CPPUNIT_ASSERT(Type{AF_ALG} == ALGORITHM);
+  CPPUNIT_ASSERT(Type{AF_PACKET} == PACKET);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  CPPUNIT_ASSERT(Type{AF_UNSPEC} == UNSPEC);
+  CPPUNIT_ASSERT(Type{AF_ALG} == ALG);
+  CPPUNIT_ASSERT(Type{AF_INET} == INET);
+#pragma GCC diagnostic pop
+}
+#import rigging.suite.io
+auto tests::unit::af::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("af");
+  series << call("Type", &Fixture::test_Type)
+         << call("Family", &Fixture::test_Family)
+         << call("constants", &Fixture::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

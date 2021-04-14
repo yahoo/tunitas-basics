@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.from_tm.interface
+#import sys.posix.packaging.required.from_tm.Result
+namespace sys::posix {
+  namespace packaging::mktime {
+    using namespace packaging::from_tm::interface;
+    namespace required = packaging::required;
+    namespace function {
+      inline auto mktime(Disaggregated const &) -> Result<Point>;
+      template<required::from_tm::Result RESULT> auto mktime(Disaggregated const &) -> Result<RESULT> = delete;
+      template<> inline auto mktime<Old>(Disaggregated const &) -> Result<Old>;
+      template<> inline auto mktime<Point>(Disaggregated const &) -> Result<Point>;
+    }
+  }
+  using packaging::mktime::function::mktime;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.from_tm.perform
+#import sys.posix.packaging.const_tm
+#import mktime
+namespace sys::posix::packaging::mktime {
+  namespace function {
+    using namespace packaging::from_tm;
+    namespace happier = packaging::const_tm;
+  }
+  auto function::mktime(Disaggregated const &in) -> Result<Point> { return mktime<Point>(in); }
+  template<> auto function::mktime<Point>(Disaggregated const &in) -> Result<Point> { return perform<Point>(happier::mktime, in); }
+  template<> auto function::mktime<Old>(Disaggregated const &in) -> Result<Old>     { return perform<Old>(happier::mktime, in); }
+}
+#endiv

@@ -1,0 +1,165 @@
+// -*- c++ -*- and wrapped in the SCOLD stylings
+#divert <hpp>
+#import slurp.file.required.Container
+#import std.string
+#import std.nothrow_t
+#import sys.call.result.Value
+#import sys.call.argument.Pathname
+namespace slurp::file {
+  //
+  // Read the file, returning the filename and the CONTAINER
+  // Throws slurp::Failure if the file cannot be opened or read.
+  //
+  // On success the contents are returned
+  // On failure, an exception is thrown
+  //
+  // See slurp::file::named::read<...>(...) for a more deliberate approach
+  //
+  template<required::Container CONTAINER> auto read(sys::call::argument::Pathname) -> CONTAINER;
+
+  // Does not throw, does return a "standard" syscall-style result
+  template<required::Container CONTAINER> auto read(std::nothrow_t, sys::call::argument::Pathname) -> sys::call::result::Value<CONTAINER>;
+}
+#endiv
+#divert <tpp>
+#import slurp.Failure
+#import slurp.file.Configuration
+#import std.back_insert_iterator
+#import std.copy
+#import std.error_code
+#import std.generic_category
+#import std.ifstream
+#import std.ios
+#import std.is_same
+#import std.move
+#import std.ostringstream
+template<slurp::file::required::Container CONTAINER> auto slurp::file::read(sys::call::argument::Pathname file_name) -> CONTAINER {
+  using configuration_type = Configuration<CONTAINER>;
+  try {
+    std::ifstream in;
+    in.exceptions(std::ios::badbit|std::ios::failbit);
+    in.open((char const *)file_name);
+    in.exceptions(std::ios::badbit);
+    in.unsetf(std::ios::skipws); // we have to (not skip) the whitespace.
+    //
+    // http://www.cplusplus.com/reference/ios/ios/good/
+    // 
+    // goodbit -> No errors (zero value iostate)
+    // eofbit  -> End-of-File reached on input operation
+    // failbit -> Logical error on i/o operation
+    // badbit  -> Read/writing error on i/o operation
+    //
+    // bad => fail
+    // eof => !good  yet eof is independent from bad or fail
+    //
+    typename configuration_type::input_iterator begin(in);
+    typename configuration_type::input_iterator end;
+    CONTAINER ret;
+    typename configuration_type::output_iterator oi(ret);
+    // This reads the file with operator>> on a character-by-character basis (buffered by istream)
+    std::copy(begin, end, oi);
+    if (!in.eof()) {
+      // Would have thrown on fail (and recall that bad => fail)
+      throw std::ios::failure("did not read the whole file");
+    }
+    return ret;
+  } catch (std::ios::failure const &f) {
+    //
+    // Problem #1 --- gcc's API / ABI ----------
+    //
+    // WATCHOUT - in gcc7 they have broken the ABI so that libstdc++ throws C++03 ABI.
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145 [5/6/7 Regression] std::ios_base::failure objects thrown from libstdc++.so use old ABI
+    //
+    // <ios>            _GLIBCXX_USE_CXX11_ABI=1
+    // libstdc++.so.6   _GLIBCXX_USE_CXX11_ABI=0
+    //
+    // C++11 puts std::ios::failure as a descendant of std::system_error
+    // See http://www.cplusplus.com/reference/ios/ios_base/failure/
+    // not fixed: gcc 4.8, gcc 6.2, gcc 7.1.
+    // 
+    // And yet as late as
+    //     gcc-c++-4.8.3-7.fc19.x86_64
+    //     libstdc++-devel-4.8.3-7.fc19.x86_64
+    //  it does not; rather it descends from std::exception as per C++98
+    // See http://www.cplusplus.com/reference/ios/ios_base/failure/
+    // and contrast with std::ios_base::failure in /usr/include/c++/4.8.3/bits/ios_base.h
+    // By putting the (ios::failure) system_error-based catcher is first.
+    //
+    // When: _GLIBCXX_USE_CXX11_ABI=1
+    //
+    // Problem #2 --- dumb diagnostic messages ----------
+    //
+    // The diagnostic messaging in std::ios::failure::what() is pointless beyond any utility at all.
+    // It indicates that a particular member function, which has nothing to do with the problem has "failed to achieve its result."
+    // We have to fix this on-site, capturing errno as soon as possible.
+    //
+    std::error_code recode(errno, std::generic_category());
+    std::string hopeful = f.what();
+    // [[FIXTHIS]] find a general way to identify these pointless explanations within ios::failure (system_error) and substitute something pointful.
+    std::string unhelpful = "iostream error";
+    std::string even_more_unhelpful = "basic_ios::clear: iostream error";
+    if (hopeful == unhelpful || hopeful == even_more_unhelpful) {
+      hopeful = "open"; // we know that open(2) has just failed.
+    }
+    // The hopeful message is why, separately the file_name is returned to the caller
+    throw Failure(recode, hopeful, (std::string) file_name);
+#if __GNUC__ < 8 // maybe fixed here?
+  } catch (std::exception const &f) {
+    //
+    // WATCHOUT - this is not fixed as late as gcc 6.2.1
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66145 [5/6/7 Regression] std::ios_base::failure objects thrown from libstdc++.so use old ABI
+    //
+    // from
+    //   Fedora release 24 (Twenty Four)
+    //   gcc-6.2.1-2.fc24.x86_64
+    //
+    // What actually gets thrown is not a descendant of std::system_error, but rather of std::exception
+    // See /usr/include/./c++/6.2.1/bits/ios_base.h:255:    class _GLIBCXX_ABI_TAG_CXX11 failure : public system_error
+    // See gdb stacktrace in __throw_ios_failiure(...)
+    //
+    //   (gdb) ptype std::ios_base::failure
+    //   type = class std::ios_base::failure : public std::exception { <------------------ this is the problem
+    //     private:
+    //       std::string _M_msg;
+    //     public:
+    //       failure(const std::string &);
+    //       ~failure(int);
+    //       virtual const char * what(void) const;
+    //   }
+    //   (gdb) 
+    //
+    std::error_code recode(errno, std::system_category());
+    std::ostringstream buf;
+    buf << file_name << ": " << recode.message();
+    throw Failure(recode, buf.str(), (std::string) file_name);
+#endif
+  }
+}
+#import std.ios
+#include <cerrno>
+template<slurp::file::required::Container CONTAINER> auto slurp::file::read(std::nothrow_t, sys::call::argument::Pathname file_name) -> sys::call::result::Value<CONTAINER> {
+  using payload_type = CONTAINER;
+  using result_type = sys::call::result::Value<payload_type>;
+  using configuration_type = Configuration<payload_type>;
+  std::ifstream in((char const *)file_name, std::ios::in);
+  if (!in) {
+    int error_num = errno; // read as soon as possible after open(2) fails
+    return result_type(false, error_num, payload_type());
+  }
+  in.unsetf(std::ios::skipws); // we have to (not skip) the whitespace.
+  typename configuration_type::input_iterator begin(in);
+  typename configuration_type::input_iterator end;
+  CONTAINER payload;
+  typename configuration_type::output_iterator oi(payload);
+    // This reads the file with operator>> on a character-by-character basis (buffered by istream)
+  std::copy(begin, end, oi);
+  // See the truth table http://www.cplusplus.com/reference/ios/basic_ios/fail/
+  if (!in.eof() && in.fail()) {
+    // ??? the test for in.fail() seems redundant here.
+    // decision: return what was actually read even though there was some problem
+    return result_type(false, EIO, std::move(payload));
+  }
+  result_type ret(true, /*errno*/ 0, std::move(payload));
+  return ret;
+}
+#endiv

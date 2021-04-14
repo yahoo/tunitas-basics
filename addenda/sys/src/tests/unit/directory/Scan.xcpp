@@ -1,0 +1,148 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace directory {
+      class Scan;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::directory::Scan : public cppunit::test::Fixture { 
+public: 
+  auto test_1arg_good() -> void;
+  auto test_1arg_fail() -> void;
+  auto test_2arg_good() -> void;
+  auto test_2arg_fail() -> void;
+  auto test_3arg_good() -> void;
+  auto test_3arg_fail() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import sys.directory.scan
+#import std.cerr
+#import std.string
+#import std.vector
+
+auto tests::unit::directory::Scan::test_1arg_good() -> void {
+  std::string place = "src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto scanned = scan<ve>(place); // <-------------------- test this
+  CPPUNIT_ASSERT(ok(scanned));
+  unsigned count = 0;
+  for (auto const &entry : value(scanned)) {
+    count++;
+    std::cerr << "any entry " << entry.name << '\n';
+  }
+  CPPUNIT_ASSERT(0 < count);
+}
+
+auto tests::unit::directory::Scan::test_1arg_fail() -> void {
+  std::string place = "...FAILS-TO-EXIST.../src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto scanned = scan<ve>(place); // <----------------------- test this
+  CPPUNIT_ASSERT(!ok(scanned));
+}
+
+auto tests::unit::directory::Scan::test_2arg_good() -> void {
+  std::string place = "src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto only_xcpp_files = [](Entry const &item) -> bool {
+    if (item.name.size() > 5) {
+      if (".xcpp" == item.name.substr(item.name.size()-5)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  auto scanned = scan<ve>(place, only_xcpp_files); // <---------- test this
+  CPPUNIT_ASSERT(ok(scanned));
+  unsigned count = 0;
+  for (auto const &entry : value(scanned)) {
+    count++;
+    std::cerr << "selected entry " << entry.name << '\n';
+  }
+  // There are four (4) *.xcpp files in this directory
+  // WATCHOUT - sometimes there are other trash files too; e.g. emacs temporaries.
+  CPPUNIT_ASSERT(5u <= count);
+}
+
+auto tests::unit::directory::Scan::test_2arg_fail() -> void {
+  std::string place = "...FAILS-TO-EXIST.../src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto any_file = [](Entry const &item) -> bool {
+    return true;
+  };
+  auto scanned = scan<ve>(place, any_file); // <---------- test this
+  CPPUNIT_ASSERT(!ok(scanned));
+}
+
+#import std.greater
+
+auto tests::unit::directory::Scan::test_3arg_good() -> void {
+  std::string place = "src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto only_xcpp_files = [](Entry const &item) -> bool {
+    if (item.name.size() > 5) {
+      if (".xcpp" == item.name.substr(item.name.size()-5)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  std::greater<Entry> cmp; // <----------------------- sort in reverse order
+  auto scanned = scan<ve>(place, only_xcpp_files, cmp); // <----- test this
+  CPPUNIT_ASSERT(ok(scanned));
+  auto container = value(scanned);
+  std::string last_entry = container.front().name;
+  CPPUNIT_ASSERT(2 <= container.size());
+  for (int i(1), e(container.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(last_entry >= container[i].name);
+  }
+}
+
+auto tests::unit::directory::Scan::test_3arg_fail() -> void {
+  std::string place = "...FAILS-TO-EXIST.../src/tests/unit/directory";
+  using ::sys::directory::scan;
+  using ::sys::directory::Entry;
+  using ve = std::vector<Entry>;
+  auto any_file = [](Entry const &item) -> bool {
+    return true;
+  };
+  std::greater<Entry> cmp;
+  auto scanned = scan<ve>(place, any_file, cmp); // <----------------- test this
+  CPPUNIT_ASSERT(!ok(scanned));
+}
+
+#import rigging.suite.io
+auto tests::unit::directory::Scan::suite() -> cppunit::Test * {
+  namespace suite = ::rigging::suite;
+  suite::Stream s("scan");
+  using rigging::suite::call; // because tests::unit::call occludes it
+  s << call("1arg-good", &Scan::test_1arg_good)
+    << call("1arg-fail", &Scan::test_1arg_fail)
+    << call("2arg-good", &Scan::test_2arg_good)
+    << call("2arg-fail", &Scan::test_2arg_fail)
+    << call("3arg-good", &Scan::test_3arg_good)
+    << call("3arg-fail", &Scan::test_3arg_fail)
+    ;
+  return finalize(s);
+}
+#divert </cpp>

@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::r::limit { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.r.Limit
+#import sys.r.Limits
+struct tests::unit::r::limit::Fixture : public cppunit::test::Fixture {
+  using Limit = ::sys::r::Limit;
+  using Limits = ::sys::r::Limits;
+  auto test_Limit() -> void;
+  auto test_Limits() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.r.constants
+namespace tests::unit::r::limit {
+  auto Fixture::test_Limit() -> void {
+    auto s = Limit{};
+    s = Limit::CPU;
+    s = Limit::CORE;
+    s = Limit::DATA;
+    s = Limit::FILE;
+    // sure, there are others...
+    CPPUNIT_ASSERT(sizeof (s));
+  }
+  auto Fixture::test_Limits() -> void {
+    auto s = Limits{}; // <---------------------------------- test this
+    CPPUNIT_ASSERT(sizeof (s));
+  }
+  auto Fixture::test_constants() -> void {
+    using namespace sys::r::constants;
+    auto s = Limit{};
+    s = AS;
+    s = CORE;
+    s = CPU;
+    s = DATA;
+    s = FSIZE;
+    s = LOCKS;
+    s = MEMLOCK;
+    s = MSGQUEUE;
+    s = NICE;
+    s = NOFILE;
+    s = NPROC;
+    s = RSS;
+    s = RTPRIO;
+    s = RTTIME;
+    CPPUNIT_ASSERT(sizeof (s));
+  }
+}
+#import rigging.suite.io
+auto tests::unit::r::limit::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("limit");
+  series << call("Limit", &Fixture::test_Limit)
+         << call("Limits", &Fixture::test_Limits)
+         << call("constants", &Fixture::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

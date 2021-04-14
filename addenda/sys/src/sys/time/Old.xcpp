@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::time {
+  //
+  // The "OLD"en time when they thought seconds were appropriate
+  //
+  // Concept:
+  //
+  //   Seconds.
+  //   Rhymes with Val=timeval and Spec=timespec
+  //   Not at global scope; ADL capable.
+  //
+  //   Is a structure so you can inherit 
+  //   If you're looking for an enum-integral representation see Since adn Diff
+  //
+  //   If you want more fluidity & facilities then use duration::Seconds.
+  //
+  // Correspondences
+  //
+  //   time::Old -- time::Since -- time::t -- time_t
+  //
+  // Traditions:
+  //
+  //   Keep with the POSIX tradition of dropping vowels and consonants.
+  //   Keep with the POSIX tradition of arbitrary names like "value" contra "spec"
+  //   And see the use of the unique field name time::Old::t_sec matching timeval::tv_sec
+  //    
+  struct Old;
+}
+#endiv
+#divert <hpp>
+#import sys.time // [[FIXTHIS]] everything is in the "namespace" module
+struct sys::time::Old {
+  constexpr Old() = default;
+  constexpr Old(time_t whole) : t_sec{whole} { }
+  time::t t_sec{};
+};
+#endiv

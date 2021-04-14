@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::error {
+  //
+  // The error category of OpenSSL errors
+  //
+  // Usage:
+  //
+  //   auto &c = category();
+  //
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import std.error_category
+#import ares.error.category
+#import std.error_condition
+#import std.string
+class ares::error::Category : public std::error_category {
+  using ancestor = std::error_category;
+  friend auto error::category() -> Category const &;
+  Category() = default;
+public:
+  auto name() const noexcept -> char const * final;
+  auto default_error_condition(int code) const noexcept -> std::error_condition final;
+  auto message(int code) const -> std::string final;
+};
+#endiv
+#divert <cpp>
+#import std.to_string
+#import ares.error.Code
+#import ares.
+namespace ares::error {
+  auto Category::name() const noexcept -> char const * {
+    return "OpenSSL";
+  }
+  auto Category::default_error_condition(int code) const noexcept -> std::error_condition {
+    auto failed = 0 != code;
+    return std::error_condition{failed, *this};
+  }
+  auto Category::message(int code) const -> std::string {
+    return ares_strerror(code);
+  }
+}
+#endiv

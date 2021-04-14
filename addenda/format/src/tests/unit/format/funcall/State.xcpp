@@ -1,0 +1,140 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::funcall {
+  // crudely, similar to tests::unit::format::separator::State which is nearby
+  // but there is more detailed testing in tests::unit::format::funcall::Fixture
+  class State;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::funcall::State : public cppunit::test::Fixture {
+public:
+  auto test_constructor() -> void;
+  auto test_operator_inc() -> void;
+  auto test_operator_insert() -> void;
+
+  auto test_char() -> void;
+  auto test_char_const_star() -> void;
+  auto test_string() -> void;
+  auto test_int() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import format.Funcall
+#import std.ostringstream
+#import std.string
+#import std.vector
+
+auto tests::unit::format::funcall::State::test_constructor() -> void {
+  using ::format::Funcall;
+  Funcall<char> c('(', ',', ')');
+  CPPUNIT_ASSERT(c.is_open());
+  Funcall<char const *> css("f(", ",", ")");
+  CPPUNIT_ASSERT(css.is_open());
+  Funcall<std::string> s("f(", ",", ")");
+  CPPUNIT_ASSERT(s.is_open());
+}  
+
+auto tests::unit::format::funcall::State::test_operator_inc() -> void {
+  using ::format::Funcall;
+  Funcall<std::string> s("f(", ",", ")");
+  CPPUNIT_ASSERT(s.is_open());
+  s++;
+  CPPUNIT_ASSERT(s.is_arguments());
+  s++;
+  CPPUNIT_ASSERT(s.is_close());
+  s++;
+  CPPUNIT_ASSERT(s.is_done());
+  try {
+    s++;
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  s.reset();
+  CPPUNIT_ASSERT(s.is_open());
+}
+
+auto tests::unit::format::funcall::State::test_operator_insert() -> void {
+  using ::format::Funcall;
+  Funcall<std::string> s("f(", ",", ")");
+  std::ostringstream buf;
+  buf << s << "apple" << s << "banana" << s << "cherry" << s.tail();
+  std::string const actual = buf.str();
+  std::string const expected = "f(apple,banana,cherry)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+} 
+
+auto tests::unit::format::funcall::State::test_char() -> void {
+  using ::format::Funcall;
+  using v = std::vector<std::string>;
+  Funcall<char> state('[', ',', ']');
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << state << word;
+  }
+  buf << state.tail();
+  std::string const actual(buf.str());
+  std::string const expected("[apple,banana,cherry]");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::funcall::State::test_char_const_star() -> void {
+  using ::format::Funcall;
+  using v = std::vector<std::string>;
+  Funcall<char const *> state("[[", "::", "]]");
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << state << word;
+  }
+  buf << state.tail();
+  std::string const actual(buf.str());
+  std::string const expected("[[apple::banana::cherry]]");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::funcall::State::test_string() -> void {
+  using ::format::Funcall;
+  using v = std::vector<std::string>;
+  Funcall<std::string> state("http://", "/", "?");
+  std::ostringstream buf;
+  for (auto word : v{"apple", "banana", "cherry"}) {
+    buf << state << word;
+  }
+  buf << state.tail();
+  std::string const actual(buf.str());
+  std::string const expected("http://apple/banana/cherry?");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+auto tests::unit::format::funcall::State::test_int() -> void {
+  using ::format::Funcall;
+  using v = std::vector<int>;
+  Funcall<std::string> state("+(", "*", ")^100");
+  std::ostringstream buf;
+  for (auto word : v{1, 2, 3}) {
+    buf << state << word;
+  }
+  buf << state.tail();
+  std::string const actual(buf.str());
+  std::string const expected("+(1*2*3)^100");
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+} 
+
+#import rigging.suite.io
+auto tests::unit::format::funcall::State::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("State");
+  series << call("char", &State::test_char)
+         << call("char const *", &State::test_char_const_star)
+         << call("string", &State::test_string)
+         << call("int", &State::test_int)
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- 7d8f74c1-8f46-4ebc-bada-2b1c72f9f74d
+#pragma once
+#include <cstdarg>
+

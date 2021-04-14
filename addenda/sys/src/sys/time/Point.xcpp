@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.time // [[FIXTHIS]] everything (too much) is in namespace.xcpp
+#import std.is_class
+namespace sys::time {
+  //
+  // The time point in system clock precision
+  //
+  // Concept:
+  //
+  //   The precision is unspecified.
+  //
+  //   The modern naming convention (uses title case for type names; lower case for namespaces)
+  //
+  // Traditions:
+  //
+  //   This is a C++ culture type.
+  //   It is an alias for the std::chrono (time) point affixed ot the system clock precision.
+  //    
+  using Point = point;
+  static_assert(std::is_class_v<Point>);
+}
+#endiv

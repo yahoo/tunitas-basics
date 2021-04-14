@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.access.interface
+namespace sys::posix {
+  namespace packaging::access {
+    using namespace packaging::access::interface;
+    namespace function {
+      inline auto access(Pathname, Access) -> result::Status;
+    }
+  }
+  using packaging::access::function::access;
+}
+using sys::posix::access; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::access {
+  auto function::access(Pathname pathname, Access mode) -> result::Status { return idiomatic::syscall<int>(Syscall::ACCESS, (char const *)pathname, (int)mode); }
+}
+#endiv

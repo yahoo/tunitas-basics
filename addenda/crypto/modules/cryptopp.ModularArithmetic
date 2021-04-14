@@ -1,0 +1,4 @@
+// -*- c++ -*- 2ff39c45-9a33-4e48-aae9-492ba08c6906
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/modarith.h>

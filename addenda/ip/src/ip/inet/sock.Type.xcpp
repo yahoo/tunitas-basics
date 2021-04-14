@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.Type
+namespace ip::inet::sock {
+  //
+  // This is that (same as sys::posix::sock::Type)
+  //
+  // WATCHOUT - the second argument to socket(2) may not be what you think it is
+  // The Linux socket(2) second argument is no longer a pure 'type.'
+  // Rather than add another argument and break POSIX compatibility (or whatever reason),
+  // the old API&ABI is overloaded to accept more information through the same conduits.
+  //
+  //   sys::posix::SOCK .................. compatibility (struct-as-namespace)
+  //   sys::posix::sock::Type ............ the type being of STREAM, DATAGRAm, etc.
+  //   sys::posix::sock::Specification ... the agglomeration of the type & options 
+  //
+  // We do not want that effect here because these values are used
+  // a) in the C++ type system value-based into libc library calls,
+  // b) the getaddrinfo, getnameinfo
+  //
+  using Type = sys::sock::Type;
+}
+#endiv

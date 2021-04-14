@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.exists
+#import sys.posix.isblk
+auto tests::unit::posix::fixture::Fixture::test_isblk() -> void {
+  using six::exists;
+  // WATCHOUT - /dev/sda won't exist in mock build environments
+  //            in that eventuality, does any block device exist at all?
+  auto some_block_file = "/dev/sda";
+  if (exists(some_block_file)) {
+    CPPUNIT_ASSERT(six::isblk(some_block_file));
+  }
+  CPPUNIT_ASSERT(!six::isblk("/dev/tty"));
+}
+#import sys.posix.ischr
+auto tests::unit::posix::fixture::Fixture::test_ischr() -> void {
+  CPPUNIT_ASSERT(!six::ischr("/dev/sda"));
+  CPPUNIT_ASSERT(six::ischr("/dev/tty"));
+}
+#import sys.posix.isdir
+auto tests::unit::posix::fixture::Fixture::test_isdir() -> void {
+  CPPUNIT_ASSERT(six::isdir("/dev"));
+  CPPUNIT_ASSERT(!six::isdir("/dev/null"));
+}
+#import sys.posix.isfifo
+auto tests::unit::posix::fixture::Fixture::test_isfifo() -> void {
+  CPPUNIT_ASSERT(!six::isfifo("/etc"));
+}
+#import sys.posix.islnk
+auto tests::unit::posix::fixture::Fixture::test_islnk() -> void {
+  CPPUNIT_ASSERT(six::islnk("//etc/init.d"));
+  CPPUNIT_ASSERT(!six::islnk("/etc"));
+}
+#import sys.posix.isreg
+auto tests::unit::posix::fixture::Fixture::test_isreg() -> void {
+  CPPUNIT_ASSERT(six::isreg("/etc/motd"));
+  CPPUNIT_ASSERT(!six::isreg("/etc"));
+}
+#import sys.posix.issock
+auto tests::unit::posix::fixture::Fixture::test_issock() -> void {
+  CPPUNIT_ASSERT(!six::issock("/etc"));
+}
+#endiv

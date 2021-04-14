@@ -1,0 +1,120 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::query { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import std.string
+#import std.unique_ptr
+#import ares.Library
+#import ares.Channel
+class tests::unit::query::Fixture : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void final;
+  auto tearDown() -> void final;
+  auto test_lambda() -> void;
+  auto test_continuation() -> void;
+  auto test_function_State() -> void;
+  auto test_function_void() -> void;
+  static auto suite() -> cppunit::Test *;
+public:
+  struct State;
+protected:
+  template<typename STATE> struct Function;
+  static std::string const SPECIMEN_FQDN;
+  std::unique_ptr<::ares::Library> library;
+  std::unique_ptr<::ares::Channel> channel;
+};
+#import tests.unit.query.Fixture.Function.void
+#import tests.unit.query.Fixture.Function.State
+#import tests.unit.query.Fixture.Query
+#import tests.unit.query.Fixture.State
+#endiv
+#divert <cpp>
+std::string const tests::unit::query::Fixture::SPECIMEN_FQDN{"www.verizonmedia.com."};
+#import std.make_unique
+#import ares.channel.option.Blob
+#import ares.channel.option.Set
+auto tests::unit::query::Fixture::setUp() -> void {
+  using namespace ::ares::channel::option;
+  library = std::make_unique<::ares::Library>();
+  channel = std::make_unique<::ares::Channel>(Blob{}, Set{});
+}
+auto tests::unit::query::Fixture::tearDown() -> void {
+  channel->cancel();
+  channel.reset();
+  library.reset();
+}
+#import ares.Library
+#import ares.query
+#import ares.dns.type.constants
+#import ares.dns.class.constants
+#import std.error_code
+#import std.function
+#import ares.run
+#import ares.channel.Guard
+#import ip.in6 // in6::addr;
+#import std.optional
+auto tests::unit::query::Fixture::test_lambda() -> void {
+  std::optional<ip::in6::addr> result;
+  std::function<void (::ares::error::Code, ::ares::Count, ::ares::Buffer<std::byte const>)> receive =
+    [&result](::ares::error::Code code, ::ares::Count count, ::ares::Buffer<std::byte const> buffer) -> void {
+      std::error_code ec{code};
+      if (::ares::error::Code::SUCCESS == code) {
+        result = ip::in6::addr{};
+      } else {
+        std::cerr << __FUNCTION__ << ' ' << __FILE__ << ':' << __LINE__ << ':'
+                  << " failed to find " << SPECIMEN_FQDN << " because " << ec.message()
+                  << '\n';
+      }
+    };
+  namespace dns = ::ares::dns;
+  ::ares::channel::Guard guard{*channel};
+  ::ares::query(*channel, SPECIMEN_FQDN, dns::IN, dns::AAAA, receive); // <-------------------------- test this
+  ::ares::run(*channel);
+  CPPUNIT_ASSERT(result);
+}
+auto tests::unit::query::Fixture::test_continuation() -> void {
+  State state{SPECIMEN_FQDN};
+  namespace dns = ::ares::dns;
+  ::ares::channel::Guard guard{*channel};
+  ::ares::query(*channel, SPECIMEN_FQDN, dns::IN, dns::AAAA, ::ares::continuation::Query<State>{}, state); // <-------------------------- test this
+  ::ares::run(*channel);
+  CPPUNIT_ASSERT(state.result);
+}
+auto tests::unit::query::Fixture::test_function_void() -> void {
+  Function<void> function{SPECIMEN_FQDN};
+  namespace dns = ::ares::dns;
+  ::ares::channel::Guard guard{*channel};
+  ::ares::query(*channel, SPECIMEN_FQDN, dns::IN, dns::AAAA, function); // <-------------------------- test this
+  ::ares::run(*channel);
+  CPPUNIT_ASSERT(function.result);
+}
+auto tests::unit::query::Fixture::test_function_State() -> void {
+  State state{SPECIMEN_FQDN};
+  Function<State> function{state};
+  namespace dns = ::ares::dns;
+  ::ares::channel::Guard guard{*channel};
+  ::ares::query(*channel, SPECIMEN_FQDN, dns::IN, dns::AAAA, function); // <-------------------------- test this
+  ::ares::run(*channel);
+  CPPUNIT_ASSERT(state.result);
+}
+#import rigging.suite.io
+auto tests::unit::query::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("query");
+  series << call("lambda", &Fixture::test_lambda)
+         << call("continuation", &Fixture::test_continuation)
+    ;
+  {
+    Stream fun("function");
+    fun << call("void", &Fixture::test_function_void)
+        << call("State", &Fixture::test_function_State)
+      ;
+    series << move(fun);
+  }
+  return finalize(series);
+}
+#endiv

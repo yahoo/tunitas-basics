@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::rsa { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.rsa.Bits
+class tests::unit::rsa::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Bits() -> void;
+  auto test_usage_Pair() -> void;
+  template<::openssl::rsa::Bits> auto test_generate() -> void;
+  auto test_generate_one() -> void;
+  auto test_generate_many() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import openssl.rsa.generate
+template<openssl::rsa::Bits BITS> auto tests::unit::rsa::Fixture::test_generate() -> void {
+  using ::openssl::rsa::generate;
+  auto r = generate(BITS);
+  CPPUNIT_ASSERT(nullptr != r.get());
+}
+#endiv
+#divert <cpp>
+#import openssl.rsa.Bits
+auto tests::unit::rsa::Fixture::test_usage_Bits() -> void {
+  using ::openssl::rsa::Bits;
+  CPPUNIT_ASSERT(512 == (int) Bits::RSA512);
+  CPPUNIT_ASSERT(1024 == (int) Bits::RSA1024);
+  CPPUNIT_ASSERT(2048 == (int) Bits::RSA2048);
+  CPPUNIT_ASSERT(4096 == (int) Bits::RSA4096);
+  CPPUNIT_ASSERT(8192 == (int) Bits::RSA8192);
+}
+#import openssl.rsa.Pair
+auto tests::unit::rsa::Fixture::test_usage_Pair() -> void {
+  auto r = ::openssl::rsa::generate(::openssl::rsa::Bits::RSA2048);
+  CPPUNIT_ASSERT(true);
+}
+#import openssl.rsa.generate
+auto tests::unit::rsa::Fixture::test_generate_one() -> void {
+  using ::openssl::rsa::Bits;
+  for (auto bits : {Bits::RSA512, Bits::RSA1024, Bits::RSA2048 /* TOO EXPENSIVE FOR TESTING  Bits::RSA4096, Bits::RSA8192*/}) {
+    auto r = ::openssl::rsa::generate(bits);
+    CPPUNIT_ASSERT(nullptr != r);
+  }
+}
+auto tests::unit::rsa::Fixture::test_generate_many() -> void {
+  using namespace ::openssl::rsa;
+  for (auto bits : {Bits::RSA512, Bits::RSA1024 /* TOO EXPENSIVE FOR TESTING Bits::RSA2048, Bits::RSA4096, Bits::RSA8192*/}) {
+    // WATCHOUT - if you set e to be too large then this takes a LOOONG time for RSA8192
+    for (int i{0}, e{2}; e != i; ++i) {
+      std::cerr << "generating #" << i << " RSA-" << (int) bits << '\n';
+      auto r = generate(bits);
+      CPPUNIT_ASSERT(nullptr != r.get());
+    }
+  }
+}
+#import tests.unit.rsa.Pair
+#import rigging.suite.io
+auto tests::unit::rsa::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("rsa");
+  {
+    Stream use("usage");
+    use << call("Bits", &Fixture::test_usage_Bits)
+        << call("Pair", &Fixture::test_usage_Pair)
+      ;
+    series << move(use);
+  } {
+    Stream gen("generate");
+    gen << call("512", &Fixture::test_generate<::openssl::rsa::Bits::RSA512>)
+        << call("1024", &Fixture::test_generate<::openssl::rsa::Bits::RSA1024>)
+        << call("2048", &Fixture::test_generate<::openssl::rsa::Bits::RSA2048>)
+        << call("4096", &Fixture::test_generate<::openssl::rsa::Bits::RSA4096>)
+        << call("8192", &Fixture::test_generate<::openssl::rsa::Bits::RSA8192>)
+        << call("one", &Fixture::test_generate_one)
+        << call("many", &Fixture::test_generate_many)
+      ;
+    series << move(gen);
+  }
+  series << add<rsa::Pair>()
+    ;
+  return finalize(series);
+}
+#endiv

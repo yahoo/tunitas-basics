@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.sleep.required.Duration
+#import sys.posix.packaging.sleep.required.Structure
+namespace sys::posix::packaging::sleep::required {
+  //
+  // Is this type suitible for coercion?
+  // Is this type the input or output of the nearby
+  //
+  //   packaging::sleep::coerce<OUT>(IN const &) -> OUT
+  //
+  template<typename TYPE> concept bool Coercible = POSIX_Time_Structure<TYPE> || Duration<TYPE>;
+}
+#endiv

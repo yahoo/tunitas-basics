@@ -1,0 +1,131 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An X.509 Certificate Name
+  //
+  // Usage:
+  //
+  //   Req req;
+  //   Name name = req.get_subject_name();
+  //   name.add_entry_by_txt(...arguments...);
+  //
+  class Name;
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_NAME
+#import openssl.x509.field.Named
+#import openssl.x509.Fields
+#forward openssl.x509.Crt
+#forward openssl.x509.Crl
+#forward openssl.x509.Req
+#forward openssl.x509.Name0
+#import std.string
+#import std.string_view
+class openssl::x509::Name : public managed::Pointer<X509_NAME> {
+  using ancestor = managed::Pointer<X509_NAME>;
+  friend class Crl;
+  friend class Crt;
+  friend class Req;
+  inline explicit Name(X509_NAME *, ancestor::Deleter const & = ancestor::Deleter{ancestor::Deleter::DELETING});
+public:
+  inline Name();
+  inline operator Name0() const;
+  inline auto oneline() const -> std::string;
+  inline auto add_entry_by_txt(Fields const &) -> void;
+  template<field::Name NAME> inline auto add_entry_by_txt(field::Named<NAME> const &) -> void;
+  // WATCHOUT - neither name, nor value can be  std::string_view because we need the final '\0' guarantee of c_str()
+  inline auto add_entry_by_txt(std::string const &name, std::string const &value) -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.x509.Name0
+#import openssl.functions
+#import openssl.error.Code
+#import std.error_code
+namespace openssl::x509 {
+  Name::Name()
+    : ancestor{X509_NAME_new(), ancestor::Deleter{ancestor::Deleter::DELETING}}
+  { }
+  Name::Name(X509_NAME *newbie, ancestor::Deleter const &del)
+    : ancestor{newbie, del}
+  { }
+  Name::operator Name0() const {
+    return Name0{get()};
+  }
+  auto Name::oneline() const -> std::string {
+    // [[FIXTHIS]] there is a copy of this code over in Name0::oneline()
+    char buffer[1<<16]; // [[FIXME]] sloppy ... see the size limits of RFC2459 in field.Named.xcpp
+    auto const buffer_size = sizeof (buffer)/sizeof (buffer[0]);
+    auto oneline = X509_NAME_oneline(get(), &buffer[0], buffer_size);
+    if (nullptr == oneline) {
+      throw std::error_code{error::Code::X509};
+    }
+    return oneline;
+  }
+  auto Name::add_entry_by_txt(Fields const &fields) -> void {
+    add_entry_by_txt(fields.C);
+    add_entry_by_txt(fields.ST);
+    add_entry_by_txt(fields.L);
+    add_entry_by_txt(fields.O);
+    add_entry_by_txt(fields.OU);
+    add_entry_by_txt(fields.CN);
+  }
+  template<field::Name NAME> auto Name::add_entry_by_txt(field::Named<NAME> const &field) -> void {
+    if (field.value) {
+      add_entry_by_txt(field.name, *field.value);
+    }
+  }
+  auto Name::add_entry_by_txt(std::string const &name, std::string const &value) -> void {
+    // https://www.openssl.org/docs/manmaster/man3/X509_NAME_add_entry_by_txt.html
+    // https://linux.die.net/man/3/x509_name_add_entry_by_txt
+    //
+    // <quote>
+    //   len
+    //       If len is -1 then the field length is calculated internally using strlen(bytes). 
+    //   loc actually determines the index where the new entry is inserted:
+    //       if it is -1 it is appended.
+    //   set determines how the new type is added.
+    //       If it is zero a new RDN is created.
+    //       If set is -1 or 1 it is added to the previous or next RDN structure respectively.
+    //       This will then be a multivalued RDN:
+    //           since multivalues RDNs are very seldom used set is almost always set to zero.
+    // </quote>
+    //                                                                       
+    // <quote>
+    //   The loc and set parameters determine where a new entry should be added.
+    //   For almost all applications loc can be set to -1 and set to 0.
+    //   This adds a new entry to the end of name as a single valued RelativeDistinguishedName ( RDN ).
+    // </quote>
+    //
+    auto const c_name = name.c_str();
+    auto const c_value = reinterpret_cast<unsigned char const *>(value.c_str());
+    auto const l_value = -1; // good luck, figure it out from the zstring?
+    auto const loc = -1;
+    auto const set = 0;
+    auto ok = X509_NAME_add_entry_by_txt(get(), c_name, MBSTRING_ASC, c_value, l_value, loc, set);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+namespace openssl::x509 {
+  static_assert(std::is_default_constructible<Name>::value);
+  static_assert(!std::is_copy_constructible<Name>::value);
+  static_assert(std::is_move_constructible<Name>::value);
+  static_assert(!std::is_copy_assignable<Name>::value);
+  static_assert(std::is_move_assignable<Name>::value);
+}
+#endiv

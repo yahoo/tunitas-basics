@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.regex.syntax.Flags
+namespace nonstd::regex::syntax {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import std.regex_constants
+namespace nonstd::regex::syntax::constants {
+  namespace implementation {
+    using namespace std::regex_constants;
+    namespace interface {
+      inline constexpr auto ICASE = icase;
+      inline constexpr auto NOSUBS = nosubs;
+      inline constexpr auto OPTIMIZE = optimize;
+      inline constexpr auto COLLATE = collate;
+      [[deprecated("instead prefer the original ECMAScript, and ahem, you know the story of why it is ECMA and not Java, right?  JavaScript, javaSCRIPT, JAVAscript, Java Script, right?")]] inline constexpr auto ECMASCRIPT = ECMAScript;
+      inline constexpr auto ECMAScript = std::regex_constants::ECMAScript;
+      inline constexpr auto BASIC = basic;
+      inline constexpr auto EXTENDED = extended;
+      inline constexpr auto AWK = awk;
+      inline constexpr auto GREP = grep;
+      inline constexpr auto EGREP = egrep;
+#if 0
+      // Yet it does not appear, even in GCC 10
+      // https://en.cppreference.com/w/cpp/regex/syntax_option_type
+      inline constexpr auto MULTILINE = multiline;
+#endif
+    }
+  }
+  using namespace implementation::interface;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace nonstd::regex::syntax::constants;
+    // Prove the (all) names are visible
+    static_assert(sizeof (ICASE));
+    static_assert(sizeof (ECMAScript));
+  }
+}
+#endiv

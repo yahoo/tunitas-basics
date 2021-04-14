@@ -1,0 +1,259 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ish::perl { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import tests.unit.ish.Palette
+class tests::unit::ish::perl::Fixture : public cppunit::test::Fixture, Palette {
+public:
+  // unify the MI
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  std::string a_path_with_redundant_slashes;
+
+  auto test_join_container() -> void;
+  auto test_join_iterators() -> void;
+  auto test_joining() -> void;
+
+  auto test_map_generic_identity() -> void;
+  auto test_map_generic_trim3() -> void;
+  auto test_map_forward_list_trim3() -> void;
+
+  auto test_split_elide0() -> void;
+  auto test_split_elide1() -> void;
+  auto test_split_elide2() -> void;
+  auto test_split_elide3() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ish.perl.join
+#import std.string
+#import std.vector
+auto tests::unit::ish::perl::Fixture::setUp() -> void {
+  Palette::setUp();
+  //
+  // ------------------------------------------two slashes------------\ (here)
+  //                                                                  |
+  //                                                                  v
+  a_path_with_redundant_slashes = "/apple/banana/cherry/dog/eagle/frog//goat";
+}
+
+auto tests::unit::ish::perl::Fixture::tearDown() -> void {
+  Palette::tearDown();
+  a_path_with_redundant_slashes.clear();
+}
+
+auto tests::unit::ish::perl::Fixture::test_join_container() -> void {
+  std::vector<std::string> group{"apple", "banana", "cherry", "dog"};
+  std::string actual = ::ish::perl::join('/', group);
+  std::string expected = "apple/banana/cherry/dog";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ish::perl::Fixture::test_join_iterators() -> void {
+  std::vector<std::string> group{"apple", "banana", "cherry", "dog"};
+  std::string actual = ::ish::perl::join('/', group);
+  std::string expected = "apple/banana/cherry/dog";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import ish.perl.joining
+#import std.string
+auto tests::unit::ish::perl::Fixture::test_joining() -> void {
+  std::string actual = ::ish::perl::joining('/', "apple", "banana", "cherry", "dog");
+  std::string expected = "apple/banana/cherry/dog";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import std.ostringstream
+#import std.string
+
+#import std.forward
+namespace {
+  auto identity(std::string const &value) -> std::string {
+    return value;
+  }
+  auto trim3(std::string const &value) -> std::string {
+    return value.substr(0, 3);
+  }
+}
+
+#import ish.perl.map
+auto tests::unit::ish::perl::Fixture::test_map_generic_identity() -> void {
+  auto md = ::ish::perl::map(identity, dspecimen);
+  auto ml = ::ish::perl::map(identity, lspecimen);
+  auto mv = ::ish::perl::map(identity, vspecimen);
+  CPPUNIT_ASSERT(md == dspecimen);
+  CPPUNIT_ASSERT(ml == lspecimen);
+  CPPUNIT_ASSERT(mv == vspecimen);
+}
+
+auto tests::unit::ish::perl::Fixture::test_map_generic_trim3() -> void {
+  auto expected = d{"app",
+                    "ban",
+                    "che",
+                    "dog",
+                    "eag",
+                    "fro",
+                    "goa",
+                    "har",
+                    "idi",
+                    "kan",
+                    "lla",
+                    "mar",
+                    "nar",
+                    "oce",
+                    "pos",
+                    "qua",
+                    "rat",
+                    "sea",
+                    "tur",
+                    "usu",
+                    "vol",
+                    "was",
+                    "xyl",
+                    "yak",
+                    "zeb"};
+  auto md = ::ish::perl::map(trim3, dspecimen);
+  auto ml = ::ish::perl::map(trim3, lspecimen);
+  auto mv = ::ish::perl::map(trim3, vspecimen);
+  auto dump = [](auto const &container) {
+    std::cout << "dump: ";
+    for (auto const &e : container) { std::cout << e; }
+    std::cout << '\n';
+  };
+  dump(expected);
+  dump(md);
+  CPPUNIT_ASSERT(expected == (d{md.begin(), md.end()}));
+  CPPUNIT_ASSERT(expected == (d{ml.begin(), ml.end()}));
+  CPPUNIT_ASSERT(expected == (d{mv.begin(), mv.end()}));
+}
+
+auto tests::unit::ish::perl::Fixture::test_map_forward_list_trim3() -> void {
+  auto expected = d{"zeb",
+                    "yak",
+                    "xyl",
+                    "was",
+                    "vol",
+                    "usu",
+                    "tur",
+                    "sea",
+                    "rat",
+                    "qua",
+                    "pos",
+                    "oce",
+                    "nar",
+                    "mar",
+                    "lla",
+                    "kan",
+                    "idi",
+                    "har",
+                    "goa",
+                    "fro",
+                    "eag",
+                    "dog",
+                    "che",
+                    "ban",
+                    "app"};
+  auto mf = ::ish::perl::map(trim3, fspecimen);
+  CPPUNIT_ASSERT(expected == (d{mf.begin(), mf.end()}));
+}
+
+#import ish.perl.split
+#import std.string
+#import std.vector
+
+auto tests::unit::ish::perl::Fixture::test_split_elide0() -> void {
+  using s = std::string;
+  // Show it works at least once
+  auto splits = ::ish::perl::split<std::vector<std::string>>('/', a_path_with_redundant_slashes, false, false);
+  CPPUNIT_ASSERT_EQUAL(s(""), splits[0]); // <-------------- observe
+  CPPUNIT_ASSERT_EQUAL(s("apple"), splits[1]);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), splits[2]);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), splits[3]);
+  CPPUNIT_ASSERT_EQUAL(s("dog"), splits[4]);
+  CPPUNIT_ASSERT_EQUAL(s("eagle"), splits[5]);
+  CPPUNIT_ASSERT_EQUAL(s("frog"), splits[6]);
+  CPPUNIT_ASSERT_EQUAL(s(""), splits[7]); // <-------------- observe
+  CPPUNIT_ASSERT_EQUAL(s("goat"), splits[8]);
+}
+
+auto tests::unit::ish::perl::Fixture::test_split_elide1() -> void {
+  using s = std::string;
+  // Show it works at least once
+  auto splits = ::ish::perl::split<std::vector<std::string>>('/', a_path_with_redundant_slashes, true, false);
+  CPPUNIT_ASSERT_EQUAL(s(""), splits[0]); // <-------------- observe
+  CPPUNIT_ASSERT_EQUAL(s("apple"), splits[1]);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), splits[2]);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), splits[3]);
+  CPPUNIT_ASSERT_EQUAL(s("dog"), splits[4]);
+  CPPUNIT_ASSERT_EQUAL(s("eagle"), splits[5]);
+  CPPUNIT_ASSERT_EQUAL(s("frog"), splits[6]);
+  CPPUNIT_ASSERT_EQUAL(s("goat"), splits[7]);
+}
+
+auto tests::unit::ish::perl::Fixture::test_split_elide2() -> void {
+  using s = std::string;
+  // Show it works at least once
+  auto splits = ::ish::perl::split<std::vector<std::string>>('/', a_path_with_redundant_slashes, false, true);
+  CPPUNIT_ASSERT_EQUAL(s("apple"), splits[0]);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), splits[1]);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), splits[2]);
+  CPPUNIT_ASSERT_EQUAL(s("dog"), splits[3]);
+  CPPUNIT_ASSERT_EQUAL(s("eagle"), splits[4]);
+  CPPUNIT_ASSERT_EQUAL(s("frog"), splits[5]);
+  CPPUNIT_ASSERT_EQUAL(s(""), splits[6]); // <-------------- observe
+  CPPUNIT_ASSERT_EQUAL(s("goat"), splits[7]);
+}
+
+auto tests::unit::ish::perl::Fixture::test_split_elide3() -> void {
+  using s = std::string;
+  // Show it works at least once
+  auto splits = ::ish::perl::split<std::vector<std::string>>('/', a_path_with_redundant_slashes, true, true);
+  CPPUNIT_ASSERT_EQUAL(s("apple"), splits[0]);
+  CPPUNIT_ASSERT_EQUAL(s("banana"), splits[1]);
+  CPPUNIT_ASSERT_EQUAL(s("cherry"), splits[2]);
+  CPPUNIT_ASSERT_EQUAL(s("dog"), splits[3]);
+  CPPUNIT_ASSERT_EQUAL(s("eagle"), splits[4]);
+  CPPUNIT_ASSERT_EQUAL(s("frog"), splits[5]);
+  CPPUNIT_ASSERT_EQUAL(s("goat"), splits[6]);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::ish::perl::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream j("join");
+  j << call("container", &Fixture::test_join_container)
+    << call("iterators", &Fixture::test_join_iterators)
+    ;
+  Stream g("joining");
+  g << call("ing", &Fixture::test_joining)
+    ;
+  Stream m("map");
+  m << call("identity", &Fixture::test_map_generic_identity)
+    << call("trim3", &Fixture::test_map_generic_trim3)
+    << call("forward_list-trim3", &Fixture::test_map_forward_list_trim3)
+    ;
+  Stream t("split");
+  t << call("elide=0", &Fixture::test_split_elide0)
+    << call("elide=1", &Fixture::test_split_elide1)
+    << call("elide=2", &Fixture::test_split_elide2)
+    << call("elide=3", &Fixture::test_split_elide3)
+    ;
+  Stream s("perl");
+  s << add(std::move(j))
+    << add(std::move(g))
+    << add(std::move(m))
+    << add(std::move(t))
+    ;
+  return finalize(s);
+}
+#endiv

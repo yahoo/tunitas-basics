@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite::open {
+  // Names of anonymous databases ... somewhere.
+  enum class Name { DISK, MEMORY }; 
+}
+#endiv
+#divert <hpp>
+#import c.const_stringz
+namespace sqlite::open {
+  inline auto name(Name) -> c::const_stringz;
+  // And surfaced as constants for convenience
+  // NOT --- constexpr auto const DISK = Name::DISK;
+  // NOT --- constexpr auto const MEMORY = Name::MEMORY;
+  // as Name::MEMORY conflicts with Flags::MEMORY
+}
+#endiv
+#divert <ipp>
+#import std.invalid_argument
+auto sqlite::open::name(Name name) -> c::const_stringz {
+  switch (name) {
+  case Name::DISK:
+    return "";
+  case Name::MEMORY:
+    return ":memory:";
+  default:
+    throw std::invalid_argument("sqlite::open::Name");
+  }
+}
+#endiv

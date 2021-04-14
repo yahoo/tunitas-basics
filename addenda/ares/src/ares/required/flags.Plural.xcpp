@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.required.flags.Single
+#import std.is_enum
+#import std.underlying_type
+namespace ares::required::flags {
+  //
+  // The plural of a flag, which is a mask in the signal style of system-level code.
+  //
+  template<typename PLURAL, Single SINGLE> concept bool Plural = (std::is_enum<PLURAL>::value &&
+                                                                  sizeof (PLURAL) >= sizeof (typename std::underlying_type<SINGLE>::type));
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import ares.Flags
+#import ares.library.Features
+#import ares.addrinfo.Flags
+#import ares.nameinfo.Flags
+namespace ares::required::flags {
+  static_assert(Plural<Flags, Flag>);
+  static_assert(Plural<library::Features, library::Feature>);
+  static_assert(Plural<addrinfo::Flags, addrinfo::Flag>);
+  static_assert(Plural<nameinfo::Flags, nameinfo::Flag>);
+}
+#endiv

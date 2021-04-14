@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// Acquire the primitive #define values
+#include <fcntl.h>
+namespace sys::f {
+  //
+  // Suitable for use as the 3rd argument to fcntl(2) under the seal adder: F::ADD_SEALS
+  // Also available in sys::posix::F as manifest constants.
+  //
+  //   auto cntled = fcntl(fd, F::ADD_SEALS, Seal::SEAL);
+  //   auto cntled = fcntl(fd, F::ADD_SEALS, Seal::SEAL | Seal::SHRINK | Seal::GROW | Seal::WRITE);
+  //
+  enum class Seal {
+    SEAL = F_SEAL_SEAL,
+    SHRINK = F_SEAL_SHRINK,
+    GROW = F_SEAL_GROW,
+    WRITE = F_SEAL_WRITE,
+  };
+}
+#endiv

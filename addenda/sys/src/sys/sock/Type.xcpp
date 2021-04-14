@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/types.h>
+#include <sys/socket.h>
+namespace sys::sock {
+  // But in general, prefer SOCK::Flags because the socket(2) call has been
+  // overloaded to accept SOCK::Flags not just SOCK::Type, like the old days.
+  enum class Type {
+    UNSPECIFIED = 0,
+    UNSPEC [[deprecated("prefer Type::UNSPECIFIED (the full word)")]] = UNSPECIFIED,
+    NONE [[deprecated("prefer Type::UNSPECIFIED (the full word)")]] = UNSPECIFIED, // clashes with Option::NONE in namespace constants
+    STREAM = SOCK_STREAM, //       Stream (in sequence, reliably delivered)
+    DGRAM = SOCK_DGRAM, //         Datagram (unsequenced, unreliably delivered)
+    DATAGRAM = DGRAM, //           sic
+    SEQPACKET = SOCK_SEQPACKET, // Sequenced Packet (sequenced, unreliably delivered)
+    SEQUENCED = SEQPACKET, //      sic
+    RDM = SOCK_RDM, //             Reliably-Delivered Message (unsequenced, reliably delivered)
+    RELIABLE = RDM, //             sic
+    DCCP = SOCK_DCCP, //           Datagram Congestion Control Protocol
+    RAW = SOCK_RAW, //             Raw (just what it says)
+    PACKET [[deprecated("instead use packet(7) with socket(AF::PACKET, SOCK::RAW, protocol) or socket(AF::PACKET, SOCK::DGRAM, protocol) with <protocol> in network order")]] = SOCK_PACKET
+  };
+}
+#endiv
+#divert <hpp>
+#import sys.sock.Option
+#import std.min
+#import std.is_same
+namespace sys::sock {
+  namespace type {
+    namespace [[hack]] field {
+      //
+      // Yuk.  There is no better way to do this?
+      // Where does the Type bitfield stop and the Options bitfield start?
+      // Who knows? ...  Only The Shadow Knows!
+      // We see, by inspection, in /usr/include/bits/socket_type.h (glibc-headers-2.28-9.fc29.x86_64)
+      //  04000 is the lowest number, so 11 bits it is.
+      //
+      //                                      ddcccbbbaaa
+      //                   |31             11|10        0|
+      // specification ::= |<----options...->|<--type--->|
+      //
+      constexpr auto lowest(Option only) -> Option { return only; }
+      template<typename... OPTIONS> constexpr auto lowest(Option first, Option second, OPTIONS ...rest) -> Option requires (true && ... && std::is_same_v<Option, OPTIONS>)
+      { return lowest(std::min(first, second), rest...); }
+      [[hack]] inline constexpr auto FIELD_BITMASK = (unsigned)lowest(Option::NONBLOCK, Option::NONBLOCK) - 1u;
+    }
+    using field::FIELD_BITMASK;
+  }
+  [[deprecated("AVOID, do not use in new work")]] inline constexpr auto flag(Type t) -> Type { return t; };
+  [[deprecated("AVOID, do not use in new work")]] inline constexpr auto is_flag(Type) -> bool { return true; }
+}
+#endiv

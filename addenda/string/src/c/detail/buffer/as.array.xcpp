@@ -1,0 +1,24 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_buffer
+#import std.array
+namespace c {
+  namespace detail {
+    namespace buffer {
+      template<typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> const &) -> basic_buffer<CHAR const>;
+      template<typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> &) -> basic_buffer<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CHAR, std::size_t N> auto c::detail::buffer::as(std::array<CHAR, N> const &arr) -> basic_buffer<CHAR const> {
+  basic_buffer<CHAR const> ret(arr.size(), arr.data());
+  return arr;
+}
+
+template<typename CHAR, std::size_t N> auto c::detail::buffer::as(std::array<CHAR, N> &arr) -> basic_buffer<CHAR> {
+  basic_buffer<CHAR> ret(arr.size(), arr.data());
+  return arr;
+}
+#divert </ipp>

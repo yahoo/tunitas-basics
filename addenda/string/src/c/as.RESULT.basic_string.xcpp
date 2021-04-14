@@ -1,0 +1,29 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.as
+#import c.basic_stringz
+#import std.basic_string
+namespace c {
+  template<typename RESULT, typename CHAR, typename TRAITS, typename ALLOC> inline auto as(std::basic_string<CHAR, TRAITS, ALLOC> const &) -> RESULT;
+  template<typename RESULT, typename CHAR, typename TRAITS, typename ALLOC> inline auto as(std::basic_string<CHAR, TRAITS, ALLOC> &) -> RESULT;
+}
+#divert </hpp>
+#divert <ipp>
+#import std.is_same
+template<typename RESULT, typename CHAR, typename TRAITS, typename ALLOC> auto c::as(std::basic_string<CHAR, TRAITS, ALLOC> const &subject) -> RESULT {
+  static_assert(std::is_same<RESULT, basic_stringz<CHAR const>>::value, "RESULT is not appropriate here");
+  return RESULT(subject.data());
+}
+
+template<typename RESULT, typename CHAR, typename TRAITS, typename ALLOC> auto c::as(std::basic_string<CHAR, TRAITS, ALLOC> &subject) -> RESULT {
+  // Allow:
+  //   as<basic_stringz<char const>>(basic_string<char>) ...... cast to const
+  //   as<basic_stringz<char>>(basic_string<char>) .. ......... identity transform
+  static_assert((std::is_same<RESULT, basic_stringz<CHAR const>>::value
+		 ||
+		 std::is_same<RESULT, basic_stringz<CHAR>>::value),
+		"RESULT is not appropriate here");
+  // Because it may be a cast, we need to recompose
+  return RESULT(subject.data());
+}
+#divert </ipp>

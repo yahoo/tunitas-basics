@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares
+//
+// WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT
+//
+// WATCHOUT - we do not want <arpa/nameser_compat.h> as it uses #defines on common words
+//
+#define _ARPA_NAMESER_COMPAT_
+//
+// WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT - WATCHOUT
+//
+#include <arpa/nameser.h>
+//
+// And in case that didn't work, we try a last ditch effort to try to save ourselves.
+// NEVER EVER EVER use #define without a lugubrious package prefix or you are ABSOLUTELY SURE that word will never be used elsewhere.
+// The C Preprocessor Must Die.  The younger languages don't have one, and they seem to be doing fine.
+//
+#undef DELETE
+#undef ADD
+#undef QUERY
+#undef IQUERY
+#undef STATUS
+#undef NOERROR
+#undef FORMERR
+#undef SERVFAIL
+#undef NXDOMAIN
+#undef NOTIMP
+#undef REFUSED
+// from <sys/param.h> which gets sucked in somehow.  Why do we need <namser.h> again?
+#undef NODEV
+#undef NOGROUP
+#undef MIN
+#undef MAX
+#undef howmany
+#undef roundup
+#undef powerof2
+#undef setbit
+#undef clrbit
+#undef isset
+#undef isclr
+namespace ares::dns { }
+#endiv

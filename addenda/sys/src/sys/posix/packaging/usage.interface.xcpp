@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rusage
+#import sys.r.Usage
+#import sys.r.Usages
+#import sys.call.Result
+namespace sys::posix::packaging::usage::interface {
+  using ::rusage;
+  using r::Usage;
+  using r::Usages;
+  using Status = call::Result;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.RUSAGE
+namespace sys::posix::packaging::usage::interface {
+  using posix::RUSAGE;
+}
+#endiv

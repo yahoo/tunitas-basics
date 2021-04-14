@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_AF_IP.Usage
+//   static_assert(tests::usage::posix_AF_IP::Usage<>);
+//
+#import sys.posix.AF.IP
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_AF_IP {
+  using sys::posix::AF;
+  namespace [[detail]] packaging {
+    template<typename IP> concept bool Instance = requires(IP) {
+      typename IP::Family;
+      typename IP::template Address<IP::V4>;
+      typename IP::template Address<IP::V6>;
+      typename IP::template Sockaddr<IP::V4>;
+      typename IP::template Sockaddr<IP::V6>;
+      requires model::Namespace_Object<IP>;
+      requires (int)IP::V4 == 4;
+      requires (int)IP::V6 == 6;
+      requires (int)IP::INET4 == AF_INET;
+      requires (int)IP::INET6 == AF_INET6;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<AF::IP>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

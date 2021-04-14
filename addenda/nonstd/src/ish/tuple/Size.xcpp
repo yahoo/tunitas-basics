@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple_size
+namespace ish::tuple {
+  //
+  // Same as std::tuple_size
+  // ...naming convention <strike>clarity</strike>vanity.
+  //
+  // recall that std::tuple_size only has specializations for
+  // the the cv-variants of std::tuple_size<std::tuple<TYPES...>>
+  // and thus so does this type alias template.
+  //
+  template<typename TYPE> using Size = std::tuple_size<TYPE>;
+}
+#endiv

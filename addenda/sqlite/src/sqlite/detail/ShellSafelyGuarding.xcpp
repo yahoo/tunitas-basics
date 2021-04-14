@@ -1,0 +1,109 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace detail {
+    template<typename UNGUARDED> class ShellSafelyGuarding;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.swap
+namespace std {
+  template<typename UNGUARDED> inline auto swap(sqlite::detail::ShellSafelyGuarding<UNGUARDED> &a, sqlite::detail::ShellSafelyGuarding<UNGUARDED> &b) -> void;
+}
+
+template<typename UNGUARDED> class sqlite::detail::ShellSafelyGuarding {
+protected:
+  using unguarded_type = UNGUARDED;
+  // You must inherit
+  ~ShellSafelyGuarding() = default;
+public:
+  // So that descendants can bring them forth with 'using'
+  inline explicit ShellSafelyGuarding(unguarded_type * = nullptr);
+  // The prototype has move semantics but not copy semantics
+  // recall: the nothrow semantic is expected & required to allow (descendants) to appear in std::tuple with move semantics
+  // if nothrow is not available then the move constructor will not be selected in the std::tuple move-constructor context.
+  inline ShellSafelyGuarding(ShellSafelyGuarding &&) throw ();
+  inline auto operator=(ShellSafelyGuarding &&) throw () -> ShellSafelyGuarding &;
+  // No copy semantics is available
+  // If the descendant wants copy semantics ... then they can jolly well implement it themselves
+  ShellSafelyGuarding(ShellSafelyGuarding const &) = delete;
+  auto operator=(ShellSafelyGuarding const &) -> ShellSafelyGuarding & = delete;
+public:
+  inline auto empty() const -> bool;
+  // Throws if nullptr
+  inline auto safe() -> unguarded_type *;
+  inline auto safe() const -> unguarded_type const *;
+  // No throw on nullptr; returns a lhs in nonconst context
+  inline auto unguarded() const -> unguarded_type const *;
+  inline auto unguarded() -> unguarded_type *&;
+protected:
+  unguarded_type *unguarded_subject;
+  friend auto std::swap<UNGUARDED>(ShellSafelyGuarding<UNGUARDED> &, ShellSafelyGuarding<UNGUARDED> &) -> void;
+};
+
+#import std.is_copy_constructible
+#import std.is_copy_assignable
+#import std.is_move_constructible
+#import std.is_move_assignable
+namespace sqlite {
+  namespace detail {
+    namespace tests {
+      namespace ShellSafelyGuarding {
+        struct InvariantsExhibitor : public ::sqlite::detail::ShellSafelyGuarding<void> { };
+        static_assert(!std::is_copy_constructible<InvariantsExhibitor>::value, "has become copy constructible (but must not be so constructible)");
+        static_assert(std::is_move_constructible<InvariantsExhibitor>::value, "not move constructible (but must be so constructible)");
+        static_assert(!std::is_copy_assignable<InvariantsExhibitor>::value, "has become copy constructible (but must not be constructible as such)");
+        static_assert(std::is_move_assignable<InvariantsExhibitor>::value, "not move constructible (but must be constructible as such)");
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+template<typename UNGUARDED> sqlite::detail::ShellSafelyGuarding<UNGUARDED>::ShellSafelyGuarding(unguarded_type *arg)
+  : unguarded_subject(arg) {
+  // arg may or may not be nullptr
+  ;
+}
+
+#import std.forward
+#import std.remove_reference
+template<typename UNGUARDED> sqlite::detail::ShellSafelyGuarding<UNGUARDED>::ShellSafelyGuarding(ShellSafelyGuarding &&anon) throw ()
+  : unguarded_subject(std::forward<typename std::remove_reference<decltype(anon.unguarded_subject)>::type>(anon.unguarded_subject)) {
+  anon.unguarded_subject = nullptr;
+}
+
+template<typename UNGUARDED> auto std::swap(sqlite::detail::ShellSafelyGuarding<UNGUARDED> &a, sqlite::detail::ShellSafelyGuarding<UNGUARDED> &b) -> void {
+  std::swap(a.unguarded_subject, b.unguarded_subject);
+}
+
+#import std.swap
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::operator=(ShellSafelyGuarding &&anon) throw () -> ShellSafelyGuarding & {
+  ShellSafelyGuarding tmp(std::forward<decltype(anon)>(anon));
+  std::swap(*this, tmp);
+  return *this;
+}
+
+#import sqlite.detail
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::safe() const -> unguarded_type const * {
+  return sqlite::detail::ensure_not_null(unguarded_subject);
+}
+
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::safe() -> unguarded_type * {
+  return sqlite::detail::ensure_not_null(unguarded_subject);
+}
+
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::unguarded() const -> unguarded_type const * {
+  return unguarded_subject;
+}
+
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::unguarded() -> unguarded_type *& {
+  return unguarded_subject;
+}
+
+template<typename UNGUARDED> auto sqlite::detail::ShellSafelyGuarding<UNGUARDED>::empty() const -> bool {
+  return nullptr == unguarded_subject;
+}
+#endiv

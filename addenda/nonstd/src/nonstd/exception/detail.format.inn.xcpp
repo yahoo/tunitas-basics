@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.exception.detail.format.If_Not_Null
+#import nonstd.required.Compare_To_Nullptr
+namespace nonstd::exception::detail::format {
+  //
+  // WATCHOUT - this is nearly the same as ::format::inn(...) and the allied classes
+  // however -lnonstd-module MUST NOT depend upon -lformat-module
+  // exactly the opposite dependence must obtain.  So the code is copied by cut & paste.
+  //
+  // If. Not. Null. then insert as VALUE.
+  //
+  // Usage:
+  //
+  //     cout << inn(__FILE__)
+  //     cout << inn(__FUNCTION__)
+  //     cout << inn(c::const_stringz{__FUNCTION__})
+  //     cout << inn(re::string<c::const_stringz>{__FUNCTION__})
+  //     cout << inn(re::string<std::string>{__FUNCTION__})
+  //
+  // Of course, the reference to the VALUE must last for the lifetime of the formatter object
+  template<required::Compare_To_Nullptr<char> VALUE> inline auto inn(VALUE const &) -> If_Not_Null<char, VALUE>;
+}
+#endiv
+#divert <ipp>
+namespace nonstd::exception::detail {
+  template<required::Compare_To_Nullptr<char> VALUE> auto format::inn(VALUE const &value) -> If_Not_Null<char, VALUE> {
+    return If_Not_Null<char, VALUE>(value);
+  }
+}
+#endiv

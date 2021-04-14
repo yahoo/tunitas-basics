@@ -1,0 +1,57 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::as {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::c::as::Fixture : public cppunit::test::Fixture { 
+public: 
+  auto test_something() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import c.argv
+#import c.environv
+#import c.stringn
+#import c.stringz
+auto tests::unit::c::as::Fixture::test_something() -> void {
+  ::c::argv av;
+  CPPUNIT_ASSERT(av.empty());
+  ::c::environv ev;
+  CPPUNIT_ASSERT(ev.empty());
+  ::c::stringn sn;
+  CPPUNIT_ASSERT(sn.empty());
+  ::c::stringz sz;
+  CPPUNIT_ASSERT(sz.empty());
+}
+
+#import tests.unit.c.as.Argv
+#import tests.unit.c.as.Environv
+#import tests.unit.c.as.Stringn
+#import tests.unit.c.as.Stringz
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+auto tests::unit::c::as::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("as");
+  series << call("something", &Fixture::test_something)
+         << add(Environv::suite())
+         << add(Argv::suite())
+         << add(Stringn::suite())
+         << add(Stringz::suite()) 
+    ;
+  return series.release();
+}
+#divert </cpp>

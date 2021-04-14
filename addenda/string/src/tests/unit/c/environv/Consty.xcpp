@@ -1,0 +1,103 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::environv {
+  class Consty;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::c::environv::Consty : public cppunit::test::Fixture { 
+public: 
+  Consty() = default;
+
+  auto test_constructor_default() -> void;
+  auto test_constructor_manifest_array() -> void;
+  auto test_constructor_pointer() -> void;
+  auto test_constructor_vector_consty() -> void;
+  auto test_constructor_vector_muting() -> void;
+  auto test_constructor_from_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  template<typename ENVIRON> auto generic_testification(ENVIRON) -> void;
+};
+#endiv
+#divert <cpp>
+#import c.basic_environv
+
+auto tests::unit::c::environv::Consty::test_constructor_default() -> void {
+  ::c::basic_environv<char const> that;
+  CPPUNIT_ASSERT(that.empty());
+}
+
+auto tests::unit::c::environv::Consty::test_constructor_manifest_array() -> void {
+  char const buf0[] = "NAME=VALUE";
+  char const buf1[] = "TERM=dumb";
+  char const buf2[] = "DEBUG=1";
+  char const *const vec[] = { buf0, buf1, buf2, nullptr };
+  ::c::basic_environv<char const> that(vec);
+  CPPUNIT_ASSERT_EQUAL(3lu, that.size());
+}
+
+auto tests::unit::c::environv::Consty::test_constructor_pointer() -> void {
+  char const buf0[] = "NAME=VALUE";
+  char const buf1[] = "TERM=dumb";
+  char const buf2[] = "DEBUG=1";
+  char const *const raw[] = { buf0, buf1, buf2, nullptr };
+  char const *const *const vec = &raw[0];
+  ::c::basic_environv<char const> that(vec);
+  CPPUNIT_ASSERT_EQUAL(3lu, that.size());
+}
+
+#import std.vector
+auto tests::unit::c::environv::Consty::test_constructor_vector_consty() -> void {
+  char const buf0[] = "NAME=VALUE";
+  char const buf1[] = "TERM=dumb";
+  char const buf2[] = "DEBUG=1";
+  std::vector<char const *> vec{buf0, buf1, buf2, nullptr};
+  ::c::basic_environv<char const> that(vec);
+  CPPUNIT_ASSERT_EQUAL(3lu, that.size());
+}
+
+auto tests::unit::c::environv::Consty::test_constructor_vector_muting() -> void {
+  char buf0[] = "NAME=VALUE";
+  char buf1[] = "TERM=dumb";
+  char buf2[] = "DEBUG=1";
+  std::vector<char *> vec{buf0, buf1, buf2, nullptr};
+  ::c::basic_environv<char const> that(vec);
+  CPPUNIT_ASSERT_EQUAL(3lu, that.size());
+}
+
+auto tests::unit::c::environv::Consty::test_constructor_from_muting() -> void {
+  char buf0[] = "NAME=VALUE";
+  char buf1[] = "TERM=dumb";
+  char buf2[] = "DEBUG=1";
+  std::vector<char *> raw{buf0, buf1, buf2, nullptr};
+  ::c::basic_environv<char> vec(raw);
+  ::c::basic_environv<char const> that(vec);
+  CPPUNIT_ASSERT_EQUAL(3lu, that.size());
+}
+
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+#import rigging.unit.suite.add
+auto tests::unit::c::environv::Consty::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("Consty");
+  series << call("constructor-default", &Consty::test_constructor_default)
+         << call("constructor_manifest_array", &Consty::test_constructor_manifest_array)
+         << call("constructor_pointer", &Consty::test_constructor_pointer)
+         << call("constructor_vector_consty", &Consty::test_constructor_vector_consty)
+         << call("constructor_vector_muting", &Consty::test_constructor_vector_muting)
+         << call("constructor_from_muting", &Consty::test_constructor_from_muting)
+    ;
+  return series.release();
+}
+#endiv

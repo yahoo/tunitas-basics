@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #define values that establish the values of the enumeration elements
+#include <fcntl.h>
+namespace sys::at {
+  //
+  // See sys::at::Position, nearby
+  // See sys.at.constants, for the namespace-scoped constants
+  //
+  enum class Cwd {
+    // n.b. the special value -100 (0xf...fff9c)
+    FDCWD = AT_FDCWD,
+    // other values are "regular" integers
+    // -1 to signal error
+    // non-negative to hold a valid (directory) file descriptor.
+  };
+}
+#endiv

@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import std.underlying_type
+#import sys.id.process.Process
+namespace sys::id::required::process {
+  //
+  // Is this type a Process identifier (enum) or its underlying type (pid_t)?
+  //
+  // Usage:
+  //
+  //   Oh come on.
+  //
+  template<typename PROCESS> concept bool Process = (std::is_same_v<PROCESS, id::process::Process> ||
+                                                     std::is_same_v<PROCESS, std::underlying_type_t<id::process::Process>>);
+}
+#endiv
+#divert <cpp>
+#import pid_t
+#import sys.id.Process
+#import sys.id.process.Process
+namespace {
+  namespace tests {
+    using namespace sys::id;
+    static_assert(required::process::Process<sys::id::Process>);
+    static_assert(required::process::Process<sys::id::process::Process>);
+    static_assert(required::process::Process<pid_t>);
+    static_assert(!required::process::Process<char>);
+  }
+}
+#endiv

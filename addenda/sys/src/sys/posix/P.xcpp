@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::p
+  // PREFER namespace sys::p::constants
+  // PREFER sys::p::Type
+  //        etc.
+  //
+  // Usage:
+  //
+  //   using P = sys::posix::P;
+  //   auto const p0 = P::ALL;
+  //   auto const p1 = P::PROCESS;
+  //   auto const p1 = P::GROUP;
+  //   ...etc...
+  //
+  struct P;
+}
+#endiv
+#divert <hpp>
+#import sys.p.Type
+#import sys.p.constants
+struct sys::posix::P {
+  using Type = p::Type;
+  inline static constexpr auto PROCESS = Type::PROCESS;
+  inline static constexpr auto GROUP   = Type::GROUP;
+  inline static constexpr auto ALL     = Type::ALL;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("spell it out! instead, prefer P::PROCESS")]] inline static constexpr auto PID = Type::PID;
+  [[deprecated("spell it out! instead, prefer P::GROUP")]] inline static constexpr auto PGID  = Type::PGID;
+#pragma GCC diagnostic pop
+  P() = delete;
+  P(P const &) = delete;
+  auto operator=(P const &) -> P & = delete;
+};
+#endiv
+#divert <ipp>
+namespace sys::posix {
+  // any?
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_P.Usage
+static_assert(tests::usage::posix_P::Usage<>);
+#endiv

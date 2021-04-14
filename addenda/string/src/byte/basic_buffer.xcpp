@@ -1,0 +1,100 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import byte.required.Byte
+namespace byte {
+  //
+  // A byte buffer with a size and a length.
+  // ... (of course) and no implicit terminating '\0' sentinel character.
+  //
+  // byte::type_t is std::uint8_t
+  // so therefore BYTE is 'type_t' or 'type_t const'
+  //
+  //
+  // Usage:
+  //
+  //     basic_buffer<type_t>       muting_buf;
+  //     basic_buffer<type_t const> consty_buf;
+  //
+  template<required::Byte BYTE> class basic_buffer;
+}
+#entail byte.basic_buffer.consty
+#endiv
+#divert <hpp>
+#import byte.detail.Buffer
+#import byte.detail.Byte
+#import std.array
+#import std.is_const
+#import std.pair
+#import std.size_t
+#import std.tuple
+#import std.vector
+// These are NOT suitable for storing the pointer values persistently.
+template<byte::required::Byte BYTE> class byte::basic_buffer : public detail::Buffer<detail::Byte<BYTE>> {
+  using ancestor = detail::Buffer<detail::Byte<BYTE>>;
+  static_assert(!std::is_const<BYTE>::value, "BYTE must never be const, see basic_buffer<BYTE const>, a different specialization, nearby");
+public:
+  basic_buffer() = default;
+  // Yes, implicit, all
+  // [[deprecated]] basic_buffer(typename ancestor::data_type, std::size_t); (not just deprecated, but purely unavailable)
+  // preceding size is primary
+  inline basic_buffer(std::size_t, typename ancestor::data_type);
+  // trailing size overrides inferred size
+  template<std::size_t N> inline basic_buffer(typename ancestor::value_type (&)[N], std::size_t = N);
+  // either order
+  inline basic_buffer(std::pair<std::size_t, BYTE *>);
+  inline basic_buffer(std::pair<BYTE *, std::size_t>);
+  // either order
+  inline basic_buffer(std::tuple<BYTE *, std::size_t>);
+  inline basic_buffer(std::tuple<std::size_t, BYTE *>);
+  template<std::size_t N> inline basic_buffer(std::array<BYTE, N> const &) = delete; // suppress this as it produces a 'data() const'
+  template<std::size_t N> inline basic_buffer(std::array<BYTE, N> &nonconst);
+  // pass by reference
+  template<typename ALLOC> inline basic_buffer(std::vector<BYTE, ALLOC> const &) = delete; // ibidem..
+  template<typename ALLOC> inline basic_buffer(std::vector<BYTE, ALLOC> &nonconst);
+};
+#endiv
+#divert <ipp>
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE>::basic_buffer(std::size_t subject_size, typename ancestor::data_type subject)
+  : ancestor(subject, subject_size) {
+  ;
+}
+#import std.min
+#import std.length_error
+template<byte::required::Byte BYTE> template<std::size_t N> byte::basic_buffer<BYTE>::basic_buffer(typename ancestor::value_type (&subject)[N], std::size_t subject_size)
+  : ancestor(subject, std::min(subject_size, N)) {
+  if (subject_size > N) {
+    // This is a programmer error; because the programmer didn't understand subject_size relative to the size N.
+    throw std::length_error("size > N");
+  }
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE>::basic_buffer(std::pair<std::size_t, BYTE *> subject)
+  : ancestor(subject.second, subject.first) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE>::basic_buffer(std::pair<BYTE *, std::size_t> subject)
+  : ancestor(subject.first, subject.second) {
+  ;
+}
+#import std.get
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE>::basic_buffer(std::tuple<std::size_t, BYTE *> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE>::basic_buffer(std::tuple<BYTE *, std::size_t> subject)
+  : ancestor(std::get<0>(subject), std::get<1>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> template<std::size_t N> byte::basic_buffer<BYTE>::basic_buffer(std::array<BYTE, N> &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+template<byte::required::Byte BYTE> template<typename ALLOC> byte::basic_buffer<BYTE>::basic_buffer(std::vector<BYTE, ALLOC> &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+#endiv

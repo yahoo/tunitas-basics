@@ -1,0 +1,4 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 70
+set -e
+uri _dnf._tcp.${TEST_DOMAIN?}

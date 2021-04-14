@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.required.Process
+namespace sys::call::result::fork {
+  //
+  // The outcome of a fork(2) family of calls that returns only the (process) identifier.
+  //
+  // This needs to be a distinct type (not a type alias) so that ADL will find it.
+  //
+  // Usage:
+  //
+  //   auto called = sys::posix::fork(); ............ returns a Process
+  //   auto called = sys::posix::native::fork(); .... returns a pid_t
+  //   if (good(called)) {
+  //     auto p = pid(called)
+  //     auto p = process(called)
+  //     ...bask in the success...
+  //   } else {
+  //     ...complain...
+  //   }
+  //
+  template<required::Process ID> struct Value;
+}
+#endiv
+#divert <hpp>
+#import sys.call.result.Value
+#forward sys.call.result.Size
+#forward sys.call.result.Element
+namespace sys::call::result {
+  namespace fork {
+    // of course ok(...) and error_num(...) and error_code(...) are also available by ADL
+    template<required::Process ID> [[deprecated("spell it out!; prefer process<ID>(Value<ID>)")]] inline auto pid(Value<ID> const &) -> ID;
+    template<required::Process ID> inline auto process(Value<ID> const &) -> ID;
+    template<required::Process ID> inline auto is_parent(Value<ID> const &) -> bool;
+    template<required::Process ID> inline auto is_child(Value<ID> const &) -> bool;
+    template<required::Process ID> inline auto is_error(Value<ID> const &) -> bool;
+  }
+  template<required::Process ID> struct fork::Value : public result::Value<ID> {
+    using Ancestor = result::Value<ID>;
+    friend class result::Element<0, Value<ID>>;
+    friend class result::Size<Value<ID>>;
+  public:
+    Value() = default;
+    using Ancestor::Value;
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::call::result {
+  template<required::Process ID> auto fork::pid(Value<ID> const &r) -> ID { return process(r); }
+  template<required::Process ID> auto fork::process(Value<ID> const &r) -> ID { return result::get<0>(r); }
+  template<required::Process ID> auto fork::is_parent(Value<ID> const &r) -> bool { return 0 < (pid_t)process(r); }
+  template<required::Process ID> auto fork::is_child(Value<ID> const &r) -> bool  { return 0 == (pid_t)process(r); }
+  template<required::Process ID> auto fork::is_error(Value<ID> const &r) -> bool  { return 0 > (pid_t)process(r); }
+}
+#endiv

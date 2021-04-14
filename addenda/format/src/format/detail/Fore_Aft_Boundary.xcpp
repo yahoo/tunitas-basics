@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import format.required.Character
+namespace format::detail {
+  //
+  // A mixin, for descendants only.
+  // Store the two characters of the fore-aft boundary; e.g. '(' ')'
+  //
+  template<required::Character CHAR> class Fore_Aft_Boundary;
+}
+#endiv
+#divert <hpp>
+template<format::required::Character CHAR> class format::detail::Fore_Aft_Boundary {
+protected:
+  ~Fore_Aft_Boundary() = default;
+public:
+  using char_type = CHAR;
+  char_type fore;
+  char_type aft;
+protected:
+  inline Fore_Aft_Boundary(char_type fore, char_type aft);
+};
+#endiv
+#divert <ipp>
+template<format::required::Character CHAR> format::detail::Fore_Aft_Boundary<CHAR>::Fore_Aft_Boundary(char_type arg_fore, char_type arg_aft)
+  : fore(arg_fore)
+  , aft(arg_aft) {
+  ;
+}
+#endiv

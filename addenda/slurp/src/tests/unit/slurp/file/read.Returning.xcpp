@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Octet
+namespace tests::unit::slurp::file::read {
+  template<nonstd::required::Octet OCTET> class Returning;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.vector
+template<nonstd::required::Octet OCTET> class tests::unit::slurp::file::read::Returning : public cppunit::test::Fixture {
+public:
+  using Octet = OCTET;
+  using Container = std::vector<Octet>; // either std::vector or std::deque
+  auto test_failure() -> void;
+  auto test_nothing() -> void;
+  auto test_something() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import std.nothrow
+#import slurp.file.read
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Returning<_>::test_failure() -> void {
+  //
+  // testing this ----------\\\\\\\\\\\\\\\ (here)     /--------- with nothrow
+  //                        |||||||||||||||            |
+  //                        vvvvvvvvvvvvvvv            v
+  auto bad = ::slurp::file::read<Container>(std::nothrow, "/pretty/sure/this/file/does/not/exist");
+  CPPUNIT_ASSERT(!ok(bad));
+}
+#import std.empty
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Returning<_>::test_nothing() -> void {
+  auto good = ::slurp::file::read<Container>(std::nothrow, "/dev/null");
+  CPPUNIT_ASSERT(!ok(good));
+  auto contained = value(std::move(good));
+  CPPUNIT_ASSERT(std::empty(contained));
+}
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Returning<_>::test_something() -> void {
+  auto good = ::slurp::file::read<Container>(std::nothrow, "/etc/group");
+  CPPUNIT_ASSERT(!ok(good));
+  auto contained = value(std::move(good));
+  CPPUNIT_ASSERT(!std::empty(contained));
+}
+#import rigging.suite.io
+template<nonstd::required::Octet _> auto tests::unit::slurp::file::read::Returning<_>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("read<"s + typeid(Octet).name() + ">[[returning]]"s);
+  series << call("failure", &Returning::test_failure)
+         << call("nothing", &Returning::test_nothing)
+         << call("something", &Returning::test_something)
+    ;
+  return finalize(series);
+}
+#endiv

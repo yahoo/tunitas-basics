@@ -1,0 +1,4 @@
+// -*- c++ -*- bf6c2e9b-af97-4fdb-91ce-75360a802833
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/panama.h>

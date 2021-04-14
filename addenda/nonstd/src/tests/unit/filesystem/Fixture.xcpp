@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.filesystem
+namespace tests::unit::filesystem {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::nonstd::filesystem;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::filesystem::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_Path() -> void;
+  auto test_Exception() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import nonstd.filesystem.Path
+#import nonstd.filesystem.Exception
+namespace tests::unit::filesystem::fixture {
+  auto Fixture::test_Path() -> void {
+    using Subject = library::Path;
+    auto subject = Subject{};
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+  auto Fixture::test_Exception() -> void {
+    using Subject = library::Exception;
+    auto subject = Subject{"what happened", std::error_code{}};
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::filesystem::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream suite("filesystem");
+  suite << call("Path", &Fixture::test_Path)
+        << call("Exception", &Fixture::test_Exception)
+        << END;
+  return finalize(suite);
+}
+#endiv

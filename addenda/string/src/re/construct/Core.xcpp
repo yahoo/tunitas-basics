@@ -1,0 +1,134 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import re.required.Corelike
+namespace re::construct {
+  //
+  // The core of the restring & rebuffer system.
+  //
+  // Whereas one can never make a completely solid choice of which string type to use.
+  // Therefore: the re::string<UNIFIER>, re::buffer<UNIFIER>
+  //
+  // Whereas both c::const_stringz and std::string are implicitly constructible
+  // from 'char const *', there is ambiguity and difficulty.
+  //
+  template<required::Corelike UNIFIER> class Core; 
+}
+#endiv
+#divert <hpp>
+namespace re::construct {
+  template<required::Corelike UNIFIER> inline auto swap(Core<UNIFIER> &, Core<UNIFIER> &) -> void;
+}
+
+#import c.const_buffer
+#import c.const_stringn
+#import c.const_stringz
+#import std.is_same
+#import std.size_t
+#import std.string
+#import std.string_view
+#import re.construct.detail.Constructor_Data_Pointer
+namespace re {
+  template<required::Corelike UNIFIER> class construct::Core {
+  protected:
+    ~Core() = default; // descendants only
+  public:
+    using unifier_type = UNIFIER;
+    Core() = default;
+    // reminder: descendants construct by supplying a fully-constructed unifier_type
+    //           and the unifier_type is agnostic to being a buffer+size or a '\0'-string.
+    inline Core(unifier_type const &);
+    inline Core(unifier_type &&);
+    // And with the move constructor, we have to have default declarations for these
+    Core(Core const &) = default;
+    auto operator=(Core const &) -> Core & = default;
+    Core(Core &&) = default;
+    auto operator=(Core &&) -> Core & = default;
+    // The member API is generic to both re::buffer<...> and re:string<...>
+    inline auto empty() const -> bool;
+    inline auto size() const -> std::size_t;
+    using const_iterator = typename unifier_type::const_iterator;
+    inline auto begin() const -> const_iterator;
+    inline auto end() const -> const_iterator;
+    using iterator = const_iterator; // there is no real non-const iterator.
+    using value_type = typename unifier_type::value_type;
+    static_assert(std::is_same<char, value_type>::value, "fail");
+    // reminder: data() and c_str() are the same thing; both return a '\0'-terminated character series.
+    inline auto data() const -> value_type const *;
+    inline auto front() const -> value_type;
+    // Descendants must implement these, as it is done differently in each UNIFIER
+    auto back() const -> value_type = delete; // implemented differently depending upon the unifier_type
+    auto operator[](std::size_t) const -> value_type = delete; // ibidem.
+    explicit operator char const *() const = delete;
+    explicit operator c::const_buffer() const = delete;
+    explicit operator c::const_stringn() const = delete;
+    explicit operator c::const_stringz() const = delete;
+    explicit operator std::string_view() const = delete;
+    operator std::string() const = delete;
+    auto c_str() const -> value_type const * = delete; // only valid if a '\0'-terminated unifier_type
+  protected:
+    friend auto construct::swap<>(Core &, Core &) -> void;
+    unifier_type unifier;
+    // yup, it's a hack
+    using descendant_constructor_data_pointer_maybe_consty_argument_type = typename detail::Constructor_Data_Pointer<UNIFIER>::type;
+  };
+}
+
+#import std.swap
+namespace std {
+  using re::construct::swap;
+}
+#endiv
+#divert <ipp>
+namespace re::construct {
+  template<required::Corelike UNIFIER> auto swap(Core<UNIFIER> &a, Core<UNIFIER> &b) -> void {
+    std::swap(a.unifier, b.unifier);
+  }
+}
+
+namespace re::construct {
+  template<required::Corelike UNIFIER> Core<UNIFIER>::Core(unifier_type const &value)
+    : unifier(value) {
+    ;
+  }
+}
+
+#import std.forward
+namespace re::construct {
+  template<required::Corelike UNIFIER> Core<UNIFIER>::Core(unifier_type &&value)
+    : unifier(std::forward<unifier_type>(value)) {
+    ;
+  }
+}
+
+namespace re::construct {
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::empty() const -> bool {
+    return unifier.empty();
+  }
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::size() const -> std::size_t {
+    return unifier.size();
+  }
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::begin() const -> const_iterator {
+    return unifier.begin();
+  }
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::end() const -> const_iterator {
+    return unifier.end();
+  }
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::data() const -> value_type const * {
+    return unifier.data();
+  }
+}
+#import std.out_of_range // FIXME ... out_of_range means (numerical? out of range)
+namespace re::construct {
+  template<required::Corelike UNIFIER> auto Core<UNIFIER>::front() const -> value_type {
+    if (empty()) {
+      throw std::out_of_range("empty");
+    }
+    return unifier.front();
+  }
+}
+#endiv

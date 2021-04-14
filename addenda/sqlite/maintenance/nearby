@@ -1,0 +1,43 @@
+#!/bin/bash
+# For terms and provenance see the LICENSE file at the top of this repository.
+cd ${0%/*}/.. || exit 70
+: ${with_nearby:=$(realpath ${0%/*}/../..)}
+: ${with_hypogeal_twilight:=${with_nearby?}/hypogeal-twilight}
+: ${with_module_boost:=${with_nearby?}/module-boost}
+: ${with_module_c:=${with_nearby?}/module-c}
+: ${with_module_format:=${with_nearby?}/module-format}
+: ${with_module_nonstd:=${with_nearby?}/module-nonstd}
+: ${with_module_options:=${with_nearby?}/module-options}
+: ${with_module_posix:=${with_nearby?}/module-posix}
+: ${with_module_slurp:=${with_nearby?}/module-slurp}
+: ${with_module_std:=${with_nearby?}/module-std}
+: ${with_module_string:=${with_nearby?}/module-string}
+: ${with_module_sys:=${with_nearby?}/module-sys}
+: ${with_module_rigging:=${with_nearby?}/module-rigging}
+
+function comment() { return 0; }
+eval \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    ${enable_dependency_tracking:+--enable-dependency-tracking=$enable_dependency_tracking} \
+    --disable-mock-build $(comment hypogeal-twlight requires this) \
+    ${with_nearby:+--with-nearby=$with_nearby} \
+    --without-submodules \
+    --without-vernacular-doggerel \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_module_boost:+--with-module-boost=$with_module_boost} \
+    ${with_module_c:+--with-module-c=$with_module_c} \
+    ${with_module_format:+--with-module-format=$with_module_format} \
+    ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \
+    ${with_module_options:+--with-module-options=$with_module_options} \
+    ${with_module_posix:+--with-module-posix=$with_module_posix} \
+    ${with_module_slurp:+--with-module-slurp=$with_module_slurp} \
+    ${with_module_std:+--with-module-std=$with_module_std} \
+    ${with_module_string:+--with-module-string=$with_module_string} \
+    ${with_module_sys:+--with-module-sys=$with_module_sys} \
+    ${with_module_rigging:+--with-module-rigging=$with_module_rigging} \
+    ${end} &&
+make &&
+make check &&
+echo OK DONE

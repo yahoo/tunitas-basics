@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix {
+  namespace packaging::wait3 {
+    using namespace packaging::wait::interface;
+    namespace [[detail]] returned {
+      using namespace bundle::wait3::returned;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.wait4.returned
+namespace sys::posix::packaging::wait3::returned {
+  //
+  // From wait3(2) of man-pages-4.16-3.fc29.noarch
+  //
+  //   <quote>
+  //     C library/kernel differences
+  //     On Linux, wait3() is a library function implemented on top of the wait4() system call.
+  //   </quote>
+  //
+  // If you are looking for the flexibility surrounding recovering the [[out]] arguments
+  // through the use of std::optional then use the overloaded 'wait' interface to access wait3(2).
+  //
+  using namespace bundle::wait3::returned;
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options) -> both::Returned<RETURNED>; // ............................................................. both wstatus and rusage are nulled
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, [[out]] usages::Filled &) -> status::Returned<RETURNED>; // ................................. the wstatus is omitted but the rusage is not
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, [[out]] status::Filled &) -> usages::Returned<RETURNED>; // ................................. the wstatus is omitted but the rusage is not
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned<RETURNED>; // ... [[out]] parameters are last
+  //
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto wait3([[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned<RETURNED>;
+  using posix::packaging::wait4::returned::wait4;
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::wait3 {
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options) -> both::Returned<RETURNED>                                                         { return wait4<RETURNED>(RETURNED{-1}, options); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, status::Filled &sutats) -> usages::Returned<RETURNED>                               { return wait4<RETURNED>(RETURNED{-1}, options, sutats); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, usages::Filled &segasu) -> status::Returned<RETURNED>                               { return wait4<RETURNED>(RETURNED{-1}, options, segasu); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned<RETURNED>   { return wait4<RETURNED>(RETURNED{-1}, options, sutats, segasu); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned<RETURNED>  { return wait4<RETURNED>(RETURNED{-1}, options, sutats, segasu); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned<RETURNED>  { return wait4<RETURNED>(RETURNED{-1}, options, sutats, segasu); }
+  template<returned::identifier::Process RETURNED> auto returned::wait3(Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned<RETURNED> { return wait4<RETURNED>(RETURNED{-1}, options, sutats, segasu); }
+}
+#endiv

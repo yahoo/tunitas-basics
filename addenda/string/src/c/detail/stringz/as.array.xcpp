@@ -1,0 +1,32 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringz
+#import std.array
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace stringz {
+      // Whereas as<...>(...) is a conversion operation,
+      // the new data invariant of stringz must be respected.
+      // These throw std::invalid_argument if the element at [N] is not nulchar
+      template<typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> const &) -> basic_stringz<CHAR const>;
+      template<typename CHAR, std::size_t N> inline auto as(std::array<CHAR, N> &) -> basic_stringz<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.stringy.enforce_terminating_nulchar_invariant
+
+template<typename CHAR, std::size_t N> auto c::detail::stringz::as(std::array<CHAR, N> const &arr) -> basic_stringz<CHAR const> {
+  stringy::enforce_terminating_nulchar_invariant(arr);
+  basic_stringz<CHAR const> ret(arr.data());
+  return ret;
+}
+
+template<typename CHAR, std::size_t N> auto c::detail::stringz::as(std::array<CHAR, N> &arr) -> basic_stringz<CHAR> {
+  stringy::enforce_terminating_nulchar_invariant(arr);
+  basic_stringz<CHAR> ret(arr.data());
+  return ret;
+}
+#divert </ipp>

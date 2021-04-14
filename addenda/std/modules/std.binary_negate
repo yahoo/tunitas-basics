@@ -1,0 +1,3 @@
+// -*- c++ -*- bd83afce-7ac0-4847-a107-5d191b5a5166
+#pragma once
+#include <functional>

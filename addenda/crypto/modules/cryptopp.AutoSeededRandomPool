@@ -1,0 +1,4 @@
+// -*- c++ -*- 66edf594-aaa4-4c80-80a9-a37a9a06cf24
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/osrng.h>

@@ -1,0 +1,128 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+namespace tests::unit::time {
+  template<typename REP> concept bool Representation = std::is_same<int unsigned long long, REP>::value || std::is_same<long double, REP>::value;
+  template<Representation REP> class Literals;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+template<tests::unit::time::Representation REP> class tests::unit::time::Literals : public cppunit::test::Fixture {
+public:
+  auto test_literals() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+
+namespace tests::unit::time {
+  template<> auto Literals<int unsigned long long>::test_literals() -> void;
+  template<> auto Literals<long double>::test_literals() -> void;
+}
+#divert </hpp>
+#divert <tpp>
+#import rigging.suite.io
+#import std.type_info
+template<tests::unit::time::Representation REP> auto tests::unit::time::Literals<REP>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call;         // because tests::unit::call occludes
+  Stream s(typeid(REP).name());
+  s << call("literals", &Literals::test_literals)
+    ;
+  return finalize(s);
+}
+#divert </tpp>
+#divert <cpp>
+#import std.chrono.system_clock
+#import sys.time.durations.literals
+template<> auto tests::unit::time::Literals<int unsigned long long>::test_literals() -> void {
+  using fractional_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<long double>>;
+  fractional_point z;
+  fractional_point p = z;
+  using namespace ::sys::time::durations::literals;
+  p += 10.99_nanoseconds;
+  p += 20.99_microseconds;
+  p += 30.99_milliseconds;
+  p += 40.99_seconds;
+  p += 50.99_minutes;
+  p += 60.99_hours;
+  p += 70.99_days;
+  p += 80.99_weeks;
+  p += 90.99_months;
+  p += 100.99_years;
+  p += 101.99_nanosecond;
+  p += 102.99_microsecond;
+  p += 103.99_millisecond;
+  p += 104.99_second;
+  p += 105.99_minute;
+  p += 106.99_hour;
+  p += 107.99_day;
+  p += 108.99_week;
+  p += 109.99_month;
+  p += 200.99_year;
+  p += 201.99_nsecs;
+  p += 202.99_usecs;
+  p += 203.99_msecs;
+  p += 204.99_secs;
+  p += 205.99_mins;
+  p += 206.99_hrs;
+  p += 207.99_nsec;
+  p += 208.99_usec;
+  p += 209.99_msec;
+  p += 300.99_sec;
+  p += 301.99_min;
+  p += 302.99_hr;
+  p += 303.99_ns;
+  p += 304.99_us;
+  p += 305.99_ms;
+  p += 306.99_s;
+  CPPUNIT_ASSERT(p != z);
+}
+
+#import sys.time.point
+#import sys.time.durations.literals
+template<> auto tests::unit::time::Literals<long double>::test_literals() -> void {
+  ::sys::time::point z;
+  ::sys::time::point p;
+  using namespace ::sys::time::durations::literals;
+  p += 1_nanoseconds;
+  p += 2_microseconds;
+  p += 3_milliseconds;
+  p += 4_seconds;
+  p += 5_minutes;
+  p += 6_hours;
+  p += 7_days;
+  p += 8_weeks;
+  p += 9_months;
+  p += 10_years;
+  p += 11_nanosecond;
+  p += 12_microsecond;
+  p += 13_millisecond;
+  p += 14_second;
+  p += 15_minute;
+  p += 16_hour;
+  p += 17_day;
+  p += 18_week;
+  p += 19_month;
+  p += 20_year;
+  p += 21_nsecs;
+  p += 22_usecs;
+  p += 23_msecs;
+  p += 24_secs;
+  p += 25_mins;
+  p += 26_hrs;
+  p += 27_nsec;
+  p += 28_usec;
+  p += 29_msec;
+  p += 30_sec;
+  p += 31_min;
+  p += 32_hr;
+  p += 33_ns;
+  p += 34_us;
+  p += 35_ms;
+  p += 36_s;
+  CPPUNIT_ASSERT(p != z);
+}
+#endiv

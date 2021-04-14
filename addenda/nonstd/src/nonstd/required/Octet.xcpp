@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_const
+#import std.is_enum
+#import std.is_integral
+#import std.is_same
+namespace nonstd::required {
+  //
+  // An 8-bit type.
+  //
+  template<typename OCTET> concept bool Octet = requires(OCTET octet) {
+    requires !std::is_const<OCTET>::value; // to belabor the point
+    requires 1 == sizeof (OCTET);
+    requires std::is_integral<OCTET>::value || std::is_enum<OCTET>::value;
+  };
+}
+#endiv
+#divert <cpp>
+#import std.byte
+namespace nonstd::required {
+  // Testify! - All known octet types are Octets
+  static_assert(Octet<char>);
+  static_assert(Octet<unsigned char>);
+  static_assert(Octet<signed char>);
+  static_assert(Octet<std::byte>);
+}
+#endiv

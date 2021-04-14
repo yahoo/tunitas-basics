@@ -1,0 +1,117 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::json {
+  class Charcode;
+}
+#endiv
+#divert <hpp>
+#import std.is_integral
+#import std.is_floating_point
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::json::Charcode : public cppunit::test::Fixture {
+public:
+  auto test_isalpha() -> void;
+  auto test_punctuation() -> void;
+  auto test_symbolic() -> void;
+  auto test_numeric() -> void;
+  auto test_exhaustive() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import format.json.charcode
+
+auto tests::unit::format::json::Charcode::test_isalpha() -> void {
+  using ::format::json::charcode;
+  std::ostringstream buf;
+  char const *const literal{"abcdefghijklmnopqrstuvwxyz0123456789"};
+  for (auto const *l(literal); '\0' != *l; ++l) {
+    buf << charcode<char>(*l);
+  }
+  std::string expected = "abcdefghijklmnopqrstuvwxyz0123456789";
+  std::string actual = buf.str();
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+
+}
+
+auto tests::unit::format::json::Charcode::test_punctuation() -> void {
+  using ::format::json::charcode;
+  std::ostringstream buf;
+  char const *const literal{"!@#$%^&*()_+[]{}\\|;:'\",<.>/?"};
+  for (auto const *l(literal); '\0' != *l; ++l) {
+    buf << charcode<char>(*l);
+  }
+  std::string expected = R"json(!@#$%^&*()_+[]{}\\|;:'\",<.>\/?)json";
+  std::string actual = buf.str();
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::format::json::Charcode::test_symbolic() -> void {
+  using ::format::json::charcode;
+  std::ostringstream buf;
+  char const *const literal{"\b\f\n\t"};
+  for (auto const *l(literal); '\0' != *l; ++l) {
+    buf << charcode<char>(*l);
+  }
+  std::string expected = "\\b\\f\\n\\t";
+  std::string actual = buf.str();
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import c.const_stringn
+auto tests::unit::format::json::Charcode::test_numeric() -> void {
+  using ::format::json::charcode;
+  std::ostringstream buf;
+  // The rest of the numeric ones will be covered in test_exhaustive
+  char const raw_literal[] = "\0\1\2\3\4\5\6\7\10\11\12\13\14\15\16\17"; //<---- WATCHOUT contains embedded '\0'
+  c::const_stringn literal(raw_literal, sizeof (raw_literal)-1);
+  for (auto ch : literal) {
+    buf << charcode<char>(ch);
+  }
+  std::string expected = R"json(\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\u000d\u000e\u000f)json";
+  std::string actual = buf.str();
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import std.numeric_limits
+auto tests::unit::format::json::Charcode::test_exhaustive() -> void {
+  using ::format::json::charcode;
+  std::ostringstream buf;
+  for (int i(std::numeric_limits<char>::min()), e(std::numeric_limits<char>::max()+1); i != e; ++i) {
+    buf << charcode<char>(i);
+  }
+  std::string expected = (R"json(\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\)json"
+                          R"json(u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u)json"
+                          R"json(0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u00a1\u00a2\u00a3\u00a4\u0)json"
+                          R"json(0a5\u00a6\u00a7\u00a8\u00a9\u00aa\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00)json"
+                          R"json(b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00ba\u00bb\u00bc\u00bd\u00be\u00b)json"
+                          R"json(f\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc)json"
+                          R"json(\u00cd\u00ce\u00cf\u00d0\u00d1\u00d2\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00d9\)json"
+                          R"json(u00da\u00db\u00dc\u00dd\u00de\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u)json"
+                          R"json(00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u00f0\u00f1\u00f2\u00f3\u0)json"
+                          R"json(0f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u00fd\u00fe\u00ff\u0000\u00)json"
+                          R"json(01\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\u000d\u000e\u000f\u0010\u0)json"
+                          R"json(011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u00)json"
+                          R"json(1e\u001f !\"#$%&'()*+,-.\/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abc)json"
+                          R"json(defghijklmnopqrstuvwxyz{|}~\u007f)json");
+  std::string actual = buf.str(); 
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import rigging.suite.io
+auto tests::unit::format::json::Charcode::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("charcode");
+  series << call("isalpha", &Charcode::test_isalpha)
+         << call("punctuation", &Charcode::test_punctuation)
+         << call("symbolic", &Charcode::test_symbolic)
+         << call("numeric", &Charcode::test_numeric)
+         << call("exhaustive", &Charcode::test_exhaustive)
+    ;
+  return finalize(series);
+}
+#endiv

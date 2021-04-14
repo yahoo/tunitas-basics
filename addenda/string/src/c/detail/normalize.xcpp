@@ -1,0 +1,5 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#entail c.detail.normalize.pair
+#entail c.detail.normalize.tuple
+#divert </hpp>

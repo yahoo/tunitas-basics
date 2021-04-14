@@ -1,0 +1,135 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::time {
+  class Put;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.time.required.Time
+class tests::unit::time::Put : public cppunit::test::Fixture {
+public:
+  auto test_format_char_const_pointer() -> void;
+  auto test_format_std_string() -> void;
+  template<typename RATIO> auto test_scale() -> void;
+  template<::sys::time::required::Time TIME> auto test_type() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <tpp>
+#import std.dec
+#import std.cerr
+#import std.ostringstream
+#import std.stol
+#import sys.time.durations
+#import sys.time.point_cast
+#import sys.time.now
+#import sys.time.put
+#import sys.posix.time
+template<typename RATIO> auto tests::unit::time::Put::test_scale() -> void {
+  auto const unscaled_specimen = sys::time::now();
+  using Duration = sys::time::durations::base<sys::time::duration::rep, RATIO>;
+  auto const scaled_specimen = sys::time::point_cast<Duration>(unscaled_specimen);
+  if (1 == RATIO::num) {
+    // there is truncation for: deca, hecto, kilo, mega, giga
+    // See https://en.cppreference.com/w/cpp/chrono/system_clock/to_time_t
+    CPPUNIT_ASSERT(::sys::time::clock::base::to_time_t(unscaled_specimen) == ::sys::time::clock::base::to_time_t(scaled_specimen));
+  }
+  std::ostringstream buf;
+  buf << sys::time::put(scaled_specimen, "%s"); // <---------------- test this on the scale value
+  long recovered_integer = std::stol(buf.str());
+  auto const recovered = sys::time::points::seconds(::sys::time::durations::seconds(recovered_integer));
+  std::cerr << std::dec;
+  std::cerr << "unscaled specimen = " << unscaled_specimen.time_since_epoch().count() << " which is " << sys::time::put(unscaled_specimen, "%F %T") << '\n';
+  std::cerr << "scaled specimen = " << scaled_specimen.time_since_epoch().count() << " which is " << sys::time::put(scaled_specimen, "%F %T") << '\n';
+  std::cerr << "recovered from " << buf.str() << " as " << recovered_integer << " which is " << sys::time::put(recovered, "%F %T") << '\n';
+  if (1 == RATIO::num) {
+    CPPUNIT_ASSERT(recovered_integer == ::sys::time::clock::base::to_time_t(unscaled_specimen));
+    CPPUNIT_ASSERT(recovered_integer == ::sys::time::clock::base::to_time_t(scaled_specimen));
+  }
+  // The recovered value is always at least truncated.
+  // but the standard apparently says it can be rounded if the implementation chooses.
+  CPPUNIT_ASSERT(recovered <= unscaled_specimen);
+}
+#import std.ostringstream
+#import sys.posix.time
+#import std.stol
+#import sys.time.as
+#import sys.time.put
+template<::sys::time::required::Time TIME> auto tests::unit::time::Put::test_type() -> void {
+  std::ostringstream buf;
+  using ::sys::time::put;
+  auto r = sys::posix::time();
+  TIME specimen = sys::time::as<TIME>(value(r));
+  buf << put(specimen, "%s");
+  long recovered = std::stol(buf.str());
+  CPPUNIT_ASSERT(value(r) <= recovered);
+}
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import std.stol
+#import sys.time.put
+#import sys.posix.time
+auto tests::unit::time::Put::test_format_char_const_pointer() -> void {
+  std::ostringstream buf;
+  using ::sys::time::put;
+  auto r = sys::posix::time();
+  auto specimen = value(r);
+  buf << put(specimen, "%s"); // <--------------- test this on char const *
+  long recovered = std::stol(buf.str());
+  // Always at least no truncation; never progress into the future.
+  CPPUNIT_ASSERT(recovered <= specimen);
+}
+#import std.string_literals
+auto tests::unit::time::Put::test_format_std_string() -> void {
+  using namespace std::string_literals;
+  std::ostringstream buf;
+  using ::sys::time::put;
+  auto r = sys::posix::time();
+  auto specimen = value(r);
+  buf << put(specimen, "%s"s); // <--------------- test this on std::string
+  long recovered = std::stol(buf.str());
+  // Always at least no truncation; never progress into the future.
+  CPPUNIT_ASSERT(recovered <= specimen);
+}
+#import rigging.suite.Stream
+auto tests::unit::time::Put::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("put");
+  {
+    Stream typ("type");
+    typ << call("point", &Put::test_type<::sys::time::point>)
+        << call("spec", &Put::test_type<::sys::time::spec>)
+        << call("t", &Put::test_type<::sys::time::t>)
+        << call("tm", &Put::test_type<::sys::time::tm>)
+        << call("val", &Put::test_type<::sys::time::val>)
+      ;
+    series << add(std::move(typ));
+  } {
+    Stream sca("scale");
+    sca << call("std::nano", &Put::test_scale<std::nano>)
+        << call("std::micro", &Put::test_scale<std::micro>)
+        << call("std::milli", &Put::test_scale<std::milli>)
+        << call("std::centi", &Put::test_scale<std::centi>)
+        << call("std::deci", &Put::test_scale<std::deci>)
+        << call("unit", &Put::test_scale<std::ratio<1>>)
+        << call("std::deca", &Put::test_scale<std::deca>)
+        << call("std::hecto", &Put::test_scale<std::hecto>)
+        << call("std::kilo", &Put::test_scale<std::kilo>)
+        << call("std::mega", &Put::test_scale<std::mega>)
+        << call("std::giga", &Put::test_scale<std::giga>)
+        ;
+    series << add(std::move(sca));
+  } {
+    Stream form("format");
+    form << call("char const *", &Put::test_format_char_const_pointer)
+         << call("std::string", &Put::test_format_std_string)
+      ;
+    series << add(std::move(form));
+  }
+  return finalize(series);
+}
+#divert </cpp>

@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail::funcall {
+  //
+  // Usage #1:
+  //     Funcall<char const *> spec("f(", ",", ")");
+  //     finalize(initialize(out, spec) << "apple" << "banana" << "cherry");
+  //
+  // Usage #2:
+  //     finalize(initialize(out, ...etc...) << "apple" << "banana" << "cherry");
+  //
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> class Finalizable;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import format.detail.funcall.State
+namespace format::detail::funcall {
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto initialize(std::basic_ostream<CHAR, TRAITS> &, State<HEAD, SEPARATOR, TAIL> &) -> Finalizable<CHAR, TRAITS, HEAD, SEPARATOR, TAIL>;
+  // Yes, an && is required here to make idiomatic Usage #1 operate
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL, typename TYPE> inline auto operator<<(Finalizable<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&, TYPE const &) -> Finalizable<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&;
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto finalize(Finalizable<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> class format::detail::funcall::Finalizable {
+public:
+  using ostream_type = std::basic_ostream<CHAR, TRAITS>;
+  using funcall_type = State<HEAD, SEPARATOR, TAIL>;
+  inline explicit Finalizable(ostream_type &, funcall_type &);
+  ostream_type &outbound;
+  funcall_type &funcall;
+};
+#endiv
+#divert <ipp>
+#import std.invalid_argument
+#include <cassert>
+template<typename C, typename T, typename H, typename S, typename L> auto format::detail::funcall::initialize(std::basic_ostream<C, T> &o, State<H, S, L> &f) -> Finalizable<C, T, H, S, L> {
+  if (!f.is_open()) {
+    throw std::invalid_argument("funcall not at OPEN");
+  }
+  return Finalizable<C, T, H, S, L>(o, f);
+}
+
+#import std.forward
+template<typename C, typename T, typename H, typename S, typename L, typename RHS> auto format::detail::funcall::operator<<(Finalizable<C, T, H, S, L> &&lhs, RHS const &rhs) -> Finalizable<C, T, H, S, L> && {
+  assert(lhs.funcall.is_open() || lhs.funcall.is_arguments());
+  lhs.outbound << lhs.funcall << rhs;
+  return std::forward<Finalizable<C, T, H, S, L>>(lhs);
+}
+
+template<typename C, typename T, typename H, typename S, typename L> auto format::detail::funcall::finalize(Finalizable<C, T, H, S, L> &&able) -> std::basic_ostream<C, T> & {
+  if (able.funcall.is_open()) {
+    // never inserted any arguments ... so insert the header
+    able.outbound << able.funcall;
+  }
+  assert(able.funcall.is_arguments());
+  able.funcall++;
+  assert(able.funcall.is_close());
+  auto &result = able.outbound << able.funcall.tail();
+  able.funcall++;
+  assert(able.funcall.is_done());
+  return result;
+}
+
+template<typename C, typename T, typename H, typename S, typename L> format::detail::funcall::Finalizable<C, T, H, S, L>::Finalizable(ostream_type &arg_outbound, funcall_type &arg_funcall)
+  : outbound(arg_outbound)
+  , funcall(arg_funcall) {
+  ;
+}
+#endiv

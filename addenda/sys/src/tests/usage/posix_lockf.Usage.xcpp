@@ -1,0 +1,91 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_lockf.Usage
+//   static_assert(tests::usage::posix_lockf::Usage<>);
+//
+#import off_t
+#import nonstd.convertible_to
+#import sys.call.Result
+#import sys.fd.required.Unmanaged
+#import sys.lockf.Operation
+#import sys.id.File
+#import sys.posix.lockf
+#import sys.posix.F
+#import sys.posix.LOCKF
+#import sys.posix.LOCK
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_lockf {
+  using sys::posix::lockf;
+  using sys::posix::native::lockf;
+  using sys::posix::F;
+  using sys::posix::LOCKF;
+  using sys::posix::LOCK;
+  namespace [[detail]] packaging {
+    namespace [[detail]] {
+      using namespace std;
+      using namespace nonstd;
+      namespace required = sys::fd::required;
+      using Operation = sys::lockf::Operation;
+      using Offset = off_t;
+      using Status = sys::call::Result;
+      template<typename FILE> concept bool Overloading = requires(FILE file, Operation operation, Offset offset) {
+        requires required::Unmanaged<FILE>;
+        { lockf(file, operation, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_LOCKF_Current = requires(FILE file, Offset offset) {
+        requires required::Unmanaged<FILE>;
+        { lockf(file, LOCKF::LOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::TEST_AND_LOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::TEST, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::UNLOCK, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_LOCKF_Consistency = requires(FILE file, Offset offset) {
+        requires required::Unmanaged<FILE>;
+        // NO SUCH ---> LOCKF::UNLOCKF
+        { lockf(file, LOCKF::END, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_LOCKF_Legacy = requires(FILE file, Offset offset) {
+        { lockf(file, LOCKF::TLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::ULOCK, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_F_Current = requires(FILE file, Offset offset) {
+        requires required::Unmanaged<FILE>;
+        { lockf(file, F::LOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, F::TEST_AND_LOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, F::TEST, offset) } -> convertible_to<Status>;
+        { lockf(file, F::UNLOCK, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_F_Aliases = requires(FILE file, Offset offset) {
+        // NO SUCH ---> F::UNLOCKF
+        { lockf(file, F::END, offset) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_F_Legacy = requires(FILE file, Offset offset) {
+        { lockf(file, F::TLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, F::ULOCK, offset) } -> convertible_to<Status>;
+      };
+    }
+    template<typename FILE> concept bool Instance = requires(FILE) {
+      requires Overloading<FILE>;
+      requires Object_LOCKF_Current<FILE>;
+      requires Object_LOCKF_Consistency<FILE>;
+      requires Object_LOCKF_Legacy<FILE>;
+      requires Object_F_Current<FILE>;
+      requires Object_F_Aliases<FILE>;
+      requires Object_F_Legacy<FILE>;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      Instance<int>;
+      Instance<sys::id::File>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

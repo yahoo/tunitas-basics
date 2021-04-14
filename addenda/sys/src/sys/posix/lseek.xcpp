@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+#import sys.id.File
+#import sys.seek.Whence
+#import off_t
+namespace sys::posix {
+  namespace packaging::lseek {
+    using Result = call::Result;
+    namespace function {
+      inline auto lseek(id::File, off_t, seek::Whence) -> Result;
+    }
+    namespace native {
+      inline auto lseek(int fd, off_t, seek::Whence) -> Result;
+    }
+  }
+  using packaging::lseek::function::lseek;
+  namespace native { using packaging::lseek::native::lseek; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::lseek {
+  auto function::lseek(id::File fd, off_t of, seek::Whence wh) -> call::Result { return native::lseek((int) fd, of, wh); }
+  auto native::lseek(int fd, off_t of, seek::Whence wh) -> call::Result        { return idiomatic::syscall<int>(Syscall::LSEEK, fd, of, (int) wh); }
+}
+#endiv

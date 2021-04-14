@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::unmanaged {
+  //
+  // The unmanaged response for a URI record.
+  //
+  struct Uri;
+}
+#endiv
+#divert <hpp>
+namespace ares::unmanaged {
+  inline auto swap(Uri &, Uri &) noexcept -> void;
+}
+#import nonstd.span
+struct ares::unmanaged::Uri {
+  inline Uri();
+  inline ~Uri();
+  Uri(Uri const &) = delete;
+  auto operator=(Uri const &) -> Uri & = delete;
+  inline Uri(Uri &&) noexcept;
+  inline auto operator=(Uri &&) noexcept -> Uri &;
+  // These URI RR things are unlike SRV RR because the payload is a string, not a name.
+  // These URI RR things are like NAPTR RR, because the payload is a string.
+  // https://tools.ietf.org/html/rfc7553
+  Uri *next;
+  // The payload isn't a host, it's a URI in all that syntactc richness.
+  // https://tools.ietf.org/html/rfc3986
+  // <quote ref="Section 4.4">
+  //   Since the URI will not be encoded as a <character-string> (see Section 3.3 of RFC 1035 [RFC1035]), there is no 255-character size limitation.
+  // </quote>
+  unsigned char *uri; 
+  [[deprecated("avoid. let parse_uri_reply(...) be the only allocator of the iri field")]] inline static auto dup(nonstd::span<unsigned char const> csz) -> unsigned char *;
+  unsigned short priority;
+  unsigned short weight;
+};
+#endiv
+#divert <ipp>
+#import std.swap
+namespace ares {
+  auto unmanaged::swap(Uri &a, Uri &b) noexcept -> void {
+    std::swap(a.next, b.next);
+    std::swap(a.uri, b.uri);
+    std::swap(a.priority, b.priority);
+    std::swap(a.weight, b.weight);
+  }
+}
+namespace ares::unmanaged {
+  Uri::Uri()
+    : next{nullptr}
+    , uri{nullptr}
+    , priority{0u}
+    , weight{0u}
+  { }
+  Uri::Uri(Uri &&other) noexcept
+    : Uri{} {
+    Uri &self{*this};
+    swap(self, other);
+  }
+  auto Uri::operator=(Uri &&other) noexcept -> Uri & {
+    Uri &self{*this};
+    swap(self, other);
+    return *this;
+  }
+}
+#import malloc
+#import free
+#import nonstd.uninitialized.copy
+namespace ares::unmanaged {
+  auto Uri::dup(nonstd::span<unsigned char const> csz) -> unsigned char * {
+    // the this->uri field MUST be managed with malloc/free because that's what c-ares C runtime does.
+    auto uri = (unsigned char *) malloc(1+csz.size());
+    if (nullptr == uri) {
+      throw std::bad_alloc{};
+    }
+    nonstd::uninitialized::copy(csz.data(), csz.size(), uri);
+    uri[csz.size()] = '\0';
+    return uri;
+  }
+  Uri::~Uri() {
+    delete next; // yup, recursion in the destructor
+    if (uri) {
+      unsigned char *tmp{nullptr};
+      std::swap(uri, tmp);
+      ::free(tmp);
+    }
+  }
+}
+#endiv

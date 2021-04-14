@@ -1,0 +1,5 @@
+tests_unit_slurp_TESTS = \
+  tests/unit/slurp/all.test \
+  tests/unit/slurp/directory.test \
+  tests/unit/slurp/file.test \
+  $(end)

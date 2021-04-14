@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_ITIMER.Usage
+//   static_assert(tests::usage::posix_ITIMER::Usage<sys::posix::ITIMER>);
+//
+#import sys.posix.ITIMER
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_ITIMER {
+  using sys::posix::ITIMER;
+  namespace [[detail]] packaging {
+    template<typename ITIMER> concept bool Instance = requires(ITIMER) {
+      typename ITIMER::Which;
+      requires model::Namespace_Object<ITIMER>;
+      requires (int)ITIMER::REAL == ITIMER_REAL;
+      requires (int)ITIMER::VIRTUAL == ITIMER_VIRTUAL;
+      requires (int)ITIMER::PROFILE == ITIMER_PROF;
+      requires (int)ITIMER::PROF == ITIMER_PROF;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<ITIMER>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- 4f709323-9994-4262-830e-59d9eaf59ac4
+#pragma once
+#include "mysql++/options.h"
+

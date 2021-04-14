@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sqlite.error.Category
+namespace sqlite::error {
+  auto category() -> Category const &;
+}
+#endiv
+#divert <ipp>
+#import sqlite.error.Category
+// Consumers at the ipp level will need to understand this...
+static_assert(std::is_base_of<std::error_category, sqlite::error::Category>::value, "sqlite::error::Category does not inherit from std::error_category");
+#endiv
+#divert <cpp>
+auto sqlite::error::category() -> Category const & {
+  static Category only;
+  return only;
+}
+#endiv

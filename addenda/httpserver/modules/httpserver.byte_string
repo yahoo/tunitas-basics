@@ -1,0 +1,6 @@
+// -*- c++ -*- 8ac32d2f-23ff-4748-ae84-403d942be271
+#pragma once
+#include <httpserver>
+namespace httpserver {
+  using Byte_String = httpserver::byte_string;
+}

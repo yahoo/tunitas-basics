@@ -1,0 +1,213 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::call::argument {
+  class Pathname;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.call.argument.Pathname
+#import std.size_t
+class tests::unit::call::argument::Pathname : public cppunit::test::Fixture { 
+public: 
+  using Subject = ::sys::call::argument::Pathname;
+  auto test_usage() -> void;
+  auto test_constructor_charstar() -> void;
+  auto test_constructor_stringz() -> void;
+  auto test_constructor_stringn() -> void;
+  auto test_constructor_string() -> void;
+  auto test_constructor_filesystem() -> void;
+  auto test_operator_cast_charstar() -> void;
+  auto test_operator_cast_stringz() -> void;
+  auto test_c_str() -> void;
+  template<typename STRINGY> auto test_as() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto syscall(Subject) -> void;
+};
+namespace tests::unit::call::argument {
+  template<> auto Pathname::test_as<char const *>() -> void;
+  template<> auto Pathname::test_as<c::const_stringz>() -> void;
+  template<> auto Pathname::test_as<c::const_stringn>() -> void;
+  template<> auto Pathname::test_as<std::string_view>() -> void;
+}
+#endiv
+#divert <tpp>
+#import sys.call.argument.as
+template<typename STRINGY> auto tests::unit::call::argument::Pathname::test_as() -> void {
+  auto const specimen = "./looky-here";
+  Subject subject{specimen};
+  auto const actual = ::sys::call::argument::as<STRINGY>(subject);
+  auto const expected = [specimen]() -> STRINGY {
+                          auto const start = specimen;
+                          auto const finish = start + std::char_traits<char>::length(start);
+                          return STRINGY{start, finish};
+                        }();
+  CPPUNIT_ASSERT(expected == actual); // either a pointer compare or a lexicographic compare
+}
+#endiv
+#divert <cpp>
+template<> auto tests::unit::call::argument::Pathname::test_as<char const *>() -> void {
+  auto const specimen = "./looky-here";
+  Subject subject{specimen};
+  auto const actual = ::sys::call::argument::as<char const *>(subject);
+  std::string const expected = specimen;
+  CPPUNIT_ASSERT(expected == actual); // either a pointer compare or a lexicographic compare
+}
+template<> auto tests::unit::call::argument::Pathname::test_as<c::const_stringz>() -> void {
+  auto const specimen = "./looky-here";
+  Subject subject{specimen};
+  auto const actual = ::sys::call::argument::as<c::const_stringz>(subject);
+  auto const expected = c::const_stringz{specimen};
+  CPPUNIT_ASSERT(expected == actual); // either a pointer compare or a lexicographic compare
+}
+template<> auto tests::unit::call::argument::Pathname::test_as<c::const_stringn>() -> void {
+  auto const specimen = "./looky-here";
+  Subject subject{specimen};
+  auto const actual = ::sys::call::argument::as<c::const_stringn>(subject);
+  auto const expected = [specimen]() {
+                          auto const start = specimen;
+                          auto const length = std::char_traits<char>::length(start);
+                          return c::const_stringn{start, length};
+                        }();
+  CPPUNIT_ASSERT(expected == actual); // either a pointer compare or a lexicographic compare
+}
+template<> auto tests::unit::call::argument::Pathname::test_as<std::string_view>() -> void {
+  auto const specimen = "./looky-here";
+  Subject subject{specimen};
+  auto const actual = ::sys::call::argument::as<std::string_view>(subject);
+  auto const expected = [specimen]() {
+                          auto const start = specimen;
+                          auto const length = std::char_traits<char>::length(start);
+                          return std::string_view{start, length};
+                        }();
+  CPPUNIT_ASSERT(expected == actual); // either a pointer compare or a lexicographic compare
+}
+#import std.move
+#import std.string_literals
+using namespace std::string_literals;
+auto tests::unit::call::argument::Pathname::syscall(Subject passage) -> void {
+  auto const expected = "/tmp/filename"s;
+  auto const &actual = (std::string) passage;
+  CPPUNIT_ASSERT_EQUAL("/tmp/filename"s, (std::string) passage);
+}
+#import c.const_stringz
+#import c.const_stringn
+#import std.string
+#import std.filesystem.path
+auto tests::unit::call::argument::Pathname::test_usage() -> void {
+  // This is the example from the commentariat above sys.call.argument.Pathname
+  syscall("/tmp/filename");
+  syscall(c::const_stringz("/tmp/filename"));
+  syscall(c::const_stringn{"/tmp/filename"});
+  syscall(std::string("/tmp/filename"));
+  syscall(std::filesystem::path("/tmp/filename"));
+}
+auto tests::unit::call::argument::Pathname::test_constructor_charstar() -> void {
+  // the lifetime of specimen must be longer than that of subject must be longer than subject's test.
+  auto const specimen = "that";
+  Subject subject{specimen};
+  char const *const cs = subject;
+  c::const_stringz const csz = ::sys::call::argument::as<c::const_stringz>(subject);
+  CPPUNIT_ASSERT("that"s == cs);
+  CPPUNIT_ASSERT("that"s == std::string(csz.c_str()));
+}
+auto tests::unit::call::argument::Pathname::test_constructor_stringz() -> void {
+  // the lifetime of specimen must be longer than that of subject must be longer than subject's test.
+  auto const specimen = c::const_stringz("that");
+  Subject subject = specimen;
+  using ::sys::call::argument::as;
+  char const *const cs = subject;
+  c::const_stringz const csz = as<c::const_stringz>(subject);
+  CPPUNIT_ASSERT("that"s == cs);
+  CPPUNIT_ASSERT("that"s == std::string(csz.c_str()));
+}
+auto tests::unit::call::argument::Pathname::test_constructor_stringn() -> void {
+  // the lifetime of specimen must be longer than that of subject must be longer than subject's test.
+  auto const specimen = c::const_stringz("that");
+  Subject subject = c::const_stringn(specimen.data(), specimen.size());
+  char const *const cs = subject;
+  using ::sys::call::argument::as;
+  c::const_stringz const csz = as<c::const_stringz>(subject);
+  CPPUNIT_ASSERT("that"s == cs);
+  CPPUNIT_ASSERT("that"s == std::string(csz.c_str()));
+}
+auto tests::unit::call::argument::Pathname::test_constructor_string() -> void {
+  // the lifetime of specimen must be longer than that of subject must be longer than subject's test.
+  auto const specimen = "that"s;
+  Subject subject = specimen;
+  char const *const cs = subject;
+  using ::sys::call::argument::as;
+  c::const_stringz const csz = as<c::const_stringz>(subject);
+  CPPUNIT_ASSERT("that"s == std::string(cs));
+  CPPUNIT_ASSERT("that"s == std::string(csz.c_str()));
+}
+auto tests::unit::call::argument::Pathname::test_constructor_filesystem() -> void {
+  // the lifetime of specimen must be longer than that of subject must be longer than subject's test.
+  auto const specimen = std::filesystem::path{"that"};
+  Subject subject = specimen;
+  char const *const cs = subject;
+  using ::sys::call::argument::as;
+  c::const_stringz const csz = as<c::const_stringz>(subject);
+  CPPUNIT_ASSERT("that"s == std::string(cs));
+  CPPUNIT_ASSERT("that"s == std::string(csz.c_str()));
+}
+auto tests::unit::call::argument::Pathname::test_operator_cast_charstar() -> void {
+  // tested above
+}
+auto tests::unit::call::argument::Pathname::test_operator_cast_stringz() -> void {
+  // tested above
+}
+auto tests::unit::call::argument::Pathname::test_c_str() -> void {
+  auto const specimen =  std::string{"./that/thing"};
+  Subject subject{specimen};
+  auto cstr = ::c::str(subject);
+  auto restring = std::string{cstr};
+  auto const &actual{restring};
+  auto const &expected{specimen};
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+#import c.const_stringz
+#import c.const_stringn
+#import std.string
+#import std.string_view
+#import std.vector
+#import rigging.suite.io
+auto tests::unit::call::argument::Pathname::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Pathname");
+  {
+    Stream con("constructor");
+    con << call("char const *", &Pathname::test_constructor_charstar)
+        << call("c::const_stringz", &Pathname::test_constructor_stringz)
+        << call("c::const_stringn", &Pathname::test_constructor_stringn)
+        << call("std::string", &Pathname::test_constructor_string)
+        << call("std::filesystem:path", &Pathname::test_constructor_filesystem)
+      ;
+    series << move(con);
+  } {
+    Stream cas("operator cast");
+    cas << call("char const *", &Pathname::test_operator_cast_charstar)
+        << call("c::const_stringz", &Pathname::test_operator_cast_stringz)
+      ;
+    series << move(cas);
+  }
+  series << call("c::str", &Pathname::test_c_str)
+    ;
+  {
+    Stream as("as");
+    as << call("char const *", &Pathname::test_as<char const *>)
+       << call("c::const_stringz", &Pathname::test_as<c::const_stringz>)
+       << call("c::const_stringn", &Pathname::test_as<c::const_stringn>)
+       << call("std::string", &Pathname::test_as<std::string>)
+       << call("std::string_view", &Pathname::test_as<std::string_view>)
+       << call("std::vector<char>", &Pathname::test_as<std::vector<char>>)
+      ;
+    series << move(as);
+  }
+  return finalize(series);
+}
+#endiv

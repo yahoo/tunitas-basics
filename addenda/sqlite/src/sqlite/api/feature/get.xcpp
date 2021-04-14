@@ -1,0 +1,23 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.api.feature.Result
+#import sqlite.Connection
+namespace sqlite {
+  namespace api {
+    namespace feature {
+      template<typename OPERATION> auto get(Connection &connection, OPERATION op) -> Result;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.status.Code
+#include <sqlite3.h>
+template<typename OPERATION> auto sqlite::api::feature::get(Connection &connection, OPERATION op) -> Result {
+  int recovered(0);
+  auto code = (status::Code)::sqlite3_db_config(connection.safe(), (int)op, QUERY_LEAVE_UNCHANGED, &recovered);
+  bool cooked = ok(code) ? (0 != recovered) : false;
+  Result ret(code, cooked);
+  return ret;
+}
+#endiv

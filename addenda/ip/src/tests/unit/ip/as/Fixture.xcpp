@@ -1,0 +1,203 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::as {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::ip::as::Fixture : public cppunit::test::Fixture {
+public:
+  // auto as<...>(...) -> TYPE
+  // returning an ...
+  auto test_in4_Address() -> void;
+  auto test_in6_Address() -> void;
+  auto test_in4_addr() -> void;
+  auto test_in6_addr() -> void;
+  auto test_in4_addr_t() -> void;
+  auto test_in6_addr_t() -> void;
+  auto test_in4_string() -> void;
+  auto test_in6_string() -> void;
+
+  auto test_in6_99() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ip.as
+#import ip.in4
+#import ip.in6
+#import std.string
+#import tests.unit.make.constructors
+#import want.cppunit.int128
+using want::cppunit::operator<<;
+
+auto tests::unit::ip::as::Fixture::test_in4_Address() -> void {
+  // respect ... RFC 3849
+  ::ip::in4::addr_t specimen = make::in4_addr_t(192, 0, 2, 133);
+  auto subject = ::ip::as<::ip::Address>(specimen); // <------------------ test this
+  CPPUNIT_ASSERT(subject.isValid());
+  CPPUNIT_ASSERT(!subject.isNull());
+  CPPUNIT_ASSERT(subject.isIPv4());
+  auto actual = ::ip::as<::ip::in4::addr_t>(subject);
+  auto expected = specimen;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::as::Fixture::test_in6_Address() -> void {
+  // respect ... RFC 5737
+  ::ip::in6::addr_t specimen = make::in6_addr_t(0x2001, 0x0db8, 0x8682, 0x4865, 0x9656, 0x4960, 0xaa46, 0x138f);
+  auto subject = ::ip::as<::ip::Address>(specimen); // <------------------ test this
+  CPPUNIT_ASSERT(subject.isValid());
+  CPPUNIT_ASSERT(!subject.isNull());
+  CPPUNIT_ASSERT(subject.isIPv6());
+  auto actual = ::ip::as<::ip::in6::addr_t>(subject);
+  auto expected = specimen;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::as::Fixture::test_in4_addr() -> void {
+  // respect ... RFC 3849
+  ::ip::in4::addr_t specimen = make::in4_addr_t(192, 0, 2, 77);
+  auto subject = ::ip::as<::ip::in4::addr>(specimen); // <------------------ test this
+  auto roundtrip = ::ip::as<::ip::in4::addr_t>(subject);
+  CPPUNIT_ASSERT_EQUAL(specimen, roundtrip);
+}
+
+auto tests::unit::ip::as::Fixture::test_in6_addr() -> void {
+  // respect ... RFC 5737
+  ::ip::in6::addr_t specimen = make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                0x07, 0xdf, 0xec, 0x3f,
+                                                0x33, 0xfb, 0x41, 0x6d,
+                                                0x9a, 0x57, 0x67, 0xda);
+  auto subject = ::ip::as<::ip::in6::addr>(specimen); // <---------------- test this
+  auto roundtrip = ::ip::as<::ip::in6::addr_t>(subject);
+  CPPUNIT_ASSERT_EQUAL(specimen, roundtrip);
+}
+
+auto tests::unit::ip::as::Fixture::test_in4_addr_t() -> void {
+  // respect ... RFC 3849
+  ::ip::in4::addr_t specimen = make::in4_addr_t(192, 0, 2, 66);
+  auto subject = ::ip::as<::ip::in4::addr_t>(specimen); // <---------------- test this
+  auto roundtrip = ::ip::as<::ip::in4::addr_t>(subject);
+  CPPUNIT_ASSERT_EQUAL(specimen, roundtrip);
+}
+
+auto tests::unit::ip::as::Fixture::test_in6_addr_t() -> void {
+  // respect ... RFC 5737
+  ::ip::in6::addr_t specimen = make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                0x6e, 0xa9, 0x2f, 0xaa,
+                                                0x51, 0x23, 0x44, 0x2c,
+                                                0xae, 0x23, 0x38, 0x66);
+  auto subject = ::ip::as<::ip::in6::addr_t>(specimen); // <---------------- test this
+  auto roundtrip = ::ip::as<::ip::in6::addr_t>(subject);
+  CPPUNIT_ASSERT_EQUAL(specimen, roundtrip);
+}
+
+#import std.setw
+#import std.setfill
+#import std.hex
+#import std.cerr
+auto tests::unit::ip::as::Fixture::test_in4_string() -> void {
+  // respect ... RFC 3849
+  ::ip::in4::addr_t specimen = make::in4_addr_t(192, 0, 2, 55);
+  auto actual = ::ip::as<std::string>(specimen); // <---------------- test this
+  std::string expected = "192.0.2.55";
+  std::cerr << __FUNCTION__
+            << "\nspecimen: " << std::setw(8) << std::setfill('0') << std::hex << specimen
+            << "\nactual:   " << actual
+            << "\nexpected: " << expected
+            << '\n';
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::as::Fixture::test_in6_string() -> void {
+  // respect ... RFC 5737
+  ::ip::in6::addr_t specimen = make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                0x45, 0x6d, 0x01, 0xae,
+                                                0x9a, 0xcc, 0x42, 0x53,
+                                                0xa2, 0xff, 0x03, 0x42);
+  auto actual = ::ip::as<std::string>(specimen); // <---------------- test this
+  std::string expected = "2001:db8:456d:1ae:9acc:4253:a2ff:342";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import tests.unit.make.constructors
+#import nonstd.uint128_t
+#import ip.as
+#import std.cerr
+#import std.hex
+#import std.setw
+#import std.setfill
+auto tests::unit::ip::as::Fixture::test_in6_99() -> void {
+  {
+    auto specimen = make::in6_addr_t(0lu, 1ul); // there's no place like ::1
+    CPPUNIT_ASSERT(0 != specimen);
+    auto sin6_addr = ::ip::as<::ip::in6::addr>(specimen);
+    { std::ostream &outbound{std::cerr};
+      auto view = std::string_view{(char const *) &sin6_addr, sizeof (sin6_addr)};
+      outbound << "view #1: ";
+      for (auto ch : view) {
+        outbound << std::hex << std::setw(2) << std::setfill('0') << (unsigned) ch;
+      }
+      outbound << '\n'; }
+  } {
+    auto specimen = nonstd::uint128_t{2ul}; // host order "almost home"
+    auto sin6_addr = ::ip::as<::ip::in6::addr>(specimen);
+    { std::ostream &outbound{std::cerr};
+      auto view = std::string_view{(char const *) &sin6_addr, sizeof (sin6_addr)};
+      outbound << "view #2: ";
+      for (auto ch : view) {
+        outbound << std::hex << std::setw(2) << std::setfill('0') << (unsigned) ch;
+      }
+      outbound << '\n'; }
+  } {
+    auto specimen = make::in6_addr_t(0lu, 0x99ul);
+    auto sin6_addr = ::ip::as<::ip::in6::addr>(specimen);
+    { std::ostream &outbound{std::cerr};
+      auto view = std::string_view{(char const *) &sin6_addr, sizeof (sin6_addr)};
+      outbound << "view #2: ";
+      for (unsigned char ch : view) {
+        outbound << std::hex << std::setw(2) << std::setfill('0') << (unsigned) ch;
+      }
+      outbound << '\n'; }
+  }
+}
+#import tests.unit.ip.as.Address
+#import rigging.suite.io
+auto tests::unit::ip::as::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream usage("usage");
+  {
+    Stream in4("in4");
+    in4
+      << call("Address", &Fixture::test_in4_Address)
+      << call("addr", &Fixture::test_in4_addr)
+      << call("addr_t", &Fixture::test_in4_addr_t)
+      << call("string", &Fixture::test_in4_string)
+      ;
+    Stream in6("in6");
+    in6
+      << call("Address", &Fixture::test_in6_Address)
+      << call("addr", &Fixture::test_in6_addr)
+      << call("addr_t", &Fixture::test_in6_addr_t)
+      << call("string", &Fixture::test_in6_string)
+      ;
+    usage << move(in4)
+          << move(in6);
+  }
+  Stream series("as");
+  series << move(usage)
+         << call("99", &Fixture::test_in6_99)
+    // add(IPv4_Structure::suite())
+    // add(IPv4_Integer::suite())
+    // add(IPv6_Structure::suite())
+    // add(IPv6_Integer::suite())
+    // add(String::suite())
+         << add<Address>();
+  return finalize(series);
+}
+#endiv

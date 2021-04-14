@@ -1,0 +1,6 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+tests_bench_XFAIL_TEST = 
+tests_bench_TEST = \
+  tests/bench/cases.test \
+  $(end)

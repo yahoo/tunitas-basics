@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::writer::stream {
+  //
+  // Whereas (their) ::Json::StyledStreamWriter becomes deprecated in jsoncpp-1.8.3.
+  // Thus (our( json::writer::Styled becomes deprecated as well.
+  // And we want to suppress the (implementation detail) of the base level deprecation as we use it.
+  //
+  // This interface is unrelated to the modern json::writer::Stream, json::writer::stream::Builder
+  //
+  // Usage:
+  //
+  //   auto value = json::Value{...somehow...};
+  //   auto sss = json::writer::stream::Styled{};
+  //         or   json::writer::stream::Styled{indentation};
+  //   { ...configure semantic & formatting options...
+  //     ... there are no such options on this interface ... }
+  //   std::ostream &stream = ...somehow...
+  //   sss.write(stream, value);
+  //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  using Styled [[deprecated]] = ::Json::StyledStreamWriter;
+#pragma GCC diagnostic pop
+}
+#endiv

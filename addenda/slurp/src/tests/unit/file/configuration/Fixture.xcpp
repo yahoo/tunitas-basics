@@ -1,0 +1,100 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::configuration {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::configuration::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_string() -> void;
+  auto test_vector_char() -> void;
+  auto test_vector_string() -> void;
+  auto test_vector_vector_char() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.file.read
+#import slurp.file.named.read
+#import std.string
+#import std.vector
+
+auto tests::unit::configuration::Fixture::test_string() -> void {
+  using configuration_type = ::slurp::file::Configuration<std::string>; // <---------------- test this
+  using container_type = configuration_type::container_type;
+  {
+    auto body = ::slurp::file::read<container_type>("/etc/group"); // <--------------------- uses Configuration<...>
+    CPPUNIT_ASSERT(!body.empty());
+  } {
+    auto red = ::slurp::file::named::read<container_type>("/etc/group"); // <--------------- uses Configuration<...>
+    CPPUNIT_ASSERT("/etc/group" == filename(red)); // <---- deprecated, see the warning
+    CPPUNIT_ASSERT("/etc/group" == name(red));
+    auto const &corpus = body(red);
+    CPPUNIT_ASSERT(!corpus.empty());
+  }
+}
+
+auto tests::unit::configuration::Fixture::test_vector_char() -> void {
+  using configuration_type = ::slurp::file::Configuration<std::vector<char>>;
+  using container_type = configuration_type::container_type;
+  {
+    auto body = ::slurp::file::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT(!body.empty());
+  } {
+    auto red = ::slurp::file::named::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT("/etc/group" == filename(red)); // <---- deprecated, see the warning
+    CPPUNIT_ASSERT("/etc/group" == name(red));
+    auto const &corpus = body(red);
+    CPPUNIT_ASSERT(!corpus.empty());
+  }
+}
+
+auto tests::unit::configuration::Fixture::test_vector_string() -> void {
+  using configuration_type = ::slurp::file::Configuration<std::vector<std::string>>;
+  using container_type = configuration_type::container_type;
+  {
+    auto body = ::slurp::file::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT(!body.empty());
+  } {
+    auto red = ::slurp::file::named::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT("/etc/group" == filename(red)); // <---- deprecated, see the warning
+    CPPUNIT_ASSERT("/etc/group" == name(red));
+    auto const &corpus = body(red);
+    CPPUNIT_ASSERT(!corpus.empty());
+  }
+}
+
+auto tests::unit::configuration::Fixture::test_vector_vector_char() -> void {
+  using configuration_type = ::slurp::file::Configuration<std::vector<std::vector<char>>>;
+  using container_type = configuration_type::container_type;
+  {
+    auto body = ::slurp::file::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT(!body.empty());
+  } {
+    auto red = ::slurp::file::named::read<container_type>("/etc/group");
+    CPPUNIT_ASSERT("/etc/group" == filename(red)); // <---- deprecated, see the warning
+    CPPUNIT_ASSERT("/etc/group" == name(red));
+    auto const &corpus = body(red);
+    CPPUNIT_ASSERT(!corpus.empty());
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::configuration::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("configuration");
+  s << call("Configuration<std::string>", &Fixture::test_string)
+    << call("Configuration<std::vector<char>>", &Fixture::test_vector_char)
+    << call("Configuration<std::vector<std::string>>", &Fixture::test_vector_string)
+    << call("Configuration<std::vector<std::vector<char>>>>", &Fixture::test_vector_vector_char)
+    ;
+  return s.release();
+}
+#endiv

@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.array
+#import nonstd.required.Dopelike
+#import nonstd.required.Spanlike
+namespace nonstd {
+  //
+  // Import std::array
+  // Enable as basic_dope convertible from std::array
+  //
+  using std::array;
+  template<typename TYPE, std::size_t N> struct basic_dope_traits<array<TYPE, N>> : public doping::Traits<TYPE> { };
+  template<typename TYPE, std::size_t N> struct span_traits<array<TYPE, N>> : public spanning::Traits<TYPE> { };
+}
+#endiv
+#divert <cpp>
+#import nonstd.array
+namespace nonstd {
+  static_assert(required::Dopelike<std::array<char, 1>>);
+}
+#endiv

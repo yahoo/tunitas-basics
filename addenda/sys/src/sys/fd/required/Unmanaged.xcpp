@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.File
+#import std.is_same
+namespace sys::fd::required {
+  //
+  // An unmanaged file descriptor can be either ... this ... or that...
+  // A managed file descriptor is a different animal.  It is sys::fd::Managed
+  //
+  // Usage:
+  //
+  //   template<fd::required::Unmanaged NATIVE> auto function(NATIVE, ...arguments...) -> Result;
+  //
+  template<typename NATIVE> concept bool Unmanaged = std::is_same_v<NATIVE, id::File> || std::is_same_v<NATIVE, int>;
+}
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import sys.fd.Managed
+namespace {
+  namespace tests {
+    using namespace sys::fd::required;
+    static_assert(Unmanaged<sys::id::File>);
+    static_assert(Unmanaged<int>);
+    static_assert(!Unmanaged<sys::fd::Managed>); // NOT the managed one
+  }
+}
+#endiv

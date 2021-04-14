@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include "json/value.h" // find Json::LogicError
+namespace json::exception {
+  //
+  // See the inheritance diagram nearby in Generic.
+  //
+  // WATCHOUT - in jsoncpp-1.8 the copy constructor does not offer a nothrow guarantee
+  // See the commentariat nearby in Generic.xcpp
+  //
+  using Logic = ::Json::LogicError;
+}
+#endiv

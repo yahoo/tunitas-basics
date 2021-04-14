@@ -1,0 +1,11 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#warning [[deprecated]] instead prefer nonstd.regex.matching.Flags (plural) or else nonstd.regex.matching.constants (again plural)
+#import nonstd.regex.matching.Flags
+#import nonstd.regex.matching.constants
+namespace nonstd::regex::constants::match {
+  using Flag [[deprecated("instead prefer nonstd::regex::matching::Flags")]] = regex::matching::Flags;
+  [[deprecated("instead prefer nontd::regex::matching::constants::DEFAULT")]] inline constexpr auto DEFAULT = std::regex_constants::match_default;
+}
+#endiv

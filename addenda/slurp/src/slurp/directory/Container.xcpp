@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.is_same
+#import std.string
+#import std.back_insert_iterator
+namespace slurp::directory {
+  template<typename CONTAINER> concept bool Container = requires (CONTAINER container) {
+    typename CONTAINER::value_type;
+    requires std::is_same<std::string, typename CONTAINER::value_type>::value;
+    { CONTAINER() }
+    { std::back_insert_iterator<CONTAINER>(container) }
+  };
+}
+
+#import std.string
+#import std.vector
+namespace slurp::directory {
+  //
+  // These, at least, are directory::Containers.
+  //
+  // the directory contents are a vector of strings
+  static_assert(Container<std::vector<std::string>>, "fail");
+  // and so on with the other STL containers; e.g. deque, list, set, etc.
+}
+#endiv

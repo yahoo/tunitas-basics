@@ -1,0 +1,287 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.same_as
+#import nonstd.required.Same
+#import sys.call.result.wait.Value
+#import sys.wait.Status
+#import sys.id.process.Process
+#import sys.id.process.Group
+#import sys.id.process.Either
+#import sys.id.Wait
+#import sys.id.wait.Typed // for id::wait::Typed and id::wait::typed_t
+#import sys.id.wait.Untyped
+#import sys.id.required.process.Process // deprecating?
+#import sys.id.required.process.Group // deprecating?
+#import sys.id.required.process.Either
+#import sys.id.required.wait.Typed
+#import sys.id.required.wait.Untyped
+#import sys.id.required.Wait // deprecating
+#import sys.posix.packaging.wait.required.identifier.Matched
+#import sys.posix.packaging.wait.required.identifier.Returned
+#import sys.p.Type
+#import sys.r.Usages
+#import sys.w.Options
+#import sys.wait.Status
+#import sys.wait.Identifier
+#import sys.wait.no
+#import id_t
+#import pid_t
+#import siginfo_t
+#import rusage
+#import std.is_same
+#import std.is_signed
+#import std.is_unsigned
+#import std.tuple
+// NASTY!  the wait(...) interface is phrased in terms of ::pid_t and ::id_t, yet one is s32 and the other is u32)
+static_assert(sizeof (::pid_t) == sizeof (::id_t));
+static_assert(std::is_signed_v<::pid_t> != std::is_signed_v<::id_t>);
+static_assert(std::is_signed_v<::pid_t> == std::is_unsigned_v<::id_t>);
+namespace sys::posix::packaging::wait::interface {
+  namespace {
+    using std::is_same;
+    using std::is_same_v;
+    using nonstd::same_as;
+  }
+  namespace id {
+    template<typename... TYPES> using Tuple [[deprecated]] = std::tuple<TYPES...>;
+    using Process = sys::id::process::Process;
+    using Group = sys::id::process::Group;
+    using Either = sys::id::process::Either;
+    using Identifier [[derecated("instead use id::wait::Untyped")]] = sys::id::Wait; static_assert(is_same_v<sys::id::Wait, sys::wait::Identifier>);
+    using Type [[deprecated("instead use id::wait::Type")]] = p::Type;
+    namespace wait = sys::id::wait;
+  }
+  using Options = w::Options;
+  namespace sig = sys::sig;
+  using Siginfo = sig::Info;
+  namespace r = sys::r;
+  using r::Usages;
+  namespace wait = sys::wait;
+  using wait::Status;
+  namespace[[detail]] c {
+    // WATCHOUT - these system structures tend to have emptiness in them which needs zeroing
+    // When an [[out]] parameter, then take a reference to the most gasic version
+    // When an [[in]] parameter or when returning, then use a self-initializing version so we know what we've got.
+    using Siginfo = ::siginfo_t;
+    using Status = int; // this is the "wstatus" or "wait status" as listed in waitpid(2) and siblings ... it is NOT result::Status
+    using Usages = ::rusage;
+  }
+#if 0
+  namespace required {
+    using nonstd::required::Same;
+    using Process [[deprecated("BLOCKED. instead, use required::identifier::Returned<PROCESS>")]] = void;
+    namespace identifier {
+      // Separate these out so that the overloading works; without the need for in-stanza function specialization special cases
+      // c.f. waitpid(...) and waitid(...)
+      template<typename PROCESS> [[deprecated]] concept bool Alternate = is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
+      template<typename PROCESS> [[deprecated]] concept bool Either = is_same_v<PROCESS, id::Either> || is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
+      template<typename PROCESS> [[deprecated]] concept bool Process = sys::id::required::process::Process<PROCESS>; // i.e. Process or pid_t ... a.k.a. "UPPER-CASE or lower-case"
+      template<typename PROCESS> [[deprecated]] concept bool Group = sys::id::required::process::Group<PROCESS>;
+      template<typename PROCESS> [[deprecated]] concept bool Wait = sys::id::required::Wait<PROCESS>; // any for waitid(2)
+      using packaging::wait::required::identifier::Returned;
+      using packaging::wait::required::identifier::Matched;
+    }
+  }
+#endif
+  namespace result {
+    // The call::result::wait::Value<...> are all specializations for which ADL finds special accessor functions
+    template<required::identifier::Returned RETURNED> using Identifier = call::result::wait::Value<RETURNED>; // the "simple" case ... avoid overloading the name "Process"
+    template<required::identifier::Returned RETURNED> using Status = call::result::wait::Value<RETURNED, wait::Status>; // ............ returned
+    template<required::identifier::Returned RETURNED> using Siginfo = call::result::wait::Value<RETURNED, sig::Info>; // .............. returned by waitid(...)
+    template<required::identifier::Returned RETURNED> using Usages = call::result::wait::Value<RETURNED, r::Usages>; // ............... returned by wait3(...), wait4(...)
+    template<required::identifier::Returned RETURNED> using Both = call::result::wait::Value<RETURNED, wait::Status, r::Usages>; // ... returned by wait3(...), wait4(...)
+  }
+  namespace [[detail]] fragments {
+    namespace function {
+      using Process = interface::id::Process;
+      namespace identifier {
+        template<typename PROCESS> concept bool Matched = required::process::Either<PROCESS>;
+        using Returned = result::Identifier<Process>;
+        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+      }
+      namespace status {
+        using Unfilled = wait::no::Status;
+        using Filled = c::Status;
+        using Returned = result::Status<Process>;
+      }
+      namespace siginfo {
+        using Unfilled = wait::no::Info;
+        using Filled = c::Siginfo;
+        using Returned = result::Siginfo<Process>;
+      }
+      namespace usages {
+        using Unfilled = wait::no::Usages;
+        using Filled = c::Usages;
+        using Returned = result::Usages<Process>;
+      }
+    }
+    namespace native {
+      // no need ---> using pid_t = ::pid_t; <--- no need
+      namespace identifier {
+        template<typename PROCESS> concept bool Matched = is_same_v<PROCESS, pid_t>;
+        using Returned = result::Identifier<pid_t>;
+        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+      }
+      namespace status {
+        using Unfilled = wait::no::Status;
+        using Filled = c::Status;
+        using Returned = result::Status<pid_t>;
+      }
+      namespace siginfo {
+        using Unfilled = wait::no::Info;
+        using Filled = c::Siginfo;
+        using Returned = result::Siginfo<pid_t>;
+      }
+      namespace usages {
+        using Unfilled = wait::no::Usages;
+        using Filled = c::Usages;
+        using Returned = result::Usages<pid_t>;
+      }
+    }
+    namespace [[detail]] returned {
+      namespace [[detail]] {
+        namespace [[detail]] input {
+          using namespace required::process;
+          using namespace required::wait;
+          template<typename PROCESS> concept bool Input = Either<PROCESS> || Process<PROCESS> || Group<PROCESS> || Untyped<PROCESS> || Typed<PROCESS>;
+        }
+        namespace [[detail]] output {
+          template<input::Input PROCESS> struct Output { using Type = PROCESS; };
+          template<> struct Output<id::Group>          { using Type = id::Process; };
+          template<> struct Output<id::Either>         { using Type = id::Process; };
+          template<> struct Output<id_t>               { using Type = pid_t; static_assert(!is_same_v<pid_t, id_t>); }; // id_t is unsigned (the type is carried separately)
+          template<> struct Output<id::wait::Untyped>  { using Type = id::Process; };
+        }
+        template<typename PROCESS> using Output = typename output::Output<PROCESS>::Type;
+      }
+      namespace identifier {
+        template<typename PROCESS> [[deprecated("if this is to be used then name it Matched<PROCESS>")]] concept bool Indicated = input::Input<PROCESS>;
+        template<typename PROCESS> concept bool Matched = input::Input<PROCESS>;
+        using sys::id::required::process::Process;
+        template<input::Input PROCESS> using Returned = result::Identifier<Output<PROCESS>>;
+      }
+      namespace status {
+        using Unfilled = wait::no::Status;
+        using Filled = c::Status;
+        template<identifier::Indicated PROCESS> using Returned = result::Status<Output<PROCESS>>;
+      }
+      namespace siginfo {
+        using Unfilled = wait::no::Info;
+        using Filled = c::Siginfo;
+        template<identifier::Indicated PROCESS> using Returned = result::Siginfo<Output<PROCESS>>;
+      }
+      namespace usages {
+        using Unfilled = wait::no::Usages;
+        using Filled = c::Usages;
+        template<identifier::Indicated PROCESS> using Returned = result::Usages<Output<PROCESS>>;
+      }
+      namespace both {
+        namespace unfilled {
+          using Status = wait::no::Status;
+          using Usages = wait::no::Usages;
+        }
+        namespace filled {
+          using Status = c::Status;
+          using Usages = c::Usages;
+        }
+        template<identifier::Indicated PROCESS> using Returned = result::Both<Output<PROCESS>>;
+      }
+    }
+  }
+  namespace bundle {
+    namespace waitpid {
+      namespace function {
+        namespace status = fragments::function::status;
+        namespace identifier = fragments::function::identifier;
+      }
+      namespace native {
+        namespace status = fragments::native::status;
+        namespace identifier = fragments::native::identifier;
+      }
+      namespace [[detail]] returned {
+        namespace status = fragments::returned::status;
+        namespace identifier = fragments::returned::identifier;
+      }
+    }
+    namespace wait2 = waitpid; 
+    namespace waitid {
+      namespace function {
+        namespace siginfo = fragments::function::siginfo;
+        namespace identifier {
+          using Typed = id::wait::Typed;
+          using Type = id::wait::Type;
+          using Untyped = id::wait::Untyped;
+          template<typename PROCESS> concept bool Matched = required::process::Either<PROCESS> || required::wait::Typed<PROCESS>;
+          using Returned = fragments::function::identifier::Returned;
+          template<typename PROCESS> [[deprecated("redefine as Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+        }
+      }
+      namespace native {
+        namespace siginfo = fragments::native::siginfo;
+        namespace identifier {
+          using Typed = id::wait::typed_t;
+          using Type = id::wait::Type;
+          using Untyped = id_t;
+          using Returned = fragments::native::identifier::Returned;
+          using Indicated [[deprecated("use Typed")]] = id::wait::typed_t;
+        }
+      }
+      namespace [[detail]] returned {
+        using id::wait::Type;
+        using id::wait::Typed;
+        using id::wait::typed_t;
+        namespace siginfo = fragments::returned::siginfo;
+        namespace identifier {
+          using fragments::returned::identifier::Process;
+          template<Process PROCESS> using Returned = fragments::returned::identifier::Returned<PROCESS>;
+        }
+      }
+    }
+    namespace wait4 {
+      namespace function {
+        namespace identifier = fragments::function::identifier;
+        namespace status = fragments::function::status;
+        namespace usages = fragments::function::usages;
+        namespace both {
+          namespace filled = fragments::returned::both::filled;
+          using Returned = result::Both<fragments::function::Process>;
+        }
+      }
+      namespace native {
+        namespace identifier = fragments::native::identifier;
+        namespace status = fragments::native::status;
+        namespace usages = fragments::native::usages;
+        namespace both {
+          namespace filled = fragments::returned::both::filled;
+          using Returned = result::Both<pid_t>;
+        }
+      }
+      namespace [[detail]] returned {
+        namespace status = fragments::returned::status;
+        namespace usages = fragments::returned::usages;
+        namespace identifier = fragments::returned::identifier;
+        namespace both = fragments::returned::both;
+      }
+    }
+    namespace wait3 = wait4;
+    namespace wait {
+      namespace [[detail]] returned {
+        namespace identifier = fragments::returned::identifier;
+        namespace status = fragments::returned::status;
+        namespace siginfo = fragments::returned::siginfo;
+        namespace usages = fragments::returned::usages;
+        namespace both = fragments::returned::both;
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.P
+#import sys.posix.W
+#import sys.posix.syscall
+namespace sys::posix::packaging::wait::interface {
+  namespace stylized = packaging::syscall::stylized; // because namespace stylized is not hoisted as is idiomatic
+}
+#endiv

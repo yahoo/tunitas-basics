@@ -1,0 +1,6 @@
+// -*- c++ -*- f867c28a-ed83-465e-addc-79ccbf5df729
+#pragma once
+#include <cppunit/Exception.h>
+namespace cppunit {
+  using CppUnit::Exception;
+}

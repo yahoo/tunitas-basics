@@ -1,0 +1,138 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import org.semver.v2 // get the inline sense
+namespace org::semver::v2 {
+  //
+  // See https://semver.org
+  //
+  // The version triple must have exactly three elements.
+  // But more restricted here, integers are restricted to 0..255 by std::uint8_t
+  // And the printed representation always leads with a 'v' as do perl vstrings
+  //
+  // Usage:
+  //
+  //   auto t = org::semver::Triple{};       a.k.a. v0.0.0
+  //   auto t = org::semver::Triple{1};      a.k.a. v1.0.0
+  //   auto t = org::semver::Triple{1,2};    a.k.a. v1.2.0
+  //   auto t = org::semver::Triple{1,2,3};  a.k.a. v1.2.3
+  //
+  class Triple;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import nonstd.required.Basic_String
+namespace org::semver::v2 {
+  template<nonstd::required::Character CHAR, nonstd::required::Character_Traits TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Triple const &) -> std::basic_ostream<CHAR, TRAITS> &;
+  inline auto to_string(Triple const &) -> std::string;
+  template<nonstd::required::Basic_String STRING> inline auto to_string(Triple const &t) -> STRING;
+  inline auto operator==(Triple const &, Triple const &) -> bool;
+  inline auto operator!=(Triple const &, Triple const &) -> bool;
+  inline auto operator<(Triple const &, Triple const &) -> bool;
+  inline auto operator<=(Triple const &, Triple const &) -> bool;
+  inline auto operator>(Triple const &, Triple const &) -> bool;
+  inline auto operator>=(Triple const &, Triple const &) -> bool;
+}
+#import std.to_string
+namespace std {
+  using org::semver::v2::to_string;
+}
+#import std.array
+#import std.uint8_t
+class org::semver::v2::Triple : public std::array<std::uint8_t, 3> {
+  using ancestor = std::array<std::uint8_t, 3>;
+public:
+  inline Triple();
+  inline Triple(value_type major, value_type minor, value_type patch);
+  // ANNOYING ANNOYING ANNOYING the extra 'e' is because there is a #define major(...) and #define minor(...)
+  //                            via <sys/types.h> and in <sys/sysmacros.h>
+  // accessors
+  inline auto majore() const -> value_type;
+  inline auto minore() const -> value_type;
+  inline auto patche() const -> value_type;
+  // setters ... are rarely used, so just use operator[](std::size_t) on 0, 1, 2
+  inline auto clear() -> void;
+};
+#endiv
+#divert <ipp>
+template<nonstd::required::Character CHAR, nonstd::required::Character_Traits TRAITS> auto org::semver::v2::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Triple const &t) -> std::basic_ostream<CHAR, TRAITS> & {
+  char sep = 'v';
+  if (t.empty()) {
+    o << o.widen(sep) << 0u; // [[WANTTHIS?]] - this creates a printed representation that is not in the data
+  } else {
+    for (auto u : t) {
+      o << o.widen(sep) << (unsigned)u;
+      sep = '.';
+    }
+  }
+  return o;
+}
+#import std.ostringstream
+auto org::semver::v2::to_string(Triple const &t) -> std::string {
+  std::ostringstream buf;
+  buf << t;
+  return buf.str();
+}
+#import std.basic_ostringstream
+template<nonstd::required::Basic_String STRING> auto org::semver::v2::to_string(Triple const &t) -> STRING {
+  using Stream = std::basic_ostringstream<typename STRING::value_type, typename STRING::traits_type>;
+  Stream buf;
+  buf << t;
+  return buf.str();
+}
+#import std.equal
+auto org::semver::v2::operator==(Triple const &a, Triple const &b) -> bool {
+  return std::equal(a.begin(), a.end(), b.begin(), b.end());
+}
+auto org::semver::v2::operator!=(Triple const &a, Triple const &b) -> bool {
+  return ! operator==(a, b);
+}
+#import std.lexicographical_compare
+auto org::semver::v2::operator<(Triple const &a, Triple const &b) -> bool {
+  return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
+}
+#import std.distance
+auto org::semver::v2::operator<=(Triple const &a, Triple const &b) -> bool {
+  // avoid making two passes over the strings
+  bool is_equal = true;
+  auto lt_eq = [&is_equal](Triple::value_type a, Triple::value_type b) {
+    is_equal &= (a == b);
+    return a < b; // <--- never use operator<= here
+  };
+  return (std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), lt_eq) ||
+          (is_equal && std::distance(a.begin(), a.end()) == std::distance(b.begin(), b.end())));
+}
+auto org::semver::v2::operator>(Triple const &a, Triple const &b) -> bool {
+  return operator<(b, a);
+}
+auto org::semver::v2::operator>=(Triple const &a, Triple const &b) -> bool {
+  // 5.4.3 >= 3.2.1
+  // 3.2.1 <= 5.4.3
+  return operator<=(b, a);
+}
+org::semver::v2::Triple::Triple()
+  : Triple{0, 0, 0}
+{ }
+org::semver::v2::Triple::Triple(value_type major, value_type minor, value_type patch)
+  : ancestor() {
+  ancestor &self(*this);
+  self[0] = major;
+  self[1] = minor;
+  self[2] = patch;
+}
+auto org::semver::v2::Triple::majore() const -> value_type {
+  return operator[](0);
+}
+auto org::semver::v2::Triple::minore() const -> value_type {
+  return operator[](1);
+}
+auto org::semver::v2::Triple::patche() const -> value_type {
+  return operator[](2);
+}
+auto org::semver::v2::Triple::clear() -> void {
+  *this = Triple{};
+}
+#endiv

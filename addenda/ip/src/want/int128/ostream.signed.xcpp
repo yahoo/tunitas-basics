@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.basic_ostream
+#import want.int128_t
+namespace want::int128 {
+  //
+  // CPPUNIT_ASSERT_EQUAL requires
+  //     operator==
+  //     operator<<
+  //
+  // Somewhere in http://gcc.gnu.org/onlinedocs/
+  //
+  // 6.8 128-bit integers
+  // 
+  // As an extension the integer scalar type __int128 is supported for targets having an integer mode wide enough to hold 128-bit. Simply write __int128 for a signed 128-bit integer, or unsigned __int128 for an unsigned 128-bit integer. There is no support in GCC to express an integer constant of type __int128 for targets having long long integer with less then [sic] 128 bit width.
+  //
+  // Thus we have to supply our own printing.
+  // Doesn't have to be tippy-top efficient, just correct.
+  //
+  template<typename CHAR, typename TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, want::int128_t) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+#import want.uint128_t
+#import want.int128.format.value
+#import want.int128.format.leader
+#import std.basic_ostringstream
+template<typename CHAR, typename TRAITS> auto want::int128::operator<<(std::basic_ostream<CHAR, TRAITS> &o, want::int128_t v) -> std::basic_ostream<CHAR, TRAITS> & {
+  using ios = std::basic_ios<CHAR, TRAITS>;
+  std::basic_ostringstream<CHAR, TRAITS> buf;
+  buf.setf(o.flags(), ios::basefield);
+  want::uint128_t uv;
+  if (v < 0) {
+    buf << '-';
+    uv = -v; // FIXME? Do we need to care?  TODO Verify what happens with the negation of std::numeric_limits<want::int128_t>::min()?
+  } else {
+    uv = v;
+  }
+  format::leader(buf, o, 0 == uv);
+  format::value(buf, uv);
+  // This respects the width and fill
+  return o << buf.str();
+}
+#endiv

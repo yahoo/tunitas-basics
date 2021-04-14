@@ -1,0 +1,3 @@
+tests_unit_resolv_TESTS = \
+  tests/unit/resolv/all.test \
+  $(end)

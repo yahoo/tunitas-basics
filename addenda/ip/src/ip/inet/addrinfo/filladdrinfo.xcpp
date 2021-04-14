@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.inet.addrinfo.Specification
+#forward ip.inet.result.Getaddrinfo // yes forward
+#import std.string
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      //
+      // Call getaddrinfo, with "IS NULL" signalled in band via pointers.
+      // either host or service can be nullptr, but not both
+      //     (this is enforced in some unspecified way by ::getaddrinfo)
+      // Upon completion (with success or failure),e first argument 'fill' is modified.
+      //
+      // The declaration is separate and requires an incomplete type of Getaddrinfo
+      // so that the function can be declared a frined within addrinfo::List
+      //
+      inline auto filladdrinfo(result::Getaddrinfo &fill, char const *host, char const *service, Specification const &spec) -> void;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import getaddrinfo
+#import ip.inet.addrinfo.List
+#import ip.inet.result.Getaddrinfo
+auto ip::inet::addrinfo::filladdrinfo(result::Getaddrinfo &fill, char const *host, char const *service, Specification const &spec) -> void {
+  ::addrinfo *result = nullptr;
+  auto eai_code = ::getaddrinfo(host, service, spec, &result);
+  int error_num = errno; // capture immediately
+  bool ok = 0 == eai_code;
+  addrinfo::List list(result);
+  result::Getaddrinfo ret(ok, error_num, std::move(list), eai_code);
+  fill = std::move(ret);
+}
+#endiv

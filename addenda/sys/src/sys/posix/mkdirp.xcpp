@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.mkdir.interface
+#import sys.call.argument.as
+namespace sys::posix {
+  //
+  // Exactly like `mkdir -p` (make the parents)
+  //
+  // Under Linux, only the S_ISVTX bit and the low 9 permission bits (USER, GROUP, OTHER) are honored.
+  // See the commentariat nearby in mkdir.xcpp or mkdirat.xcpp
+  //
+  // Usage:
+  //
+  //   auto made = mkdirp(pathname, mode);
+  //   if (!ok(made)) {
+  //      ...complain...
+  //   }
+  //
+  namespace packaging::mkdirp {
+    using namespace packaging::mkdir::interface;
+    namespace function {
+      inline auto mkdirp(Pathstring, Permissions) -> result::Status;
+      using call::argument::as;
+    }
+  }
+  using packaging::mkdirp::function::mkdirp;
+}
+#endiv
+#divert <ipp>
+#import c.const_stringz
+#import std.move
+#import std.ostringstream
+#import std.string
+#import std.vector
+#import sys.e.Code
+#import sys.e.constants
+#import sys.posix.mkdir
+#import want.split
+auto sys::posix::packaging::mkdirp::function::mkdirp(Pathstring carrier, Permissions perms) -> result::Status {
+  auto const &pathname = as<std::string const &>(carrier);
+  if (pathname.empty()) {
+    // sure ... "." already exists
+    return {};
+  } else {
+    bool fullpath = '/' == pathname.front();
+    std::vector<std::string> components = want::split<std::vector<std::string>>(pathname, '/');
+    std::string partial;
+    if (!fullpath) {
+      partial += '.';
+    }
+    for (auto const &component : components) {
+      if (!component.empty()) {
+        partial += '/';
+        partial += component;
+        auto r = posix::mkdir(partial, perms);
+        if (!good(r)) {
+          if (e::EXIST != sys_error_code(r)) {
+            return r;
+          }
+        }
+      }
+    }
+  }
+  return {};
+}
+#endiv

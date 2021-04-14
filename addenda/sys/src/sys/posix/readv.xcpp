@@ -1,0 +1,62 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.iov.interface
+namespace sys::posix {
+  namespace packaging::readv {
+    using namespace packaging::iov::interface;
+    namespace function {
+      // readv(2)
+      inline auto readv(File, [[out]] io::Vec *, Count) -> Result;
+      inline auto readv(File, [[out]] io::Vector<io::Vec>) -> Result;
+      // preadv(2)
+      inline auto readv(File, [[out]] io::Vec *, Count, Offset) -> Result;
+      inline auto readv(File, [[out]] io::Vector<io::Vec>, Offset) -> Result;
+      // preadv2(2)
+      inline auto readv(File, [[out]] io::Vec *, Count, Offset, Flags) -> Result;
+      inline auto readv(File, [[out]] io::Vector<io::Vec>, Offset, Flags) -> Result;
+    }
+    namespace native {
+      // readv(2)
+      inline auto readv(int fd, [[out]] io::Vec *, Count) -> Result;
+      inline auto readv(int fd, [[out]] io::Vector<io::Vec>) -> Result;
+      // preadv(2)
+      inline auto readv(int fd, [[out]] io::Vec *, Count, Offset) -> Result;
+      inline auto readv(int fd, [[out]] io::Vector<io::Vec>, Offset) -> Result;
+      // preadv2(2)
+      inline auto readv(int fd, [[out]] io::Vec *, Count, Offset, Flags) -> Result;
+      inline auto readv(int fd, [[out]] io::Vector<io::Vec>, Offset, Flags) -> Result;
+    }
+  }
+  using packaging::readv::function::readv;
+  namespace native { using packaging::readv::native::readv; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::readv {
+  // readv(2)
+  auto function::readv(File fd, io::Vec *vec, Count count) -> Result { return native::readv((int)fd, vec, count); }
+  auto function::readv(File fd, io::Vector<io::Vec> vec) -> Result   { return native::readv((int)fd, vec); }
+  //
+  auto native::readv(int fd, io::Vec *vec, Count count) -> Result { return idiomatic::syscall<ssize_t>(Syscall::READ, fd, vec, count); }
+  auto native::readv(int fd, io::Vector<io::Vec> vec) -> Result   { return native::readv(fd, vec.data(), vec.size()); }
+}
+#import sys.posix.packaging.syscall.Offset
+namespace sys::posix::packaging::readv {
+  // preadv(2)
+  auto function::readv(File fd, io::Vec *vec, Count count, Offset offset) -> Result { return native::readv((int)fd, vec, count, offset); }
+  auto function::readv(File fd, io::Vector<io::Vec> vec, Offset offset) -> Result   { return native::readv((int)fd, vec, offset); }
+  //
+  auto native::readv(int fd, io::Vec *vec, Count count, Offset offset) -> Result { return packaging::syscall::Offset::preadv(fd, vec, count, offset); }
+  auto native::readv(int fd, io::Vector<io::Vec> vec, Offset offset) -> Result   { return native::readv(fd, vec.data(), vec.size(), offset); }
+}
+namespace sys::posix::packaging::readv {
+  // preadv2(2)
+  auto function::readv(File fd, io::Vec *vec, Count count, Offset offset, Flags flags) -> Result { return native::readv((int)fd, vec, count, offset, flags); }
+  auto function::readv(File fd, io::Vector<io::Vec> vec, Offset offset, Flags flags) -> Result   { return native::readv((int)fd, vec, offset, flags); }
+  //
+  auto native::readv(int fd, io::Vec *vec, Count count, Offset offset, Flags flags) -> Result { return packaging::syscall::Offset::preadv2(fd, vec, count, offset, (int)flags); }
+  auto native::readv(int fd, io::Vector<io::Vec> vec, Offset offset, Flags flags) -> Result   { return native::readv(fd, vec.data(), vec.size(), offset, flags); }
+}
+#endiv

@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sqlite
+namespace sqlite {
+  namespace query {
+    namespace detail {
+      template<::sqlite::column_index N, typename... COLUMNS> struct Getter;
+    }
+  }
+}
+#entail sqlite.query.detail.Getter.N.COLUMN.COLUMNS
+#entail sqlite.query.detail.Getter.N
+#endiv

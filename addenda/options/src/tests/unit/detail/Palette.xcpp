@@ -1,0 +1,66 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace detail {
+      class Palette;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import c.argv
+#import tests.unit.Argv
+#import std.vector
+#import std.string
+class tests::unit::detail::Palette {
+protected:
+  Palette() = default;
+  Palette(Palette const &) = delete;
+  auto operator=(Palette const &) -> Palette & = delete;
+  virtual ~Palette() = default;
+public:
+  // Avoid names that are near Fixture::setUp() and Fixture::tearDown()
+  template<typename ITERATOR1, typename ITERATOR2> auto bringup(ITERATOR1 start1, ITERATOR1 finish1, ITERATOR2 start2, ITERATOR2 finish2) -> void;
+  auto bringdown() -> void;
+
+private:
+  // NASTY!   We need a buffer of "live" modifiable characters, laid out like an argv
+  // An array of pointers-to-null-terminated character arrays
+  // AND with a nullptr sentinel at the end
+  // BUT with the "size" not taking into account that nullptr sentinel.
+  //
+  // argv_workspace holds the trailing nullptr sentinel
+  // argv points into the workspace with an "honest" size.
+  Argv argv_workspace;
+public:
+  c::argv argv;
+  std::vector<std::string> characters;
+};
+#endiv
+#divert <tpp>
+#import std.copy
+#import std.back_inserter
+#import tests.unit.back_duplicator
+template<typename ITERATOR1, typename ITERATOR2> auto tests::unit::detail::Palette::bringup(ITERATOR1 start1, ITERATOR1 finish1, ITERATOR2 start2, ITERATOR2 finish2) -> void {
+  auto duplicator = back_duplicator(this->argv_workspace);
+  std::copy(start1, finish1, duplicator);
+  std::copy(start2, finish2, duplicator);
+  this->argv_workspace.push_back(nullptr); // NOT duplicator = nullptr;
+  this->argv = extract<decltype(this->argv)>(this->argv_workspace);
+
+  std::copy(start2, finish2, std::back_inserter(this->characters));
+}
+#endiv
+#divert <cpp>
+#import unit.rigging.lhs
+#import unit.rigging.clear
+auto tests::unit::detail::Palette::bringdown() -> void {
+  using ::unit::rigging::lhs;
+  using ::unit::rigging::clear;
+  lhs(argv_workspace) = clear;
+  lhs(argv) = clear;
+  lhs(characters) = clear;
+}
+#endiv

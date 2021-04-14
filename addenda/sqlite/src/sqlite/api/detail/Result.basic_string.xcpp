@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sqlite.api.detail.Result
+#import std.basic_string
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename CHAR, typename TRAITS, typename ALLOC> struct Result<std::basic_string<CHAR, TRAITS, ALLOC>>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Result
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+template<typename CHAR, typename TRAITS, typename ALLOC> struct sqlite::api::detail::Result<std::basic_string<CHAR, TRAITS, ALLOC>>
+  // Only the "standard" specializations for std::string and std::wstring are valid (useable)
+  : private sqlite::detail::ResultSFINAE<void>
+  , private sqlite::detail::pass_by_const_reference<std::basic_string<CHAR, TRAITS, ALLOC>>
+  , public sqlite::detail::specialization_is_invalid
+{ };
+#endiv

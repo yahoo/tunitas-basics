@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::f::layer {
+  //
+  // Distinguish among
+  //    Process-Associated
+  //  contra
+  //    Open File Description distinctions
+  // in some of the syscalls
+  // e.g. getlock, setlock, setlock_waiting
+  //
+  // Usage:
+  //
+  //   auto funcall(File, layer:;Process, Wait) -> Result;
+  //   auto funcall(File, layer:;File, Wait) -> Result;
+  //   auto funcall(File, layer::Which, Wait) -> Result;
+  //
+  enum Process { };
+  enum File { };
+  enum Which { PROCESS, FILE };
+}
+#endiv

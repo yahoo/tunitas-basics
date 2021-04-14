@@ -1,0 +1,119 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell {
+  namespace external {
+    namespace detail {
+      class Execable;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import std.string
+#import std.vector
+#import sys.exits.Code
+
+class shell::external::detail::Execable {
+public:
+  Execable() = default;
+protected:
+  ~Execable() = default;
+public:
+  using result_type = sys::exits::Code;
+  inline auto accept(std::string &&) -> result_type;
+  template<typename STRING> inline auto accept(STRING const &) -> result_type;
+  template<typename... ARGUMENTS> inline auto operator()(ARGUMENTS const &...) -> result_type; 
+protected:
+  inline auto process(result_type) -> result_type;
+  template<typename... REST> inline auto process(result_type, std::string &&, REST &&...) -> result_type;
+  template<typename STRING, typename... REST> inline auto process(result_type, STRING const &, REST const &...) -> result_type;
+  using argument_vector = std::vector<std::string>;
+  argument_vector args;
+  using exec_vector = std::vector<char *>;
+  auto fork_exec_wait(exec_vector const &) -> result_type;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+#import c.str
+#import c.stringz
+#import c.const_stringz
+#import std.forward
+
+auto shell::external::detail::Execable::accept(std::string &&value) -> result_type {
+  args.push_back(std::forward<decltype(value)>(value));
+  return result_type();
+}
+
+template<typename STRING> auto shell::external::detail::Execable::accept(STRING const &value) -> result_type {
+  std::string tmp(value.begin(), value.end());
+  args.push_back(std::move(tmp));
+  return result_type();
+}
+
+auto shell::external::detail::Execable::process(result_type previous) -> result_type {
+  if (fail(previous)) {
+    return previous;
+  } else {
+    // exec from C, believes that its strings are nonconst - ahem - writable
+    exec_vector xargs;
+    for (auto const &arg : args) {
+      xargs.push_back(const_cast<char *>(c::str(arg)));
+    }
+    return fork_exec_wait(xargs);
+  }
+}
+
+template<typename... REST> auto shell::external::detail::Execable::process(result_type previous, std::string &&first, REST &&...rest) -> result_type {
+  auto step = previous | accept(std::forward<decltype(first)>(first));
+  return process(step, std::forward<decltype(rest)>(rest)...);
+}
+
+template<typename STRING, typename... REST> auto shell::external::detail::Execable::process(result_type previous, STRING const &first, REST const &...rest) -> result_type {
+  static_assert((std::is_same<std::string, STRING>::value ||
+		 std::is_same<c::const_stringz, STRING>::value),
+		"the STRING must be std::string c::string::String<char>");
+  auto step = previous | accept(first);
+  return process(step, rest...);
+}
+
+template<typename... VALUES> auto shell::external::detail::Execable::operator()(VALUES const &...values) -> result_type {
+  return process(result_type(), values...);
+}
+#divert </ipp>
+#divert <cpp>
+#import _exit
+#import std.invalid_argument
+#import std.error_code
+#import std.system_error
+#import sys.posix.exec
+#import sys.posix.fork
+#import sys.posix.wait
+#import sys.exits.constants
+auto shell::external::detail::Execable::fork_exec_wait(exec_vector const &xargs) -> result_type {
+  if (xargs.empty()) {
+    throw std::invalid_argument("empty exec");
+  }
+  auto fork = sys::posix::fork();
+  if ( !ok(fork) ) {
+    std::error_code ec(error_num(fork), std::system_category());
+    throw std::system_error(ec);
+  }
+  if (is_parent(fork)) {
+    auto waited = sys::posix::wait()();
+    auto child = status(waited);
+    if (ifexited(child)) {
+      return result_type(exitstatus(child));
+    } else {
+      return sys::exits::MAX;
+    }
+  } else {
+    // is the child, all we can do is hope it works
+    (void) sys::posix::exec(xargs.front(), xargs);
+    _exit(sys::exits::MAX);
+  }
+}
+#divert </cpp>

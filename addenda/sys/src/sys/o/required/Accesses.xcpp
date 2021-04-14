@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.Access
+#import sys.o.Accesses
+#import std.is_same
+namespace sys::o::required {
+  //
+  // Either the singleton or the (bitset) flags variant of o::Accesses
+  // Normally you'd use overloading to express this.
+  // But when overloading on the return type, a template be used.
+  //
+  // Usage:
+  //
+  //   template<required::Accesses RESULT> inline auto function(...somehow...) -> RESULT;
+  //
+  template<typename ACCESSES> concept bool Accesses = std::is_same_v<ACCESSES, o::Accesses> || std::is_same_v<ACCESSES, o::Access>;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::o;
+    static_assert(required::Accesses<Access>);
+    static_assert(required::Accesses<Accesses>);
+  }
+}
+#endiv

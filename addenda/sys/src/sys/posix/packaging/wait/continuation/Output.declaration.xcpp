@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.continuation.Unmatched
+#import sys.posix.packaging.wait.required.identifier.Unmatched
+#import sys.posix.packaging.wait.required.identifier.Returned
+namespace sys::posix::packaging::wait::continuation {
+  //
+  // The second step of the various input and output overloadings  of wait(2)
+  // Specializations only.
+  //
+  // Usage:
+  //
+  //   see wait.xcpp
+  //
+  enum class Call { WAIT2, WAITPID, WAITID, WAIT3, WAIT4 };
+  template<Call, required::identifier::Unmatched UNMATCHED, required::identifier::Returned RETURNED> struct Output;
+}
+#import sys.posix.packaging.wait.required.identifier.Matched
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.wait.interface
+// Nearly every specialization will need these
+namespace sys::posix::packaging::wait::continuation {
+  namespace [[convenience]] {
+    using packaging::wait::interface::Options;
+    namespace identifier = packaging::wait::interface::fragments::returned::identifier;
+    namespace status = packaging::wait::interface::fragments::returned::status;
+    namespace siginfo = packaging::wait::interface::fragments::returned::siginfo;
+    namespace usages = packaging::wait::interface::fragments::returned::usages;
+    namespace both = packaging::wait::interface::fragments::returned::both;
+  }
+}
+#import sys.id.Process
+#import sys.id.Wait // sys::id::wait::typed_t of tuple<Type , id_t>
+#import pid_t
+#endiv

@@ -1,0 +1,74 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.nothrow
+#import ares.reply.Record
+#import ares.Success
+#import ares.Buffer
+#import std.byte
+#import std.function
+namespace ares::reply {
+  //
+  // Parse a DNS reply, any reply at all.
+  // The first variant throws on failure.
+  // The second variant signals its outcome with a Success.
+  //
+  // WATCHOUT - the use of parse is in a callback from the C runtime.  Exceptions MUST not return back out to the C runtime.
+  //
+  // Usage #1:
+  //
+  //   try {
+  //     auto buffer = ...somehow...; ................ as returned from the server (via the callback)
+  //     reply::Record<MX> record; ................... filled by parsing
+  //     parse<MX>(buffer, record);
+  //      ...use the record...
+  //   } catch (exception::Aspect const &e) {
+  //      ...complain about e.what() ...
+  //   }
+  //
+  // Usage #2:
+  //
+  //     auto buffer = ...somehow...; ................ as returned from the server (via the callback)
+  //     reply::Record<MX> record; ................... filled by parsing
+  //     auto parsed = parse<MX>(std::nothrow, buffer, record);
+  //     if (ok(parsed)) {
+  //       ...use the record...
+  //     } else {
+  //      ...complain about error_code(parsed);
+  //     }
+  //
+  template<Resource_Record RECORD> inline auto parse(Buffer<std::byte const> buffer, [[fill, inout]] Record<RECORD> &) -> void;
+  template<Resource_Record RECORD> inline auto parse(std::nothrow_t, Buffer<std::byte const> buffer, [[fill, inout]] Record<RECORD> &) noexcept -> Success = delete; // only specializations
+  namespace detail {
+    template<Resource_Record RECORD> using Function = std::function<int (unsigned char const *data, int size, [[fill]] typename unmanaged::Structure<RECORD>::Parse **record)>;
+    template<Resource_Record RECORD, typename FILL> inline auto parse(Buffer<std::byte const> buffer, [[out]] FILL &, Function<RECORD> parser) noexcept -> Success;
+  }
+}
+#endiv
+#divert <ipp>
+#import ares.error.category
+#import ares.exception.Library
+#import std.error_code
+#import std.move
+namespace ares {
+  template<Resource_Record RECORD> auto reply::parse(Buffer<std::byte const> buffer, Record<RECORD> &record) -> void {
+    auto parsed = parse(std::nothrow, buffer, record);
+    if (!ok(parsed)) {
+      throw exception::Library{error_code(parsed), "parse"};
+    }
+  }
+  template<Resource_Record RECORD, typename FILL> auto reply::detail::parse(Buffer<std::byte const> buffer, FILL &fill, Function<RECORD> parser) noexcept -> Success try {
+    typename unmanaged::Structure<RECORD>::Parse *raw{nullptr};
+    [[sloppy("the byte of yore")]] auto const their_data = reinterpret_cast<unsigned char const *>(buffer.data());
+    [[sloppy("signed integer size")]] auto const their_size = int(buffer.size());
+    auto parsed = parser(their_data, their_size, &raw);
+    fill = std::move(FILL{raw});
+    return ARES_SUCCESS == parsed ? Success{SUCCESS} : Success{std::error_code{parsed, error::category()}};
+  } catch (std::system_error const &e) {
+    return Success{e.code()};
+  } catch (...) {
+    // Pick one of the locally-generated error codes.  We caused this and found this here in the client
+    return Success{std::error_code{error::Code::BADQUERY}};
+  }
+}
+#endiv

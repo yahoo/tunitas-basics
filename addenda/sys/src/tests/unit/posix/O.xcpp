@@ -1,0 +1,91 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class O; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.id.File
+#import sys.posix.O
+#import sys.o.Flags
+#import sys.call.argument.Permissions
+#import sys.fd.required.Unmanaged
+struct tests::unit::posix::O : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::O;
+  auto test_mentions() -> void;
+  auto test_syscall() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  // Like create(2) or open(2)
+  using Flags = ::sys::o::Flags;
+  using Permissions = ::sys::call::argument::Permissions;
+  template<fd::required::Unmanaged FD> static auto syscallike(FD, Flags) -> void;
+  template<fd::required::Unmanaged FD> static auto syscallike(FD, Flags, Permissions) -> void;
+};
+#endiv
+#divert <cpp>
+#import sys.o.constants
+namespace tests::unit::posix {
+  // Thesse exist so they can be called.
+  // That the call is unambiguaous and :just happens is the test.
+  template<fd::required::Unmanaged FD> auto O::syscallike(FD, Flags) -> void              { CPPUNIT_ASSERT(true); }
+  template<fd::required::Unmanaged FD> auto O::syscallike(FD, Flags, Permissions) -> void { CPPUNIT_ASSERT(true); }
+  //
+  auto O::test_mentions() -> void {
+    Subject::Flags f;
+    // access
+    f = Subject::READ;
+    f = Subject::WRITE;
+    f = Subject::READWRITE;
+    // create
+    f = Subject::NOCREATE;
+    f = Subject::CLOSE_ON_EXEC;
+    f = Subject::TRUNCATE;
+    f = Subject::CREATE;
+    f = Subject::DIRECTORY;
+    f = Subject::EXCLUSIVE;
+    f = Subject::NO_CONTROL_TERMINAL;
+    f = Subject::TRUNCATE;
+    f = Subject::CLOEXEC;
+    f = Subject::CREAT;
+    f = Subject::EXCL;
+    f = Subject::NOCTTY;
+    f = Subject::TRUNC;
+    // status
+    f = Subject::NONE;
+    f = Subject::APPEND;
+    f = Subject::ASYNC;
+    f = Subject::DIRECT;
+    f = Subject::LARGEFILE;
+    f = Subject::NOATIME;
+    f = Subject::NONBLOCK;
+    f = Subject::PATH;
+    f = Subject::SYNC;
+    f = Subject::TMPFILE;
+    CPPUNIT_ASSERT(Subject::Flags{} != f);
+  }
+  auto O::test_syscall() -> void {
+    using namespace ::sys::o::constants;
+    {
+      auto fd = int{-1};
+      syscallike(fd, Subject::RDONLY);
+      syscallike(fd, Subject::READ | Subject::WRITE | Subject::APPEND | Subject::TMPFILE, 0666);
+    } {
+      auto fd = id::File{-1};
+      syscallike(fd, Subject::RDONLY | Subject::WRONLY | Subject::CREATE | Subject::DIRECTORY);
+      syscallike(fd, Subject::RDONLY | Subject::WRONLY | Subject::CREATE | Subject::DIRECTORY, 0666);
+    }
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::O::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("O");
+  series << call("mentions", &O::test_mentions)
+         << call("syscall", &O::test_syscall)
+         << END;
+  return finalize(series);
+}
+#endiv

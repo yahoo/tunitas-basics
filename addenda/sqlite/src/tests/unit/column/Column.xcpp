@@ -1,0 +1,192 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace column {
+      class Column;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::column::Column : public cppunit::test::Fixture {
+public:
+  auto test_constructor_default() -> void;
+  auto test_constructor_Column() -> void;
+  auto test_constructor_Shell() -> void;
+  auto test_assignment_Column() -> void;
+  auto test_assignment_Shell() -> void;
+  auto test_destructor() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite
+#import sqlite.Application
+#import sqlite.Column
+#import sqlite.Connection
+#import sqlite.Statement
+#import std.move
+#import std.time_t
+
+auto tests::unit::column::Column::test_constructor_default() -> void {
+  // Actually there is no default constructor for sqlite::Column or sqlite::column::Shell
+  CPPUNIT_ASSERT(true);
+}
+
+#import std.move
+auto tests::unit::column::Column::test_constructor_Column() -> void {
+  sqlite::Application a;
+  sqlite::Connection c(a);
+  auto opened = c.open(sqlite::open::Name::MEMORY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto prepped = c.prepare<sqlite::Statement>("select strftime('%s', 'now'), 99;");
+  CPPUNIT_ASSERT(ok(prepped));
+  sqlite::Statement s = std::move(value(prepped));
+  CPPUNIT_ASSERT(s.is_prepared());
+  CPPUNIT_ASSERT(!s.empty());
+  CPPUNIT_ASSERT(row(s.step()));
+  // reminder: there are no unsigned integers in SQLite,
+  // so the errors entailed in the conversion to unsigned are on our hands.
+  sqlite::Column _c0(s, 0);
+  sqlite::Column c0(std::move(_c0)); // <--- test this Column(Column &&)
+  sqlite::Column _c1(s, 1);
+  sqlite::Column c1(std::move(_c1)); // <--- ibidem.
+  auto now = (std::time_t)(c0.get<sqlite::int64>());
+  auto some99 = c1.get<sqlite::int64>();
+  // Yup, it is not the epoch
+  CPPUNIT_ASSERT(0 < now);
+  // And it is after when I wrote this line $(date +%s)
+  CPPUNIT_ASSERT(1478532310 < now);
+  CPPUNIT_ASSERT(99 == some99);
+  CPPUNIT_ASSERT(done(s.step()));
+}
+
+#import std.move
+auto tests::unit::column::Column::test_constructor_Shell() -> void {
+  sqlite::Application a;
+  sqlite::Connection c(a);
+  auto opened = c.open(sqlite::open::Name::MEMORY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto prepped = c.prepare<sqlite::Statement>("select strftime('%s', 'now'), 99;");
+  CPPUNIT_ASSERT(ok(prepped));
+  sqlite::Statement s(std::move(value(prepped)));
+  CPPUNIT_ASSERT(s.is_prepared());
+  CPPUNIT_ASSERT(!s.empty());
+  CPPUNIT_ASSERT(row(s.step()));
+  // reminder: there are no unsigned integers in SQLite,
+  // so the errors entailed in the conversion to unsigned are on our hands.
+  sqlite::column::Shell _first(s, 0);
+  sqlite::Column first(std::move(_first)); // <------- test this Column(column::Shell &&)
+  sqlite::column::Shell _second(s, 1);
+  sqlite::Column second(std::move(_second)); // <----- test this Column(column::Shell &&)
+  auto now = (std::time_t)(first.get<sqlite::int64>());
+  auto some99 = second.get<sqlite::int64>();
+  // Yup, it is not the epoch
+  CPPUNIT_ASSERT(0 < now);
+  // And it is after when I wrote this line $(date +%s)
+  CPPUNIT_ASSERT(1478532321 < now);
+  CPPUNIT_ASSERT(99 == some99);
+  CPPUNIT_ASSERT(done(s.step()));
+}
+
+#import std.move
+auto tests::unit::column::Column::test_assignment_Column() -> void {
+  sqlite::Application a;
+  sqlite::Connection c(a);
+  auto opened = c.open(sqlite::open::Name::MEMORY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto prepped = c.prepare<sqlite::Statement>("select strftime('%s', 'now');");
+  CPPUNIT_ASSERT(ok(prepped));
+  sqlite::Statement s;
+  CPPUNIT_ASSERT(!s.is_prepared());
+  CPPUNIT_ASSERT(s.empty());
+  s = std::move(value(prepped)); // <----------- test this Column::operator=(Column &&)
+  CPPUNIT_ASSERT(s.is_prepared());
+  CPPUNIT_ASSERT(!s.empty());
+  CPPUNIT_ASSERT(row(s.step()));
+  // reminder: there are no unsigned integers in SQLite,
+  // so the errors entailed in the conversion to unsigned are on our hands.
+  sqlite::Column first(s.column<sqlite::Column>(0u));
+  auto now = (std::time_t)(first.get<sqlite::int64>());
+  // Yup, it is not the epoch
+  CPPUNIT_ASSERT(0 < now);
+  // And it is after when I wrote this line $(date +%s)
+  CPPUNIT_ASSERT(1478450509 < now);
+  CPPUNIT_ASSERT(done(s.step()));
+}
+
+#import std.move
+auto tests::unit::column::Column::test_assignment_Shell() -> void {
+  sqlite::Application a;
+  sqlite::Connection c(a);
+  auto opened = c.open(sqlite::open::Name::MEMORY);
+  CPPUNIT_ASSERT(ok(opened));
+  auto prepped = c.prepare<sqlite::Statement>("select strftime('%s', 'now');");
+  CPPUNIT_ASSERT(ok(prepped));
+  sqlite::Statement s;
+  CPPUNIT_ASSERT(!s.is_prepared());
+  CPPUNIT_ASSERT(s.empty());
+  s = std::move(value(prepped)); // <----- test this Column::operator=(column::Shell &&)
+  CPPUNIT_ASSERT(s.is_prepared());
+  CPPUNIT_ASSERT(!s.empty());
+  CPPUNIT_ASSERT(row(s.step()));
+  // reminder: there are no unsigned integers in SQLite,
+  // so the errors entailed in the conversion to unsigned are on our hands.
+  sqlite::column::Shell first(s.column<sqlite::column::Shell>(0u));
+  auto now = (std::time_t)(first.get<sqlite::int64>());
+  // Yup, it is not the epoch
+  CPPUNIT_ASSERT(0 < now);
+  // And it is after when I wrote this line $(date +%s)
+  CPPUNIT_ASSERT(1478532330 < now);
+  CPPUNIT_ASSERT(done(s.step()));
+}
+
+auto tests::unit::column::Column::test_destructor() -> void {
+  sqlite::Application a;
+  sqlite::Connection c(a);
+  auto opened = c.open(sqlite::open::Name::MEMORY);
+  CPPUNIT_ASSERT(ok(opened));
+  std::size_t SOME_ARBITRARY_LIMIT = 481;
+  for (std::size_t i(0), e(SOME_ARBITRARY_LIMIT); e != i; ++i) {
+    std::ostringstream buf;
+    buf << "select strftime('%s', 'now') + " << i << ";";
+    auto prepped = c.prepare<sqlite::Statement>(buf.str());
+    CPPUNIT_ASSERT(ok(prepped));
+    sqlite::Statement s = std::move(value(prepped));
+    CPPUNIT_ASSERT(s.is_prepared());
+    CPPUNIT_ASSERT(!s.empty());
+    CPPUNIT_ASSERT(row(s.step()));
+    sqlite::Column only(s.column<sqlite::Column>(0u));
+    auto now = (std::time_t)only.get<sqlite::int64>();
+    // Yup, it is not the epoch
+    CPPUNIT_ASSERT(0 < now);
+    // And it is after when I wrote this line $(date +%s)
+    CPPUNIT_ASSERT(1478532336 < now);
+    CPPUNIT_ASSERT(done(s.step()));
+    // <----- test this (~Column) ... surely the destructor of s runs now.  How's that going?
+  }
+}
+
+#import tests.unit.column.Shell
+#import tests.unit.column.Column
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::column::Column::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Column");
+  s << call("destructor", &Column::test_destructor)
+    << call("constructor-default", &Column::test_constructor_default)
+    << call("constructor-Column", &Column::test_constructor_Column)
+    << call("constructor-Shell", &Column::test_constructor_Shell)
+    << call("assignment-Column", &Column::test_assignment_Column)
+    << call("assignment-Shell", &Column::test_assignment_Shell)
+    ;
+  return s.release();
+}
+#endiv

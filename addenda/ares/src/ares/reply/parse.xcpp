@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.reply.parse.declaration
+#import ares.reply.parse.A
+#import ares.reply.parse.AAAA
+#import ares.reply.parse.MX
+#import ares.reply.parse.NAPTR
+#import ares.reply.parse.NS
+#import ares.reply.parse.PTR
+#import ares.reply.parse.SOA
+#import ares.reply.parse.SRV
+#import ares.reply.parse.TXT
+#import ares.reply.parse.URI
+#endiv

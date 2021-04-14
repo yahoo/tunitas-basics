@@ -1,0 +1,4 @@
+// -*- c++ -*- c6f6c0d8-0e12-43ea-a16c-0899caca6b96
+#pragma once
+#include "boost/variant.hpp"
+// NOT #include "boost/variant/bad_visit.hpp"

@@ -1,0 +1,4 @@
+// -*- c++ -*- 35db526f-5be6-4489-9446-0a74f996716e
+#pragma once
+#include "mysql++/connection.h"
+

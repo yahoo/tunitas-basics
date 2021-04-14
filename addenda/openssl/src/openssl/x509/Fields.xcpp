@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // The Fields of a Subject Name or Issuer Name
+  //
+  // These are useful for API and UX use cases where the fields need to be captured and
+  // stored before being inserted into a x509::Crt or x509::Req.
+  //
+  // Usage:
+  //
+  //   Fields ff;
+  //   ff.C.value = "US"";
+  //   ff.ST.value = "California"";
+  //   ff.L.value = "Palo Alto"";
+  //   ff.O.value = "Example Inc.";
+  //   ff.OU.value = "Operations";
+  //   ff.CN.value = "*.example.org";
+  //
+  class Fields;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.optional
+#import openssl.x509.field.Named
+class openssl::x509::Fields {
+  using Name = field::Name;
+  template<Name NAME> using Named = field::Named<NAME>;
+public:
+  Fields() = default;
+  Named<Name::C> C;
+  Named<Name::ST> ST;
+  Named<Name::L> L;
+  Named<Name::O> O;
+  Named<Name::OU> OU;
+  Named<Name::CN> CN;
+};
+#endiv

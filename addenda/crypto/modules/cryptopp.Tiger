@@ -1,0 +1,4 @@
+// -*- c++ -*- 8a466643-052e-440a-a61a-2268aedae601
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/tiger.h>

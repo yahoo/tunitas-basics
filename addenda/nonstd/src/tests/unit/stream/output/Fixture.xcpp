@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::stream::output {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::stream::output::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Prefixing() -> void;
+  auto test_usage_Bracketing() -> void;
+  auto test_usage_Suffixing() -> void;
+
+  auto test_something_else() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import nonstd.stream.output.iterator.Prefixing
+auto tests::unit::stream::output::Fixture::test_usage_Prefixing() -> void {
+  using ::nonstd::stream::output::iterator::Prefixing;
+  std::ostringstream buf;
+  Prefixing<char, int> pout(',', buf);
+  buf << "list: 0";
+  pout = 1;
+  pout = 2;
+  pout = 3;
+  std::string const actual = buf.str();
+  std::string const expected = "list: 0,1,2,3";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import nonstd.stream.output.iterator.Bracketing
+auto tests::unit::stream::output::Fixture::test_usage_Bracketing() -> void {
+  using ::nonstd::stream::output::iterator::Bracketing;
+  std::ostringstream buf;
+  Bracketing<char, int, char> pout('(', buf, ')');
+  buf << "list: ";
+  pout = 1;
+  pout = 2;
+  pout = 3;
+  std::string const actual = buf.str();
+  std::string const expected = "list: (1)(2)(3)";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import nonstd.stream.output.iterator.Suffixing
+auto tests::unit::stream::output::Fixture::test_usage_Suffixing() -> void {
+  using ::nonstd::stream::output::iterator::Suffixing;
+  std::ostringstream buf;
+  Suffixing<int, char> pout(buf, ',');
+  buf << "list: ";
+  pout = 1;
+  pout = 2;
+  pout = 3;
+  buf << "4";
+  std::string const actual = buf.str();
+  std::string const expected = "list: 1,2,3,4";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::stream::output::Fixture::test_something_else() -> void {
+  // Surely there is something to test, no?
+  CPPUNIT_ASSERT(true);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::stream::output::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream usage("usage");
+  usage << call("Prefixing", &Fixture::test_usage_Prefixing)
+        << call("Bracketing", &Fixture::test_usage_Bracketing)
+        << call("Suffixing", &Fixture::test_usage_Suffixing)
+    ;
+  Stream s("output");
+  s << add(std::move(usage))
+    << call("something-else", &Fixture::test_something_else)
+    ;
+  return finalize(s);
+}
+#endiv

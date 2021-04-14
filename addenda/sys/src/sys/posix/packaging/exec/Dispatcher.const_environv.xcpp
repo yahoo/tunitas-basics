@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.exec.Dispatcher.declaration
+#import c.environv
+#import c.const_environv
+namespace sys::posix::packaging::exec {
+  // These are nulptr-terminated series of pointers to '\0'-terminated character series
+  template<typename... PRECEEDING> class Dispatcher<char **, PRECEEDING...>; 
+  template<typename... PRECEEDING> class Dispatcher<char const **, PRECEEDING...>;
+  template<typename... PRECEEDING> class Dispatcher<char const *const *, PRECEEDING...>;
+  template<typename... PRECEEDING> class Dispatcher<c::environv, PRECEEDING...>;
+  template<typename... PRECEEDING> class Dispatcher<c::const_environv, PRECEEDING...>;
+}
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.exec.Core
+#import sys.posix.packaging.exec.function
+namespace sys::posix::packaging::exec {
+  template<typename... PRECEEDING> class Dispatcher<char const *const *, PRECEEDING...> : public Core<exec::function::execle, /*final*/ c::const_environv, /*path*/ c::const_stringz, PRECEEDING...> {
+    using Ancestor = Core<exec::function::execle, /*final*/ c::const_environv, /*path*/ c::const_stringz, PRECEEDING...>;
+  public:
+    using used_type = typename Ancestor::call_type;
+    using ignored_type = packaging::exec::function::execl *;
+    // The difference between
+    //   1. Dispatcher<char const *, PRECEEDING...>
+    //   2. Dispatcher<char const *const *, PRECEEDING...>
+    // is this constructor (which argument is ignored, the 1st or the 2nd)
+    inline Dispatcher(ignored_type, used_type used) : Ancestor{used} { }
+  };
+  template<typename... PRECEEDING> struct Dispatcher<char const **, PRECEEDING...> : public Dispatcher<char const *const *, PRECEEDING...> {
+    using Ancestor = Dispatcher<char const *const *, PRECEEDING...>;
+    using Ancestor::Dispatcher;
+  };
+  template<typename... PRECEEDING> struct Dispatcher<char **, PRECEEDING...> : public Dispatcher<char const *const *, PRECEEDING...> {
+    using Ancestor = Dispatcher<char const *const *, PRECEEDING...>;
+    using Ancestor::Dispatcher;
+  };
+  template<typename... PRECEEDING> struct Dispatcher<c::const_environv, PRECEEDING...> : public Dispatcher<char const *const *, PRECEEDING...> {
+    using Ancestor = Dispatcher<char const *const *, PRECEEDING...>;
+    using Ancestor::Dispatcher;
+  };
+  template<typename... PRECEEDING> struct Dispatcher<c::environv, PRECEEDING...> : public Dispatcher<char const *const *, PRECEEDING...> {
+    using Ancestor = Dispatcher<char const *const *, PRECEEDING...>;
+    using Ancestor::Dispatcher;
+  };
+}
+#endiv

@@ -1,0 +1,3 @@
+tests_unit_call_TESTS = \
+  tests/unit/call/cases.test \
+  $(end)

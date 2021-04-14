@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.path.filename.has.Iterator
+namespace nonstd::path::filename::has {
+  //
+  // has_prefix and has_suffix are symmetrical
+  //
+  // The '.' is implicit after the the pattern (it must not be *in* the pattern)
+  //
+  // has::somefix of a filename (stopping at path boundaries)
+  // Using '.' as an implicit separator, which is implicitly supplied.
+  //
+  // Usages (from the external interface, above)
+  //
+  //   has_prefix("app.le", "app") -> true
+  //   has_prefix("o.make.out", "o") -> true
+  //   has_prefix("rc.d/file.log", "rc") -> true
+  //   has_prefix(".bashrc", "") -> true
+  //
+  //   has_suffix("app.le", "le") -> true
+  //   has_suffix("o.make.out", "out") -> true
+  //   has_suffix("rc.d/file.log", "log") -> true
+  //   has_suffix(".bashrc", "bashrc") -> true
+  //
+  // The empty subject cannot match any pattern (prefix or suffix).
+  // The leading (trailing) slash subject cannot match any pattern (prefix or suffix).
+  // The empty prefix matches "dotfiles"
+  // The empty suffix matches "files ending in a dot"
+  //
+  template<Iterator ITERATOR> inline auto somefix(ITERATOR subject_start, ITERATOR subject_finish, ITERATOR pattern_start, ITERATOR pattern_finish) -> bool;
+}
+#endiv
+#divert <ipp>
+#import std.invalid_argument
+template<nonstd::path::filename::has::Iterator ITERATOR> auto nonstd::path::filename::has::somefix(ITERATOR subject_start, ITERATOR subject_finish, ITERATOR pattern_start, ITERATOR pattern_finish) -> bool {
+  ITERATOR si(subject_start);
+  ITERATOR se(subject_finish);
+  ITERATOR pi(pattern_start);
+  ITERATOR const pe(pattern_finish);
+  while (si != se && pi != pe && *pi == *si) {
+    if (*si  == '/') {
+      se = si;
+      break;
+    }
+    if (*pi == '/') {
+      throw std::invalid_argument("pattern cannot contain '/'");
+    }
+    si++;
+    pi++;
+  }
+  return pi == pe && si != se && '.' == *si;
+}
+#endiv

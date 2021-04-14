@@ -1,0 +1,3 @@
+// -*- c++ -*- cd9afe5b-8a46-4aa9-804a-be07a49ea088
+#pragma once
+#include "mysql++/tcp_connection.h"

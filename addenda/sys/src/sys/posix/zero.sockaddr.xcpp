@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import socklen_t
+#forward sys.posix.sockaddr
+#import sys.posix.required.Sockaddr
+#import sys.posix.zero.template
+namespace sys::posix::packaging::zero::implementation::interface {
+  inline auto zero(sockaddr *, socklen_t) -> void;
+  inline auto zero(sockaddr &) -> void;
+  template<required::Sockaddr SOCKADDR> inline auto zero(SOCKADDR &) -> void;
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::zero::implementation {
+  auto interface::zero(sockaddr *sa, socklen_t sz) -> void                         { uninitialized_zero(reinterpret_cast<char *>(sa), sz); }
+  auto interface::zero(sockaddr &sa) -> void                                       { uninitialized_zero(sa); }
+  template<required::Sockaddr SOCKADDR> auto interface::zero(SOCKADDR &sa) -> void { uninitialized_zero(sa); }
+}
+#endiv

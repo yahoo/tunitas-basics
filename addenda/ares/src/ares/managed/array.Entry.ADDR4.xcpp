@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.managed.array.Entry.declaration
+namespace ares::managed::array {
+  template<> struct Entry<ADDR4>;
+}
+#endiv
+#divert <hpp>
+#import ares.managed.array.entry.Basis
+#import ares.unmanaged.Structure
+#import ip.in4 // in4::addr
+namespace ares::managed::array {
+  template<> struct Entry<ADDR4> : public entry::Basis<unmanaged::Structure<A>::Array_Item> {
+    using ancestor = entry::Basis<unmanaged::Structure<A>::Array_Item>; // and thus appears as the type ancestor::Unmanaged
+  public:
+    inline explicit Entry(Unmanaged const *);
+    using Address = ip::in4::addr;
+    inline auto address() const -> Address const &;
+    inline auto ttl() const -> time::Seconds override;
+  };
+}
+#endiv
+#divert <ipp>
+namespace ares::managed::array {
+  Entry<ADDR4>::Entry(Unmanaged const *un) : ancestor{un} { }
+  auto Entry<ADDR4>::ttl() const -> time::Seconds { return time::Seconds{unmanaged->ttl}; }
+  auto Entry<ADDR4>::address() const -> Address const & { return *static_cast<Address const *>(&unmanaged->ipaddr); }
+}
+#endiv

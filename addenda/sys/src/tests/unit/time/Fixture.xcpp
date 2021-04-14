@@ -1,0 +1,192 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::time {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+struct tests::unit::time::Fixture : public cppunit::test::Fixture {
+  auto test_gm() -> void;
+  auto test_local() -> void;
+  auto test_now() -> void;
+  auto test_usage_put_format_char_const_pointer() -> void;
+  auto test_usage_put_format_std_string() -> void;
+  template<typename TIME> auto test_usage_put_scaled() -> void;
+  auto test_types() -> void;
+  auto test_unix_time() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <tpp>
+#import std.ostringstream
+#import std.stol
+#import std.string_literals
+#import sys.time.put
+#import sys.time.point_cast
+#import sys.time.now
+#import sys.posix.time
+template<typename RATIO> auto tests::unit::time::Fixture::test_usage_put_scaled() -> void {
+  std::ostringstream buf;
+  auto const unscaled_specimen = ::sys::time::now();
+  using Duration = ::sys::time::durations::base<::sys::time::duration::rep, RATIO>;
+  auto const scaled_specimen = ::sys::time::point_cast<Duration>(unscaled_specimen);
+  using namespace std::string_literals;
+  buf << ::sys::time::put(scaled_specimen, "%s"s); // <---------------- test this on the scaled value
+  auto const recovered_integer = std::stol(buf.str());
+  auto const recovered = ::sys::time::points::seconds(::sys::time::durations::seconds(recovered_integer));
+  // The recovered value is always at least truncated
+  // but the standard apparently says it can be rounded if the implementation chooses.
+  CPPUNIT_ASSERT(recovered <= scaled_specimen);
+}
+#endiv
+#divert <cpp>
+#import sys.time.gm
+auto tests::unit::time::Fixture::test_gm() -> void {
+  auto m = sys::time::gm();
+  // what else to assert here?
+  CPPUNIT_ASSERT(m.tm_year >= 117);
+  CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon >= 5));
+  CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon > 5) || (m.tm_year == 117 && m.tm_mon == 5 && m.tm_mday >= 24));
+}
+#import sys.time.local
+auto tests::unit::time::Fixture::test_local() -> void {
+  auto m = sys::time::local();
+  // what else to assert here?
+  // After 2017-06-24, accounting fo the odd encoding of sys::time::tm
+  CPPUNIT_ASSERT(m.tm_year >= 117);
+  CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon >= 5));
+  CPPUNIT_ASSERT(m.tm_year > 117 || (m.tm_year == 117 && m.tm_mon > 5) || (m.tm_year == 117 && m.tm_mon == 5 && m.tm_mday >= 24));
+}
+#import sys.time.now
+#import std.chrono.system_clock
+auto tests::unit::time::Fixture::test_now() -> void {
+  auto actual = sys::time::now();
+  auto expected = std::chrono::system_clock::now();
+  CPPUNIT_ASSERT(actual <= expected);
+}
+#import std.ostringstream
+#import std.stol
+#import sys.time.put
+#import sys.posix.time
+auto tests::unit::time::Fixture::test_usage_put_format_char_const_pointer() -> void {
+  std::ostringstream buf;
+  using ::sys::time::put;
+  auto r = sys::posix::time();
+  auto specimen = value(r);
+  CPPUNIT_ASSERT(specimen >= 0);
+  buf << put(specimen, "%s");
+  long recovered = std::stol(buf.str());
+  CPPUNIT_ASSERT(specimen == recovered);
+}
+#import std.string_literals
+auto tests::unit::time::Fixture::test_usage_put_format_std_string() -> void {
+  using namespace std::string_literals;
+  std::ostringstream buf;
+  using ::sys::time::put;
+  auto r = sys::posix::time();
+  auto specimen = value(r);
+  CPPUNIT_ASSERT(specimen >= 0);
+  buf << put(specimen, "%s"s);
+  long recovered = std::stol(buf.str());
+  CPPUNIT_ASSERT(specimen == recovered);
+}
+// The test here is that the module definitions exist at all
+// it is the #import statmeents that are the test
+#import sys.time.point
+#import sys.time.spec
+#import sys.time.t
+#import sys.time.tm
+#import sys.time.val
+#import sys.time.durations.literals
+auto tests::unit::time::Fixture::test_types() -> void {
+  // Reminder: these don't all have the same precision so there is loss of information in the conversions
+  auto then = ::sys::time::now();
+  using namespace ::sys::time::durations::literals;
+  auto lo = then - 1_hr;
+  auto hi = then + 1_hr;
+  ::sys::time::point p = ::sys::time::as<::sys::time::point>(then);
+  ::sys::time::spec s = ::sys::time::as<::sys::time::spec>(then);
+  ::sys::time::t t = ::sys::time::as<::sys::time::t>(then);
+  ::sys::time::tm m = ::sys::time::as<::sys::time::tm>(then);
+  ::sys::time::val v = ::sys::time::as<::sys::time::val>(then);
+  auto re_p = ::sys::time::as<::sys::time::point>(p);
+  auto re_s = ::sys::time::as<::sys::time::point>(s);
+  auto re_t = ::sys::time::as<::sys::time::point>(t);
+  auto re_m = ::sys::time::as<::sys::time::point>(m);
+  auto re_v = ::sys::time::as<::sys::time::point>(v);
+  CPPUNIT_ASSERT(lo <= re_p && re_p <= hi);
+  CPPUNIT_ASSERT(lo <= re_s && re_s <= hi);
+  CPPUNIT_ASSERT(lo <= re_t && re_t <= hi);
+  CPPUNIT_ASSERT(lo <= re_m && re_m <= hi);
+  CPPUNIT_ASSERT(lo <= re_v && re_v <= hi);
+}
+#import sys.time.as
+auto tests::unit::time::Fixture::test_unix_time() -> void {
+  using namespace sys::time;
+  auto now = unix::time(nullptr);
+  auto tmb = as<sys::time::tm>(now);
+  CPPUNIT_ASSERT(tmb.tm_year+1900 >= 2016);
+}
+#import tests.unit.time.as.Fixture
+#import tests.unit.time.cast.Fixture
+#import tests.unit.time.Put
+#import tests.unit.time.Literals
+#import rigging.suite.io
+auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  auto series = Stream{"time"};
+  series << []() {
+              auto use = Stream{"usage"};
+              use << []() {
+                       auto put = Stream{"put"};
+                       put << []() {
+                                auto form = Stream{"format"};
+                                form << call("char const *", &Fixture::test_usage_put_format_char_const_pointer)
+                                     << call("std::string", &Fixture::test_usage_put_format_std_string)
+                                     << END;
+                                return move(form);
+                              }()
+                           << []() {
+                                auto sca = Stream{"scale"};
+                                sca << call("std::nano", &Fixture::test_usage_put_scaled<std::nano>)
+                                    << call("std::micro", &Fixture::test_usage_put_scaled<std::micro>)
+                                    << call("std::milli", &Fixture::test_usage_put_scaled<std::milli>)
+                                    << call("std::centi", &Fixture::test_usage_put_scaled<std::centi>)
+                                    << call("std::deci", &Fixture::test_usage_put_scaled<std::deci>)
+                                    << call("unit", &Fixture::test_usage_put_scaled<std::ratio<1>>)
+                                    << call("std::deca", &Fixture::test_usage_put_scaled<std::deca>)
+                                    << call("std::hecto", &Fixture::test_usage_put_scaled<std::hecto>)
+                                    << call("std::kilo", &Fixture::test_usage_put_scaled<std::kilo>)
+                                    << call("std::mega", &Fixture::test_usage_put_scaled<std::mega>)
+                                    << call("std::giga", &Fixture::test_usage_put_scaled<std::giga>)
+                                    << END;
+                                return move(sca);
+                              }()
+                           << END;
+                         return move(put);
+                     }()
+                  << END;
+              return move(use);
+            }()
+         << call("gm", &Fixture::test_gm)
+         << call("local", &Fixture::test_local)
+         << call("now", &Fixture::test_now)
+         << call("types", &Fixture::test_types)
+         << call("unix_time", &Fixture::test_unix_time)
+         << add<Put>()
+         << add<as::Fixture>()
+         << add<cast::Fixture>()
+         << ([]() {
+               auto lit = Stream{"literals"};
+               lit << add<Literals<unsigned long long>>()
+                   << add<Literals<long double>>()
+                   << END;
+               return move(lit);
+             }())
+         << END;
+  return finalize(series);
+}
+#endiv

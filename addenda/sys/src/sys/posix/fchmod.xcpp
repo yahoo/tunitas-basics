@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.id.File
+#import sys.call.Result
+#import sys.call.argument.Permissions
+namespace sys::posix {
+  namespace packaging::fchmod {
+    using call::Result;
+    using call::argument::Permissions;
+    namespace function{
+      using id::File;
+      inline auto fchmod(File, Permissions) -> Result;
+    }
+    namespace native {
+      inline auto fchmod(int, Permissions) -> Result;
+    }
+  }
+  using packaging::fchmod::function::fchmod;
+  namespace native { using packaging::fchmod::native::fchmod; }
+}
+using sys::posix::fchmod; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::fchmod {
+  auto function::fchmod(File fd, Permissions perms) -> Result { return native::fchmod((int) fd, perms); }
+  auto native::fchmod(int fd, Permissions perms) -> Result    { return idiomatic::syscall<int>(Syscall::FCHMOD, fd, (mode_t) perms); } 
+}
+#endiv

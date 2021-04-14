@@ -1,0 +1,95 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class LOCK; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.LOCK
+#import sys.flock.Specification
+#import tests.lib.Call
+struct tests::unit::posix::LOCK : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::LOCK;
+  auto test_lease_mentions() -> void;
+  auto test_lock_mentions() -> void;
+  auto test_flock_mentions() -> void;
+  static auto suite() -> cppunit::Test *;
+  template<lib::Call> struct Constants;
+protected:
+  static auto leasealike(Subject::Operation<Subject::LEASE>) -> void;
+  static auto lockalike(Subject::Operation<Subject::LOCK>) -> void;
+  static auto flockalike(::sys::flock::Specification) -> void;
+  static auto flockalike(Subject::Operation<Subject::FLOCK>, Subject::Options<Subject::FLOCK>) -> void;
+};
+#endiv
+#divert <cpp>
+#import std.is_same
+namespace tests::unit::posix {
+  // Just show they can be called without ambiguity
+  auto LOCK::leasealike(Subject::Operation<Subject::LEASE>) -> void                                   { CPPUNIT_ASSERT(true); }
+  auto LOCK::lockalike(Subject::Operation<Subject::LOCK>) -> void                                     { CPPUNIT_ASSERT(true); }
+  auto LOCK::flockalike(::sys::flock::Specification) -> void                                          { CPPUNIT_ASSERT(true); }
+  auto LOCK::flockalike(Subject::Operation<Subject::FLOCK>, Subject::Options<Subject::FLOCK>) -> void { CPPUNIT_ASSERT(true); }
+  auto LOCK::test_flock_mentions() -> void {
+    using Flockop = Subject::Operation<Subject::FLOCK>;
+    Flockop op;
+    op = Subject::SH;
+    op = Subject::EX;
+    op = Subject::FLOCK::UN;
+    flockalike(op);
+    using Flocktions = Subject::Options<Subject::FLOCK>;
+    Flocktions ns;
+    ns = Subject::NB;
+    ns = Subject::MAND;
+    ns = Subject::MANDATORY;
+    ns = Subject::ADVISORY;
+    flockalike(op, ns);
+    ::sys::flock::Specification sp;
+    sp = Subject::SH | Subject::NB;
+    sp = Subject::EX | Subject::MAND;
+    sp = Subject::FLOCK::UN | Subject::ADVISORY;
+    flockalike(sp);
+  }
+  auto LOCK::test_lease_mentions() -> void {
+    using Leaseop = Subject::Operation<Subject::LEASE>;
+    Leaseop op;
+    op = Subject::Ancestors::LEASE::RD;   static_assert(!std::is_same_v<decltype(Subject::RD), decltype(Subject::Ancestors::LEASE::RD)>);
+    op = Subject::Ancestors::LEASE::WR;
+    op = Subject::Ancestors::LEASE::END;
+    op = Subject::Ancestors::LEASE::UN;
+    op = Subject::UNLOCK<Subject::LEASE>;
+    leasealike(op);
+  }
+  auto LOCK::test_lock_mentions() -> void {
+    using Lockop = Subject::Operation<Subject::LOCK>;
+    Lockop op;
+    op = Subject::READ;
+    op = Subject::WRITE;
+    op = Subject::ENDLOCK;
+    op = Subject::UN;
+    op = Subject::UNLOCK<Subject::LOCK>;
+    lockalike(op);
+  }
+}
+#import tests.unit.posix.LOCK.Constants.FLOCK
+#import tests.unit.posix.LOCK.Constants.LEASE
+#import rigging.suite.io
+auto tests::unit::posix::LOCK::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("LOCK");
+  series << []() {
+              Stream men{"mentions"};
+              men << call("flock", &LOCK::test_flock_mentions)
+                  << call("lease", &LOCK::test_lease_mentions)
+                  << call("lock", &LOCK::test_lock_mentions)
+                  << END;
+              return move(men);
+            }()
+         << add<Constants<FLOCK>>()
+         << add<Constants<LEASE>>()
+         << END;
+  return finalize(series);
+}
+#endiv

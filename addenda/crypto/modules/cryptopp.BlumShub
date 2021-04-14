@@ -1,0 +1,4 @@
+// -*- c++ -*- b72e22af-a63b-4b40-bd44-141db9d475a3
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/blumshub.h>

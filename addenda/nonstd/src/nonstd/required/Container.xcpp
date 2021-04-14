@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Basic
+namespace nonstd::required {
+  //
+  // Is this type suitable for use in a range for loop?
+  // That's it!
+  // Namely, does it have a begin() and end()
+  //
+  // Usage:
+  //
+  //   template<required::Container CONTAINER> struct Container;
+  //
+  template<typename CONTAINER> concept Container = container::Basic<CONTAINER>;
+}
+#endiv

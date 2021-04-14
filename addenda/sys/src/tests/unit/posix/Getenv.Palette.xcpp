@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.posix.Getenv
+#endiv
+#divert <hpp>
+template<typename ARGUMENT> struct tests::unit::posix::Getenv::Palette {
+  using Argument = ARGUMENT;
+  inline explicit Palette(char const *literal);
+  inline auto get() -> Argument; // always copies the Argument
+protected:
+  Argument saved;
+};
+#import tests.unit.posix.Getenv.Palette.charstar
+#import tests.unit.posix.Getenv.Palette.stringz
+#import tests.unit.posix.Getenv.Palette.stringn
+#import tests.unit.posix.Getenv.Palette.vector
+#endiv
+#divert <ipp>
+namespace tests::unit::posix {
+  template<typename _> Getenv::Palette<_>::Palette(char const *literal)
+    : saved{literal}
+    { }
+  template<typename _> auto Getenv::Palette<_>::get() -> Argument {
+    return saved;
+  }
+}
+#endiv

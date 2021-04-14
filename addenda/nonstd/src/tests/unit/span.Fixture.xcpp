@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::span { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::span::Fixture : public cppunit::test::Fixture {
+public:
+  template<typename TYPE> auto test_usage_simple() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import nonstd.span
+template<typename TYPE> auto tests::unit::span::Fixture::test_usage_simple() -> void {
+  using Subject = nonstd::span<TYPE>;
+  Subject s0;
+  CPPUNIT_ASSERT(s0.empty());
+  TYPE buf[3] = { };
+  Subject s1{&buf[0], 3u};
+  CPPUNIT_ASSERT(3 == s1.size());
+}
+#endiv
+#divert <cpp>
+#import rigging.suite.io
+auto tests::unit::span::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("span");
+  {
+    Stream use("usage");
+    use << call("char", &Fixture::test_usage_simple<char>)
+        << call("char const", &Fixture::test_usage_simple<char const>)
+      ;
+    series << move(use);
+  }
+  return finalize(series);
+}
+#endiv

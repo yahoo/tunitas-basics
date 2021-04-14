@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.getuid
+auto tests::unit::posix::fixture::Fixture::test_getuid() -> void {
+  auto u = six::getuid();
+  CPPUNIT_ASSERT(sizeof (u));
+}
+#import sys.posix.geteuid
+auto tests::unit::posix::fixture::Fixture::test_geteuid() -> void {
+  auto u = six::geteuid();
+  CPPUNIT_ASSERT(sizeof (u));
+}
+#import sys.posix.setuid
+auto tests::unit::posix::fixture::Fixture::test_setuid() -> void {
+  auto const something = sys::id::User(-1);
+  auto sat = six::setuid(something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.seteuid
+auto tests::unit::posix::fixture::Fixture::test_seteuid() -> void {
+  auto const something = sys::id::User(-1);
+  auto sat = six::seteuid(something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.setreuid
+auto tests::unit::posix::fixture::Fixture::test_setreuid() -> void {
+  auto const something = sys::id::User(-1);
+  auto sat = six::setreuid(something, something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.setresuid
+auto tests::unit::posix::fixture::Fixture::test_setresuid() -> void {
+  auto const dark_side = sys::id::User(-1);
+  auto const something = sys::id::User(-1);
+  auto sat = six::setresuid(something, something, dark_side);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#endiv

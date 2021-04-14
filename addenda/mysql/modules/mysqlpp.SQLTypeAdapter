@@ -1,0 +1,3 @@
+// -*- c++ -*- fe8f36dd-db94-414e-94e3-e066c083f69c
+#pragma once
+#include "mysql++/stadapter.h"

@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.timegm
+#import sys.time.t
+#import sys.time.point
+#import sys.time.tm
+auto tests::unit::posix::fixture::Fixture::test_timegm() -> void {
+  namespace tim = ::sys::time;
+  {
+    auto got = six::timegm<tim::point>(tim::tm{});
+    CPPUNIT_ASSERT(good(got));
+    auto val = value(got);
+    CPPUNIT_ASSERT(sizeof (val));
+  } {
+    auto got = six::timegm<tim::t>(tim::tm{});
+    CPPUNIT_ASSERT(good(got));
+    auto val = value(got);
+    CPPUNIT_ASSERT(sizeof (val));
+  }
+}
+#endiv

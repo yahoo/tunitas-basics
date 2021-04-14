@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.pselect
+#import sys.time.spec
+#import sys.fd.Set
+auto tests::unit::posix::fixture::Fixture::test_pselect() -> void {
+  using six::pselect;
+  using fd::Set;
+  Set rd, wr, ex;
+  // We (hope) these file descriptors are not already open
+  rd[99] = true;
+  wr[88] = true;
+  ex[77] = true;
+  // WATCHOUT - if timeout is unspecified or null then select will block indefinitely
+  auto const zero = ::sys::time::spec{};
+  auto selected = pselect(read(rd), write(wr), except(ex), zero);
+  // Of course it returned, the timeout (zero) was exceeded
+  CPPUNIT_ASSERT(!good(selected));
+  CPPUNIT_ASSERT(EBADF == error_num(selected));
+}
+#endiv

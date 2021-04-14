@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.remove_const
+#import ip.required.Sockaddr
+namespace ip::inet::sockaddr {
+  //
+  // The common part of the Lhs or Rhs 
+  // Descendants only
+  //
+  // Usage:
+  //
+  //   see Xhs<...>
+  template<required::constable::Sockaddr> class Generic;
+}
+#endiv
+#divert <hpp>
+#import ip.endian.Integer
+#import ip.in // in::port_t
+#import ip.in4 // in4::addr_t
+#import ip.in6 // in6::addr_t
+#import ip.endian.Integer
+#import ip.inet.Family
+#import ip.inet.Protocol
+#import ip.inet.traits.Sockaddr
+namespace ip::inet {
+  template<required::constable::Sockaddr SOCKADDR> class sockaddr::Generic {
+  protected:
+    ~Generic() = default;
+  public:
+    using Traits = traits::Sockaddr<typename std::remove_const<SOCKADDR>::type>;
+    using sockaddr_type = SOCKADDR; // may be consty
+    inline explicit Generic(sockaddr_type &subject) : subject{subject} { }
+    // New School
+    using Family = inet::Family;
+    using Hostport = endian::Integer<endian::Order::HOST, ip::in::port_t>;
+    struct port {
+      using Integer = ip::in::port_t; // treated as  host-order port until assigned into sin_port, sin6_port
+      using Host = endian::Integer<endian::Order::HOST, Integer>;
+      using Network = endian::Integer<endian::Order::NETWORK, Integer>;
+    };
+    struct address {
+      using Structure = typename Traits::addr_type;
+      using Integer = typename Traits::addr_t_type;
+      using Host = endian::Integer<endian::Order::HOST, Integer>;
+      using Network = endian::Integer<endian::Order::NETWORK, Integer>;
+    };
+    using Protocol = inet::Protocol;
+    // old_school
+    using family_type = Family;
+    using hostport_type = typename port::Integer;
+    using port_type = typename port::Integer;
+    using addr_type = typename address::Structure;
+    using addr_t_type = typename address::Integer;
+    using protocol_type = Protocol;
+  protected:
+    sockaddr_type &subject; // may be consty
+  };
+}
+#endiv

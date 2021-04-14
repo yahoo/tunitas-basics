@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #$defines that define the values of the enumeration elements
+#include <sqlite3.h>
+namespace sqlite {
+  namespace config  {
+    namespace session {
+      enum class NOP { VALUE = 0 };
+      enum class SINGLETHREAD { VALUE = SQLITE_CONFIG_SINGLETHREAD };
+      enum class MULTITHREAD { VALUE = SQLITE_CONFIG_MULTITHREAD };
+      enum class SERIALIZED { VALUE = SQLITE_CONFIG_SERIALIZED };
+      enum class MALLOC { VALUE = SQLITE_CONFIG_MALLOC };
+      enum class GETMALLOC { VALUE = SQLITE_CONFIG_GETMALLOC };
+      enum class SCRATCH { VALUE = SQLITE_CONFIG_SCRATCH };
+      enum class PAGECACHE { VALUE = SQLITE_CONFIG_PAGECACHE };
+      enum class HEAP { VALUE = SQLITE_CONFIG_HEAP };
+      enum class MEMSTATUS { VALUE = SQLITE_CONFIG_MEMSTATUS };
+      enum class MUTEX { VALUE = SQLITE_CONFIG_MUTEX };
+      enum class GETMUTEX { VALUE = SQLITE_CONFIG_GETMUTEX };
+      enum class LOOKASIDE { VALUE = SQLITE_CONFIG_LOOKASIDE };
+      enum class PCACHE { VALUE = SQLITE_CONFIG_PCACHE };
+      enum class GETPCACHE { VALUE = SQLITE_CONFIG_GETPCACHE };
+      enum class LOG { VALUE = SQLITE_CONFIG_LOG };
+      enum class URI { VALUE = SQLITE_CONFIG_URI };
+      enum class PCACHE2 { VALUE = SQLITE_CONFIG_PCACHE2 };
+      enum class GETPCACHE2 { VALUE = SQLITE_CONFIG_GETPCACHE2 };
+      enum class COVERING_INDEX_SCAN { VALUE = SQLITE_CONFIG_COVERING_INDEX_SCAN };
+      enum class SQLLOG { VALUE = SQLITE_CONFIG_SQLLOG };
+      enum class MMAP_SIZE { VALUE = SQLITE_CONFIG_MMAP_SIZE };
+      enum class WIN32_HEAPSIZE { VALUE = SQLITE_CONFIG_WIN32_HEAPSIZE };
+    }
+  }
+}
+#endiv

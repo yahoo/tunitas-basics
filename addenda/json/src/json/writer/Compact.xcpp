@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::writer {
+  //
+  // The Compact Writer
+  // Accepts a json::Value and produces a std::string which is compact
+  // Is the arduous equivalent of to_string(json::Value) -> std::string
+  //
+  // These are all effectively equivalent interfaces, but each unique and quirky in its own way
+  //    json::writer::Compact
+  //    json::writer::Fast
+  //    to_string(json::Value) -> std::string    which is very much like ::Json::writeString(Factory, Value) -> std::string
+  //
+  // The rhyming similarities (not ours are related by any ancestry; theirs are related by ancestry in json::Writer)
+  //   ... Ours ...........        ...Theirs........
+  //   json::writer::Compact       json::writer::Fast
+  //   json::writer::Pretty        json::writer::Styled
+  //
+  // Internally it uses json::writer::builder::Stream, as directed by the underling jsoncpp-devel-1.8.4-5.fc29.x86_64
+  //
+  // Usage:
+  //
+  //   auto value = json::Value{...somehow...};
+  //   auto ccc = json::writer::Compact{};
+  //   std::string stringified = ccc.write(value);
+  //
+  class Compact;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import json.Value
+class json::writer::Compact {
+public:
+  Compact() = default;
+  inline auto write(Value const &) const -> std::string;
+};
+#endiv
+#divert <ipp>
+#import json.writer.Stream
+#import json.writer.stream.Builder
+#import std.unique_ptr
+#import std.ostringstream
+auto json::writer::Compact::write(json::Value const &value) const -> std::string {
+  // This is very Java-flavored.
+  // [[FIXTHIS]] shouldn't there be something to cache the specification & the builder?
+  writer::stream::Builder bob;
+  bob["commentStyle"] = "None";
+  std::unique_ptr<writer::Stream> w(bob.newStreamWriter());
+  std::ostringstream buf;
+  w->write(value, &buf);
+  return buf.str();
+}
+#endiv

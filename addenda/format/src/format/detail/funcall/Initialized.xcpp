@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail::funcall {
+  //
+  // Usage #2: (see Finalizer)
+  //     finalize(initialize(out, "F(", ".", ")") << "apple" << "banana" << "cherry");
+  //
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> class Initialized;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail::funcall {
+  // Must pass HEAD, SEPARATOR, TAIL by value so that the type inference is appropriate for the return type
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto initialize(std::basic_ostream<CHAR, TRAITS> &, HEAD, SEPARATOR, TAIL) -> Initialized<CHAR, TRAITS, HEAD, SEPARATOR, TAIL>;
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL, typename VALUE> inline auto operator<<(Initialized<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&, VALUE const &) -> Initialized<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&;
+  template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> inline auto finalize(Initialized<CHAR, TRAITS, HEAD, SEPARATOR, TAIL> &&) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import format.detail.funcall.Finalizable
+#import format.detail.funcall.State
+#import std.decay
+template<typename CHAR, typename TRAITS, typename HEAD, typename SEPARATOR, typename TAIL> class format::detail::funcall::Initialized {
+public:
+  using ostream_type = std::basic_ostream<CHAR, TRAITS>;
+  // want char const[2] -> char const *
+  using head_type = typename std::decay<HEAD>::type;
+  using separator_type = typename std::decay<SEPARATOR>::type;
+  using tail_type = typename std::decay<TAIL>::type;
+  inline explicit Initialized(ostream_type &, head_type const &, separator_type const &, tail_type const &);
+  // WATCHOUT - we have to supply these because of the object-internal reference
+  inline Initialized(Initialized const &);
+  inline auto operator=(Initialized const &) -> Initialized & = delete;
+  inline Initialized(Initialized &&);
+  inline auto operator=(Initialized &&) -> Initialized & = delete;
+protected:
+  using funcall_type = State<HEAD, SEPARATOR, TAIL>;
+  funcall_type stored_funcall;
+  using finalizable_type = Finalizable<CHAR, TRAITS, HEAD, SEPARATOR, TAIL>;
+  finalizable_type unexposed_finalizable;
+  template<typename C, typename T, typename H, typename S, typename L> friend auto initialize(std::basic_ostream<C, T> &, H, S, L) -> Initialized<C, T, H, S, L>;
+  template<typename C, typename T, typename H, typename S, typename L, typename VALUE> friend auto funcall::operator<<(Initialized<C, T, H, S, L> &&, VALUE const &) -> Initialized<C, T, H, S, L> &&;
+  template<typename C, typename T, typename H, typename S, typename L> friend auto finalize(Initialized<C, T, H, S, L> &&) -> std::basic_ostream<C, T> &;
+};
+#endiv
+#divert <ipp>
+#import std.move
+template<typename C, typename T, typename H, typename S, typename L> auto format::detail::funcall::initialize(std::basic_ostream<C, T> &o, H h, S s, L l) -> Initialized<C, T, H, S, L> {
+  Initialized<C, T, H, S, L> i(o, h, s, l);
+  return i;
+}
+
+#import std.forward
+template<typename C, typename T, typename H, typename S, typename L, typename VALUE> auto format::detail::funcall::operator<<(Initialized<C, T, H, S, L> &&i, VALUE const &v) -> Initialized<C, T, H, S, L> && {
+  using initialized_type = Initialized<C, T, H, S, L>;
+  using finalizable_type = typename initialized_type::finalizable_type;
+  std::forward<finalizable_type>(i.unexposed_finalizable) << v;
+  return std::forward<initialized_type>(i);
+}
+
+template<typename C, typename T, typename H, typename S, typename L> auto format::detail::funcall::finalize(Initialized<C, T, H, S, L> &&i) -> std::basic_ostream<C, T> & {
+  using initialized_type = Initialized<C, T, H, S, L>;
+  using finalizable_type = typename initialized_type::finalizable_type;
+  return finalize(std::forward<finalizable_type>(i.unexposed_finalizable));
+}
+
+template<typename C, typename T, typename H, typename S, typename L> format::detail::funcall::Initialized<C, T, H, S, L>::Initialized(ostream_type &arg_outbound, head_type const &arg_head, separator_type const &arg_separator, tail_type const &arg_tail) 
+  : stored_funcall(arg_head, arg_separator, arg_tail)
+  , unexposed_finalizable(arg_outbound, stored_funcall) {
+  ;
+}
+
+template<typename C, typename T, typename H, typename S, typename L> format::detail::funcall::Initialized<C, T, H, S, L>::Initialized(Initialized const &other)
+  : stored_funcall(other.stored_funcall)
+  , unexposed_finalizable(other.unexposed_finalizable.outbound, stored_funcall) {
+  ;
+}
+
+template<typename C, typename T, typename H, typename S, typename L> format::detail::funcall::Initialized<C, T, H, S, L>::Initialized(Initialized &&other)
+  : stored_funcall(std::forward<funcall_type>(other.stored_funcall))
+  , unexposed_finalizable(other.unexposed_finalizable.outbound, stored_funcall) {
+  ;
+}
+#endiv

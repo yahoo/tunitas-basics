@@ -1,0 +1,114 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::asn1 { class Time0; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.asn1.Time0
+#import openssl.asn1.Time
+class tests::unit::asn1::Time0 : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::asn1::Time0;
+  using Alternate = ::openssl::asn1::Time;
+  auto test_constructor_conversion() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_assignment_conversion() -> void;
+  template<typename TIME> auto test_as() -> void;
+  auto test_to_posix_time_01() -> void;
+  auto test_to_posix_time_02() -> void;
+  auto test_to_posix_time_03() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import openssl.time.now
+#import openssl.asn1.as
+template<typename TIME> auto tests::unit::asn1::Time0::test_as() -> void {
+  Alternate const alternate{::openssl::time::now()};
+  Subject const specimen{alternate};
+  auto ttt = ::openssl::asn1::as<TIME>(specimen);
+  CPPUNIT_ASSERT(TIME{} != ttt);
+  CPPUNIT_ASSERT(1555633415l < sys::time::as<sys::time::t>(ttt));
+}
+#endiv
+#divert <cpp>
+#import openssl.time.now
+auto tests::unit::asn1::Time0::test_constructor_conversion() -> void {
+  Alternate alternate{openssl::time::now()};
+  Subject subject{alternate}; // <-------------------------------------- test this
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import std.move
+auto tests::unit::asn1::Time0::test_constructor_move() -> void {
+  Alternate alternate{openssl::time::now()};
+  Subject specimen{alternate};
+  Subject moved{std::move(specimen)};
+  CPPUNIT_ASSERT(nullptr != moved.get());
+}
+#import openssl.time.literals
+auto tests::unit::asn1::Time0::test_assignment_move() -> void {
+  using namespace ::openssl::time::literals;
+  Alternate alternate{openssl::time::now()};
+  Alternate alternate2{openssl::time::now() + 10_days};
+  Subject specimen{alternate};
+  Subject moved{alternate2};
+  moved = std::move(specimen);
+  CPPUNIT_ASSERT(nullptr != moved.get());
+}
+#import openssl.asn1.to_posix_time
+auto tests::unit::asn1::Time0::test_to_posix_time_01() -> void {
+  Alternate aaa{::openssl::time::now()};
+  Subject subject{aaa};
+  auto ttt = ::openssl::asn1::to_posix_time(subject.get());
+  CPPUNIT_ASSERT(0 != ttt);
+}
+auto tests::unit::asn1::Time0::test_to_posix_time_02() -> void {
+  // rinse and repeat
+  for (auto i{0u}, e{100u}; e != i; ++i) {
+    Alternate aaa{::openssl::time::now()};
+    Subject subject{aaa};
+    auto ttt = ::openssl::asn1::to_posix_time(subject.get());
+    CPPUNIT_ASSERT(0 != ttt);
+  };
+}
+auto tests::unit::asn1::Time0::test_to_posix_time_03() -> void {
+  //
+  // A placeholder
+  //
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+auto tests::unit::asn1::Time0::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Time0");
+  {
+    Stream con("constructor");
+    con << call("conversion", &Time0::test_constructor_conversion)
+        << call("move", &Time0::test_constructor_move)
+      ;
+      series << move(con);
+  } {
+    Stream ass("assignment");
+    ass << call("move", &Time0::test_assignment_move)
+      ;
+    series << move(ass);
+  } {
+    Stream aas("as");
+    aas << call("Posix", &Time0::test_as<::openssl::time::Posix>)
+        << call("Point", &Time0::test_as<::openssl::time::Point>)
+      ;
+    series << move(aas);
+  } {
+    Stream top("to_posix_time");
+    top << call("01", &Time0::test_to_posix_time_01)
+        << call("02", &Time0::test_to_posix_time_02)
+        << call("03", &Time0::test_to_posix_time_03)
+      ;
+    series << move(top);
+  }
+  return finalize(series);
+}
+#endiv

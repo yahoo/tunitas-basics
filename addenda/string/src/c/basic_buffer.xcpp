@@ -1,0 +1,120 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.required.Character
+namespace c {
+  //
+  // A character buffer with a size and a length.
+  // ... and no implicit terminating '\0' sentinel character.
+  //
+  template<required::Character CHAR> class basic_buffer;
+}
+#entail c.basic_buffer.consty
+#endiv
+#divert <hpp>
+#import c.detail.BoundVector
+#import c.detail.Character
+#import c.detail.Stringz
+#import c.detail.Stringn
+#import std.array
+#import std.basic_string
+#import std.basic_string_view
+#import std.is_const
+#import std.pair
+#import std.size_t
+#import std.tuple
+#import std.vector
+
+// These are suitable ONLY for aiding the comparison operators
+// These are NOT suitable for storing the pointer values persistently.
+template<c::required::Character CHAR> class c::basic_buffer : public detail::BoundVector<detail::Character<CHAR>> {
+  using ancestor = detail::BoundVector<detail::Character<CHAR>>;
+  static_assert(!std::is_const<CHAR>::value, "CHAR must never be const, see basic_buffer<CHAR const>, a different specialization, nearby");
+public:
+  basic_buffer() = default;
+  // Yes, implicit, all
+  // [[deprecated]] basic_buffer(typename ancestor::data_type, std::size_t); (not just deprecated, but purely unavailable)
+  // preceding size is primary
+  inline basic_buffer(std::size_t, typename ancestor::data_type);
+  // trailing size overrides inferred size
+  template<std::size_t N> inline basic_buffer(typename ancestor::value_type (&)[N], std::size_t = N);
+  inline basic_buffer(detail::Stringz<CHAR>);
+  inline basic_buffer(detail::Stringn<CHAR>);
+  // either order
+  inline basic_buffer(std::pair<std::size_t, CHAR *>);
+  inline basic_buffer(std::pair<CHAR *, std::size_t>);
+  // either order
+  inline basic_buffer(std::tuple<CHAR *, std::size_t>);
+  inline basic_buffer(std::tuple<std::size_t, CHAR *>);
+  template<std::size_t N> inline basic_buffer(std::array<CHAR, N> const &) = delete; // ibidem.
+  template<std::size_t N> inline basic_buffer(std::array<CHAR, N> &nonconst);
+  // pass by reference
+  template<typename TRAITS, typename ALLOC> inline basic_buffer(std::basic_string<CHAR, TRAITS, ALLOC> const &) = delete; // ibidem.
+  template<typename TRAITS> inline basic_buffer(std::basic_string_view<CHAR, TRAITS> const &) = delete; // ibidem.
+  template<typename ALLOC> inline basic_buffer(std::vector<CHAR, ALLOC> const &) = delete; // ibidem..
+  template<typename ALLOC> inline basic_buffer(std::vector<CHAR, ALLOC> &nonconst);
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#endiv
+#divert <ipp>
+#import std.get
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(std::size_t subject_size, typename ancestor::data_type subject)
+  : ancestor(subject, subject_size) {
+  ;
+}
+
+#import std.min
+#import std.length_error
+template<c::required::Character CHAR> template<std::size_t N> c::basic_buffer<CHAR>::basic_buffer(typename ancestor::value_type (&subject)[N], std::size_t subject_size)
+  : ancestor(subject, std::min(subject_size, N)) {
+  if (subject_size > N) {
+    throw std::length_error("size > N");
+  }
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(std::pair<std::size_t, CHAR *> subject)
+  : ancestor(subject.second, subject.first) {
+  ;
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(std::pair<CHAR *, std::size_t> subject)
+  : ancestor(subject.first, subject.second) {
+  ;
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(std::tuple<std::size_t, CHAR *> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  ;
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(std::tuple<CHAR *, std::size_t> subject)
+  : ancestor(std::get<0>(subject), std::get<1>(subject)) {
+  ;
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(detail::Stringz<CHAR> subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+
+template<c::required::Character CHAR> c::basic_buffer<CHAR>::basic_buffer(detail::Stringn<CHAR> subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+
+template<c::required::Character CHAR> template<std::size_t N> c::basic_buffer<CHAR>::basic_buffer(std::array<CHAR, N> &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+
+template<c::required::Character CHAR> template<typename ALLOC> c::basic_buffer<CHAR>::basic_buffer(std::vector<CHAR, ALLOC> &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+#endiv

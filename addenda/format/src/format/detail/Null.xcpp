@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail {
+  template<typename VALUE> class Null;
+}
+#entail format.detail.Null.optional
+#entail format.detail.Null.pointer
+#endiv
+#divert <hpp>
+#import std.ostream
+namespace format::detail {
+  template<typename VALUE> inline auto operator<<(std::ostream &, Null<VALUE> const &) -> std::ostream &;
+}
+
+#import format.detail.Formatter
+template<typename VALUE> class format::detail::Null : public Formatter<VALUE> {
+  using ancestor = Formatter<VALUE>;
+public:
+  using ancestor::Formatter;
+  template<typename CHAR, typename TRAITS> inline auto emit(std::basic_ostream<CHAR, TRAITS> &) const -> std::basic_ostream<CHAR, TRAITS> &;
+};
+#endiv
+#divert <ipp>
+template<typename VALUE> auto format::detail::operator<<(std::ostream &o, Null<VALUE> const &d) -> std::ostream & {
+  return d.emit(o);
+}
+
+template<typename VALUE> template<typename CHAR, typename TRAITS> auto format::detail::Null<VALUE>::emit(std::basic_ostream<CHAR, TRAITS> &o) const -> std::basic_ostream<CHAR, TRAITS> & {
+  return o << this->value;
+}
+#endiv

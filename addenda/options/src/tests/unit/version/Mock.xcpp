@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace version {
+      class Mock;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import options.throwable.Version
+class tests::unit::version::Mock : public options::throwable::Version {
+  using Ancestor = options::throwable::Version;
+public:
+  using Ancestor::Version;
+  // (old) option::Version
+  // (new) option::version::String
+  auto version() const -> options::version::String override final;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::version::Mock::version() const -> options::version::String {
+  options::version::String v{1,2,3,4,5,6};
+  return v;
+}
+#endiv

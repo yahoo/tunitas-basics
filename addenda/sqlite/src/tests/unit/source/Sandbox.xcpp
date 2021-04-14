@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace source {
+      class Sandbox;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Application
+#import sqlite.Connection
+class tests::unit::source::Sandbox {
+public:
+  inline Sandbox();
+  Sandbox(Sandbox const &) = delete;
+  auto operator=(Sandbox const &) -> Sandbox & = delete;
+protected:
+  sqlite::Application app;
+public:
+  sqlite::Connection conn;
+};
+#endiv
+#divert <ipp>
+#import sqlite.open.Name
+#import sqlite.open.Flags
+tests::unit::source::Sandbox::Sandbox()
+  : app()
+  , conn(app) {
+  using namespace sqlite::open;
+  auto open_mode = +Flag::CREATE | Flag::READWRITE;
+  check(conn.open(Name::MEMORY, open_mode), "open");
+  conn.extended_result_codes(true);
+}
+#endiv

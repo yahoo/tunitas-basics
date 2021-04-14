@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/socket.h>
+namespace sys::net {
+  //
+  // Historical.
+  // The AF and PF series are basically the same thing.
+  // Here lies t he basic trickery to allow both namespace af and namespace pf
+  // to have parallel construction,
+  // to have the same enum members but be differen enum types.
+  //
+  // To give the flavor of the usage, consider the socket(2) call.
+  //
+  //   auto socketed = socket(af::Family<INET6>, SOCK::STREAM, pf::Family<UNSPECIFIED>);
+  //   auto socketed = socket(af::Family<INET4>, SOCK::STREAM, pf::Family<INET4>);
+  //   auto socketed = socket(af::Family<INET6>, SOCK::STREAM, pf::Family<INET6>);
+  //   auto socketed = socket(af::Family<LOCAL>, SOCK::STREAM, pf::Family<LOCAL>);
+  //
+  enum class Network
+    { UNSPECIFIED = PF_UNSPEC,
+      UNSPEC [[deprecated("prefer UNSPECIFIED (the full worrd) for new work")]] = UNSPECIFIED,
+      UNIX = PF_UNIX,
+      LOCAL = UNIX,
+      INET4 = PF_INET,
+      INET [[deprecated("prefer INET4 for new work")]] = INET4,
+      INET6 = PF_INET6,
+      // Below here ... these have dubious support & testing.  Good luck.
+      IPX = PF_IPX,
+      NETLINK = PF_NETLINK,
+      X25 = PF_X25,
+      AX25 = PF_AX25,
+      ATMPVC = PF_ATMPVC,
+      APPLETALK = PF_APPLETALK,
+      PACKET = PF_PACKET,
+      ALGORITHM = PF_ALG,
+      ALG [[deprecated("buy a vowel; prefer ALGORITHM")]] = ALGORITHM };
+}
+#endiv

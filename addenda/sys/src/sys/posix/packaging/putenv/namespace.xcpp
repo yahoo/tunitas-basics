@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix::packaging::putenv {
+  //
+  // There are function & maybe class name declarations nearby
+  //
+  // See the commentariat in the putenv(3). The older versions of libc (glibc) used the
+  // string as-supplied, so an allocated copy needed to be moved into the interface.
+  // The more modern versions of (g)libc make another copy for persistent use;
+  // so the caller's copy is abandoned.
+  //
+  // The conformance here is to the more modern usage; expecting glibc to make its own copy.
+  //
+  // MOVEIN - (older) the pointer "moves in" and becomes part of the data structure
+  // COPYIN - (newer) the buffer is "copied in"; the buffer is "effectively const"
+  enum class Policy { MOVEIN, COPYIN };
+}
+#endiv

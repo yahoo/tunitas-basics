@@ -1,0 +1,8 @@
+#!/bin/sh
+source ${0%/*}/rigging.sh || exit 70
+if [[ -f ./run.case.01.test ]] ; then dir=.; else dir=tests/ca; fi
+#       infile         outfile               outfile
+${exe?} ${dir}/csr.pem ${dir}/t99.02.ca.key.pem ${dir}/t99.02.ca.crt.pem &&
+openssl x509 -in "${dir}/t99.02.ca.crt.pem" -noout -text &&
+echo OK
+

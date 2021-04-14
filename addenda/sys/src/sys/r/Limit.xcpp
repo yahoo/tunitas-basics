@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/resource.h> // for all the constants and more
+namespace sys::r {
+  //
+  // The resource names for getrlimit(2), setrlimit(2), prlimit(2)
+  //
+  // Pairwise
+  //
+  //   Limit <---> Limits
+  //   the 'reosurce' argument to getrlimit(2), setrlimit(2), prlimit(2).
+  //
+  // Constants
+  //
+  //   r::INFINITY is in sys.r.constants or sys.posix.RLIMIT
+  //
+  // Usage:
+  //
+  //   Oh come on, it's an enum.
+  //
+  enum class Limit {
+    CPU_TIME = RLIMIT_CPU, //                     seconds        Per-process CPU limit, in seconds.
+    FILE_SIZE = RLIMIT_FSIZE, //                  bytes          Largest file that can be created, in bytes.
+    DATA_SIZE = RLIMIT_DATA, //                   bytes          Maximum size of data segment, in bytes.
+    STACK_SIZE = RLIMIT_STACK, //                 bytes          Maximum size of stack segment, in bytes.
+    CORE_FILE_SIZE = RLIMIT_CORE, //              bytes          Largest core file that can be created, in bytes.
+    RESIDENT_SET_SIZE = RLIMIT_RSS, //            bytes          Largest resident set size, in bytes.
+    OPEN_FILE_COUNT = RLIMIT_NOFILE, //           count          Number of open files.
+    ADDRESS_SPACE_SIZE = RLIMIT_AS, //            bytes          Address space limit.
+    PROCESS_COUNT = RLIMIT_NPROC, //              count          Number of processes.
+    MEMORY_LOCK_SIZE = RLIMIT_MEMLOCK, //         bytes          Locked-in-memory address space.
+    FILE_LOCK_COUNT = RLIMIT_LOCKS, //            count          Maximum number of file locks.
+    SIGNAL_PENDING_COUNT = RLIMIT_SIGPENDING, //  count          Maximum number of pending signals.
+    MESSAGE_QUEUE_SIZE = RLIMIT_MSGQUEUE, //      bytes          Maximum bytes in POSIX message queues.
+    NICE_PRIORITY = RLIMIT_NICE, //               1..40          Maximum nice priority allowed. Nice levels 19 .. -20 correspond to 0 .. 39
+    REALTIME_PRIORITY = RLIMIT_RTPRIO, //         priority       Maximum realtime priority allowed for non-priviledged processes.
+    REALTIME_CPU_TIME = RLIMIT_RTTIME, //         microseconds   Maximum CPU time in µs without [blocking](a system call) = REALTIME_PRIORITY,
+    // some compatibilities
+    FSIZE [[deprecated("spell it out instead, prefer Resource::FILE")]] = FILE_SIZE,
+    OFILE [[compatibility("BSD name for NOFILE, OPEN_FILE_COUNT")]] = OPEN_FILE_COUNT,
+    // The Traditional Names
+    CPU = CPU_TIME,
+    FILE = FILE_SIZE,
+    DATA = DATA_SIZE,
+    STACK = STACK_SIZE,
+    CORE = CORE_FILE_SIZE,
+    RSS = RESIDENT_SET_SIZE,
+    NOFILE = OPEN_FILE_COUNT,
+    AS = ADDRESS_SPACE_SIZE,
+    NPROC = PROCESS_COUNT,
+    MEMLOCK = MEMORY_LOCK_SIZE,
+    LOCKS = FILE_LOCK_COUNT,
+    SIGPENDING = SIGNAL_PENDING_COUNT,
+    MSGQUEUE = MESSAGE_QUEUE_SIZE,
+    NICE = NICE_PRIORITY,
+    RTPRIO = REALTIME_PRIORITY,
+    RTTIME = REALTIME_CPU_TIME,
+  };
+}
+#endiv

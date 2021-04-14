@@ -1,0 +1,64 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_integral
+#import std.is_floating_point
+#import std.is_same
+#import std.nullptr_t
+#import format.json.required.Numeric
+#import format.json.required.Stringlike
+namespace format::json::required {
+  //
+  // The concept of the types that can represent a JSON literal.
+  // These are not necessarily C++ literals
+  // Positive
+  //    'bool'             for JSON literals 'true' and 'false'
+  //    'std::nullptr_t'   for JSON literal 'null'
+  // Negative
+  //    'char' is not a JSON literal (only strin, not wstring, u16string, u32stringg)
+  //    'wchar', 'u16char' 'u32char' etc.
+  //
+  // WATCHOUT - not dealt with here 32-vs-64-vs-128 bits
+  // Wherwas JSON is "defined on 32 bits" any use of 64-bit quantities is fraught (i.e. the reader may refuse to accept)
+  //
+  template<typename LITERALLY> concept bool Literally = 
+    (std::is_same<LITERALLY, bool>::value ||
+     std::is_same<LITERALLY, std::nullptr_t>::value ||
+     Numeric<LITERALLY> ||
+     Stringlike<LITERALLY>);
+#if 0
+  && requires(LITERALLY literally) {
+    // NOT checking operator<<
+    //   outbound << literally;
+    // because bool and std::nullptr_t have odd operator<< requirements
+    // as does Stringlike<LITERALLY>
+  };
+#endif
+}
+
+#import std.string
+#import std.string_view
+#import c.stringz
+#import c.const_stringz
+#import std.nullptr_t
+namespace format::json::required {
+  static_assert(Literally<int short signed>, "fail");
+  static_assert(Literally<int short unsigned>, "fail");
+  static_assert(Literally<int signed>, "fail");
+  static_assert(Literally<int unsigned>, "fail");
+  static_assert(Literally<int long signed>, "fail");
+  static_assert(Literally<int long unsigned>, "fail");
+  static_assert(Literally<int long long signed>, "fail");
+  static_assert(Literally<int long long unsigned>, "fail");
+  static_assert(Literally<float>, "fail");
+  static_assert(Literally<double>, "fail");
+  static_assert(Literally<long double>, "fail");
+  static_assert(Literally<bool>, "fail");
+  static_assert(Literally<std::nullptr_t>, "fail");
+  static_assert(Literally<char const *>, "fail");
+  static_assert(Literally<std::string>, "fail");
+  static_assert(Literally<std::string_view>, "fail");
+  static_assert(Literally<c::const_stringz>, "fail");
+  static_assert(Literally<c::stringz>, "fail");
+}
+#endiv

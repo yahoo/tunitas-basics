@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::un::proto {
+  //
+  // A vastly reduced selection of pf::Type
+  //
+  // Scope:
+  //
+  //   un::socket
+  //   un::socketpair
+  //
+  // Usage:
+  //
+  //   auto sd = un::socket(LOCAL, SOCK::DATAGRAM, un::proto::Family<LOCAL>);
+  //   auto sd2 = un::socketpair(UNIX, SOCK::DATAGRAM, un::proto::Family<UNIX>);
+  //
+  // 
+  enum class Type;
+}
+#import sys.net.Network
+namespace sys::un::proto::type {
+  template<net::Network> struct Traits;
+  template<> struct Traits<net::Network::UNSPECIFIED>;
+  template<> struct Traits<net::Network::LOCAL>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+#import std.false_type
+namespace sys::un::proto {
+  template<net::Network> struct type::Traits : public std::false_type { };
+  namespace type {
+    template<> struct Traits<net::Network::UNSPECIFIED> : public std::true_type { };
+    template<> struct Traits<net::Network::LOCAL> : public std::true_type { };
+  }
+}
+#endiv

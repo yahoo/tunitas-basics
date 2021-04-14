@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.addr.required.Sockaddr
+#include <hpp/sys.sock.addr.traits.Sockaddr.sockaddr>
+#include <hpp/sys.sock.addr.traits.Sockaddr.sockaddr_in4>
+#include <hpp/sys.sock.addr.traits.Sockaddr.sockaddr_in6>
+#include <hpp/sys.sock.addr.traits.Sockaddr.sockaddr_un>
+#import sys.posix.required.rebundled // WATCHOUT -- this has an inline namespace with sys:;posix::required::sock (so you need the full-qualification below)
+namespace sys::posix::required {
+  //
+  // This interface supplies the traits that enable the known "important" network stacks.
+  //
+  // Usage:
+  //
+  //   #import sys.posix.required.Sockaddr
+  //   template<sys::;;posix::required::Sockaddr SOCKADDR> struct Thing;
+  //   template<sys::;;posix::required::Sockaddr SOCKADDR> auto function(SOCCKADDR &) -> void;
+  //
+  using sys::sock::addr::required::Sockaddr;
+}
+#endiv

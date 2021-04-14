@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+namespace sys::posix {
+  //
+  // The Open File Descript{or,ion} (OFD) locks.
+  // See File Byte Range (FBR), nearby.
+  //
+  // [[Decision]] The flock struct(ure) is too big and too vaguely defined to offer it inn return as Value<flock> return.
+  //
+  // These are the "Linux-specific" locks: F_OFD_GETLK, F_OFD_SETLK, F_OFD_SETLKW
+  //
+  // <quote ref="open(2)" ref="man-pages-4.16-3.fc29.noarch">
+  //   A file descriptor is a reference to an open file description;
+  //   this reference is unaffected if the pathname is subsequently removed or modified to refer to a different file.
+  // </quote>
+  //
+  // <quote ref="fcntl(2)" ref="man-pages-4.16-3.fc29.noarch">
+  //   This lock type is Linux-specific, and available since Linux 3.15.
+  //   There is a proposal with the Austin Group to include this lock type in the next revision of POSIX.1.
+  //   For an explanation of open file descriptions, see open(2).
+  // </quote>
+  //
+  namespace packaging::ofd_getlk {
+    using namespace packaging::lock::interface;
+    using namespace bundle::getlock;
+    namespace function {
+      [[deprecated("buy a vowel, prefer getlock(File, F::OPEN_FILE, flock &)")]] inline auto ofd_getlk(File, [[out]] truct::flock &) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer getlock(File, F::OPEN_FILE, flock &)")]] inline auto ofd_getlk(int fd, [[out]] truct::flock &) -> Status;
+    } 
+  }
+  using packaging::ofd_getlk::function::ofd_getlk;
+  namespace native { using packaging::ofd_getlk::native::ofd_getlk; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getlock
+namespace sys::posix::packaging::ofd_getlk {
+  auto function::ofd_getlk(File fd, truct::flock &lock) -> Status { return posix::getlock(fd, F::FILE, lock); }
+  auto native::ofd_getlk(int fd, truct::flock &lock) -> Status    { return posix::native::getlock(fd, F::FILE, lock); }
+}
+#endiv

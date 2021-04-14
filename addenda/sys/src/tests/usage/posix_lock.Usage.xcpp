@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_lock.Usage
+//   static_assert(tests::usage::posix_lock::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.call.Result
+#import sys.call.result.Value
+#import sys.fd.required.Unmanaged
+#import sys.id.File
+#import sys.lock.Operation
+#import sys.posix.LOCK
+#import sys.posix.getlock
+#import sys.posix.setlock
+#import sys.posix.setlock_waiting
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_lock {
+  using sys::posix::getlock;
+  using sys::posix::setlock_waiting;
+  using sys::posix::native::getlock;
+  using sys::posix::native::setlock;
+  using sys::posix::native::setlock_waiting;
+  using sys::posix::LOCK;
+  namespace [[detail]] packaging {
+    namespace [[detail]] {
+      using namespace std;
+      using namespace nonstd;
+      namespace required = sys::fd::required;
+      using Operation = sys::lock::Operation;
+      using Returned = sys::call::result::Value<Operation>;
+      using Status = sys::call::Result;
+      template<typename FILE> concept bool Overloading = requires(FILE file, Operation operation) {
+        requires required::Unmanaged<FILE>;
+        { getlock(file) } -> convertible_to<Returned>;
+        { getlock(file, operation) } -> convertible_to<Status>;
+        { setlock(file, operation) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_LOCK_Long = requires(FILE file) {
+        requires required::Unmanaged<FILE>;
+        { setlock(file, LOCK::READ) } -> convertible_to<Status>;
+        { setlock(file, LOCK::WRITE) } -> convertible_to<Status>;
+        { setlock(file, LOCK::END) } -> convertible_to<Status>;
+        { setlock(file, LOCK::ENDLOCK) } -> convertible_to<Status>;
+      };
+      template<typename FILE> concept bool Object_LOCK_Short = requires(FILE file) {
+        requires required::Unmanaged<FILE>;
+        { lock(file, LOCK::RD) } -> convertible_to<Status>;
+        { lock(file, LOCK::WR) } -> convertible_to<Status>;
+        { lock(file, LOCK::UN) } -> convertible_to<Status>;
+      };
+    }
+    template<typename FILE> concept bool Instance = requires(FILE) {
+      requires Overloading<FILE>;
+      requires Object_LOCK_Short<FILE>;
+      requires Object_LOCK_Long<FILE>;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      Instance<int>;
+      Instance<sys::id::File>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

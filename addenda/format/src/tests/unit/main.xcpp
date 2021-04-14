@@ -1,0 +1,12 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import rigging.bench.Main
+#import tests.unit.format.Fixture
+#import tests.unit.want.Fixture
+auto main(int argc, char **argv) -> int {
+  rigging::bench::Main remain(tests::unit::format::Fixture::suite(),
+                              tests::unit::want::Fixture::suite());
+  return remain(argc, argv);
+}
+#endiv

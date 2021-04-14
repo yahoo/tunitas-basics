@@ -1,0 +1,4 @@
+// -*- c++ -*- c1a6938e-2086-4a00-b3e0-05e8072433e6
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/mqv.h>

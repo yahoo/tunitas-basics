@@ -1,0 +1,184 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception
+#import nonstd.string
+#import nonstd.required
+namespace tests::unit::exception {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::nonstd::exception;
+    namespace string = ::nonstd::string;
+    namespace required = ::nonstd::required;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import nonstd.required.Exception
+struct tests::unit::exception::Fixture : public cppunit::test::Fixture {
+  auto test_usage_Invalid_Datum() -> void;
+  auto test_usage_Invalid_Enum() -> void;
+  template<required::Character> auto test_usage_Quitting() -> void;
+  template<required::Exception> auto test_renamed_Simple() -> void;
+  template<required::Exception> auto test_renamed_View() -> void;
+  template<required::Exception> auto test_renamed_Storage() -> void;
+  auto test_renamed_Future() -> void;
+  static auto suite() -> cppunit::Test *;
+private:
+  template<required::Character CHAR, required::Character_Traits TRAITS = std::char_traits<CHAR>> struct Palette;
+};
+#endiv
+#divert <tpp>
+#import std.empty
+#import nonstd.sysexits.constants
+#import nonstd.exception.Basic_Quitting
+#import tests.unit.exception.Fixture.Palette
+namespace tests::unit::exception::fixture {
+  template<required::Character CHAR> auto Fixture::test_usage_Quitting() -> void {
+    using Quitting = library::Basic_Quitting<CHAR>;
+    using Palette = Fixture::Palette<CHAR>;
+    Quitting s0;
+    Quitting s1a(::nonstd::sysexits::Code{7});
+    Quitting s1b(Palette::simple_quitting_message());
+    Quitting s2(Palette::simple_quitting_message(), ::nonstd::sysexits::Code{8});
+    std::basic_stringstream<CHAR> buf;
+    buf << s0 << s1a << s1b << s2;
+    auto const actual = buf.str();
+    CPPUNIT_ASSERT(!actual.empty());
+    auto const code = s0.code();
+    CPPUNIT_ASSERT_EQUAL(::nonstd::sysexits::FAIL, code);
+    CPPUNIT_ASSERT(!std::empty(s0.message()));
+    auto const name = s0.severity_name();
+    CPPUNIT_ASSERT(!std::empty(name));
+    s0.stream() << s0 << '\n';
+  }
+  template<required::Exception EXCEPTION> auto Fixture::test_renamed_Simple() -> void try {
+    // Exhibit the default constructor;
+    throw EXCEPTION{};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  template<required::Exception EXCEPTION> auto Fixture::test_renamed_Storage() -> void try {
+    // Exhibit the constructor from a single string (storage) argument
+    throw EXCEPTION{"because"s};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  template<required::Exception EXCEPTION> auto Fixture::test_renamed_View() -> void try {
+    // Exhibit the constructor from a single string_view argument
+    throw EXCEPTION{"because"sv};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#endiv
+#divert <cpp>
+#import nonstd.exception.Future
+namespace tests::unit::exception::fixture {
+  auto Fixture::test_renamed_Future() -> void try {
+    // Exhibit the constructor.
+    throw library::Future{std::future_errc{}};
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import nonstd.exception.Exception
+#import nonstd.exception.Logic
+#import nonstd.exception.Bound
+#import nonstd.exception.Domain
+#import nonstd.exception.Invalid
+#import nonstd.exception.Length
+#import nonstd.exception.Runtime
+#import nonstd.exception.Range
+#import nonstd.exception.Overflow
+#import nonstd.exception.Underflow
+// SOON nonstd.exception.Filesystem
+// SOON nonstd.exception.System
+#import nonstd.string.Storage
+#import nonstd.string.View
+#import tests.unit.exception.Invalid_Datum
+#import tests.unit.exception.Invalid_Enum
+#import tests.unit.exception.Basic_Quitting
+#import tests.unit.exception.Quitting
+#import tests.unit.exception.Unexpected
+#import tests.unit.exception.Unimplemented
+#import tests.unit.exception.Unreachable
+#import tests.unit.exception.detail.format.Fixture
+#import rigging.suite.io
+auto tests::unit::exception::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"exception"};
+  series << []{
+              auto use = Stream{"usage"};
+              use << []{
+                       auto qui = Stream{"Quitting"};
+                       qui << call("char", &Fixture::test_usage_Quitting<char>)
+                           << call("wchar_t", &Fixture::test_usage_Quitting<wchar_t>)
+                           << END;
+                       return move(qui);
+                     }()
+                  << END;
+              return move(use);
+            }()
+         << []{
+              auto qui = Stream{"Basic_Quitting"};
+              qui << add<Basic_Quitting<char>>()
+                  << add<Basic_Quitting<wchar_t>>()
+                  << END;
+              return move(qui);
+            }()
+         << []{
+              auto ren = Stream{"renamed"};
+              ren << []{
+                       auto oth = Stream{"other"};
+                       oth << call("Exception", &Fixture::test_renamed_Simple<library::Exception>)
+                           << call("Future", &Fixture::test_renamed_Future)
+                           << END;
+                       return move(oth);
+                     }()
+                  << []{
+                       auto str = Stream{"string::Storage"};
+                       str << call("Logic", &Fixture::test_renamed_Storage<library::Logic<string::Storage>>)
+                           << call("Bound", &Fixture::test_renamed_Storage<library::Bound<string::Storage>>)
+                           << call("Domain", &Fixture::test_renamed_Storage<library::Domain<string::Storage>>)
+                           << call("Invalid", &Fixture::test_renamed_Storage<library::Invalid<string::Storage>>)
+                           << call("Length", &Fixture::test_renamed_Storage<library::Length<string::Storage>>)
+                           << call("Range", &Fixture::test_renamed_Storage<library::Range<string::Storage>>)
+                           << call("Overflow", &Fixture::test_renamed_Storage<library::Overflow<string::Storage>>)
+                           << call("Underflow", &Fixture::test_renamed_Storage<library::Underflow<string::Storage>>)
+                           << END;
+                         return move(str);
+                     }()
+                  << []{
+                       auto vie = Stream{"string::View"};
+                       vie << call("Logic", &Fixture::test_renamed_View<library::Logic<string::View>>)
+                           << call("Bound", &Fixture::test_renamed_View<library::Bound<string::View>>)
+                           << call("Domain", &Fixture::test_renamed_View<library::Domain<string::View>>)
+                           << call("Invalid", &Fixture::test_renamed_View<library::Invalid<string::View>>)
+                           << call("Length", &Fixture::test_renamed_View<library::Length<string::View>>)
+                           << call("Runtime", &Fixture::test_renamed_View<library::Runtime<string::View>>)
+                           << call("Range", &Fixture::test_renamed_View<library::Range<string::View>>)
+                           << call("Overflow", &Fixture::test_renamed_View<library::Overflow<string::View>>)
+                           << call("Underflow", &Fixture::test_renamed_View<library::Underflow<string::View>>)
+                           << END;
+                       return move(vie);
+                     }()
+                  << END;
+              return move(ren);
+            }()
+         << add<Invalid_Datum>()
+         << add<Invalid_Enum>()
+         << add<Quitting>()
+         << add<Unreachable>()
+         << add<Unexpected>()
+         << add<Unimplemented>()
+         << add<detail::format::Fixture>()
+         << END;
+  return finalize(series);
+}
+#endiv

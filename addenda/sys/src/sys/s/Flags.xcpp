@@ -1,0 +1,64 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Flags
+#import sys.s.Flag
+#import mode_t
+namespace sys::s {
+  //
+  // The flags, aggregated into a set of them
+  // They are made of the same stuuff as a mode_t (but are not a mode_t)
+  // Check opperator~ to seee that only the low twelve bits  are preserved upon complementationn.
+  //
+  // The emplacers: special(...), user(...), group(...), other(...)
+  // The positiioners: specialof(...), userof(...), groupof(...), otherf(...)
+  //
+  // Usage:
+  //
+  //   auto flags = Flags{0777};
+  //   auto flags = Flag::ROTHER | WOTHER | XOTHER;
+  //
+  using Flags = flags::Flags<Flag, mode_t>;
+}
+#endiv
+#divert <hpp>
+#import sys.s.Bits
+#import std.underlying_type
+namespace sys::s {
+  namespace packaging::flags {
+    inline constexpr auto emplace(Bits b, unsigned shift) -> Flags { return Flags{((Bits::Value) b & 07) << shift}; }
+    inline constexpr auto extract(Flags f, unsigned shift) -> Bits { return Bits{((Flags::Value) f >> shift) & 07}; }
+    using Uf = std::underlying_type_t<Flag>;
+    namespace bundle {
+      inline constexpr auto operator|(Flag a, Flag b) -> Flags { return Flags{(Uf) a | (Uf)b}; }
+      inline constexpr auto operator&(Flag a, Flag b) -> Flags { return Flags{(Uf) a & (Uf)b}; }
+      inline constexpr auto operator~(Flag b) -> Flags         { return Flags{07777 & ~(Uf)b}; }
+      //
+      inline constexpr auto special(Bits b) -> Flags { return emplace(b, 9); }
+      inline constexpr auto user(Bits b) -> Flags    { return emplace(b, 6); }
+      inline constexpr auto group(Bits b) -> Flags   { return emplace(b, 3); }
+      inline constexpr auto other(Bits b) -> Flags   { return emplace(b, 0); }
+      //
+      inline constexpr auto specialof(Flags f) -> Bits { return extract(f, 9); }
+      inline constexpr auto userof(Flags f) -> Bits    { return extract(f, 6); }
+      inline constexpr auto groupof(Flags f) -> Bits   { return extract(f, 3); }
+      inline constexpr auto otherof(Flags f) -> Bits   { return extract(f, 0); }
+    }
+  }
+  // NOT HELPFUL ---> using namespace packaging::flags::bundle; <--- NOT HELPFUL ENOUGH
+  // In order for ADL to find these, we need to have a declaration positioned (not just visibility)
+  using packaging::flags::bundle::operator|;
+  using packaging::flags::bundle::operator&;
+  using packaging::flags::bundle::operator~;
+  //
+  using packaging::flags::bundle::special;
+  using packaging::flags::bundle::user;
+  using packaging::flags::bundle::group;
+  using packaging::flags::bundle::other;
+  //
+  using packaging::flags::bundle::specialof;
+  using packaging::flags::bundle::userof;
+  using packaging::flags::bundle::groupof;
+  using packaging::flags::bundle::otherof;
+}
+#endiv

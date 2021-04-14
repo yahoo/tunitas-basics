@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.Channel
+#import ares.Count
+#import ares.fd.Set
+#import ares.fd.Sets
+namespace ares::fd {
+  //
+  // Count the number of file descriptors that are ready for activity
+  //
+  // The sense of ares::count(...) follows that of ares_nfds(3) in the off-by-one for use in select(2)
+  //
+  // <quote ref="man:ares_fds(3)">
+  //   ares_fds(3)  returns a value that is one greater than the number of the highest socket set in either read_fds or write_fds.
+  //   If no queries are active, ares_fds(3) returns 0.
+  // </quote>
+  // <quote ref="man:select(2)">
+  //   nfds  should be set to the highest-numbered file descriptor in any of the three sets, plus 1.
+  //   The indicated file descriptors in each set are checked, up to this limit (but see BUGS [which talks about the upper limit]).
+  // </quote>
+  //
+  // Usage:
+  //
+  //   auto channel = Channel{...somehow...};
+  //   ...send off some queries...
+  //   fd::Set r, w;
+  //   auto ccc = selectable(channel, r, w);
+  //   if (!zero(ccc)) {
+  //      ... = ares::select(ccc, r, w); <--------------------------------- accepts ccc directoy
+  //      ... = sys::posix::select(ccc-1, read(r), write(w)); <------------ requires some conversion
+  //   }
+  //
+#if 0
+  namespace packaging::selectable::function {
+    using fd::set::Reference;
+    using fd::set::Purpose;
+    using fd::ANCHOR;
+    using Reads = Reference<Purpose::READ>;
+    using Writes = Reference<Purpose::WRITE>;
+    inline auto selectable(Channel &, [[out]] Reads, [[out]] Writes) -> Count;
+    inline auto selectable(Channel &, [[out]] Sets &) -> Count;
+  }
+  using packaging::selectable::function::selectable;
+#endif
+  inline auto selectable(Channel &, [[out]] Set &, [[out]] Set &) -> Count;
+  inline auto selectable(Channel &, [[out]] Sets &) -> Count;
+}
+#endiv
+#divert <ipp>
+#import ares.fd.set.Reference
+namespace ares {
+  auto fd::selectable(Channel &channel, Set &r, Set &w) -> Count {
+    set::Reference<set::Purpose::READ> rr{r};
+    set::Reference<set::Purpose::WRITE> ww{w};
+    return Count(::ares_fds(channel.get(), rr.repointer(), ww.repointer()));
+  }
+  auto fd::selectable(Channel &channel, Sets &rw) -> Count {
+    return selectable(channel, rw.reads, rw.writes);
+  }
+}
+#if 0
+namespace ares::fd::packaging::selectable {
+  auto function::selectable(Channel &channel, Reads r, Writes w) -> Count {
+    return Count(::ares_fds(channel.get(), r.repointer(), w.repointer()));
+  }
+  auto function::selectable(Channel &channel, Sets &rw) -> Count {
+    return selectable(channel, reads(ANCHOR, rw.reads), writes(ANCHOR, rw.writes));
+  }
+}
+#endif
+#endiv

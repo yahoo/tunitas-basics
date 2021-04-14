@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #defines that define the values of the enumeration elements
+#include <sqlite3.h>
+namespace sqlite {
+  namespace config  {
+    namespace session {
+      enum class Code {
+        NOP = 0,
+        // nil
+        SINGLETHREAD = SQLITE_CONFIG_SINGLETHREAD,
+        // nil
+        MULTITHREAD = SQLITE_CONFIG_MULTITHREAD,
+        // nil
+        SERIALIZED = SQLITE_CONFIG_SERIALIZED,
+        // sqlite3_mem_methods*
+        MALLOC = SQLITE_CONFIG_MALLOC,
+        // sqlite3_mem_methods*
+        GETMALLOC = SQLITE_CONFIG_GETMALLOC,
+        // void*, int sz, int N
+        SCRATCH = SQLITE_CONFIG_SCRATCH,
+        // void*, int sz, int N
+        PAGECACHE = SQLITE_CONFIG_PAGECACHE,
+        // void*, int nByte, int min
+        HEAP = SQLITE_CONFIG_HEAP,
+        // boolean
+        MEMSTATUS = SQLITE_CONFIG_MEMSTATUS,
+        // sqlite3_mutex_methods*
+        MUTEX = SQLITE_CONFIG_MUTEX,
+        // sqlite3_mutex_methods*
+        GETMUTEX = SQLITE_CONFIG_GETMUTEX,
+        // previously SQLITE_CONFIG_CHUNKALLOC 12 which is now unused & unmentionable
+        // int int
+        LOOKASIDE = SQLITE_CONFIG_LOOKASIDE,
+        // no-op
+        PCACHE = SQLITE_CONFIG_PCACHE,
+        // no-op
+        GETPCACHE = SQLITE_CONFIG_GETPCACHE,
+        // c89::Func, void*
+        LOG = SQLITE_CONFIG_LOG,
+        // int
+        URI = SQLITE_CONFIG_URI,
+        // sqlite3_pcache_methods2*
+        PCACHE2 = SQLITE_CONFIG_PCACHE2,
+        // sqlite3_pcache_methods2*
+        GETPCACHE2 = SQLITE_CONFIG_GETPCACHE2,
+        // int
+        COVERING_INDEX_SCAN = SQLITE_CONFIG_COVERING_INDEX_SCAN,
+        // c89::Sqllog, void*
+        SQLLOG = SQLITE_CONFIG_SQLLOG,
+        // sqlite3_int64, sqlite3_int64
+        MMAP_SIZE = SQLITE_CONFIG_MMAP_SIZE,
+        // int nByte
+        WIN32_HEAPSIZE = SQLITE_CONFIG_WIN32_HEAPSIZE,
+      };
+    }
+  }
+}
+#endiv

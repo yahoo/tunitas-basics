@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward format.json.detail.Literal
+#import std.basic_ostream
+namespace format::json::detail {
+  template<typename CHAR, typename TRAITS> inline auto operator_ltlt(std::basic_ostream<CHAR, TRAITS> &, bool) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+#import format.json.detail.Literal
+template<typename CHAR, typename TRAITS> auto format::json::detail::operator_ltlt(std::basic_ostream<CHAR, TRAITS> &o, bool literal) -> std::basic_ostream<CHAR, TRAITS> & {
+  // supply the boolean literals explicitly; do not let std::boolalpha choose the wording via the locale
+  // FIXME ... these literals need to be widened to CHAR
+  return o << (literal ? "true" : "false");
+}
+#endiv

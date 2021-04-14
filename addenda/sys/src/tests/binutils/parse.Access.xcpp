@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.ok.Access
+#import tests.binutils.parse
+namespace tests::binutils {
+  //
+  // The parser for the ok mode of access(2)
+  //
+  // Special: 
+  //   Optional non-specification of the ok::Access, with the final number omitted
+  //   e.g. 
+  //      access /tmp/somefile        e.g. ok::EXISTS
+  //      access /tmp/somefile 0      e.g. ok::F
+  //   
+  // Usage:
+  //
+  //    return r = access(av[1], parse<ok::Access>(av, 2));
+  //
+  template<> inline auto parse<sys::ok::Access>(c::const_argv av, std::size_t position) -> sys::ok::Access;
+}
+#endiv
+#divert <ipp>
+#import std.stoi
+#import std.string
+#import sys.ok.constants
+#import tests.binutils.exception.Argument_Count
+#import tests.binutils.exception.Argument_Access
+template<> inline auto tests::binutils::parse<sys::ok::Access>(c::const_argv av, std::size_t position) -> sys::ok::Access {
+  using namespace sys::ok;
+  if (position == av.size()) {
+    // Optional non-specification of the ok::Access value
+    return EXISTS;
+  } else if (position+1 == av.size()) {
+    std::string const modeword = av[position];
+    std::size_t end(0);
+    auto const candidate = std::stoi(modeword, &end); // WATCHOUT [[FIXTHIS]] this throws independently of other error signalling
+    if (modeword.size() != end || candidate < 0 || 7 < candidate) {
+      throw exception::Argument_Access(modeword);
+    }
+    return sys::ok::Access(candidate);
+  }
+  throw exception::Argument_Count();
+}
+#endiv

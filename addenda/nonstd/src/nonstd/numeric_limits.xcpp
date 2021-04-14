@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd {
+  //
+  // Numeric Limits, but for a broader range of nonstd integer numbers.
+  //
+  // http://en.cppreference.com/w/cpp/types/numeric_limits
+  //
+  // Implementations may provide specializations of std::numeric_limits for implementation-specific types: 
+  //     e.g. GCC provides std::numeric_limits<__int128>.
+  //     WATCHOUT - GCC 7 DOES NOT DO THIS
+  //
+  // Non-standard libraries may add specializations for library-provided types:
+  //     e.g. OpenEXR provides std::numeric_limits<half> for a 16-bit floating-point type.
+  //
+  template<typename NUMBER> struct numeric_limits;
+  // Need these so the specialization against cf-unqualified types "just works"
+  template<typename NUMBER> struct numeric_limits<NUMBER const>;
+  template<typename NUMBER> struct numeric_limits<NUMBER volatile>;
+  template<typename NUMBER> struct numeric_limits<NUMBER const volatile>;
+}
+#entail nonstd.numeric_limits.int128
+#endiv
+#divert <hpp>
+#import std.numeric_limits
+template<typename NUMBER> struct nonstd::numeric_limits : public std::numeric_limits<NUMBER> { };
+template<typename NUMBER> struct nonstd::numeric_limits<NUMBER const> : public numeric_limits<NUMBER> { };
+template<typename NUMBER> struct nonstd::numeric_limits<NUMBER volatile> : public numeric_limits<NUMBER> { };
+template<typename NUMBER> struct nonstd::numeric_limits<NUMBER const volatile> : public numeric_limits<NUMBER> { };
+#endiv

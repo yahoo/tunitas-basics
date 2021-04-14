@@ -1,0 +1,20 @@
+// -*- c++ -*- with the SCOLD stylings
+#divert <fpp>
+#forward nonstd.path.filename.mount.Joinering
+namespace nonstd::path::filename::mount {
+  template<typename SEPARATOR> class Joinering<SEPARATOR>;
+}
+#endiv
+#divert <hpp>
+template<typename SEPARATOR> class nonstd::path::filename::mount::Joinering<SEPARATOR> {
+public:
+  inline explicit Joinering(SEPARATOR);
+  SEPARATOR separator;
+};
+#endiv
+#divert <ipp>
+template<typename SEPARATOR> nonstd::path::filename::mount::Joinering<SEPARATOR>::Joinering(SEPARATOR arg_separator)
+  : separator(arg_separator) {
+  ;
+}
+#endiv

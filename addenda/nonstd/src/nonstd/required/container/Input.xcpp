@@ -1,0 +1,49 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.container.Traits // but you will likely need some specializations
+#include <hpp/nonstd.container.Traits>
+#import nonstd.required.iterator.Input
+#import nonstd.required.container.Basic
+namespace nonstd::required::container {
+  //
+  // Is this type a container that has an input iterator?
+  //
+  // Concept:
+  //
+  //   Just what it says on the label.
+  //
+  // Known:
+  //
+  //   Because this concept is driven off of container::Traits<CONTAINER>
+  //   this will NOT work in the well-known case of input streams
+  //     Container .... std::istringstream
+  //     Iterator ..... std::istream_iterator
+  //
+  // Design:
+  //
+  //   The design uses subconcepts iterator::Input to get the inheritance properties therein.
+  //
+  // Usage:
+  //
+  //   template<required::container::Input CONTAINER> struct Something;
+  //
+  template<typename CONTAINER> concept Input = requires(CONTAINER container) {
+    typename nonstd::container::Traits<CONTAINER>::Iterator;
+    requires Basic<CONTAINER>;
+    requires iterator::Input<typename nonstd::container::Traits<CONTAINER>::Iterator>;
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Input<vector<string>>);
+    static_assert(Input<string>);
+  }
+}
+#endiv

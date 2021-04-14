@@ -1,0 +1,18 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringz
+#import std.basic_string
+namespace c { 
+  namespace detail { 
+    // There is no as_muting (mutable) because basic_string<C, T, A> does not support unconstrained access to its internal buffer
+    template<typename CHAR, typename TRAITS, typename ALLOC> inline auto as_consty(std::basic_string<CHAR, TRAITS, ALLOC> const &) -> basic_stringz<CHAR const>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CHAR, typename TRAITS, typename ALLOC> auto c::as_consty(std::basic_string<CHAR, TRAITS, ALLOC> const &str) -> basic_stringz<CHAR const> {
+  // basic_string<CHAR> already supplies the invariant of a '\0'-terminating sentinel
+  basic_stringz<CHAR const> ret(str.data());
+  return ret;
+}
+#divert </ipp>

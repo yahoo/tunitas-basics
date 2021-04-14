@@ -1,0 +1,10 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import slurp.file.Configuration.declaration
+#import slurp.file.Configuration.string
+#import slurp.file.Configuration.CONTAINER.Octet
+#import slurp.file.Configuration.CONTAINER.string
+#import slurp.file.Configuration.CONTAINER.deque.Octet
+#import slurp.file.Configuration.CONTAINER.vector.Octet
+#endiv

@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::guardian {
+  //
+  // Guardian for the unlink tests.
+  //
+  // Usage:
+  //
+  //   Hack the Sspew.
+  //
+  struct Unlink;
+}
+#endiv
+#divert <hpp>
+#import std.string
+struct tests::guardian::Unlink {
+  inline explicit Unlink(std::string const &arg_subject);
+  inline ~Unlink();
+  Unlink(Unlink const &) = delete;
+  auto operator=(Unlink const &) -> Unlink & = delete;
+protected:
+  // a filename, to be unlinked upon destruction
+  std::string subject;
+};
+#endiv
+#divert <ipp>
+#import sys.posix.unlink
+namespace tests::guardian {
+  Unlink::Unlink(std::string const &arg_subject)
+    : subject(arg_subject)
+  { }
+  Unlink::~Unlink() {
+    // This is a destructor, so we can't throw or amplify the problem.
+    // If we can't remove the subject, then we just have to let it stay.
+    six::unlink(subject);
+  }
+}
+#endiv

@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace config {
+      //
+      // A configuration for testing purposes
+      // The Ancestor (config::Generic) is inherit-only
+      //
+      class Configuration;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import options.Program
+#import options.config.Generic
+class tests::unit::config::Configuration : public options::config::Generic {
+  using Ancestor = options::config::Generic;
+public:
+  inline explicit Configuration(options::Program const &);
+};
+#endiv
+#divert <ipp>
+tests::unit::config::Configuration::Configuration(options::Program const &arg)
+  : Ancestor(arg) {
+  ;
+}
+#endiv

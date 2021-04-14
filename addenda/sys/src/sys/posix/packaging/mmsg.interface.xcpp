@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.basic_dope
+#import nonstd.span
+#import std.is_same
+#import std.remove_const
+#import sys.call.argument.Converter
+#import sys.id.File
+#import sys.msg.Header
+#import sys.msg.Headers
+#import sys.posix.packaging.msg.interface
+#import sys.posix.mmsghdr
+#import sys.posix.packaging.required // cascade the required
+#import sys.posix.packaging.msg.interface
+#import sys.time.spec
+#import sys.time.durations // sys::time::durations::nanoseconds a.k.a. std::chrono::nanoseconds
+namespace sys::posix::packaging::mmsg::interface {
+  //
+  // Scope:
+  //
+  //   recvmmsg(2)    ... which extends recvmsg(2)
+  //   sendmmsg(2)    ... which extends sendmsg(2)
+  //
+  // Usage:
+  //
+  //   the usual
+  //
+  using id::File;
+  namespace size = msg::interface::size;
+  using msg::interface::Flags;
+  namespace time {
+    using Duration = sys::time::durations::nanoseconds;
+    using Specification = sys::time::spec;
+    using Timeout = call::argument::Converter<Duration, Specification>;
+  }
+  using time::Timeout;
+  namespace result {
+    // Prepare for recvmmsg to return the time left in addition to count of messages read.
+    template<typename TYPE, typename... TYPES> using Result = call::result::Value<TYPE, TYPES...>;
+  }
+  using Result = result::Result<size::Signed>;
+  template<typename HDR> requires std::is_same_v<mmsghdr, HDR> using Header = sys::msg::Header<HDR>;
+  template<typename HDR, std::size_t N> requires std::is_same_v<mmsghdr, HDR> using Headers = sys::msg::Headers<HDR, N>;
+  template<typename HDR> requires std::is_same_v<mmsghdr, std::remove_const_t<HDR>> using Dope = nonstd::basic_dope<HDR>;
+  template<typename HDR> requires std::is_same_v<mmsghdr, std::remove_const_t<HDR>> using Span = nonstd::span<HDR>;
+}
+#endiv
+#divert <hpp>
+#import sys.msg.constants
+namespace sys::posix::packaging::mmsg::interface {
+  using sys::msg::NONE;
+}
+#endiv

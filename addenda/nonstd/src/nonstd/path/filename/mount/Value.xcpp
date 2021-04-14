@@ -1,0 +1,112 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::path::filename::mount {
+  //
+  // Usage: see nonstd::path::filename::workbench()
+  // Similar to Reference
+  //
+  // The workbench() produces an "unbound mount" (point)
+  // A mount::reference is a bound mount (point)
+  // Work occurs on the string that is mounted as such.
+  //
+  // The string is recovered with
+  //
+  //    auto finalize(Value &&) -> std::string
+  //    auto operator+(Value &&) -> std::string
+  //
+  class Value;
+}
+#endiv
+#divert <hpp>
+#import std.string
+namespace nonstd::path::filename::mount {
+  //
+  // operator* uses '.' as a separator
+  // operator/ uses '/' as a separator
+  //
+  inline auto operator*(Value &&, std::string const &more) -> Value &&;
+  inline auto operator*(std::string const &more, Value &&) -> Value &&;
+  inline auto operator/(Value &&, std::string const &more) -> Value &&;
+  inline auto operator/(std::string const &more, Value &&) -> Value &&;
+  inline auto finalize(Value &&) -> std::string;
+  inline auto operator+(Value &&) -> std::string; // prefer
+
+  namespace detail {
+    // avoid the cut & paste
+    inline auto operator_separator(char, std::string const &more, Value &&) -> Value &&;
+    inline auto operator_separator(char, Value &&, std::string const &more) -> Value &&;
+  }
+}
+class nonstd::path::filename::mount::Value {
+public:
+  template<typename ITERATOR> inline Value(ITERATOR start, ITERATOR finish);
+  inline explicit Value(std::string  &&basis);
+  inline explicit Value(std::string const &basis);
+  std::string subject;
+};
+#endiv
+#divert <ipp>
+template<typename ITERATOR> nonstd::path::filename::mount::Value::Value(ITERATOR start, ITERATOR finish)
+  : subject(start, finish) {
+  ;
+}
+
+#import std.forward
+nonstd::path::filename::mount::Value::Value(std::string &&anon)
+  : subject(std::forward<std::string>(anon)) {
+  ;
+}
+
+nonstd::path::filename::mount::Value::Value(std::string const &basis)
+  : subject(basis) {
+  ;
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator*(Value &&anon, std::string const &more) -> Value && {
+  return detail::operator_separator('.', std::forward<Value>(anon), more);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator*(std::string const &more, Value &&anon) -> Value && {
+  return detail::operator_separator('.', more, std::forward<Value>(anon));
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator/(Value &&anon, std::string const &more) -> Value && {
+  return detail::operator_separator('/', std::forward<Value>(anon), more);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator/(std::string const &more, Value &&anon) -> Value && {
+  return detail::operator_separator('/', more, std::forward<Value>(anon));
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::detail::operator_separator(char separator, Value &&anon, std::string const &more) -> Value && {
+  if (!more.empty()) {
+    anon.subject += separator;
+    anon.subject += more;
+  }
+  return std::forward<Value>(anon);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::detail::operator_separator(char separator, std::string const &more, Value &&anon) -> Value && {
+  if (!more.empty()) {
+    anon.subject.insert(anon.subject.begin(), separator);
+    anon.subject.insert(anon.subject.begin(), more.begin(), more.end());
+  }
+  return std::forward<Value>(anon);
+}
+
+auto nonstd::path::filename::mount::finalize(Value &&anon) -> std::string {
+  return operator+(std::forward<Value>(anon));
+}
+
+auto nonstd::path::filename::mount::operator+(Value &&anon) -> std::string {
+  std::string ret(std::forward<std::string>(anon.subject));
+  return ret;
+}
+#endiv

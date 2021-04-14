@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import idtype_t
+namespace sys::p {
+  enum class Type {
+    // ... New School
+    PROCESS = P_PID,
+    GROUP = P_PGID,
+    ALL = P_ALL,
+    // old_school
+    PID [[deprecated("spell it out! instead, prefer p::PROCESS")]] = PROCESS,
+    PGID [[deprecated("spell it out! instead, prefer p::GROUP")]]  = GROUP,
+  };
+}
+#endiv

@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.char_traits
+#import nonstd.stream.required
+#import nonstd.required.character.Type
+#import nonstd.required.character.Traits
+namespace nonstd::stream {
+  template<required::character::Type CHAR, required::character::Traits<CHAR> TRAITS = std::char_traits<CHAR>> class basic_null;
+  // following std::ostream as std::basic_ostream<char>
+  using null = basic_null<char>;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+#import std.unique_ptr
+#import nonstd.stream.Nullbuf
+namespace nonstd {
+  template<required::character::Type CHAR, required::character::Traits<CHAR> TRAITS> class stream::basic_null : public std::basic_ostream<CHAR, TRAITS> {
+    using ancestor = std::basic_ostream<CHAR, TRAITS>;
+  public:
+    inline basic_null();
+    // No capability for copy or move because of the ancestry
+  protected:
+    std::unique_ptr<::nonstd::stream::Nullbuf<CHAR, TRAITS>> buf;
+  };
+}
+#endiv
+#divert <ipp>
+namespace nonstd::stream {
+  template<required::character::Type _C, required::character::Traits<_C> _T> basic_null<_C, _T>::basic_null()
+    : ancestor()
+    , buf(new Nullbuf<typename ancestor::char_type, typename ancestor::traits_type>()) {
+    this->rdbuf(buf.get());
+  }
+}
+#endiv

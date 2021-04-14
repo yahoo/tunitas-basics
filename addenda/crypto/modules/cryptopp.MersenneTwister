@@ -1,0 +1,4 @@
+// -*- c++ -*- d6f09d04-e3cc-4f4f-bf95-7acddbe5417b
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/mersenne.h>

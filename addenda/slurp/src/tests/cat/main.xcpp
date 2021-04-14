@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import c.argv
+#import c.rest
+#import options.Program
+#import slurp.file.named.read
+#import std.begin
+#import std.cerr
+#import std.copy
+#import std.cout
+#import std.end
+#import std.exception
+#import std.ostream_iterator
+#import std.string
+#import sys.exits.constants
+auto main(int arg_c, char **arg_v) -> int {
+  c::argv argv(arg_c, arg_v);
+  options::Program program(argv);
+  using container_type = std::string;
+  std::ostream &err(std::cerr);
+  std::ostream &out(std::cout);
+  sys::exits::Code exit = sys::exits::OK;
+  for (std::string name_of_file : rest(argv)) {
+    try {
+      auto r = slurp::file::named::read<container_type>(name_of_file);
+      auto f = name(r);
+      auto b = body(r);
+      err << "filename " << f << '\n'
+          << "cat (forwards)\n";
+      std::copy(std::begin(b), std::end(b), std::ostream_iterator<char>(out));
+    } catch (std::exception const &e) {
+      err << program << ": failed to open " << name_of_file << " because " << e.what() << '\n';
+      exit = sys::exits::FAIL;
+    }
+  }
+  return exit;
+}
+#endiv

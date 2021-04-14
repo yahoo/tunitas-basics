@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.options.Composer.declaration
+#forward sys.o.options.Options.Access.Status
+namespace sys::o::options {
+  //
+  // Useful in pipe2(2) where the 2nd argument is a option set which combines the Accesses, and Statuses.
+  // [[Why?]] because that's the tradition of how these things are done. Bit-flags & bit-fields blended into a single syscall argument.
+  //
+  // Usage:
+  //
+  //   see Options<Access,Status>
+  //
+  template<> struct Composer<Options<Access,Status>>;
+}
+#endiv
+#divert <hpp>
+#import sys.o.Accesses
+#import sys.o.Statuses
+namespace sys::o::options {
+  template<> struct Composer<Options<Access,Status>> {
+    inline constexpr [[implicit]] Composer() : value{0} { }
+    inline constexpr [[implicit]] Composer(Access a) : value{(int) a} { }
+    inline constexpr [[implicit]] Composer(Accesses a) : value{(int) a} { }
+    inline constexpr [[implicit]] Composer(Status s) : value{(int) s} { }
+    inline constexpr [[implicit]] Composer(Statuses s) : value{(int) s} { }
+    using Value = int; // This is the type of the 2nd argument to open(2)
+    using value_type [[deprecated]] = Value;
+    inline constexpr operator Value() const { return value; }
+  protected:
+    inline constexpr explicit Composer(Value v) : value{v} { }
+    Value value;
+  };
+}
+#endiv

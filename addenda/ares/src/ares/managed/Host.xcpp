@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed {
+  //
+  // The managed host record, specialized to a particular address type.
+  // This shell provides some of the interface to the unmanaged::Host structure.
+  //
+  // Usage: see Record<A>, Record<AAAA>
+  //
+  // Non-Usage: Record<NS>, Record<PTR> which return (QDN-)NAMEs
+  //
+  template<Address_Genre> class Host;
+}
+#endiv
+#divert <hpp>
+#import ares.managed.host.Basis
+#import ares.managed.host.Addresses
+namespace ares {
+  template<Address_Genre THE_GENRE> class managed::Host : public host::Basis {
+    using ancestor = host::Basis;
+    inline static constexpr auto GENRE = THE_GENRE;
+  public:
+    Host() = default;
+    inline explicit Host(Unmanaged const *);
+    inline auto addresses() const -> host::Addresses<GENRE>;
+  };
+}
+#endiv
+#divert <ipp>
+namespace ares::managed {
+  template<Address_Genre _> Host<_>::Host(Unmanaged const *un): ancestor{un} { }
+  template<Address_Genre _> auto Host<_>::addresses() const -> host::Addresses<GENRE> {
+    return host::Addresses<GENRE>{unmanaged->h_length, unmanaged->h_addr_list};
+  }
+}
+#endiv

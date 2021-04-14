@@ -1,0 +1,12 @@
+// -*- c++ -*- 4b0969e9-acd8-4a0e-a309-4215fe38b0c1
+#pragma once
+//
+// This is YOUR project's config.h, not something that is installed herein.
+// You also need to supply -D_GNU_SOURCE
+// or in configure.ac declare HGTW_ENABLE_GDB (SCOLD_ENABLE_GDB)
+// to enable Lmid_t and allied constants.
+//
+#if ! defined(_GNU_SOURCE)
+#error use -D_GNU_SOURCE to enable the definition of Lmid_t
+#endif
+#include <dlfcn.h>

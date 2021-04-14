@@ -1,0 +1,154 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  namespace shortish {
+    //
+    // Usage: see shortish::Getter
+    // but generally
+    //
+    //  auto main(int argc, char *argv[]) -> int {
+    //    Getter get(specification, c::as<c::argv>(argc, argv));
+    //    Step step;
+    //    while ( ! end(step = get()) ) {
+    //      ...
+    //    }
+    //
+    class Step;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import c.const_stringz
+#import options.Code
+
+namespace options {
+  namespace shortish {
+    // The Code returned in the step; can be ERR or Code::END
+    inline auto code(Step const &) -> Code;
+
+    // optional values may be present or absent
+    inline auto present(Step const &) -> bool;
+    inline auto absent(Step const &) -> bool;
+    // optional values may or may not be present
+    // This may be unsafe; so test for nullptr == const_stringz::data()
+    inline auto optional(Step const &) -> c::const_stringz;
+    // The option value must be present
+    // this interface is always safe, but cannot distinguish "not present" from "is empty"
+    inline auto required(Step const &) -> std::string;
+
+    // Code was at_END ...
+    // stepping is done
+    inline auto end(Step const &) -> bool;
+    inline auto more(Step const &) -> bool;
+
+    // Code was UNKNOWN or MISSING(value)
+    inline auto erroneous(Step const &) -> bool;
+    inline auto flag_in_error(Step const &) -> char;
+
+    // when Code was UNKNOWN
+    inline auto is_unknown_flag(Step const &) -> bool;
+
+    // when Code was MISSING
+    inline auto is_missing_value(Step const &) -> bool;
+  }
+}
+
+class options::shortish::Step {
+  //
+  // See the nearby Getter for more detailed usage
+  //
+  // Usage
+  //     Step step;
+  //     while ( ! end(step = get()) ) {
+  //        ...etc...
+  //     }
+  //
+public:
+  Step() = default;
+  // success, or END; no option value
+  inline explicit Step(Code); // success
+  // success, with the option value
+  inline Step(Code, c::const_stringz const &);
+  // error, Code should be Code::UNKNOWN or Code::MISSING
+  inline explicit Step(Code, char flag_in_error);
+public:
+  Code code;
+  c::const_stringz value;
+  char flag_in_error; // a.k.a. optopt
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+options::shortish::Step::Step(Code the_code)
+  : code(the_code)
+  , value()
+  , flag_in_error('\0') {
+  ;
+}
+
+options::shortish::Step::Step(Code the_code, char the_flag_in_error)
+  : code(the_code)
+  , value()
+  , flag_in_error(the_flag_in_error) {
+  ;
+}
+
+options::shortish::Step::Step(Code the_code, c::const_stringz const &the_value)
+  : code(the_code)
+  , value(the_value)
+  , flag_in_error('\0') {
+  ;
+}
+
+auto options::shortish::code(Step const &step) -> Code {
+  return step.code;
+}
+
+auto options::shortish::present(Step const &step) -> bool {
+  // not just "empty", but nullptr
+  return nullptr != step.value.data();
+}
+
+auto options::shortish::absent(Step const &step) -> bool {
+  return !present(step);
+}
+
+auto options::shortish::optional(Step const &step) -> c::const_stringz {
+  // May return a const_stringz managing the nullptr in case where the was absent
+  return step.value;
+}
+
+auto options::shortish::required(Step const &step) -> std::string {
+  // May return a const_stringz managing the nullptr in case where the was absent
+  // Recall ... value may be managing nothing (nullptr), but we want a safe return of an empty string.
+  std::string ret(step.value.begin(), step.value.end());
+  return ret;
+}
+
+auto options::shortish::end(Step const &step) -> bool {
+  return options::end(step.code);
+}
+
+auto options::shortish::more(Step const &step) -> bool {
+  return options::more(step.code);
+}
+
+auto options::shortish::erroneous(Step const &step) -> bool {
+  return Code::UNKNOWN == step.code || Code::MISSING == step.code;
+}
+
+auto options::shortish::is_unknown_flag(Step const &step) -> bool {
+  return Code::UNKNOWN == step.code;
+}
+
+auto options::shortish::is_missing_value(Step const &step) -> bool {
+  return Code::MISSING == step.code;
+}
+
+auto options::shortish::flag_in_error(Step const &step) -> char {
+  return step.flag_in_error;
+}
+#divert </ipp>

@@ -1,0 +1,10 @@
+// -*- c++ -*- 06a666fb-9896-4668-a71d-08b0965b3b51
+#pragma once
+#include <unistd.h>
+namespace std {
+  // This is our invention.
+  // This is nonstandard.  Only ::ssize_t exists.
+  // std::ssize_t is not actually standardized.
+  // ... so we can pretend that std::ssize_t exists
+  using ssize_t = ::ssize_t;
+}

@@ -1,0 +1,25 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+check_bin_ca = check/bin/ca
+check_bin_ca_LDADD = \
+  $(lib_libopenssl_module_la) \
+  -lsys-module \
+  $(end)
+check_bin_ca_LDFLAGS = $(nothing_more)
+check_bin_ca_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_ca_SOURCES))
+check_bin_ca_SOURCES = \
+  obj/src/tests/ca/main.cpp \
+  obj/src/tests/ca/namespace.cpp \
+  obj/src/tests/ca/Files.cpp \
+  $(end)
+$(scold_cxxdir)/tests/ca/dependencies.mk: $(check_bin_ca_SOURCES)
+$(check_bin_ca_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/ca/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/ca/dependencies.mk #       automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/tests/ca/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/ca/dependencies.mk

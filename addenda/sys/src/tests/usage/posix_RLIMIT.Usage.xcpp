@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_RLIMIT.Usage
+//   static_assert(tests::usage::posix_RLIMIT::Usage<>);
+//
+#import sys.posix.RLIMIT
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_RLIMIT {
+  using sys::posix::RLIMIT;
+  namespace [[detail]] packaging {
+    template<typename RLIMIT> concept bool Instance = requires(RLIMIT) {
+      typename RLIMIT::Limit;
+      typename RLIMIT::Limits;
+      requires model::Namespace_Object<RLIMIT>;
+      requires (int)RLIMIT::CPU == RLIMIT_CPU;
+      requires (int)RLIMIT::FSIZE == RLIMIT_FSIZE;
+      requires (int)RLIMIT::DATA == RLIMIT_DATA;
+      requires (int)RLIMIT::STACK == RLIMIT_STACK;
+      requires (int)RLIMIT::CORE == RLIMIT_CORE;
+      requires (int)RLIMIT::RSS == __RLIMIT_RSS;
+      requires (int)RLIMIT::NOFILE == RLIMIT_NOFILE;
+      requires (int)RLIMIT::OFILE == RLIMIT_OFILE;
+      requires (int)RLIMIT::AS == RLIMIT_AS;
+      requires (int)RLIMIT::NPROC == __RLIMIT_NPROC;
+      requires (int)RLIMIT::MEMLOCK == __RLIMIT_MEMLOCK;
+      requires (int)RLIMIT::LOCKS == __RLIMIT_LOCKS;
+      requires (int)RLIMIT::SIGPENDING == __RLIMIT_SIGPENDING;
+      requires (int)RLIMIT::MSGQUEUE == __RLIMIT_MSGQUEUE;
+      requires (int)RLIMIT::NICE == __RLIMIT_NICE;
+      requires (int)RLIMIT::RTPRIO == __RLIMIT_RTPRIO;
+      requires (int)RLIMIT::RTTIME == __RLIMIT_RTTIME;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<RLIMIT>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

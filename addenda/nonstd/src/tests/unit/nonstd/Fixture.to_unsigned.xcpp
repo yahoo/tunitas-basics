@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.nonstd.Fixture
+#import std.numeric_limits
+#import nonstd.to_unsigned
+#import nonstd.exception.Exception
+namespace tests::unit::nonstd::fixture {
+  auto Fixture::test_to_unsigned_same() -> void {
+    auto same = (long unsigned int)3;
+    auto companion = library::to_unsigned(same); // <----- test this
+    CPPUNIT_ASSERT(3u == companion);
+  }
+  auto Fixture::test_to_unsigned_good() -> void {
+    auto different = (long signed int)3;
+    auto companion = library::to_unsigned(different); // <----- test this
+    CPPUNIT_ASSERT(3u == companion);
+  }
+  auto Fixture::test_to_unsigned_fail() -> void try {
+    auto fail = -99;
+    library::to_unsigned(fail); // <----- test this
+    CPPUNIT_ASSERT(false);
+  } catch (library::exception::Exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#endiv

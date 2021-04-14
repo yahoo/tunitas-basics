@@ -1,0 +1,15 @@
+// -*- c++ -*-
+#divert <hpp>
+#import std.function
+namespace shell {
+  namespace internal {
+    template<typename TYPE> inline auto enumeration(TYPE value) -> std::function<TYPE ()>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename TYPE> inline auto shell::internal::enumeration(TYPE value) -> std::function<TYPE ()> {
+  std::function<TYPE ()> ret = [value]{ return value; };
+  return ret;
+}
+#divert </ipp>

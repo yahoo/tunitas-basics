@@ -1,0 +1,4 @@
+#!/bin/sh
+source ${0%/*}/rigging.sh || exit 1
+ugly='/re/construct/string_view'
+unit $ugly

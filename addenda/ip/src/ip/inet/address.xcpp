@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward ip.inet.sockaddr.Lhs.ADDRESS
+#forward ip.inet.sockaddr.Rhs.ADDRESS
+#import ip.required.Sockaddr
+namespace ip::inet {
+  template<required::Sockaddr SOCKADDR> inline auto address(SOCKADDR const &) -> sockaddr::Rhs<sockaddr::ADDRESS, SOCKADDR>;
+  template<required::Sockaddr SOCKADDR> inline auto address(SOCKADDR &) -> sockaddr::Lhs<sockaddr::ADDRESS, SOCKADDR>;
+}
+#endiv
+#divert <ipp>
+#import ip.inet.sockaddr.Lhs.ADDRESS
+#import ip.inet.sockaddr.Rhs.ADDRESS
+namespace ip {
+  template<required::Sockaddr SOCKADDR> auto inet::address(SOCKADDR const &sa) -> sockaddr::Rhs<sockaddr::ADDRESS, SOCKADDR> {
+    return sockaddr::Rhs<sockaddr::ADDRESS, SOCKADDR>{sa};
+  }
+  template<required::Sockaddr SOCKADDR> auto inet::address(SOCKADDR &sa) -> sockaddr::Lhs<sockaddr::ADDRESS, SOCKADDR> {
+    return sockaddr::Lhs<sockaddr::ADDRESS, SOCKADDR>{sa};
+  }
+}
+#endiv

@@ -1,0 +1,51 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::pf {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.net.Network
+#import sys.pf.Family
+namespace sys::pf::constants {
+  //
+  // The Protocol Family Constants
+  // These are NO LONGER a mere cpoy o the Address Family Constants.
+  // If you are looking for the address family constants then prefer those in sys::af::constants
+  //
+  // By convention, each protocol family has its own address (set)
+  // By history, each address(set) has its own protocol (set)
+  //
+  // Historically:
+  //
+  //   AF and PF were "the same thing" ... there's a Wikipedia article on how that played out
+  //
+  // Alternatives:
+  //
+  //   any <-------> posix::PF::UNSPEC <----> struct posix::PF
+  //   ip(7) <-----> posix::IPPROTO::IP <---> struct posix::PF::IP <---> inline namespace sys::ip::proto::constants
+  //   unix(7) <---> posix::PF::UNSPEC <----> struct posix::PF::UN <---> inline namespace sys::un::constants
+  //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline constexpr auto UNSPECIFIED = Family<net::Network::UNSPECIFIED>;
+  [[deprecated("instead prefer af::constants::UNIX")]] inline constexpr auto UNIX = Family<net::Network::UNIX>;
+  [[deprecated("instead prefer af::constants::LOCAL")]] inline constexpr auto LOCAL = Family<net::Network::LOCAL>;
+  [[deprecated("instead prefer af::constants::INET4")]] inline constexpr auto INET4 = Family<net::Network::INET4>;
+  [[deprecated("instead prefer af::constants::INET6")]] inline constexpr auto INET6 = Family<net::Network::INET6>;
+  [[deprecated("instead prefer af::constants::IPX")]] inline constexpr auto IPX = Family<net::Network::IPX>;
+  [[deprecated("instead prefer af::constants::NETLINK")]] inline constexpr auto NETLINK = Family<net::Network::NETLINK>;
+  [[deprecated("instead prefer af::constants::X25")]] inline constexpr auto X25 = Family<net::Network::X25>;
+  [[deprecated("instead prefer af::constants::AX25")]] inline constexpr auto AX25 = Family<net::Network::AX25>;
+  [[deprecated("instead prefer af::constants::ATMPVC")]] inline constexpr auto ATMPVC = Family<net::Network::ATMPVC>;
+  [[deprecated("instead prefer af::constants::APPLETALK")]] inline constexpr auto APPLETALK = Family<net::Network::APPLETALK>;
+  [[deprecated("instead prefer af::constants::PACKET")]] inline constexpr auto PACKET = Family<net::Network::PACKET>;
+  [[deprecated("instead prefer af::constants::ALGORITHM")]] inline constexpr auto ALGORITHM = Family<net::Network::ALGORITHM>;
+  // The older names with arbitrarily-missing vowels & consonants.
+  inline constexpr auto UNSPEC = Family<net::Network::UNSPEC>;
+  [[deprecated("instead prefer af::constants::INET")]] inline constexpr auto INET = Family<net::Network::INET>;
+  [[deprecated("instead prefer af::constants::ALG")]] inline constexpr auto ALG = Family<net::Network::ALG>;
+#pragma GCC diagnostic pop
+}
+#endiv

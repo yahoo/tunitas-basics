@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import std.string
+#import sys.posix.mktemp
+#import sys.posix.symlink
+#import sys.posix.readlink
+#import sys.posix.unlink
+auto tests::unit::posix::fixture::Fixture::test_readlink() -> void {
+  auto m = six::mktemp("/tmp/t99.tests.unit.posix.readlink.XXXXXX");
+  CPPUNIT_ASSERT(good(m));
+  std::string const specimen = value(m);
+  guardian::Cleanup_Spackled_Names cleanup{specimen};
+  auto const payload = std::string("inky-linky-dinky-do, what do you think I want to do");
+  auto s = six::symlink(payload, specimen);
+  CPPUNIT_ASSERT(good(s));
+  auto r = six::readlink(specimen); // <----------------- test this
+  CPPUNIT_ASSERT(good(r));
+  auto const recovered = value(r);
+  CPPUNIT_ASSERT_EQUAL(payload, recovered);
+  auto u = six::unlink(specimen);
+  CPPUNIT_ASSERT(good(u));
+}
+#endiv

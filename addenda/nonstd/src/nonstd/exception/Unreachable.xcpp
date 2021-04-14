@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::exception {
+  //
+  // The unreachable (line) exception
+  //
+  // Concept:
+  //
+  //   The position is declared to be unreachable at a file & line number.
+  // Th  e 'function' position can usefully be used to explain the unreachability.
+  //
+  //   Unreachability is a logic error because it is the programmer's fault for not
+  //   assessing the control and data possibilities.
+  //
+  // Design:
+  //
+  //   Support old-school tokens __FUNCTION__, __FILE__, __LINE__
+  //   Support new-school interface std::source_location
+  //
+  // Usage:
+  //
+  //   throw Unreachable(};
+  //   throw Unreachable(std::source_location::current()};
+  //   throw Unreachable{__FUNCTION__, __FILE__, __LINE__};
+  //
+  // Usage:
+  //
+  //   if (returns_false()) {
+  //     throw Unreachable("f(x)", __FILE__, __LINE__);
+  //   }
+  //
+  class [[nodiscard]] Unreachable;
+}
+#endiv
+#divert <hpp>
+#import nonstd.exception.detail.Function_File_Line
+#import nonstd.exception.Logic
+#import nonstd.basic_string_view
+class nonstd::exception::Unreachable : public detail::Function_File_Line<Logic<string_view>> {
+  using Ancestor = detail::Function_File_Line<Logic<string_view>>;
+public:
+  using Ancestor::Function_File_Line;
+};
+#endiv

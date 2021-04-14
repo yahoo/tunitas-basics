@@ -1,0 +1,77 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception { class Invalid_Datum; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.exception.Invalid_Datum
+class tests::unit::exception::Invalid_Datum : public cppunit::test::Fixture {
+public:
+  using Subject = ::nonstd::exception::Invalid_Datum;
+  auto test_catchit_1arg() -> void;
+  auto test_catchit_2arg() -> void;
+  auto test_throwit_1arg() -> void;
+  auto test_throwit_2arg() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.cerr
+#import std.runtime_error
+auto tests::unit::exception::Invalid_Datum::test_throwit_1arg() -> void {
+  using namespace ::nonstd;
+  try {
+    throw Subject{"bad"}; // <--------------- test this, a constructor, 1-arg
+  } catch (std::runtime_error const &e) {
+    std::cerr << "exception: " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::exception::Invalid_Datum::test_throwit_2arg() -> void {
+  using namespace ::nonstd;
+  try {
+    throw Subject{"bad", "thing"}; // <--------------- test this, a constructor, 2-arg
+  } catch (std::runtime_error const &e) {
+    std::cerr << "exception: " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::exception::Invalid_Datum::test_catchit_1arg() -> void {
+  using namespace ::nonstd;
+  try {
+    throw Subject{"bad"};
+  } catch (std::runtime_error const &e) {
+    std::cerr << "exception: " << e.what() << '\n'; // <----------------- test this, the messaging
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::exception::Invalid_Datum::test_catchit_2arg() -> void {
+  try {
+    throw Subject{"bad", "thing"};
+  } catch (std::runtime_error const &e) {
+    std::cerr << "exception: " << e.what() << '\n'; // <----------------- test this, the messaging
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::exception::Invalid_Datum::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Invalid_Datum");
+  {
+    Stream thr("throw");
+    thr << call("1-arg", &Invalid_Datum::test_throwit_1arg)
+        << call("2-arg", &Invalid_Datum::test_throwit_2arg)
+      ;
+    series << add(std::move(thr));
+  } {
+    Stream cat("catch");
+    cat << call("1-arg", &Invalid_Datum::test_catchit_1arg)
+        << call("2-arg", &Invalid_Datum::test_catchit_2arg)
+      ;
+    series << add(std::move(cat));
+  }
+  return finalize(series);
+}
+#endiv

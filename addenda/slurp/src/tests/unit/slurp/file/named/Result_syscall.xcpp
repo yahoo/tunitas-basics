@@ -1,0 +1,121 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::slurp::file::named {
+  class Result_syscall;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.string
+#import std.vector
+#import slurp.file.named.Result.syscall
+class tests::unit::slurp::file::named::Result_syscall : public cppunit::test::Fixture {
+public:
+  using adl_type = ::slurp::file::named::ADL;
+  using string_payload_type = ::slurp::file::named::Result<std::string>;
+  using string_result_type = ::sys::call::result::Value<string_payload_type>;
+  using vector_payload_type = ::slurp::file::named::Result<std::vector<char>>;
+  using vector_result_type = ::sys::call::result::Value<vector_payload_type>;
+
+  auto test_construction() -> void;
+  auto test_filename() -> void;
+  auto test_body() -> void;
+  auto test_returning() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import slurp.file.named.Result.syscall
+#import std.string
+
+auto tests::unit::slurp::file::named::Result_syscall::test_construction() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  {
+    std::string file_contents("contents");
+    string_payload_type sr_pl(adl_type(), some_filename, std::string(file_contents));
+    string_result_type sr(true, 0, sr_pl);
+    CPPUNIT_ASSERT(ok(sr));
+    CPPUNIT_ASSERT_EQUAL(0, error_num(sr));
+    CPPUNIT_ASSERT(some_filename == name(sr));
+    CPPUNIT_ASSERT(file_contents == body(sr));
+  } {
+    std::vector<char> file_contents{'c', 'o', 'n', 't', 'e', 'n', 't', 's'};
+    vector_payload_type vcr_pl(adl_type(), some_filename, std::vector<char>(file_contents));
+    vector_result_type vcr(false, 1, vcr_pl);
+    CPPUNIT_ASSERT(!ok(vcr));
+    CPPUNIT_ASSERT_EQUAL(1, error_num(vcr));
+    CPPUNIT_ASSERT(some_filename == name(vcr));
+    {
+      // because operator== is defined over strings, not vector<char>
+      std::string refile_contents(file_contents.begin(), file_contents.end());
+      auto r = body(vcr);
+      std::string rebody(r.begin(), r.end());
+      CPPUNIT_ASSERT(refile_contents == rebody);
+    }
+  }
+}
+
+auto tests::unit::slurp::file::named::Result_syscall::test_filename() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  std::string file_contents("contents");
+  string_payload_type sr_pl(adl_type(), some_filename, std::string(file_contents));
+  string_result_type sr(true, 88, sr_pl);
+  CPPUNIT_ASSERT(ok(sr));
+  CPPUNIT_ASSERT_EQUAL(88, error_num(sr));
+  CPPUNIT_ASSERT(some_filename == name(sr));
+}
+
+auto tests::unit::slurp::file::named::Result_syscall::test_body() -> void {
+  std::string some_filename("/var/tmp/a-file");
+  std::size_t const REALLY_BIG = 1000000;
+  std::vector<char> file_contents(REALLY_BIG); // really big
+  vector_payload_type vcr_pl(adl_type(), some_filename, std::vector<char>(file_contents));
+  vector_result_type vcr(false, 44, vcr_pl);
+  CPPUNIT_ASSERT(!ok(vcr));
+  CPPUNIT_ASSERT_EQUAL(44, error_num(vcr));
+  CPPUNIT_ASSERT(REALLY_BIG == body(vcr).size());
+}
+
+namespace {
+  template<typename CONTAINER> auto return_a_Result_CONTAINER() -> ::sys::call::result::Value<::slurp::file::named::Result<CONTAINER>> {
+    std::string some_filename("/var/tmp/a-file");
+    CONTAINER file_contents{'c', 'o', 'n', 't', 'e', 'n', 't', 's'};
+    using adl_type = tests::unit::slurp::file::named::Result_syscall::adl_type;
+    using payload_type = ::slurp::file::named::Result<CONTAINER>;
+    using result_type = ::sys::call::result::Value<payload_type>;
+    payload_type sr_pl(adl_type(), some_filename, CONTAINER(file_contents));
+    result_type sr(false, 19, sr_pl);
+    CPPUNIT_ASSERT(!ok(sr));
+    CPPUNIT_ASSERT_EQUAL(19, error_num(sr));
+    CPPUNIT_ASSERT(some_filename == name(sr));
+    CPPUNIT_ASSERT(file_contents == body(sr));
+    return sr;
+  }
+}
+
+auto tests::unit::slurp::file::named::Result_syscall::test_returning() -> void {
+  auto sr = return_a_Result_CONTAINER<std::string>();
+  CPPUNIT_ASSERT(!name(sr).empty());
+  CPPUNIT_ASSERT(!body(sr).empty());
+  auto vr = return_a_Result_CONTAINER<std::vector<char>>();
+  CPPUNIT_ASSERT(!name(vr).empty());
+  CPPUNIT_ASSERT(!body(vr).empty());
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::slurp::file::named::Result_syscall::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Result<CONTAINER>");
+  s << call("construction", &Result_syscall::test_construction)
+    << call("filename", &Result_syscall::test_filename)
+    << call("body", &Result_syscall::test_body)
+    << call("returning", &Result_syscall::test_returning)
+    ;
+  return s.release();
+}
+#endiv

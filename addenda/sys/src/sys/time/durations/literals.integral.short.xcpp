@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sys.time.durations.literals
+namespace sys {
+  namespace time {
+    namespace durations {
+      namespace literals {
+
+	// Short (SI-type naming)
+	constexpr inline integral operator"" _ns(unsigned long long);
+	constexpr inline integral operator"" _us(unsigned long long);
+	constexpr inline integral operator"" _ms(unsigned long long);
+	constexpr inline integral operator"" _s(unsigned long long);
+
+      }
+    }
+  }
+}
+
+#import sys.time.duration_cast
+
+constexpr auto sys::time::durations::literals::operator"" _ns(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::nanoseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _us(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::microseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _ms(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::milliseconds(n));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _s(unsigned long long n) -> integral {
+    return duration_cast<integral>(durations::seconds(n));
+}
+#endiv

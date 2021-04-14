@@ -1,0 +1,3 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 70
+execing execp-path-cargv-cenvv date +%s

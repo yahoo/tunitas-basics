@@ -1,0 +1,12 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.regex.Fixture
+#endiv
+#divert <cpp>
+#import nonstd.regex.Traits
+auto tests::unit::regex::Fixture::test_Traits() -> void {
+  using Traits = ::nonstd::regex::Traits<char>;
+  CPPUNIT_ASSERT_EQUAL(2lu, Traits::length("12"));
+}
+#endiv

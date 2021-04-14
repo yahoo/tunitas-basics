@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.required.Unmanaged
+namespace ares::managed::list::entry {
+  //
+  // The basis for an Entry<RESOURCE>
+  // Descendants only
+  //
+  // Const deep references only.
+  // Yes copy semantics, but it is shallow.
+  // Yes, move semantics, again the shallow sense.
+  // NO destruction against the const reference.
+  //
+  // Usage: see Entry<ADDR4>, Entry<ADDR6>
+  //
+  template<required::Unmanaged UNMANAGED> class Basis;
+}
+#endiv
+#divert <hpp>
+#import ares.time.durations // time::Seconds
+namespace ares::managed::list {
+  template<required::Unmanaged UNMANAGED> class entry::Basis {
+    // WATCHOUT - there is no vtable here, unlike in list::entry::Basis<UNMANAGED>
+  public:
+    using Unmanaged = UNMANAGED; // accessed by required::list::Entry<ENTRY>
+  protected:
+    ~Basis() = default;
+    inline explicit Basis(Unmanaged const *un) : unmanaged{un} { }
+    Unmanaged const *unmanaged;
+  };
+}
+#endiv

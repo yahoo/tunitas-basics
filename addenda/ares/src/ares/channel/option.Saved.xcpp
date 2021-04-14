@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::channel::option {
+  //
+  // The saved options (blob and mask)
+  // This is deprecated, as is its ancestor.
+  //
+  // The destructor frees the memory created by Channel::save().
+  // As such, an option::Saved can only be created by that interface.
+  // Use option::Blob if you need to manage your own options [but this scheme is deprectaed so don't]
+  //
+  // Usage:
+  //
+  //   see Channel::Channel(...constructors...)
+  //
+  [[deprecated]] struct Saved;
+}
+#endiv
+#divert <hpp>
+#import ares.channel.option.Blob
+#import ares.channel.option.Set
+#forward ares.channel.Channel
+class ares::channel::option::Saved : public Blob {
+  using ancestor = Blob;
+public:
+  inline Saved();
+  Saved(Saved &&) noexcept = default;
+  auto operator=(Saved &&) noexcept -> Saved & = default;
+  inline ~Saved();
+  Set mask;
+protected:
+  friend class channel::Channel;
+  inline Saved(Blob, Set);
+};
+#endiv
+#divert <ipp>
+#import ares.channel.option.constants
+namespace ares::channel::option {
+  Saved::Saved()
+    : ancestor{}
+    , mask{option::NONE}
+  { }
+  Saved::Saved(Blob blob, Set mask)
+    : ancestor{std::move(blob)}
+    , mask{mask}
+  { }
+  Saved::~Saved() {
+    ::ares_destroy_options(this);
+  }
+}
+#import ares.channel.Channel // finish the #forward obligation
+#endiv

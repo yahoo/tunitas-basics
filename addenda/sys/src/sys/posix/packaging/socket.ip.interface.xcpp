@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.af.Type
+#import sys.ip.proto.Protocol
+#import sys.ip.sock.Type
+#import sys.ip.sock.Specification
+#import sys.posix.packaging.sock.core
+namespace sys::posix::packaging::socket::ip::interface {
+  //
+  // Scope:
+  //
+  //   ip::socket
+  //   ip::socketpair
+  //
+  // Usage:
+  //
+  //   the usual
+  //
+  using namespace packaging::sock::core;
+  using Address = af::Type;
+  using sys::ip::proto::Protocol;
+  using Socket = sys::ip::sock::Type;
+  using Specification = sys::ip::sock::Specification;
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::socket::ip::interface {
+  inline constexpr auto UNSPECIFIED = Protocol{};
+}
+#endiv

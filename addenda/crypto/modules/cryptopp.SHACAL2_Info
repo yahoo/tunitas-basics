@@ -1,0 +1,4 @@
+// -*- c++ -*- 15724946-e310-4bd2-913e-484f3ba720a0
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/shacal2.h>

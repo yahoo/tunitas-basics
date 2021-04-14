@@ -1,0 +1,17 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.detail.UnboundVector
+#import c.detail.Character
+namespace c {
+  namespace detail {
+    template<typename CHAR> class UnboundVector<Character<CHAR>>;
+  }
+}
+#import c.detail.UnboundVector.Character.consty
+#import c.detail.UnboundVector.Character.muting
+#divert </fpp>

@@ -1,0 +1,6 @@
+// -*- c++ -*- a64fa223-af87-48ab-9d0c-70a0e9314439
+#pragma once
+#include <cppunit/extensions/TestDecorator.h>
+namespace cppunit::decorator {
+  using Test = CppUnit::TestDecorator;
+}

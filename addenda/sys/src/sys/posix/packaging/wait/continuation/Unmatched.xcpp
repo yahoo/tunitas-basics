@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix::packaging::wait::continuation {
+  //
+  // Used for the wait2 and wait3 template signatures
+  // wherein the templates of these two interfaces to not accept a "matched."
+  //
+  // Needed both in namespace packaging::wait::interface interface and elsewhere
+  //
+  enum class Unmatched { };
+}
+#endiv

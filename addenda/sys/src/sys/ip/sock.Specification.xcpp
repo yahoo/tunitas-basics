@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.specification.Specification
+#import sys.ip.sock.Type
+namespace sys::ip::sock {
+  //
+  // The specification is a composition of the (ip socket) Type and the Options
+  // The main doccumentarriat is in sys.sock.Specifiiation.xcpp
+  //
+  // Usage:
+  //
+  //                   <----- IP-Specific Types ----->
+  //                   <--address-->  <-- socktype -->
+  //   auto s = socket(AF::IP::INET4, SOCK::IP::STREAM, IPPROTO::TCP);
+  //   auto s = socket(AF::IP::INET4, SOCK::IP::STREAM | SOCK::CLOEXEC, IPPROTO::UDP);
+  //   auto s = socket(AF::IP::INET4, SOCK::IP::STREAM | SOCK::CLOEXEC | SOCK::NONBLOCK, IPPROTO::TCP);
+  //
+  using Specification = sys::sock::specification::Specification<Type>;
+}
+#endiv
+#divert <hpp>
+#import sys.sock.Options
+namespace sys::ip::sock {
+  // Here, operator| is performing "concatenation"
+  // As s uch, there is no corresponding operator& because these are always  disjoinnt.
+  using Options = sys::sock::Options;
+  inline constexpr auto operator|(Options s, Type t) -> Specification { return Specification{s} | Specification{t}; }
+  inline constexpr auto operator|(Type t, Options s) -> Specification { return Specification{t} | Specification{s}; }
+}
+#endiv

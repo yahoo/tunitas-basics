@@ -1,0 +1,12 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import uuid.detail.Wrapper
+namespace uuid {
+  inline auto copy(detail::Wrapper &dst, detail::Wrapper const &src) -> void;
+}
+#endiv
+#divert <ipp>
+auto uuid::copy(detail::Wrapper &dst, detail::Wrapper const &src) -> void {
+  return ::uuid_copy(dst.value, src.value);
+}
+#endiv

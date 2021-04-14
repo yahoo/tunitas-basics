@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.is_same
+#import std.ratio // and all scalings atto .. exa
+#import sys.time.point // and sys.time.points.base<C,D>
+#import sys.time.spec
+#import sys.time.t
+#import sys.time.tm
+#import sys.time.val
+namespace sys::time::required {
+  //
+  // A time type is one of these enumerated elements
+  //
+  namespace detail {
+    //
+    // Because there is no way to state an existential quantifier "forall" in a concept.
+    // We have to enumerate the reasonable scalings of the system_clock time system.
+    // blik.
+    //
+    static_assert(std::is_same<sys::time::clock::base, std::chrono::system_clock>::value);
+    template<typename TIME> concept bool Point_Reasonable_Scalings =
+      (std::is_same<TIME, time::point>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::atto>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::femto>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::pico>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::nano>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::micro>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::milli>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::centi>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::deci>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::ratio<1>>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::deca>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::hecto>>>::value ||
+       // Hours
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::kilo>>>::value ||
+       // Months
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::mega>>>::value ||
+       // Generations, a score years
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::giga>>>::value ||
+       // Historical
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::tera>>>::value ||
+       // Geological
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::peta>>>::value ||
+       std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::exa>>>::value);
+  }
+  template<typename TIME> concept bool Time =
+    (detail::Point_Reasonable_Scalings<TIME> ||
+     std::is_same<TIME, time::spec>::value ||
+     std::is_same<TIME, time::t>::value ||
+     std::is_same<TIME, time::tm>::value ||
+     std::is_same<TIME, time::val>::value);
+}
+#endiv

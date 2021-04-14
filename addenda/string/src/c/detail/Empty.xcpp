@@ -1,0 +1,21 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace c {
+  namespace detail {
+    template<typename CHAR> struct Empty;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+template<typename CHAR> struct c::detail::Empty {
+  static CHAR const STRING[1];
+};
+#divert </hpp>
+#divert <tpp>
+template<typename CHAR> CHAR const c::detail::Empty<CHAR>::STRING[1]{ CHAR(0) };
+#divert </tpp>

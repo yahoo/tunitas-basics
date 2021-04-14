@@ -1,0 +1,79 @@
+# -*- Makefile -*-
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.11/01.black-platinum-hen series/v0.12/02.maroon-iron-crow series/v0.12/03.red-mercury-goose series/v0.13/04.green-copper-heron; do
+#       increment=$(git log | grep -c ^commit)
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# API 403  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 265  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the branch and history estimator formula
+#     ...  time passes
+# API 151  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the branch and history estimator formula
+#     ...  time passes
+# API 38   reserved for SCOLDing, Release 01 (Black Platinum Hen); circa Version v0.11.5, 887fb4b02161be0138927fc349b63b16ceb7ce53
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+lib_libstring_module_la_CURRENT = 404
+lib_libstring_module_la_REVISION = 0
+lib_libstring_module_la_AGE = 138
+lib_libstring_module_la_CRA = $(lib_libstring_module_la_CURRENT):$(lib_libstring_module_la_REVISION):$(lib_libstring_module_la_AGE)
+lib_libstring_module_la_VERSION_INFO = -version-info $(lib_libstring_module_la_CRA)
+
+lib_libstring_module_la = lib/libstring-module.la
+lib_libstring_module_la_LIBADD = \
+  $(lib_libbyte_la) \
+  $(lib_libc_runtime_la) \
+  $(lib_libre_la) \
+  $(lib_libstd_la) \
+  $(lib_libwant_la) \
+  $(end)
+lib_libstring_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libstring_module_la_VERSION_INFO)
+lib_libstring_module_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libstring_module_la_SOURCES))
+lib_libstring_module_la_SOURCES = 
+
+$(scold_cxxdir)/string/dependencies.mk: Makefile
+	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libstring_module_la_SOURCES)) 
+	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libstring_module_la_SOURCES)) 
+include $(scold_cxxdir)/string/dependencies.mk
+mostlyclean-local::
+	rm -f $(scold_cxxdir)/string/dependencies.mk

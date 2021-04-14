@@ -1,0 +1,3 @@
+// -*- c++ -*- 7410858e-a7f9-45f6-b668-75bb02dca374
+#pragma once
+#include <half_float.half> // there is #pragma reinclude magic in here

@@ -1,0 +1,26 @@
+// -*- c++ -*- in the SCOLD stylings which are so popular these days
+#divert <hpp>
+#import std.allocator
+#import std.string
+namespace ish {
+  namespace perl {
+    //
+    // Similar to Perl's
+    //
+    //     @LHS = map {...block...} @RHS
+    //
+    template<typename OPERATION, template<typename V, typename A> class CONTAINER> inline auto map(OPERATION, CONTAINER<std::string, std::allocator<std::string>> const &) -> CONTAINER<std::string, std::allocator<std::string>>;
+    template<template<typename V, typename A> class CONTAINER> inline auto map(std::string (&operation)(std::string const &), CONTAINER<std::string, std::allocator<std::string>> const &) -> CONTAINER<std::string, std::allocator<std::string>>;
+  }
+}
+#endiv
+#divert <ipp>
+#import ish.perl.detail.map
+template<typename OPERATION, template<typename V, typename A> class CONTAINER> auto ish::perl::map(OPERATION operation, CONTAINER<std::string, std::allocator<std::string>> const &source) -> CONTAINER<std::string, std::allocator<std::string>> {
+  return detail::map(operation, source);
+}
+
+template<template<typename V, typename A> class CONTAINER> auto ish::perl::map(std::string (&operation)(std::string const &), CONTAINER<std::string, std::allocator<std::string>> const &source) -> CONTAINER<std::string, std::allocator<std::string>> {
+  return detail::map(operation, source);
+}
+#endiv

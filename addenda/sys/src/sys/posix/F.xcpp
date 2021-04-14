@@ -1,0 +1,173 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // Compatibility and uniformity.
+  // We have 'struct F' contra 'namespace f'
+  //
+  // Pattern
+  //   struct-as-namespace.
+  //
+  // Usage:
+  //
+  //   F::GETFD            f::Function
+  //   F::OWNER::TID       f::Owner
+  //   F::SEAL::GROW       f::Seal       also f::Seals, a.k.a. flagset::Container<f::Seal...etc...>
+ //
+  struct F;
+}
+#endiv
+#divert <hpp>
+#import off_t
+#import sys.f.Function
+#import sys.f.constants
+#import sys.f.layer.Which
+#import sys.f.Wait
+#import sys.lockf.constants
+#import sys.unlock.Call
+#import sys.posix.required.rebundled
+#forward sys.posix.DN
+#import sys.posix.LOCKF
+struct sys::posix::F : public LOCKF {
+  using Function = f::Function;
+  using Command [[deprecated("instead prefer the modern usage: sys::posix::f::Function")]] = Function;
+  using Process = f::layer::Process;
+  using File = f::layer::File;
+  using Which = f::layer::Which;
+  using Wait = f::Wait;
+  //
+  inline static constexpr auto PROCESS = Which::PROCESS;
+  inline static constexpr auto FILE = Which::FILE;
+  inline static constexpr auto NOWAIT = Wait::NOWAIT;
+  inline static constexpr auto WAIT = Wait::WAIT;
+  //
+  inline static constexpr auto DUPFD = f::DUPFD;
+  inline static constexpr auto DUPFD_CLOEXEC = f::DUPFD_CLOEXEC;
+  //
+  inline static constexpr auto GETFD = f::GETFD;
+  inline static constexpr auto SETFD = f::SETFD;
+  //  
+  inline static constexpr auto GETFL = f::GETFL;
+  inline static constexpr auto SETFL = f::SETFL;
+  //
+  inline static constexpr auto GETLOCK_PROCESS = f::GETLOCK_PROCESS;
+  inline static constexpr auto SETLOCK_PROCESS = f::SETLOCK_PROCESS;
+  inline static constexpr auto SETLOCK_PROCESS_WAITING = f::SETLOCK_PROCESS_WAITING;
+  inline static constexpr auto GETLOCK_FILE = f::GETLOCK_FILE;
+  inline static constexpr auto SETLOCK_FILE = f::SETLOCK_FILE;
+  inline static constexpr auto SETLOCK_FILE_WAITING = f::SETLOCK_FILE_WAITING;
+  //
+  inline static constexpr auto GETLOCK64_PROCESS = f::GETLOCK64_PROCESS;
+  inline static constexpr auto SETLOCK64_PROCESS = f::SETLOCK64_PROCESS;
+  inline static constexpr auto SETLOCK64_PROCESS_WAITING = f::SETLOCK64_PROCESS_WAITING;
+#ifdef F_OFD_GETLK64
+  inline static constexpr auto GETLOCK64_FILE = f::GETLOCK64_FILE;
+  inline static constexpr auto SETLOCK64_FILE = f::SETLOCK64_FILE;
+  inline static constexpr auto SETLOCK64_FILE_WAITING = f::SETLOCK64_FILE_WAITING;
+#endif
+  //
+  inline static constexpr auto SETLEASE = f::SETLEASE;
+  inline static constexpr auto GETLEASE = f::GETLEASE;
+  //
+  inline static constexpr auto NOTIFY = f::NOTIFY;
+  //
+  inline static constexpr auto GETPIPE_SIZE = f::GETPIPE_SIZE;
+  inline static constexpr auto SETPIPE_SIZE = f::SETPIPE_SIZE;
+  //
+  inline static constexpr auto GETOWNER = f::GETOWNER;
+  inline static constexpr auto SETOWNER = f::SETOWNER;
+  inline static constexpr auto GETOWNER_EX = f::GETOWNER_EX;
+  inline static constexpr auto SETOWNER_EX = f::SETOWNER_EX;
+  //
+  inline static constexpr auto GETSIGNAL = f::GETSIGNAL;
+  inline static constexpr auto SETSIGNAL = f::SETSIGNAL;
+  //
+  inline static constexpr auto ADD_SEALS = f::ADD_SEALS;
+  inline static constexpr auto GET_SEALS = f::GET_SEALS;
+  //
+  inline static constexpr auto GET_RWH_PROCESS = f::GET_RWH_PROCESS;
+  inline static constexpr auto SET_RWH_PROCESS = f::SET_RWH_PROCESS;
+  inline static constexpr auto GET_RWH_FILE = f::GET_RWH_FILE;
+  inline static constexpr auto SET_RWH_FILE = f::SET_RWH_FILE;
+#ifdef F_GETOWNER_UIDS
+  inline static constexpr auto GETOWNER_UIDS = f::GETOWNER_UIDS;
+#endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  // Say whether you want the PROCESS variant or the FILE variant
+  [[deprecated("spell it out! instead prefer F::GETLOCK_PROCESS")]]            inline static constexpr auto GETLOCK = f::GETLOCK;
+  [[deprecated("spell it out! instead prefer F::SETLOCK_PROCESS")]]            inline static constexpr auto SETLOCK = f::SETLOCK;
+  [[deprecated("spell it out! instead prefer F::SETLOCK_PROCESS_WAITING")]]    inline static constexpr auto SETLOCK_WAITING = f::SETLOCK_WAITING;
+  [[deprecated("spell it out! instead prefer F::GETLOCK64_PROCESS")]]          inline static constexpr auto GETLOCK64 = f::GETLOCK64;
+  [[deprecated("spell it out! instead prefer F::SETLOCK64_PROCESS")]]          inline static constexpr auto SETLOCK64 = f::SETLOCK64;
+  [[deprecated("spell it out! instead prefer F::SETLOCK64_PROCESS_WAITING")]]  inline static constexpr auto SETLOCK64_WAITING = f::SETLOCK64_WAITING;
+  // spell it out "LK" versus "Lock"
+  [[deprecated("spell it out! instead, prefer F::GETLOCK_PROCESS")]]           inline static constexpr auto GETLK      = f::GETLK;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK_PROCESS")]]           inline static constexpr auto SETLK      = f::SETLK;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK_PROCESS_WAITING")]]   inline static constexpr auto SETLKW     = f::SETLKW;
+  [[deprecated("spell it out! instead, prefer F::GETLOCK64_PROCESS")]]         inline static constexpr auto GETLK64    = f::GETLK64;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK64_PROCESS")]]         inline static constexpr auto SETLK64    = f::SETLK64;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK64_PROCESS_WAITING")]] inline static constexpr auto SETLKW64   = f::SETLKW64;
+  // spell it out "OFD" becomes "FILE" and "LK" becomes "LOCK"
+  [[deprecated("spell it out! instead, prefer F::GETLOCK_FILE")]]              inline static constexpr auto OFD_GETLK  = f::OFD_GETLK;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK_FILE")]]              inline static constexpr auto OFD_SETLK  = f::OFD_SETLK;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK_FILE_WAITING")]]      inline static constexpr auto OFD_SETLKW = f::OFD_SETLKW;
+#ifdef F_OFD_GETLK64
+  [[deprecated("spell it out! instead, prefer F::GETLOCK64_FILE")]]            inline static constexpr auto OFD_GETLK64  = f::OFD_GETLK64;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK64_FILE")]]            inline static constexpr auto OFD_SETLK64  = f::OFD_SETLK64;
+  [[deprecated("spell it out! instead, prefer F::SETLOCK64_FILE_WAITING")]]    inline static constexpr auto OFD_SETLKW64 = f::OFD_SETLKW64;
+#endif
+  [[deprecated("spell it out! instead, prefer F::GETPIPE_SIZE")]]              inline static constexpr auto GETPIPE_SZ  = f::GETPIPE_SZ;
+  [[deprecated("spell it out! instead, prefer F::SETPIPE_SIZE")]]              inline static constexpr auto SETPIPE_SZ  = f::SETPIPE_SZ;
+  [[deprecated("spell it out! instead, prefer F::GETOWNER")]]                  inline static constexpr auto GETOWN      = f::GETOWN;
+  [[deprecated("spell it out! instead, prefer F::SETOWNER")]]                  inline static constexpr auto SETOWN      = f::SETOWN;
+  [[deprecated("spell it out! instead, prefer F::GETOWNER_EX")]]               inline static constexpr auto GETOWN_EX   = f::GETOWN_EX;
+  [[deprecated("spell it out! instead, prefer F::SETOWNER_EX")]]               inline static constexpr auto SETOWN_EX   = f::SETOWN_EX;
+  [[deprecated("spell it out! instead, prefer F::GETSIGNAL")]]                 inline static constexpr auto GETSIG      = f::GETSIG;
+  [[deprecated("spell it out! instead, prefer F::SETSIGNAL")]]                 inline static constexpr auto SETSIG      = f::SETSIG;
+  [[deprecated("spell it out! instead, prefer F::GET_RWH_PROCESS")]]           inline static constexpr auto GET_RWH     = f::GET_RWH;
+  [[deprecated("spell it out! instead, prefer F::SET_RWH_PROCESS")]]           inline static constexpr auto SET_RWH     = f::SET_RWH;
+  [[deprecated("spell it out! instead, prefer F::GET_RWH_PROCESS")]]           inline static constexpr auto GET_RW_HINT = f::GET_RW_HINT;
+  [[deprecated("spell it out! instead, prefer F::SET_RWH_PROCESS")]]           inline static constexpr auto SET_RW_HINT = f::SET_RW_HINT;
+#pragma GCC diagnostic pop
+#if 0 // [[REMOVEWHEN]] whenever ... this is good and working and happy
+  //
+  // F::Operation<LOCKF>
+  //
+  inline static constexpr auto LOCKF = unlock::Call::LOCKF;
+  template<unlock::Call CALL> requires CALL == LOCKF using Operation = lockf::Operation;
+  using Offset = off_t;
+  //
+  // lockf(fd, F::LOCK, offset)
+  // lockf(fd, F::TEST_AND_LOCK, offset)
+  // lockf(fd, F::TEST, offset)
+  // lockf(fd, F::UNLOCK, offset)
+  //
+  inline static constexpr auto LOCK          = lockf::LOCK;
+  inline static constexpr auto TEST_AND_LOCK = lockf::TEST_AND_LOCK;
+  inline static constexpr auto TEST          = lockf::TEST;
+  inline static constexpr auto UNLOCK        = lockf::UNLOCK;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("spell it out! instead, prefer F::TEST_AND_LOCK")]] inline static constexpr auto TLOCK = lockf::TLOCK;
+  [[deprecated("spell it out! instead, prefer F::UNLOCK")]]        inline static constexpr auto ULOCK = lockf::ULOCK;
+  [[deprecated("spell it out! instead, prefer F::UNLOCK")]]        inline static constexpr auto UNLOCKF = lockf::UNLOCK; // "UNLOCK" is oversubscribed
+#pragma GCC diagnostic pop
+#endif
+  //
+  // Manifest constants for other types which must be placed herein.
+  //
+  using DN [[deprecated("instead prefer sys::posix::DN")]] = posix::DN;
+  struct OWNER;
+  struct _SEAL_; // [[tricky]] a ruse to allow us to say F::SEAL::SEAL without naming that constructor
+  using SEAL = _SEAL_;
+  F() = delete;
+  F(F const &) = delete;
+  auto operator=(F const &) -> F & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_F.Usage
+static_assert(tests::usage::posix_F::Usage<>);
+#endiv

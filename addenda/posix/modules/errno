@@ -1,0 +1,3 @@
+// -*- c++ -*- 78cf5abe-3c5e-482c-99bf-e81bc3d777b1
+#pragma once
+#include <errno.h>

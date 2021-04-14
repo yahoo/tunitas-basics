@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { struct EX; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.EX
+struct tests::unit::posix::EX : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::EX;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  // Most of these will already have been tested in tests::usage::posix_EX
+  auto EX::test_constants() -> void {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    auto x = Subject::Code{};
+    x = Subject::OK;
+    x = Subject::FAIL;
+    x = Subject::ZERO;
+    x = Subject::ONE;
+    x = Subject::TWO;
+    x = Subject::USAGE;
+    x = Subject::DATAERR;
+    x = Subject::NOINPUT;
+    x = Subject::NOUSER;
+    x = Subject::NOHOST;
+    x = Subject::UNAVAILABLE;
+    x = Subject::SOFTWARE;
+    x = Subject::OSERR;
+    x = Subject::OSERROR;
+    x = Subject::OSFILE;
+    x = Subject::CANTCREATE;
+    x = Subject::TEMPORARY;
+    x = Subject::TEMPFAIL;
+    x = Subject::PROTOCOL;
+    x = Subject::NOPERM;
+    x = Subject::NOPERMISSION;
+    x = Subject::CONFIG;
+    x = Subject::CANTREMOVE;
+    x = Subject::NOGROUP;
+    x = Subject::UNCOMMITTED;
+    x = Subject::NOGOLDEN;
+    x = Subject::NOOUTPUT;
+    x = Subject::NOCOMMAND;
+    CPPUNIT_ASSERT(sizeof (x));
+#pragma GCC diagnostic pop
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::EX::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("EX");
+  series << call("constants", &EX::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

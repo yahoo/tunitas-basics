@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::evp {
+  //
+  // A Key Pair
+  // [[FIXTHIS]] Avoiding wholly-unmotivated renaming at this point
+  //
+  class PKey0;
+}
+#endiv
+#divert <hpp>
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.EVP_PKEY_const
+#import openssl.System
+#import openssl.types
+#forward openssl.evp.PKey
+#forward openssl.x509.Crt
+#forward openssl.x509.Req
+class openssl::evp::PKey0 : public managed::Pointer<EVP_PKEY const> {
+  using ancestor = managed::Pointer<EVP_PKEY const>;
+  friend class x509::Crt;
+  friend class x509::Req;
+  friend class evp::PKey;
+  inline explicit PKey0(EVP_PKEY const *);
+public:
+  [[deprecated("instead use system()")]] inline auto base_id() const -> int;
+  inline auto system() const -> System;
+};
+#endiv
+#divert <ipp>
+#import openssl.ec.Key
+#import openssl.rsa.Pair
+namespace openssl::evp {
+  PKey0::PKey0(EVP_PKEY const *key)
+    : ancestor{key}
+  { }
+  auto PKey0::base_id() const -> int {
+    return EVP_PKEY_base_id(get());
+  }
+  auto PKey0::system() const -> System {
+    return System{EVP_PKEY_base_id(get())};
+  }
+}
+#endiv

@@ -1,0 +1,169 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::dope::bytewise { template<typename BUFFER> class Nullptr; }
+#endiv
+#divert <hpp>
+#import std.byte
+#import nonstd.basic_dope
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.dope.bytewise.Palette
+template<typename BUFFER> class tests::unit::dope::bytewise::Nullptr : public cppunit::test::Fixture, Palette { 
+public: 
+  using Subject = BUFFER;
+  auto setUp() -> void final;
+  auto tearDown() -> void final;
+  auto test_constructor_default() -> void;
+  auto test_constructor_pointer_size() -> void;
+  auto test_constructor_muting_pair_size_first() -> void;
+  auto test_constructor_muting_pair_size_second() -> void;
+  auto test_constructor_consty_pair_size_first() -> void;
+  auto test_constructor_consty_pair_size_second() -> void;
+  auto test_constructor_muting_tuple_size_first() -> void;
+  auto test_constructor_muting_tuple_size_second() -> void;
+  auto test_constructor_consty_tuple_size_first() -> void;
+  auto test_constructor_consty_tuple_size_second() -> void;
+  auto test_constructor_array() -> void;
+  auto test_constructor_vector() -> void;
+  static auto suite() -> cppunit::Test *;
+private:
+  static constexpr auto const nullptr_dammit = (std::byte const *)(nullptr);
+};
+#import nonstd.dope
+namespace tests::unit::dope::bytewise {
+  // Cannot construct a muting buffer from a consty buffer; so these are stubbed out
+  template<> auto Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_pair_size_first() -> void;
+  template<> auto Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_pair_size_second() -> void;
+  template<> auto Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_tuple_size_first() -> void;
+  template<> auto Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_tuple_size_second() -> void;
+}
+#endiv
+#divert <tpp>
+#import nonstd.basic_dope
+#import std.size_t
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::setUp() -> void {
+  Palette::setUp();
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::tearDown() -> void {
+  Palette::tearDown();
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_default() -> void {
+  Subject t; // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_pointer_size() -> void {
+  Subject t(nullptr, 0); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+#import std.pair
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_muting_pair_size_first() -> void {
+  ::std::pair<::std::size_t, std::byte *> p(0, nullptr); // <------------------------ ::byte::type_t *
+  Subject t(p); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_muting_pair_size_second() -> void {
+  ::std::pair<std::byte *, ::std::size_t> p(nullptr, 0); // <------------------------ std::byte *
+  Subject t(p); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_consty_pair_size_first() -> void {
+  ::std::pair<::std::size_t, std::byte const *> p(0, nullptr); // <------------------ std::byte const *
+  Subject t(p); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_consty_pair_size_second() -> void {
+  ::std::pair<std::byte const *, ::std::size_t> p(nullptr, 0); // <------------------ std::byte const *
+  Subject t(p); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+#import std.tuple
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_muting_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, std::byte *> u(0, nullptr); // <-------------------------- std::byte *
+  Subject t(u); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_muting_tuple_size_second() -> void {
+  ::std::tuple<std::byte *, ::std::size_t> u(nullptr, 0); // <-------------------------- std::byte *
+  Subject t(u); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_consty_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, std::byte const *> u(0, nullptr); // <------------------ std::byte const *
+  Subject t(u); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_consty_tuple_size_second() -> void {
+  ::std::tuple<std::byte const *, ::std::size_t> u(nullptr, 0); // <------------------ std::byte const *
+  Subject t(u); // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_array() -> void {
+  // A std::array<...> cannot be a nullptr.
+  // There is nothing to test here.
+  CPPUNIT_ASSERT(true);
+}
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::test_constructor_vector() -> void {
+  // A std::vector<...> cannot be a nullptr.
+  // There is nothing to test here.
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+#import std.string_literals
+#import std.type_info
+template<typename _> auto tests::unit::dope::bytewise::Nullptr<_>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::suite;
+  Stream series("Nullptr<"s + typeid(Subject).name() + ">s");
+  series << call("constructor_default", &Nullptr::test_constructor_default)
+         << call("constructor_pointer_size", &Nullptr::test_constructor_pointer_size)
+         << call("constructor_muting_pair_size_first", &Nullptr::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Nullptr::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_pair_size_first", &Nullptr::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Nullptr::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_tuple_size_first", &Nullptr::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Nullptr::test_constructor_consty_tuple_size_second)
+         << call("constructor_muting_tuple_size_first", &Nullptr::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Nullptr::test_constructor_consty_tuple_size_second)
+         << call("constructor_array", &Nullptr::test_constructor_array)
+         << call("constructor_vector", &Nullptr::test_constructor_vector)
+    ;
+  return finalize(series);
+}
+#endiv
+#divert <cpp>
+template<> auto tests::unit::dope::bytewise::Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_pair_size_first() -> void { }
+template<> auto tests::unit::dope::bytewise::Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_pair_size_second() -> void { }
+template<> auto tests::unit::dope::bytewise::Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_tuple_size_first() -> void { }
+template<> auto tests::unit::dope::bytewise::Nullptr<nonstd::dope<std::byte>>::test_constructor_consty_tuple_size_second() -> void { }
+#endiv

@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+namespace sys::posix {
+  //
+  // Same as "${TMPDIR:-/tmp}"
+  //
+  // Always produces some value.
+  //
+  // Usage:
+  //
+  //   auto temporary = tmpdir()
+  //
+  inline auto tmpdir() -> std::string;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getenv
+auto sys::posix::tmpdir() -> std::string {
+  auto got = getenv("TMPDIR");
+  if (good(got)) {
+    return value(got);
+  } else {
+    return "/tmp";
+  }
+}
+#endiv

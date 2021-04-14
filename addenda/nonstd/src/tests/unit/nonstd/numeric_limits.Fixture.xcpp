@@ -1,0 +1,116 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd
+namespace tests::unit::nonstd::numeric_limits {
+  namespace fixture {
+    class Fixture;
+    namespace library = ::nonstd;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+struct tests::unit::nonstd::numeric_limits::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_int128_signed_min() -> void;
+  auto test_int128_signed_max() -> void;
+  auto test_int128_unsigned_min() -> void;
+  auto test_int128_unsigned_max() -> void;
+  auto test_generic_signed() -> void;
+  auto test_generic_unsigned() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <ipp>
+#import nonstd.integers // all of them
+#import nonstd.numeric_limits
+namespace tests::unit::nonstd::numeric_limits::fixture {
+  using namespace library::integers;
+  using library::numeric_limits; // and it is a template
+}
+#import nonstd.int128.ostream
+using nonstd::int128::operator<<; // MUST be at global scope; so callees transitively within CPPUNIT_ASSERT_EQUAL an see it
+#endiv
+#divert <cpp>
+namespace tests::unit::nonstd::numeric_limits::fixture {
+  auto Fixture::test_int128_signed_min() -> void {
+    constexpr auto hh = int128_t(uint32_t(numeric_limits<int32_t>::min())) << 3*32;
+    constexpr auto hl = int128_t(0x0'0000'0000u) << 2*32;
+    constexpr auto lh = int128_t(0x0'0000'0000u) << 1*32;
+    constexpr auto ll = int128_t(0x0'0000'0000u) << 0*32;
+    constexpr auto minimum = hh | hl | lh | ll;
+    CPPUNIT_ASSERT_EQUAL(minimum, numeric_limits<int128_t>::min());
+  }
+  auto Fixture::test_int128_signed_max() -> void {
+    constexpr auto hh = int128_t(numeric_limits<int32_t>::max()) << 3*32;
+    constexpr auto hl = int128_t(0x0'ffff'ffffu) << 2*32;
+    constexpr auto lh = int128_t(0x0'ffff'ffffu) << 1*32;
+    constexpr auto ll = int128_t(0x0'ffff'ffffu) << 0*32;
+    constexpr auto minimum = hh | hl | lh | ll;
+    CPPUNIT_ASSERT_EQUAL(minimum, numeric_limits<int128_t>::max());
+  }
+  auto Fixture::test_int128_unsigned_min() -> void {
+    CPPUNIT_ASSERT_EQUAL(uint128_t(0), numeric_limits<uint128_t>::min());
+  }
+  auto Fixture::test_int128_unsigned_max() -> void {
+    constexpr auto hh = uint128_t(0x0'ffff'ffffu) << 3*32;
+    constexpr auto hl = uint128_t(0x0'ffff'ffffu) << 2*32;
+    constexpr auto lh = uint128_t(0x0'ffff'ffffu) << 1*32;
+    constexpr auto ll = uint128_t(0x0'ffff'ffffu) << 0*32;
+    constexpr auto maximum = hh | hl | lh | ll;
+    CPPUNIT_ASSERT_EQUAL(maximum, numeric_limits<uint128_t>::max());
+  }
+  auto Fixture::test_generic_signed() -> void {
+    // Just show that the numeric limit is defined (in the library)
+    // its value is not as relevant as that the numeric limit is in fact defined.
+    CPPUNIT_ASSERT(numeric_limits<int8_t>::min() < numeric_limits<int8_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<int16_t>::min() < numeric_limits<int16_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<int32_t>::min() < numeric_limits<int32_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<int64_t>::min() < numeric_limits<int64_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<int128_t>::min() < numeric_limits<int128_t>::max());
+  }
+  auto Fixture::test_generic_unsigned() -> void {
+    CPPUNIT_ASSERT(numeric_limits<uint8_t>::min() < numeric_limits<uint8_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<uint16_t>::min() < numeric_limits<uint16_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<uint32_t>::min() < numeric_limits<uint32_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<uint64_t>::min() < numeric_limits<uint64_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<uint128_t>::min() < numeric_limits<uint128_t>::max());
+  }
+}
+#import rigging.suite.io
+auto tests::unit::nonstd::numeric_limits::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using rigging::suite::move; // because we have an occluding 'namespace move'
+  auto series = Stream{"numeric_limits"};
+  series << []() {
+              auto gen = Stream{"generic"};
+              gen << call("signed", &Fixture::test_generic_signed)
+                  << call("unsigned", &Fixture::test_generic_unsigned) 
+                  << END;
+              return move(gen);
+            }()
+         << []() {
+              auto in = Stream{"int128"};
+              in << []() {
+                      auto sig = Stream{"signed"};
+                      sig << call("min", &Fixture::test_int128_signed_min)
+                          << call("max", &Fixture::test_int128_signed_max) 
+                          << END;
+                      return move(sig);
+                    }()
+                 << []() {
+                      auto uns = Stream{"unsigned"};
+                      uns << call("min", &Fixture::test_int128_unsigned_min)
+                          << call("max", &Fixture::test_int128_unsigned_max) 
+                          << END;
+                      return move(uns);
+                    }()
+                 << END;
+              return move(in);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

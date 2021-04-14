@@ -1,0 +1,56 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+# These modules are just for API (not ABI) compatibility
+# They are substantially empty save for 'namespace' and 'using' declarations.
+# They provide compatibility with module-path < 0.9.
+# Also stated: module-path 0.8.x was the last series;
+# on SCOLDing Release 04 (Green Copper Heron).
+
+# merely a convenience
+lib_libpath_la = lib/libpath.la
+lib_libpath_la_LIBADD = $(nothing)
+lib_libpath_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+lib_libpath_la_MODULES = $(call HT_SOURCEStoMODULES, $(lib_libpath_la_SOURCES))
+lib_libpath_la_SOURCES = \
+  obj/src/path/namespace.cpp \
+  \
+  obj/src/path/filename.cpp \
+  obj/src/path/filename.deprefix.cpp \
+  obj/src/path/filename.desuffix.cpp \
+  obj/src/path/filename.has_prefix.cpp \
+  obj/src/path/filename.has_suffix.cpp \
+  obj/src/path/filename.join.cpp \
+  obj/src/path/filename.joining.cpp \
+  obj/src/path/filename.trim.cpp \
+  obj/src/path/filename.workbench.cpp \
+  \
+  obj/src/path/filename.has.cpp \
+  obj/src/path/filename.has.Iterator.cpp \
+  obj/src/path/filename.has.prefix.cpp \
+  obj/src/path/filename.has.suffix.cpp \
+  obj/src/path/filename.has.somefix.cpp \
+  \
+  obj/src/path/filename.mount.cpp \
+  obj/src/path/filename.mount.Unbound.cpp \
+  obj/src/path/filename.mount.Reference.cpp \
+  obj/src/path/filename.mount.Value.cpp \
+  obj/src/path/filename.mount.Joiner.cpp \
+  obj/src/path/filename.mount.Joinering.cpp \
+  \
+  obj/src/path/filename.trimmer.cpp \
+  obj/src/path/filename.trimmer.Workbench.cpp \
+  obj/src/path/filename.trimmer.Prototype.cpp \
+  obj/src/path/filename.trimmer.Deprefix.cpp \
+  obj/src/path/filename.trimmer.Desuffix.cpp \
+  $(end)
+$(scold_cxxdir)/path/dependencies.mk: $(lib_libpath_la_SOURCES)
+$(lib_libpath_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/path/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/path/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/path/dependencies.mk

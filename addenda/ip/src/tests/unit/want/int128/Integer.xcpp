@@ -1,0 +1,267 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::want::int128 {
+  template<typename TRAITS> class Integer;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.map
+#import std.string
+#import std.type_info
+#import tests.unit.want.int128.Traits
+template<typename TRAITS> class tests::unit::want::int128::Integer : public ::cppunit::test::Fixture {
+public:
+  using Traits = TRAITS;
+  using subject_type = typename Traits::int_type;
+
+  //
+  // We just have to prove that the operator<< works, not everything else about large integers.
+  //
+  auto test_operator_insert_lowrange() -> void;
+  auto test_operator_insert_zerospan() -> void;
+  auto test_operator_insert_zerospan_by_parallel_construction() -> void;
+  auto test_operator_insert_crossover() -> void;
+  auto test_operator_insert_highrange() -> void;
+
+  static auto suite() -> ::cppunit::Test *;
+private:
+  auto exercise_operator_insert_across_some_range(subject_type lower, subject_type upper, char const *description) -> void;
+  using Expectation_Map = std::map<subject_type, std::string>;
+  static Expectation_Map const EXPECTATIONS;
+  static auto synth(std::string const &) -> std::string;
+};
+
+namespace tests::unit::want::int128 {
+  template<> Integer<Traits<::want::uint128_t, std::uint64_t>>::Expectation_Map const Integer<Traits<::want::uint128_t, std::uint64_t>>::EXPECTATIONS;
+  template<> Integer<Traits<::want::int128_t, std::int64_t>>::Expectation_Map const Integer<Traits<::want::int128_t, std::int64_t>>::EXPECTATIONS;
+}
+#endiv
+#divert <tpp>
+#import std.cerr
+#import std.ostringstream
+#import want.int128.ostream
+using want::int128::operator<<; // which is not visible unless made explicitly so.
+#import want.nonstd.is_signed
+
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::test_operator_insert_zerospan_by_parallel_construction() -> void {
+  std::ostream &out(std::cerr);
+  out << "(parallel construction)\nzerospan:";
+  for (auto k(Traits::zerospan_min()), e(Traits::zerospan_max()); e != k; ++k) {
+    out << ' ' << k;
+  }
+  out << '\n';
+  if constexpr (::want::nonstd::is_signed<typename Traits::int_type>::value) {
+      // this is a reasonable test only for the signed form...
+      for (auto k(Traits::zerospan_min()), e(Traits::zerospan_max()); e != k; ++k) {
+        std::ostringstream buf128;
+        buf128 << k;
+        std::ostringstream buf64;
+        buf64 << typename Traits::native_integer_type(k); // <---------- because of this
+        auto actual = buf128.str();
+        decltype(actual) expected = buf64.str();
+        CPPUNIT_ASSERT_EQUAL(expected, actual);
+      }
+    }
+}
+
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::test_operator_insert_lowrange() -> void {
+  exercise_operator_insert_across_some_range(Traits::low_min(), Traits::low_max(), "low");
+}
+
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::test_operator_insert_zerospan() -> void {
+  exercise_operator_insert_across_some_range(Traits::zerospan_min(), Traits::zerospan_max(), "zerospan");
+}
+
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::test_operator_insert_crossover() -> void {
+  exercise_operator_insert_across_some_range(Traits::crossover_min(), Traits::crossover_max(), "crossover");
+}
+
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::test_operator_insert_highrange() -> void {
+  exercise_operator_insert_across_some_range(Traits::high_min(), Traits::high_premax(), "highrange");
+}
+
+#import std.cerr
+#import std.out_of_range
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::exercise_operator_insert_across_some_range(subject_type lower_bound, subject_type upper_bound, char const *description) -> void {
+  auto const BASIC_SANITY_LIMIT = 100;
+  for (auto sanity_counter{0}, k{lower_bound}, e{upper_bound}; e != k; ++k, ++sanity_counter) {
+    if (sanity_counter > BASIC_SANITY_LIMIT) {
+      // This triggers when the test tries to iterate across full 32-bit or 64-bit or 128-bit range.
+      // Don't do that. "Skip a little, brother."  -- Monty Python, Holy Grail
+      std::cerr << "aborting to orbit at " << k << " because of the BASIC_SANITY_LIMIT across " << lower_bound << ".." << upper_bound << '\n';
+      k = e - 2;
+      continue;
+    }
+    try {
+      std::ostringstream buf128;
+      buf128 << k;
+      auto actual = buf128.str();
+      decltype(actual) expected = EXPECTATIONS.at(k);
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    } catch (std::out_of_range const &oor) {
+      // It is reasonable to use operator<<(want::int128_t), or operator<<(want::uint128_t)
+      // here because the failure is from EXPECTATIONS not containing an entry for the value k
+      std::cerr << "missing EXPECTATION entry for " << k << '\n';
+      throw;
+    }
+  }
+}
+
+#import std.move
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::synth(std::string const &pattern) -> std::string {
+  auto code = typeid(typename TRAITS::int_type).name();
+  auto pretty = (nullptr == code ? "null" :
+                 'n' == code[0] ? "int128_t" :
+                 'o' == code[0] ? "uint128_t" :
+                 code);
+  std::string token = "%s";
+  std::string working = pattern;
+  auto pos = working.find(token);
+  if (std::string::npos != pos) {
+    working.replace(pos, token.size(), pretty);
+  }
+  return working;
+}
+
+#import rigging.suite.io
+template<typename TRAITS> auto tests::unit::want::int128::Integer<TRAITS>::suite() -> ::cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series(synth("Integer<%s>"));
+  series << call(synth("operator<<(%s),lowrange"), &Integer::test_operator_insert_lowrange)
+         << call(synth("operator<<(%s),zerospan"), &Integer::test_operator_insert_zerospan)
+         << call(synth("operator<<(%s),zerospan-parallel"), &Integer::test_operator_insert_zerospan_by_parallel_construction)
+         << call(synth("operator<<(%s),crossover"), &Integer::test_operator_insert_crossover)
+         << call(synth("operator<<(%s),highrange"), &Integer::test_operator_insert_highrange)
+    ;
+  return finalize(series);
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::want::int128 {
+  // generate the literals with bc (a.k.a. dc)
+  // Cut them up with bc, see ./quad nearby
+
+  using ui = ::want::uint128_t;
+  constexpr auto const ui232 = ui(1ull<<32);
+  using u32 = std::uint32_t;
+  constexpr auto uiconstant(u32 m1, u32 m2, u32 m3, u32 m4) -> ui { return m4 + ui232*(m3 + ui232*(m2 + ui232*m1)); }
+  using Iui128 = Integer<Traits<::want::uint128_t, std::uint64_t>>;
+  template<> Iui128::Expectation_Map const Iui128::EXPECTATIONS{
+{ uiconstant(0lu, 0lu, 0lu, 0lu), "0" },
+{ uiconstant(0lu, 0lu, 0lu, 1lu), "1" },
+{ uiconstant(0lu, 0lu, 0lu, 2lu), "2" },
+{ uiconstant(0lu, 0lu, 0lu, 3lu), "3" },
+{ uiconstant(0lu, 0lu, 0lu, 4lu), "4" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967290lu), "4294967290" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967291lu), "4294967291" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967292lu), "4294967292" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967293lu), "4294967293" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967294lu), "4294967294" },
+{ uiconstant(0lu, 0lu, 0lu, 4294967295lu), "4294967295" },
+{ uiconstant(0lu, 0lu, 1lu, 0lu), "4294967296" },
+{ uiconstant(0lu, 0lu, 1lu, 1lu), "4294967297" },
+{ uiconstant(0lu, 0lu, 1lu, 2lu), "4294967298" },
+{ uiconstant(0lu, 0lu, 1lu, 3lu), "4294967299" },
+{ uiconstant(0lu, 0lu, 1lu, 4lu), "4294967300" },
+{ uiconstant(0lu, 0lu, 1lu, 5lu), "4294967301" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967290lu), "18446744073709551610" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967291lu), "18446744073709551611" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967292lu), "18446744073709551612" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967293lu), "18446744073709551613" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967294lu), "18446744073709551614" },
+{ uiconstant(0lu, 0lu, 4294967295lu, 4294967295lu), "18446744073709551615" },
+{ uiconstant(0lu, 1lu, 0lu, 0lu), "18446744073709551616" },
+{ uiconstant(0lu, 1lu, 0lu, 1lu), "18446744073709551617" },
+{ uiconstant(0lu, 1lu, 0lu, 2lu), "18446744073709551618" },
+{ uiconstant(0lu, 1lu, 0lu, 3lu), "18446744073709551619" },
+{ uiconstant(0lu, 1lu, 0lu, 4lu), "18446744073709551620" },
+{ uiconstant(0lu, 1lu, 0lu, 5lu), "18446744073709551621" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967290lu), "340282366920938463463374607431768211450" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967291lu), "340282366920938463463374607431768211451" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967292lu), "340282366920938463463374607431768211452" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967293lu), "340282366920938463463374607431768211453" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967294lu), "340282366920938463463374607431768211454" },
+{ uiconstant(4294967295lu, 4294967295lu, 4294967295lu, 4294967295lu), "340282366920938463463374607431768211455" }};
+// uiconstant(0lu, 0lu, 0lu, 0lu), "340282366920938463463374607431768211456" },
+
+ using si = :: want::int128_t;
+  constexpr auto const si232 = si(1ull<<32);
+  constexpr auto siconstant(int sign, u32 m1, u32 m2, u32 m3, u32 m4) -> si { return si(sign) * si(m4 + si232*(m3 + si232*(m2 + si232*m1))); }
+  using Isi128 = Integer<Traits<::want::int128_t, std::int64_t>>;
+  template<> Isi128::Expectation_Map const Isi128::EXPECTATIONS{
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967295lu)-1, "-170141183460469231731687303715884105728" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967295lu), "-170141183460469231731687303715884105727" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967294lu), "-170141183460469231731687303715884105726" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967293lu), "-170141183460469231731687303715884105725" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967292lu), "-170141183460469231731687303715884105724" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967291lu), "-170141183460469231731687303715884105723" },
+{ siconstant(-1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967290lu), "-170141183460469231731687303715884105722" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 5lu), "-9223372036854775813" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 4lu), "-9223372036854775812" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 3lu), "-9223372036854775811" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 2lu), "-9223372036854775810" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 1lu), "-9223372036854775809" },
+{ siconstant(-1, 0lu, 0lu, 2147483648lu, 0lu), "-9223372036854775808" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967295lu), "-9223372036854775807" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967294lu), "-9223372036854775806" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967293lu), "-9223372036854775805" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967292lu), "-9223372036854775804" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967291lu), "-9223372036854775803" },
+{ siconstant(-1, 0lu, 0lu, 2147483647lu, 4294967290lu), "-9223372036854775802" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483653lu), "-2147483653" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483652lu), "-2147483652" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483651lu), "-2147483651" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483650lu), "-2147483650" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483649lu), "-2147483649" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483648lu), "-2147483648" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483647lu), "-2147483647" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483646lu), "-2147483646" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483645lu), "-2147483645" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483644lu), "-2147483644" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483643lu), "-2147483643" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2147483642lu), "-2147483642" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 5lu), "-5" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 4lu), "-4" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 3lu), "-3" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 2lu), "-2" },
+{ siconstant(-1, 0lu, 0lu, 0lu, 1lu), "-1" },
+{ siconstant(1, 0lu, 0lu, 0lu, 0lu), "0" },
+{ siconstant(1, 0lu, 0lu, 0lu, 1lu), "1" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2lu), "2" },
+{ siconstant(1, 0lu, 0lu, 0lu, 3lu), "3" },
+{ siconstant(1, 0lu, 0lu, 0lu, 4lu), "4" },
+{ siconstant(1, 0lu, 0lu, 0lu, 5lu), "5" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483643lu), "2147483643" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483644lu), "2147483644" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483645lu), "2147483645" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483646lu), "2147483646" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483647lu), "2147483647" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483648lu), "2147483648" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483649lu), "2147483649" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483650lu), "2147483650" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483651lu), "2147483651" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483652lu), "2147483652" },
+{ siconstant(1, 0lu, 0lu, 0lu, 2147483653lu), "2147483653" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967290lu), "9223372036854775802" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967291lu), "9223372036854775803" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967292lu), "9223372036854775804" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967293lu), "9223372036854775805" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967294lu), "9223372036854775806" },
+{ siconstant(1, 0lu, 0lu, 2147483647lu, 4294967295lu), "9223372036854775807" },
+{ siconstant(1, 0lu, 0lu, 2147483648lu, 0lu), "9223372036854775808" },
+{ siconstant(1, 0lu, 0lu, 2147483648lu, 1lu), "9223372036854775809" },
+{ siconstant(1, 0lu, 0lu, 2147483648lu, 2lu), "9223372036854775810" },
+{ siconstant(1, 0lu, 0lu, 2147483648lu, 3lu), "9223372036854775811" },
+{ siconstant(1, 0lu, 0lu, 2147483648lu, 4lu), "9223372036854775812" },
+// (echo ibase=16; echo 7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA) | bc
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967290lu), "170141183460469231731687303715884105722" },  // 0x7ffffffffffffffffffffffffffffffa
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967291lu), "170141183460469231731687303715884105723" },  // 0x7ffffffffffffffffffffffffffffffb
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967292lu), "170141183460469231731687303715884105724" },  // 0x7ffffffffffffffffffffffffffffffc
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967293lu), "170141183460469231731687303715884105725" },  // 0x7ffffffffffffffffffffffffffffffd
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967294lu), "170141183460469231731687303715884105726" },  // 0x7ffffffffffffffffffffffffffffffe
+{ siconstant(1, 2147483647lu, 4294967295lu, 4294967295lu, 4294967295lu), "170141183460469231731687303715884105727" }}; // 0x7fffffffffffffffffffffffffffffff
+}
+#endiv

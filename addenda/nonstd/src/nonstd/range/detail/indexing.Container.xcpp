@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.iterator.Input
+namespace nonstd::range::detail::indexing {
+  //
+  // The range basis for the self-indexing iterator
+  //
+  // Usage:
+  //
+  //   see nonstd::range::indexing(...)
+  //
+  template<required::iterator::Input> struct Container;
+}
+#endiv
+#divert <hpp>
+#forward nonstd.range.detail.indexing.Iterator
+namespace nonstd::range::detail {
+  template<required::iterator::Input SUBITERATOR> class indexing::Container {
+    using Subiterator = SUBITERATOR;
+  public:
+    Container() = default;
+    inline Container(Subiterator, Subiterator);
+    inline auto empty() const -> bool;
+    using Iterator = indexing::Iterator<Subiterator>;
+    inline auto begin() const -> Iterator;
+    inline auto end() const -> Iterator;
+  protected:
+    Subiterator start, finish;
+  };
+}
+#endiv
+#divert <ipp>
+#import nonstd.range.detail.indexing.Iterator
+namespace nonstd::range::detail::indexing {
+  template<required::iterator::Input _> Container<_>::Container(Subiterator start, Subiterator finish) : start{start}, finish{finish} { }
+  template<required::iterator::Input _> auto Container<_>::empty() const -> bool     { return start == finish; }
+  template<required::iterator::Input _> auto Container<_>::begin() const -> Iterator { return {Index{0}, start}; }
+  template<required::iterator::Input _> auto Container<_>::end() const -> Iterator   { return {finish}; }
+}
+#endiv

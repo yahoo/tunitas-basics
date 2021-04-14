@@ -1,0 +1,93 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.unique_ptr
+#import sys.entry.required.Entry
+#import sys.entry.Buffer
+namespace sys::entry {
+  //
+  // A pointer to an entry;
+  // direct & convenient accesses to the fields;
+  //
+  // The managed pointer to a Buffer
+  // Looks like a pointer to the Entry; hides the Buffer sense
+  //
+  // e.g. for Buffer<::passwd> one can get direct pointer-level access
+  // e.g. for Pointer<::passwd>, the same
+  //
+  //         ptr->pw_name
+  //          ptr->pw_uid
+  //          ptr->pw_gid
+  //        ptr->pw_gecos
+  //          ptr->pw_dir
+  //        ptr->pw_shell
+  //
+  // Usage:
+  //
+  //   entry::Pointer<::passwd> ptr{new entry::Buffer<::passwd>{}};
+  //
+  template<required::Entry ENTRY> class Pointer;
+}
+#endiv
+#divert <hpp>
+#import std.unique_ptr
+#import sys.entry.Buffer
+namespace sys {
+  template<entry::required::Entry ENTRY> class entry::Pointer : private std::unique_ptr<entry::Buffer<ENTRY>> {
+    using ancestor = std::unique_ptr<entry::Buffer<ENTRY>>;
+    using Buffer = entry::Buffer<ENTRY>;
+    using Entry = ENTRY;
+  public:
+    Pointer() = default;
+    using ancestor::unique_ptr;
+    using ancestor::reset;
+    using ancestor::release;
+    using ancestor::get;
+#if 0
+    inline explicit Pointer(Buffer *);
+    inline auto reset(Buffer *) -> void;
+    inline auto release() -> Buffer *;
+    inline auto operator!() const -> bool;
+    inline auto get() const -> Entry const *;
+    inline auto get() -> Entry *;
+#endif
+    inline auto operator*() const -> Entry const &;
+    inline auto operator*() -> Entry &;
+    inline auto operator->() const -> Entry const *;
+    inline auto operator->() -> Entry *;
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::entry {
+#if 0
+  template<required::Entry _> Pointer<_>::Pointer(Buffer *buffer)
+    : ancestor{buffer}
+  { }
+  template<required::Entry _> auto Pointer<_>::reset(Buffer *buffer) -> void {
+  }
+  template<required::Entry _> auto Pointer<_>::release() -> Buffer * {
+  }
+  template<required::Entry _> auto Pointer<_>::get() const -> Buffer const * {
+  }
+  template<required::Entry _> auto Pointer<_>::get() -> Buffer * {
+  }
+#endif
+  template<required::Entry _> auto Pointer<_>::operator*() const -> Entry const & {
+    auto const &buffer{this->ancestor::operator*()};
+    return *buffer.entry();
+  }
+  template<required::Entry _> auto Pointer<_>::operator*() -> Entry & {
+    auto &buffer{this->ancestor::operator*()};
+    return *buffer.entry();
+  }
+  template<required::Entry _> auto Pointer<_>::operator->() const -> Entry const * {
+    auto const &buffer{this->ancestor::operator*()};
+    return buffer.entry();
+  }
+  template<required::Entry _> auto Pointer<_>::operator->() -> Entry * {
+    auto &buffer{this->ancestor::operator*()};
+    return buffer.entry();
+  }
+}
+#endiv

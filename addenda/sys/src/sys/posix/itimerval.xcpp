@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import itimerval
+static_assert(sizeof (itimerval));
+namespace sys::posix {
+  using itimerval = ::itimerval;
+}
+#endiv
+#divert <hpp>
+#import sys.posix.clear.itimerval
+#import sys.posix.zero.itimerval
+#endiv

@@ -1,0 +1,3 @@
+tests_unit_ish_cxx_TESTS = \
+  tests/unit/ish/cxx/cases.test \
+  $(end)

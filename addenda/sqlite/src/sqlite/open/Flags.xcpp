@@ -1,0 +1,200 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sqlite.open.each.Flag
+namespace sqlite {
+  namespace open  {
+    // A bitmask of the (singular) Flag
+    // Constructed with operators and casts
+    enum Flags { NONE = 0 };
+    using each::Flag;
+  }
+}
+#endiv
+#divert <hpp>
+namespace sqlite {
+  namespace open  {
+    inline constexpr auto operator+(Flags) -> Flags;
+    namespace each {
+      inline constexpr auto operator+(Flag) -> Flags;
+    }
+
+    // composition
+    inline constexpr auto operator|(Flags, Flags) -> Flags;
+    inline constexpr auto operator|(Flag, Flags) -> Flags;
+    inline constexpr auto operator|(Flags, Flag) -> Flags;
+    inline auto operator|=(Flags &, Flags) -> Flags &;
+    inline auto operator|=(Flags &, Flag) -> Flags &;
+    namespace each {
+      inline constexpr auto operator|(Flag, Flag) -> Flags;
+    }
+
+    // extraction
+    inline constexpr auto operator&(Flags, Flags) -> Flags;
+    inline constexpr auto operator&(Flag, Flags) -> Flags;
+    inline constexpr auto operator&(Flags, Flag) -> Flags;
+    inline auto operator&=(Flags &, Flags) -> Flags &;
+    inline auto operator&=(Flags &, Flag) -> Flags &;
+    namespace each {
+      inline constexpr auto operator&(Flag, Flag) -> Flags;
+    }
+
+    // inversion
+    inline constexpr auto operator~(Flags) -> Flags;
+    namespace each {
+      inline constexpr auto operator~(Flag) -> Flags;
+    }
+
+    inline auto contains(Flags, Flag) -> bool;
+
+    // construction
+    inline auto flags(Flags) -> Flags;     // identity
+           auto flag(Flags) -> Flag;       // a.k.a. as<Flag>(Flags) (throws on !is_flag(...)
+    namespace each {
+      inline auto flags(Flag) -> Flags;      // a.k.a. as<Flags>(Flag)
+    }
+
+    // test whether it contains a single value (any value)
+    auto is_flag(Flags) -> bool;
+  }
+}
+
+constexpr auto sqlite::open::operator+(Flags s) -> Flags {
+  return s;
+}
+
+constexpr auto sqlite::open::each::operator+(Flag f) -> Flags {
+  return Flags((int)(f));
+}
+
+constexpr auto sqlite::open::operator|(Flags a, Flags b) -> Flags {
+  return Flags((int)(a) | (int)(b));
+}
+
+constexpr auto sqlite::open::operator|(Flags a, Flag b) -> Flags {
+  return Flags((int)(a) | (int)(b));
+}
+
+constexpr auto sqlite::open::operator|(Flag a, Flags b) -> Flags {
+  return Flags((int)(a) | (int)(b));
+}
+
+constexpr auto sqlite::open::each::operator|(Flag a, Flag b) -> Flags {
+  return Flags((int)(a) | (int)(b));
+}
+
+constexpr auto sqlite::open::operator&(Flags a, Flags b) -> Flags {
+  return Flags((int)(a) & (int)(b));
+}
+
+constexpr auto sqlite::open::operator&(Flags a, Flag b) -> Flags {
+  return Flags((int)(a) & (int)(b));
+}
+
+constexpr auto sqlite::open::operator&(Flag a, Flags b) -> Flags {
+  return Flags((int)(a) & (int)(b));
+}
+
+constexpr auto sqlite::open::each::operator&(Flag a, Flag b) -> Flags {
+  return Flags((int)(a) & (int)(b));
+}
+
+constexpr auto sqlite::open::operator~(Flags s) -> Flags {
+  return Flags(~(int)s);
+}
+
+constexpr auto sqlite::open::each::operator~(Flag f) -> Flags {
+  return Flags(~(int)f);
+}
+
+namespace sqlite::open {
+  constexpr auto const READONLY = +Flag::READONLY;
+  constexpr auto const READWRITE = +Flag::READWRITE;
+  constexpr auto const CREATE = +Flag::CREATE;
+  constexpr auto const DELETEONCLOSE = +Flag::DELETEONCLOSE;
+  constexpr auto const EXCLUSIVE = +Flag::EXCLUSIVE;
+  constexpr auto const AUTOPROXY = +Flag::AUTOPROXY;
+  constexpr auto const URI = +Flag::URI;
+  constexpr auto const MEMORY = +Flag::MEMORY;
+  constexpr auto const MAIN_DB = +Flag::MAIN_DB;
+  constexpr auto const TEMP_DB = +Flag::TEMP_DB;
+  constexpr auto const TRANSIENT_DB = +Flag::TRANSIENT_DB;
+  constexpr auto const MAIN_JOURNAL = +Flag::MAIN_JOURNAL;
+  constexpr auto const TEMP_JOURNAL = +Flag::TEMP_JOURNAL;
+  constexpr auto const SUBJOURNAL = +Flag::SUBJOURNAL;
+  constexpr auto const JOURNAL = +Flag::MASTER_JOURNAL;
+  constexpr auto const NOMUTEX = +Flag::NOMUTEX;
+  constexpr auto const FULLMUTEX = +Flag::FULLMUTEX;
+  constexpr auto const SHAREDCACHE = +Flag::SHAREDCACHE;
+  constexpr auto const PRIVATECACHE = +Flag::PRIVATECACHE;
+  constexpr auto const WAL = +Flag::WAL;
+}
+#endiv
+#divert <ipp>
+auto sqlite::open::operator|=(Flags &lhs, Flags rhs) -> Flags & {
+  lhs = lhs | rhs;
+  return lhs;
+}
+
+auto sqlite::open::operator|=(Flags &lhs, Flag rhs) -> Flags & {
+  lhs = lhs | rhs;
+  return lhs;
+}
+
+auto sqlite::open::operator&=(Flags &lhs, Flags rhs) -> Flags & {
+  lhs = lhs & rhs;
+  return lhs;
+}
+
+auto sqlite::open::operator&=(Flags &lhs, Flag rhs) -> Flags & {
+  lhs = lhs & rhs;
+  return lhs;
+}
+
+auto sqlite::open::contains(Flags s, Flag f) -> bool {
+  return (Flags)f == (f & s);
+}
+
+auto sqlite::open::flags(Flags s) -> Flags {
+  return s;
+}
+
+auto sqlite::open::each::flags(Flag f) -> Flags {
+  return Flags((int)(f));
+}
+#endiv
+#divert <cpp>
+auto sqlite::open::is_flag(Flags s) -> bool {
+  if (Flags() == s) {
+    return false;
+  }
+  unsigned count = 0;
+  for (int i(0), e(8*sizeof (Flags)); e != i; ++i) {
+    int bitset =(1<<i) & (int)(s);
+    count += bitset ? 1: 0;
+    if (1 < count) {
+      break;
+    }
+  }
+  return 1 == count;
+}
+
+#import std.invalid_argument
+#import std.logic_error
+auto sqlite::open::flag(Flags s) -> Flag {
+  if (Flags() == s) {
+    return Flag();
+  }
+  for (int i(0), e(8*sizeof (Flags)); e != i; ++i) {
+    int bitmask = 1<<i;
+    int bitset = bitmask & (int)(s);
+    if (bitset) {
+      if (bitmask != (int)(s)) {
+        throw std::invalid_argument("is not a flag");
+      }
+      return Flag(s);
+    }
+  }
+  throw std::logic_error("not a flag, not a mask and not zero?");
+}
+#endiv

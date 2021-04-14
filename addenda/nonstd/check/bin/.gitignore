@@ -1,0 +1,5 @@
+# yes, ./bin should exist
+.dirstamp
+.libs
+unit
+#end

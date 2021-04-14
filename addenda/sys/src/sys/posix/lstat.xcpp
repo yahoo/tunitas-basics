@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.stat.interface
+namespace sys::posix {
+  namespace packaging::lstat {
+    using namespace packaging::stat::interface;
+    namespace function {
+      inline auto lstat(Pathname) -> result::Buffer;
+    }
+  }
+  using packaging::lstat::function::lstat;
+}
+using sys::posix::lstat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import errno
+#import sys.posix.packaging.stat.Buffer
+#import sys.posix.packaging.stat.Version
+namespace sys::posix::packaging::lstat {
+  auto function::lstat(Pathname pathname) -> result::Buffer {
+    using namespace packaging::stat;
+    Buffer buf;
+    int called = Version<Call::LSTAT>::call((char const *)pathname, &buf);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = 0 == called;
+    return {ok, errnum, buf, called};
+  }
+}
+#endiv

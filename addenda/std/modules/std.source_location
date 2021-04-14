@@ -1,0 +1,10 @@
+// -*- c++ -*- 39a38f9f-bac6-4381-828e-2626e5b24f6d
+#pragma once
+#if 11 <= __GCC__
+#include <source_location> // maybe?
+#else
+#include <experimental/source_location>
+namespace std {
+  using experimental::source_location;
+}
+#endif

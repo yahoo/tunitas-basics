@@ -1,0 +1,49 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+#import sqlite.api.detail.Dispatch
+#import std.vector
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename CHAR, typename ALLOC> struct Dispatch<std::vector<CHAR, ALLOC>>;
+    } 
+  }
+}
+#entail sqlite.api.detail.Dispatch.vector.char
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Bind
+#import sqlite.api.detail.Column
+#import sqlite.api.detail.Result
+#import sqlite.api.detail.Parameter
+template<typename CHAR, typename ALLOC> struct sqlite::api::detail::Dispatch<std::vector<CHAR, ALLOC>> {
+  using value_type = std::vector<CHAR, ALLOC>;
+  inline auto bind(unguarded::Statement *, bind_index, typename Bind<value_type>::argument_type value) -> typename Bind<value_type>::result_type;
+  inline auto column(unguarded::Statement *, column_index) -> typename Column<value_type>::result_type;
+  inline auto result(unguarded::Function *, typename Result<value_type>::argument_type) -> typename Result<value_type>::result_type;
+  inline auto parameter(unguarded::Value *) -> typename Parameter<value_type>::result_type;
+};
+#endiv
+#divert <ipp>
+#import sqlite.detail
+
+template<typename CHAR, typename ALLOC> auto sqlite::api::detail::Dispatch<std::vector<CHAR, ALLOC>>::bind(unguarded::Statement *, bind_index, typename Bind<value_type>::argument_type) -> typename Bind<value_type>::result_type {
+  static_assert(Bind<value_type>::is_valid, "only specializations, only the specialization of the 'usual' vector<char> types");
+  static_assert(sqlite::detail::never_allowed<value_type>::value, "only specializations, only the specialization of the 'usual' vector<char> types");
+}
+
+template<typename CHAR, typename ALLOC> auto sqlite::api::detail::Dispatch<std::vector<CHAR, ALLOC>>::column(unguarded::Statement *, column_index) -> typename Column<value_type>::result_type {
+  static_assert(Column<value_type>::is_valid, "only specializations, only the specialization of the 'usual' vector<char> types");
+  static_assert(sqlite::detail::never_allowed<value_type>::value, "only specializations, only the specialization of the 'usual' vector<char> types");
+}
+
+template<typename CHAR, typename ALLOC> auto sqlite::api::detail::Dispatch<std::vector<CHAR, ALLOC>>::result(unguarded::Function *, typename Result<value_type>::argument_type) -> typename Result<value_type>::result_type {
+  static_assert(Result<value_type>::is_valid, "only specializations, only the specialization of the 'usual' vector<char> types");
+  static_assert(sqlite::detail::never_allowed<value_type>::value, "only specializations, only the specialization of the 'usual' vector<char> types");
+}
+
+template<typename CHAR, typename ALLOC> auto sqlite::api::detail::Dispatch<std::vector<CHAR, ALLOC>>::parameter(unguarded::Value *) -> typename Parameter<value_type>::result_type {
+  static_assert(Parameter<value_type>::is_valid, "only specializations, only the specialization of the 'usual' vector<char> types");
+  static_assert(sqlite::detail::never_allowed<value_type>::value, "only specializations, only the specialization of the 'usual' vector<char> types");
+}
+#endiv

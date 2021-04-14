@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/sys.posix.F>
+#endiv
+#divert <hpp>
+#import sys.f.Owner
+struct sys::posix::F::OWNER {
+  using Owner = f::Owner;
+  inline static constexpr auto THREAD = Owner::THREAD;
+  inline static constexpr auto PROCESS = Owner::PROCESS;
+  inline static constexpr auto GROUP = Owner::GROUP;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto TID = Owner::TID;
+  inline static constexpr auto PID = Owner::PID;
+  inline static constexpr auto PGRP = Owner::PGRP;
+  inline static constexpr auto GID = Owner::GID;
+  OWNER() = delete;
+  OWNER(OWNER const &) = delete;
+  auto operator=(OWNER const &) -> OWNER & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_F_OWNER.Usage
+static_assert(tests::usage::posix_F_OWNER::Usage<>);
+#endiv

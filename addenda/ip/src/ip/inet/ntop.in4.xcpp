@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.inet.ntop
+namespace ip {
+  namespace inet {
+    template<> inline auto ntop<in4::addr>(in4::addr const &) -> result::Value<std::string>;
+    template<> inline auto ntop<in4::addr_t>(in4::addr_t const &) -> result::Value<std::string>;
+  }
+}
+#endiv
+#divert <ipp>
+#import ip.inet.AF.Family
+#import inet_ntop
+#import std.move
+#import std.vector
+template<> auto ip::inet::ntop<ip::in4::addr>(in4::addr const &source) -> result::Value<std::string> {
+  using Result = result::Value<std::string>;
+  // for want of non-const access into std::string, we have to copy from buf
+  // FIXME ... will std::string::operator[]() -> char & work?
+  // but then true up the actual length.
+  std::vector<char> buf;  
+  buf.resize(in4::ADDRSTRLEN);
+  auto code = ::inet_ntop((int)(AF::INET4), reinterpret_cast<void const *>(&source), buf.data(), buf.size());
+  int errnum = errno; // capture this immediately.
+  // From inet_ntop(3)
+  //   success, returns a non-NULL pointer to dst.
+  //   failure, returns nullptr if there was an error, with errno set to indicate the error.
+  bool ok = nullptr != code;
+  std::string val = ok ? std::string(buf.data()) : std::string();
+  return Result{ok, errnum, val};
+}
+
+#import ip.as
+template<> auto ip::inet::ntop<ip::in4::addr_t>(in4::addr_t const &address) -> result::Value<std::string> {
+  return ntop(as<in4::addr>(address));
+}
+#endiv

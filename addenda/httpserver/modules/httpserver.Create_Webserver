@@ -1,0 +1,6 @@
+// -*- c++ -*- 8cc52e0b-fcab-4800-a3d3-493cdc547c6f
+#pragma once
+#include <httpserver>
+namespace httpserver {
+  using Create_Webserver [[deprecated("instead use httpserver::webserver::Create")]] = httpserver::create_webserver;
+}

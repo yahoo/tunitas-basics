@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ish::shell { class Basename; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::ish::shell::Basename : public cppunit::test::Fixture {
+public:
+  auto test_string() -> void;
+  auto test_container() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ish.shell.basename
+auto tests::unit::ish::shell::Basename::test_string() -> void {
+  using ::ish::shell::basename;
+  CPPUNIT_ASSERT("file.cpp" == basename("./file.cpp"));
+  CPPUNIT_ASSERT("file.cpp" == basename("/apple/banana/file.cpp"));
+  CPPUNIT_ASSERT("file.cpp" == basename("../file.cpp"));
+  CPPUNIT_ASSERT("file.cpp" == basename("./////////////file.cpp"));
+}
+
+#import std.vector
+auto tests::unit::ish::shell::Basename::test_container() -> void {
+  using v = std::vector<std::string>;
+  auto sources = v{"./file.cpp",
+                   "/apple/banana/file.cpp",
+                   "../file.cpp",
+                   "./////////////file.cpp"};
+  auto const actual = ::ish::shell::basename(sources);
+  auto const expected = v{"file.cpp", "file.cpp", "file.cpp", "file.cpp"};
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::ish::shell::Basename::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("basename");
+  s << call("string", &Basename::test_string)
+    << call("container", &Basename::test_container)
+    ;
+  return finalize(s);
+}
+#endiv

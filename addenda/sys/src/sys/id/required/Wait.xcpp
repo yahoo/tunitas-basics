@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.required.wait.Untyped
+namespace sys::id::required {
+  template<typename ID> concept bool Wait = wait::Untyped<ID>;
+}
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import sys.id.Wait
+#import sys.id.wait.Untyped
+#import id_t
+#import pid_t
+namespace {
+  namespace tests {
+    using namespace sys::id;
+    static_assert(required::Wait<Wait>);
+    static_assert(required::Wait<wait::Untyped>);
+    static_assert(required::Wait<id_t>);
+    //
+    static_assert(!required::Wait<File>);
+    static_assert(!required::Wait<pid_t>);
+  }
+}
+#endiv

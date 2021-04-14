@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import slurp.Failure
+namespace file {
+  namespace slurp {
+    //
+    // deprecated ---> ::file::slurp::Failure
+    // current ------> ::slurp::Failure
+    //
+    using ::slurp::Failure;
+    namespace detail {
+      //
+      // Even more deprecated ...
+      //
+      //   file::slurp::deprecated::Failure
+      //
+      // Specimen
+      //     slurp::detail::Failure is deprecated, please use slurp::Failure
+      //     src/slurp/file/Failure.xcpp:9:65: warning: ignoring attributes applied to class type 'slurp::Failure' outside of definition [-Wattributes]
+      //
+      // can only apply these to a function  __attribute__ ((deprecated));
+      using Failure = ::slurp::Failure;
+    }
+  }
+}
+#endiv

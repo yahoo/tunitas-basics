@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// https://wiki.scold-lang.org/page/nonstd.random_access_iterator_tag
+#import std.random_access_iterator_tag
+namespace nonstd {
+  //
+  // Same as random_access_iterator_tag ... but a better name.
+  // Why?  We like it that way.  Also for Reasons.
+  //
+  // Commentariat on the why and wherefore here
+  // See nonstd.iterator.category.Undirected
+  //
+  // Usage:
+  //
+  //   Yes, Use It.
+  //
+  using undirected_iterator_tag = std::random_access_iterator_tag;
+}
+#endiv

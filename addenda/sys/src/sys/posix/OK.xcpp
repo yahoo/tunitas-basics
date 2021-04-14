@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // The Access algebra as an object.
+  // It's a struct, but it really is a namespace
+  //
+  // Usage:
+  //
+  //   #import sys.ok.constants
+  //   using namespace sys::ok;
+  //   auto query = R | W;
+  //
+  //   #import sys.posix.OK.constants       or simply #import sys.posix.OK
+  //   using OK = sys::posix::OK;
+  //   auto query = OK::R | OK::W;
+  //
+  struct OK;
+}
+#endiv
+#divert <hpp>
+#import sys.ok.Axis
+#import sys.ok.Access
+#import sys.ok.constants
+#import sys.ok.required.Access
+struct sys::posix::OK {
+  using Access = ok::Access;
+  using Axis = ok::Axis;
+  using Mode = Access; // the historical name (not yet deprecated)
+  template<ok::required::Access RESULT> inline static auto as(Axis x) -> RESULT;
+  template<ok::required::Access RESULT> inline static auto as(Access s) -> RESULT;
+  //
+  inline static constexpr auto F = ok::F;
+  inline static constexpr auto R = ok::R;
+  inline static constexpr auto W = ok::W;
+  inline static constexpr auto X = ok::X;
+  inline static constexpr auto RW = ok::RW;
+  inline static constexpr auto RX = ok::RX;
+  inline static constexpr auto WX = ok::WX;
+  inline static constexpr auto RWX = ok::RWX;
+  //
+  inline static constexpr auto EXISTS = ok::EXISTS;
+  inline static constexpr auto READABLE = ok::READABLE;
+  inline static constexpr auto WRITABLE = ok::WRITABLE;
+  inline static constexpr auto EXECUTABLE = ok::EXECUTABLE;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto READ = ok::READ;
+  inline static constexpr auto WRITE = ok::WRITE;
+  inline static constexpr auto EXECUTE = ok::EXECUTE;
+#pragma GCC diagnostic pop
+  // This struct is just an ersatz namespace.
+  OK() = delete;
+  OK(OK const &) = delete;
+  auto operator=(OK const &) -> OK & = delete;
+};
+#endiv
+#divert <ipp>
+#import sys.ok.as
+namespace sys::posix {
+  template<ok::required::Access RESULT> auto OK::as(Axis x) -> RESULT   { return ok::as<RESULT>(x); }
+  template<ok::required::Access RESULT> auto OK::as(Access s) -> RESULT { return ok::as<RESULT>(s); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_OK.Usage
+static_assert(tests::usage::posix_OK::Usage<>);
+#endiv

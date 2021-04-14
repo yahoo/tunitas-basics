@@ -1,0 +1,96 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.detail.Stringz
+namespace c {
+  namespace detail {
+    template<typename CHAR> class Stringz;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import std.is_const
+#import std.size_t
+#import c.detail.UnboundVector
+#import c.detail.Character
+#forward c.basic_buffer
+#forward c.detail.Stringn
+#import std.basic_string
+#import std.basic_string_view
+#import std.vector
+
+// These are suitable ONLY for aiding the comparison operators
+// These are NOT suitable for storing the pointer values persistently.
+template<typename CHAR> class c::detail::Stringz : public UnboundVector<Character<CHAR>> {
+  using ancestor = UnboundVector<Character<CHAR>>;
+  static_assert(!std::is_const<CHAR>::value, "CHAR cannot be const, use Stringz<CHAR const> which is a different specialization, nearby");
+public:
+  Stringz() = default;
+  // Yes, implicit, all
+  // Undefined behavior (segfault) if there is no '\0' character out there
+  inline [[implicit]] Stringz(typename ancestor::data_type);
+  // Throws an exception if value[N] is not '\0'; this designed for use with character literals only
+  template<std::size_t N> inline [[implicit]] Stringz(typename ancestor::value_type (&)[N]);
+  template<typename ALLOC> inline [[implicit]] Stringz(std::vector<CHAR, ALLOC> &);
+  template<typename TRAITS> Stringz(std::basic_string<CHAR, TRAITS> const &) = delete; // as it does not support non-const access to its internal buffers
+  template<typename TRAITS> Stringz(std::basic_string_view<CHAR, TRAITS> const &) = delete; // as it does not support non-const access to its internal buffers AND it does not guarantee a '\0' at offset size()+1
+  // These are not user-defined conversions because they require a non-const reference
+  // BUT the length (size) of the stringz will not be from the Buffer, but rather from counting, by walking to the nulchar sentinel
+  inline explicit Stringz(basic_buffer<CHAR> /*nonconst*/ &);
+  inline explicit Stringz(Stringn<CHAR> /*nonconst*/ &);
+  // (synthetic copy constructor) Stringz(Stringz<CHAR> const &);
+  // size is computed by counting
+  // data() and c_str() are the same
+  inline auto c_str() const -> CHAR const *;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+#import c.basic_buffer
+#import c.detail.Stringn
+#import c.detail.stringy.enforce_embedded_nulchar_invariant
+
+template<typename CHAR> c::detail::Stringz<CHAR>::Stringz(typename ancestor::data_type subject)
+  : ancestor(subject) {
+  ; // This is uncheckable ... we are being given a pointer, and we hope there is a '\0'-terminator sentinel out three
+}
+
+template<typename CHAR> template<std::size_t N> c::detail::Stringz<CHAR>::Stringz(typename ancestor::value_type (&subject)[N])
+  : ancestor(subject) {
+  // Was the thing that we just accepted terminated appropriately?
+  stringy::enforce_embedded_nulchar_invariant(&this->held[0], &this->held[N]);
+}
+
+template<typename CHAR> template<typename ALLOC> c::detail::Stringz<CHAR>::Stringz(std::vector<CHAR, ALLOC> &subject)
+  : ancestor(subject.data()) {
+  // The subject itself must contain the '\0' terminator.
+  // vector nul = { '\0' }
+  // vector cat = { 'c' 'a' 't' '\0' }
+  stringy::enforce_embedded_nulchar_invariant(&this->held[0], &this->held[subject.size()]);
+}
+
+template<typename CHAR> c::detail::Stringz<CHAR>::Stringz(basic_buffer<CHAR> &subject)
+  : ancestor(subject.data()) {
+  // The subject itself must contain the '\0' terminator.
+  // buffer cat(1, ...) = { '\0' }
+  // buffer cat(4, ...) = { 'c' 'a' 't' '\0' }
+  stringy::enforce_embedded_nulchar_invariant(&this->held[0], &this->held[subject.size()]);
+}
+
+template<typename CHAR> c::detail::Stringz<CHAR>::Stringz(Stringn<CHAR> &subject)
+  : ancestor(subject.data()) {
+  // This is overkill because Stringz<CHAR> already guarantees a '\0' terminator.
+  stringy::enforce_embedded_nulchar_invariant(&this->held[0], &this->held[subject.size()+1]);
+}
+
+template<typename CHAR> auto c::detail::Stringz<CHAR>::c_str() const -> CHAR const * {
+  // Yet we <strike>know</strike> strongly believe there is a '\0' terminator sentinel out there.
+  return ancestor::data();
+}
+#endiv

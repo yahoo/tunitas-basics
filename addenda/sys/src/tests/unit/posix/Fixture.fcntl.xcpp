@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.F
+#import sys.posix.close
+#import sys.posix.fcntl
+auto tests::unit::posix::fixture::Fixture::test_fcntl() -> void {
+  using F = sys::posix::F;
+  auto duped = nat::fcntl(0, F::DUPFD, 0);
+  CPPUNIT_ASSERT(good(duped));
+  guardian::Closer<guardian::closer::Native> guard{value(duped)};
+}
+// the rest of these have moved off to tests::unit::posix::Syscall<FCNTL>
+#endiv

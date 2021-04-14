@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::exits {
+  //
+  // Be able to throw a sys::exits::Code, with an explanation.
+  // Always with narrow messaging; else use nonstd::exception::Basic_Quitting<CHAR, TRAITS>
+  //
+  // This is variant of nonstd::exception::Quitting which is specialized around sys::exits::Code.
+  //
+  // Offers different messaging scenarios:
+  //
+  //    Exception::what() ----------------------> "quitting" (the narrow literal "quitting")
+  //    Exception::message() -------------------> "sky is cloudy, solar not operable" (no '\n')
+  //    operator<<(ostream &, Exception &) -----> "error, sky is cloudy, solar not operable" (no '\n')
+  //
+  // Usage:
+  //
+  //   throw Exception{sys::exits::CONFIG};
+  //   throw Exception{"cloudy & overcast", sys::exits::TEMPFAIL};
+  //
+  //   try {
+  //     ...
+  //     throw Exception{sys::exits::CONFIG};
+  //     ...
+  //   } catch (nonstd::exception::Quitting const &q) {
+  //      q.stream() << q << '\n';
+  //      return q.code();
+  //   }
+  //
+  class [[nodiscard]] Exception;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import sys.exits.Code
+#import sys.exits.Code.sysexits // enable the overload for nonstd::sysexits::Code{sys::exits::Code}
+#import nonstd.exception.Quitting
+class sys::exits::Exception : public nonstd::exception::Quitting {
+  using ancestor = nonstd::exception::Quitting;
+public:
+  inline explicit Exception(Code);
+  inline Exception(std::string const &explanation, Code);
+};
+#endiv
+#divert <ipp>
+sys::exits::Exception::Exception(Code code)
+  : ancestor{code}
+{ }
+sys::exits::Exception::Exception(std::string const &explanation, Code code)
+  : ancestor{explanation, code}
+{ }
+#endiv

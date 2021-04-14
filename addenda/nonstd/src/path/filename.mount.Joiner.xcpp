@@ -1,0 +1,4 @@
+#divert <fpp>
+#import nonstd.path.filename.mount.Joiner
+namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] mount { using ::nonstd::path::filename::mount::Joiner; } } }
+#endiv

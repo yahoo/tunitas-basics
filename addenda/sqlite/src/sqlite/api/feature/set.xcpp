@@ -1,0 +1,26 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.api.feature.Result
+#import sqlite.Connection
+namespace sqlite {
+  namespace api {
+    namespace feature {
+      template<typename OPERATION> auto set(Connection &connection, OPERATION op, bool value) -> Result;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.status.Code
+#import sqlite.Connection
+#include <sqlite3.h>
+template<typename OPERATION> auto sqlite::api::feature::set(Connection &connection, OPERATION op, bool value) -> Result {
+  int recovered(0);
+  int settable = value ? SETTING_TRUE : SETTING_FALSE;
+  auto code = (status::Code)::sqlite3_db_config(connection.safe(), (int)op, settable, &recovered);
+  bool cooked = ok(code) ? (0 != recovered) : false;
+  // gratuitously, you get the value you just set back on the return
+  Result ret(code, cooked);
+  return ret;
+}
+#endiv

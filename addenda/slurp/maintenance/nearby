@@ -1,0 +1,59 @@
+#!/bin/bash
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+cd ${0%/*}/.. || exit 70
+: ${with_prefix:=/exp/scold}
+: ${with_siblings:=$(realpath ${0%/*}/..)}
+: ${with_nearby:=$(realpath ${0%/*}/../..)}
+: ${with_hypogeal_twilight:=${with_nearby?}/hypogeal-twilight}
+: ${with_module_nonstd:=${with_nearby?}/module-nonstd}
+: ${with_module_posix:=${with_nearby?}/module-posix}
+: ${with_module_rigging:=${with_nearby?}/module-rigging}
+: ${with_module_string:=${with_nearby?}/module-string}
+: ${with_module_sys:=${with_nearby?}/module-sys}
+if [[ -z $with_nonstd_cppunit ]] ; then
+    #
+    # usage:
+    #
+    # with_nonstd_cppunit=no  run ./maintenance/nearby .............................. the base case (nothing nonstd needed)
+    # with_nonstd_cppunit=yes run ./maintenance/nearby .............................. try to find /exp/nonstd/cppunit
+    #                         run ./maintenance/nearby .............................. same
+    #
+    case $(type -p gcc) in
+    ( /exp/gcc/*/bin/gcc )
+        # Then we MUST use the nonstd cppunit that was built with this compiler
+        # Else we will get inexplicable segfaults in the unit tests (but nowhere else)
+        if [[ -d /exp/nonstd/cppunit ]] ; then
+            with_nonstd_cppunit=/exp/nonstd/cppunit
+            enable_rpm_package_checking=no
+        else
+            echo "${0}: error: there is no /exp/nonstd/cppunit but there is an experimental gcc at $(type -p g++)"
+            exit 1
+        fi 1>&2
+        ;;
+    ( /usr/bin/gcc )
+        # Standard GCC, use whatever cppunit shows up
+        # 
+        ;;
+    esac
+fi
+eval \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    ${with_nearby:+--with-nearby=$with_nearby} \
+    ${with_siblings:+--with-siblings=$with_siblings} \
+    --without-submodules \
+    --without-vernacular-doggerel \
+    --disable-mock-build \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${enable_rpm_package_checking:+--enable-rpm-package-checking=$enable_rpm_package_checking} \
+    ${with_nonstd_cppunit:+--with-nonstd-cppunit=$with_nonstd_cppunit} \
+    ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \
+    ${with_module_posix:+--with-module-posix=$with_module_posix} \
+    ${with_module_rigging:+--with-module-rigging=$with_module_rigging} \
+    ${with_module_sys:+--with-module-sys=$with_module_sys} \
+    ${end} &&
+make &&
+make check &&
+echo OK DONE

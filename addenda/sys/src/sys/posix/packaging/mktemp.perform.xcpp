@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.stringz
+#import c.const_stringz
+#import std.filesystem.path
+#import std.function
+#import std.string
+#import std.vector
+#import sys.call.result.Value
+namespace sys::posix::packaging::mktemp {
+  inline auto perform(c::stringz TEMPLATE, std::function<char *(char *)>) -> call::result::Value<std::filesystem::path>;
+  inline auto perform(c::const_stringz TEMPLATE, std::function<char *(char *)>) -> call::result::Value<std::filesystem::path>;
+  inline auto perform(std::string TEMPLATE, std::function<char *(char *)>) -> call::result::Value<std::filesystem::path>;
+  // nonsensical.
+  inline auto perform(std::filesystem::path const &TEMPLATE, std::function<char *(char *)>) -> call::result::Value<std::filesystem::path> = delete;
+  // old school: into the self-same buffer.
+  inline auto perform(std::vector<char> &TEMPLATE_modified_in_place, std::function<char *(char *)>) -> call::result::Value<bool>;
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+#import mktemp
+#import std.move
+#import std.invalid_argument
+namespace sys::posix::packaging {
+  auto mktemp::perform(c::stringz TEMPLATE, std::function<char *(char *)> make) -> call::result::Value<std::filesystem::path> {
+    auto rebuffer = make(TEMPLATE.data());
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = '\0' != *rebuffer;
+    return {ok, errnum, rebuffer};
+  }
+  auto mktemp::perform(c::const_stringz TEMPLATE, std::function<char *(char *)> make) -> call::result::Value<std::filesystem::path> {
+    std::vector<char> buffer(TEMPLATE.begin(), TEMPLATE.end());
+    buffer.push_back('\0');
+    auto rebuffer = make(buffer.data());
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = '\0' != *rebuffer;
+    return {ok, errnum, rebuffer};
+  }
+  auto mktemp::perform(std::string TEMPLATE, std::function<char *(char *)> make) -> call::result::Value<std::filesystem::path> {
+    auto rebuffer = make(TEMPLATE.data());
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = '\0' != *rebuffer;
+    return {ok, errnum, rebuffer};
+  }
+  auto mktemp::perform(std::vector<char> &TEMPLATE_modified, std::function<char *(char *)> make) -> call::result::Value<bool> {
+    if (TEMPLATE_modified.empty() || '\0' != TEMPLATE_modified.back()) {
+      throw std::invalid_argument("mktemp vector<char> template has no nul char sentinel at the end");
+    }
+    auto rebuffer = make(TEMPLATE_modified.data());
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = '\0' != *rebuffer;
+    return {ok, errnum, ok};
+  }
+}
+#endiv

@@ -1,0 +1,271 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// The same thing as sys::errc, but named and numbered according to POSIX
+// AND according to the actual system that you are on now.
+// This is the naming that you remember from POSIX
+//
+// Plays well with
+//
+//   std::error_code
+//   std::error_condition
+//   std::system_error
+//
+// Usage:
+//
+//   using sys::posix::E;
+//   auto e = E::SUCCESS;
+//   auto ec = std::error_code{E::BADF};
+//   throw std::system_error{E::BADF};
+//
+#include <cerrno>
+namespace sys::e {
+  enum class Code {
+    SUCCESS = 0,
+    //
+    // (Mostly) these are the historical names; with compatibliity.
+    // Where there was impossibility (2BIG) or silly vowel reduction (FBIG) an alternate occurs.
+    // The alternates preserve the original "character" of the vowel and consonant omissions.
+    //
+    // This mirrors enum class Code
+    // This mimics enum class Code and std::errc
+    // This matches the system-available error codes in #include <cerrno>
+    // ...which are system-specific; historically-defined and quirky.
+    //
+    // This is by the method of "copypasta and hope for the best."
+    // This is cut out of
+    //   /usr/include/c++/8/x86_64-redhat-linux/bits/error_constants.h
+    //   libstdc++-devel-8.2.1-5.fc29.x86_64
+    //
+    // What else are we to do? "you use macros when you run out of language"
+    //
+    // These are declared in alphabetical order by std::errc enum tag name
+    // This order has nothing todo with anything, really.
+    // The integer values are "correct" with respect to the system adn with respect to std::errc
+    //
+    AFNOSUPPORT    = EAFNOSUPPORT, // address_family_not_supported
+    ADDRINUSE      = EADDRINUSE, // address_in_use
+    ADDRNOTAVAIL   = EADDRNOTAVAIL, // address_not_available
+    ISCONN         = EISCONN, // already_connected
+    ARGLISTTOOLONG = E2BIG, // argument_list_too_long
+    TOOBIG [[deprecated("too cute, too cryptic.  instead, prefer Code::ARGLISTTOOLONG")]] = ARGLISTTOOLONG,
+    DOM            = EDOM, // argument_out_of_domain
+    FAULT          = EFAULT, // bad_address
+    BADF           = EBADF, // bad_file_descriptor
+
+#ifdef EBADMSG
+    BADMSG         = EBADMSG, // bad_message
+#endif
+
+    PIPE           = EPIPE, // broken_pipe
+    CONNABORTED    = ECONNABORTED, // connection_aborted
+    ALREADY        = EALREADY, // connection_already_in_progress
+    CONNREFUSED    = ECONNREFUSED, // connection_refused
+    CONNRESET      = ECONNRESET, // connection_reset
+    XDEV           = EXDEV, // cross_device_link
+    DESTADDRREQ    = EDESTADDRREQ, // destination_address_required
+    BUSY           = EBUSY, // device_or_resource_busy
+    NOTEMPTY       = ENOTEMPTY, // directory_not_empty
+    NOEXEC         = ENOEXEC, // executable_format_error
+    EXIST          = EEXIST, // file_exists
+    FBIG [[deprecated("buy a vowel! spell it out! instead, prefer Code::FILE2BIG")]] = EFBIG,
+    FILE2BIG       = EFBIG, // file_too_large
+    NAMETOOLONG    = ENAMETOOLONG, // filename_too_long
+    NOSYS          = ENOSYS, // function_not_supported
+    HOSTUNREACH    = EHOSTUNREACH, // host_unreachable
+
+#ifdef EIDRM
+    IDRM           = EIDRM, // identifier_removed
+#endif
+
+    ILSEQ          = EILSEQ, // illegal_byte_sequence
+    NOTTY          = ENOTTY, // inappropriate_io_control_operation
+    INTR           = EINTR, // interrupted
+    INVAL          = EINVAL, // invalid_argument
+    SPIPE [[deprecated("names mean things! instead prefer Code::SEEK")]] = ESPIPE,
+    SEEK           = ESPIPE, // invalid_seek
+    IO             = EIO, // io_error
+    ISDIR          = EISDIR, // is_a_directory
+    MSGSIZE        = EMSGSIZE, // message_size
+    NETDOWN        = ENETDOWN, // network_down
+    NETRESET       = ENETRESET, // network_reset
+    NETUNREACH     = ENETUNREACH, // network_unreachable
+    NOBUFS         = ENOBUFS, // no_buffer_space
+    CHILD          = ECHILD, // no_child_process
+
+#ifdef ENOLINK
+    NOLINK         = ENOLINK, // no_link
+#endif
+
+    NOLCK [[deprecated("buy a vowel! instead, prefer Code::NOLOCK")]] = ENOLCK,
+    NOLOCK         = ENOLCK, // no_lock_available
+#ifdef ENODATA
+    NODATA         = ENODATA, // no_message_available
+#endif
+
+    NOMSG          = ENOMSG, // no_message
+    NOPROTOOPT     = ENOPROTOOPT, // no_protocol_option
+    NOSPC          = ENOSPC, // no_space_on_device
+
+#ifdef ENOSR
+    NOSR           = ENOSR, // no_stream_resources
+#endif
+
+    NXIO           = ENXIO, // no_such_device_or_address
+    NOTBLK         = ENOTBLK, // Block device required (WATCHOUT: not in ISO C++)
+    NODEV          = ENODEV, // no_such_device
+    NOENT          = ENOENT, // no_such_file_or_directory
+    SRCH           = ESRCH, // no_such_process
+    NOTDIR         = ENOTDIR, // not_a_directory
+    NOTSOCK        = ENOTSOCK, // not_a_socket
+
+#ifdef ENOSTR
+    NOSTR          = ENOSTR, // not_a_stream
+#endif
+
+    NOTCONN        = ENOTCONN, // not_connected
+    NOMEM          = ENOMEM, // not_enough_memory
+
+#ifdef ENOTSUP
+    NOTSUP         = ENOTSUP, // not_supported
+#endif
+
+#ifdef ECANCELED
+    CANCELED       = ECANCELED, // operation_canceled
+#endif
+
+    INPROGRESS     = EINPROGRESS, // operation_in_progress
+    PERM           = EPERM, // operation_not_permitted
+    OPNOTSUPP      = EOPNOTSUPP, // operation_not_supported
+    WOULDBLOCK     = EWOULDBLOCK, // operation_would_block
+
+#ifdef EOWNERDEAD
+    OWNERDEAD      = EOWNERDEAD, // owner_dead
+#endif
+
+    ACCES          = EACCES, // permission_denied
+
+#ifdef EPROTO
+    PROTO          = EPROTO, // protocol_error
+#endif
+
+    PROTONOSUPPORT = EPROTONOSUPPORT, // protocol_not_supported
+    ROFS           = EROFS, // read_only_file_system
+    DEADLK         = EDEADLK, // resource_deadlock_would_occur
+    AGAIN          = EAGAIN, // resource_unavailable_try_again
+    RANGE          = ERANGE, // result_out_of_range
+
+#ifdef ENOTRECOVERABLE
+    NOTRECOVERABLE = ENOTRECOVERABLE, // state_not_recoverable
+#endif
+
+#ifdef ETIME
+    TIME           = ETIME, // stream_timeout
+#endif
+
+#ifdef ETXTBSY
+    TXTBSY         = ETXTBSY, // text_file_busy
+#endif
+
+    TIMEDOUT       = ETIMEDOUT, // timed_out
+    NFILE          = ENFILE, // too_many_files_open_in_system
+    MFILE          = EMFILE, // too_many_files_open
+    MLINK          = EMLINK, // too_many_links
+    LOOP           = ELOOP, // too_many_symbolic_link_levels
+
+#ifdef EOVERFLOW
+    OVERFLOW       = EOVERFLOW, // value_too_large
+    _OVERFLOW_     = EOVERFLOW, // [[WATCHOUT]] [[FIXTHIS]] - <math.h> has #define OVERFLOW and #define UNDERFLOW
+#endif
+
+    PROTOTYPE      = EPROTOTYPE, // wrong_protocol_type
+    //
+    // Above here are the standard C++ enumeration values but using their POSIX-derived names.
+    // Below here are the Linux-specific extensions which expand the range of errno values
+    // This list is computed by removing the list (above) from the full set of values listed in the various errno.h
+    //
+    // see /usr/include/asm-generic/errno.h
+    CHRNG = ECHRNG,
+    L2NSYNC = EL2NSYNC,
+    L3HLT = EL3HLT,
+    L3RST = EL3RST,
+    LNRNG = ELNRNG,
+    UNATCH = EUNATCH,
+    NOCSI = ENOCSI,
+    L2HLT = EL2HLT,
+    BADE = EBADE,
+    BADR = EBADR,
+    XFULL = EXFULL,
+    NOANO = ENOANO,
+    BADRQC = EBADRQC,
+    BADSLT = EBADSLT,
+    DEADLOCK = EDEADLOCK,
+    BFONT = EBFONT,
+    NONET = ENONET,
+    NOPKG = ENOPKG,
+    REMOTE = EREMOTE,
+    ADV = EADV,
+    SRMNT = ESRMNT,
+    COMM = ECOMM,
+    MULTIHOP = EMULTIHOP,
+    DOTDOT = EDOTDOT,
+    NOTUNIQ = ENOTUNIQ,
+    REMCHG = EREMCHG,
+    LIBACC = ELIBACC,
+    LIBBAD = ELIBBAD,
+    LIBSCN = ELIBSCN,
+    LIBMAX = ELIBMAX,
+    LIBEXEC = ELIBEXEC,
+    RESTART = ERESTART,
+    USERS = EUSERS,
+    SOCKTNOSUPPORT = ESOCKTNOSUPPORT,
+    PFNOSUPPORT = EPFNOSUPPORT,
+    SHUTDOWN = ESHUTDOWN,
+    TOOMANYREFS = ETOOMANYREFS,
+    HOSTDOWN = EHOSTDOWN,
+    STALE = ESTALE,
+    UCLEAN = EUCLEAN,
+    NOTNAM = ENOTNAM,
+    NAVAIL = ENAVAIL,
+    ISNAM = EISNAM,
+    DQUOT = EDQUOT,
+    NOMEDIUM = ENOMEDIUM,
+    MEDIUMTYPE = EMEDIUMTYPE,
+    NOKEY = ENOKEY,
+    KEYEXPIRED = EKEYEXPIRED,
+    KEYREVOKED = EKEYREVOKED,
+    KEYREJECTED = EKEYREJECTED,
+    RFKILL = ERFKILL,
+    HWPOISON = EHWPOISON,
+    // and onward from here...
+  };
+}
+#endiv
+#divert <hpp>
+#import std.error_code
+namespace sys::e {
+  inline auto make_error_code(Code) -> std::error_code;
+  //
+  // Rhymes with sys::call::Result
+  // These are useful when extending from namespace sys::error.
+  //
+  inline auto ok(Code) -> bool;
+  inline auto good(Code) -> bool;
+  inline auto fail(Code) -> bool;
+  [[deprecated("oddlly, prefer the shorter form fail(Code)")]] inline auto failure(Code) -> bool;
+}
+#endiv
+#divert <ipp>
+#import std.system_category
+namespace sys {
+  auto e::make_error_code(Code code) -> std::error_code {
+    // "basically" the same as std::make_error_code
+    return std::error_code{(int) code, std::system_category()};
+  }
+  auto e::ok(Code c) -> bool      { return good(c); }
+  auto e::good(Code c) -> bool    { return e::Code::SUCCESS == c; }
+  auto e::fail(Code c) -> bool    { return !good(c); }
+  auto e::failure(Code c) -> bool { return fail(c); }
+}
+#endiv

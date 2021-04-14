@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.underlying_type
+namespace ares::nameinfo {
+  //
+  // An option
+  //
+  enum Flag
+    { NOFQDN = ARES_NI_NOFQDN,
+      NUMERICHOST = ARES_NI_NUMERICHOST,
+      NAMEREQD = ARES_NI_NAMEREQD,
+      NUMERICSERV = ARES_NI_NUMERICSERV,
+      DGRAM = ARES_NI_DGRAM,
+      UCP = DGRAM,
+      TCP = ARES_NI_TCP,
+      SCTP = ARES_NI_SCTP,
+      DCCP = ARES_NI_DCCP,
+      NUMERICSCOPE = ARES_NI_NUMERICSCOPE,
+      LOOKUPHOST = ARES_NI_LOOKUPHOST,
+      LOOKUPSERVICE = ARES_NI_LOOKUPSERVICE,
+      // Declared as "Reserved for future use" yet GNU Libc uses it
+      IDN = ARES_NI_IDN,
+      IDN_ALLOW_UNASSIGNED = ARES_NI_IDN_ALLOW_UNASSIGNED,
+      IDN_USE_STD3_ASCII_RULES = ARES_NI_IDN_USE_STD3_ASCII_RULES };
+  namespace flag {
+    using Underlying = std::underlying_type<Flag>::type;
+  }
+}
+#endiv

@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.traits.Ratio
+#include <hpp/nonstd.traits.Ratio>
+namespace nonstd::required {
+  //
+  // Is this an instance of the std::ratio template?
+  //
+  // Usage:
+  //
+  //   template<required::Ratio RATIO> struct Thing;
+  //
+  template<typename RATIO> concept bool Ratio = traits::Ratio<RATIO>::value;
+}
+#endiv

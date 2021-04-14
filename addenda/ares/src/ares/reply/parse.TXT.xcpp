@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.reply.parse.declaration
+#import ares.reply.Record.TXT
+namespace ares::reply {
+  //
+  // Specialization to parse an TXT record.
+  // Usage: see parse.declaration.xcpp
+  //
+  template<> inline auto parse<TXT>(std::nothrow_t, Buffer<std::byte const>, [[fill, inout]] Record<TXT> &) noexcept -> Success;
+}
+#endiv
+#divert <ipp>
+namespace ares::reply {
+  template<> auto parse<TXT>(std::nothrow_t no, Buffer<std::byte const> buffer, Record<TXT> &record) noexcept -> Success {
+    return detail::parse<TXT>(buffer, record, ::ares_parse_txt_reply);
+  }
+}
+#endiv

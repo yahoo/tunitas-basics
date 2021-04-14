@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_argv
+#import c.const_environv
+#import std.vector
+#import std.string
+#import sys.call.Result
+namespace tests::execing::fail {
+  auto process(sys::call::Result const &, std::string const &syscall, std::string const &command, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> void;
+  auto process(sys::call::Result const &, std::string const &syscall, std::string const &command, std::vector<std::string> const &argv) -> void;
+  auto process(sys::call::Result const &, std::string const &syscall, std::string const &command, c::const_argv, c::const_environv) -> void;
+  auto process(sys::call::Result const &, std::string const &syscall, std::string const &command, c::const_argv) -> void;
+}
+#endiv
+#divert <cpp>
+#import tests.execing.main // for NAME
+#import nonstd.exception.Quitting
+#import std.string
+#import std.vector
+#import sys.exits.constants
+#import std.cerr
+#import tests.execing.quote
+using namespace tests::execing;
+auto fail::process(sys::call::Result const &r, std::string const &syscall, std::string const &command, c::const_argv av, c::const_environv ev) -> void {
+  using Vector = std::vector<std::string>;
+  process(r, syscall, command, Vector{av.begin(), av.end()}, Vector{ev.begin(), ev.end()});
+}
+auto fail::process(sys::call::Result const &r, std::string const &syscall, std::string const &command, c::const_argv av) -> void {
+  using Vector = std::vector<std::string>;
+  process(r, syscall, command, Vector{av.begin(), av.end()});
+}
+auto fail::process(sys::call::Result const &r, std::string const &syscall, std::string const &command, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> void {
+  auto ec = error_code(r);
+  std::cerr << NAME << ": error, could not " << syscall << " " << command << " because " << ec.message() << '\n';
+  std::cerr << "argv: " << quote(argv) << '\n';
+  std::cerr << "envv: " << quote(envv) << '\n';
+  throw nonstd::exception::Quitting{"failed", sys::exits::SOFTWARE};
+}
+auto fail::process(sys::call::Result const &r, std::string const &syscall, std::string const &command, std::vector<std::string> const &argv) -> void {
+  auto ec = error_code(r);
+  std::cerr << NAME << ": error, could not " << syscall << " " << command << " because " << ec.message() << '\n';
+  std::cerr << "argv: " << quote(argv) << '\n';
+  throw nonstd::exception::Quitting{"failed", sys::exits::SOFTWARE};
+}
+#endiv

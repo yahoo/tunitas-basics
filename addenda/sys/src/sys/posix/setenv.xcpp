@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringz
+#import sys.call.Result
+namespace sys {
+  namespace posix {
+    inline auto setenv(c::const_stringz name, c::const_stringz value, bool overwrite = true) -> call::Result;
+  }
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+#import setenv
+#import std.move
+auto sys::posix::setenv(c::const_stringz name, c::const_stringz value, bool overwrite) -> call::Result {
+  using result_type = call::Result;
+  auto code = ::setenv(name.data(), value.data(), overwrite);
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = 0 == code;
+  result_type ret(ok, errnum, code);
+  return ret;
+}
+#endiv

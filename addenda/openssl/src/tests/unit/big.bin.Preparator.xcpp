@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::big::bin {
+  template<typename PREPARATOR> class Preparator;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+template<typename PREPARATOR> class tests::unit::big::bin::Preparator : public cppunit::test::Fixture {
+public:
+  using Subject = PREPARATOR;
+  auto test_constructor() -> void;
+  auto test_data_size() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+namespace tests::unit::big::bin {
+  template<typename _> auto Preparator<_>::test_constructor() -> void {
+    Subject subject{99};
+    // n.b. we put a leading 0 octet in front of positive quantities to ensure the high bit is 0 (positive)
+    auto const FUDGE = 0; // std::is_unsigned<typename Subject::Value>::value ? 1 : 0;
+    auto const expected = sizeof (typename Subject::Value) + FUDGE;
+    auto const actual = subject.size();
+    std::cerr << "size actual=" << actual << " " << expected << '\n';
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  template<typename _> auto Preparator<_>::test_data_size() -> void {
+    typename Subject::Value specimen = 99;
+    Subject subject{specimen};
+    // [[FIXTHIS]] prove somehow that this is the big endian representation of the specimen
+    CPPUNIT_ASSERT(nullptr != subject.data());
+    {
+      auto const FUDGE = 0; // std::is_unsigned<typename Subject::Value>::value ? 1 : 0;
+      auto const expected = sizeof (typename Subject::Value) + FUDGE;
+      auto const actual = subject.size();
+      std::cerr << "size actual=" << actual << " " << expected << '\n';
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    }
+  }
+}
+#import rigging.suite.io
+template<typename _> auto tests::unit::big::bin::Preparator<_>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Preparator<"s + typeid(Subject).name() + ">"s);
+  series << call("constructor", &Preparator::test_constructor)
+         << call("data+size", &Preparator::test_data_size)
+    ;
+  return finalize(series);
+}
+#endiv

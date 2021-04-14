@@ -1,0 +1,79 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::r
+  // PREFER namespace sys::r::constants
+  // PREFER sys::r::Limit
+  //        etc.
+  //
+  // Pairwise
+  //
+  //   Resource <---> Limit
+  //
+  // Usage:
+  //
+  //   using RLIMIT = sys::posix::RLIMIT;
+  //   auto const r0 = RLIMIT::CPU_TIME;
+  //   auto const r1 = RLIMIT::FILE_SIZE;
+  //   auto const r2 = RLIMIT::NICE_PRIORITY;
+  //   ...etc...
+  //
+  struct RLIMIT;
+}
+#endiv
+#divert <hpp>
+#import sys.r.Limit
+#import sys.r.Limits
+#import sys.r.constants
+struct sys::posix::RLIMIT {
+  using Limit = r::Limit;
+  using Limits = r::Limits;
+  inline static constexpr auto CPU_TIME             = r::CPU_TIME; //                  seconds        Per-process CPU limit, in seconds.
+  inline static constexpr auto FILE_SIZE            = r::FILE_SIZE; //                 bytes          Largest file that can be created, in bytes.
+  inline static constexpr auto DATA_SIZE            = r::DATA_SIZE; //                 bytes          Maximum size of data segment, in bytes.
+  inline static constexpr auto STACK_SIZE           = r::STACK_SIZE; //                bytes          Maximum size of stack segment, in bytes.
+  inline static constexpr auto CORE_FILE_SIZE       = r::CORE_FILE_SIZE; //            bytes          Largest core file that can be created, in bytes.
+  inline static constexpr auto RESIDENT_SET_SIZE    = r::RESIDENT_SET_SIZE; //         bytes          Largest resident set size, in bytes.
+  inline static constexpr auto OPEN_FILE_COUNT      = r::OPEN_FILE_COUNT; //           count          Number of open files.
+  inline static constexpr auto ADDRESS_SPACE_SIZE   = r::ADDRESS_SPACE_SIZE; //        bytes          Address space limit.
+  inline static constexpr auto PROCESS_COUNT        = r::PROCESS_COUNT; //             count          Number of processes.
+  inline static constexpr auto MEMORY_LOCK_SIZE     = r::MEMORY_LOCK_SIZE; //          bytes          Locked-in-memory address space.
+  inline static constexpr auto FILE_LOCK_COUNT      = r::FILE_LOCK_COUNT; //           count          Maximum number of file locks.
+  inline static constexpr auto SIGNAL_PENDING_COUNT = r::SIGNAL_PENDING_COUNT; //      count          Maximum number of pending signals.
+  inline static constexpr auto MESSAGE_QUEUE_SIZE   = r::MESSAGE_QUEUE_SIZE; //        bytes          Maximum bytes in POSIX message queues.
+  inline static constexpr auto NICE_PRIORITY        = r::NICE_PRIORITY; //             1..40          Maximum nice priority allowed. Nice levels 19 .. -20 correspond to 0 .. 39
+  inline static constexpr auto REALTIME_PRIORITY    = r::REALTIME_PRIORITY; //         priority       Maximum realtime priority allowed for non-priviledged processes.
+  inline static constexpr auto REALTIME_CPU_TIME    = r::REALTIME_CPU_TIME; //         microseconds   Maximum CPU time in µs without [blocking](a system call) = REALTIME_PRIORITY,
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto FSIZE [[deprecated("spell it out instead, prefer r::FILE")]]              = r::FSIZE;
+  inline static constexpr auto OFILE [[compatibility("BSD name for r::NOFILE, and r::OPEN_FILE_COUNT")]] = r::OFILE;
+#pragma GCC diagnostic pop
+  inline static constexpr auto CPU        = r::CPU;
+  inline static constexpr auto FILE       = r::FILE;
+  inline static constexpr auto DATA       = r::DATA;
+  inline static constexpr auto STACK      = r::STACK;
+  inline static constexpr auto CORE       = r::CORE;
+  inline static constexpr auto RSS        = r::RSS;
+  inline static constexpr auto NOFILE     = r::NOFILE;
+  inline static constexpr auto AS         = r::AS;
+  inline static constexpr auto NPROC      = r::NPROC;
+  inline static constexpr auto MEMLOCK    = r::MEMLOCK;
+  inline static constexpr auto LOCKS      = r::LOCKS;
+  inline static constexpr auto SIGPENDING = r::SIGPENDING;
+  inline static constexpr auto MSGQUEUE   = r::MSGQUEUE;
+  inline static constexpr auto NICE       = r::NICE;
+  inline static constexpr auto RTPRIO     = r::RTPRIO;
+  inline static constexpr auto RTTIME     = r::RTTIME;
+  RLIMIT() = delete;
+  RLIMIT(RLIMIT const &) = delete;
+  auto operator=(RLIMIT const &) -> RLIMIT & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_RLIMIT.Usage
+static_assert(tests::usage::posix_RLIMIT::Usage<>);
+#endiv

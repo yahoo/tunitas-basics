@@ -1,0 +1,56 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.parse.Dispatcher
+#import tests.parse.Mode
+namespace tests::parse {
+  using Commander = Dispatcher<Mode>;
+}
+#endiv
+#divert <hpp>
+#import c.argv
+#import sys.exits.Code
+namespace tests::parse {
+  inline char const *const NAME = "parse";
+  auto main(c::argv) -> sys::exits::Code;
+}
+#endiv
+#divert <cpp>
+auto main(int c, char *v[]) -> int {
+  return tests::parse::main(c::argv(c, v));
+}
+#import std.cerr
+#import std.cout
+#import std.clog
+#import std.exception
+#import sys.exits.Code
+#import sys.exits.constants
+#import tests.parse.Configuration
+#import tests.parse.go
+#import tests.parse.Usage
+auto tests::parse::main(c::argv av) -> sys::exits::Code {
+  try {
+    Configuration::SINGLETON.NAME = NAME; // [[FIXTHIS]] or not - derive this from argv[0] with options::Program
+    Commander d{{Mode::UNSTATED, &go::unstated},
+                {Mode::EITHER, &go::eitherway},
+                {Mode::SHORT, &go::shortingly},
+                {Mode::LONG, &go::longingly}};
+    // peek at the 1st option to see if it indicates "short only" or "long only"
+    auto go = d(peek(av));
+    return go(av);
+  } catch (options::throwable::Usage const &u) {
+    u.stream() << u;
+    return u.code();
+  } catch (std::exception const &e) {
+    // this was a surprise
+    std::cerr << NAME << ": error, " << e.what() << '\n';
+    return sys::exits::SOFTWARE;
+  } catch (sys::exits::Code &e) {
+    if (sys::exits::USAGE == e) {
+      tests::parse::Usage u(Configuration::SINGLETON.NAME, e);
+      u.stream() << u;
+    }
+    return e;
+  }
+}
+#endiv

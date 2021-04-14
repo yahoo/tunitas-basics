@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_RUSAGE.Usage
+//   static_assert(tests::usage::posix_RUSAGE::Usage<>);
+//
+#import sys.posix.RUSAGE
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_RUSAGE {
+  using sys::posix::RUSAGE;
+  namespace [[detail]] packaging {
+    template<typename RUSAGE> concept bool Instance = requires(RUSAGE) {
+      typename RUSAGE::Usage;
+      typename RUSAGE::Usages;
+      requires model::Namespace_Object<RUSAGE>;
+      requires (int)RUSAGE::SELF == RUSAGE_SELF;
+      requires (int)RUSAGE::CHILDREN == RUSAGE_CHILDREN;
+      requires (int)RUSAGE::THREAD == RUSAGE_THREAD;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<RUSAGE>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

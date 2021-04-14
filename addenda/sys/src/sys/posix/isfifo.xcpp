@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.is.interface
+namespace sys::posix {
+  namespace packaging::is {
+    using namespace packaging::is::interface;
+    namespace function {
+      inline auto isfifo(Pathname) -> bool;
+      inline auto isfifo(Buffer const &) -> bool;
+      inline auto isfifo(Permissions) -> bool;
+      inline auto isfifo(File) -> bool;
+    }
+    namespace native {
+      inline auto isfifo(int) -> bool;
+    }
+  }
+  using packaging::is::function::isfifo;
+  namespace native { using packaging::is::native::isfifo; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.fstat
+#import sys.posix.stat
+namespace sys::posix::packaging::is {
+  auto function::isfifo(Buffer const &b) -> bool { return S_ISFIFO(b.st_mode); }
+  auto function::isfifo(Permissions p) -> bool { return S_ISFIFO((mode_t) p); }
+  auto function::isfifo(Pathname pathname) -> bool {
+    auto r = posix::stat(move(pathname));
+    return good(r) && isfifo(value(r));
+  }
+  auto function::isfifo(File f) -> bool {
+    auto r = posix::fstat(f);
+    return good(r) && isfifo(value(r));
+  }
+  auto native::isfifo(int fd) -> bool {
+    auto r = posix::native::fstat(fd);
+    return good(r) && function::isfifo(value(r));
+  }
+}
+#endiv

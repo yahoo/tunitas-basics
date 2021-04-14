@@ -1,0 +1,3 @@
+// -*- c++ -*- 58b101d6-7bfd-4378-a6b0-dcbeca87d57a
+#pragma once
+#include <sys/signal.h>

@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::shut
+  // PREFER namespace sys::shut::constants
+  // PREFER sys::shut::Down
+  //        etc.
+  //
+  // Usage:
+  //
+  //   using SHUT = sys::posix::SHUT;
+  //   auto const s0 = SHUT::READWRITE;
+  //   auto const s1 = SHUT::WRITE;
+  //   auto const s2 = SHUT::READWRITE;
+  //   ...etc...
+  //
+  struct SHUT;
+}
+#endiv
+#divert <hpp>
+#import sys.shut.Down
+#import sys.shut.constants
+struct sys::posix::SHUT {
+  using Down = shut::Down;
+  using Type = shut::Type;
+  inline static constexpr auto READ      = shut::READ;
+  inline static constexpr auto WRITE     = shut::WRITE;
+  inline static constexpr auto READWRITE = shut::READWRITE;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto RD   [[deprecated("spell it out! buy a vowel! instead prefer SHUT::READ")]]      = shut::READ;
+  inline static constexpr auto WR   [[deprecated("spell it out! buy a vowel! instead prefer SHUT::WRITE")]]     = shut::WRITE;
+  inline static constexpr auto RDWR [[deprecated("spell it out! buy a vowel! instead prefer SHUT::READWRITE")]] = shut::READWRITE;
+#pragma GCC diagnostic pop
+  SHUT() = delete;
+  SHUT(SHUT const &) = delete;
+  auto operator=(SHUT const &) -> SHUT & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_SHUT.Usage
+static_assert(tests::usage::posix_SHUT::Usage<>);
+#endiv

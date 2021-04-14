@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace query {
+      //
+      // Create a (test) database, in memory, with a few rows.
+      //
+      class Database;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.Application
+#import sqlite.Connection
+class tests::unit::query::Database {
+public:
+  Database();
+  ::sqlite::Application app;
+  ::sqlite::Connection conn;
+};
+#endiv
+#divert <cpp>
+#import sqlite.open.Flags
+#import sqlite.open.Name
+#import sqlite.source
+tests::unit::query::Database::Database()
+  : app()
+  , conn(app) {
+  using ::sqlite::open::Name;
+  using ::sqlite::open::Flag;
+  check(conn.open(Name::MEMORY, Flag::READWRITE | Flag::CREATE), "open");
+  //
+  // WATCHOUT - do not use 'char' as the datatype for column #1; that just means "TEXT"  in SQLite.
+  //            see https://www.sqlite.org/datatype3.html
+  //
+  // WATCHOUT - there are assertion statements that check for the values inserted into the table.
+  // WATCHOUT - inserting "2" into a tinyint will get the value "1"
+  //            this is checked in Fixture.xcpp
+  //
+  std::string const schema(R"sql(create table t99(b1 tinyint, i1 int, f1 float, s1 text);)sql"
+                           R"sql(insert into t99(b1, i1, f1, s1) values(0, 1, 2.3, "one");)sql"
+                           R"sql(insert into t99(b1, i1, f1, s1) values(1, 2, 3.4, "two");)sql"
+                           R"sql(insert into t99(b1, i1, f1, s1) values(2, 3, 4.5, "three");)sql");
+  check(::sqlite::source(conn, schema), "schema establishment");
+}
+#endiv

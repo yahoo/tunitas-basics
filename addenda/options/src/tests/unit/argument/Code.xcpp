@@ -1,0 +1,100 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace argument {
+      class Code;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::argument::Code : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_default_constructor() -> void;
+  auto test_literal_conversion_constructor() -> void;
+  auto test_conversion_to_integer() -> void;
+  auto test_operator_equal() -> void;
+  auto test_operator_notequal() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.argument.Code
+#import options.argument.constants
+
+namespace a = options::argument;
+
+auto tests::unit::argument::Code::test_default_constructor() -> void {
+  a::Code def;
+  CPPUNIT_ASSERT(a::NO == def);
+}
+
+auto tests::unit::argument::Code::test_literal_conversion_constructor() -> void {
+  a::Code no = a::NO;
+  CPPUNIT_ASSERT(a::NO == no);
+  a::Code required(a::REQUIRED);
+  CPPUNIT_ASSERT(a::REQUIRED == required);
+  a::Code optional;
+  optional = a::OPTIONAL;
+  CPPUNIT_ASSERT(a::OPTIONAL == optional);
+}
+
+auto tests::unit::argument::Code::test_conversion_to_integer() -> void {
+  a::Code no = a::NO;
+  int int_no = no;
+  CPPUNIT_ASSERT(a::NO == int_no);
+  a::Code required(a::REQUIRED);
+  int int_required = required;
+  CPPUNIT_ASSERT(a::REQUIRED == int_required);
+  a::Code optional;
+  optional = a::OPTIONAL;
+  int int_optional = optional;
+  CPPUNIT_ASSERT(a::OPTIONAL == int_optional);
+}
+
+auto tests::unit::argument::Code::test_operator_equal() -> void {
+  a::Code all[] = { a::NO, a::REQUIRED, a::OPTIONAL };
+  for (auto a : all) {
+    for (auto b : all) {
+      bool same = a == b; // <---- testing operator==
+      int int_a = a;
+      int int_b = b;
+      bool int_same = int_a == int_b;
+      CPPUNIT_ASSERT(int_same == same);
+    }
+  }
+}
+
+auto tests::unit::argument::Code::test_operator_notequal() -> void {
+  a::Code all[] = { a::NO, a::REQUIRED, a::OPTIONAL };
+  for (auto a : all) {
+    for (auto b : all) {
+      bool same = a != b; // <---- testing operator==
+      int int_a = a;
+      int int_b = b;
+      bool int_same = int_a != int_b;
+      CPPUNIT_ASSERT(int_same == same);
+    }
+  }
+}
+
+#import tests.unit.argument.Code
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::argument::Code::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("argument");
+  s << call("default", &Code::test_default_constructor)
+    << call("literal", &Code::test_literal_conversion_constructor)
+    << call("int cast", &Code::test_conversion_to_integer)
+    << call("operator==", &Code::test_operator_equal)
+    << call("operator!=", &Code::test_operator_notequal);
+  return finalize(s);
+}
+#endiv

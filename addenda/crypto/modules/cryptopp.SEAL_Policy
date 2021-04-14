@@ -1,0 +1,4 @@
+// -*- c++ -*- 7715f439-1441-425b-a278-b59806f3501b
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/seal.h>

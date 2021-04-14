@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception::detail::format {
+  template<typename TYPE> class If_Not_Null;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+template<typename TYPE> class tests::unit::exception::detail::format::If_Not_Null : public cppunit::test::Fixture {
+public:
+  using Subject = TYPE;
+  auto test_null() -> void;
+  auto test_empty() -> void;
+  auto test_FILE() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import std.string_literals
+#import nonstd.exception.detail.format.inn
+namespace tests::unit::exception::detail::format {
+  template<typename _> auto If_Not_Null<_>::test_null() -> void {
+    using namespace std::string_literals;
+    using ::nonstd::exception::detail::format::inn;
+    std::ostringstream buf;
+    buf << inn((char const *)nullptr);
+    auto const actual = buf.str();
+    auto const expected = "(null)"s;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  template<typename _> auto If_Not_Null<_>::test_empty() -> void {
+    using namespace std::string_literals;
+    using ::nonstd::exception::detail::format::inn;
+    std::ostringstream buf;
+    buf << inn("");
+    auto const actual = buf.str();
+    auto const expected = ""s; // <---------------------------- empty, not "(empty)"
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  template<typename _> auto If_Not_Null<_>::test_FILE() -> void {
+    using namespace std::string_literals;
+    using ::nonstd::exception::detail::format::inn;
+    std::ostringstream buf;
+    buf << inn(__FILE__); // <------------------ this is what we came to test
+    auto const actual = buf.str();
+    CPPUNIT_ASSERT(!actual.empty());
+    auto const unexpected1 = "(null)"s;
+    CPPUNIT_ASSERT(unexpected1 != actual);
+    auto const unexpected2 = "(empty)"s;
+    CPPUNIT_ASSERT(unexpected2 != actual);
+  }
+}
+#import std.type_info
+#import std.string_literals
+#import rigging.suite.io
+namespace tests::unit::exception::detail::format {
+  template<typename _> auto If_Not_Null<_>::suite() -> cppunit::Test * {
+    using namespace std::string_literals;
+    using namespace ::rigging::suite;
+    Stream series("If_Not_Null<"s + typeid(Subject).name() + ">"s);
+    series << call("null", &If_Not_Null::test_null)
+           << call("empty", &If_Not_Null::test_empty)
+           << call("FILE", &If_Not_Null::test_FILE)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

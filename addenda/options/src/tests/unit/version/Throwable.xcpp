@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace version {
+      class Throwable;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::version::Throwable : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_default_constructor() -> void;
+
+  // (old) option::Version
+  // (new) option::version::String
+  auto test_member_version() -> void;
+  auto test_member_version_string() -> void;
+  auto test_member_unformatted() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.version.Mock
+auto tests::unit::version::Throwable::test_default_constructor() -> void {
+  // All the complexity is buried in Mock.
+  // Yup, it has a default constructor.
+  Mock def("a.out");
+  CPPUNIT_ASSERT(0 != def.version().size());
+}
+
+#import std.cout
+#import options.Version
+auto tests::unit::version::Throwable::test_member_version() -> void {
+  Mock specimen("a.out");
+  options::Version vs = specimen.version(); // <-------------- option::Version
+  CPPUNIT_ASSERT( !vs.empty() );
+  CPPUNIT_ASSERT(0 != vs.size());
+  std::cout << "version=\"" << vs << "\"\n";
+}
+
+#import options.version.String
+auto tests::unit::version::Throwable::test_member_version_string() -> void {
+  Mock specimen("a.out");
+  options::version::String vs = specimen.version(); // <-------------- option::version::String
+  CPPUNIT_ASSERT( !vs.empty() );
+  CPPUNIT_ASSERT(0 != vs.size());
+  std::cout << "version=\"" << vs << "\"\n";
+}
+
+#import std.cout
+#import std.string
+#import std.ostringstream
+auto tests::unit::version::Throwable::test_member_unformatted() -> void {
+  Mock specimen("a.out");
+  std::string uf = specimen.unformatted();
+  CPPUNIT_ASSERT( !uf.empty() );
+  std::cout << "unformatted=\"" << uf << "\"\n";
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::version::Throwable::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("version-throwable");
+  s << call("default", &Throwable::test_default_constructor)
+    << call("version", &Throwable::test_member_version)
+    << call("version_string", &Throwable::test_member_version_string)
+    << call("unformatted", &Throwable::test_member_unformatted)
+    ;
+  return finalize(s);
+}
+#endiv

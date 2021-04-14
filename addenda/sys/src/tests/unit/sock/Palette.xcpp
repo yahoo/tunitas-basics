@@ -1,0 +1,106 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::sock {
+  //
+  // The palette for Scenario 1
+  //
+  struct Palette;
+}
+#endiv
+#divert <hpp>
+#import sys.sock.Option
+#import sys.sock.Options
+#import tests.flags // Series
+namespace tests::unit {
+  struct sock::Palette {
+    using Option = ::sys::sock::Option;
+    using Options = ::sys::sock::Options;
+  public:
+    virtual ~Palette() = default;
+    Palette() = default;
+    using Flag = Option; // per required::Palette<PALETTE>
+    using Flags = Options;
+    std::vector<Option> some_flag_series; // must be named 'flags' per required::Palette<...>
+    Options no_flags;
+    Options all_flags;
+    virtual auto setUp() -> void;
+    virtual auto tearDown() -> void;
+    auto test_flag_constants() -> void;
+    auto test_flags_constants() -> void;
+    template<typename RESULT> inline static auto as(Option) -> RESULT;
+    template<typename RESULT> inline static auto as(Options) -> RESULT;
+    template<typename FIXTURE> static auto series() -> flags::Series;
+  };
+}
+#endiv
+#divert <ipp>
+#import sys.sock.as
+namespace tests::unit::sock {
+  template<typename RESULT> auto Palette::as(Option f) -> RESULT  { return ::sys::sock::as<RESULT>(f); }
+  template<typename RESULT> auto Palette::as(Options s) -> RESULT { return ::sys::sock::as<RESULT>(s); }
+}
+#endiv
+#divert <tpp>
+#import rigging.suite.io
+namespace tests::unit::sock {
+  template<typename FIXTURE> auto Palette::series() -> flags::Series {
+    using namespace rigging::suite;
+    Stream con{"constants"};
+    // These are actually required to be implemented up in Palette
+    con << call("flag", &FIXTURE::test_flag_constants)
+        << call("flags", &FIXTURE::test_flags_constants)
+      ;
+    return move(con);
+  }
+}
+#endiv
+#divert <cpp>
+#import tests.flags.required.Palette
+namespace tests::unit::sock {
+  static_assert(flags::required::Palette<Palette>);
+}
+#import rigging.unit.lhs
+#import rigging.unit.clear
+namespace tests::unit::sock {
+  using rigging::unit::lhs;
+  using rigging::unit::clear;
+  auto Palette::setUp() -> void {
+    using v = std::vector<Option>;
+    lhs(some_flag_series) = v{// MUST NOT ---> Option::NONE <--- MUST NOT (because that is not a flag, it is the absence of ALL flags)
+                              Option::CLOEXEC,
+                              Option::CLOSE_ON_EXEC,
+                              Option::NONBLOCK};
+    lhs(no_flags) = Options{};
+    lhs(all_flags) = Options{SOCK_CLOEXEC|
+                             SOCK_NONBLOCK};
+    CPPUNIT_ASSERT(0 != some_flag_series.size());
+    CPPUNIT_ASSERT(0 == (int)no_flags);
+    CPPUNIT_ASSERT(0 != (int)all_flags);
+  }
+  auto Palette::tearDown() -> void {
+    lhs(some_flag_series) = clear;
+    lhs(no_flags) = clear;
+    lhs(all_flags) = clear;
+  }
+  auto Palette::test_flag_constants() -> void {
+    // Utter them all [[FIXTHIS]] ensure that this is really all of the constants
+    Option o;
+    o = Option::CLOEXEC;
+    o = Option::NONBLOCK;
+    CPPUNIT_ASSERT(Option::NONBLOCK == o);
+  }
+  auto Palette::test_flags_constants() -> void {
+    // Utter them all [[FIXTHIS]] ensure that this is really all of the constants
+    Options s;
+    s = Options::NONE;
+    s = Option::CLOEXEC;
+    s = Option::NONBLOCK;
+    CPPUNIT_ASSERT(Options::NONE != s);
+    CPPUNIT_ASSERT(s != Options::NONE);
+    s = Options::NONE;
+    CPPUNIT_ASSERT(Options::NONE == s);
+    CPPUNIT_ASSERT(s == Options::NONE);
+  }
+}
+#endiv

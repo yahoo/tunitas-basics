@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import json.Value
+namespace json {
+  namespace detail {
+    namespace pairwise {
+      namespace traits {
+	// There is no struct template, only specializations
+	template<typename JSONITERATOR> struct Value;
+	template<> struct Value<json::Value::const_iterator>;
+	template<> struct Value<json::Value::iterator>;
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+template<> struct json::detail::pairwise::traits::Value<json::Value::iterator> {
+    using itrator_type = json::Value::iterator;
+    using json_value_type = json::Value;
+};
+
+template<> struct json::detail::pairwise::traits::Value<json::Value::const_iterator> {
+    using iterator_type = json::Value::const_iterator;
+    using json_value_type = json::Value const;
+};
+#endiv

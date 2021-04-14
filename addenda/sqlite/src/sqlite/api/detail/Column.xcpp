@@ -1,0 +1,73 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<typename VALUE> struct Column;
+    } 
+  }
+}
+//
+// https://www.sqlite.org/datatype3.html
+// 3.1. Determination Of Column Affinity
+//
+// The affinity of a column is determined by the declared type of the column,
+// according to the following rules in the order shown:
+//
+//    If the declared type contains the string "INT" then it is assigned INTEGER affinity.
+//    If the declared type of the column contains any of the strings "CHAR", "CLOB", or "TEXT"
+//       then that column has TEXT affinity. Notice that the type VARCHAR contains the string
+//       "CHAR" and is thus assigned TEXT affinity.
+//    If the declared type for a column contains the string "BLOB" or if no type is specified then the column has affinity BLOB.
+//    If the declared type for a column contains any of the strings "REAL", "FLOA", or "DOUB" then the column has REAL affinity.
+//    Otherwise, the affinity is NUMERIC.
+//
+// Note that the order of the rules for determining column affinity is important.
+//
+// A column whose declared type is "CHARINT" will match both rules 1 and 2 but
+// the first rule takes precedence and so the column affinity will be INTEGER.
+//
+// Note that a declared type of "FLOATING POINT" would give INTEGER affinity,
+// not REAL affinity, due to the "INT" at the end of "POINT".
+//
+// And the declared type of "STRING" has an affinity of NUMERIC, not TEXT. 
+//
+// Therefore ... Column<char> is ill-posed (it is not an INTEGER but rather is stored as a TEXT)
+// And so on.
+// 
+// builtins
+#entail sqlite.api.detail.Column.bool
+#entail sqlite.api.detail.Column.double
+#entail sqlite.api.detail.Column.int32
+#entail sqlite.api.detail.Column.int64
+// recall: no 'int unsigned' variants because SQLite does not support such.
+
+// "C" data types
+#entail sqlite.api.detail.Column.const_buffer
+#entail sqlite.api.detail.Column.const_stringn
+#entail sqlite.api.detail.Column.const_stringz
+
+// STL data types
+#entail sqlite.api.detail.Column.basic_string
+#entail sqlite.api.detail.Column.string
+#entail sqlite.api.detail.Column.wstring
+#entail sqlite.api.detail.Column.vector
+#entail sqlite.api.detail.Column.vector.char
+
+// SQLite data types
+#entail sqlite.api.detail.Column.Column
+#entail sqlite.api.detail.Column.column.Shell
+#entail sqlite.api.detail.Column.Null
+#entail sqlite.api.detail.Column.Type
+#entail sqlite.api.detail.Column.Value
+#entail sqlite.api.detail.Column.Value.UNPROTECTED
+#endiv
+#divert <hpp>
+#import sqlite.api.detail
+#import sqlite.api.detail.Result
+template<typename VALUE> struct sqlite::api::detail::Column
+  : private sqlite::detail::ResultSFINAE<VALUE> // private, so the unspecialized template is useless
+  , public sqlite::detail::specialization_is_invalid
+{ };
+#endiv

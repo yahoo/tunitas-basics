@@ -1,0 +1,246 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip {
+  class Address;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::ip::Address : public cppunit::test::Fixture {
+public:
+  auto test_constructor_default() -> void;
+  auto test_constructor_in4_addr_t() -> void;
+  auto test_constructor_in4_addr() -> void;
+  auto test_constructor_in6_addr_t() -> void;
+  auto test_constructor_in6_addr() -> void;
+
+  auto test_isIPv4() -> void;
+  auto test_isIPv6() -> void;
+  auto test_isNull() -> void;
+  auto test_isValid() -> void;
+
+  auto test_clear() -> void;
+  auto test_swap() -> void;
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+
+  auto test_operator_insert_none() -> void;
+  auto test_operator_insert_in4_addr_t() -> void;
+  auto test_operator_insert_in4_addr() -> void;
+  auto test_operator_insert_in6_addr_t() -> void;
+  auto test_operator_insert_in6_addr() -> void;
+  auto test_operator_insert_fqdn() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.make.constructors
+#import ip.in4
+#import ip.in6
+#import ip.as
+#import ip.Address
+
+auto tests::unit::ip::Address::test_constructor_default() -> void {
+  ::ip::Address a0;
+  ::ip::Address a1;
+  CPPUNIT_ASSERT_EQUAL(a0, a1);
+  auto actual = ::ip::as<::ip::Address>(a0); // <------------------------------- test this
+  auto expected = a1;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_constructor_in4_addr_t() -> void  {
+  // respect ... RFC 3849
+  ::ip::Address a0(make::in4_addr_t(192, 0, 2, 3));
+  ::ip::Address a1 = a0;
+  CPPUNIT_ASSERT_EQUAL(a0, a1);
+  CPPUNIT_ASSERT(a0.isIPv4());
+  auto actual = ::ip::as<::ip::Address>(a0); // <------------------------------- test this
+  auto expected = a1;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_constructor_in6_addr_t() -> void  {
+  // respect ... RFC 5737
+  ::ip::Address a0(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                    0x7e, 0xd1, 0x4b, 0x2f,
+                                    0x37, 0xdb, 0x49, 0xd6,
+                                    0x80, 0x6d, 0x58, 0xce));
+  ::ip::Address a1 = a0;
+  CPPUNIT_ASSERT_EQUAL(a0, a1);
+  CPPUNIT_ASSERT(a0.isIPv6());
+  auto actual = ::ip::as<::ip::Address>(a0); // <------------------------------- test this
+  auto expected = a1;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_constructor_in4_addr() -> void  {
+  // respect ... RFC 3849
+  ::ip::Address a0(::ip::as<::ip::in4::addr>(make::in4_addr_t(192, 0, 2, 3)));
+  ::ip::Address a1 = a0;
+  CPPUNIT_ASSERT_EQUAL(a0, a1);
+  CPPUNIT_ASSERT(a0.isIPv4());
+  auto actual = ::ip::as<::ip::Address>(a0); // <------------------------------- test this
+  auto expected = a1;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_constructor_in6_addr() -> void  {
+  // respect ... RFC 5737
+  ::ip::Address a0(::ip::as<::ip::in6::addr>(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                              0x7e, 0xd1, 0x4b, 0x2f,
+                                                              0x37, 0xdb, 0x49, 0xd6,
+                                                              0x80, 0x6d, 0x58, 0xce)));
+  ::ip::Address a1 = a0;
+  CPPUNIT_ASSERT_EQUAL(a0, a1);
+  CPPUNIT_ASSERT(a0.isIPv6());
+  auto actual = ::ip::as<::ip::Address>(a0); // <------------------------------- test this
+  auto expected = a1;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_isIPv4() -> void {
+  ::ip::Address a;
+  a.isIPv4();
+#warning WRITEME auto tests::unit::ip::Address::test_isIPv4() -> void 
+}
+
+auto tests::unit::ip::Address::test_isIPv6() -> void {
+  ::ip::Address a;
+  a.isIPv6();
+#warning WRITEME auto tests::unit::ip::Address::test_isIPv6() -> void
+}
+
+auto tests::unit::ip::Address::test_isNull() -> void {
+  ::ip::Address a;
+  a.isNull();
+#warning WRITEME auto tests::unit::ip::Address::test_isNull() -> void
+}
+
+auto tests::unit::ip::Address::test_isValid() -> void {
+  ::ip::Address a;
+  a.isValid();
+#warning WRITEME auto tests::unit::ip::Address::test_isValid() -> void
+}
+
+auto tests::unit::ip::Address::test_clear() -> void {
+  ::ip::Address a;
+  a.clear();
+#warning WRITEME auto tests::unit::ip::Address::test_clear() -> void
+}
+
+auto tests::unit::ip::Address::test_swap() -> void {
+  ::ip::Address a, b;
+  swap(a, b);
+#warning WRITEME auto tests::unit::ip::Address::test_swap() -> void
+}
+
+auto tests::unit::ip::Address::test_operator_eq() -> void {
+  ::ip::Address a, b;
+  a == b;
+#warning WRITEME auto tests::unit::ip::Address::test_operator_eq() -> void
+}
+
+auto tests::unit::ip::Address::test_operator_ne() -> void {
+  ::ip::Address a, b;
+  a != b;
+#warning WRITEME auto tests::unit::ip::Address::test_operator_ne() -> void
+}
+
+#import std.ostringstream
+auto tests::unit::ip::Address::test_operator_insert_none() -> void {
+  ::ip::Address subject;
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "none"; // <------------------ FIXME ... is this the appropriate answer?
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_operator_insert_in4_addr_t() -> void {
+  ::ip::Address subject(make::in4_addr_t(192, 0, 2, 77));
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.77";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_operator_insert_in6_addr_t() -> void {
+  ::ip::Address subject(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                         0xb6, 0x26, 0xf7, 0x8a,
+                                         0x53, 0x61, 0x44, 0x7e,
+                                         0xb6, 0x77, 0x36, 0x0b));
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:b626:f78a:5361:447e:b677:360b";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_operator_insert_in4_addr() -> void {
+  ::ip::Address subject(::ip::as<::ip::in4::addr>(make::in4_addr_t(192, 0, 2, 77)));
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "192.0.2.77";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_operator_insert_in6_addr() -> void {
+  ::ip::Address subject(::ip::as<::ip::in6::addr>(make::in6_addr_t(0x20, 0x01, 0x0d, 0xb8,
+                                                                   0xb6, 0x26, 0xf7, 0x8a,
+                                                                   0x53, 0x61, 0x44, 0x7e,
+                                                                   0xb6, 0x77, 0x36, 0x0b)));
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "2001:db8:b626:f78a:5361:447e:b677:360b";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::ip::Address::test_operator_insert_fqdn() -> void {
+  ::ip::Address subject("somehost.example.com");
+  std::ostringstream buf;
+  buf << subject;
+  std::string actual = buf.str();
+  std::string expected = "somehost.example.com";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import rigging.suite.io
+auto tests::unit::ip::Address::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream constructors("constructors");
+  constructors << call("default", &Address::test_constructor_default)
+               << call("in4::addr_t", &Address::test_constructor_in4_addr_t)
+               << call("in4::addr", &Address::test_constructor_in4_addr)
+               << call("in6::addr_t", &Address::test_constructor_in6_addr_t)
+               << call("in6::addr", &Address::test_constructor_in6_addr)
+    ;
+  Stream insert("operator<<");
+  insert << call("none", &Address::test_operator_insert_none)
+         << call("in4::addr_t", &Address::test_operator_insert_in4_addr_t)
+         << call("in4::addr", &Address::test_operator_insert_in4_addr)
+         << call("in6::addr_t", &Address::test_operator_insert_in6_addr_t)
+         << call("in6::addr", &Address::test_operator_insert_in6_addr)
+         << call("fqdn", &Address::test_operator_insert_fqdn)
+    ;
+  Stream series("Address");
+  series << move(constructors)
+         << call("isIPv4", &Address::test_isIPv4)
+         << call("isIPv6", &Address::test_isIPv6)
+         << call("isNull", &Address::test_isNull)
+         << call("isValid", &Address::test_isValid)
+         << call("clear", &Address::test_clear)
+         << call("swap", &Address::test_swap)
+         << call("operator==", &Address::test_operator_eq)
+         << call("operator!=", &Address::test_operator_ne)
+         << move(insert)
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,6 @@
+// -*- c++ -*- 4b5ad48a-c798-4a69-9e1e-f67106c1e343
+#pragma once
+#include <cppunit/XmlOutputter.h>
+namespace cppunit::xml {
+  using Outputter = CppUnit::XmlOutputter;
+}

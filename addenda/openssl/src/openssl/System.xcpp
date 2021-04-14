@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include "openssl/evp.h" // for the EVP_PKEY #define values (that we support)
+namespace openssl {
+  //
+  // Among the supported EVP_PKEY types
+  // c.f. https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_assign_RSA.html
+  //      https://www.openssl.org/docs/man1.1.0/man3/EVP_PKEY_type.html
+  //
+  // EVP_PKEY_RSA, NID_rsaEncryption
+  //               avoid RSA2 because it is "rare" (what does that mean? there is no "rare").
+  // EVP_PKEY_DSA
+  // EVP_PKEY_DH
+  // EVP_PKEY_EC   NID_X9_62_id_ecPublicKey
+  // EVP_REA_NONE  NID_undef
+  //
+  enum class System
+    { NONE = EVP_PKEY_NONE,
+      RSA = EVP_PKEY_RSA,
+      EC = EVP_PKEY_EC };
+}
+#endiv

@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+#import sys.posix.packaging.lock.Nomenclature
+namespace sys::posix {
+  //
+  // Apply or remove an advisory lock on the open file specified by fd.
+  // This is whole-file locking; you may be wanting of lockf(3) which has dubious byte-range locking with fcntl(2).
+  //
+  // Usage:
+  //
+  //   flock(fd, LOCK::SH);
+  //   flock(fd, LOCK::EX);
+  //   flock(fd, LOCK::UN);
+  //   flock(fd, LOCK::SH | LOCK::NB);
+  //
+  namespace packaging::flock {
+    using namespace packaging::lock::interface;
+    using namespace bundle::flock;
+    namespace function {
+      inline auto flock(File, Specification) -> Status;
+      inline auto flock(File, Operation, Options) -> Status;
+    }
+    namespace native {
+      inline auto flock(int fd, Specification) -> Status;
+      inline auto flock(int fd, Operation, Options) -> Status;
+    }
+  }
+  using packaging::flock::function::flock;
+  namespace native { using packaging::flock::native::flock; }
+}
+using sys::posix::flock; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::flock {
+  auto function::flock(File fd, Operation op, Options ns) -> Status { return native::flock((int)fd, op | ns); }
+  auto function::flock(File fd, Specification op) -> Status         { return native::flock((int)fd, op); }
+  auto native::flock(int fd, Operation op, Options ns) -> Status    { return flock(fd, op | ns); }
+  auto native::flock(int fd, Specification op) -> Status            { return idiomatic::syscall<int>(Syscall::FLOCK, fd, (int)op); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_flock.Usage
+static_assert(tests::usage::posix_flock::Usage<>);
+#endiv

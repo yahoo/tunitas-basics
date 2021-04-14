@@ -1,0 +1,3 @@
+// -*- c++ -*- 44ac551e-fbf2-4ce9-b139-2a1b316cc650
+#pragma once
+#include <ratio>

@@ -1,0 +1,20 @@
+#!/bin/bash
+cd ${0%/*}/.. || exit 70
+: ${with_nearby:=$(realpath ${0%/*}/../..)}
+: ${with_hypogeal_twilight=${with_nearby?}/hypogeal-twilight}
+: ${with_module_c=${with_nearby?}/module-c}
+: ${with_module_std=${with_nearby?}/module-std}
+eval \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    --without-submodules \
+    --without-vernacular-doggerel \
+    --disable-mock-build \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_module_c:+--with-module-c=$with_module_c} \
+    ${with_module_std:+--with-module-std=$with_module_std} \
+    ${end} &&
+make &&
+make check &&
+echo OK DONE

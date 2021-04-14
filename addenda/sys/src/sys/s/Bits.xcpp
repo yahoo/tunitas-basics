@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Flags
+#import sys.s.Bit
+#import mode_t
+namespace sys::s {
+  //
+  // The "bits" are the three bits R, W, X appearing together.
+  // They are made of the same stuff as a mode_t (but are not a mode_t)
+  // Check operator~ to see that only the low three bits are preserved  upon complementation.
+  //
+  // See Flags for the triple (rwx,rwx,rwx) or quad (sst,rwx,rwx,rwx)
+  //
+  // Usage:
+  //
+  //   auto b = Bit::R | Bit::W | Bit::X;
+  //   auto b = ~Bit::X
+  //
+  using Bits = flags::Flags<Bit, mode_t>;
+}
+#endiv
+#divert <hpp>
+#import std.underlying_type
+namespace sys::s {
+  namespace packaging::bits {
+    using Uf = std::underlying_type_t<Bit>;
+    namespace bundle {
+      inline constexpr auto operator|(Bit a, Bit b) -> Bits { return Bits{(Uf)a | (Uf)b}; }
+      inline constexpr auto operator&(Bit a, Bit b) -> Bits { return Bits{(Uf)a & (Uf)b}; }
+      inline constexpr auto operator~(Bit b) -> Bits        { return Bits{07 & ~(Uf)b}; }
+    }
+  }
+  // not helpful ---> using namespace packaging::bits::bundle; <--- not helpful
+  using packaging::bits::bundle::operator|;
+  using packaging::bits::bundle::operator&;
+  using packaging::bits::bundle::operator~;
+}
+#endiv

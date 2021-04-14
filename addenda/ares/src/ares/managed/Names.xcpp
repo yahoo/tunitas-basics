@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed {
+  //
+  // The name (set) as is found in NS or PTR records
+  // Comprises a list of QDN (Qualified Domain Names)
+  //
+  // The name list (name set) is anchored in a Host, from which only the names are used.
+  // This is somewhat ugly, but that is how the underling (C-)ares data structures are used.
+  //
+  // Usage:
+  //
+  //   See reply::Record<NS> or reply::Record<PTR>
+  //
+  class Names;
+}
+#endiv
+#divert <hpp>
+#import ares.managed.host.Aspect
+#import ares.managed.host.Names
+namespace ares {
+  //
+  // Arbitrarily choose Host<IN6> as the anchor ---------------\ (here)
+  //                                                           |
+  //                                                           v
+  class managed::Names : public host::Aspect<host::Names, Host<IN6>> {
+    using ancestor = host::Aspect<host::Names, Host<IN6>>;
+  public:
+    Names() = default;
+    using ancestor::Aspect;
+  };
+}
+#endiv

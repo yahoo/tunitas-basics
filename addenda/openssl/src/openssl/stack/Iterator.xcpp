@@ -1,0 +1,104 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import openssl.required.Iteratable
+namespace openssl::stack {
+  //
+  // The iterator on the Stack<TYPE> and Stack0<TYPE>
+  // Allows for the range for loop to operate on the stack.
+  // These stacks basically a deque of pointers.
+  //
+  // Usage:
+  //
+  //   auto stack = Stack<...>{...somehow...};
+  //   for (auto const &item : stack) {
+  //     ...use item...
+  //   }
+  //
+  template<required::Iteratable> class Iterator;
+}
+#import openssl.stack.Iterator.iterator_traits
+#endiv
+#divert <hpp>
+namespace openssl::stack {
+  template<required::Iteratable STACK> inline auto operator==(Iterator<STACK> const &, Iterator<STACK> const &) -> bool;
+  template<required::Iteratable STACK> inline auto operator!=(Iterator<STACK> const &, Iterator<STACK> const &) -> bool;
+}
+#import std.size_t
+namespace openssl {
+  template<required::Iteratable STACK> class stack::Iterator {
+  public:
+    inline Iterator();
+    using Value = typename std::iterator_traits<Iterator>::Value;
+    inline auto operator*() -> Value;
+    inline auto operator++() -> Iterator &;
+    inline auto operator++(int) -> Iterator;
+    inline auto operator--() -> Iterator &;
+    inline auto operator--(int) -> Iterator;
+  protected:
+    using Owner = STACK;
+    using Index = std::size_t;
+    inline Iterator(Owner &, Index position);
+    friend auto stack::operator==<>(Iterator const &, Iterator const &) -> bool;
+    Owner *owner; // so we can represent null and the default-constructed iterator
+    Index position;
+  };
+}
+#endiv
+#divert <ipp>
+namespace openssl {
+  template<required::Iteratable STACK> auto stack::operator==(Iterator<STACK> const &a, Iterator<STACK> const &b) -> bool {
+    return &a.owner == &b.owner && a.position == b.position;
+  }
+  template<required::Iteratable STACK> auto stack::operator!=(Iterator<STACK> const &a, Iterator<STACK> const &b) -> bool {
+    return !operator==(a, b);
+  }
+}
+#import openssl.exception.Argument
+#import openssl.exception.Range
+#import openssl.functions
+namespace openssl::stack {
+  template<required::Iteratable _> Iterator<_>::Iterator()
+    : owner{nullptr}
+    , position{0}
+  { }
+  template<required::Iteratable _> Iterator<_>::Iterator(Owner &owner, Index position)
+    : owner{&owner}
+    , position{position}
+  { }
+  template<required::Iteratable _> auto Iterator<_>::operator*() -> Value {
+    if (position >= owner.size()) {
+      throw exception::Argument{}; // we know it is bad
+    }
+    auto valued = OPENSSL_sk_value(owner.get(), position);
+    if (nullptr == valued) {
+      throw exception::Range{}; // they know it is bad
+    }
+    return Owner::Traits::revalorize(valued); // magic happens in here for Value0{...} or Value{...} constructors
+  }
+  template<required::Iteratable _> auto Iterator<_>::operator++() -> Iterator & {
+    if (position >= owner.size()) {
+      throw exception::Argument{};
+    }
+    ++position;
+    return *this;
+  }
+  template<required::Iteratable _> auto Iterator<_>::operator++(int) -> Iterator {
+    Iterator old{*this};
+    operator++();
+    return old;
+  }
+  template<required::Iteratable _> auto Iterator<_>::operator--() -> Iterator & {
+    if (0 == position) {
+      throw exception::Argument{};
+    }
+    --position;
+    return *this;
+  }
+  template<required::Iteratable _> auto Iterator<_>::operator--(int) -> Iterator {
+    Iterator old{*this};
+    operator--();
+    return old;
+  }
+}
+#endiv

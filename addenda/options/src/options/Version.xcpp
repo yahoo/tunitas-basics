@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import options.version.String
+namespace options {
+  //
+  // Disambiguation:
+  //     options::throwable::Version - Ancestor of your package's exception
+  //     options::Version            - the vstring v0.1.2.3
+  //
+  // Whereas: options::Version is deprecated
+  // but we don't want to break a lot of working code.
+  using Version = version::String;
+}
+#endiv

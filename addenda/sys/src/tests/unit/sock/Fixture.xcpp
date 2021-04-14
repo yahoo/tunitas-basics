@@ -1,0 +1,105 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::sock { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.sock.Type
+#import sys.sock.Options
+#import sys.sock.Specification
+struct tests::unit::sock::Fixture : public cppunit::test::Fixture {
+  using Type = ::sys::sock::Type;
+  using Option = ::sys::sock::Option;
+  using Options = ::sys::sock::Options;
+  using Specification = ::sys::sock::Specification;
+  auto test_usage_Options() -> void;
+  auto test_usage_Specification() -> void;
+  auto test_call() -> void;
+  auto test_constants() -> void;
+  auto test_as() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  enum Address { ADDRESS };
+  enum Protocol { PROTOCOL };
+  auto socketlike(Address, Specification, Protocol) -> void;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::sock {
+  auto Fixture::socketlike(Address, Specification, Protocol) -> void {
+    // There is nothing to do.
+    // The Unambiguous call to this function is the test itself.
+  }
+  auto Fixture::test_usage_Options() -> void {
+    auto s = Options{Option::CLOEXEC};
+    CPPUNIT_ASSERT(sizeof (s));
+  }
+  auto Fixture::test_usage_Specification() -> void {
+    auto s = Specification{Type::STREAM | Option::CLOEXEC};
+    CPPUNIT_ASSERT(0 != (int)s);
+  }
+}
+#import sys.sock.constants
+namespace tests::unit::sock {
+  auto Fixture::test_constants() -> void {
+    using namespace ::sys::sock::constants;
+    auto t = UNSPECIFIED;
+    t = STREAM;
+    t = DGRAM;
+    t = DATAGRAM;
+    t = SEQPACKET;
+    t = SEQUENCED;
+    t = RDM;
+    t = RELIABLE;
+    t = DCCP;
+    t = RAW;
+    t = PACKET;
+    CPPUNIT_ASSERT(UNSPECIFIED != t);
+    auto s = NONE;
+    s |= CLOEXEC;
+    s |= CLOSE_ON_EXEC;
+    s |= NONBLOCK;
+    CPPUNIT_ASSERT(NONE != s);
+    Specification n = t | s;
+    CPPUNIT_ASSERT(0 != (int)n);
+  }
+}
+#import sys.sock.as
+#import sys.sock.constants
+namespace tests::unit::sock {
+  auto Fixture::test_as() -> void {
+    using namespace ::sys::sock::constants;
+    using ::sys::sock::as;
+    CPPUNIT_ASSERT(Option::CLOEXEC == as<Option>(CLOEXEC));
+    CPPUNIT_ASSERT(Option::NONBLOCK == as<Option>(NONBLOCK));
+  }
+}
+#import tests.unit.sock.Palette
+#import tests.unit.sock.Options
+#import tests.unit.sock.Specification
+#import tests.flags.Scenario
+#import rigging.suite.io
+auto tests::unit::sock::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  namespace testing = tests::unit::sock;
+  Stream series("sock");
+  series << []() {
+              Stream use{"usage"};
+              // anything?
+              use << call("Options", &Fixture::test_usage_Options)
+                  << call("Specification", &Fixture::test_usage_Specification)
+                ;
+              return move(use);
+            }()
+         << call("as", &Fixture::test_as)
+         << call("constants", &Fixture::test_constants)
+         << add<tests::flags::Scenario<1, Palette>>()
+#warning [[FIXTHIS]] the adl testing for contains(...) and is_flag(...) is in posix::SOCK::Fixture
+         << add<testing::Options>()
+         << add<testing::Specification>()
+         << END;
+  return finalize(series);
+}
+#endiv

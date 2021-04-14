@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.argument.converter.Conversion.declaration
+#endiv
+#divert <hpp>
+#import std.is_convertible
+namespace sys::call::argument {
+  template<typename SOURCE, typename TARGET> struct converter::Conversion {
+    using Source = SOURCE;
+    using Target = TARGET;
+    // If this assertion does not work for you then you MUST develop your own specialized conversion.
+    static_assert(std::is_convertible_v<Source, Target>);
+    inline static constexpr auto convert(Source source) -> Target { return source; }
+  };
+}
+#endiv

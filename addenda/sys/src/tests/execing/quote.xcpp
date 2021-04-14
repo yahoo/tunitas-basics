@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+#import tests.execing.quoting.Formatter
+#import nonstd.required.container.Holding
+namespace tests::execing {
+  //
+  // Set up the quoter for an operator<< call site.
+  // The lifetime of the container must be longer than that of the formatter.
+  //
+  // Usage:
+  //
+  //   auto argv = std::vector<std::string>{...somehow...};
+  //   cout << quote(argv) << '\n';
+  //
+  namespace quoting {
+    template<tests::execing::quoting::required::Container CONTAINER> inline auto quote(CONTAINER const &) -> Formatter<CONTAINER>;
+  }
+  using quoting::quote;
+}
+#endiv
+#divert <ipp>
+namespace tests::execing {
+  template<quoting::required::Container CONTAINER> auto quoting::quote(CONTAINER const &container) -> Formatter<CONTAINER> {
+    return Formatter<CONTAINER>{container};
+  }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.vector
+#import std.string
+namespace tests::execing::quoting {
+  using Quoted = decltype(quote(std::vector<std::string>{}));
+  static_assert(0 != sizeof (Quoted));
+}
+#endiv

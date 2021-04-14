@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.regex.Fixture
+#endiv
+#divert <cpp>
+#import nonstd.regex.match
+#import nonstd.regex.matching.Results
+#import nonstd.regex.Pattern
+// [[FIXTHIS]] there should be around six varians of this
+auto tests::unit::regex::Fixture::test_function_match() -> void {
+  using ::nonstd::regex::match;
+  using ::nonstd::regex::matching::Results;
+  using ::nonstd::regex::Pattern;
+  auto const specimen = "apple banana cherry dog eagle frog goat harpie idiot jackass kangaroo llama marmot narwhal ocelot possum quail rat seal turkey usufruct vole whale xylotyl yak zebra"s;
+  auto const pattern = Pattern{".*harpie.*"};
+  { Results<std::string::const_iterator> results;
+    auto matched = match(specimen.begin(), specimen.end(), results, pattern);
+    CPPUNIT_ASSERT(matched); }
+  { Results<char const *> results;
+    auto matched = match(specimen.c_str(), results, pattern);
+    CPPUNIT_ASSERT(matched); }
+  { Results<std::string::const_iterator> results;
+    auto matched = match(specimen, results, pattern);
+    CPPUNIT_ASSERT(matched); }
+}
+#endiv

@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import off_t
+#import sys.id.File
+#import nonstd.dope
+#import sys.posix.preadv2
+#import sys.posix.AT
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_preadv2_function_1() -> void {
+    auto const fd = id::File{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const offset = off_t{0};
+    auto const flags = sys::posix::AT::NONE;
+    auto red = sys::posix::preadv2(fd, &io[0], COUNT, offset, flags);
+    CPPUNIT_ASSERT(fail(red));
+  }
+  auto Fixture::test_preadv2_function_2() -> void {
+    auto const fd = id::File{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const dope = nonstd::dope<iovec>{&io[0], COUNT};
+    auto const offset = off_t{0};
+    auto const flags = sys::posix::AT::NONE;
+    auto red = sys::posix::preadv2(fd, dope, offset, flags);
+    CPPUNIT_ASSERT(fail(red));
+  }
+}
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_preadv2_native_1() -> void {
+    auto const fd = int{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const offset = off_t{0};
+    auto const flags = sys::posix::AT::NONE;
+    auto red = sys::posix::native::preadv2(fd, &io[0], COUNT, offset, flags);
+    CPPUNIT_ASSERT(fail(red));
+  }
+  auto Fixture::test_preadv2_native_2() -> void {
+    auto const fd = int{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const dope = nonstd::dope<iovec>{&io[0], COUNT};
+    auto const offset = off_t{0};
+    auto const flags = sys::posix::AT::NONE;
+    auto red = sys::posix::native::preadv2(fd, dope, offset, flags);
+    CPPUNIT_ASSERT(fail(red));
+  }
+}
+#endiv

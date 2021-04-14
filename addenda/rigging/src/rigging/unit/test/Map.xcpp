@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::unit::test {
+  class Map;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import std.function
+#import std.map
+#import std.string
+#import std.initializer_list
+
+class rigging::unit::test::Map : public std::map<std::string, std::function<cppunit::Test *(void)>> {
+  using ancestor = std::map<std::string, std::function<cppunit::Test *(void)>>;
+public:
+  inline explicit Map(std::initializer_list<ancestor::value_type>);
+};
+#endiv
+#divert <ipp>
+#import rigging.unit.Usage
+#import std.vector
+#import std.string
+#import std.invalid_argument
+rigging::unit::test::Map::Map(std::initializer_list<ancestor::value_type> list)
+  : ancestor(list) {
+  Map &self(*this);
+  mapped_type usage(&Usage::suite);
+  // WATCHOUT - these get inserted into the map *after* the initializer list
+  // That means that the descendant's bindings for --usage or --help will never be admitted.
+  // So we check for that and vomit if there is already a binding.
+  for (auto const &word : std::vector<std::string>{"--help", "--usage"}) {
+    if (self.end() != self.find(word)) {
+      throw std::invalid_argument("already a binding for " + word);
+    }
+    self[word] = usage;
+  }
+}
+#endiv

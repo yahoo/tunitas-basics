@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+// whereas ish::tuple::cat takes arguments of tuples and flattens them out into one big tuple
+// ish::tuple::cons adds an element to the tuple on either end, front or back.
+#import std.tuple
+namespace ish::tuple {
+  // not found by ADL
+  template<typename TYPE, typename... TYPES> inline auto cons(TYPE &&, std::tuple<TYPES...> &&) -> std::tuple<TYPE, TYPES...>;
+  template<typename... TYPES, typename TYPE> inline auto cons(std::tuple<TYPES...> &&, TYPE &&) -> std::tuple<TYPES..., TYPE>;
+}
+#endiv
+#divert <ipp>
+#import std.forward
+template<typename TYPE, typename... TYPES> auto ish::tuple::cons(TYPE &&anon1, std::tuple<TYPES...> &&anonN) -> std::tuple<TYPE, TYPES...> {
+  return std::tuple_cat(std::tuple<TYPE>(std::forward<TYPE>(anon1)), std::forward<std::tuple<TYPES...>>(anonN));
+}
+
+template<typename... TYPES, typename TYPE> auto ish::tuple::cons(std::tuple<TYPES...> &&anonN, TYPE &&anon1) -> std::tuple<TYPES..., TYPE> {
+  return std::tuple_cat(std::forward<std::tuple<TYPES...>>(anonN), std::tuple<TYPE>(std::forward<TYPE>(anon1)));
+}
+#endiv

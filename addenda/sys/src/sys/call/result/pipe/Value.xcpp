@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result // to cascade the namespaces, in lieu of sys.call.result.required
+#import sys.required.Descriptor
+namespace sys::call::result::pipe {
+  //
+  // The outome of a pipe() or pipe2() system call
+  //
+  // This needs to be a distinct type so that ADL will find it.
+  //
+  // Usage:
+  //
+  //   auto piped = sys::posix::pipe();
+  //   auto piped = sys::posix::pipe(O::DIRECT | O::CLOEXEC | O::NONBLOCK);
+  //   auto rd = read_side(piped);
+  //   auto wr = write_side(piped);
+  //
+  template<required::Descriptor> class Value;
+}
+#endiv
+#divert <hpp>
+namespace sys::call::result::pipe {
+  //
+  // Available by inheritance
+  // ok(...),
+  // error_code(...),
+  // error_condition(...),
+  // error_message(...),
+  // error_num(...), etc 
+  //
+  template<required::Descriptor FD> inline auto read_side(Value<FD> const &) -> FD;
+  template<required::Descriptor FD> inline auto write_side(Value<FD> const &) -> FD;
+}
+#import sys.call.result.Value
+#forward sys.call.result.Size.pipe.Value
+#forward sys.call.result.Element.pipe.Value
+namespace sys::call::result {
+  template<required::Descriptor FD> class pipe::Value : public result::Value<FD, FD> {
+    using Ancestor = result::Value<FD, FD>;
+    // template<std::size_t N, required::Descriptor F> friend class result::Element<N, pipe::Value<F>>;
+    template<std::size_t N, typename VFD> friend class result::Element;
+    friend class result::Element<0, Value<FD>>;
+    friend class result::Element<1, Value<FD>>;
+    friend class Size<Value<FD>>;
+  public:
+    Value() = default;
+    using Ancestor::Value;
+  };
+}
+#endiv  
+#divert <ipp>
+namespace sys::call::result {
+  template<required::Descriptor FD> auto pipe::read_side(Value<FD> const &v) -> FD { return result::get<0>(v); }
+  template<required::Descriptor FD> auto pipe::write_side(Value<FD> const &v) -> FD { return result::get<1>(v); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.call_result_pipe_Value.Usage
+namespace {
+  static_assert(tests::usage::call_result_pipe_Value::Usage<>);;
+}
+#endiv

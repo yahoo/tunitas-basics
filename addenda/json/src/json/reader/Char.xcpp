@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::reader {
+  //
+  // The character reader, as of jsoncpp-1.8.3.
+  // This is a very Java-centric way of managing the API.
+  //
+  // Usage:
+  //
+  //   reader::builder::Char bob;
+  //   bob ...set up...
+  //   std::unique_ptr<reader::Char> r(bob.newCharReader());
+  //   bool b = r->parse(...)
+  //   std::string s = r->getFormattedErrorMessages();
+  //
+  using Char = ::Json::CharReader;
+}
+#endiv

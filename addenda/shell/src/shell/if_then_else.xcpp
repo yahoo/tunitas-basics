@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell {
+  template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> struct IfThenElse;
+  namespace detail {
+    namespace if_then_else {
+      template<typename BASE, typename... ARGUMENTS> struct Arguments;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import std.bind
+#import std.placeholders
+
+namespace shell {
+  template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> inline auto if_then_else(CONDITION const &, CONSEQUENT const &, ALTERNATE const &) -> RESULT;
+  namespace ite {
+    template<typename BASE, typename... ARGUMENTS> inline auto arguments(ARGUMENTS const &...) -> detail::if_then_else::Arguments<BASE, ARGUMENTS...>;
+  }
+}
+
+template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> struct shell::IfThenElse {
+  using condition_type = CONDITION;
+  using consequent_type = CONSEQUENT;
+  using alternate_type = ALTERNATE;
+  using result_type = RESULT;
+  template<typename BASE, typename... ARGUMENTS> using Arguments = detail::if_then_else::Arguments<BASE, ARGUMENTS...>;
+  inline IfThenElse(condition_type const &, consequent_type const &, alternate_type const &);
+  template<typename CONDITION_ARGUMENTS, typename CONSEQUENT_ARGUMENTS, typename ALTERNATE_ARGUMENTS> inline auto operator()(CONDITION_ARGUMENTS const &, CONSEQUENT_ARGUMENTS const &, ALTERNATE_ARGUMENTS const &) -> result_type;
+public:
+  condition_type condition;
+  consequent_type consequent;
+  alternate_type alternate;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+
+template<typename BASE, typename... ARGUMENTS> struct shell::detail::if_then_else::Arguments {
+public:
+  inline Arguments(ARGUMENTS const &...);
+  using result_type = typename BASE::result_type;
+  inline auto operator()(BASE &) -> result_type;
+protected:
+  decltype(std::bind(std::placeholders::_1, ARGUMENTS()...)) call;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+
+#divert </hpp>
+#divert <ipp>
+template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> inline auto shell::if_then_else(CONDITION const &condition, CONSEQUENT const &consequent, ALTERNATE const &alternate) -> RESULT {
+  IfThenElse<RESULT, CONDITION, CONSEQUENT, ALTERNATE> ret(condition, consequent, alternate); 
+  return ret;
+}
+
+template<typename BASE, typename... ARGUMENTS> inline auto shell::ite::arguments(ARGUMENTS const &...arguments) -> detail::if_then_else::Arguments<BASE, ARGUMENTS...> {
+  detail::if_then_else::Arguments<BASE, ARGUMENTS...> ret(arguments...);
+  return ret;
+}
+
+
+template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> shell::IfThenElse<RESULT, CONDITION, CONSEQUENT, ALTERNATE>::IfThenElse(condition_type const &the_condition, consequent_type const &the_consequent, alternate_type const &the_alternate)
+  : condition(the_condition)
+  , consequent(the_consequent)
+  , alternate(the_alternate) {
+  ;
+}
+
+template<typename RESULT, typename CONDITION, typename CONSEQUENT, typename ALTERNATE> template<typename CONDITION_ARGUMENTS, typename CONSEQUENT_ARGUMENTS, typename ALTERNATE_ARGUMENTS> auto shell::IfThenElse<RESULT, CONDITION, CONSEQUENT, ALTERNATE>::operator()(CONDITION_ARGUMENTS const &call_condition, CONSEQUENT_ARGUMENTS const &call_consequent, ALTERNATE_ARGUMENTS const &call_alternate) -> result_type {
+  if (call_condition(condition)) {
+    return call_consequent(consequent);
+  } else {
+    return call_alternate(alternate);
+  }
+}  
+
+template<typename BASE, typename... ARGUMENTS> shell::detail::if_then_else::Arguments<BASE, ARGUMENTS...>::Arguments(ARGUMENTS const &...arguments)
+  : call(std::bind(std::placeholders::_1, arguments...)) {
+  ;
+}
+
+template<typename BASE, typename... ARGUMENTS> auto shell::detail::if_then_else::Arguments<BASE, ARGUMENTS...>::operator()(BASE &base) -> result_type {
+  return call(base);
+}
+#divert </ipp>

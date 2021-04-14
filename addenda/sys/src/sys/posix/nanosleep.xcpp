@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sleep.interface
+namespace sys::posix {
+  //
+  // Design:
+  //
+  //   The time literals, e.g. 1s, 1ms, 1us, 1ns are in the basic precision unit
+  //   They SHOULD be converted to nanosecond precision at the call site
+  //
+  // Usage:
+  //
+  //   auto slept = nanoseconds(duration_cast<Nanoseconds>(10ns));
+  //   auto slept = nanoseconds(10ns);
+  //   
+  namespace packaging::nanosleep {
+    using namespace packaging::sleep;
+    namespace interface {
+      using namespace packaging::sleep::interface;
+      namespace required = packaging::sleep::interface::required;
+      template<required::Integer REP, required::Ratio RATIO> inline auto nanosleep(duration::Duration<REP, RATIO> const &) -> result::Returned<duration::Duration<REP, RATIO>>;
+      template<required::Integer REP, required::Ratio RATIO> inline auto nanosleep(duration::Duration<REP, RATIO> const &, [[out]] duration::Duration<REP, RATIO> &) -> result::Status;
+      // You can't get nanosecond precision out of time::Val, so it is removed
+      inline auto nanosleep(time::Val const &) -> result::Returned<time::Val> = delete;
+      inline auto nanosleep(time::Val const &, nullptr_t) -> result::Status = delete;
+      inline auto nanosleep(time::Val const &, time::Val &) -> result::Status = delete;
+      inline auto nanosleep([[in]] time::Spec const &) -> result::Returned<time::Spec>;
+      inline auto nanosleep([[in]] time::Spec const &, nullptr_t) -> result::Status;
+      inline auto nanosleep([[in]] time::Spec const &, [[out]] time::Spec &) -> result::Status;
+    }
+  }
+  using packaging::nanosleep::interface::nanosleep;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+#import sys.posix.packaging.sleep.coerce
+#import sys.posix.packaging.sleep.returning
+#import sys.posix.packaging.sleep.status
+namespace sys::posix::packaging::nanosleep {
+  auto interface::nanosleep(time::Spec const &interval) -> result::Returned<time::Spec>            { return returning(interval); }
+  auto interface::nanosleep(time::Spec const &interval, std::nullptr_t) -> result::Status          { return idiomatic::syscall<int>(Syscall::NANOSLEEP, &interval, reinterpret_cast<time::Spec const *>(0)); }
+  auto interface::nanosleep(time::Spec const &interval, time::Spec &remaining) -> result::Status   { return idiomatic::syscall<int>(Syscall::NANOSLEEP, &interval, &remaining); }
+  template<interface::required::Integer REP, interface::required::Ratio RATIO> auto interface::nanosleep(duration::Duration<REP, RATIO> const &interval) -> result::Returned<duration::Duration<REP, RATIO>> {
+    auto const presented = coerce<duration::Nanoseconds>(interval);
+    return coerce<duration::Duration<REP, RATIO>>(returning(presented));
+  }
+  template<interface::required::Integer REP, interface::required::Ratio RATIO> auto interface::nanosleep(duration::Duration<REP, RATIO> const &interval, duration::Duration<REP, RATIO> &remaining) -> result::Status {
+    auto const presented = coerce<time::Spec>(interval);
+    auto collected = time::Spec{};
+    auto status = idiomatic::syscall<int>(Syscall::NANOSLEEP, &presented, &collected);
+    // ALWAYS update the remaining, even when the return is fail(slept) ... e.g. interrupted by a signal handler.
+    remaining = coerce<duration::Duration<REP, RATIO>>(collected);
+    return status;
+  }
+}
+#endiv

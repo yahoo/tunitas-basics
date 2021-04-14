@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/file.h> // availability as coumented in flock(2)
+namespace sys::flock {
+  // The individual option flags
+  // The "socket flags" are enumerated on the manual page socket(2)
+  enum class Option {
+    NONE      = 0, //                a.k.a. Option{}
+    ADVISORY  = NONE, //             but ADVISORY is not really a "bit" or a "flag" per se; it is the absence (of MANDATORY)
+    NONBLOCK  = LOCK_NB, //          rhymes with O::NONBLOCK
+    MANDATORY = LOCK_MAND,
+    NB   [[deprecated("spell it out! instead, prefer Option::NONBLOCK")]]  = NONBLOCK,
+    MAND [[deprecated("spell it out! instead, prefer Option::MANDATORY")]] = MANDATORY,
+  };
+}
+#endiv

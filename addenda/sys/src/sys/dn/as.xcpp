@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.dn.Notifies
+#import sys.dn.required.Notifies
+namespace sys::dn {
+  template<required::Notifies RESULT> auto as(Notifies) -> RESULT = delete;
+  template<required::Notifies RESULT> auto as(Notify) -> RESULT = delete;
+  template<> inline auto as<Notify>(Notify) -> Notify;  //      unexceptional (identity)
+  template<> inline auto as<Notify>(Notifies) -> Notify;  //    demotion can throw because it demotion of multi-flag values is ambiguous.
+  template<> inline auto as<Notifies>(Notify) -> Notifies; //   unexceptional (simple promotion)
+  template<> inline auto as<Notifies>(Notifies) -> Notifies; // unexceptional (identity)
+}
+#endiv
+#divert <ipp>
+#import sys.flags.maskof
+namespace sys {
+  template<> auto dn::as<dn::Notify>(Notify n) -> Notify       { return n; }
+  template<> auto dn::as<dn::Notify>(Notifies n) -> Notify     { return sys::flags::maskof<Notify>(n, Notifies::Limits::begin(), Notifies::Limits::end()); }
+  template<> auto dn::as<dn::Notifies>(Notify n) -> Notifies   { return Notifies{n}; }
+  template<> auto dn::as<dn::Notifies>(Notifies n) -> Notifies { return n; }
+}
+#endiv

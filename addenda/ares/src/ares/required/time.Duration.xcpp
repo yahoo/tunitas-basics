@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.required.time.Ratio
+#import std.chrono.duration
+#import std.is_same
+namespace ares::required::time {
+  //
+  // Is this a duration?
+  // Not a descendant, but an instance of the template std::chrono::duration<R, P>
+  //
+  template<typename DURATION> concept bool Duration = requires(DURATION duration) {
+    typename DURATION::rep;
+    typename DURATION::period;
+    requires std::is_same<DURATION, std::chrono::duration<typename DURATION::rep, typename DURATION::period>>::value;
+  };
+}
+#endiv

@@ -1,0 +1,269 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::json {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::json::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_experimental_hash_of_bind_overloading_which_does_not_work() -> void;
+  auto test_pair() -> void;
+  auto test_charcode() -> void;
+  auto test_literal() -> void;
+  auto test_qq() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+#import std.set
+#import std.string
+#import std.vector
+
+#import format.json.pair
+auto tests::unit::format::json::Fixture::test_experimental_hash_of_bind_overloading_which_does_not_work() -> void {
+  std::ostringstream buf;
+  std::string const apple = "apple";
+  std::string const cherry = "cherry";
+  int dog = 3;
+  double eagle = 4.0;
+  using ::format::json::pair;
+  static_assert(::format::json::required::Stringlike<decltype(apple)>, "fail");
+  static_assert(::format::json::required::Stringlike<decltype("banana")>, "fail");
+  static_assert(::format::json::required::stringlike::Array<decltype("banana")>, "fail");
+  static_assert(::format::json::required::Numeric<decltype(dog)>, "fail");
+  static_assert(::format::json::required::Stringlike<decltype(cherry)>, "fail");
+  static_assert(::format::json::required::Literally<decltype(dog)>, "fail");
+  buf << ::format::json::pair(apple, "banana")
+      << pair(apple, "banana")
+      << ' ';
+  buf << pair("banana", cherry)
+      << ' ';
+  buf << ::format::json::pair(cherry, dog)
+      << pair<std::string, int>(cherry, dog)
+      << pair(cherry, dog)
+      << pair(cherry, "dog")
+      << pair(cherry, cherry)
+      << pair(cherry, 0)
+      << pair(cherry, dog)
+      << pair(cherry, 0.0)
+      << ' ';
+  buf << pair("dog", eagle)
+      << ' ';
+  buf << pair("eagle", false)
+      << ' ';
+  buf << pair("false", nullptr)
+      << ' ';
+  buf << pair("null", true)
+    ;
+  std::string const expected = R"quote("apple":"banana" "banana":"cherry" "cherry":3 "3":4 "4":false "false":null "null":true)quote";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+#import std.fixed
+#import std.setprecision
+auto tests::unit::format::json::Fixture::test_pair() -> void {
+  std::ostringstream buf;
+  std::string const apple = "apple";
+  std::string const cherry = "cherry";
+  int dog = 3;
+  double eagle = 4.0;
+  using ::format::json::pair;
+  buf << std::fixed << std::setprecision(1)
+      << pair(apple, "banana")
+      << ' '
+      << pair("banana", cherry)
+      << ' '
+      << pair(cherry, dog)
+      << ' '
+      << pair("dog", eagle)
+      << ' '
+      << pair("eagle", false)
+      << ' '
+      << pair("false", nullptr)
+      << ' '
+      << pair("null", true)
+    ;
+  std::string const expected = R"quote("apple":"banana" "banana":"cherry" "cherry":3 "dog":4.0 "eagle":false "false":null "null":true)quote";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+#import std.string
+#import std.string_view
+#import c.stringz
+#import c.const_stringz
+#import c.stringn
+#import c.const_stringn
+#import format.json.literal
+auto tests::unit::format::json::Fixture::test_literal() -> void {
+  std::ostringstream buf;
+  using ::format::json::literal;
+  buf << literal(nullptr)
+      << ' '
+      << literal(true)
+      << ' '
+      << literal(false)
+#if 0
+    // There are no literal characters, only literal strings
+      << literal('a')
+      << ' '
+      << literal('\x01')
+      << ' '
+      << literal('\xff')
+#endif
+      << " char[int8]: "
+      << literal((char unsigned) 1)
+      << '/'
+      << literal((char signed) -1)
+      << " short: "
+      << literal((int short unsigned) 2)
+      << '/'
+      << literal((int short signed) -2)
+      << " int: "
+      << literal((int short unsigned) 3)
+      << '/'
+      << literal((int short signed) -3)
+      << " long: "
+      << literal((int long unsigned) 4)
+      << '/'
+      << literal((int long signed) -4)
+      << " long long: "
+      << literal((int long long unsigned) 5)
+      << '/'
+      << literal((int long long signed) -5)
+      << " float: "
+      << literal((float) 6.7)
+      << '/'
+      << literal((float) -6.7)
+      << " double: "
+      << literal((double) 7.8)
+      << '/'
+      << literal((double) -7.8)
+      << " long double: "
+      << literal((double) 8.9)
+      << '/'
+      << literal((double) -8.9)
+    ;
+  buf << " char const *: "
+      << literal("apple")
+      << " std::string(s): "
+      << literal(std::string("banana"))
+      << '/'
+      << literal(std::string_view("cherry"))
+    ;
+  char raw_dog[] = "dog";
+  c::stringz dog(raw_dog);
+  c::stringz const_dog(raw_dog);
+  buf << " c::stringz: "
+      << literal(dog)
+      << '/'
+      << literal(const_dog)
+    ;
+  char raw_eagle[] = "eagle";
+  c::stringn eagle(raw_eagle, sizeof (raw_eagle)-1);
+  c::const_stringn const_eagle(raw_eagle, sizeof (raw_eagle)-1);
+  buf << " c::stringn: "
+      << literal(eagle)
+      << '/'
+      << literal(const_eagle)
+    ;
+  std::string const expected = (R"json(null true false)json"
+#if 0
+                                // There are no literal characters, only literal strings
+                                " " R"json("a" \u0001 \u00ff)json"
+#endif
+                                " "
+                                R"json(char[int8]: 1/-1)json"
+                                " "
+                                R"json(short: 2/-2)json"
+                                " "
+                                R"json(int: 3/-3)json"
+                                " "
+                                R"json(long: 4/-4)json"
+                                " "
+                                R"json(long long: 5/-5)json"
+                                " "
+                                R"json(float: 6.7/-6.7)json"
+                                " "
+                                R"json(double: 7.8/-7.8)json"
+                                " "
+                                R"json(long double: 8.9/-8.9)json"
+                                " "
+                                R"json(char const *: "apple")json"
+                                " "
+                                R"json(std::string(s): "banana"/"cherry")json"
+                                " "
+                                R"json(c::stringz: "dog"/"dog")json"
+                                " "
+                                R"json(c::stringn: "eagle"/"eagle")json");
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import format.json.charcode
+auto tests::unit::format::json::Fixture::test_charcode() -> void {
+  std::ostringstream buf;
+  using ::format::json::charcode;
+  char const *const literal1 = R"json(abcdefghijklmnopqrstuvwxyz01234567890'"\/()[])json";
+  for (auto const *l(literal1); '\0' != *l; ++l) {
+    buf << charcode(*l);
+  }
+  char const *const literal2 = "\b\f\t\n";
+  for (auto const *l(literal2); '\0' != *l; ++l) {
+    buf << charcode(*l);
+  }
+  std::string const expected = R"json(abcdefghijklmnopqrstuvwxyz01234567890'\"\\\/()[]\b\f\t\n)json";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import format.json.qq
+auto tests::unit::format::json::Fixture::test_qq() -> void {
+  std::ostringstream buf;
+  using ::format::json::qq;
+  char apple = 'a';
+  std::string const cherry = "cherry";
+  int dog = 3;
+  buf << qq(apple) << ' ' << qq("banana") << ' ' << qq(cherry) << ' ' << qq(dog);
+  std::string const expected = R"quote("a" "banana" "cherry" "3")quote";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}  
+
+#import tests.unit.format.json.Charcode
+#import tests.unit.format.json.Literal
+#import tests.unit.format.json.Pair
+#import tests.unit.format.json.QuoteQuote
+#import rigging.suite.io
+auto tests::unit::format::json::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("json");
+  series << call("some-pair", &Fixture::test_pair)
+         << call("some-charcode", &Fixture::test_charcode)
+         << call("some-literal", &Fixture::test_literal)
+         << call("some-qq", &Fixture::test_qq)
+         << add(Charcode::suite())
+         << add(Literal::suite())
+         << add(Pair::suite())
+         << add(QuoteQuote::suite())
+         ;
+  return finalize(series);
+}
+#endiv

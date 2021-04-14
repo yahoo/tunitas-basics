@@ -1,0 +1,569 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.posix.Driver.declaration
+namespace tests::unit::posix {
+#if __cplusplus < 202003L
+  // C++20? http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1099r5.html
+  inline constexpr auto FCNTL = Call::FCNTL;
+#endif
+  struct Driver<FCNTL>;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import flock
+#import flock64
+namespace tests::unit::posix {
+  template<> struct Driver<FCNTL> : public cppunit::test::Fixture {
+    struct Truct {
+      using Flock = struct flock; // ... pesky!
+      using Flock64 = flock64; // ...... no occluding function flock64
+    };
+    auto test_dupfd() -> void;
+    auto test_dupfd_cloexec() -> void;
+    auto test_getfd() -> void;
+    auto test_setfd() -> void;
+    auto test_getfl() -> void;
+    auto test_setfl() -> void;
+    auto test_getlk() -> void;
+    auto test_setlk() -> void;
+    auto test_setlkw() -> void;
+    auto test_ofd_getlk() -> void;
+    auto test_ofd_setlk() -> void;
+    auto test_ofd_setlkw() -> void;
+    auto test_getlk64() -> void;
+    auto test_setlk64() -> void;
+    auto test_setlkw64() -> void;
+    auto test_ofd_getlk64() -> void;
+    auto test_ofd_setlk64() -> void;
+    auto test_ofd_setlkw64() -> void;
+    auto test_getlease() -> void;
+    auto test_setlease_by_LEASE() -> void;
+    auto test_setlease_by_LOCK() -> void;
+    auto test_getpipe_sz() -> void;
+    auto test_setpipe_sz() -> void;
+    auto test_getown() -> void;
+    auto test_setown() -> void;
+    auto test_getown_ex() -> void;
+    auto test_setown_ex() -> void;
+    auto test_getsig() -> void;
+    auto test_setsig() -> void;
+    auto test_notify() -> void;
+    auto test_add_seals() -> void;
+    auto test_get_seals() -> void;
+    auto test_get_rw_hint() -> void;
+    auto test_set_rw_hint() -> void;
+    auto test_get_file_rw_hint() -> void;
+    auto test_set_file_rw_hint() -> void;
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <cpp>
+#import nonstd.uninitialized.zero
+#import sys.posix.F
+#import sys.posix.F.SEAL
+#import sys.posix.FD
+#import sys.posix.DN
+#import sys.posix.LEASE
+#import sys.posix.LOCK
+#import sys.posix.O
+#import sys.posix.fcntl
+#import tests.guardian.Closer
+namespace tests::unit::posix {
+  auto Driver<FCNTL>::test_dupfd() -> void {
+    using F = six::F;
+    auto const fd = 0;
+    auto const greater_than = 0;
+    auto duped = nat::fcntl(fd, F::DUPFD, greater_than);
+    CPPUNIT_ASSERT(good(duped) || !good(duped)); // just show it was callable
+    guardian::Closer<guardian::closer::Native> guard{value(duped)};
+  }
+  auto Driver<FCNTL>::test_dupfd_cloexec() -> void {
+    using F = six::F;
+    auto const fd = 0;
+    auto const greater_than = 2;
+    auto duped = nat::fcntl(fd, F::DUPFD_CLOEXEC, greater_than);
+    CPPUNIT_ASSERT(good(duped) || !good(duped)); // just show it was callable
+    guardian::Closer<guardian::closer::Native> guard{value(duped)};
+  }
+  auto Driver<FCNTL>::test_getfd() -> void {
+    using FD = six::FD;
+    using F = six::F;
+    auto fd = 0;
+    auto got = nat::fcntl(fd, F::GETFD);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    FD::Flags them = FD::Flags{value(got)};
+    CPPUNIT_ASSERT(sizeof (them));
+  }
+  auto Driver<FCNTL>::test_setfd() -> void {
+    using FD = six::FD;
+    using F = six::F;
+    // We will change the fd, so make a new one to modify..
+    auto duped = nat::fcntl(0, F::DUPFD, 0);
+    CPPUNIT_ASSERT(good(duped) || !good(duped)); // just show it was callable
+    int tmp = value(duped);
+    guardian::Closer<guardian::closer::Native> guard{tmp};
+    { auto sat = nat::fcntl(tmp, F::SETFD, FD::NONE); // <-------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFD, FD::CLOEXEC); // <-------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFD, FD::CLOEXEC | FD::CLOEXEC); // <---------- test this (combination)
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFD, ~FD::CLOEXEC); // turn it off?
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+  }
+  auto Driver<FCNTL>::test_getfl() -> void {
+    using O = six::O;
+    using F = six::F;
+    auto got = nat::fcntl(0, F::GETFL);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    auto them = O::Flags{value(got)};
+    CPPUNIT_ASSERT(sizeof (them));
+  }
+  auto Driver<FCNTL>::test_setfl() -> void {
+    using O = six::O;
+    using F = six::F;
+    // We will change the fd, so make a new one to modify..
+    auto duped = nat::fcntl(0, F::DUPFD, 0);
+    CPPUNIT_ASSERT(good(duped) || !good(duped)); // just show it was callable
+    int tmp = value(duped);
+    guardian::Closer<guardian::closer::Native> guard{tmp};
+    // <quote>[On Linux] this command can change only the O_APPEND, O_ASYNC, O_DIRECT, O_NOATIME, and O_NONBLOCK flags.</quote>
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE); // <---------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::APPEND); // <-------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::DIRECT); // <-------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NOATIME); // <------------- test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONBLOCK); // <------------ test this
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    // And then test combinations
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE | O::APPEND);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE | O::APPEND | O::DIRECT);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE | O::APPEND | O::DIRECT | O::NOATIME);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    { auto sat = nat::fcntl(tmp, F::SETFL, O::NONE | O::APPEND | O::DIRECT | O::NOATIME | O::NONBLOCK);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+  }
+  auto Driver<FCNTL>::test_getlk() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::GETLK, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_setlk() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::SETLK, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_setlkw() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::SETLKW, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_ofd_getlk() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_GETLK, buf); // <----------- test this OFD_GETLK
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_ofd_setlk() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_SETLK, buf); // <---------- test this OFD_SETLK
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_ofd_setlkw() -> void {
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_SETLKW, buf); // <-------- test this OFD_SETLKW
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_getlk64() -> void {
+    using F = six::F;
+    flock64 buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::GETLK64, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_setlk64() -> void {
+    using F = six::F;
+    flock64 buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::SETLK64, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_setlkw64() -> void {
+    using F = six::F;
+    flock64 buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::SETLKW64, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_ofd_getlk64() -> void {
+#ifdef F_OFD_GETLK64
+    using F = six::F;
+    flock64 buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_GETLK64, buf); // <----------- test this OFD_GETLK64
+    CPPUNIT_ASSERT(good(got) || !good(got));
+#endif
+  }
+  auto Driver<FCNTL>::test_ofd_setlk64() -> void {
+#ifdef F_OFD_SETLK64
+    using F = six::F;
+    flock64 buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_SETLK64, buf); // <---------- test this OFD_SETLK64
+    CPPUNIT_ASSERT(good(got) || !good(got));
+#endif
+  }
+  auto Driver<FCNTL>::test_ofd_setlkw64() -> void {
+#ifdef F_OFD_SETLKW64
+    using F = six::F;
+    Truct::Flock buf;
+    nonstd::uninitialized::zero(buf);
+    auto fd = -1;
+    auto got = nat::fcntl(fd, F::OFD_SETLKW64, buf); // <-------- test this OFD_SETLKW64
+    CPPUNIT_ASSERT(good(got) || !good(got));
+#endif
+  }
+  auto Driver<FCNTL>::test_getlease() -> void {
+    using F = six::F;
+    using LOCK = six::LOCK;
+    auto const fd = -1;
+    auto got = nat::fcntl(fd, F::GETLEASE);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    auto them = LOCK::Lease{value(got)};
+    CPPUNIT_ASSERT(sizeof (them));
+  }
+  auto Driver<FCNTL>::test_setlease_by_LEASE() -> void {
+    using F = six::F;
+    using LEASE = six::LEASE;
+    auto const fd = -1;
+    { auto got = nat::fcntl(fd, F::SETLEASE, LEASE::RD);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+    { auto got = nat::fcntl(fd, F::SETLEASE, LEASE::WR);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+    { auto got = nat::fcntl(fd, F::SETLEASE, LEASE::END);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+  }
+  auto Driver<FCNTL>::test_setlease_by_LOCK() -> void {
+    using F = six::F;
+    using LOCK = six::LOCK;
+    auto const fd = -1;
+    { auto got = nat::fcntl(fd, F::SETLEASE, LOCK::RD);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+    { auto got = nat::fcntl(fd, F::SETLEASE, LOCK::WR);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+    { auto got = nat::fcntl(fd, F::SETLEASE, LOCK::END);
+      CPPUNIT_ASSERT(good(got) || !good(got)); }
+  }
+  auto Driver<FCNTL>::test_getpipe_sz() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    auto got = nat::fcntl(fd, F::GETPIPE_SZ);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    int them = value(got);
+    CPPUNIT_ASSERT(sizeof (them));
+  }
+  auto Driver<FCNTL>::test_setpipe_sz() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    int const resize = 8096;
+    auto sat = nat::fcntl(fd, F::SETPIPE_SZ, resize);
+    CPPUNIT_ASSERT(good(sat) || !good(sat)); // just show it was callable
+  }
+  auto Driver<FCNTL>::test_getown() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    auto got = nat::fcntl(fd, F::GETOWN);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    id_t that = value(got);
+    CPPUNIT_ASSERT(sizeof (that));
+  }
+  auto Driver<FCNTL>::test_setown() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    using namespace sys::id::process;
+    auto const pr = Process{1}; // ... pids are positive, pgrps are negative
+    { auto sat = nat::fcntl(fd, F::SETOWN, pr);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // just show it was callable
+    auto const gr = Group{1}; // ..... pgrps are negative
+    { auto sat = nat::fcntl(fd, F::SETOWN, gr);
+      CPPUNIT_ASSERT(good(sat) || !good(sat)); } // ibidem.
+  }
+  auto Driver<FCNTL>::test_getown_ex() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    f_owner_ex buf;
+    nonstd::uninitialized::zero(buf);
+    auto got = nat::fcntl(fd, F::GETOWN_EX, buf);
+    CPPUNIT_ASSERT(good(got) || !good(got));
+  }
+  auto Driver<FCNTL>::test_setown_ex() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    f_owner_ex buf;
+    nonstd::uninitialized::zero(buf);
+    auto sat = nat::fcntl(fd, F::SETOWN_EX, buf);
+    CPPUNIT_ASSERT(good(sat) || !good(sat));
+  }
+  auto Driver<FCNTL>::test_getsig() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    auto got = nat::fcntl(fd, F::GETSIG);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it was callable
+    int that = value(got);
+    CPPUNIT_ASSERT(sizeof (that));
+  }
+  auto Driver<FCNTL>::test_setsig() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    auto const signum = 0;
+    auto sat = nat::fcntl(fd, F::SETOWN, signum);
+    CPPUNIT_ASSERT(good(sat) || !good(sat)); // just show it was callable
+  }
+  auto Driver<FCNTL>::test_notify() -> void {
+    using F = six::F;
+    using DN = six::DN;
+    auto const fd = -1;
+    // singles
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::ACCESS);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::MODIFY);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::CREATE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::DELETE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::RENAME);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::ATTRIB);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::ATTRIBUTE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::MULTISHOT);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    // pairs
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::NONE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ACCESS);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::MODIFY);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::CREATE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::DELETE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::RENAME);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ATTRIB);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ATTRIBUTE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::MULTISHOT);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    // triples
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::NONE | DN::ACCESS);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ACCESS | DN::MODIFY);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::MODIFY | DN::CREATE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::CREATE | DN::DELETE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::DELETE | DN::RENAME);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::RENAME | DN::ATTRIB);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ATTRIB | DN::ATTRIBUTE);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::ATTRIBUTE | DN::MULTISHOT);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    { auto note = nat::fcntl(fd, F::NOTIFY, DN::NONE | DN::MULTISHOT | DN::ACCESS);
+      CPPUNIT_ASSERT(good(note) || !good(note)); }
+    // but no we are not doing the power set
+  }
+  auto Driver<FCNTL>::test_add_seals() -> void {
+    using F = six::F;
+    using SEAL = six::F::SEAL;
+    auto const fd = -1;
+    { auto added = nat::fcntl(fd, F::ADD_SEALS, SEAL::NONE);
+      CPPUNIT_ASSERT(good(added) || !good(added)); }
+    { auto added = nat::fcntl(fd, F::ADD_SEALS, SEAL::SEAL);
+      CPPUNIT_ASSERT(good(added) || !good(added)); }
+    { auto added = nat::fcntl(fd, F::ADD_SEALS, SEAL::GROW);
+      CPPUNIT_ASSERT(good(added) || !good(added)); }
+    { auto added = nat::fcntl(fd, F::ADD_SEALS, SEAL::SHRINK);
+      CPPUNIT_ASSERT(good(added) || !good(added)); }
+    { auto added = nat::fcntl(fd, F::ADD_SEALS, SEAL::WRITE);
+      CPPUNIT_ASSERT(good(added) || !good(added)); }
+  }
+  auto Driver<FCNTL>::test_get_seals() -> void {
+    using F = six::F;
+    auto const fd = -1;
+    auto got = nat::fcntl(fd, F::GET_SEALS);
+    CPPUNIT_ASSERT(good(got) || !good(got)); // just show it can be called
+    auto them = F::SEAL::Seal{value(got)};
+    CPPUNIT_ASSERT(sizeof (them));
+  }
+  auto Driver<FCNTL>::test_get_rw_hint() -> void {
+#warning WRITETHIS auto Driver<FCNTL>::test_get_rw_hint() -> void 
+    CPPUNIT_ASSERT(true);
+  }
+  auto Driver<FCNTL>::test_set_rw_hint() -> void {
+#warning WRITETHIS auto Driver<FCNTL>::test_set_rw_hint() -> void 
+    CPPUNIT_ASSERT(true);
+  }
+  auto Driver<FCNTL>::test_get_file_rw_hint() -> void {
+#warning WRITETHIS auto Driver<FCNTL>::test_get_file_rw_hint() -> void 
+    CPPUNIT_ASSERT(true);
+  }
+  auto Driver<FCNTL>::test_set_file_rw_hint() -> void {
+#warning WRITETHIS auto Driver<FCNTL>::test_set_file_rw_hint() -> void 
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::posix {
+  auto Driver<FCNTL>::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    Stream series{"fcntl"};
+    series << call("dupfd", &Driver::test_dupfd)
+           << call("dupfd_cloexec", &Driver::test_dupfd_cloexec)
+           << call("getfd", &Driver::test_getfd)
+           << call("setfd", &Driver::test_setfd)
+           << call("getfl", &Driver::test_getfl)
+           << call("setfl", &Driver::test_setfl)
+           << []() {
+                // um, wow.
+                Stream lck{"lock"};
+                lck << []() {
+                         Stream pro{"process"};
+                         pro << []() {
+                                  Stream a32{"32"};
+                                  a32 << call("getlk", &Driver::test_getlk)
+                                      << call("setlk", &Driver::test_setlk)
+                                      << call("setlkw", &Driver::test_setlkw)
+                                    ;
+                                  return move(a32);
+                                }()
+                             << []() {
+                                  Stream a64{"64"};
+                                  a64 << call("getlk", &Driver::test_getlk64)
+                                      << call("setlk", &Driver::test_setlk64)
+                                      << call("setlkw", &Driver::test_setlkw64)
+                                    ;
+                                  return move(a64);
+                                }()
+                           ;
+                         return move(pro);
+                       }()
+                    << []() {
+                         Stream fil{"file"};
+                         fil << []() {
+                                  Stream a32{"32"};
+                                  a32 << call("getlk", &Driver::test_ofd_getlk)
+                                      << call("setlk", &Driver::test_ofd_setlk)
+                                      << call("setlkw", &Driver::test_ofd_setlkw)
+                                    ;
+                                  return move(a32);
+                                }()
+                             << []() {
+                                  Stream a64{"64"};
+                                  a64 << call("getlk", &Driver::test_ofd_getlk64)
+                                      << call("setlk", &Driver::test_ofd_setlk64)
+                                      << call("setlkw", &Driver::test_ofd_setlkw64)
+                                    ;
+                                  return move(a64);
+                                }()
+                           ;
+                         return move(fil);
+                       }()
+                  ;
+                return move(lck);
+              }()
+           << []() {
+                Stream lea{"lease"};
+                lea << call("getlease", &Driver::test_getlease)
+                    << []() {
+                         Stream set{"setlease"};
+                         set << []() {
+                                  Stream by{"by"};
+                                  by << call("LOCK", &Driver::test_setlease_by_LOCK)
+                                     << call("LEASE", &Driver::test_setlease_by_LEASE)
+                                     << END;
+                                  return move(by);
+                                }()
+                             << END;
+                         return move(set);
+                       }()
+                    << END;
+                return move(lea);
+              }()
+           << call("getpipe-sz", &Driver::test_getpipe_sz)
+           << call("setpipe-sz", &Driver::test_setpipe_sz)
+           << call("setown", &Driver::test_setown)
+           << call("getown-ex", &Driver::test_getown_ex)
+           << call("setown-ex", &Driver::test_setown_ex)
+           << call("getsig", &Driver::test_getsig)
+           << call("setsig", &Driver::test_setsig)
+           << call("notify", &Driver::test_notify)
+           << call("add-seals", &Driver::test_add_seals)
+           << call("get-seals", &Driver::test_get_seals)
+           << []() {
+                // um, wow.
+                Stream rwh{"rw-hint"};
+                rwh << []() {
+                         Stream pro{"process"};
+                         pro << call("get", &Driver::test_get_rw_hint)
+                             << call("set", &Driver::test_set_rw_hint)
+                             << END;
+                         return move(pro);
+                       }()
+                    << []() {
+                         Stream fil{"file"};
+                         fil << call("get_hint", &Driver::test_get_file_rw_hint)
+                             << call("set", &Driver::test_set_file_rw_hint)
+                             << END;
+                         return move(fil);
+                       }()
+                    << END;
+                return move(rwh);
+              }()
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

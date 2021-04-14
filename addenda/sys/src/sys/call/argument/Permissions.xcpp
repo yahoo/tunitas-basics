@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::call::argument {
+  //
+  // Like mode_t, but convert-constructs from a variety of sources
+  // Only to be used as a function call argument converter.
+  //
+  // Usage:
+  //
+  //   [[declaration]]
+  //   auto function(Permissions) -> Something
+  //
+  //   [[call site]]
+  //   function(0777);
+  //   function(S::
+  //
+  class Permissions;
+}
+#endiv
+#divert <hpp>
+#import sys.s.Mode
+class sys::call::argument::Permissions : public s::Mode {
+  using Ancestor = s::Mode;
+public:
+  Permissions() = default;
+  inline  Permissions(Ancestor const &a) : Ancestor{a} { }
+  using Ancestor::Mode;
+};
+#endiv

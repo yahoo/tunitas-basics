@@ -1,0 +1,10 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 1
+#
+# This is expected to vomit out all of the test case names
+# using
+#   unit::rigging::test::Bench
+#     unit::rigging::test::Runner
+#       unit::rigging::test::detail::SelfAware
+#
+unit --list

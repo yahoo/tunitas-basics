@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.argument.Stringface
+#import sys.call.result.Value
+#import sys.posix.required // cascade
+#import sys.required.Stringz
+#import sys.posix.packaging.required // cascade namespace required
+namespace sys::posix::packaging::getenv::interface {
+  //
+  // Common types for the interface to the function(s)
+  // Packaged up (bundled up) for easy import elsewhere
+  //
+  // Usage:
+  //
+  //   Hack the Spew, but see posix::getenv(...) and posix::secure_getenv(...)
+  //
+  //   namespace packaging::getenv_function {
+  //     using namespace packaging::getenv::interface;
+  //     ...declare... getenv(...) -> Result;
+  //   }
+  // 
+  using Name = call::argument::Stringface;
+  template<required::Stringz RESULT> using Result = call::result::Value<RESULT>;
+}
+#divert <hpp>
+#import std.is_trivially_copy_constructible
+namespace sys::posix::packaging::getenv::interface {
+  static_assert(std::is_trivially_copy_constructible_v<Name>);
+}
+#endiv

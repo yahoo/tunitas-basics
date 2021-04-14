@@ -1,0 +1,129 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json::reader {
+  //
+  // The parser result.
+  //
+  // Usage:
+  //
+  //   auto reader = Reader{...somehow...};
+  //   auto parsed = reader.parse(...somehow...);
+  //   if (ok(parsed)) {
+  //      ...yay, the parsing worked just fine...
+  //      auto const &tree = value(parsed);
+  //      auto &tree = value(parsed);
+  //      auto tree = value(std::move(parsed));
+  //   } else {
+  //      ...nay, the parsing failed...
+  //   }
+  //
+  class Result;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import json.Value
+namespace json::reader {
+  inline auto ok(Result const &) -> bool;
+  //
+  [[deprecated("prefer check<EXCEPTION>(Result, string)")]] inline auto check(Result const &, std::string const & = "") -> void;
+  template<typename EXCEPTION> inline auto check(Result const &, std::string const & = "") -> void;
+
+  // These are casts, so you use them in combination with std::move(...)
+  inline auto value(Result const &) -> Value const &;
+  inline auto value(Result &) -> Value &;
+  inline auto value(Result &&) -> Value &&;
+
+  // ERG! the namespace 'json::value' occludes value(...) in any context within namespace json
+  // This provides an alternate access path for ADL.
+  inline auto vv(Result const &) -> Value const &;
+  inline auto vv(Result &) -> Value &;
+  inline auto vv(Result &&) -> Value &&;
+  // ...older (avoid) ...
+  [[deprecated("prefer vv(Result const &)")]] inline auto getvalue(Result const &) -> Value const &;
+  [[deprecated("prefer vv(Result &)")]] inline auto getvalue(Result &) -> Value &;
+  [[deprecated("prefer vv(Result &&)")]] inline auto getvalue(Result &&) -> Value &&;
+}
+#import std.tuple
+class json::reader::Result : public std::tuple<bool /*success*/, Value> {
+  using Ancestor = std::tuple<bool /*success*/, Value>;
+public:
+  inline Result();
+  inline explicit Result(bool success);
+  // move-in semantics, never copy semantics
+  inline explicit Result(bool success, Value &&recovered);
+  // ibidem. (move-in semantics)
+  Result(Result const &) = delete;
+  auto operator=(Result const &) -> Result & = delete;
+  inline Result(Result &&);
+  inline auto operator=(Result &&) -> Result &;
+};
+#endiv
+#divert <ipp>
+#import std.get
+auto json::reader::ok(Result const &subject) -> bool {
+  return std::get<0>(subject);
+}
+
+template<typename EXCEPTION> auto json::reader::check(Result const &subject, std::string const &cryptic_hint_of_a_message_about_the_failure) -> void {
+  if (!ok(subject)) {
+    std::string remessage = "failed";
+    if (!cryptic_hint_of_a_message_about_the_failure.empty()) {
+      remessage += " ";
+      remessage += cryptic_hint_of_a_message_about_the_failure;
+    }
+    throw EXCEPTION(remessage);
+  }
+}
+
+#import json.exception.Generic
+auto json::reader::check(Result const &subject, std::string const &cryptic_hint) -> void {
+  check<json::exception::Generic>(subject, cryptic_hint);
+}
+
+#import std.get
+auto json::reader::value(Result const &subject) -> Value const &    { return std::get<1>(subject); }
+auto json::reader::vv(Result const &subject) -> Value const &       { return value(subject); }
+auto json::reader::getvalue(Result const &subject) -> Value const & { return value(subject); }
+
+#import std.move
+auto json::reader::value(Result &subject) -> Value &    { return std::get<1>(subject); }
+auto json::reader::vv(Result &subject) -> Value &       { return value(subject); }
+auto json::reader::getvalue(Result &subject) -> Value & { return value(subject); }
+
+#import std.get
+#import std.forward
+auto json::reader::value(Result &&anon) -> Value &&    { return std::get<1>(std::forward<Result>(anon)); }
+auto json::reader::vv(Result &&anon) -> Value &&       { return value(std::forward<Result>(anon)); }
+auto json::reader::getvalue(Result &&anon) -> Value && { return value(std::forward<Result>(anon)); }
+
+json::reader::Result::Result()
+  : Ancestor(/*success*/ true, Value()) {
+  ;
+}
+
+json::reader::Result::Result(bool arg_success)
+  : Ancestor(arg_success, Value()) {
+  ;
+}
+
+json::reader::Result::Result(bool arg_success, Value &&arg_recovered)
+#import std.forward
+  : Ancestor(arg_success, std::forward<Value>(arg_recovered)) {
+  ;
+}
+
+#import std.forward
+json::reader::Result::Result(Result &&anon)
+  : Ancestor(std::forward<Ancestor>(anon)) {
+  ;
+}
+
+#import std.swap
+auto json::reader::Result::operator=(Result &&anon) -> Result & {
+  Result tmp(std::forward<Result>(anon));
+  std::swap(tmp, *this);
+  return *this;
+}
+#endiv

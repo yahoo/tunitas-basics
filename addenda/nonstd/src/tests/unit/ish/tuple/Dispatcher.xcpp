@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ish::tuple { class Dispatcher; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::ish::tuple::Dispatcher : public cppunit::test::Fixture {
+public:
+  auto test_case_true_zero() -> void;
+  auto test_case_false_any() -> void;
+  auto test_case_false_zero() -> void;
+
+  static auto suite() -> cppunit::Test *;
+
+  enum Rainfall { };
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import std.tuple
+#import ish.tuple.detail.rebuild.Dispatcher
+
+auto tests::unit::ish::tuple::Dispatcher::test_case_true_zero() -> void {
+  using ::ish::tuple::detail::rebuild::Dispatcher;
+  Dispatcher<true, 4u, 0u, int, char, double, Rainfall> rebuilder;
+  std::tuple<int, char, double, Rainfall> test(1, 'a', 2.3, Rainfall());
+  auto r = rebuilder(std::move(test));
+  std::tuple<char, double, Rainfall> const expected('a', 2.3, Rainfall());
+  std::tuple<char, double, Rainfall> const actual = r;
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+auto tests::unit::ish::tuple::Dispatcher::test_case_false_any() -> void {
+  using ::ish::tuple::detail::rebuild::Dispatcher;
+  Dispatcher<false, 4u, 0u, int, char, double, Rainfall> rebuilder;
+  std::tuple<int, char, double, Rainfall> test(1, 'a', 2.3, Rainfall());
+  auto r = rebuilder(std::move(test));
+  std::tuple<int, char, double, Rainfall> const expected(1, 'a', 2.3, Rainfall());
+  std::tuple<int, char, double, Rainfall> const actual = r;
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+auto tests::unit::ish::tuple::Dispatcher::test_case_false_zero() -> void {
+  using ::ish::tuple::detail::rebuild::Dispatcher;
+  Dispatcher<false, 0u, 0u> rebuilder;
+  std::tuple<> test;
+  auto r = rebuilder(std::move(test));
+  std::tuple<> const expected = std::tuple<>();
+  std::tuple<> const actual = r;
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::ish::tuple::Dispatcher::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Dispatcher");
+  s << call("case_true_zero", &Dispatcher::test_case_true_zero)
+    << call("case_false_any", &Dispatcher::test_case_false_any)
+    << call("case_false_zero", &Dispatcher::test_case_false_zero)
+    ;
+  return finalize(s);
+}
+#endiv

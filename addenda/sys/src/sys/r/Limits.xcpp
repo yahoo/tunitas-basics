@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rlimit
+#import sys.r.Limit // used as the uniqueness key
+#import sys.detail.Initialized
+namespace sys::r {
+  //
+  // The resource limit definition
+  // By default, is self-initializing
+  // ADL-friendly.
+  //
+  // Pairwise:
+  //
+  //   Limit <---> Limits
+  //   the 'reosurce' argument to getrlimit(2), setrlimit(2), prlimit(2).
+  //
+  // Usage:
+  //
+  //   auto recovered = sys::r::Limits{};
+  //   auto got = sys::posix::getrlimit(RLIMIT::CORE, recovered);
+  //   auto got = sys::posix::getrlimit(RLIMIT::DATA, recovered);
+  //   ...etc...
+  //
+  using Limits = sys::detail::Initialized<rlimit, Limit>;
+}
+#endiv

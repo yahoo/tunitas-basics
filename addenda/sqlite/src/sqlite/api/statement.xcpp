@@ -1,0 +1,110 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import c.const_stringn
+#import c.const_stringz
+#import std.string
+#import sqlite.status.Code
+#forward sqlite.statement.Shell
+#import sqlite.Value
+#import sqlite.api.detail.Bind
+#import sqlite.api.detail.Column
+#import sqlite.Type
+namespace sqlite {
+  namespace api {
+    // Since all preparation is with "prepare v2" this is always applicable
+    inline auto sql(statement::Shell const &) -> std::string;
+    template<typename STRING> inline auto sql(statement::Shell const &) -> STRING;
+    template<> inline auto sql<c::const_stringn>(statement::Shell const &) -> c::const_stringn;
+    template<> inline auto sql<c::const_stringz>(statement::Shell const &) -> c::const_stringz;
+    template<> inline auto sql<std::string>(statement::Shell const &) -> std::string;
+
+    inline auto readonly(statement::Shell &) -> bool;
+    inline auto busy(statement::Shell &) -> bool;
+
+    inline auto finalize(statement::Shell &) -> status::Code;
+    inline auto reset(statement::Shell &) -> status::Code;
+    inline auto step(statement::Shell &) -> status::Code;
+
+    // Where VALUE is Value<...> it must be Value<UNPROTECTED>
+    inline auto clear_bindings(statement::Shell &) -> status::Code;
+    inline auto bind_parameter_count(statement::Shell &) -> bind_index;
+    template<typename VALUE> inline auto bind(statement::Shell &, bind_index, VALUE) -> typename detail::Bind<VALUE>::result_type;
+    inline auto column_count(statement::Shell &) -> column_index;
+    // Where RESULT is Value<...> it must be Value<UNPROTECTED>
+    inline auto type(statement::Shell &, column_index) -> Type;
+    template<typename RESULT> inline auto column(statement::Shell &, column_index) -> typename detail::Column<RESULT>::result_type;
+  }
+}
+#entail sqlite.statement.Shell
+#endiv
+#divert <ipp>
+#import sqlite.api.unguarded
+
+auto sqlite::api::sql(statement::Shell const &st) -> std::string {
+  c::const_stringz tmp(unguarded::sql(st.safe()));
+  return std::string(tmp.begin(), tmp.end());
+}
+
+template<typename STRING> auto sqlite::api::sql(statement::Shell const &) -> STRING {
+  static_assert(0 == sizeof (STRING) && 0 != sizeof (STRING), "specializations only");
+  return STRING();
+}
+
+template<> auto sqlite::api::sql<c::const_stringn>(statement::Shell const &st) -> c::const_stringn {
+  c::const_stringz tmp(unguarded::sql(st.safe()));
+  return c::const_stringn(tmp.data(), tmp.size());
+}
+
+template<> auto sqlite::api::sql<c::const_stringz>(statement::Shell const &st) -> c::const_stringz {
+  return unguarded::sql(st.safe());
+}
+
+template<> auto sqlite::api::sql<std::string>(statement::Shell const &st) -> std::string {
+  c::const_stringz tmp(unguarded::sql(st.safe()));
+  return std::string(tmp.begin(), tmp.end());
+}
+
+auto sqlite::api::readonly(statement::Shell &statement) -> bool {
+  return unguarded::readonly(statement.safe());
+}
+
+auto sqlite::api::busy(statement::Shell &statement) -> bool {
+  return unguarded::busy(statement.safe());
+}
+
+auto sqlite::api::finalize(statement::Shell &statement) -> status::Code {
+  return unguarded::finalize(statement.safe());
+}
+
+auto sqlite::api::reset(statement::Shell &statement) -> status::Code {
+  return unguarded::reset(statement.safe());
+}
+
+auto sqlite::api::step(statement::Shell &statement) -> status::Code {
+  return unguarded::step(statement.safe());
+}
+
+auto sqlite::api::clear_bindings(statement::Shell &statement) -> status::Code {
+  return unguarded::clear_bindings(statement.safe());
+}
+
+auto sqlite::api::bind_parameter_count(statement::Shell &statement) -> bind_index {
+  return unguarded::bind_parameter_count(statement.safe());
+}
+
+template<typename VALUE> auto sqlite::api::bind(statement::Shell &statement, bind_index idx, VALUE value) -> typename detail::Bind<VALUE>::result_type {
+  return unguarded::bind<VALUE>(statement.safe(), idx, value);
+}
+
+auto sqlite::api::column_count(statement::Shell &statement) -> column_index {
+  return unguarded::column_count(statement.safe());
+}
+
+auto sqlite::api::type(statement::Shell &statement, column_index idx) -> Type {
+  return unguarded::type(statement.safe(), idx);
+}
+
+template<typename RESULT> auto sqlite::api::column(statement::Shell &statement, column_index idx) -> typename detail::Column<RESULT>::result_type {
+  return unguarded::column<RESULT>(statement.safe(), idx);
+}
+#endiv

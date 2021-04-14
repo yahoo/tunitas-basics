@@ -1,0 +1,4 @@
+// -*- c++ -*- 4e1fe91f-7d37-481e-9d56-808cc01f7c58
+#pragma once
+#include "mysql++/mystring.h"
+

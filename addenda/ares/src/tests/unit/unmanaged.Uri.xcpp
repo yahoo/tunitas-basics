@@ -1,0 +1,135 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::unmanaged { class Uri; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.unmanaged.Uri
+#import c.const_stringz
+#import nonstd.span
+class tests::unit::unmanaged::Uri : public cppunit::test::Fixture {
+public:
+  using Subject = ::ares::unmanaged::Uri;
+  auto test_constructor_default() -> void;
+  auto test_constructor_move() -> void;
+  auto test_assignment_move() -> void;
+  auto test_destructor_one() -> void;
+  auto test_destructor_list() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto spanify(c::const_stringz) -> nonstd::span<unsigned char const>;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::unmanaged::Uri::spanify(c::const_stringz specimen) -> nonstd::span<unsigned char const> {
+  // Wow this is clumsy.
+  return nonstd::span<unsigned char const>(reinterpret_cast<unsigned char const *>(specimen.data()), specimen.size());
+}
+auto tests::unit::unmanaged::Uri::test_constructor_default() -> void {
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(nullptr == subject.next);
+  CPPUNIT_ASSERT(nullptr == subject.uri);
+  CPPUNIT_ASSERT(0u == subject.priority);
+  CPPUNIT_ASSERT(0u == subject.weight);
+}
+auto tests::unit::unmanaged::Uri::test_constructor_move() -> void {
+  Subject *zero = nullptr;
+  auto *one = new Subject{};
+  one->next = zero;
+  one->uri = Subject::dup(spanify("example.com"));
+  one->priority = 3u;
+  one->weight = 4u;
+  Subject subject{std::move(*one)}; // <---------------------------- test this
+  CPPUNIT_ASSERT(nullptr == subject.next);
+  CPPUNIT_ASSERT(nullptr != subject.uri);
+  CPPUNIT_ASSERT(3u == subject.priority);
+  CPPUNIT_ASSERT(4u == subject.weight);
+  CPPUNIT_ASSERT(nullptr == one->next);
+  CPPUNIT_ASSERT(nullptr == one->uri);
+  CPPUNIT_ASSERT(0u == one->priority);
+  CPPUNIT_ASSERT(0u == one->weight);
+}
+auto tests::unit::unmanaged::Uri::test_assignment_move() -> void {
+  Subject *zero = nullptr;
+  auto *one = new Subject{};
+  one->next = zero;
+  one->uri = Subject::dup(spanify("example.com"));
+  one->priority = 3u;
+  one->weight = 4u;
+  Subject subject;
+  subject = std::move(*one); // <------------------------------------- test this
+  CPPUNIT_ASSERT(nullptr == subject.next);
+  CPPUNIT_ASSERT(nullptr != subject.uri);
+  CPPUNIT_ASSERT(3u == subject.priority);
+  CPPUNIT_ASSERT(4u == subject.weight);
+  CPPUNIT_ASSERT(nullptr == one->next);
+  CPPUNIT_ASSERT(nullptr == one->uri);
+  CPPUNIT_ASSERT(0u == one->priority);
+  CPPUNIT_ASSERT(0u == one->weight);
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::unmanaged::Uri::test_destructor_one() -> void {
+  Subject *zero = nullptr;
+  auto *one = new Subject{};
+  one->next = zero;
+  one->uri = Subject::dup(spanify("example.com"));
+  one->priority = 3u;
+  one->weight = 4u;
+  delete one; // <-------------------------------------- test this
+}
+auto tests::unit::unmanaged::Uri::test_destructor_list() -> void {
+  Subject *zero = nullptr;
+  auto *one = new Subject{};
+  one->next = zero;
+  one->uri = Subject::dup(spanify("1.example.com"));
+  one->priority = 3u;
+  one->weight = 4u;
+  auto *two = new Subject{};
+  two->next = one;
+  two->uri = Subject::dup(spanify("2.example.com"));
+  two->priority = 5u;
+  two->weight = 6u;
+  auto *three = new Subject{};
+  three->next = two;
+  three->uri = Subject::dup(spanify("3.example.com"));
+  three->priority = 7u;
+  three->weight = 8u;
+  auto *four = new Subject{};
+  four->next = three;
+  four->uri = Subject::dup(spanify("4.example.com"));
+  four->priority = 9u;
+  four->weight = 0xau;
+  auto *five = new Subject{};
+  five->next = four;
+  five->uri = Subject::dup(spanify("5.example.com"));
+  five->priority = 0xbu;
+  five->weight = 0xcu;
+  delete five; // <-------------------------------------- test this
+}
+#import rigging.suite.io
+auto tests::unit::unmanaged::Uri::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Uri");
+  {
+    Stream con("constructor");
+    con << call("default", &Uri::test_constructor_default)
+        << call("move", &Uri::test_constructor_move)
+      ;
+    series << move(con);
+  } {
+    Stream ass("assignment");
+    ass << call("move", &Uri::test_assignment_move)
+      ;
+    series << move(ass);
+  } {
+    Stream des("destructor");
+    des << call("one", &Uri::test_destructor_one)
+        << call("list", &Uri::test_destructor_list)
+      ;
+    series << move(des);
+  }
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,107 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace transaction {
+    //
+    // Usage: see sqlite.transaction.Manager
+    //
+    class Guard;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.transaction.Manager
+#import sqlite.status.Code
+class sqlite::transaction::Guard {
+public:
+  using status_type = sqlite::status::Code;
+  using manager_type = sqlite::transaction::Manager;
+  using statements_type = sqlite::transaction::Statements;
+  enum Choice { END = 1, ROLLBACK = 2 };
+  inline explicit Guard(manager_type &, Choice = ROLLBACK);
+  inline explicit Guard(statements_type &, Choice = ROLLBACK);
+  inline ~Guard();
+  Guard(Guard const &) = delete;
+  auto operator=(Guard const &) -> Guard & = delete;
+  inline auto begin() -> status_type;
+  inline auto begin(Choice) -> status_type;
+  inline auto rollback() -> status_type;
+  inline auto end() -> status_type;
+protected:
+  // The manager which maintains the prepared statements.
+  statements_type &statements;
+  // The choice to be used if begin() is called
+  // ... of course begin(Choice) supplies its own choice
+  Choice prospective_choice;
+  enum class State
+  { UNBEGUN = 0,
+    CHOSE_END = Choice::END,
+    CHOSE_ROLLBACK = Choice::ROLLBACK,
+    DONE = 3 };
+  State state;
+  inline static auto convert(Choice) -> State;
+};
+#endiv
+#divert <ipp>
+auto sqlite::transaction::Guard::convert(Choice ch) -> State {
+  return State((int)(ch));
+}
+
+sqlite::transaction::Guard::Guard(manager_type &manager, Choice choice)
+  : Guard(manager.statements, choice) {
+  ;
+}
+
+sqlite::transaction::Guard::Guard(statements_type &statements, Choice choice)
+  : statements(statements)
+  , prospective_choice(choice)
+  , state(State::UNBEGUN) {
+  ;
+}
+
+#import std.runtime_error
+sqlite::transaction::Guard::~Guard() {
+  switch (state) {
+  case State::UNBEGUN:
+    state = State::DONE;
+    break;
+  case State::DONE:
+    break;
+  case State::CHOSE_END:
+    end();
+    break;
+  case State::CHOSE_ROLLBACK:
+    rollback();
+    break;
+  default:
+    // src/sqlite/transaction/Guard.xcpp:78:61: warning: throw will always call terminate() [-Wterminate]
+    // throw std::runtime_error("invalid date in sqlite::Guard");
+    break;
+  }
+}
+
+auto sqlite::transaction::Guard::begin() -> status_type {
+  return begin(prospective_choice);
+}
+
+auto sqlite::transaction::Guard::begin(Choice choice) -> status_type {
+  state = convert(choice);
+  statements.begin_transaction.reset();
+  return statements.begin_transaction.step();
+}
+
+auto sqlite::transaction::Guard::rollback() -> status_type {
+  // Even if state was something else, we now will roll back.  We're done.
+  state = State::DONE;
+  statements.rollback_transaction.reset();
+  return statements.rollback_transaction.step();
+}
+
+auto sqlite::transaction::Guard::end() -> status_type {
+  // Even if state was something else, we now will roll back.  We're done.
+  state = State::DONE;
+  statements.end_transaction.reset();
+  return statements.end_transaction.step();
+}
+#endiv

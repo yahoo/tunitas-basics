@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.exception.Unimplemented>
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.exception.Unimplemented
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import std.char_traits
+#import std.basic_ostringstream
+namespace tests::unit::exception::unimplemented {
+  template<required::Character CHAR, required::Character_Traits TRAITS> struct Unimplemented::Operator::Insert : public cppunit::test::Fixture {
+    using Char = CHAR;
+    using Traits = TRAITS;
+    using Buffer = std::basic_ostringstream<Char, Traits>;
+    using Subject = library::Unimplemented;
+    auto test_operator_insert() -> void;
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <tpp>
+#import std.empty
+#import rigging.suite.io
+namespace tests::unit::exception::unimplemented {
+  template<required::Character C, required::Character_Traits T> auto Unimplemented::Operator::Insert<C,T>::test_operator_insert() -> void {
+    auto specimen = Subject{};
+    auto buf = Buffer{};
+    buf << specimen; // <------------------------------ test this (operator<< on )
+    CPPUNIT_ASSERT(!empty(buf.str()));
+    if constexpr (nonstd::same_as<Char, char>) {
+      std::cerr << "Unimplemented announces [" << buf.str() << "]\n";
+    }
+  }
+  template<required::Character C, required::Character_Traits T> auto tests::unit::exception::Unimplemented::Operator::Insert<C,T>::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    auto series = Stream{"operator<<"s + typeid(Char).name() + ">"s};
+    series << call("operator<<", &Insert::test_operator_insert)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

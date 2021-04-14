@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::sysexits {
+  //
+  // Declare sysexits::Code has a user-defined conversion from TYPE.
+  //
+  // true in Is_Constructible_From<TYPE>
+  //   enables nonstd::sysexits::Code::Code(TYPE)
+  //   via make(TYPE) -> nonstd::sysexits::Code
+  //
+  // Usage:
+  //
+  //    template<> code::Is_Constructible_From<Some_Type> : public std::true_type { };
+  //
+  //    auto Some_Type some_type = ...
+  //    sysexits::Code code{some_type};
+  //
+  template<typename TYPE> struct Is_Constructible_From;
+  template<> struct Is_Constructible_From<int signed>;
+  template<> struct Is_Constructible_From<int unsigned>;
+  template<> struct Is_Constructible_From<std::uint8_t>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+#import std.false_type
+template<typename TYPE> struct nonstd::sysexits::Is_Constructible_From : public std::false_type { };
+template<> struct nonstd::sysexits::Is_Constructible_From<int signed> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Constructible_From<int unsigned> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Constructible_From<std::uint8_t> : public std::true_type { };
+#endiv

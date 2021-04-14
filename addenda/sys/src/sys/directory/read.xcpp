@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringz
+#import sys.directory.DIR
+#import sys.directory.detail.read.Result
+#import sys.directory.Entry
+namespace sys {
+  namespace directory {
+    template<typename RESULT> auto read(DIR *) -> detail::read::Result<RESULT>;
+    template<> auto read<entry *>(DIR *) -> detail::read::Result<entry *>;
+    template<> auto read<Entry>(DIR *) -> detail::read::Result<Entry>;
+    template<> inline auto read<std::string>(DIR *) -> detail::read::Result<std::string>;
+    namespace {
+      inline auto readdir(DIR *) -> detail::read::Result<entry *>;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+namespace sys {
+  namespace directory {
+    namespace {
+      // Because the "-dir" suffix is amusing to the legacy C-language interface
+      auto readdir(DIR *d) -> detail::read::Result<entry *> {
+        return read<entry *>(d);
+      }
+    }
+  }
+}
+
+#import std.move
+template<> auto sys::directory::read<std::string>(DIR *d) -> detail::read::Result<std::string> {
+  using result_type = detail::read::Result<std::string>;
+  auto red = read<entry *>(d);
+  auto eof = !ok(red) || nullptr == value(red);
+  auto name = !eof ? value(red)->d_name : std::string();
+  result_type ret(ok(red), error_num(red), eof, name);
+  return ret;
+}
+#endiv
+#divert <tpp>
+template<typename RESULT> auto sys::directory::read(DIR *d) -> detail::read::Result<RESULT> {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "only specializations");
+}
+#endiv
+#divert <cpp>
+#include <cerrno>
+template<> auto sys::directory::read<sys::directory::entry *>(DIR *d) -> detail::read::Result<entry *> {
+  using result_type = detail::read::Result<entry *>;
+  //
+  // Good luck.  This returns a pointer to storage managed in the 'DIR *d'; it is overwritten on the subsquent call
+  //
+  // From readdir(3)
+  //     If the end of the directory stream is reached, NULL is returned and errno is not changed.
+  //     If an error occurs, NULL is returned and errno is set appropriately.
+  //     To distinguish end of stream and from an error,
+  //     set errno to zero before calling readdir() and then check the value of errno if NULL is returned.
+  //
+  errno = 0;
+  auto red = ::readdir(d);
+  bool ok = nullptr != red;
+  bool eof = nullptr == red && 0 == errno;
+  result_type res(ok, errno, eof, red);
+  return res;
+}
+
+#import std.move
+template<> auto sys::directory::read<sys::directory::Entry>(DIR *d) -> detail::read::Result<Entry> {
+  using result_type = detail::read::Result<Entry>;
+  // Wow ... the past tense of "read" is "read" ... or maybe "red"
+  auto red = read<entry *>(d);
+  auto pointer = value(red);
+  auto indirect = ok(red) ? Entry(*pointer) : Entry();
+  result_type ret(ok(red), error_num(red), eof(red), indirect);
+  return ret;
+}
+
+#endiv

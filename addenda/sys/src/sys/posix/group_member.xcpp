@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.gid
+#import group_member
+namespace sys::posix {
+  namespace packaging::group_member {
+    using namespace packaging::gid;
+    //
+    // The group_member(3) is a GNU extension.
+    // It only checks the supplementary groups.
+    //
+    namespace function {
+      inline auto group_member(Group) -> bool;
+    }
+  }
+  using packaging::group_member::function::group_member;
+  namespace native { using ::group_member; }
+}
+using sys::posix::group_member;
+#endiv
+#divert <ipp>
+#import group_member
+namespace sys::posix::packaging::group_member {
+  auto function::group_member(Group gid) -> bool { return 0 != ::group_member((gid_t) gid); }
+}
+#endiv

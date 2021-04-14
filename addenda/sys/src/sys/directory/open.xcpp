@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.argument.Pathname
+#import sys.directory.DIR
+#import sys.directory.detail.open.Result
+namespace sys::directory {
+  namespace packaging::open_function {
+    using call::argument::Pathname;
+    using detail::open::Result; // a.k.a. sys::call::Value<DIR *>;
+    inline auto open(Pathname) -> Result;
+    inline auto open(int fd) -> Result;
+    inline namespace dir {
+      // Because the "-dir" suffix is amusing to the legacy C-language interfacea
+      inline auto opendir(Pathname) -> Result;
+      inline auto fdopendir(int) -> Result;
+    }
+  }
+  using packaging::open_function::open;
+  namespace dir = packaging::open_function::dir;
+}
+// DO NOT ``using sys::directory::open'' as that will ambiguate with "file open"
+#endiv
+#divert <ipp>
+#include <cerrno>
+auto sys::directory::packaging::open_function::open(Pathname name) -> Result {
+  auto opened = ::opendir(name);
+  bool ok = nullptr != opened;
+  int errnum = errno;
+  Result ret(ok, errnum, opened);
+  return ret;
+}
+auto sys::directory::packaging::open_function::open(int fd) -> Result {
+  auto opened = ::fdopendir(fd);
+  bool ok = nullptr != opened;
+  int errnum = errno;
+  Result ret(ok, errnum, opened);
+  return ret;
+}
+auto sys::directory::dir::opendir(Pathname name) -> Result {
+  return open(name);
+}
+auto sys::directory::dir::fdopendir(int fd) -> Result {
+  return open(fd);
+}
+#endiv

@@ -1,0 +1,301 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::dope::bytewise { class Consty; }
+#endiv
+#divert <hpp>
+#import std.byte
+#import nonstd.basic_dope
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.dope.bytewise.Palette
+class tests::unit::dope::bytewise::Consty : public cppunit::test::Fixture, Palette { 
+public: 
+  using Subject = ::nonstd::basic_dope<std::byte const>;
+  auto setUp() -> void final;
+  auto tearDown() -> void final;
+  auto test_constructor_default() -> void;
+  auto test_constructor_pointer_size() -> void;
+  auto test_constructor_manifest_array() -> void;
+  auto test_constructor_manifest_array_smaller() -> void;
+  auto test_constructor_manifest_array_too_big() -> void;
+  auto test_constructor_manifest_array_IGNORED_on_too_big() -> void;
+  auto test_constructor_muting_buffer() -> void;
+  auto test_constructor_muting_pair_size_first() -> void;
+  auto test_constructor_muting_pair_size_second() -> void;
+  auto test_constructor_consty_pair_size_first() -> void;
+  auto test_constructor_consty_pair_size_second() -> void;
+  auto test_constructor_muting_tuple_size_first() -> void;
+  auto test_constructor_muting_tuple_size_second() -> void;
+  auto test_constructor_consty_tuple_size_first() -> void;
+  auto test_constructor_consty_tuple_size_second() -> void;
+  auto test_constructor_array() -> void;
+  auto test_constructor_vector() -> void;
+  auto test_iteration() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.size_t
+auto tests::unit::dope::bytewise::Consty::setUp() -> void {
+  Palette::setUp();
+}
+auto tests::unit::dope::bytewise::Consty::tearDown() -> void {
+  Palette::tearDown();
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_default() -> void {
+  Subject t; // <------------- test this
+  CPPUNIT_ASSERT(t.empty());
+  CPPUNIT_ASSERT(0 == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(t.begin() == t.end());
+}
+#import std.distance
+auto tests::unit::dope::bytewise::Consty::test_constructor_pointer_size() -> void {
+  Subject t(pbb, LENGTH); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_manifest_array() -> void {
+  Subject t(aNbb); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(aNbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_manifest_array_smaller() -> void {
+  auto const smaller_size = LENGTH - 5;
+  Subject t(aNb, smaller_size); // <------------- test this 
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(smaller_size == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(aNb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(smaller_size == ::std::distance(t.begin(), t.end()));
+}
+#import std.length_error
+auto tests::unit::dope::bytewise::Consty::test_constructor_manifest_array_too_big() -> void {
+  try {
+    Subject t(LENGTH+1, aNb); // <------------- test this
+    CPPUNIT_ASSERT(false);
+  } catch (std::length_error const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_manifest_array_IGNORED_on_too_big() -> void {
+  try {
+    Subject t(aNb, LENGTH+1); // <------------- test this (it observes the size of aNb)
+    // WATCHOUT - program behavior is now undefined because LENGTH+1 is invalid
+    CPPUNIT_ASSERT(true);
+  } catch (std::length_error const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_muting_buffer() -> void {
+  using SUBTEST_BYTE_TYPE = std::byte; // <— we're in the "consty" tester
+  ::nonstd::basic_dope<SUBTEST_BYTE_TYPE> a(aNb);
+  Subject t(a); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == a[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+#import std.pair
+auto tests::unit::dope::bytewise::Consty::test_constructor_muting_pair_size_first() -> void {
+  ::std::pair<::std::size_t, std::byte *> p(LENGTH, pb); // <------------------------ std::byte *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_muting_pair_size_second() -> void {
+  ::std::pair<std::byte *, ::std::size_t> p(pb, LENGTH); // <------------------------ std::byte *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_consty_pair_size_first() -> void {
+  ::std::pair<::std::size_t, std::byte const *> p(LENGTH, pbb); // <------------------ std::byte const *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_consty_pair_size_second() -> void {
+  ::std::pair<std::byte const *, ::std::size_t> p(pbb, LENGTH); // <------------------ std::byte const *
+  Subject t(p); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+#import std.tuple
+auto tests::unit::dope::bytewise::Consty::test_constructor_muting_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, std::byte *> u(LENGTH, pb); // <-------------------------- std::byte *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_muting_tuple_size_second() -> void {
+  ::std::tuple<std::byte *, ::std::size_t> u(pb, LENGTH); // <-------------------------- std::byte *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_consty_tuple_size_first() -> void {
+  ::std::tuple<::std::size_t, std::byte const *> u(LENGTH, pbb); // <------------------ std::byte const *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+auto tests::unit::dope::bytewise::Consty::test_constructor_consty_tuple_size_second() -> void {
+  ::std::tuple<std::byte const *, ::std::size_t> u(pbb, LENGTH); // <------------------ std::byte const *
+  Subject t(u); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  CPPUNIT_ASSERT(pbb == t.data());
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+#import nonstd.array
+#import std.copy
+#import std.distance
+auto tests::unit::dope::bytewise::Consty::test_constructor_array() -> void {
+  ::std::array<std::byte, LENGTH> a;
+  // prepare for & copy in the nullptr at the end of pbb
+  ::std::copy(pbb, pbb+LENGTH+1, a.begin());
+  Subject t(a); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == a[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+#import nonstd.vector
+auto tests::unit::dope::bytewise::Consty::test_constructor_vector() -> void {
+  ::std::vector<std::byte> v;
+  v.resize(LENGTH);
+  ::std::copy(pbb, pbb+LENGTH, v.begin());
+  Subject t(v); // <------------- test this
+  generic_testification(t);
+  CPPUNIT_ASSERT(!t.empty());
+  CPPUNIT_ASSERT(0 != t.size());
+  CPPUNIT_ASSERT(LENGTH == t.size());
+  CPPUNIT_ASSERT(nullptr != t.data());
+  for (unsigned i(0), e(t.size()); e != i; ++i) {
+    CPPUNIT_ASSERT(t[i] == v[i]);
+  }
+  CPPUNIT_ASSERT(t.begin() != t.end());
+  CPPUNIT_ASSERT(LENGTH == ::std::distance(t.begin(), t.end()));
+}
+#import std.max
+#import std.min
+auto tests::unit::dope::bytewise::Consty::test_iteration() -> void {
+  ::nonstd::basic_dope<std::byte const> m(aNb);
+  ::nonstd::basic_dope<std::byte const> byte(aNbb);
+  CPPUNIT_ASSERT(m.size() == byte.size());
+  CPPUNIT_ASSERT(!m.empty());
+  CPPUNIT_ASSERT(0 != m.size());
+  using iterator = ::nonstd::basic_dope<std::byte const>::iterator; // <------------- test this
+  for (iterator mi(m.begin()), me(m.end()), ci(byte.begin()), ce(byte.end()); me != mi && ce != ci; mi++, ci++) {
+    std::byte mvalue(*mi);
+    std::byte cvalue(*ci);
+    std::byte low = ::std::min(mvalue, cvalue);
+    std::byte high = ::std::max(mvalue, cvalue);
+    static_assert('A' < 'a', "upper case not smaller than lower case");
+    auto lowercase = ::std::max(low, high);
+    auto uppercase = ::std::min(low, high);
+    auto const expected = std::byte(char(lowercase) - 'a' + 'A');
+    CPPUNIT_ASSERT(expected == uppercase); // that is how they were constructed
+  }
+}
+#import rigging.suite.io
+auto tests::unit::dope::bytewise::Consty::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("consty");
+  series << call("constructor_default", &Consty::test_constructor_default)
+         << call("constructor_pointer_size", &Consty::test_constructor_pointer_size)
+         << call("constructor_manifest_array", &Consty::test_constructor_manifest_array)
+         << call("constructor_manifest_array_smaller", &Consty::test_constructor_manifest_array_smaller)
+         << call("constructor_manifest_array_too_big", &Consty::test_constructor_manifest_array_too_big)
+         << call("constructor_manifest_array_IGNORED_too_big", &Consty::test_constructor_manifest_array_IGNORED_on_too_big)
+         << call("constructor_muting_buffer", &Consty::test_constructor_muting_buffer)
+         << call("constructor_muting_pair_size_first", &Consty::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Consty::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_pair_size_first", &Consty::test_constructor_muting_pair_size_first)
+         << call("constructor_consty_pair_size_second", &Consty::test_constructor_consty_pair_size_second)
+         << call("constructor_muting_tuple_size_first", &Consty::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Consty::test_constructor_consty_tuple_size_second)
+         << call("constructor_muting_tuple_size_first", &Consty::test_constructor_muting_tuple_size_first)
+         << call("constructor_consty_tuple_size_second", &Consty::test_constructor_consty_tuple_size_second)
+         << call("constructor_array", &Consty::test_constructor_array)
+         << call("constructor_vector", &Consty::test_constructor_vector)
+         << call("iteration", &Consty::test_iteration)
+    ;
+  return finalize(series);
+}
+#endiv

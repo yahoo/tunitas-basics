@@ -1,0 +1,27 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.as.RESULT.Value
+#import json.Value
+namespace json {
+  // the identity
+  template<> inline auto as<Value>(Value const &) -> Value; // a deep copy
+  template<> inline auto as<Value>(Value &&) -> Value;      // an identity, shallow, a move
+}
+#endiv
+#divert <ipp>
+#import json.to.Value.Value
+template<> auto json::as<json::Value>(Value const &value) -> Value {
+  return to<Value>(VALUE(), value);
+}
+
+#ifndef JSON_HAS_RVALUE_REFERENCES
+// this is a jsoncpp-1.7 thing; jsoncpp-1.6 does not have rvalue references
+// and without the rvalue references, these will be copy-semantic (deep copy) and ... ambiguous
+#error JSON_HAS_RVALUE_REFERENCES is not configured
+#endif
+
+#import std.forward
+template<> auto json::as<json::Value>(Value &&anon) -> Value {
+  return to<Value>(VALUE(), std::forward<Value>(anon));
+}
+#endiv

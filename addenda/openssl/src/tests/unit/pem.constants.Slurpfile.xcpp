@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::pem::constants {
+  template<typename INDEX> struct Slurpfile;
+}
+#endiv
+#divert <hpp>
+#import std.filesystem.path
+template<typename INDEX> struct tests::unit::pem::constants::Slurpfile {
+  static auto filepath() -> std::filesystem::path;
+};
+#import openssl.evp.PKey
+#import openssl.x509.Crt
+#import openssl.x509.Crl
+#import openssl.x509.Req
+namespace tests::unit::pem::constants {
+  template<> auto Slurpfile<::openssl::x509::Crt>::filepath() -> std::filesystem::path;
+  template<> auto Slurpfile<::openssl::x509::Crl>::filepath() -> std::filesystem::path;
+  template<> auto Slurpfile<::openssl::evp::PKey>::filepath() -> std::filesystem::path;
+  template<> auto Slurpfile<::openssl::x509::Req>::filepath() -> std::filesystem::path;
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::pem::constants {
+  template<> auto Slurpfile<::openssl::x509::Crl>::filepath() -> std::filesystem::path { return "test_load_x509_Crl.pem"; }
+  template<> auto Slurpfile<::openssl::x509::Crt>::filepath() -> std::filesystem::path { return "test_load_x509_Crt.pem"; }
+  template<> auto Slurpfile<::openssl::evp::PKey>::filepath() -> std::filesystem::path { return "test_load_evp_PKey.pem"; }
+  template<> auto Slurpfile<::openssl::x509::Req>::filepath() -> std::filesystem::path { return "test_load_x509_Req.pem"; }
+}
+#endiv

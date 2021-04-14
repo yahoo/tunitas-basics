@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::bio {
+  //
+  // The Guardian of the BIO (string)
+  // Is RAII.  Either you get a working buffer or you get an exception.
+  // The buffer goes away upon destruction of the guard.
+  //
+  // Usage:
+  //
+  //   {
+  //      bio::String guard{bio::new_string()};
+  //      ...use the guard...
+  //   }
+  //
+  class String;
+}
+#endiv
+#divert <hpp>
+#import std.string
+namespace openssl::bio {
+  inline auto to_string(String const &) -> std::string;
+}
+#import openssl.types
+#import openssl.bio.new_string
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.BIO
+class openssl::bio::String : public managed::Pointer<BIO> {
+  using ancestor = managed::Pointer<BIO>;
+  inline explicit String(BIO *);
+  friend auto openssl::bio::new_string() -> String;
+public:
+  inline String();
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+auto openssl::bio::to_string(String const &io) -> std::string {
+  // See the recipe https://www.openssl.org/docs/man1.0.2/man3/BIO_s_mem.html
+  BUF_MEM *mem{nullptr};
+  BIO_get_mem_ptr(io.get(), &mem);
+  // DO NOT ---> BIO_set_close(mem, BIO_NOCLOSE); <--- DO NOT
+  return std::string{mem->data, mem->length};
+}
+#import openssl.bio.new_string
+namespace openssl::bio {
+  String::String()
+    : String{new_string()}
+  { }
+  String::String(BIO *io)
+    : ancestor{io}
+  { }
+}
+#endiv

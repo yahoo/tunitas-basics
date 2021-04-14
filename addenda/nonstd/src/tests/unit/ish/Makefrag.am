@@ -1,0 +1,23 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_ish_SUBSOURCES = \
+  obj/src/tests/unit/ish/namespace.cpp \
+  obj/src/tests/unit/ish/Fixture.cpp \
+  obj/src/tests/unit/ish/Palette.cpp \
+  obj/src/tests/unit/ish/bash/Fixture.cpp \
+  obj/src/tests/unit/ish/bash/namespace.cpp \
+  obj/src/tests/unit/ish/cxx/Fixture.cpp \
+  obj/src/tests/unit/ish/cxx/namespace.cpp \
+  obj/src/tests/unit/ish/make/Fixture.cpp \
+  obj/src/tests/unit/ish/make/namespace.cpp \
+  obj/src/tests/unit/ish/perl/Fixture.cpp \
+  obj/src/tests/unit/ish/perl/namespace.cpp \
+  obj/src/tests/unit/ish/shell/Basename.cpp \
+  obj/src/tests/unit/ish/shell/Dirname.cpp \
+  obj/src/tests/unit/ish/shell/Fixture.cpp \
+  obj/src/tests/unit/ish/shell/namespace.cpp \
+  obj/src/tests/unit/ish/tuple/Dispatcher.cpp \
+  obj/src/tests/unit/ish/tuple/Fixture.cpp \
+  obj/src/tests/unit/ish/tuple/namespace.cpp \
+  obj/src/tests/unit/ish/tuple/Result.cpp \
+  $(end)

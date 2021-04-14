@@ -1,0 +1,137 @@
+// -*- c++ -*- in the SCOLD styling
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace api {
+      namespace dispatch {
+        class Result;
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.api.dispatch.Sandbox
+class tests::unit::api::dispatch::Result : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+
+  Sandbox sandbox;
+
+  auto test_bool() -> void;
+  auto test_const_buffer() -> void;
+  auto test_const_stringn() -> void;
+  auto test_const_stringz() -> void;
+  auto test_int32() -> void;
+  auto test_int64() -> void;
+  auto test_Null() -> void;
+  auto test_string() -> void;
+  auto test_wstring() -> void;
+  auto test_vector_char() -> void;
+  auto test_Zeroblob() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.api.detail.Dispatch
+
+auto tests::unit::api::dispatch::Result::setUp() -> void {
+  sandbox.setUp();
+}
+
+auto tests::unit::api::dispatch::Result::tearDown() -> void {
+  sandbox.tearDown();
+}
+
+auto tests::unit::api::dispatch::Result::test_bool() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_bool() -> void
+  ::sqlite::api::detail::Dispatch<bool> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_const_buffer() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_const_buffer() -> void
+  ::sqlite::api::detail::Dispatch<c::const_buffer> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_const_stringn() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_const_stringn() -> void
+  ::sqlite::api::detail::Dispatch<c::const_stringn> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_const_stringz() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_const_stringz() -> void
+  ::sqlite::api::detail::Dispatch<c::const_stringz> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_int32() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_int32() -> void
+  ::sqlite::api::detail::Dispatch<sqlite::int32> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_int64() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_int64() -> void
+  ::sqlite::api::detail::Dispatch<sqlite::int64> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_Null() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_Null() -> void
+  ::sqlite::api::detail::Dispatch<::sqlite::Null> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_string() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_string() -> void
+  ::sqlite::api::detail::Dispatch<std::string> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_wstring() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_wstring() -> void
+  ::sqlite::api::detail::Dispatch<std::wstring> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_vector_char() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_vector_char() -> void
+  ::sqlite::api::detail::Dispatch<std::vector<char>> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+auto tests::unit::api::dispatch::Result::test_Zeroblob() -> void {
+#warning WRITEME auto tests::unit::api::dispatch::Result::test_Zeroblob() -> void
+  ::sqlite::api::detail::Dispatch<::sqlite::Zeroblob> dispatch;
+  CPPUNIT_ASSERT(true);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::api::dispatch::Result::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("dispatch");
+  s << call("bool", &Result::test_bool)
+    << call("const_buffer", &Result::test_const_buffer)
+    << call("const_stringn", &Result::test_const_stringn)
+    << call("const_stringz", &Result::test_const_stringz)
+    << call("int32", &Result::test_int32)
+    << call("int64", &Result::test_int64)
+    << call("Null", &Result::test_Null)
+    << call("string", &Result::test_string)
+    << call("wstring", &Result::test_wstring)
+    << call("vector_char", &Result::test_vector_char)
+    << call("Zeroblob", &Result::test_Zeroblob)
+    ;
+  return s.release();
+}
+#endiv

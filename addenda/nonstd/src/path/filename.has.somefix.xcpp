@@ -1,0 +1,4 @@
+#divert <hpp>
+#import nonstd.path.filename.has.somefix
+namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] has { using ::nonstd::path::filename::has::somefix; } } }
+#endiv

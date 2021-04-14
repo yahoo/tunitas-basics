@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.ip.Version
+#import sys.ip.required.Version
+#import sys.ip.version.Traits
+#import sys.af.Family
+namespace sys::ip::addr {
+  //
+  // The address family constants.
+  // These are (contexpr) variable declarations so they properly belong at <hpp>
+  // There are just the two.
+  //
+  // This is how constrained constants within addr::Type are minted
+  //
+  // Usage:
+  //
+  //   auto const a4 = ip::addr::Family<ip::INET4>;
+  //   auto const a6 = ip::addr::Family<ip::INET6>;
+  //
+  template<Version VERSION>
+  requires required::Version<VERSION>
+  inline constexpr auto Family = af::Family<version::Traits<VERSION>::ADDRESS>;
+}
+#endiv
+#divert <cpp>
+#import sys.ip.constants
+#import sys.af.constants
+namespace {
+  namespace tests {
+    using namespace sys::ip;
+    using sys::ip::addr::Family;
+    static_assert((int)Family<IPv4> == (int)sys::af::INET4);
+    static_assert((int)Family<IPv6> == (int)sys::af::INET6);
+    static_assert((int)Family<IPv4> == AF_INET);
+    static_assert((int)Family<IPv6> == AF_INET6);
+  }
+}
+#endiv

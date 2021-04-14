@@ -1,0 +1,86 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::path::filename::trimmer {
+  //
+  // An operator in the trimmer pantheon.
+  // Remove the suffix of a path; respecting path boundaries.
+  // Trailing slashes are removed; the result can be the empty path, i.e. ""
+  //
+  // Usage:
+  //     using nonstd::path::filename::trim;
+  //     trim(subject) << deprefix("some/pattern");
+  //
+  // All the magic happens in operator<<
+  //
+  // Reminder, this removes *path* component suffixes, it does not remove *filename* suffixes;
+  // i.e. it won't remove ".o" in "filename.o"   You must use ish::bash::desuffix(...) for that.
+  //
+  class Desuffix;
+}
+#divert <hpp>
+#import nonstd.path.filename.trimmer.Workbench
+namespace nonstd::path::filename::trimmer {
+  //
+  // See the helpers nearby
+  //     nonstd::path::filename::trim
+  //     nonstd::path::filename::desuffix
+  //
+  // Example:
+  //     workbench binds to a string "/home/USER/.config/application/filename";
+  //     deprefix contains pattern ".config/application/filename";
+  //
+  // Usage:
+  //     trim(subject) << desuffix(pattern);
+  //
+  // Result
+  //     workbench binds to a string "/home/USER"
+  //
+  inline auto operator<<(Workbench, Desuffix const &) -> Workbench;
+}
+#import std.string
+#import nonstd.path.filename.trimmer.Prototype
+class nonstd::path::filename::trimmer::Desuffix : public Prototype {
+  using ancestor = Prototype;
+public:
+  using ancestor::Prototype;
+};
+#endiv
+#divert <ipp>
+#include <cassert>
+auto nonstd::path::filename::trimmer::operator<<(Workbench workbench, Desuffix const &desuffix) -> Workbench {
+  std::string::size_type position = workbench.subject.rfind(desuffix.pattern);
+  // Does the pattern match exactly at the end?
+  if (std::string::npos != position && position + desuffix.pattern.size() == workbench.subject.size()) {
+    std::string::size_type size = workbench.subject.size();
+    if (0 == position) {
+      workbench.subject.clear();
+    } else if ('/' == workbench.subject[position-1]) {
+      //
+      // The pattern must start after a '/' else the pattern does not match
+      //
+      while (0 < position && '/' == workbench.subject[position-1]) {
+        position--;
+      }
+      if (0 == position) {
+        workbench.subject.clear();
+      } else {
+        auto erasure_length = size - position;
+        workbench.subject.erase(position, erasure_length);
+      }
+    } else {
+      //
+      // The pattern didn't start after a '/', therefore it does not match
+      // The trimming is a no-op
+      //
+      // e.g.
+      //     workbench binds to a string "/home/USERNAME/.config/application/filename";
+      //     desuffix contains pattern "config/application/filename"; <------"config" not ".config"
+      //     trim(subject) << desuffix(pattern);
+      //     no trimming occurs.
+      //
+    }
+  }
+  return workbench;
+}
+#endiv

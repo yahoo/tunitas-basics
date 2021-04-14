@@ -1,0 +1,17 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_nonstd_range_SUBSOURCES = \
+  obj/src/nonstd/range/namespace.cpp \
+  obj/src/nonstd/range/detail/namespace.cpp \
+  \
+  obj/src/nonstd/range/reverse.cpp \
+  obj/src/nonstd/range/detail/Reverse.cpp \
+  \
+  obj/src/nonstd/range/forward.cpp \
+  obj/src/nonstd/range/detail/Forward.cpp \
+  \
+  obj/src/nonstd/range/indexing.cpp \
+  obj/src/nonstd/range/detail/indexing.Container.cpp \
+  obj/src/nonstd/range/detail/indexing.Index.cpp \
+  obj/src/nonstd/range/detail/indexing.Iterator.cpp \
+  $(end)

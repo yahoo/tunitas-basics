@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+#import sys.id.File
+#import sys.id.User
+#import sys.id.Group
+#import uid_t
+#import gid_t
+namespace sys::posix {
+  namespace packaging::fchown {
+    using id::File;
+    using id::User;
+    using id::Group;
+    using call::Result;
+    namespace function {
+      inline auto fchown(File, User) -> Result;
+      inline auto fchown(File, Group) -> Result;
+      inline auto fchown(File, User, Group) -> Result;
+      inline auto fchown(File, uid_t, gid_t) -> Result;
+    }
+    namespace native {
+      inline auto fchown(int, uid_t, gid_t) -> Result;
+    }
+  }
+  using packaging::fchown::function::fchown;
+  namespace native { using packaging::fchown::native::fchown; }
+}
+using sys::posix::fchown; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import sys.posix.syscall 
+namespace sys::posix::packaging::fchown {
+  auto function::fchown(File file, User uid) -> Result             { return native::fchown((int) file, (uid_t)uid, gid_t(-1)); }
+  auto function::fchown(File file, Group gid) -> Result            { return native::fchown((int) file, uid_t(-1), (gid_t)gid); }
+  auto function::fchown(File file, User uid, Group gid) -> Result  { return native::fchown((int) file, (uid_t)uid, (gid_t)gid); }
+  auto function::fchown(File file, uid_t uid, gid_t gid) -> Result { return native::fchown((int) file, uid, gid); }
+  // See the commentariat about (on 64-bit)Syscall::FCHOWN, (on 32-bit)Syscall::FCHOWN32 nearby to sys::posix::packaging::chown::Pathname
+  static_assert(4 == sizeof (uid_t));
+  static_assert(4 == sizeof (gid_t));
+  auto native::fchown(int fd, uid_t uid, gid_t gid) -> Result      { return idiomatic::syscall<int>(Syscall::FCHOWN, fd, uid, gid); }
+}
+#endiv

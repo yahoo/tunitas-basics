@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::unlock {
+  //
+  // PotAAAAto, Potaaahhhto
+  // Has to do with distinguishing between the two UNLOCK verbs.
+  //
+  //   namespace sys::posix {
+  //
+  //     flock(2) .......... LOCK::UNLOCK<LOCK::FLOCK> ... LOCK::UNFLOCK .... Operation;
+  //     {g,s}etlease(2) ... LOCK::UNLOCK<LOCK::LEASE> ... LOCK::ENDLEASE ... Operation;
+  //     {g,s}etlock(2) .... LOCK::UNLOCK<LOCK::LOCK> .... LOCK::ENDLOCK .... Operation;
+  //     ... and the various flavors: process-associated, file-associated.
+  //   
+  //     lockf(3) .......... F::UNLOCK ................... F::UNLOCKF ....... Operation;
+  //   }
+  //
+  enum class Call { FLOCK, LEASE, LOCK, LOCKF };
+}
+#endiv

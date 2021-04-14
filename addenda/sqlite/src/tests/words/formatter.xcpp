@@ -1,0 +1,14 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import tests.words.detail.Formatter
+namespace tests {
+  namespace words {
+    inline auto formatter() -> detail::Formatter;
+  }
+}
+#endiv
+#divert <ipp>
+auto tests::words::formatter() -> detail::Formatter {
+  return detail::Formatter{};
+}
+#endiv

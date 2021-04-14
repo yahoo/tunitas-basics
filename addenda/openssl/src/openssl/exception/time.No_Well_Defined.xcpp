@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::exception::time {
+  //
+  // A time of no well defined expiry is discovered (and should not have been)
+  // This is the ASN1 Time which is No Well Defined Expiration
+  //
+  // Usage:
+  //
+  //   try {
+  //     throw time::No_Well_Defined{};
+  //   } catch (Aspect const &) {
+  //     ...recover...
+  //   }
+  //
+  class No_Well_Defined;
+}
+#endiv
+#divert <hpp>
+#import openssl.exception.Time
+class openssl::exception::time::No_Well_Defined : public Time {
+  using ancestor = Time;
+public:
+  No_Well_Defined() = default;
+  auto what() const noexcept -> char const * override;
+};
+#endiv
+#divert <cpp>
+auto openssl::exception::time::No_Well_Defined::what() const noexcept -> char const * {
+  return "no well defined expiration";
+}
+#endiv

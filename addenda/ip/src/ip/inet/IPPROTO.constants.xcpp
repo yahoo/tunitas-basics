@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.IPPROTO
+#warning module ip.inet.IPPROTO.constants is deprecated, instead prefer ip.inet.ipproto.constants (or not even that)
+#endiv
+#divert <hpp>
+#import ip.inet.IPPROTO
+#import sys.posix.ipproto.constants // Yes, the lower-case one.  Whatever is in there, you get that.
+namespace ip::inet {
+  static_assert(sizeof (IPPROTO::NONE));
+  static_assert(sizeof (IPPROTO::UDP));
+  static_assert(sizeof (IPPROTO::TCP));
+}
+#endiv

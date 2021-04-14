@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::sig {
+  //
+  // The signal handler
+  //
+  // Stridently ...:
+  //
+  // <quote ref=man:signal(2) rpm=man-pages-4.16-3.fc29.noarch>
+  //   The only portable use of signal() is to set a signal's disposition to SIG_DFL or SIG_IGN.
+  //   The semantics when using signal() to establish a signal handler vary across systems
+  //   (and POSIX.1 explicitly permits this variation);
+  //   <bold> do not use it for this purpose.</bold>
+  // </quote>
+  //
+  // Usage:
+  //
+  //   auto set = signal(SIG::TERM,  Handler::IGN);
+  //   auto set = signal(SIG::TERM,  SIG::IGN);
+  //
+  // Alternatively:
+  // 
+  //   auto set = signal(SIG::TERM,  SIG::DFL);
+  //   auto set = signal(SIG::TERM,  SIG::IGN);
+  //
+  struct Handler;
+}
+#endiv
+#divert <hpp>
+#import sighandler_t // from _GNU_SOURCE
+#include <signal.h> // for SIG_DFL, SIG_IGN et al.
+struct sys::sig::Handler {
+  constexpr Handler() : value{SIG_DFL} { }
+  constexpr explicit Handler(sighandler_t value) : value{value} { }
+  constexpr operator sighandler_t() const { return value; }
+protected:
+  sighandler_t value;
+};
+#endiv

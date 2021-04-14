@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../Makefrag.am; included in the top-level Makefile.am
+src_sys_required_SOURCES_SET = \
+  obj/src/sys/required/namespace.cpp \
+  obj/src/sys/required/Class.cpp \
+  obj/src/sys/required/Enumeration.cpp \
+  obj/src/sys/required/Descriptor.cpp \
+  obj/src/sys/required/Integer.cpp \
+  obj/src/sys/required/Integral.cpp \
+  obj/src/sys/required/Stringz.cpp \
+  obj/src/sys/required/stringz.Does_Conform.cpp \
+  $(end)

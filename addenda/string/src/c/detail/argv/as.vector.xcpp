@@ -1,0 +1,29 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_argv
+#import std.vector
+namespace c {
+  namespace detail {
+    template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR const *, ALLOC> const &) -> basic_argv<CHAR const>;
+    template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR *, ALLOC> const &) -> basic_argv<CHAR const>;
+    template<typename CHAR, typename ALLOC> inline auto as(std::vector<CHAR *, ALLOC> &) -> basic_argv<CHAR>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.basic_argv
+template<typename CHAR, typename ALLOC> auto c::detail::as(std::vector<CHAR const *, ALLOC> const &vec) -> basic_argv<CHAR const> {
+  basic_argv<CHAR const> ret(vec.size(), vec.data());
+  return ret;
+}
+
+template<typename CHAR, typename ALLOC> auto c::detail::as(std::vector<CHAR *, ALLOC> const &vec) -> basic_argv<CHAR const> {
+  basic_argv<CHAR const> ret(vec.size(), vec.data());
+  return ret;
+}
+
+template<typename CHAR, typename ALLOC> auto c::detail::as(std::vector<CHAR *, ALLOC> &vec) -> basic_argv<CHAR> {
+  basic_argv<CHAR> ret(vec.size(), vec.data());
+  return ret;
+}
+#divert </ipp>

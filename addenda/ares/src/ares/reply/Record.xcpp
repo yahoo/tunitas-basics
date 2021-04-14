@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.reply.Record.declaration
+#import ares.reply.Record.A
+#import ares.reply.Record.AAAA
+#import ares.reply.Record.MX
+#import ares.reply.Record.NAPTR
+#import ares.reply.Record.NS
+#import ares.reply.Record.PTR
+#import ares.reply.Record.SOA
+#import ares.reply.Record.TXT
+#import ares.reply.Record.SRV
+#import ares.reply.Record.URI
+#endiv

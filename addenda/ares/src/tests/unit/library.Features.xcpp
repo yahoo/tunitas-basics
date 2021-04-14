@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::library { class Features; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import ares.library.Feature
+#import ares.library.Features
+class tests::unit::library::Features : public cppunit::test::Fixture {
+public:
+  using Single = ::ares::library::Feature;
+  using Plural = ::ares::library::Features;
+  auto test_constants() -> void;
+  auto test_compose_single_single() -> void;
+  auto test_compose_single_plural() -> void;
+  auto test_compose_plural_single() -> void;
+  auto test_compose_plural_plural() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#import ares.library.features.constants
+#endiv
+#divert <cpp>
+auto tests::unit::library::Features::test_constants() -> void {
+  using namespace ::ares::library::features;
+  Plural subject = NONE;
+  CPPUNIT_ASSERT(NONE == subject);
+  subject = WIN32;
+  subject = ALL;
+  CPPUNIT_ASSERT(ALL == subject);
+}
+auto tests::unit::library::Features::test_compose_single_single() -> void {
+  using namespace ::ares::library::features;
+  auto subject = Single::NONE | Single::NONE;
+  CPPUNIT_ASSERT(Plural{} == subject);
+  subject = Single::NONE | Single::NONE | Single::WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  CPPUNIT_ASSERT(ALL == subject); // ahem because there are no other "features" besides Windows
+}
+auto tests::unit::library::Features::test_compose_single_plural() -> void {
+  using namespace ::ares::library::features;
+  auto subject = Single::NONE | NONE;
+  CPPUNIT_ASSERT(Plural{} == subject);
+  subject = Single::NONE | WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  subject = Single::NONE | WIN32 | Single::WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  CPPUNIT_ASSERT(ALL == subject); // ahem because there are no other "features" besides Windows
+}
+auto tests::unit::library::Features::test_compose_plural_single() -> void {
+  using namespace ::ares::library::features;
+  auto subject = NONE | Single::NONE;
+  CPPUNIT_ASSERT(Plural{} == subject);
+  subject = NONE | Single::WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  subject = WIN32 | WIN32 | Single::WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  CPPUNIT_ASSERT(ALL == subject); // ahem because there are no other "features" besides Windows
+}
+auto tests::unit::library::Features::test_compose_plural_plural() -> void {
+  using namespace ::ares::library::features;
+  auto subject = NONE | NONE;
+  CPPUNIT_ASSERT(Plural{} == subject);
+  subject = NONE | WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  subject = WIN32 | WIN32 | WIN32;
+  CPPUNIT_ASSERT(WIN32 == subject);
+  CPPUNIT_ASSERT(ALL == subject); // ahem because there are no other "features" besides Windows
+}
+#import rigging.suite.io
+auto tests::unit::library::Features::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Features"};
+  series << call("constants", &Features::test_constants)
+    ;
+  {
+    Stream com{"compose"};
+    com << call("single,single", &Features::test_compose_single_single)
+        << call("single,plural", &Features::test_compose_single_plural)
+        << call("plural,single", &Features::test_compose_plural_single)
+        << call("plural,plural", &Features::test_compose_plural_plural)
+      ;
+    series << move(com);
+  }
+  return finalize(series);
+}
+#endiv

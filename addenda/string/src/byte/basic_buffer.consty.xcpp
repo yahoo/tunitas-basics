@@ -1,0 +1,108 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward byte.basic_buffer
+#import byte.required.Byte
+namespace byte {
+  template<required::Byte BYTE> class basic_buffer<BYTE const>;
+}
+#endiv
+#divert <hpp>
+#import byte.detail.Buffer
+#import byte.detail.Byte
+#import std.array
+#import std.pair
+#import std.size_t
+#import std.tuple
+#import std.vector
+// These are NOT suitable for storing the pointer values persistently.
+template<byte::required::Byte BYTE> class byte::basic_buffer<BYTE const> : public detail::Buffer<detail::Byte<BYTE const>> {
+  using ancestor = detail::Buffer<detail::Byte<BYTE const>>;
+public:
+  basic_buffer() = default;
+  // Yes, implicit, all
+  // [[deprecated]] basic_buffer(typename ancestor::const_data_type, std::size_t); (not just deprecated, but purely unavailable)
+  // preceding size is primary
+  inline basic_buffer(std::size_t, typename ancestor::const_data_type);
+  // trailing size overrides inferred size
+  template<std::size_t N> inline basic_buffer(typename ancestor::value_type const (&)[N], std::size_t = N);
+  inline basic_buffer(basic_buffer<BYTE>);
+  // either order
+  inline basic_buffer(std::pair<BYTE *, std::size_t>);
+  inline basic_buffer(std::pair<BYTE const *, std::size_t>);
+  inline basic_buffer(std::pair<std::size_t, BYTE *>);
+  inline basic_buffer(std::pair<std::size_t, BYTE const *>);
+  // either order
+  inline basic_buffer(std::tuple<BYTE *, std::size_t>);
+  inline basic_buffer(std::tuple<BYTE const *, std::size_t>);
+  inline basic_buffer(std::tuple<std::size_t, BYTE *>);
+  inline basic_buffer(std::tuple<std::size_t, BYTE const *>);
+  // pass by reference
+  template<std::size_t N> inline [[implicit]] basic_buffer(std::array<BYTE, N> const &);
+  template<typename ALLOC> inline [[implicit]] basic_buffer(std::vector<BYTE, ALLOC> const &);
+};
+#endiv
+#divert <ipp>
+#import byte.basic_buffer
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::size_t subject_size, typename ancestor::const_data_type subject)
+  : ancestor(subject, subject_size) {
+  ;
+}
+#import std.min
+#import std.length_error
+template<byte::required::Byte BYTE> template<std::size_t N> byte::basic_buffer<BYTE const>::basic_buffer(typename ancestor::value_type const (&subject)[N], std::size_t subject_size)
+  : ancestor(subject, std::min(subject_size, N)) {
+  if (subject_size > N) {
+    // This is a programmer error; because the programmer didn't understand subject_size relative to the size N.
+    throw std::length_error("size > N");
+  }
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(basic_buffer<BYTE> subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::pair<std::size_t, BYTE *> subject)
+  : ancestor(subject.second, subject.first) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::pair<BYTE *, std::size_t> subject)
+  : ancestor(subject.first, subject.second) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::pair<std::size_t, BYTE const *> subject)
+  : ancestor(subject.second, subject.first) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::pair<BYTE const *, std::size_t> subject)
+  : ancestor(subject.first, subject.second) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::tuple<std::size_t, BYTE *> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::tuple<BYTE *, std::size_t> subject)
+  : ancestor(std::get<0>(subject), std::get<1>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::tuple<std::size_t, BYTE const *> subject)
+  : ancestor(std::get<1>(subject), std::get<0>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> byte::basic_buffer<BYTE const>::basic_buffer(std::tuple<BYTE const *, std::size_t> subject)
+  : ancestor(std::get<0>(subject), std::get<1>(subject)) {
+  ;
+}
+template<byte::required::Byte BYTE> template<std::size_t N> byte::basic_buffer<BYTE const>::basic_buffer(std::array<BYTE, N> const &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+template<byte::required::Byte BYTE> template<typename ALLOC> byte::basic_buffer<BYTE const>::basic_buffer(std::vector<BYTE, ALLOC> const &subject)
+  : ancestor(subject.data(), subject.size()) {
+  ;
+}
+#endiv

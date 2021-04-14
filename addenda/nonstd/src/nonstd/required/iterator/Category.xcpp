@@ -1,0 +1,41 @@
+// -*- c++ -*- C++23+ with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_base_of
+//
+// Whereas the iterator tags are really a class descendancy...
+// <pedantic>because we require the complete type definition</pedantic>
+// ... but these are in the standard library so they are completely available at <fpp> anyway
+//
+#if 1
+#import nonstd.iterator.Categories
+#include <hpp/nonstd.iterator.Categories>
+#else
+#import nonstd.output_iterator_tag
+#import nonstd.input_iterator_tag
+#import nonstd.forward_iterator_tag
+#import nonstd.bidirectional_iterator_tag
+#import nonstd.undirected_iterator_tag
+#import nonstd.contiguous_iterator_tag
+#include <hpp/nonstd.output_iterator_tag>
+#include <hpp/nonstd.input_iterator_tag>
+#include <hpp/nonstd.forward_iterator_tag>
+#include <hpp/nonstd.bidirectional_iterator_tag>
+#include <hpp/nonstd.undirected_iterator_tag>
+#include <hpp/nonstd.contiguous_iterator_tag>
+#endif
+namespace nonstd::required::iterator {
+  //
+  // Is this type one of the iterator categories?
+  //
+  // Concept:
+  //
+  //   https://en.cppreference.com/w/cpp/iterator/iterator_tags
+  //
+  // Design:
+  //
+  //   Take advantage of the inheritance relationship
+  //
+  template<typename CATEGORY> concept bool Category = (std::is_base_of_v<input_iterator_tag, CATEGORY> ||
+                                                       std::is_base_of_v<output_iterator_tag, CATEGORY>);
+}
+#endiv

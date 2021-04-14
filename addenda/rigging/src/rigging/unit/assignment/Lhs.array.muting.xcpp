@@ -1,0 +1,77 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rigging.unit.assignment.Lhs
+#import std.size_t
+namespace rigging::unit::assignment {
+  template<std::size_t N> class Lhs<char [N]>;
+}
+#endiv
+#divert <hpp>
+#import rigging.unit.assignment.Clear
+#import rigging.unit.Buffer
+#import rigging.unit.Stringz
+template<std::size_t N> class rigging::unit::assignment::Lhs<char [N]> {
+public:
+  using value_type = char[N];
+  using base_type = char;
+  inline explicit Lhs(value_type &lhs);
+  inline auto operator=(Clear) -> Lhs &;
+  template<std::size_t M> inline auto operator=(base_type const (&rhs)[M]) -> Lhs &;
+  // In order to assign into manifest-szie array, you have to specify size of the rhs
+  inline auto operator=(Buffer) -> Lhs &;
+  inline auto operator=(Stringz) -> Lhs &;
+protected:
+  value_type &lhs;
+};
+#endiv
+#divert <ipp>
+template<std::size_t N> rigging::unit::assignment::Lhs<char [N]>::Lhs(value_type &arg)
+  : lhs(arg) {
+  ;
+}
+  
+#import std.fill_n
+template<std::size_t N> auto rigging::unit::assignment::Lhs<char [N]>::operator=(Clear) -> Lhs & {
+  std::fill_n(&lhs[0], N, '\0');
+  return *this;
+}
+
+#import std.invalid_argument
+#import std.copy
+template<std::size_t N> template<std::size_t M> auto rigging::unit::assignment::Lhs<char [N]>::operator=(base_type const (&rhs)[M]) -> Lhs & {
+  static_assert(M < N, "rhs is too big");
+  // the '\0' sentinel character is *within* the rhs Stringz, at least at the last position M
+  std::size_t rhs_size = M;
+  std::size_t lhs_size = N;
+  if (lhs_size < rhs_size) {
+    throw std::invalid_argument("rhs too big (to copy into the lhs)");
+  }
+  std::copy(&rhs[0], &rhs[M], &lhs[0]);
+  return *this;
+}
+
+#import std.invalid_argument
+#import std.copy
+template<std::size_t N> auto rigging::unit::assignment::Lhs<char [N]>::operator=(Buffer rhs) -> Lhs & {
+  // the '\0' sentinel character is *within* the Buffer, at least at the last position M
+  std::size_t rhs_size = rhs.size();
+  std::size_t lhs_size = N-1;
+  if (lhs_size < rhs_size) {
+    throw std::invalid_argument("rhs too big (to copy into the lhs)");
+  }
+  std::copy(rhs.begin(), rhs.end(), &lhs[0]);
+  return *this;
+}
+
+template<std::size_t N> auto rigging::unit::assignment::Lhs<char [N]>::operator=(Stringz rhs) -> Lhs & {
+  // including the '\0' sentinel character
+  std::size_t rhs_size = rhs.size()+1;
+  std::size_t lhs_size = N;
+  if (lhs_size < rhs_size) {
+    throw std::invalid_argument("rhs too big (to copy into the lhs)");
+  }
+  std::copy(rhs.begin(), rhs.end()+1, &lhs[0]);
+  return *this;
+}
+#endiv

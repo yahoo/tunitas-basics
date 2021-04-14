@@ -1,0 +1,4 @@
+// -*- c++ -*- 0534b686-0d45-4dfb-819a-48ead0c92cf4
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/shark.h>

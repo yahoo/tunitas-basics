@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rigging.unit.Exit
+#import unit.rigging
+#endiv
+#divert <cpp>
+#import std.is_same
+namespace {
+  using rb = ::rigging::unit::Exit;
+  using ub = ::unit::rigging::Exit;
+  static_assert(std::is_same<rb, ub>::value);
+}
+#endiv

@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_same
+#import std.underlying_type
+#import sys.id.Group
+namespace sys::id::required {
+  //
+  // Is this type a Group identifier (enum) or its underlying type (gid_t)?
+  //
+  // Usage:
+  //
+  //   Oh come on.
+  //
+  template<typename USER> concept bool Group = (std::is_same_v<USER, id::Group> ||
+                                                std::is_same_v<USER, std::underlying_type_t<id::Group>>);
+}
+#endiv
+#divert <cpp>
+#import gid_t
+#import sys.id.Group
+#import sys.id.required.Group
+#import sys.id.process.Group
+#import sys.id.required.process.Group
+namespace {
+  namespace tests {
+    using namespace sys::id;
+    static_assert(required::process::Group<sys::id::process::Group>);
+    static_assert(required::process::Group<pid_t>); // <---------------------- pid_t
+    static_assert(!required::Group<sys::id::process::Group>);
+    static_assert(required::Group<gid_t>); // <------------------------------- same as gid_t (group of a user.group)
+    static_assert(!required::Group<char *>);
+  }
+}
+#endiv

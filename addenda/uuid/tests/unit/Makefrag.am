@@ -1,0 +1,9 @@
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  tests/unit/container.test \
+  tests/unit/generate.test \
+  tests/unit/parse.test \
+  tests/unit/time.test \
+  tests/unit/unparsing.test \
+  tests/unit/unparse.test \
+  $(end)

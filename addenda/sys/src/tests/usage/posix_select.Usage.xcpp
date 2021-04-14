@@ -1,0 +1,156 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_select.Usage
+//   static_assert(tests::usage::posix_select::Usage<>);
+//
+#import std.optional
+#import sys.call.result.Value
+#import sys.fd.set.Reference
+#import sys.time.spec
+#import sys.time.val
+#import sys.posix.packaging.select.required.Duration
+#import sys.sig.Set // and sigset_t
+namespace tests::usage::posix_select {
+  namespace [[detail]] reference {
+    using namespace sys::fd::set;
+    using Reads = Reference<Purpose::READ>::Optional;
+    using Writes = Reference<Purpose::WRITE>::Optional;
+    using Excepts = Reference<Purpose::EXCEPT>::Optional;
+  }
+  using reference::Reads;
+  using reference::Writes;
+  using reference::Excepts;
+  using Timeval = sys::time::val;
+  using Timeout = std::optional<Timeval>;
+  using Count = sys::call::result::Value<int>;
+  namespace required = sys::posix::packaging::select::required;
+  template<required::Duration DURATION> using Optional = std::optional<DURATION>; // NOT detail::select::Optional<DURATION>
+  using Sigset = std::optional<std::reference_wrapper<sigset_t const>>;
+}
+#endiv
+#divert <tpp>
+#import nonstd.same_as
+#import nonstd.convertible_to
+#import sys.posix.packaging.select.Optional
+#import sys.posix.select
+#import tests.usage.countof
+namespace tests::usage::posix_select {
+  using sys::posix::select;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    namespace time = sys::time;
+    namespace {
+      namespace [[detail]] stanza_select {
+        template<typename...> concept bool Select = requires(int n, Reads r, Writes w, Excepts e) {
+          { select(r) } -> same_as<Count>;
+          { select(w) } -> same_as<Count>;
+          { select(e) } -> same_as<Count>;
+          { select(r, w) } -> same_as<Count>;
+          { select(r, e) } -> same_as<Count>;
+          { select(w, e) } -> same_as<Count>;
+          { select(r, w, e) } -> same_as<Count>;
+          //
+          { select(n, r) } -> same_as<Count>;
+          { select(n, w) } -> same_as<Count>;
+          { select(n, e) } -> same_as<Count>;
+          { select(n, r, w) } -> same_as<Count>;
+          { select(n, r, e) } -> same_as<Count>;
+          { select(n, w, e) } -> same_as<Count>;
+          { select(n, r, w, e) } -> same_as<Count>;
+        };
+        template<typename TIMEOUT> concept bool SelectTimeout = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t) {
+          requires required::Duration<TIMEOUT>;
+          { select(r, t) } -> same_as<Count>;
+          { select(r, w, t) } -> same_as<Count>;
+          { select(r, e, t) } -> same_as<Count>;
+          { select(w, e, t) } -> same_as<Count>;
+          { select(r, w, e, t) } -> same_as<Count>;
+          { select(n, r, t) } -> same_as<Count>;
+          { select(n, r, w, t) } -> same_as<Count>;
+          { select(n, r, e, t) } -> same_as<Count>;
+          { select(n, w, e, t) } -> same_as<Count>;
+          { select(n, r, w, e, t) } -> same_as<Count>;
+        };
+        template<typename..._> concept bool Stanza = requires(_...) {
+          requires 0 == countof<_...>;
+          requires Select<>;
+          requires SelectTimeout<time::t>;
+          requires SelectTimeout<time::val>;
+          requires SelectTimeout<time::spec>;
+          requires SelectTimeout<time::durations::seconds>;
+          requires SelectTimeout<time::durations::milliseconds>;
+          requires SelectTimeout<time::durations::microseconds>;
+          requires SelectTimeout<time::durations::nanoseconds>;
+        };
+      }
+      namespace [[dteail]] stanza_pselect {
+        template<typename TIMEOUT> concept bool PSelectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+          requires required::Duration<TIMEOUT>;
+          { select(r, s) } -> same_as<Count>;
+          { select(r, w, s) } -> same_as<Count>;
+          { select(r, e, s) } -> same_as<Count>;
+          { select(w, e, s) } -> same_as<Count>;
+          { select(r, w, e, s) } -> same_as<Count>;
+          { select(n, r, s) } -> same_as<Count>;
+          { select(n, r, w, s) } -> same_as<Count>;
+          { select(n, r, e, s) } -> same_as<Count>;
+          { select(n, w, e, s) } -> same_as<Count>;
+          { select(n, r, w, e, s) } -> same_as<Count>;
+        };
+        template<typename TIMEOUT> concept bool PSelectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+          requires required::Duration<TIMEOUT>;
+          { select(r, s, t) } -> same_as<Count>;
+          { select(r, w, s, t) } -> same_as<Count>;
+          { select(r, e, s, t) } -> same_as<Count>;
+          { select(w, e, s, t) } -> same_as<Count>;
+          { select(r, w, e, s, t) } -> same_as<Count>;
+          { select(n, r, s, t) } -> same_as<Count>;
+          { select(n, r, w, s, t) } -> same_as<Count>;
+          { select(n, r, e, s, t) } -> same_as<Count>;
+          { select(n, w, e, s, t) } -> same_as<Count>;
+          { select(n, r, w, e, s, t) } -> same_as<Count>;
+        };
+        template<typename TIMEOUT> concept bool PSelectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t, Sigset s) {
+          requires required::Duration<TIMEOUT>;
+          { select(r, t, s) } -> same_as<Count>;
+          { select(r, w, t, s) } -> same_as<Count>;
+          { select(r, e, t, s) } -> same_as<Count>;
+          { select(w, e, t, s) } -> same_as<Count>;
+          { select(r, w, e, t, s) } -> same_as<Count>;
+          { select(n, r, t, s) } -> same_as<Count>;
+          { select(n, r, w, t, s) } -> same_as<Count>;
+          { select(n, r, e, t, s) } -> same_as<Count>;
+          { select(n, w, e, t, s) } -> same_as<Count>;
+          { select(n, r, w, e, t, s) } -> same_as<Count>;
+        };
+        template<typename TIMEOUT> concept bool PSelect = requires(TIMEOUT) {
+          requires PSelectSigset<TIMEOUT>;
+          requires PSelectSigsetTimeout<TIMEOUT>;
+          requires PSelectTimeoutSigset<TIMEOUT>;
+        };
+        template<typename..._> concept bool Stanza = requires(_...) {
+          requires 0 == countof<_...>;
+          requires PSelect<time::t>;
+          requires PSelect<time::val>;
+          requires PSelect<time::spec>;
+          requires PSelect<time::durations::seconds>;
+          requires PSelect<time::durations::milliseconds>;
+          requires PSelect<time::durations::microseconds>;
+          requires PSelect<time::durations::nanoseconds>;
+        };
+      }
+    }
+    template<typename..._> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires stanza_select::Stanza<>;
+      requires stanza_pselect::Stanza<>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

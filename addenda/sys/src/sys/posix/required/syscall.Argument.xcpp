@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_integral
+#import std.is_pointer
+namespace sys::posix::required::syscall {
+  //
+  // What types can be passed to syscall(2)?
+  //
+  // Usage:
+  //
+  //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
+  //
+  template<typename TYPE> concept bool Argument = std::is_integral_v<TYPE> || std::is_pointer_v<TYPE>;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::posix::required::syscall;
+    struct Junk;
+    static_assert(Argument<int>);
+    static_assert(Argument<unsigned>);
+    static_assert(Argument<long>);
+    static_assert(Argument<unsigned long>);
+    static_assert(Argument<int *>);
+    static_assert(Argument<long *>);
+    static_assert(Argument<long const *>);
+    static_assert(Argument<void *>);
+    static_assert(Argument<void const *>);
+    static_assert(Argument<Junk *>);
+    static_assert(Argument<Junk const *>);
+  }
+}
+#endiv

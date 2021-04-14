@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.shutdown
+#import sys.posix.socket
+#import sys.af.Family
+auto tests::unit::posix::fixture::Fixture::test_shutdown() -> void {
+  // Doesn't matter if the system calls fail.  Just call them.
+  auto c = six::socket(::sys::af::Family<::sys::net::Network::INET6>, ::sys::sock::Type{});
+  CPPUNIT_ASSERT(good(c) || fail(c));
+  auto sock_fd = value(c);
+  auto d = six::shutdown(sock_fd, ::sys::shut::Down::RDWR); // <----------- the testing happens in here
+  CPPUNIT_ASSERT(good(d) || fail(d));
+}
+#endiv

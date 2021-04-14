@@ -1,0 +1,3 @@
+tests_unit_ish_make_TESTS = \
+  tests/unit/ish/make/cases.test \
+  $(end)

@@ -1,0 +1,77 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple
+#import sqlite.status.Code
+#import std.error_code
+#import std.string
+namespace sqlite {
+  namespace detail {
+    namespace read {
+      enum class Lookup { ADL };
+      using Result = std::tuple<Lookup, status::Code, std::error_code, /*filename*/ std::string, /*sql_syntax*/ std:: string>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+namespace sqlite {
+  namespace detail {
+    namespace read {
+      inline auto make(status::Code, std::error_code, std::string const &filename, std::string const &unprepared_sql_syntax) -> Result;
+      inline auto make(status::Code, std::error_code, std::string &&filename, std::string &&unprepared_sql_syntax) -> Result;
+
+      inline auto ok(Result const &) -> bool;
+      inline auto code(Result const &) -> status::Code;
+      inline auto error_code(Result const &) -> std::error_code;
+      inline auto filename(Result const &) -> std::string const &;
+      inline auto filename(Result &&) -> std::string;
+
+      // the SQL will only be populated if !ok(Code)
+      inline auto sql(Result const &) -> std::string const &;
+      inline auto sql(Result &&) -> std::string;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+auto sqlite::detail::read::make(status::Code code, std::error_code ec, std::string const &filename, std::string const &unprepared_sql_syntax) -> Result {
+  return Result(Lookup(), code, ec, filename, unprepared_sql_syntax);
+}
+
+#import std.forward
+auto sqlite::detail::read::make(status::Code code, std::error_code ec, std::string &&filename, std::string &&unprepared_sql_syntax) -> Result {
+  return Result(Lookup(), code, ec, std::forward<std::string>(filename), std::forward<std::string>(unprepared_sql_syntax));
+}
+
+#import std.get
+auto sqlite::detail::read::ok(Result const &r) -> bool {
+  return ok(code(r));
+}
+
+auto sqlite::detail::read::code(Result const &r) -> status::Code {
+  return std::get<1>(r);
+}
+
+auto sqlite::detail::read::error_code(Result const &r) -> std::error_code {
+  return std::get<2>(r);
+}
+
+auto sqlite::detail::read::filename(Result const &r) -> std::string const & {
+  return std::get<3>(r);
+}
+
+#import std.forward
+auto sqlite::detail::read::filename(Result &&anon) -> std::string {
+  return std::get<3>(std::forward<Result>(anon));
+}
+
+auto sqlite::detail::read::sql(Result const &r) -> std::string const & {
+  return std::get<4>(r);
+}
+
+#import std.forward
+auto sqlite::detail::read::sql(Result &&anon) -> std::string {
+  return std::get<4>(std::forward<Result>(anon));
+}
+#endiv

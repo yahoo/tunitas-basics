@@ -1,0 +1,122 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in series/v0.11/01.black-platinum-hen series/v0.12/02.maroon-iron-crow series/v0.12/03.red-mercury-goose series/v0.13/04.green-copper-heron; do
+#       increment=37
+#       api=$((api+increment))
+#       echo "$branch API $api"
+#   done
+#
+# API 205  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 155  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 102   reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 50   reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+lib_libslurp_module_la_CURRENT = 209
+lib_libslurp_module_la_REVISION = 1
+lib_libslurp_module_la_AGE = 2
+lib_libslurp_module_la_CRA = $(lib_libslurp_module_la_CURRENT):$(lib_libslurp_module_la_REVISION):$(lib_libslurp_module_la_AGE)
+lib_libslurp_module_la_VERSION_INFO = -version-info $(lib_libslurp_module_la_CRA)
+
+lib_libslurp_module_la = lib/libslurp-module.la
+lib_libslurp_module_la_LIBADD = \
+  $(lib_libwant_la) \
+  -lsys-directory-module \
+  -lstring-module \
+  $(end)
+lib_libslurp_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libslurp_module_la_VERSION_INFO)
+lib_libslurp_module_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(lib_libslurp_module_la_SOURCES))
+lib_libslurp_module_la_SOURCES = \
+  $(lib_libslurp_module_la_DEPRECATED_SOURCES) \
+  \
+  obj/src/slurp/namespace.cpp \
+  obj/src/slurp/Failure.cpp \
+  \
+  obj/src/slurp/directory/namespace.cpp \
+  obj/src/slurp/directory/Container.cpp \
+  obj/src/slurp/directory/read.cpp \
+  \
+  obj/src/slurp/directory/named/namespace.cpp \
+  obj/src/slurp/directory/named/read.cpp \
+  obj/src/slurp/directory/named/Result.cpp \
+  obj/src/slurp/directory/named/Result.syscall.cpp \
+  \
+  obj/src/slurp/file/namespace.cpp \
+  obj/src/slurp/file/Configuration.declaration.cpp \
+  obj/src/slurp/file/Configuration.CONTAINER.Octet.cpp \
+  obj/src/slurp/file/Configuration.CONTAINER.string.cpp \
+  obj/src/slurp/file/Configuration.CONTAINER.deque.Octet.cpp \
+  obj/src/slurp/file/Configuration.CONTAINER.vector.Octet.cpp \
+  obj/src/slurp/file/Configuration.string.cpp \
+  obj/src/slurp/file/Configuration.cpp \
+  obj/src/slurp/file/Container.cpp \
+  obj/src/slurp/file/required.Container.cpp \
+  obj/src/slurp/file/read.cpp \
+  obj/src/slurp/file/istream.Iterator.cpp \
+  obj/src/slurp/file/istream.Iterator.byte.cpp \
+  obj/src/slurp/file/istream.Iterator.byte.iterator_traits.cpp \
+  \
+  obj/src/slurp/file/named/namespace.cpp \
+  obj/src/slurp/file/named/read.cpp \
+  obj/src/slurp/file/named/Result.cpp \
+  obj/src/slurp/file/named/Result.syscall.cpp \
+  $(end)
+
+lib_libslurp_module_la_DEPRECATED_SOURCES = \
+  obj/src/file/slurp/namespace.cpp \
+  obj/src/file/slurp/read.cpp \
+  obj/src/file/slurp/Failure.cpp \
+  $(end)
+
+$(scold_cxxdir)/slurp/dependencies.mk: $(lib_libslurp_module_la_SOURCES)
+$(lib_libslurp_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/slurp/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/slurp/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/slurp/dependencies.mk

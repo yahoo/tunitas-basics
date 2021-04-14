@@ -1,0 +1,321 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::call::result {
+  class Result;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::call::result::Result : public cppunit::test::Fixture { 
+public: 
+  auto test_construction0() -> void;
+  auto test_construction1() -> void;
+  auto test_construction2() -> void;
+  auto test_construction3() -> void;
+  auto test_enbooleanate_bool() -> void;
+  auto test_enbooleanate_other() -> void;
+  auto test_ok() -> void;
+  auto test_value_const() -> void;
+  auto test_value_rhs() -> void;
+  auto test_value_cast() -> void;
+  auto test_get_const() -> void;
+  auto test_get_ref() -> void;
+  auto test_get_cast() -> void;
+  auto test_error_code() -> void;
+  auto test_error_condition() -> void;
+  auto test_error_num() -> void;
+  auto test_error_message() -> void;
+  auto test_std_system_error_code() -> void;
+  auto test_std_system_error_condition() -> void;
+  auto test_std_generic_error_code() -> void;
+  auto test_std_generic_error_condition() -> void;
+  auto test_sys_error_code() -> void;
+  auto test_deprecated_std_error_code() -> void;
+  auto test_deprecated_std_error_condition() -> void;
+  auto test_deprecated_errnum() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import std.string_literals
+#include <cerrno>
+#import sys.call.Result
+auto tests::unit::call::result::Result::test_construction0() -> void {
+  sys::call::Result r0;
+  CPPUNIT_ASSERT(ok(r0));
+}
+auto tests::unit::call::result::Result::test_construction1() -> void {
+  errno = 14;
+  sys::call::Result r1(false);
+  CPPUNIT_ASSERT(!ok(r1));
+  CPPUNIT_ASSERT(14 == errnum(r1));
+}
+auto tests::unit::call::result::Result::test_construction2() -> void {
+  sys::call::Result r2(true, 99);
+  CPPUNIT_ASSERT(ok(r2));
+  CPPUNIT_ASSERT(99 == errnum(r2));
+}
+auto tests::unit::call::result::Result::test_construction3() -> void {
+  sys::call::Result r3(false, 45, -1);
+  CPPUNIT_ASSERT(!ok(r3));
+  CPPUNIT_ASSERT(45 == errnum(r3));
+  CPPUNIT_ASSERT(-1 == value(r3));
+}
+#import sys.call.result.Value
+auto tests::unit::call::result::Result::test_enbooleanate_bool() -> void {
+  for (auto good : {false, true}) {
+    int const errnum = 13;
+    char const a2 = '\2';
+    double const a3 = 3.4;
+    auto r = ::sys::call::result::Value<bool, char, double>{good, errnum, !good, a2, a3}; // testing Value<bool, ...>
+    auto b = enbooleanate(r);
+    CPPUNIT_ASSERT_EQUAL(ok(r), ok(b));
+    CPPUNIT_ASSERT_EQUAL(good, ok(b));
+    CPPUNIT_ASSERT_EQUAL(!good, value(b));
+  }
+}
+auto tests::unit::call::result::Result::test_enbooleanate_other() -> void {
+  for (auto good : {false, true}) {
+    int const errnum = 13;
+    int const a1 = -1;
+    char const a2 = '\2';
+    double const a3 = 3.4;
+    auto r = ::sys::call::result::Value<int, char, double>{good, errnum, a1, a2, a3}; // testing Value<OTHER, ...>
+    auto b = enbooleanate(r);
+    CPPUNIT_ASSERT_EQUAL(ok(r), ok(b));
+    CPPUNIT_ASSERT_EQUAL(good, ok(b));
+    CPPUNIT_ASSERT_EQUAL((0 == a1), value(b));
+  }
+}
+auto tests::unit::call::result::Result::test_ok() -> void {
+  sys::call::Result r(false, 45, -1);
+  CPPUNIT_ASSERT(!ok(r));
+  CPPUNIT_ASSERT(45 == errnum(r));
+  CPPUNIT_ASSERT(-1 == value(r));
+}
+auto tests::unit::call::result::Result::test_value_const() -> void {
+  std::string const specimen{"bad because, just because"};
+  sys::call::result::Value<std::string> const r{false, 45, specimen};
+  std::string const &actual = value(r);
+  std::string const &expected = specimen;
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::call::result::Result::test_value_rhs() -> void {
+  std::string const specimen{"bad because, just because"};
+  sys::call::result::Value<std::string> r{false, 45, specimen};
+  std::string &actual = value(r);
+  actual[0] = 'B';
+  std::string const expected{"Bad because, just because"};
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::call::result::Result::test_value_cast() -> void {
+  std::string const specimen{"bad because, just because"};
+  sys::call::result::Value<std::string> r{false, 45, specimen};
+  std::string actual = value(std::move(r));
+  CPPUNIT_ASSERT(!actual.empty());
+  CPPUNIT_ASSERT(value(r).empty());
+  std::string const &expected{specimen};
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::call::result::Result::test_get_const() -> void {
+  std::string const specimens[]{"bad", "because", "just", "because"};
+  sys::call::result::Value<std::string, std::string, std::string, std::string> const r{false, 45, specimens[0], specimens[1], specimens[2], specimens[3]};
+  using sys::call::result::get;
+  std::string const &actual = get<2>(r);
+  std::string const &expected = specimens[2];
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::call::result::Result::test_get_ref() -> void {
+  std::string const specimens[]{"bad", "because", "just", "because"};
+  sys::call::result::Value<std::string, std::string, std::string, std::string> r{false, 45, specimens[0], specimens[1], specimens[2], specimens[3]};
+  using sys::call::result::get;
+  std::string &actual = get<2>(r);
+  actual[0] = 'J';
+  std::string const expected{"Just"};
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+auto tests::unit::call::result::Result::test_get_cast() -> void {
+  std::string const specimens[]{"bad", "because", "just", "because"};
+  sys::call::result::Value<std::string, std::string, std::string, std::string> r{false, 45, specimens[0], specimens[1], specimens[2], specimens[3]};
+  using sys::call::result::get;
+  std::string actual = get<2>(std::move(r));
+  CPPUNIT_ASSERT(!actual.empty());
+  CPPUNIT_ASSERT(get<2>(r).empty());
+  std::string const &expected{specimens[2]};
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+#import std.error_code
+#import std.system_category
+auto tests::unit::call::result::Result::test_error_code() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = error_code(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::system_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_error_condition() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = error_condition(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::generic_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_error_message() -> void {
+  for (int i{-512}, e{512}; e != i; ++i) {
+    bool const good = false;
+    int const errnum = i;
+    int const returned = -1;
+    ::sys::call::Result r{good, errnum, returned};
+    auto m = error_message(r);
+    CPPUNIT_ASSERT(!m.empty());
+  }
+}
+auto tests::unit::call::result::Result::test_error_num() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto actual = error_num(r);
+  CPPUNIT_ASSERT(errnum == actual);
+}
+auto tests::unit::call::result::Result::test_std_system_error_code() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_system_error_code(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::system_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_std_system_error_condition() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_system_error_condition(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::system_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_std_generic_error_code() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_generic_error_code(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::generic_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_std_generic_error_condition() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_generic_error_condition(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::generic_category() == &ec.category());
+}
+#import sys.error.Code
+#import sys.error.constants
+auto tests::unit::call::result::Result::test_sys_error_code() -> void {
+  using namespace sys::error::constants;
+  auto y = ::sys::error::code(ENOENT);
+  CPPUNIT_ASSERT(::sys::error::NOENT == y);
+}
+auto tests::unit::call::result::Result::test_deprecated_std_error_code() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_error_code(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::system_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_deprecated_std_error_condition() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, errnum, returned};
+  auto ec = std_error_condition(r);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::generic_category() == &ec.category());
+}
+auto tests::unit::call::result::Result::test_deprecated_errnum() -> void {
+  bool const good = false;
+  int const expected = 13;
+  int const returned = -1;
+  ::sys::call::Result r{good, expected, returned};
+  auto actual = errnum(r);
+  CPPUNIT_ASSERT(expected == actual);
+}
+#import rigging.suite.io
+auto tests::unit::call::result::Result::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Result");
+  {
+    Stream con("construction");
+    con << call("0", &Result::test_construction0)
+        << call("1", &Result::test_construction1)
+        << call("2", &Result::test_construction2)
+        << call("3", &Result::test_construction3)
+      ;
+    series << move(con);
+  } {
+    Stream enb("enbooleanate");
+    enb << call("bool", &Result::test_enbooleanate_bool)
+        << call("other", &Result::test_enbooleanate_other)
+      ;
+    series << move(enb);
+  }
+  series << call("good", &Result::test_ok)
+    ;
+  {
+    Stream val("value");
+    val << call("consty", &Result::test_value_const)
+        << call("rhs", &Result::test_value_rhs)
+        << call("cast", &Result::test_value_cast)
+      ;
+    series << move(val);
+  } {
+    Stream err("error");
+    err << call("code", &Result::test_error_code)
+        << call("condition", &Result::test_error_condition)
+        << call("message", &Result::test_error_message)
+        << call("num", &Result::test_error_num)
+      ;
+    series << move(err);
+  } {
+    Stream sys("system");
+    sys << call("std_system_error_code", &Result::test_std_system_error_code)
+        << call("std_system_error_condition", &Result::test_std_system_error_condition)
+      ;
+    series << move(sys);
+  } {
+    Stream sys("generic");
+    sys << call("std_generic_error_code", &Result::test_std_generic_error_code)
+        << call("std_generic_error_condition", &Result::test_std_generic_error_condition)
+      ;
+    series << move(sys);
+  } {
+    Stream se("sys::error");
+    se << call("sys_error_code", &Result::test_sys_error_code)
+      ;
+    series << move(se);
+  } {
+    Stream sys("deprecated");
+    sys << call("std_error_code", &Result::test_deprecated_std_error_code)
+        << call("std_error_condition", &Result::test_deprecated_std_error_condition)
+        << call("errnum", &Result::test_deprecated_errnum)
+      ;
+    series << move(sys);
+  }
+  return finalize(series);
+}
+#endiv

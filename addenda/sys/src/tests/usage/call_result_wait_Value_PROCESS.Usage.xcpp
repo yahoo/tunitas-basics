@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.call_result_wait_Value_PROCESS.Usage
+//   static_assert(tests::usage::call::result_wait_Value_PROCESS::Usage<>);
+//
+#import pid_t
+#import error_t
+#import nonstd.convertible_to
+#import nonstd.same_as
+#import sys.call.result.Element
+#import sys.call.result.Size
+#import sys.call.result.wait.Value.PROCESS.Status
+#import sys.call.result.required.Wait
+#import sys.id.Process
+#import sys.id.required.Process
+#import tests.usage.call_result_Value.Usage
+#import tests.usage.countof
+namespace tests::usage::call_result_wait_Value {
+  using sys::call::result::wait::Value;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    namespace [[detail]] result {
+      namespace required {
+        using sys::id::required::Process;
+        using sys::call::result::required::Wait;
+      }
+      template<typename RESULT, typename PROCESS> concept bool Process = requires(RESULT result, bool good, error_t error, PROCESS ssecorp) {
+        requires required::Wait<PROCESS>;
+        requires call_result_Value::Scenario<RESULT>;
+        requires required::Process<PROCESS>;
+        { RESULT{} };
+        { RESULT{good, error, ssecorp} };
+        { pid(result) } -> convertible_to<PROCESS>;
+        { process(result) } -> convertible_to<PROCESS>;
+      };
+    }
+    namespace [[detail]] {
+      using sys::call::result::Element;
+      using sys::call::result::Size;
+      template<typename RESULT> concept bool Instance = requires(RESULT) {
+        requires 2 == Size<RESULT>::value;
+        requires result::Process<RESULT, typename Element<0, RESULT>::Type>;
+      };
+    }
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<Value<pid_t>>;
+      requires Instance<Value<sys::id::Process>>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

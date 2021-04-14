@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.optional
+#import sys.posix.packaging.select.required.Duration
+namespace sys::posix::packaging::select {
+  //
+  // An optional duration.
+  // In any of the possible time format.  Any of them.
+  // This MUST be a type alias because it is used in an inferred-type template overloading scenario
+  // e.g.
+  //   declared-as
+  //     template<required::Duration DURATION> auto select(int nfds, Reads, Optional<DURATION>, Sigset) -> Count;
+  //                                                                              ^
+  //   called as                                                                  |
+  //     auto c = select(99, Reads{}, std::optional<sys::time::microseconds>{});  |
+  //                                  ^                                           |
+  //                                  |                                           |
+  //                                  |                                           |
+  //     this parameter here ---------/-------------------------------------------/
+  //
+  // Usage:
+  //
+  //   auto opt = select::Optional<sys::time::val>{};
+  //   auto opt = select::Optional<sys::time::spec>{};
+  //   auto opt = select::Optional<sys::time::milliseconds>{};
+  //   auto opt = select::Optional<sys::time::microseconds>{};
+  //
+  template<typename DURATION> requires required::Duration<DURATION> using Optional = std::optional<DURATION>;
+}
+#endiv

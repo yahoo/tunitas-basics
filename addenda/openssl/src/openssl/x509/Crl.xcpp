@@ -1,0 +1,172 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An X.509 Certificate Revocation List (CRL)
+  //
+  // Usage:
+  //
+  //   Crl crl;
+  //   ... this being RAII, either you got it or you're out of here...
+  //   crl.set_version(crl::Version{2});
+  //   ...etc...
+  //
+  class Crl;
+  namespace crl {
+    enum Version : int long;
+  }
+}
+#endiv
+#divert <hpp>
+#import openssl.asn1.Time
+#import openssl.asn1.Time0
+#import openssl.evp.PKey0
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_CRL
+#import openssl.pem.load.declaration
+#import openssl.pem.from_string_view.declaration
+#import openssl.types
+#forward openssl.x509.Extension0
+#forward openssl.x509.Name
+#forward openssl.x509.Name0
+#forward openssl.x509.Revoked0
+#forward openssl.Stack0
+class openssl::x509::Crl : public managed::Pointer<x509::CRL> {
+  using ancestor = managed::Pointer<x509::CRL>;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::load::detail::open_read_close(Filepath, std::function<POINTER *(BIO *)>) -> RESULT;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::from_string_view::detail::copy_read(std::string_view, std::function<POINTER *(BIO *)>) -> RESULT;
+  inline explicit Crl(x509::CRL *);
+public:
+  inline Crl();
+  inline auto get_version() -> crl::Version;
+  inline auto set_version(crl::Version) -> void;
+  inline auto get_issuer_name() const -> Name0;
+  inline auto get_issuer_name() -> Name;
+  inline auto set_issuer_name(Name const &) -> void;
+  inline auto get_lastUpdate() const -> asn1::Time0;
+  inline auto set_lastUpdate(time::Point const &) -> void;
+  inline auto set_lastUpdate(asn1::Time const &) -> void;
+  inline auto get_nextUpdate() const -> asn1::Time0;
+  inline auto set_nextUpdate(time::Point const &) -> void;
+  inline auto set_nextUpdate(asn1::Time const &) -> void;
+  inline auto get_extensions() const -> Stack0<Extension0>;
+  inline auto add_ext(Extension const &) -> void;
+  inline auto get_revocations() const -> Stack0<Revoked0>;
+  // [[ADDTHIS]] get_revoked_by_serial()
+  // [[ADDTHIS]] get_revoked_by_cert()
+  inline auto add_revoked(Revoked) -> void;
+  // [[ADDTHIS]] get_signature()
+  // [[ADDTHIS]] get_signature_nid()
+  // EVP_sha1(), EVP_sha256(), etc.
+  inline auto sign(evp::PKey0 const &, EVP_MD const *function) -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.error.Code
+#import openssl.functions
+#import openssl.x509.Extension0
+#import openssl.x509.Name
+#import openssl.x509.Name0
+#import openssl.x509.Revoked
+#import openssl.x509.Revoked0
+#import openssl.Stack0
+#import std.error_code
+#import std.underlying_type
+namespace openssl::x509 {
+  Crl::Crl()
+    : ancestor{X509_CRL_new()}
+  { }
+  Crl::Crl(x509::CRL *crl)
+    : ancestor{crl}
+  { }
+  auto Crl::get_version() -> crl::Version {
+    return crl::Version{X509_CRL_get_version(get())};
+  }
+  auto Crl::set_version(crl::Version version) -> void {
+    if (!X509_CRL_set_version(get(), (std::underlying_type<crl::Version>::type) version)) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crl::get_issuer_name() const -> Name0 {
+    // WATCHOUT - openssl-devel-1.1.0i-1.fc28.x86_64 has X509_CRL_get_issuer but X509_CRL_set_issuer_name
+    return Name0{X509_CRL_get_issuer(get())};
+  }
+  auto Crl::get_issuer_name() -> Name {
+    // WATCHOUT - ibidem.
+    return Name{X509_CRL_get_issuer(get()), Name::Deleter{Name::Deleter::DROPPING}};
+  }
+  auto Crl::set_issuer_name(Name const &name) -> void {
+    auto ok = X509_CRL_set_issuer_name(get(), name.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crl::get_lastUpdate() const -> asn1::Time0 {
+    return asn1::Time0{X509_CRL_get0_lastUpdate(get())};
+  }
+  auto Crl::set_lastUpdate(time::Point const &then) -> void {
+    set_lastUpdate(asn1::Time{then});
+  }
+  auto Crl::set_lastUpdate(asn1::Time const &then) -> void {
+    auto ok = X509_CRL_set1_lastUpdate(get(), then.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crl::get_nextUpdate() const -> asn1::Time0 {
+    return asn1::Time0{X509_CRL_get0_nextUpdate(get())};
+  }
+  auto Crl::set_nextUpdate(time::Point const &then) -> void {
+    set_nextUpdate(asn1::Time{then});
+  }
+  auto Crl::set_nextUpdate(asn1::Time const &then) -> void {
+    auto ok = X509_CRL_set1_nextUpdate(get(), then.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crl::get_extensions() const -> Stack0<Extension0> {
+    // These stacks (sets?) always contain immutable objects, so "get0"
+    return Stack0<Extension0>::Traits::construct(X509_CRL_get0_extensions(get()));
+  }
+  auto Crl::add_ext(Extension const &ext) -> void {
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_CRL_add_ext.html
+    //   <quote>
+    //     X509v3_add_ext() adds extension ex to stack *x at position loc.
+    //     If loc is -1 the new extension is added to the end.
+    //     If *x is NULL a new stack will be allocated.
+    //     The passed extension ex is duplicated internally so it must be freed after use.
+    //     <snip/>
+    //     X509_CRL_get_ext_count(), X509_CRL_get_ext(), X509_CRL_get_ext_by_NID(), X509_CRL_get_ext_by_OBJ(), X509_CRL_get_ext_by_critical(), X509_CRL_delete_ext() and X509_CRL_add_ext() operate on the extensions of CRL x they are otherwise identical to the X509v3 functions.
+    //   </quote>
+    auto const LAST = -1;
+    auto ok = X509_CRL_add_ext(get(), ext.get(), LAST);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crl::get_revocations() const -> Stack0<Revoked0> {
+    // These stacks (sets?) always contain immutable objects, so "get0"
+    return Stack0<Revoked0>::Traits::construct(X509_CRL_get_REVOKED(get()));
+  }
+  auto Crl::add_revoked(Revoked revoked) -> void {
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_CRL_add0_revoked.html
+    //   <quote>
+    //     X509_CRL_add0_revoked() appends revoked entry rev to CRL crl.
+    //     The pointer rev is used internally so it must not be freed up after the call: it is freed when the parent CRL is freed.
+    //   </quote>
+    auto ok = X509_CRL_add0_revoked(get(), revoked.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+    revoked.release();
+  }
+  auto Crl::sign(evp::PKey0 const &pk, EVP_MD const *function) -> void {
+    auto ok = X509_CRL_sign(get(), const_cast<EVP_PKEY *>(pk.get()), function);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+}
+#endiv

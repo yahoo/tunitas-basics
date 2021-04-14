@@ -1,0 +1,132 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::environv {
+  template<typename ENVIRONV> class Nullptr;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import c.basic_environv
+template<typename ENVIRONV> class tests::unit::c::environv::Nullptr : public cppunit::test::Fixture { 
+public: 
+  using Subject = ENVIRONV;
+  using Value = typename Subject::value_type;
+
+  auto test_constructor_default() -> void;
+  auto test_constructor_manifest_array() -> void;
+  auto test_constructor_pointer() -> void;
+  auto test_constructor_vector_consty() -> void;
+  auto test_constructor_vector_muting() -> void;
+  auto test_constructor_from_muting() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  template<typename ENVIRON> auto generic_testification(ENVIRON) -> void;
+};
+
+#import c.const_environv
+namespace tests::unit::c::environv {
+  template<> auto Nullptr<::c::const_environv>::test_constructor_vector_muting() -> void;
+  template<> auto Nullptr<::c::const_environv>::test_constructor_from_muting() -> void;
+
+}
+#endiv
+#divert <tpp>
+#import std.cerr
+#import std.invalid_argument
+
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_default() -> void {
+  Subject that;
+  CPPUNIT_ASSERT(that.empty());
+  CPPUNIT_ASSERT(0 == that.size());
+  CPPUNIT_ASSERT(that.begin() == that.end());
+}
+
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_manifest_array() -> void {
+  Value *const raw = nullptr;
+  Subject that(raw); // FIXME - this does not test that constructor
+  CPPUNIT_ASSERT(that.empty());
+  CPPUNIT_ASSERT(0 == that.size());
+  CPPUNIT_ASSERT(that.begin() == that.end());
+}
+
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_pointer() -> void {
+  Value *const raw = nullptr;
+  Subject that(raw);
+  CPPUNIT_ASSERT(that.empty());
+  CPPUNIT_ASSERT(0 == that.size());
+  CPPUNIT_ASSERT(that.begin() == that.end());
+}
+
+#import std.vector
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_vector_consty() -> void {
+  try {
+    std::vector<Value> vec;
+    Subject that(vec);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "catching expected exception saying " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_vector_muting() -> void {
+  try {
+    std::vector<char *> vec;
+    Subject that(vec);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "catching expected exception saying " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::test_constructor_from_muting() -> void {
+  try {
+    std::vector<char *> raw;
+    ::c::basic_environv<char> vec(raw);
+    Subject that(vec);
+    CPPUNIT_ASSERT(false);
+  } catch (std::invalid_argument const &e) {
+    std::cerr << "catching expected exception saying " << e.what() << '\n';
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+#import std.string_literals
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.call
+#import rigging.unit.suite.add
+template<typename ENVIRONV> auto tests::unit::c::environv::Nullptr<ENVIRONV>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::unit::suite;
+  Stream series("Nullptr<"s + typeid(ENVIRONV).name() + ">"s);
+  series << call("constructor-default", &Nullptr::test_constructor_default)
+         << call("constructor_manifest_array", &Nullptr::test_constructor_manifest_array)
+         << call("constructor_pointer", &Nullptr::test_constructor_pointer)
+         << call("constructor_vector_consty", &Nullptr::test_constructor_vector_consty)
+         << call("constructor_vector_muting", &Nullptr::test_constructor_vector_muting)
+         << call("constructor_from_muting", &Nullptr::test_constructor_from_muting)
+    ;
+  return series.release();
+}
+#endiv
+#divert <cpp>
+template<> auto tests::unit::c::environv::Nullptr<c::const_environv>::test_constructor_vector_muting() -> void {
+  // There is no way to construct a c::const_environv from a std::vector<char *>
+  // So this test is moot
+  CPPUNIT_ASSERT(true);
+}
+
+template<> auto tests::unit::c::environv::Nullptr<c::const_environv>::test_constructor_from_muting() -> void {
+  // There is no way to construct a c::const_environv from a c::environv
+  // So this test is moot
+  CPPUNIT_ASSERT(true);
+}
+#endiv

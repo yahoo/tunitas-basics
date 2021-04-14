@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.EnvironmentSaveAndRestore
+#import std.unique_ptr
+#import std.size_t
+struct tests::unit::EnvironmentSaveAndRestore::PartialConstructionGuardian : public std::unique_ptr<char *[]> {
+  using ancestor = std::unique_ptr<char *[]>;
+public:
+  inline explicit PartialConstructionGuardian(std::size_t N, char **recently_allocated);
+  inline ~PartialConstructionGuardian();
+  PartialConstructionGuardian(PartialConstructionGuardian const &) = delete;
+  auto operator=(PartialConstructionGuardian const &) -> PartialConstructionGuardian &  = delete;
+  std::size_t const N;
+};
+#endiv
+#divert <ipp>
+#import std.fill_n
+tests::unit::EnvironmentSaveAndRestore::PartialConstructionGuardian::PartialConstructionGuardian(std::size_t arg_N, char **arg_recently_allocated)
+  : ancestor(arg_recently_allocated)
+  , N(arg_N) {
+  std::fill_n(ancestor::get(), N+1, nullptr);
+  ;
+}
+
+tests::unit::EnvironmentSaveAndRestore::PartialConstructionGuardian::~PartialConstructionGuardian() {
+  if (char **backbone = ancestor::get()) {
+    for (int i(N-1), e(-1); e != i; --i) {
+      delete[] backbone[i];
+    }
+    // and the ancestor will take care of destructing the backbone vector itself
+  }
+}
+#endiv

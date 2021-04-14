@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../posix/Makefrag.am; included in the top-level Makefile.am
+src_sys_entry_SOURCES_SET = \
+  obj/src/sys/entry/namespace.cpp \
+  obj/src/sys/entry/Endent.template.cpp \
+  obj/src/sys/entry/Endent.passwd.cpp \
+  obj/src/sys/entry/Endent.group.cpp \
+  obj/src/sys/entry/Endent.cpp \
+  obj/src/sys/entry/Buffer.cpp \
+  obj/src/sys/entry/Pointer.cpp \
+  obj/src/sys/entry/required.Entry.cpp \
+  $(end)

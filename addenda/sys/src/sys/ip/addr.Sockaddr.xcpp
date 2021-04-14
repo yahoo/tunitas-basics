@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.ip.Version
+#import sys.ip.version.Traits
+#include <hpp/sys.ip.version.Traits>
+#import sys.ip.addr.Traits
+#include <hpp/sys.ip.addr.Traits>
+namespace sys::ip::addr {
+  //
+  // The socket address types.
+  // There are just the two.
+  //
+  template<Version VERSION>
+  requires version::Traits<VERSION>::value
+  using Sockaddr = typename addr::Traits<VERSION>::Sockaddr;
+}
+#endiv
+#divert <cpp>
+#import sys.ip.constants
+#import std.is_same
+namespace {
+  namespace tests {
+    static_assert(std::is_same_v<::sockaddr_in4, sys::ip::addr::Sockaddr<sys::ip::IPv4>>);
+    static_assert(std::is_same_v<::sockaddr_in6, sys::ip::addr::Sockaddr<sys::ip::IPv6>>);
+  }
+}
+#endiv

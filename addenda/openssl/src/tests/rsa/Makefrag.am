@@ -1,0 +1,23 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+check_bin_rsa = check/bin/rsa
+check_bin_rsa_LDADD = \
+  $(lib_libopenssl_module_la) \
+  $(end)
+check_bin_rsa_LDFLAGS = $(nothing_more)
+check_bin_rsa_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_rsa_SOURCES))
+check_bin_rsa_SOURCES = \
+  obj/src/tests/rsa/main.cpp \
+  obj/src/tests/rsa/namespace.cpp \
+  $(end)
+$(scold_cxxdir)/tests/rsa/dependencies.mk: $(check_bin_rsa_SOURCES)
+$(check_bin_rsa_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/rsa/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/rsa/dependencies.mk #       automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/tests/rsa/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/rsa/dependencies.mk

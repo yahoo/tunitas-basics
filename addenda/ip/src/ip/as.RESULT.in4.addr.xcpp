@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.string
+#import ip.Address
+namespace ip {
+  template<typename RESULT> inline auto as(in4::addr const &) -> RESULT;
+  template<> inline auto as<in4::addr_t>(in4::addr const &) -> in4::addr_t;
+  template<> inline auto as<in4::addr>(in4::addr const &) -> in4::addr;
+  template<> inline auto as<std::string>(in4::addr const &) -> std::string;
+  template<> inline auto as<Address>(in4::addr const &) -> Address;
+}
+#endiv
+#divert <ipp>
+template<typename RESULT> auto ip::as(in4::addr const &) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "specializations only");
+  return RESULT();
+}
+
+#import ip.inet.lhs
+template<> auto ip::as<ip::in4::addr_t>(in4::addr const &address) -> in4::addr_t {
+  in4::addr_t ret;
+  inet::lhs(ret) = address;
+  return ret;
+}
+
+template<> auto ip::as<ip::in4::addr>(in4::addr const &address) -> in4::addr {
+  return address;
+}
+
+#import std.system_error
+#import std.system_category
+#import ip.inet.ntop
+template<> auto ip::as<std::string>(in4::addr const &address) -> std::string {
+  auto r = inet::ntop(address);
+  if (!ok(r)) {
+    throw std::system_error(error_num(r), std::system_category());
+  }
+  return value(r);
+}
+
+#import std.move
+template<> auto ip::as<ip::Address>(in4::addr const &address) -> Address {
+  return Address{address};
+}
+#endiv

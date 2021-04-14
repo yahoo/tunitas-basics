@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace query {
+    template<typename UNIQUENESS, typename... COLUMNS> class Rows;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.statement.Shell
+#import sqlite.query.Cursor
+#import sqlite.query.Rows
+template<typename UNIQUENESS, typename... COLUMNS> class sqlite::query::Rows {
+public:
+  using statement_type = ::sqlite::statement::Shell;
+  inline explicit Rows(statement_type &);
+  using iterator = Cursor<UNIQUENESS, COLUMNS...>;
+  inline auto begin() -> iterator;
+  inline auto end() -> iterator;
+protected:
+  // And as such, the Rows must have a lifetime longer than the statement to which it refers
+  statement_type &statement;
+};
+#endiv
+#divert <ipp>
+template<typename UNIQUENESS, typename... COLUMNS> sqlite::query::Rows<UNIQUENESS, COLUMNS...>::Rows(statement_type &arg_statement)
+  : statement(arg_statement) {
+  ;
+}
+
+template<typename UNIQUENESS, typename... COLUMNS> auto sqlite::query::Rows<UNIQUENESS, COLUMNS...>::begin() -> iterator {
+  return iterator(statement, statement.step());
+}
+
+template<typename UNIQUENESS, typename... COLUMNS> auto sqlite::query::Rows<UNIQUENESS, COLUMNS...>::end() -> iterator {
+  return iterator(statement, ::sqlite::status::Code::DONE);
+}
+#endiv

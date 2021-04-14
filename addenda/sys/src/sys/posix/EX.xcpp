@@ -1,0 +1,97 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // WATCHOUT - there is historical conflation among
+  //   the "error codes"
+  // and
+  //   the "exits code" (alliterates with "attorneys general")
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::ex                (older) namespace sys::exits
+  // PREFER namespace sys::ex::constants     (older) namespace sys::exits::constants
+  // PREFER sys::ex::Code                    (older) sys::error::Code
+  //        etc.
+  //
+  // Usage:
+  //
+  //   using EX = sys::posix::EX;
+  //   auto const x0 = EX::OK;
+  //   auto const x1 = EX::FAIL;
+  //   ...etc...
+  //
+  struct EX;
+}
+#endiv
+#divert <hpp>
+#import sys.ex.Code
+#import sys.ex.constants
+#import sys.posix.required.rebundled
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+struct sys::posix::EX {
+  using Code = ex::Code;
+  inline static constexpr auto OK    = ex::OK;
+  inline static constexpr auto GOOD  = ex::OK;
+  inline static constexpr  auto FAIL = ex::FAIL;
+  //
+  // Because exit(0), exit(1) and exit(2) are common
+  inline static constexpr auto ZERO = ex::ZERO;
+  inline static constexpr auto ONE  = ex::ONE;
+  inline static constexpr auto TWO  = ex::TWO;
+  //
+  inline static constexpr auto USAGE                                                 = ex::USAGE;
+  inline static constexpr auto DATA                                                  = ex::DATA;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto DATAERR      = ex::DATAERR;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto DATAERROR    = ex::DATAERROR;
+  inline static constexpr auto INPUT                                                 = ex::INPUT;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOINPUT      = ex::NOINPUT;
+  inline static constexpr auto USER                                                  = ex::USER;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOUSER       = ex::NOUSER;
+  inline static constexpr auto HOST                                                  = ex::HOST;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOHOST       = ex::NOHOST;
+  inline static constexpr auto UNAVAILABLE                                           = ex::UNAVAILABLE;
+  inline static constexpr auto SOFTWARE                                              = ex::SOFTWARE;
+  inline static constexpr auto OS                                                    = ex::OS;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto OSERR        = ex::OSERR;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto OSERROR      = ex::OSERROR;
+  inline static constexpr auto FILE                                                  = ex::FILE;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto OSFILE       = ex::OSFILE;
+  inline static constexpr auto CANTCREATE                                            = ex::CANTCREATE;
+  inline static constexpr auto TEMPORARY                                             = ex::TEMPORARY;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto TEMPFAIL     = ex::TEMPFAIL;
+  inline static constexpr auto PROTOCOL                                              = ex::PROTOCOL;
+  inline static constexpr auto PERMISSION                                            = ex::PERMISSION;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOPERM       = ex::NOPERM;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOPERMISSION = ex::NOPERMISSION;
+  inline static constexpr auto CONFIGURATION                                         = ex::CONFIGURATION;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto CONFIG       = ex::CONFIG;
+  inline static constexpr auto CANTCREAT                                             = ex::CANTCREAT;
+  // Extensions beyond <sysexits.h>
+  inline static constexpr auto CANTREMOVE                                            = ex::CANTREMOVE;
+  inline static constexpr auto GROUP                                                 = ex::GROUP;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOGROUP      = ex::NOGROUP;
+  // Extensions beyond <sysexits.h>
+  // origination: anguish-answer >= 2.0 (as a practice)
+  inline static constexpr auto TESTING                                               = ex::TESTING;
+  // originating ... [[somewhere]]
+  inline static constexpr auto UNIMPLEMENTED                                         = ex::UNIMPLEMENTED;
+  // see incendiary-sophist >      = 0.2, .../lib/rigging/sysexits.sh
+  inline static constexpr auto UNCOMMITTED                                           = ex::UNCOMMITTED;
+  inline static constexpr auto GOLDEN                                                = ex::GOLDEN;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOGOLDEN     = ex::NOGOLDEN;
+  inline static constexpr auto OUTPUT                                                = ex::OUTPUT;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOOUTPUT     = ex::NOOUTPUT;
+  inline static constexpr auto COMMAND                                               = ex::COMMAND;
+  [[deprecated("prefer the simpler one")]] inline static constexpr auto NOCOMMAND    = ex::NOCOMMAND;
+  EX() = delete;
+  EX(EX const &) = delete;
+  auto operator=(EX const &) -> EX & = delete;
+};
+#pragma GCC diagnostic pop
+#endiv
+#divert <cpp>
+#import tests.usage.posix_EX.Usage
+static_assert(tests::usage::posix_EX::Usage<>);
+#endiv

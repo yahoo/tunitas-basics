@@ -1,0 +1,118 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host::names {
+  //
+  // The iterator over the (name, aliases}
+  // When returning, synthesize a std::string
+  // But provide for synthesizing a zero-alloc cheaper spanlike, including a std::string_view.
+  // 
+  // Because of the complexity of iterating over two separate items
+  // this is a forward iterator, not a bidirectional iterator.
+  // As this is a forward iterator, only, the end iterator is universal, being the default-constructed iterator.
+  //
+  // Usage: see host::Names
+  //
+  //    ...as usual...
+  //
+  class Iterator;
+}
+#import ares.managed.host.names.Iterator.iterator_traits
+#endiv
+#divert <hpp>
+namespace ares::managed::host::names {
+  inline auto swap(Iterator &, Iterator &) noexcept -> void;
+  inline auto operator==(Iterator const &, Iterator const &) -> bool;
+  inline auto operator!=(Iterator const &, Iterator const &) -> bool;
+}
+#import ares.required.Spanlike
+#forward ares.managed.host.Names
+class ares::managed::host::names::Iterator {
+  using Subindex = int long signed; // with -1 being distinguished
+  inline Iterator(Subindex, char const *name, char const *const *aliases);
+  friend class host::Names;
+public:
+  using Value = std::string; // ... New School
+  using value_type = Value; // .... old_school
+  inline Iterator();
+  // Throws if the iterator equals end(); unspecified what happens if the iterator is after the end
+  inline auto operator*() const -> std::string;
+  inline auto get() const -> std::string;
+  template<required::Spanlike SPANLIKE> inline auto get() const -> SPANLIKE;
+  // These operations are unchecked (and uncheckable)
+  inline auto operator++() -> Iterator &;
+  inline auto operator++(int) -> Iterator;
+private:
+  Subindex subindex;
+  char const *name; // MUST not be nullptr
+  char const *const *aliases; // MAY be nullptr, else has a nullptr sentinel
+  friend auto names::swap(Iterator &, Iterator &) noexcept -> void;
+  friend auto names::operator==(Iterator const &, Iterator const &) -> bool;
+};
+#endiv
+#divert <ipp>
+#import std.swap
+namespace ares::managed::host {
+  auto names::swap(Iterator &a, Iterator &b) noexcept -> void {
+    std::swap(a.subindex, b.subindex);
+    std::swap(a.name, b.name);
+    std::swap(a.aliases, b.aliases);
+  }
+  auto names::operator==(Iterator const &a, Iterator const &b) -> bool {
+    return (a.subindex == b.subindex &&
+            a.name == b.name &&
+            a.aliases == b.aliases);
+  }
+  auto names::operator!=(Iterator const &a, Iterator const &b) -> bool {
+    return !operator==(a, b);
+  }
+}
+#import ares.exception.Null
+#import nonstd.span
+#import strlen
+namespace ares::managed::host::names {
+  Iterator::Iterator()
+    : subindex{-1}
+    , name{nullptr}
+    , aliases{nullptr}
+  { }
+  Iterator::Iterator(Subindex subindex, char const *name, char const *const *aliases)
+    : subindex{subindex}
+    , name{name}
+    , aliases{aliases}
+  { }
+  auto Iterator::operator*() const -> Value { return get(); }
+  auto Iterator::get() const -> Value {
+    auto spun = get<nonstd::span<char const>>();
+    return Value{spun.data(), spun.size()};
+  }
+  template<required::Spanlike SPANLIKE> auto Iterator::get() const -> SPANLIKE {
+    auto returnable = [this]() -> char const * {
+                        if (-1 == subindex) {
+                          return name;
+                        } else if (nullptr == aliases) {
+                          return nullptr;
+                        } else {
+                          return aliases[subindex];
+                        }
+                      }();
+    if (nullptr == returnable) {
+      throw exception::Null{};
+    }
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(returnable), strlen(returnable)};
+  }
+  auto Iterator::operator++() -> Iterator & {
+    ++subindex; // n.b. this is unchecked
+    if (nullptr == aliases || nullptr == aliases[subindex]) {
+      *this = Iterator{};
+    }
+    return *this;
+  }
+  auto Iterator::operator++(int) -> Iterator {
+    Iterator old{*this};
+    operator++();
+    return old;
+  }
+}
+#import ares.managed.host.Names // match the #forward, above
+#endiv

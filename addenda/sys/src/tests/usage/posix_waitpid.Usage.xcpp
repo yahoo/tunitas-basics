@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_waitpid.Usage
+//   static_assert(tests::usage::posix_waitpid::Usage<>);
+//
+#import nonstd.convertible_to
+#import pid_t
+#import sys.call.result.wait.Value
+#import sys.id.Process
+#import sys.id.process.Either
+#import sys.id.process.Group
+#import sys.id.process.Process
+#import sys.id.required.Process
+#import sys.id.required.process.Process
+#import sys.id.required.process.Either
+#import sys.posix.waitpid
+#import sys.w.Options
+#import tests.usage.countof
+namespace tests::usage::posix_waitpid {
+  using sys::posix::waitpid;
+  using sys::posix::native::waitpid;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    namespace io {
+      using Options = sys::w::Options;
+      using Status = sys::wait::Status;
+    }
+    namespace result { using namespace sys::call::result::wait; }
+    namespace required = sys::id::required;
+    namespace [[detail]] {
+      template<typename RETURNED, typename MATCHED> concept bool Instance = requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats) {
+        requires required::Process<RETURNED>;
+        requires required::process::Process<MATCHED> || required::process::Either<MATCHED>; // not enforced: that the sense of RETURNED and MATCHED are commensurate
+        { waitpid(matched) } -> convertible_to<result::Value<RETURNED, io::Status>>;
+        { waitpid(matched, options) } -> convertible_to<result::Value<RETURNED, io::Status>>;
+        { waitpid(matched, options, sutats) } -> convertible_to<result::Value<RETURNED>>;
+        { waitpid(matched, sutats, options) } -> convertible_to<result::Value<RETURNED>>;
+        // and the null possibilities
+        { waitpid(matched, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+        { waitpid(matched, {}, options) } -> convertible_to<result::Value<RETURNED>>;
+      };
+    }
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<pid_t, pid_t>;
+      requires Instance<sys::id::Process, sys::id::process::Process>;
+      requires Instance<sys::id::Process, sys::id::process::Group>;
+      requires Instance<sys::id::Process, sys::id::process::Either>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

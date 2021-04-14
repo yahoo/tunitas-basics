@@ -1,0 +1,93 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward re.construct.String
+#import std.string
+namespace re::construct {
+  template<> class String<std::string>;
+}
+#endiv
+#divert <hpp>
+#import re.construct.Stringy
+template<> class re::construct::String<std::string> : public Stringy<std::string> {
+  using ancestor = Stringy<std::string>;
+public:
+  String() = default;
+  using ancestor::Stringy;
+  String(String const &) = default;
+  auto operator=(String const &) -> String & = default;
+  inline String(std::string &&);
+  inline auto operator=(std::string &&) -> String &;
+  inline operator std::string const &() const;
+  inline operator std::string &();
+  inline auto operator[](std::size_t) const -> value_type;
+  inline auto operator[](std::size_t) -> value_type &;
+  using ancestor::front;
+  inline auto front() -> value_type &;
+  inline auto back() const -> value_type;
+  inline auto back() -> value_type &;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+re::construct::String<std::string>::String(std::string &&value)
+  : ancestor(std::forward<std::string>(value)) {
+  ;
+}
+
+auto re::construct::String<std::string>::operator=(std::string &&value) -> String & {
+  String tmp(std::forward<std::string>(value));
+  std::swap(tmp, *this);
+  return *this;
+}
+
+re::construct::String<std::string>::operator std::string const &() const {
+  return unifier;
+}
+
+re::construct::String<std::string>::operator std::string &() {
+  return unifier;
+}
+
+#import std.out_of_range
+auto re::construct::String<std::string>::operator[](std::size_t index) const -> value_type {
+  if (index >= size()) {
+    throw std::out_of_range("index too big");
+  }
+  return unifier[index];
+}
+
+#import std.is_same
+auto re::construct::String<std::string>::operator[](std::size_t index) -> value_type & {
+  static_assert(std::is_same<decltype(unifier[index]), value_type &>::value, "fail");
+  if (index >= size()) {
+    throw std::out_of_range("index too big");
+  }
+  return unifier[index];
+}
+
+auto re::construct::String<std::string>::front() -> value_type & {
+  if (empty()) {
+    throw std::out_of_range("empty");
+  }
+  return unifier.front();
+}
+
+auto re::construct::String<std::string>::back() const -> value_type {
+  if (empty()) {
+    throw std::out_of_range("empty");
+  }
+  return unifier.back();
+}
+
+auto re::construct::String<std::string>::back() -> value_type & {
+  if (empty()) {
+    throw std::out_of_range("empty");
+  }
+  return unifier.back();
+}
+#endiv

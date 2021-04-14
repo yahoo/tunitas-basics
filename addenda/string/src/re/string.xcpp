@@ -1,0 +1,20 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import re.construct.String
+#import re.required.Stringlike
+namespace re {
+  //
+  // One can never make a completely solid choice of which string type to use.
+  // Therefore: the re::string<UNIFIER>
+  //
+  // Whereas both c::const_stringz and std::string are implicitly constructible
+  // from 'char const *', there is ambiguity and difficulty.
+  //
+  template<required::Stringlike UNIFIER> using string = construct::String<UNIFIER>;
+}
+#endiv

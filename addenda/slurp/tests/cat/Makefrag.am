@@ -1,0 +1,3 @@
+tests_cat_TESTS = \
+  tests/cat/case.test \
+  $(end)

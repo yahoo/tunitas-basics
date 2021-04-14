@@ -1,0 +1,160 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::exits {
+  //
+  // The "sysexit" codes as an std::error_category.
+  // This interfaces the exit codes into the std::error_code and std::error_condition systems.
+  //
+  // With the usual interface
+  // e.g. https://en.cppreference.com/w/cpp/error/error_category
+  //
+  // Usage:
+  //
+  //   std::error_category const &cat = category();
+  //
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import std.error_category
+#import std.error_code
+#import std.error_condition
+#import std.string
+#import sys.exits.category
+class sys::exits::Category : public std::error_category {
+  using ancestor = std::error_category;
+  friend auto exits::category() -> Category const &;
+  Category() = default;
+public:
+  auto name() const noexcept -> char const * final;
+  auto default_error_condition(int code) const noexcept -> std::error_condition final;
+  auto equivalent(int code, std::error_condition const &) const noexcept -> bool final;
+  auto equivalent(std::error_code const &, int code) const noexcept -> bool final;
+  auto message(int code) const -> std::string final;
+};
+#endiv
+#divert <cpp>
+auto sys::exits::Category::name() const noexcept -> char const * {
+  return "sysexits";
+}
+#import sys.exits.Condition
+#import sys.exits.error_condition
+auto sys::exits::Category::default_error_condition(int code) const noexcept -> std::error_condition {
+  return std::error_condition{0 == code ? Condition::SUCCESS : Condition::FAILURE}; 
+}
+auto sys::exits::Category::equivalent(int lhs_code, std::error_condition const &rhs_condition) const noexcept -> bool {
+  return *this == rhs_condition.category() && default_error_condition(lhs_code) == rhs_condition;
+}
+auto sys::exits::Category::equivalent(std::error_code const &lhs_code, int rhs_code) const noexcept -> bool {
+  return *this == lhs_code.category() && lhs_code.value() == rhs_code;
+}
+#import sys.exits.constants
+#import std.ostringstream
+auto sys::exits::Category::message(int UNCHECKED_code) const -> std::string {
+  char const *words{"unknown"};
+  //
+  // System exit codes can really only be 7 bits, see wait(2).
+  // And sys::exits::Code::Code will throw invalid_argument the value is negative or out of range.
+  // We have to resolve that here.
+  //
+  try {
+    Code subject{UNCHECKED_code};
+    switch (subject) {
+      // The basics of <sysexits.h>
+    case OK:
+      words = "OK";
+      break;
+      // The basics of <sysexits.h>
+    case USAGE:
+      words = "command line usage error";
+      break;
+    case DATA:
+      words = "data format error";
+      break;
+    case INPUT:
+      words = "cannot open input";
+      break;
+    case USER:
+      words = "addressee unknown";
+      break;
+    case HOST:
+      words = "host name unknown";
+      break;
+    case UNAVAILABLE:
+      words = "service unavailable";
+      break;
+    case SOFTWARE:
+      words = "internal software error";
+      break;
+    case OS:
+      words = "system error (e.g., can't fork)";
+      break;
+    case FILE:
+      words = "critical OS file missing";
+      break;
+    case CANTCREATE:
+      words = "can't create (user) output file";
+      break;
+    case IO:
+      words = "input/output error";
+      break;
+    case TEMPORARY:
+      words = "remporary failure; user is invited to retry";
+      break;
+    case PROTOCOL:
+      words = "remote error in protocol";
+      break;
+    case PERMISSION:
+      words = "permission denied";
+      break;
+    case CONFIGURATION:
+      words = "configuration error";
+      break;
+      // on beyond <sysexits.h>
+    case CANTREMOVE:
+      words = "can't remove (user) output file";
+      break;
+    case GROUP:
+      words = "group name unknown";
+      break;
+      //
+      // These are particular to the SCOLDing development method
+      // UNCOMMITTED ... NOCOMMAND
+      // see incendiary-sophist >= 0.2, .../lib/rigging/sysexits.sh
+      //
+    case TESTING:
+      words = "test mode";
+      break;
+    case UNCOMMITTED:
+      // From the scold rpm build & packaging system (vernacular-doggerel)    
+      words = "there are uncommitted changes";
+      break;
+    case GOLDEN:
+      // From the scold test rigging (incendiary-sophist)
+      words = "the golden file is missing (validate & copy *.out to *.gold)";
+      break;
+    case OUTPUT:
+      // Ibidem.
+      words = "the output file is missing (why?)";
+      break;
+    case COMMAND:
+      // Ibidem.
+      words = "command not found; i.e. a shell error";
+      break;
+    default:
+      {
+        std::ostringstream buf;
+        buf << "FAILURE, " << subject; // operator<<(std::ostream, Code)
+        return buf.str();
+      }
+    }
+    return words;
+  } catch (std::invalid_argument const &e) {
+    std::ostringstream buf;
+    buf << "INVALID, exit " << UNCHECKED_code;
+    return buf.str();
+  }
+}
+#endiv
+

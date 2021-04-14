@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_base_of
+#import std.basic_string_view
+namespace nonstd::required {
+  //
+  // Is this a basic_string_view (descendant?)
+  //
+  template<typename STRING_VIEW> concept bool Basic_String_View = requires(STRING_VIEW string_view) {
+    typename STRING_VIEW::value_type;
+    typename STRING_VIEW::traits_type;
+    requires std::is_base_of<std::basic_string_view<typename STRING_VIEW::value_type, typename STRING_VIEW::traits_type>, STRING_VIEW>::value;
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.string_view
+#import std.wstring
+#import std.wstring_view
+#if 8 < __GNUC__ // surely gcc 10 will have C++20 "in the bag"
+// [[FIXTHIS]] ... #import std.u16string
+// [[FIXTHIS]] ... #import std.u16string_view
+// [[FIXTHIS]] ... #import std.u32string
+// [[FIXTHIS]] ... #import std.u32string_view
+// [[FIXTHIS]] ... #import std.u8string
+// [[FIXTHIS]] ... #import std.u8string_view
+#endif
+namespace nonstd::required {
+  static_assert(!Basic_String_View<std::string>);
+  static_assert(!Basic_String_View<std::wstring>);
+  static_assert(Basic_String_View<std::string_view>);
+  static_assert(Basic_String_View<std::wstring_view>);
+#if 11 <= __GNUC__
+// ergo ccc 10 still does not have it
+// viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
+  static_assert(!Basic_String_View<std::u16string>);
+  static_assert(!Basic_String_View<std::u32string>);
+  static_assert(!Basic_String_View<std::u8string>);
+  static_assert(Basic_String_View<std::u16string_view>);
+  static_assert(Basic_String_View<std::u32string_view>);
+  static_assert(Basic_String_View<std::u8string_view>);
+#endif
+}
+#endiv

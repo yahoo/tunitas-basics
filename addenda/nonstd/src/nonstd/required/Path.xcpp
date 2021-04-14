@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+#import std.filesystem.path
+#import std.is_base_of
+namespace nonstd::required {
+  //
+  // Is this type a filesystem path?
+  // Also admit descendants of std::filesystem::path.
+  //
+  // Usage:
+  //
+  //   template<required::Path PATH> auto function(...) -> PATH;
+  //
+  template<typename PATH> concept bool Path = requires(PATH path) {
+    typename PATH::value_type;
+    typename PATH::string_type;
+    requires std::is_same<char, typename PATH::value_type>::value;
+    requires std::is_same<std::string, typename PATH::string_type>::value;
+    requires std::is_base_of<std::filesystem::path, PATH>::value;
+    requires requires(PATH, std::string string, char const *pointer) {
+      { PATH{string} };
+      { PATH{pointer} };
+    };
+  };
+}
+#endiv
+#divert <cpp>
+// Of course, this is test code
+#import std.filesystem.path
+#import std.string
+#import std.wstring
+#import std.string_view
+#import c.const_stringz
+namespace nonstd::required {
+  static_assert(Path<std::filesystem::path>);
+  static_assert(!Path<std::string>);
+  static_assert(!Path<std::wstring>);
+  static_assert(!Path<std::string_view>);
+  static_assert(!Path<c::const_stringz>);
+  static_assert(!Path<char const *>);
+  static_assert(!Path<int>);
+}
+#endiv

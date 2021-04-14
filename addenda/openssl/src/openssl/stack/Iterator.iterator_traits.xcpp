@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import openssl.required.Stackable
+#forward openssl.stack.Iterator
+#forward openssl.Stack
+#forward openssl.Stack0
+#import std.iterator_traits
+namespace std {
+  //
+  // Provide the specializations std::iterator_traits<ITERATOR>
+  // for the for the iterators on Stack and Stack0
+  //
+  // Usage:
+  //
+  //   see nearby, stack::Iterator<...>
+  //
+  template<openssl::required::Stackable TYPE> struct iterator_traits<openssl::stack::Iterator<openssl::Stack<TYPE>>>;
+  template<openssl::required::Stackable TYPE> struct iterator_traits<openssl::stack::Iterator<openssl::Stack0<TYPE>>>;
+}
+#endiv
+#divert <hpp>
+#import openssl.stack.iterator.traits.Generic
+template<openssl::required::Stackable TYPE> struct std::iterator_traits<openssl::stack::Iterator<openssl::Stack<TYPE>>> : public openssl::stack::iterator::traits::Generic<openssl::Stack<TYPE>> { };
+template<openssl::required::Stackable TYPE> struct std::iterator_traits<openssl::stack::Iterator<openssl::Stack0<TYPE>>> : public openssl::stack::iterator::traits::Generic<openssl::Stack0<TYPE>> { };
+#endiv
+#divert <ipp>
+#import openssl.stack.Iterator
+#import openssl.Stack
+#import openssl.Stack0
+#endiv

@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.at.position.Position.declaration
+namespace sys::at::position {
+  //
+  // The integer (native) variant of the file descriptor convenience.
+  // Major commentariat is in sys.at.position.Position.declaration
+  //
+  template<> struct Position<int>;
+}
+#endiv
+#divert <hpp>
+#forward sys.at.position.Position.File
+#import sys.at.Cwd
+#import sys.fd.Managed
+#import sys.id.File
+namespace sys::at::position {
+  template<> class Position<int> {
+    using Managed = fd::Managed;
+    using File = id::File;
+  public:
+    inline [[implicit]] Position(int directory);
+    inline [[implicit]] Position(Managed const &);
+    inline [[implicit]] Position(File);
+    inline [[implicit]] Position(Cwd);
+    inline [[implicit]] Position(Position<id::File> const &);
+    using Value = int;
+    inline explicit operator Value() const;
+  protected:
+    Value directory;
+  };
+}
+#endiv
+#divert <ipp>
+#import sys.fd.Managed
+#import sys.at.position.Position.File
+namespace sys::at::position {
+  Position<int>::Position(int directory) : directory{directory} { } 
+  Position<int>::Position(Managed const &directory) : directory{(int)directory.get()} { }
+  Position<int>::Position(File directory) : directory{(int)directory} { }
+  Position<int>::Position(Cwd cwd) : directory{(int)cwd} { }
+  Position<int>::Position(Position<File> const &other) : directory{(int)other.directory} { }
+  Position<int>::operator Value() const { return directory; }
+}
+#endiv

@@ -1,0 +1,6 @@
+// -*- c++ -*- d0bdfbc9-f038-47c1-b46c-8bf4305c3e41
+#pragma once
+#include <cppunit/SynchronizedObject.h>
+namespace cppunit {
+  using CppUnit::SynchronizedObject;
+}

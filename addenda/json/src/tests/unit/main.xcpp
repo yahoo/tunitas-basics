@@ -1,0 +1,91 @@
+// This is -*- c++ -*- with SCOLD stylings
+#divert <cpp>
+#include <tests.unit.as.Fixture>
+#include <tests.unit.exception.Fixture>
+#include <tests.unit.features.Fixture>
+#include <tests.unit.lexical_cast.Fixture>
+#include <tests.unit.parse.Fixture>
+#include <tests.unit.reader.Fixture>
+#include <tests.unit.string.Fixture>
+#include <tests.unit.to.Fixture>
+#include <tests.unit.value.Fixture>
+#include <tests.unit.writer.Fixture>
+
+#include <unit.rigging.Exit>
+#include <unit.rigging.exit.constants>
+#include <unit.rigging.test.Bench>
+namespace EX = unit::rigging::exit;
+
+#include <std.string>
+#include <std.clog>
+#include <std.exception>
+#include <std.ostream>
+
+namespace ur = unit::rigging;
+namespace urt = ur::test;
+namespace EX = ur::exit;
+
+namespace {
+    
+  struct Mode {
+    bool debug;
+    bool verbose;
+    Mode()
+      : debug(true)
+      , verbose(true) {
+      ;
+    }
+  } MODE;
+
+  auto emit_usage(std::ostream &) -> void;
+}
+
+auto main(int argc, char **argv) -> int {
+  try {
+    if (2 != argc) {
+      std::cerr << "Error: you must specify the name of the test suite to call\n";
+      throw EX::USAGE;
+    }
+
+    std::string test_name(argv[1]);
+
+    urt::Bench bench(std::clog);
+    bench.addTest(tests::unit::as::Fixture::suite());
+    bench.addTest(tests::unit::exception::Fixture::suite());
+    bench.addTest(tests::unit::features::Fixture::suite());
+    bench.addTest(tests::unit::lexical_cast::Fixture::suite());
+    bench.addTest(tests::unit::parse::Fixture::suite());
+    bench.addTest(tests::unit::reader::Fixture::suite());
+    bench.addTest(tests::unit::string::Fixture::suite());
+    bench.addTest(tests::unit::to::Fixture::suite());
+    bench.addTest(tests::unit::value::Fixture::suite());
+    bench.addTest(tests::unit::writer::Fixture::suite());
+
+    ur::Exit exit;
+    exit &= bench.run(test_name);
+
+    if (MODE.verbose) {
+      std::clog << exit << '\n';
+    }
+    return exit;
+  } catch (ur::Exit const &exit) {
+    // This was expected
+    if (EX::USAGE == exit) {
+      emit_usage(std::clog);
+    }
+    return exit;
+  } catch (std::exception const &e) {
+    // This was not expected
+    std::cerr << "Error: " << e.what() << '\n';
+    return EX::SOFTWARE;
+  }
+}
+
+namespace {
+
+  auto emit_usage(std::ostream &out) -> void {
+    out << "usage: unit { --list | <suite-name> }\n";
+  }
+
+}
+#endiv

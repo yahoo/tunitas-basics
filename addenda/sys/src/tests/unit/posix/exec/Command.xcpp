@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix::exec {
+  //
+  // The Commands
+  // Specializations only; always and everywhere
+  //
+  // USage:
+  //
+  //    see Scheme<COMMAND>, COMMAND2>
+  //
+  namespace command {
+    enum Name { DATE, ECHO };
+    enum Path { FULL, SHORT };
+  }
+  template<command::Name, command::Path> struct Command;
+  template<command::Name NAME> struct Command<NAME, command::SHORT>;
+  template<> struct Command<command::DATE, command::FULL>;
+  template<> struct Command<command::ECHO, command::FULL>;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.filesystem.path
+namespace tests::unit::posix::exec {
+  template<command::Name NAME> struct Command<NAME, command::SHORT> {
+    inline static auto path() -> std::filesystem::path { return Command<NAME, command::FULL>::path().filename(); }
+    inline static auto name() -> std::string           { return Command<NAME, command::FULL>::name(); }
+  };
+  template<> struct Command<command::DATE, command::FULL> {
+    inline static auto path() -> std::filesystem::path { return "/bin/date"s; }
+    inline static auto name() -> std::string           { return "date"s; }
+  };
+  template<> struct Command<command::ECHO, command::FULL> {
+    inline static auto path() -> std::filesystem::path { return "/bin/echo"s; }
+    inline static auto name() -> std::string           { return "echo"s; }
+  };
+}
+#endiv

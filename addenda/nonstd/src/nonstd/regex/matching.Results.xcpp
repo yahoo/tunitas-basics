@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.match_results
+#import std.string
+#import nonstd.regex.matching.Sub
+#import nonstd.regex.required.ALL
+namespace nonstd::regex::matching {
+  template<required::iterator::Bidirectional BI, required::Allocator ALLOC = std::allocator<matching::Sub<BI>>> using Results = std::match_results<BI, ALLOC>;
+  using CResults = Results<char const *>;
+  using SResults = Results<std::string::const_iterator>;
+}
+#endiv

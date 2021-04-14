@@ -1,0 +1,25 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import std.string
+namespace json {
+  template<typename RESULT> inline auto as(std::string const &) -> RESULT;
+  template<typename RESULT> inline auto as(std::string &&) -> RESULT;
+}
+#entail json.as.string.string
+#endiv
+#divert <ipp>
+template<typename RESULT> auto json::as(std::string const &) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "as<...>(...) is ambiguous with json::Value(std::string), use to<...>(...) instead");
+  return RESULT();
+}
+
+template<typename RESULT> auto json::as(std::string &) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "as<...>(...) is ambiguous with json::Value(std::string), use to<...>(...) instead");
+  return RESULT();
+}
+
+template<typename RESULT> auto json::as(std::string &&) -> RESULT {
+  static_assert(0 == sizeof (RESULT) && 0 != sizeof (RESULT), "as<...>(...) is ambiguous with json::Value(std::string), use to<...>(...) instead");
+  return RESULT();
+}
+#endiv

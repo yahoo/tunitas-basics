@@ -1,0 +1,24 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_call_SOURCES_SET = \
+  obj/src/tests/unit/call/namespace.cpp \
+  obj/src/tests/unit/call/Fixture.cpp \
+  obj/src/tests/unit/call/Size.cpp \
+  obj/src/tests/unit/call/Element.cpp \
+  obj/src/tests/unit/call/Generator_Of_Interesting_Values.cpp \
+  obj/src/tests/unit/call/Value.cpp \
+  obj/src/tests/unit/call/result.Fixture.cpp \
+  obj/src/tests/unit/call/result.Pipe.cpp \
+  obj/src/tests/unit/call/result.Result.cpp \
+  obj/src/tests/unit/call/result.Value.cpp \
+  obj/src/tests/unit/call/argument.Fixture.cpp \
+  obj/src/tests/unit/call/argument.Pathname.cpp \
+  obj/src/tests/unit/call/argument.Pathstring.cpp \
+  obj/src/tests/unit/call/argument.Stringface.cpp \
+  obj/src/tests/unit/call/argument.Stringsite.cpp \
+  obj/src/tests/unit/call/argument.Permissions.cpp \
+  $(end)

@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward nonstd.make_unsigned
+#import nonstd.int128_t
+#import nonstd.uint128_t
+namespace nonstd {
+  //
+  // The make_unsigned for GCC's 128-bit types.
+  //
+  // http://en.cppreference.com/w/cpp/types/make_unsigned
+  //
+  template<> struct make_unsigned<int128_t>;
+  template<> struct make_unsigned<int128_t const>;
+  template<> struct make_unsigned<int128_t volatile>;
+  template<> struct make_unsigned<int128_t const volatile>;
+  //
+  template<> struct make_unsigned<uint128_t>;
+  template<> struct make_unsigned<uint128_t const>;
+  template<> struct make_unsigned<uint128_t volatile>;
+  template<> struct make_unsigned<uint128_t const volatile>;
+}
+#endiv
+#divert <hpp>
+#import nonstd.integers
+template<> struct nonstd::make_unsigned<nonstd::integers::int128_t> { using type = integers::uint128_t; };
+template<> struct nonstd::make_unsigned<nonstd::integers::int128_t const> { using type = integers::uint128_t const; };
+template<> struct nonstd::make_unsigned<nonstd::integers::int128_t volatile> { using type = integers::uint128_t volatile; };
+template<> struct nonstd::make_unsigned<nonstd::integers::int128_t const volatile> { using type = integers::uint128_t const volatile; };
+//
+template<> struct nonstd::make_unsigned<nonstd::integers::uint128_t> { using type = integers::uint128_t; };
+template<> struct nonstd::make_unsigned<nonstd::integers::uint128_t const> { using type = integers::uint128_t const; };
+template<> struct nonstd::make_unsigned<nonstd::integers::uint128_t volatile> { using type = integers::uint128_t volatile; };
+template<> struct nonstd::make_unsigned<nonstd::integers::uint128_t const volatile> { using type = integers::uint128_t const volatile; };
+#endiv

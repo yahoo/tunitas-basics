@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sqlite
+#import c.const_stringz
+#import sqlite.value.detail.As
+namespace sqlite {
+  namespace value {
+    namespace detail {
+      template<> class As<c::const_stringz>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#forward sqlite.api.unguarded
+#import sqlite.value.detail.Result
+template<> class sqlite::value::detail::As<c::const_stringz> : public Result<c::const_stringz> {
+  using Ancestor = Result<c::const_stringz>;
+public:
+  // Please pay particular attention to the fact that the pointer returned here
+  // is invalidated by any subsequent call to a pointer-returning API call; e.g. As<c::const_buffer>
+  // To avoid, use a buffer-copying specialization; e.g. As<std::string>
+  inline auto operator()(api::unguarded::Value *) -> Ancestor::result_type;
+};
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+#import sqlite.c89
+#import sqlite.api.lob.Getter
+auto sqlite::value::detail::As<c::const_stringz>::operator()(api::unguarded::Value *value) -> Ancestor::result_type {
+  using will = api::lob::Getter<api::unguarded::Value, char, c89::utf8>;
+  will const get(::sqlite3_value_text, ::sqlite3_value_bytes);
+  auto got = get(value);
+  // And there is no need to reference size(got) because stringz computes its own length on-site
+  c::const_stringz ret(data(got));
+  return ret;
+}
+#endiv

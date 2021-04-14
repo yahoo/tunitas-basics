@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import nonstd.required.iterator.Input
+#import nonstd.required.iterator.Forward
+namespace nonstd::uninitialized {
+  //
+  // https://wiki.scold-lang.org/page/nonstd.uninitialized.copy
+  //
+  // Copy into an uninitialized area of memory.
+  //
+  template<required::iterator::Input SOURCE, required::iterator::Forward DESTINATION> inline auto copy(SOURCE first, SOURCE last, DESTINATION) -> void;
+  template<typename OBJECT, std::size_t N, required::iterator::Forward DESTINATION> inline auto copy(OBJECT (&source)[N], DESTINATION) -> void;
+  template<required::iterator::Input SOURCE, required::iterator::Forward DESTINATION> inline auto copy(SOURCE, std::size_t N, DESTINATION) -> void;
+}
+#endiv
+#divert <ipp>
+#import std.uninitialized_copy
+template<nonstd::required::iterator::Input SOURCE, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized::copy(SOURCE first, SOURCE last, DESTINATION dest) -> void {
+  std::uninitialized_copy(first, last, dest);
+}
+#import std.uninitialized_copy_n
+template<typename OBJECT, std::size_t N, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized::copy(OBJECT (&source)[N], DESTINATION dest) -> void {
+  std::uninitialized_copy_n(&source[0], N, dest);
+}
+template<nonstd::required::iterator::Input SOURCE, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized::copy(SOURCE source, std::size_t N, DESTINATION dest) -> void {
+  std::uninitialized_copy_n(source, N, dest);
+}
+#endiv

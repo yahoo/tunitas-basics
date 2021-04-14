@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.owner.interface
+namespace sys::posix {
+  namespace packaging::getown_ex {
+    using namespace packaging::owner::interface;
+    using namespace bundle::getowner::extended;
+    namespace function {
+      [[deprecated("buy a vowel, prefer getowner(File)")]] inline auto getown_ex(File) -> Returned;
+      [[deprecated("buy a vowel, prefer getowner(File, f_owner_ex &)")]] inline auto getown_ex(File, [[out]] Argument &) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer getowner(File)")]] inline auto getown_ex(int fd) -> Returned;
+      [[deprecated("buy a vowel, prefer getowner(File, f_owner_ex &)")]] inline auto getown_ex(int fd, [[out]] Argument &) -> Status;
+    } 
+  }
+  using packaging::getown_ex::function::getown_ex;
+  namespace native { using packaging::getown_ex::native::getown_ex; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getowner
+namespace sys::posix::packaging::getown_ex {
+  auto function::getown_ex(File fd) -> Returned              { return posix::getowner<Payload>(fd); }
+  auto function::getown_ex(File fd, Argument &arg) -> Status { return posix::getowner(fd, arg); }
+  auto native::getown_ex(int fd) -> Returned                 { return posix::native::getowner<Payload>(fd); }
+  auto native::getown_ex(int fd, Argument &arg) -> Status    { return posix::native::getowner(fd, arg); }
+}
+#endiv

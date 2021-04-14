@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.is.interface
+namespace sys::posix {
+  namespace packaging::is {
+    using namespace packaging::is::interface;
+    namespace function {
+      inline auto islnk(Pathname) -> bool;
+      inline auto islnk(Buffer const &) -> bool;
+      inline auto islnk(Permissions) -> bool;
+      inline auto islnk(File) -> bool = delete;
+    }
+    namespace native {
+      inline auto islnk(int) -> bool = delete;
+    }
+  }
+  using packaging::is::function::islnk;
+  namespace native { using packaging::is::native::islnk; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.lstat
+namespace sys::posix::packaging::is {
+  auto function::islnk(Buffer const &b) -> bool { return islnk(b.st_mode); }
+  auto function::islnk(Permissions p) -> bool { return S_ISLNK((mode_t) p); }
+  auto function::islnk(Pathname pathname) -> bool {
+    auto r = posix::lstat(move(pathname));
+    return good(r) && islnk(value(r));
+  }
+}
+#endiv

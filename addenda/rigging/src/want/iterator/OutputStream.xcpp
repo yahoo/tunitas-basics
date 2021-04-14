@@ -1,0 +1,67 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.char_traits
+namespace want {
+  namespace iterator {
+    template<typename ITEM, typename CHAR, typename TRAITS = std::char_traits<CHAR>> class OutputStream;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.iterator
+#import std.output_iterator_tag
+#import std.string
+#import std.char_traits
+#import std.basic_ostream
+template<typename ITEM, typename CHAR, typename TRAITS> class want::iterator::OutputStream : public std::iterator<std::output_iterator_tag, void, void, void, void> {
+  using ancestor = std::iterator<std::output_iterator_tag, void, void, void, void>;
+public:
+  using char_type = char;
+  using traits_type = std::char_traits<char>;
+  using ostream_type = std::basic_ostream<char_type, traits_type>;
+  inline explicit OutputStream(ostream_type &);
+  inline OutputStream(ostream_type &, std::string const &prefix, std::string const &suffix);
+  inline auto operator=(ITEM const &) -> OutputStream &;
+  inline auto operator*() -> OutputStream &;
+  inline auto operator++() -> OutputStream &;
+  inline auto operator++(int) -> OutputStream;
+protected:
+  ostream_type &out;
+  std::string prefix;
+  std::string suffix;
+};
+#endiv
+#divert <ipp>
+template<typename ITEM, typename CHAR, typename TRAITS> want::iterator::OutputStream<ITEM, CHAR, TRAITS>::OutputStream(ostream_type &arg_out)
+  : out(arg_out)
+  , prefix()
+  , suffix() {
+  ;
+}
+
+template<typename ITEM, typename CHAR, typename TRAITS> want::iterator::OutputStream<ITEM, CHAR, TRAITS>::OutputStream(ostream_type &arg_out, std::string const &arg_prefix, std::string const &arg_suffix)
+  : out(arg_out)
+  , prefix(arg_prefix)
+  , suffix(arg_suffix) {
+  ;
+}
+
+template<typename ITEM, typename CHAR, typename TRAITS> auto want::iterator::OutputStream<ITEM, CHAR, TRAITS>::operator=(ITEM const &item) -> OutputStream & {
+  // this, line, right here, is the only difference between this class (template) and std::ostream_iterator, which only has a suffix
+  out << prefix << item << suffix;
+  return *this;
+}
+
+template<typename ITEM, typename CHAR, typename TRAITS> auto want::iterator::OutputStream<ITEM, CHAR, TRAITS>::operator*() -> OutputStream & {
+  return *this;
+}
+
+template<typename ITEM, typename CHAR, typename TRAITS> auto want::iterator::OutputStream<ITEM, CHAR, TRAITS>::operator++() -> OutputStream & {
+  return *this;
+}
+
+template<typename ITEM, typename CHAR, typename TRAITS> auto want::iterator::OutputStream<ITEM, CHAR, TRAITS>::operator++(int) -> OutputStream {
+  return *this;
+}
+#endiv

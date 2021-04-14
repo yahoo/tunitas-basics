@@ -1,0 +1,20 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_path_SUBSOURCES = \
+  obj/src/tests/unit/path/namespace.cpp \
+  obj/src/tests/unit/path/compatibility.cpp \
+  obj/src/tests/unit/path/Fixture.cpp \
+  obj/src/tests/unit/path/filename/Fixture.cpp \
+  obj/src/tests/unit/path/filename/has/Fixture.cpp \
+  obj/src/tests/unit/path/filename/has/namespace.cpp \
+  obj/src/tests/unit/path/filename/mount/Fixture.cpp \
+  obj/src/tests/unit/path/filename/mount/namespace.cpp \
+  obj/src/tests/unit/path/filename/mount/Reference.cpp \
+  obj/src/tests/unit/path/filename/mount/Unbound.cpp \
+  obj/src/tests/unit/path/filename/mount/Value.cpp \
+  obj/src/tests/unit/path/filename/namespace.cpp \
+  obj/src/tests/unit/path/filename/trimmer/Deprefix.cpp \
+  obj/src/tests/unit/path/filename/trimmer/Desuffix.cpp \
+  obj/src/tests/unit/path/filename/trimmer/Fixture.cpp \
+  obj/src/tests/unit/path/filename/trimmer/namespace.cpp \
+  $(end)

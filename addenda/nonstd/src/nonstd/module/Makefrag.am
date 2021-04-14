@@ -1,0 +1,24 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Whereas the "-module" suffix is deprecat{ed,ing} in the DSO names.
+# There is a need for some compatibility shim such that older link lines still work until such time as the
+# dependeing projects can update to use -lstd
+#
+# current:     -lnonstd
+# deprecated:  -lnonstd-module
+#
+# Thus libnonstd-module.so depends upon libnonstd.so and everything "just works"
+# The DSO versioning scheme ensures that "the right thing happens"
+#
+lib_libnonstd_module_la_CURRENT = $(lib_libnonstd_la_CURRENT)
+lib_libnonstd_module_la_REVISION = $(lib_libnonstd_la_REVISION)
+lib_libnonstd_module_la_AGE = $(lib_libnonstd_la_AGE)
+lib_libnonstd_module_la_CRA = $(lib_libnonstd_module_la_CURRENT):$(lib_libnonstd_module_la_REVISION):$(lib_libnonstd_module_la_AGE)
+lib_libnonstd_module_la_VERSION_INFO = -version-info $(lib_libnonstd_module_la_CRA)
+
+lib_libnonstd_module_la = lib/libnonstd-module.la
+lib_libnonstd_module_la_LIBADD = $(lib_libnonstd_la)
+lib_libnonstd_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libnonstd_module_la_VERSION_INFO)
+lib_libnonstd_module_la_MODULES = $(none)
+lib_libnonstd_module_la_SOURCES = $(none)

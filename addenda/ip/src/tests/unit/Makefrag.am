@@ -1,0 +1,87 @@
+# -*- Makefile -*-
+
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  $(lib_libwant_la) \
+  -linet-module \
+  -lip-module \
+  -lunit-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET)
+check_bin_unit_MODULES = $(call SCOLD_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  \
+  obj/src/tests/unit/make/namespace.cpp \
+  obj/src/tests/unit/make/Fixture.cpp \
+  obj/src/tests/unit/make/constructors.cpp \
+  \
+  obj/src/tests/unit/ip/namespace.cpp \
+  obj/src/tests/unit/ip/Fixture.cpp \
+  obj/src/tests/unit/ip/Address.cpp \
+  \
+  obj/src/tests/unit/ip/as/namespace.cpp \
+  obj/src/tests/unit/ip/as/Address.cpp \
+  obj/src/tests/unit/ip/as/Fixture.cpp \
+  \
+  obj/src/tests/unit/ip/endian/namespace.cpp \
+  obj/src/tests/unit/ip/endian/Fixture.cpp \
+  obj/src/tests/unit/ip/endian/Integer.cpp \
+  obj/src/tests/unit/ip/endian/Palette.cpp \
+  obj/src/tests/unit/ip/endian/Palette.Operator_Insert.cpp \
+  obj/src/tests/unit/ip/endian/Reorder.cpp \
+  obj/src/tests/unit/ip/endian/Reorder.16.cpp \
+  obj/src/tests/unit/ip/endian/Reorder.32.cpp \
+  obj/src/tests/unit/ip/endian/Reorder.64.cpp \
+  obj/src/tests/unit/ip/endian/Reorder.128.cpp \
+  \
+  obj/src/tests/unit/ip/format/namespace.cpp \
+  obj/src/tests/unit/ip/format/Fixture.cpp \
+  \
+  obj/src/tests/unit/ip/inet/namespace.cpp \
+  obj/src/tests/unit/ip/inet/Fixture.cpp \
+  obj/src/tests/unit/ip/inet/Family.cpp \
+  obj/src/tests/unit/ip/inet/Protocol.cpp \
+  obj/src/tests/unit/ip/inet/Restring.cpp \
+  obj/src/tests/unit/ip/inet/Restringable.cpp \
+  \
+  obj/src/tests/unit/ip/inet/addrinfo/namespace.cpp \
+  obj/src/tests/unit/ip/inet/addrinfo/Fixture.cpp \
+  obj/src/tests/unit/ip/inet/addrinfo/Iterator.cpp \
+  obj/src/tests/unit/ip/inet/addrinfo/List.cpp \
+  obj/src/tests/unit/ip/inet/addrinfo/Specification.cpp \
+  obj/src/tests/unit/ip/inet/addrinfo/Value.cpp \
+  \
+  obj/src/tests/unit/ip/inet/nameinfo/namespace.cpp \
+  obj/src/tests/unit/ip/inet/nameinfo/Fixture.cpp \
+  \
+  obj/src/tests/unit/ip/inet/sockaddr/namespace.cpp \
+  obj/src/tests/unit/ip/inet/sockaddr/Fixture.cpp \
+  obj/src/tests/unit/ip/inet/sockaddr/Family.cpp \
+  obj/src/tests/unit/ip/inet/sockaddr/Address.cpp \
+  obj/src/tests/unit/ip/inet/sockaddr/Port.cpp \
+  \
+  obj/src/tests/unit/want/namespace.cpp \
+  obj/src/tests/unit/want/Fixture.cpp \
+  \
+  obj/src/tests/unit/want/cppunit/namespace.cpp \
+  obj/src/tests/unit/want/cppunit/Fixture.cpp \
+  \
+  obj/src/tests/unit/want/int128/namespace.cpp \
+  obj/src/tests/unit/want/int128/Fixture.cpp \
+  obj/src/tests/unit/want/int128/Integer.cpp \
+  obj/src/tests/unit/want/int128/Traits.cpp \
+  $(end)
+
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES,  $(check_bin_unit_SOURCES))
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

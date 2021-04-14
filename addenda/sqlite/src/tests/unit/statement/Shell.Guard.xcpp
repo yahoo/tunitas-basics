@@ -1,0 +1,35 @@
+// -*- c++ -*- in the SCOLD styling
+#divert <hpp>
+#import sqlite.statement.Shell
+#import tests.unit.statement.Shell
+class tests::unit::statement::Shell::Guard {
+  //
+  // Because we're testing sqlite::statement::Shell, we have to finalize explicitly with our own guard.
+  // The tester for sqlite::Statement does not need this because statements are finalized in ~Statement()
+public:
+  using shell_type = sqlite::statement::Shell;
+  inline explicit Guard(shell_type &subject);
+  inline ~Guard();
+  Guard(Guard const &) = delete;
+  auto operator=(Guard const &) -> Guard & = delete;
+private:
+  shell_type &subject;
+};
+#endiv
+#divert <ipp>
+tests::unit::statement::Shell::Guard::Guard(shell_type &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+
+#import std.cerr
+tests::unit::statement::Shell::Guard::~Guard() {
+  try {
+    auto c = this->subject.finalize();
+    auto b = ok(c);
+    CPPUNIT_ASSERT(b); // <--- this should always be OK
+  } catch (...) {
+    std::cerr << "WARNING - unexpected exception suppressed in tests::unit::statement::Shell::Guard::~Guard()\n";
+  }
+}
+#endiv

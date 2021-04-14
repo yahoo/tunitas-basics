@@ -1,0 +1,96 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      //
+      // For use as the optional specification (a.k.a. "hints") in getaddrinfo(3).
+      //
+      class Specification;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import ip.inet.AF.Family
+#import ip.inet.AI.Features
+#import ip.inet.PF.Family
+#import ip.inet.SOCK.Type
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      inline auto operator|(Specification, Family) -> Specification;
+      inline auto operator|(Specification, AI::Features) -> Specification;
+      inline auto operator|(Specification, SOCK::Type) -> Specification;
+    }
+  }
+}
+
+#import addrinfo
+class ip::inet::addrinfo::Specification {
+public:
+  inline Specification();
+  Specification(Specification const &) = default;
+  Specification(Specification &&) = default;
+  auto operator=(Specification const &) -> Specification & = default;
+  auto operator=(Specification &&) -> Specification & = default;
+  inline auto operator|=(Family) -> Specification &;
+  inline auto operator|=(AI::Features) -> Specification &;
+  inline auto operator|=(SOCK::Type) -> Specification &;
+  inline operator ::addrinfo const *() const;
+protected:
+  //
+  // From getaddrinfo(3)
+  //   All the other fields in the structure pointed to by hints must contain
+  //   either 0 or a NULL pointer, as appropriate.  Specifying hints as NULL is
+  //   equivalent to setting ai_socktype and ai_protocol to 0; ai_family to
+  //   AF_UNSPEC; and ai_flags to (AI_V4MAPPED | AI_ADDRCONFIG).
+  //
+  // ... and yet signalling "IS NULL" is always different somehow than signalling
+  // with the defaulted values.  So we preserve the semantic of "IS NULL" here.
+  bool defaulted;
+  ::addrinfo subject;
+};
+#endiv
+#divert <ipp>
+auto ip::inet::addrinfo::operator|(Specification s, Family f) -> Specification {
+  return s |= f;
+}
+
+auto ip::inet::addrinfo::operator|(Specification s, AI::Features f) -> Specification {
+  return s |= f;
+}
+
+auto ip::inet::addrinfo::operator|(Specification s, SOCK::Type f) -> Specification {
+  return s |= f;
+}
+
+#import std.fill_n
+ip::inet::addrinfo::Specification::Specification()
+  : defaulted(true) {
+  std::fill_n(reinterpret_cast<char *>(&subject), sizeof (subject), '\0');
+}
+
+auto ip::inet::addrinfo::Specification::operator|=(Family value) -> Specification & {
+  defaulted = false;
+  subject.ai_family = (int)(value);
+  return *this;
+}
+
+auto ip::inet::addrinfo::Specification::operator|=(AI::Features value) -> Specification & {
+  defaulted = false;
+  subject.ai_flags = (int)(value);
+  return *this;
+}
+
+auto ip::inet::addrinfo::Specification::operator|=(SOCK::Type value) -> Specification & {
+  defaulted = false;
+  subject.ai_socktype = (int)(value);
+  return *this;
+}
+
+ip::inet::addrinfo::Specification::operator ::addrinfo const *() const {
+  return defaulted ? nullptr : &subject;
+}
+#endiv

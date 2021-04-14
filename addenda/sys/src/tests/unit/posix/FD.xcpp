@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { struct FD; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.FD
+struct tests::unit::posix::FD : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::FD;
+  auto test_mentions() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.fd.constants
+namespace tests::unit::posix {
+  auto FD::test_mentions() -> void {
+    auto mentioned = Subject::CLOEXEC;
+    CPPUNIT_ASSERT(::sys::fd::CLOEXEC == mentioned);
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::posix {
+  auto FD::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    using ::rigging::suite::call; // because namespace tests::unit::call occludes
+    Stream series("FD");
+    series << call("mentions", &FD::test_mentions)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

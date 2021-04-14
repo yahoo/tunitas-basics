@@ -1,0 +1,84 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::unit::detail {
+  template<typename CONTAINER> class Containerized;
+}
+#endiv
+#divert <hpp>
+#import rigging.unit.Buffer
+#import rigging.unit.Stringz
+#import rigging.unit.assignment.Clear
+template<typename CONTAINER> class rigging::unit::detail::Containerized {
+public:
+  using value_type = CONTAINER;
+  using base_type = typename value_type::value_type;
+
+  inline explicit Containerized(value_type &lhs);
+  inline auto operator=(assignment::Clear) -> Containerized &;
+  // copy semantics
+  inline auto operator=(value_type const &) -> Containerized &;
+  // move semantics
+  inline auto operator=(value_type &&) -> Containerized &;
+  template<std::size_t N> inline auto operator=(base_type const (&rhs)[N]) -> Containerized &;
+  inline auto operator=(Buffer rhs) -> Containerized &;
+  inline auto operator=(Stringz rhs) -> Containerized &;
+protected:
+  value_type &lhs;
+  auto push_back_null_sentinel() -> void;
+};
+#entail rigging.unit.detail.Containerized.string
+#endiv
+#divert <ipp>
+template<typename CONTAINER> rigging::unit::detail::Containerized<CONTAINER>::Containerized(value_type &arg)
+  : lhs(arg) {
+  ;
+}
+
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(assignment::Clear) -> Containerized & {
+  lhs.clear();
+  return *this;
+}
+
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(value_type const &rhs) -> Containerized & {
+  lhs = rhs;
+  return *this;
+}
+
+#import std.forward
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(value_type &&rhs) -> Containerized & {
+  lhs = std::forward<value_type>(rhs);
+  return *this;
+}
+
+#import rigging.unit.Stringz
+#import std.copy
+#import std.back_inserter
+template<typename CONTAINER> template<std::size_t N> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(base_type const (&rhs)[N]) -> Containerized & {
+  // WATCHOUT - we want the Stringz variant, not the Buffer variant
+  // because presumably there is a '\0' sentinel buried at the end of rhs, at least at rhs[N-1]
+  rigging::unit::Stringz buf(rhs);
+  return operator=(buf);
+}
+
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(Buffer rhs) -> Containerized & {
+  lhs.clear();
+  auto bii = std::back_inserter(lhs);
+  std::copy(rhs.begin(), rhs.end(), bii);
+  push_back_null_sentinel(); // <-------- WATCHOUT this is necessary because Buffer does not need it, but, Container (simulating stringz) does not
+  return *this;
+}
+
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::operator=(Stringz rhs) -> Containerized & {
+  lhs.clear();
+  auto bii = std::back_inserter(lhs);
+  std::copy(rhs.begin(), rhs.end(), bii);
+  push_back_null_sentinel(); // <-------- WATCHOUT this is necessary because Stringz makes this implicit, Container does not
+  return *this;
+}
+
+template<typename CONTAINER> auto rigging::unit::detail::Containerized<CONTAINER>::push_back_null_sentinel() -> void {
+  // You may need to specialize this one function if the CONTAINER can handle its own null-at-end sentinel
+  lhs.push_back('\0');
+}
+#endiv

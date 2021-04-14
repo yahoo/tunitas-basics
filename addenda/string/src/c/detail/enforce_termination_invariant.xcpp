@@ -1,0 +1,68 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+namespace c {
+  namespace detail {
+    //
+    // In support of the data invariants of stringz, environv, string, argv, etc.
+    //
+    // FINAL means that the ZERO sentinel is exactly the final element of the container or iterator bounded-range
+    //       ZERO == container.back() and !container.empty()
+    //       ZERO == finish[-1] and start < finish
+    //   Example: buffer cat = { 'c' 'a' 't' '\0' }
+    //
+    // EMBEDDED means the ZERO sentinel is at least at the final element of the container or iterator bounded-range
+    //          means that the ZERO sentinel may be within the container or within the bounded range as well.
+    //   Example: buffer kittycat = { 'k' 'i' 't' 't' 'y' '\0' 'c' 'a' 't' '\0' }
+    //
+    // This throws std::invalid_argument if no element at or before [N] is not "the zero"
+    enum class FINAL { };
+    template<typename CONTAINER, typename VALUE> inline auto enforce_termination_invariant(FINAL, CONTAINER const &, VALUE zero, char const *zero_name) -> void;
+    template<typename ITERATOR, typename VALUE> inline auto enforce_termination_invariant(FINAL, ITERATOR start, ITERATOR finish, VALUE zero, char const *zero_name) -> void;
+    enum class EMBEDDED { };
+    template<typename CONTAINER, typename VALUE> inline auto enforce_termination_invariant(EMBEDDED, CONTAINER const &, VALUE zero, char const *zero_name) -> void;
+    template<typename ITERATOR, typename VALUE> inline auto enforce_termination_invariant(EMBEDDED, ITERATOR start, ITERATOR finish, VALUE zero, char const *zero_name) -> void;
+
+    inline auto throw_sentinel_was_not_found(char const *zero_name) -> void;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CONTAINER, typename VALUE> auto c::detail::enforce_termination_invariant(FINAL, CONTAINER const &container, VALUE zero, char const *zero_name) -> void {
+  if (container.empty() || zero != container.back()) {
+    throw_sentinel_was_not_found(zero_name);
+  }
+}
+
+template<typename ITERATOR, typename VALUE> auto c::detail::enforce_termination_invariant(FINAL, ITERATOR start, ITERATOR finish, VALUE zero, char const *zero_name) -> void {
+  if (start == finish || zero != *(finish-1)) {
+    throw_sentinel_was_not_found(zero_name);
+  }
+}
+
+template<typename CONTAINER, typename VALUE> auto c::detail::enforce_termination_invariant(EMBEDDED embedded, CONTAINER const &container, VALUE zero, char const *zero_name) -> void {
+  enforce_termination_invariant(embedded, container.begin(), container.end(), zero, zero_name);
+}
+
+#import std.is_same
+#import std.iterator_traits
+#import std.reverse_iterator
+template<typename ITERATOR, typename VALUE> auto c::detail::enforce_termination_invariant(EMBEDDED, ITERATOR start, ITERATOR finish, VALUE zero, char const *zero_name) -> void {
+  using value_type = typename std::iterator_traits<ITERATOR>::value_type;
+  static_assert(std::is_same<value_type, VALUE>::value, "VALUE is different than CONTAINER::value_type");
+  using riterator = std::reverse_iterator<ITERATOR>;
+  for (riterator i(finish), e(start); e != i; ++i) {
+    if (zero == *i) {
+      return; // ok
+    }
+  }
+  throw_sentinel_was_not_found(zero_name);
+}
+
+#import std.invalid_argument
+#import std.ostringstream
+auto c::detail::throw_sentinel_was_not_found(char const *zero_name) -> void {
+  std::ostringstream buf;
+  buf << "the terminating " << zero_name << " sentinel was not found";
+  throw std::invalid_argument(buf.str());
+}
+#divert </ipp>

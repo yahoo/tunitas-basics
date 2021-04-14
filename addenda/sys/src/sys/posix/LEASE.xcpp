@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // Constants suitable for use in getlease(3) and setlease(3).
+  //
+  // Compatibility and uniformity of naming.
+  // We have LOCK contra LEASE.
+  //
+  // Alternatives:
+  //   struct LOCK which inherits from LEASE for ...historical... reasons
+  //   namespace sys::lease
+  //
+  // Pattern:
+  //   struct-as-namespace.
+  //
+  // Usage:
+  //
+  //   auto got = getlease(fd);
+  //   auto sat = setlease(fd, LEASE::READ);
+  //   auto sat = setlease(fd, LEASE::WRITE);
+  //   auto sat = setlease(fd, LEASE::END);
+  //
+  //   auto sat = setlease(fd, LEASE::UNLOCK);
+  //   auto sat = setlease(fd, LEASE::READ);
+  //   auto sat = setlease(fd, LEASE::WRITE);
+  //   auto sat = setlease(fd, LEASE::UN);
+  //
+  struct LEASE;
+}
+#endiv
+#divert <hpp>
+#import sys.lease.Operation
+#import sys.lease.constants
+struct sys::posix::LEASE {
+  using Operation = lease::Operation;
+  inline static constexpr auto READ   = lease::READ;
+  inline static constexpr auto WRITE  = lease::WRITE;
+  inline static constexpr auto END    = lease::END;
+  [[deprecated("spell it out! instead, prefer LEASE::END")]] inline static constexpr auto UNLOCK   = lease::UNLOCK;
+  [[deprecated("spell it out! instead, prefer LEASE::END")]] inline static constexpr auto ENDLEASE = lease::UNLOCK;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("spell it out! instead, prefer LEASE::READ")]]  inline static constexpr auto RD = lease::RD;
+  [[deprecated("spell it out! instead, prefer LEASE::WRITE")]] inline static constexpr auto WR = lease::WR;
+  [[deprecated("spell it out! instead, prefer LEASE::END")]]   inline static constexpr auto UN = lease::UN;
+#pragma GCC diagnostic pop
+  LEASE() = delete;
+  LEASE(LEASE const &) = delete;
+  auto operator=(LEASE const &) -> LEASE & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_LEASE.Usage
+static_assert(tests::usage::posix_LEASE::Usage<>);
+#endiv

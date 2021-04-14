@@ -49,36 +49,53 @@ if [[ -z ${with_std_scold} ]] ; then
 fi
 : ${with_siblings:=${PWD%/*}}
 #
-# What is in the "nearby" area?
-# but priority for anything below us in the submodules?
+# What is in the "nearby" area?  Maybe it is in /build
+# But priority for anything below us in the submodules?
 #
-if [[ -d ${PWD%/*}/nearby ]] ; then
-    : ${with_nearby:=${PWD%/*}/nearby}
+if [[ -n $with_build ]] ; then
+    # The "build" directory is a meta-meta area, e.g. /build, with sublocations for tunitas, state-space, scold, nonstd, adhoc and so on.
+    : ${with_tunitas_nearby:=${with_build?}/tunitas}
+    : ${with_scold_nearby:=${with_build?}/scold}
+elif [[ -n $with_nearby ]] ; then
+    # The "nearby" directory is a convenience directory ... nearby ... that blends it all together.
     : ${with_tunitas_nearby:=${with_nearby?}}
     : ${with_scold_nearby:=${with_nearby?}}
 elif [[ -d /build/tunitas ]] && [[ -d /build/scold ]] ; then
-    : ${with_nearby:=/build}
-    : ${with_tunitas_nearby:=${with_nearby?}/tunitas}
-    : ${with_scold_nearby:=${with_nearby?}/scold}
+    # guess at /build
+    : ${with_build:=/build}
+    : ${with_tunitas_nearby:=${with_build?}/tunitas}
+    : ${with_scold_nearby:=${with_build?}/scold}
+elif [[ -d ${PWD%/*}/nearby ]] ; then
+    # guess at .../nearby
+    : ${with_nearby:=${PWD%/*}/nearby}
+    : ${with_tunitas_nearby:=${with_nearby?}}
+    : ${with_scold_nearby:=${with_nearby?}}
 else
+    # this won't work because ... there is no obvious default
+    : ${with_build:=no}
     : ${with_nearby:=no}
     : ${with_tunitas_nearby:=${with_nearby?}}
     : ${with_scold_nearby:=${with_nearby?}}
 fi
-: ${with_submodules:=no} # nope ..... : ${with_submodules:=${PWD}/submodules} # must be a full path
-declare __submodules_nearby
-if [[ no == ${with_submodules:-no} ]] ; then
-    # could be no
-    __submodules_nearby=no
-elif [[ yes == ${__submodules_nearby:-no} ]] ; then
-    __submodules_nearby=$(realpath ./submodules)
-    { echo "${0##*/}: warning, submodules should not be merely 'yes'"
-      echo "${0##*/}: warning, submodules should be a full path"
-      echo "${0##*/}: notice, continuing with ${__submodules_nearby?}"; } 1>&2
-else
-    # [[unchecked]] musn't be merely 'yes' or a non-existent directory 
-    __submodules_nearby=$(realpath ${with_submodules?})
-fi
+{
+    #
+    # AVOID using submodules.
+    #
+    : ${with_submodules:=no} # nope ..... : ${with_submodules:=${PWD}/submodules} # must be a full path
+    declare __submodules_nearby
+    if [[ no == ${with_submodules:-no} ]] ; then
+        # could be no
+        __submodules_nearby=no
+    elif [[ yes == ${__submodules_nearby:-no} ]] ; then
+        __submodules_nearby=$(realpath ./submodules)
+        { echo "${0##*/}: warning, submodules should not be merely 'yes'"
+          echo "${0##*/}: warning, submodules should be a full path"
+          echo "${0##*/}: notice, continuing with ${__submodules_nearby?}"; } 1>&2
+    else
+        # [[unchecked]] musn't be merely 'yes' or a non-existent directory 
+        __submodules_nearby=$(realpath ${with_submodules?})
+    fi
+}
 #
 # Decide the defaults
 # you can always override the defaults from the command line, but that can be onerous
@@ -135,7 +152,7 @@ fi
 : ${with_nonstd_libhttpserver:=/opt/nonstd/libhttpserver} # ... REQUIRED at least nonstd-libhttpserver-0.9.0-8.1.ipv6+poll+regex
 : ${with_nonstd_half:=/opt/nonstd/half} # ..................... REQUIRED because there is no "standard half"
 # ${with_nonstd_jsoncpp:=/opt/nonstd/jsoncpp} # ............... OPTIONAL
-: ${with_temerarious_flagship:=${with_siblings?}/temerarious-flagship}
+: ${with_temerarious_flagship:=${with_tunitas_nearby?}/temerarious-flagship}
 eval \
     ${prefix:+prefix=$prefix} \
     ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \

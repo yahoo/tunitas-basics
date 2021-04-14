@@ -1,0 +1,11 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Const_Iterator
+namespace nonstd::required::container {
+  //
+  // A cute alias
+  // Too cute.
+  //
+  template<typename CONTAINER> concept Constie = Const_Iterator<CONTAINER>;
+}
+#endiv

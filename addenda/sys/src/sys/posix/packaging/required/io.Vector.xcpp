@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import iovec
+#import std.is_same
+#import std.remove_const
+namespace sys::posix::packaging::required {
+  //
+  // Is this an 'io::Vector' or 'io::Vector const'?
+  // a.k.a. is this an 'iovec' or 'iovec const'?
+  //
+  // Positioned in packaging::iov::interface as the idiomatic 'io::Vector'
+  //
+  // Usage:
+  //
+  //   oh come on
+  // 
+  template<typename VECTOR> concept bool Vector = std::is_same_v<std::remove_const_t<VECTOR>, ::iovec>;
+}
+#endiv

@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::exits {
+  //
+  // The simplified Condition corresponding to the nearby Code.
+  // For use with std::error_condition
+  //
+  // Usage:
+  //
+  //   Condition c = Condition::SUCCESS;
+  //   Condition c = Condition::FAILURE;
+  //
+  //
+  enum class Condition { SUCCESS = 0, FAILURE = 1 };
+}
+#endiv
+#divert <hpp>
+namespace sys::exits {
+  //
+  // Usage:
+  //
+  //   if (ok(c)) { ... }
+  //   if (failure(c)) { ... }
+  //
+  inline auto ok(Condition) -> bool;
+  inline auto success(Condition) -> bool;
+  inline auto failure(Condition) -> bool;
+  //
+  // operator==, operator!= already exist
+  //
+  // Accreting failure conditions across a series
+  inline auto operator|(Condition, Condition) -> Condition;
+  inline auto operator|=(Condition &, Condition) -> Condition &;
+  // Accreting success conditions across a series
+  inline auto operator&(Condition, Condition) -> Condition;
+  inline auto operator&=(Condition &, Condition) -> Condition &;
+}
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import std.basic_ostream
+namespace sys::exits {
+  template<nonstd::required::Character CHAR, nonstd::required::Character_Traits TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Condition) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+auto sys::exits::ok(Condition condition) -> bool {
+  return success(condition);
+}
+auto sys::exits::success(Condition condition) -> bool {
+  return Condition::SUCCESS == condition;
+}
+auto sys::exits::failure(Condition condition) -> bool {
+  return !ok(condition);
+}
+auto sys::exits::operator&(Condition a, Condition b) -> Condition {
+  //
+  // saturate the success (this is boolean AND implemented on true-coded-as-zero) 
+  // definition:
+  //   Condition c = a & b
+  //   c succeeds if a and b succeeded
+  //
+  return ok(a) ? b : a;
+}
+
+auto sys::exits::operator&=(Condition &lhs, Condition rhs) -> Condition & {
+  lhs = lhs & rhs;
+  return lhs;
+}
+auto sys::exits::operator|(Condition a, Condition b) -> Condition {
+  //
+  // absorb the failures (this is boolean OR implemented on true-coded-as-zero)
+  // definition:
+  //   Condition c = a | b;
+  //   c fails if both a or b failed
+  //
+  return ok(a) ? a : b;
+}
+auto sys::exits::operator|=(Condition &lhs, Condition rhs) -> Condition & {
+  lhs = lhs | rhs;
+  return lhs;
+}
+template<nonstd::required::Character CHAR, nonstd::required::Character_Traits TRAITS> auto sys::exits::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Condition c) -> std::basic_ostream<CHAR, TRAITS> & {
+  CHAR const leader[]{'e','x','i','t',' ','\0'};  // make the compiler widen char -> CHAR
+  return o << leader << (int)c;
+}
+#endiv

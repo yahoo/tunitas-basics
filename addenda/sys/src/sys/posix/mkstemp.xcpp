@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.filesystem.path
+#import std.string
+#import std.vector
+#import sys.call.result.Value
+namespace sys::posix {
+  // To Wit: Always use mkstemp, never use mktemp.
+  //
+  // The TEMPLATE must be a (narrow-)character string specifying a
+  // template pattern in which the last six characters are "XXXXXX"
+  // See mktemp(3).  Perhaps prefer mkstemp(3).   Also see mkdtemp(3)
+  //
+  // Returns a live file descriptor which must be closed by the caller.
+  inline auto mkstemp(std::string TEMPLATE) -> call::result::Value<int, std::filesystem::path>;
+  // 
+  inline auto mkstemp(std::vector<char> &TEMPLATE_modified_in_place) -> call::result::Value<int>;
+}
+#endiv
+#divert <ipp>
+#import mkstemp
+#import sys.posix.detail.mk_temp
+auto sys::posix::mkstemp(std::string TEMPLATE) -> call::result::Value<int, std::filesystem::path> {
+  using Result = call::result::Value<int, std::filesystem::path>;
+  auto fd = ::mkstemp(TEMPLATE.data());
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = 0 <= fd;
+  return Result(ok, errnum, fd, TEMPLATE.data());
+}
+#import std.invalid_argument
+auto sys::posix::mkstemp(std::vector<char> &TEMPLATE_modified) -> call::result::Value<int> {
+  using Result = call::result::Value<int>;
+  if (TEMPLATE_modified.empty() || '\0' != TEMPLATE_modified.back()) {
+    throw std::invalid_argument("mkstemp vector<char> template has no nul char sentinel at the end");
+  }
+  auto fd = ::mkstemp(TEMPLATE_modified.data());
+  auto errnum = errno; // capture the value of errno before doing anything else
+  auto ok = 0 <= fd;
+  return Result(ok, errnum, fd);
+}
+#endiv

@@ -1,0 +1,68 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sys.time.durations.literals
+namespace sys {
+  namespace time {
+    namespace durations {
+      namespace literals {
+
+	// Long (plural)
+	constexpr inline fractional operator"" _nanoseconds(long double);
+	constexpr inline fractional operator"" _microseconds(long double);
+	constexpr inline fractional operator"" _milliseconds(long double);
+	constexpr inline fractional operator"" _seconds(long double);
+	constexpr inline fractional operator"" _minutes(long double);
+	constexpr inline fractional operator"" _hours(long double);
+	constexpr inline fractional operator"" _days(long double);
+	constexpr inline fractional operator"" _weeks(long double);
+	constexpr inline fractional operator"" _months(long double);
+	constexpr inline fractional operator"" _years(long double);
+
+      }
+    }
+  }
+}
+
+#import sys.time.duration_cast
+
+constexpr auto sys::time::durations::literals::operator"" _nanoseconds(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::nanoseconds(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _microseconds(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::microseconds(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _milliseconds(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::milliseconds(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _seconds(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::seconds(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _minutes(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::minutes(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _hours(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::hours(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _days(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::days(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _weeks(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::weeks(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _months(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::months(d));
+}
+
+constexpr auto sys::time::durations::literals::operator"" _years(long double d) -> fractional {
+    return duration_cast<fractional>(durations::fractional::years(d));
+}
+#endiv

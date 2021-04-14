@@ -1,0 +1,19 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 1
+
+cd ${0%/*}
+set -e
+
+test bull = "$(parse --frog=bull frog)"
+test "" = "$(parse --frog -- frog)"
+
+test "green" = "$(parse --frog=green -- frog)"
+test "green" = "$(parse -fgreen -- frog)"
+# n.b. the syntax does not support optional arguments being "next"
+#      NOT accepted: parse --frog green -- frog
+#      as the 'green' word is treated as a succeeding non-option word (a query)
+
+test "kermit" = "$(parse -fkermit -- frog)"
+
+test billy = "$(parse --goat=billy goat)"
+test mountain = "$(parse -gmountain --apple goat)"

@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flock.Operation
+namespace sys::lock::fcntl {
+  //
+  // Suitable for use as the 3rd argument to fcntl(2) under the lock setters: F:{OFD_,}SET{LK,LK64}
+  // Also available in sys::posix::F as manifest constants.
+  //
+  //   auto called = fcntl(fd, F::SET,  struct flock { .l_type{F::RDLCK} ...somehow... });
+  //   auto called = fcntl(fd, F::SET64, struct flock { .l_type{F::WRLCK} ...somehow... });
+  //   auto called = fcntl(fd, F::OFD_SET, struct flock { .l_type{F::UNLCK} ...somehow... });
+  //   auto called = fcntl(fd, F::OFD_SET64, struct flock { .l_type{F::UNLCK} ...somehow... });
+  //
+#if 1
+  using Operation = flock::Operation;
+#else
+  // [[REMOVEWHEN]] whenever
+  enum class Operation {
+    READ = F_RDLCK,
+    RDLCK [[deprecated("buy a vowel, instead prefer READ")]] = READ,
+    RD [[deprecated("buy a vowel, instead prefer READ")]] = READ,
+    WRITE = F_WRLCK,
+    WRLCK [[deprecated("buy a vowel, instead prefer WRITE")]] = WRITE,
+    WR [[deprecated("buy a vowel, instead prefer WRITE")]] = WRITE,
+    UNLOCK = F_UNLCK,
+    UNLCK [[deprecated("buy a vowel, instead prefer UNLOCK")]] = UNLOCK,
+    UN [[deprecated("buy a vowel, instead prefer UNLOCK")]] = UNLOCK,
+  };
+#endif
+}
+#endiv

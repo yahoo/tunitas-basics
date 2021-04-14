@@ -1,0 +1,35 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.detail.normcore.Components
+namespace c {
+  namespace detail {
+    namespace normcore {
+      template<template<typename FIRST, typename SECOND> class PAIRLIKE, typename FIRST, typename SECOND> struct Components<PAIRLIKE, FIRST, SECOND, false>;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import c.detail.normcore.Accessor
+#import std.is_integral
+#import std.is_pointer
+template<template<typename FIRST, typename SECOND> class PAIRLIKE, typename FIRST, typename SECOND> struct c::detail::normcore::Components<PAIRLIKE, FIRST, SECOND, false> {
+  static_assert(std::is_pointer<FIRST>::value, "FIRST is not a pointer (representing a character string or vector of character strings)");
+  static_assert(std::is_integral<SECOND>::value, "SECOND is not an integer (representing a size)");
+  using accessor = Accessor<PAIRLIKE<FIRST, SECOND>>;
+  using first_type = FIRST;
+  using second_type = SECOND;
+  static constexpr bool const FLIP = false;
+  template<typename tFIRST, typename tSECOND> using pairlike_template = PAIRLIKE<tFIRST, tSECOND>;
+  using pairlike_type = PAIRLIKE<first_type, second_type>;
+  template<typename tFIRST, typename tSECOND> using result_template = PAIRLIKE<tFIRST, tSECOND>; // <--- FLIP=false => no swap
+  using result_type = PAIRLIKE<first_type, second_type>;
+  using refirst_type = first_type;
+  using resecond_type = second_type;
+};
+#divert </hpp>

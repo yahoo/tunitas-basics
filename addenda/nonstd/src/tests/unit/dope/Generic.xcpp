@@ -1,0 +1,136 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::dope {
+  template<typename DOPE> class Generic;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+template<typename DOPE> class tests::unit::dope::Generic : public cppunit::test::Fixture {
+public:
+  using Subject = DOPE;
+  using Value = typename DOPE::Value;
+  //
+  // WATCHOUT - this does not test the mutable-vs-consty variants
+  //            it only tests one variant if there are two available.
+  //
+  auto test_constructor_default() -> void;
+  auto test_data() -> void;
+  auto test_size() -> void;
+  auto test_empty() -> void;
+  auto test_begin_end() -> void;
+  auto test_front() -> void;
+  auto test_back() -> void;
+  auto test_at_good() -> void;
+  auto test_at_fail() -> void;
+  auto test_operator_index() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  inline static auto g(unsigned v) -> Value { return Value(v); }
+  inline static constexpr auto SPECIMEN_SIZE = 10u;
+};
+#endiv
+#divert <tpp>
+#import std.distance
+namespace tests::unit::dope {
+  template<typename _> auto Generic<_>::test_constructor_default() -> void {
+    Subject subject;
+    CPPUNIT_ASSERT(subject.empty());
+  }
+  template<typename _> auto Generic<_>::test_data() -> void {
+    Value specimen[SPECIMEN_SIZE]{};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.data(); // <------------- test this
+    CPPUNIT_ASSERT(nullptr != actual);
+  }
+  template<typename _> auto Generic<_>::test_size() -> void {
+    Value specimen[SPECIMEN_SIZE]{};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.size(); // <------------- test this
+    CPPUNIT_ASSERT(SPECIMEN_SIZE == actual);
+  }
+  template<typename _> auto Generic<_>::test_empty() -> void {
+    Value specimen[SPECIMEN_SIZE]{};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.empty(); // <------------- test this
+    CPPUNIT_ASSERT(false == actual);
+  }
+  template<typename _> auto Generic<_>::test_begin_end() -> void {
+    Value specimen[SPECIMEN_SIZE]{};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto count{0u};
+    for (auto unused : subject) { // <------------- test begin & end
+      unused = unused; // shut. up.
+      ++count;
+    }
+    CPPUNIT_ASSERT(SPECIMEN_SIZE == count);
+    auto const actual = std::distance(subject.begin(), subject.end());
+    CPPUNIT_ASSERT(SPECIMEN_SIZE == actual);
+  }
+  template<typename _> auto Generic<_>::test_front() -> void {
+    Value specimen[SPECIMEN_SIZE]{g(9),g(8),g(7),g(6),g(5),g(4),g(3),g(2),g(1),g(0)};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.front(); // <------------- test this
+    CPPUNIT_ASSERT(g(9) == actual);
+  }
+  template<typename _> auto Generic<_>::test_back() -> void {
+    Value specimen[SPECIMEN_SIZE]{g(9),g(8),g(7),g(6),g(5),g(4),g(3),g(2),g(1),g(0)};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.back(); // <------------- test this
+    CPPUNIT_ASSERT(g(0) == actual);
+  }
+  template<typename _> auto Generic<_>::test_at_good() -> void {
+    Value specimen[SPECIMEN_SIZE]{g(9),g(8),g(7),g(6),g(5),g(4),g(3),g(2),g(1),g(0)};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject.at(3); // <------------- test this
+    CPPUNIT_ASSERT(g(6) == actual);
+  }
+  template<typename _> auto Generic<_>::test_at_fail() -> void {
+    try {
+      Value specimen[SPECIMEN_SIZE]{};
+      Subject subject{&specimen[0], SPECIMEN_SIZE};
+      subject.at(300); // <------------- test this
+      CPPUNIT_ASSERT(false);
+    } catch (std::exception const &) {
+      CPPUNIT_ASSERT(true);
+    }
+  }
+  template<typename _> auto Generic<_>::test_operator_index() -> void {
+    Value specimen[SPECIMEN_SIZE]{g(9),g(8),g(7),g(6),g(5),g(4),g(3),g(2),g(1),g(0)};
+    Subject subject{&specimen[0], SPECIMEN_SIZE};
+    auto const actual = subject[4]; // <------------- test this
+    CPPUNIT_ASSERT(g(5) == actual);
+  }
+}
+#import rigging.suite.io
+#import std.type_info
+template<typename _> auto tests::unit::dope::Generic<_>::suite() -> cppunit::Test * {
+  using namespace std::string_literals;
+  using namespace ::rigging::suite;
+  Stream series{"basic_dope<"s + typeid(Value).name() + ">"s};
+  {
+    Stream con("constructor");
+    con << call("default", &Generic::test_constructor_default)
+      ;
+    series << move(con);
+  }
+  series << call("data", &Generic::test_data)
+         << call("size", &Generic::test_size)
+         << call("empty", &Generic::test_empty)
+         << call("begin", &Generic::test_begin_end)
+         << call("front", &Generic::test_front)
+         << call("back", &Generic::test_back)
+         << call("operator[]", &Generic::test_operator_index)
+    ;
+  {
+    Stream at("at");
+    at << call("good", &Generic::test_at_good)
+       << call("fail", &Generic::test_at_fail)
+      ;
+    series << move(at);
+  }
+  return finalize(series);
+}
+#endiv

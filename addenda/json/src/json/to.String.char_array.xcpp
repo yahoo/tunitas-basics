@@ -1,0 +1,25 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import json.to.String.ARGUMENT
+#import std.size_t
+namespace json {
+  //
+  // This is essentially a constructor call
+  // converting "to" a String "from" the ARGUMENT which is a manifest array
+  //
+  // For usage scenarios, see the commentariat in json.to.String.ARGUMENT
+  //
+  template<std::size_t N> inline auto to(STRING, char const (&)[N]) -> String;
+}
+#endiv
+#divert <ipp>
+#import std.move
+#import std.string
+template<std::size_t N> inline auto json::to(STRING, char const (&array)[N]) -> String {
+  // DO NOT use ---> std::string cooked(&array[0], &array[N])
+  // as that adds the \0 at the end fo the array right into the string.
+  std::string parboiled(&array[0]);
+  json::String boiled(tag::String(), std::move(parboiled));
+  return std::move(boiled);
+}
+#endiv

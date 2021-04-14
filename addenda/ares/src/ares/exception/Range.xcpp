@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::exception {
+  //
+  // An access attempt has occurred for an element which is out of the valid range of the contanier.
+  //
+  // As with std::runtime_error, the "reason" argument is always copied.
+  // The constructor interface attempts to provide a way to avoid duplicate construction of a std::string at the call site.
+  //
+  // Usage:
+  //
+  //   try {
+  //     throw Range{};
+  //     throw Range{"function-name"};
+  //   } catch (Aspect const &) {
+  //     ...recover...
+  //   }
+  //
+  class Range;
+}
+#endiv
+#divert <hpp>
+#import ares.exception.Aspect
+#import std.out_of_range
+#import re.string
+#import c.const_stringz
+class ares::exception::Range : public Aspect, public std::out_of_range {
+  struct ancestors {
+    using Aspect = ares::exception::Aspect;
+    using Exception = std::out_of_range;
+  };
+public:
+  inline Range();
+  inline explicit Range(re::string<c::const_stringz> reason);
+  auto what() const noexcept -> char const * override;
+};
+#endiv
+#divert <ipp>
+namespace ares::exception {
+  Range::Range()
+    : ancestors::Exception{"out of range"}
+  { }
+  Range::Range(re::string<c::const_stringz> reason)
+    : ancestors::Exception{reason.c_str()}
+  { }
+}
+#endiv
+#divert <cpp>
+auto ares::exception::Range::what() const noexcept -> char const * {
+  return ancestors::Exception::what();
+}
+#endiv

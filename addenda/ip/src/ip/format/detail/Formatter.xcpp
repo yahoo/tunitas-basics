@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.format.required.in // Either
+namespace ip::format::detail {
+  //
+  // An address is insertable with operator<<
+  //
+  template<required::in::Either EITHER> class Formatter;
+}
+#entail ip.format.detail.Formatter.Address
+#entail ip.format.detail.Formatter.Optional
+#endiv
+#divert <hpp>
+template<ip::format::required::in::Either EITHER> class ip::format::detail::Formatter {
+protected:
+  ~Formatter() = default; // descendants only
+public:
+  using value_type = EITHER;
+  inline explicit Formatter(value_type const &);
+  value_type value;
+};
+
+#import format.detail.ifnot.traits.Sizer
+namespace format::detail::ifnot::traits {
+  template<ip::format::required::in::Either EITHER> struct Sizer<ip::format::detail::Formatter<EITHER>> {
+    using Subsizer = Sizer<EITHER>;
+  public:
+    using value_type = ip::format::detail::Formatter<EITHER>; // NOT Formatter<EITHER> a.k.a. format::detail::Formatter<EITHER>
+    inline static constexpr auto is_null(value_type const &subject) -> bool { return Subsizer::is_null(subject.value); }
+    inline static constexpr auto is_empty(value_type const &subject) -> bool { return Subsizer::is_empty(subject.value); }
+  };
+}
+#endiv
+#divert <ipp>
+namespace ip::format::detail {
+  template<required::in::Either EITHER> Formatter<EITHER>::Formatter(value_type const &value)
+    : value(value) {
+    ;
+  }
+}
+#endiv
+

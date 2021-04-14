@@ -1,0 +1,4 @@
+#divert <hpp>
+#import nonstd.path.filename.desuffix
+namespace [[deprecated]] path { namespace [[deprecated]] filename { using ::nonstd::path::filename::desuffix; } }
+#endiv

@@ -1,0 +1,23 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.required.Fixture>
+#endiv
+#divert <hpp>
+struct tests::unit::required::fixture::Fixture::Specimens {
+  struct Not_Default_Constructible {
+    Not_Default_Constructible(int);
+  };
+  struct Not_Copy_Constructible {
+    Not_Copy_Constructible(Not_Copy_Constructible const &) = delete;
+  };
+  struct Not_Copy_Assignable {
+    auto operator=(Not_Copy_Assignable const &) -> Not_Copy_Assignable & = delete;
+  };
+  struct Not_Move_Constructible {
+    Not_Move_Constructible(Not_Move_Constructible &&) = delete;
+  };
+  struct Not_Move_Assignable {
+    auto operator=(Not_Move_Assignable &&) -> Not_Move_Assignable & = delete;
+  };
+};
+#endiv

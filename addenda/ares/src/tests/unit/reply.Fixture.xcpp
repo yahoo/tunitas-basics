@@ -1,0 +1,120 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::reply { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::reply::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_Record_A() -> void;
+  auto test_usage_Record_AAAA() -> void;
+  auto test_usage_Record_MX() -> void;
+  auto test_usage_Record_NAPTR() -> void;
+  auto test_usage_Record_NS() -> void;
+  auto test_usage_Record_PTR() -> void;
+  auto test_usage_Record_SOA() -> void;
+  auto test_usage_Record_SRV() -> void;
+  auto test_usage_Record_TXT() -> void;
+  auto test_usage_Record_URI() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ares.key
+namespace tests::unit::reply {
+  using namespace ::ares::key;
+}
+#import ares.reply.Record.A
+auto tests::unit::reply::Fixture::test_usage_Record_A() -> void {
+  using namespace ::ares::reply;
+  Record<A> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.AAAA
+auto tests::unit::reply::Fixture::test_usage_Record_AAAA() -> void {
+  using namespace ::ares::reply;
+  Record<AAAA> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.MX
+auto tests::unit::reply::Fixture::test_usage_Record_MX() -> void {
+  using namespace ::ares::reply;
+  Record<MX> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.NAPTR
+auto tests::unit::reply::Fixture::test_usage_Record_NAPTR() -> void {
+  using namespace ::ares::reply;
+  Record<NAPTR> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.NS
+auto tests::unit::reply::Fixture::test_usage_Record_NS() -> void {
+  using namespace ::ares::reply;
+  Record<NS> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.PTR
+auto tests::unit::reply::Fixture::test_usage_Record_PTR() -> void {
+  using namespace ::ares::reply;
+  Record<PTR> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.SOA
+auto tests::unit::reply::Fixture::test_usage_Record_SOA() -> void {
+  using namespace ::ares::reply;
+  Record<SOA> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.SRV
+auto tests::unit::reply::Fixture::test_usage_Record_SRV() -> void {
+  using namespace ::ares::reply;
+  Record<SRV> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.TXT
+auto tests::unit::reply::Fixture::test_usage_Record_TXT() -> void {
+  using namespace ::ares::reply;
+  Record<TXT> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import ares.reply.Record.URI
+auto tests::unit::reply::Fixture::test_usage_Record_URI() -> void {
+  using namespace ::ares::reply;
+  Record<URI> subject;
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.reply.Record
+#import rigging.suite.io
+auto tests::unit::reply::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("reply");
+  {
+    Stream use("usage");
+#warning #if 0
+#if 0
+    use << call("Host", &Fixture::test_usage_Host)
+      ;
+#endif
+    {
+      Stream rec("Record");
+      rec << call("A", &Fixture::test_usage_Record_A)
+          << call("AAAA", &Fixture::test_usage_Record_AAAA)
+          << call("MX", &Fixture::test_usage_Record_MX)
+          << call("NAPTR", &Fixture::test_usage_Record_NAPTR)
+          << call("NS", &Fixture::test_usage_Record_NS)
+          << call("PTR", &Fixture::test_usage_Record_PTR)
+          << call("SOA", &Fixture::test_usage_Record_SOA)
+          << call("SRV", &Fixture::test_usage_Record_SRV)
+          << call("TXT", &Fixture::test_usage_Record_TXT)
+          << call("URI", &Fixture::test_usage_Record_URI)
+        ;
+      use << move(rec);
+    }
+    series << move(use);
+  }
+  return finalize(series);
+}
+#endiv

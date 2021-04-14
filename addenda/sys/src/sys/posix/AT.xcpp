@@ -1,0 +1,65 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // Prefer namespace sys::at;
+  //
+  // Usage:
+  //
+  //   using AT = sys::posix::AT;
+  //   auto fd = AT::FDCWD;
+  //   auto flags = AT::REMOVEDIR | AT::SYMLINK_FOLLOW;
+  //
+  struct AT;
+}
+#endiv
+#divert <hpp>
+#import sys.at.Cwd
+#import sys.at.Flag
+#import sys.at.Flags
+#import sys.at.constants
+#import sys.at.required.Flags
+#import sys.posix.required // cascade namespace required
+struct sys::posix::AT {
+  using Cwd = at::Cwd;
+  using Flag = at::Flag;
+  using Flags = at::Flags;
+  template<at::required::Flags RESULT> inline static auto as(Flag f) -> RESULT;
+  template<at::required::Flags RESULT> inline static auto as(Flags s) -> RESULT;
+  inline static constexpr auto FDCWD = at::FDCWD;
+  inline static constexpr auto NONE = at::NONE;
+  inline static constexpr auto SYMLINK_NOFOLLOW = at::SYMLINK_NOFOLLOW;
+  inline static constexpr auto SYMLINK_FOLLOW = at::SYMLINK_FOLLOW;
+  inline static constexpr auto REMOVE_DIRECTORY = at::REMOVE_DIRECTORY;
+  inline static constexpr auto NO_AUTOMOUNT = at::NO_AUTOMOUNT;
+  inline static constexpr auto EMPTY_PATH = at::EMPTY_PATH;
+  inline static constexpr auto EACCESS = at::EACCESS;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto REMOVEDIR = at::REMOVEDIR;
+#pragma GCC diagnostic pop
+  [[deprecated("prefer as<Flag>(Flags)")]] inline static auto flag(Flags) -> Flag;
+  [[deprecated("prefer as<Flag>(Flag)")]] inline static auto flag(Flag) -> Flag;
+  AT() = delete;
+  AT(AT const &) = delete;
+  auto operator=(AT const &) -> AT & = delete;
+};
+#endiv
+#divert <ipp>
+#import sys.at.as
+namespace sys::posix {
+  template<at::required::Flags RESULT> auto AT::as(Flag f) -> RESULT  { return at::as<RESULT>(f); }
+  template<at::required::Flags RESULT> auto AT::as(Flags s) -> RESULT { return at::as<RESULT>(s); }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  auto AT::flag(Flag f) -> Flag  { return at::as<Flag>(f); }
+  auto AT::flag(Flags s) -> Flag { return at::as<Flag>(s); }
+#pragma GCC diagnostic pop
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_AT.Usage
+static_assert(tests::usage::posix_AT::Usage<>);
+#endiv

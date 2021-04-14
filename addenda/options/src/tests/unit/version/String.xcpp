@@ -1,0 +1,203 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace version {
+      class String;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import options.Version
+class tests::unit::version::String : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  options::Version one;
+  options::Version two;
+  options::Version three;
+  options::Version four;
+
+  auto test_default_constructor() -> void;
+  auto test_iterator_constructor() -> void;
+  auto test_initializer_list_constructor() -> void;
+  // Actually all the vector constructors work here .. and there are a lot of those
+
+  auto test_operator_insert() -> void;
+
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+  auto test_operator_lt() -> void;
+  auto test_operator_le() -> void;
+  auto test_operator_gt() -> void;
+  auto test_operator_ge() -> void;
+
+  // pesky
+  auto test_lexicographic_prefixing() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.Version
+auto tests::unit::version::String::setUp() -> void {
+  one = options::Version{'\3', '\7', '\10'};
+  two = options::Version{'\0', '\1', '\x9'};
+  three = options::Version{'\0', '\1', '\x9', '\1'};
+  four = one;
+}
+
+auto tests::unit::version::String::tearDown() -> void {
+  one.clear();
+  two.clear();
+  three.clear();
+  four.clear();
+}
+
+auto tests::unit::version::String::test_default_constructor() -> void {
+  options::Version def;
+  CPPUNIT_ASSERT(def.empty());
+}
+
+#import std.string
+auto tests::unit::version::String::test_iterator_constructor() -> void {
+  std::string raw{'\1','\2', '\0'};
+  options::Version specimen(raw.begin(), raw.end());
+  CPPUNIT_ASSERT(3 == specimen.size());
+  CPPUNIT_ASSERT(1 == specimen[0]);
+  CPPUNIT_ASSERT(2 == specimen[1]);
+  CPPUNIT_ASSERT(0 == specimen[2]);
+}
+
+auto tests::unit::version::String::test_initializer_list_constructor() -> void {
+  options::Version specimen{'\x9','\x8', '\0', '\x1'};
+  CPPUNIT_ASSERT(4 == specimen.size());
+  CPPUNIT_ASSERT(9 == specimen[0]);
+  CPPUNIT_ASSERT(8 == specimen[1]);
+  CPPUNIT_ASSERT(0 == specimen[2]);
+  CPPUNIT_ASSERT(1 == specimen[3]);
+}
+
+#import std.ostringstream
+auto tests::unit::version::String::test_operator_insert() -> void {
+  options::Version specimen{'\1','\2', '\0'};
+  std::ostringstream buf;
+  buf << specimen;
+  CPPUNIT_ASSERT("v1.2.0" == buf.str()); 
+}
+
+auto tests::unit::version::String::test_operator_eq() -> void {
+  CPPUNIT_ASSERT(  (one == one) );
+  CPPUNIT_ASSERT( !(one == two) );
+  CPPUNIT_ASSERT( !(one == three) );
+  CPPUNIT_ASSERT(  (one == four) );
+}
+
+auto tests::unit::version::String::test_operator_ne() -> void {
+  CPPUNIT_ASSERT( !(one != one) );
+  CPPUNIT_ASSERT(  (one != two) );
+  CPPUNIT_ASSERT(  (one != three) );
+  CPPUNIT_ASSERT( !(one != four) );
+}
+
+auto tests::unit::version::String::test_operator_lt() -> void {
+  CPPUNIT_ASSERT( !(one < one) );
+  CPPUNIT_ASSERT( !(two < two) );
+  CPPUNIT_ASSERT(  (two < three) );
+}
+
+auto tests::unit::version::String::test_operator_le() -> void {
+  CPPUNIT_ASSERT(  (one <= one) );
+  CPPUNIT_ASSERT(  (two <= two) );
+  CPPUNIT_ASSERT(  (two <= three) );
+  CPPUNIT_ASSERT( !(one <= three) );
+}
+
+auto tests::unit::version::String::test_operator_gt() -> void {
+  CPPUNIT_ASSERT( !(one > one) );
+  CPPUNIT_ASSERT( !(two > two) );
+  CPPUNIT_ASSERT( !(two > three) );
+}
+
+auto tests::unit::version::String::test_operator_ge() -> void {
+  CPPUNIT_ASSERT(  (one >= one) );
+  CPPUNIT_ASSERT(  (two >= two) );
+  CPPUNIT_ASSERT( !(two >= three) );
+}
+
+#import std.ostringstream
+namespace {
+  inline auto s(options::Version const &v) -> std::string {
+    std::ostringstream buf;
+    buf << v;
+    return buf.str();
+  }
+
+  template<class InputIt1, class InputIt2>
+  inline auto lc(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) -> bool {
+    for ( ; (first1 != last1) && (first2 != last2); first1++, (void) first2++ ) {
+      if (*first1 < *first2) return true;
+      if (*first2 < *first1) return false;
+    }
+    return (first1 == last1) && (first2 != last2);
+  }
+}
+
+#import std.cout
+auto tests::unit::version::String::test_lexicographic_prefixing() -> void {
+  std::cout << std::boolalpha
+            << "\ntwo=" << two
+            << "\nthree=" << three
+            << "\nlc(two, three) " << lc(two.begin(), two.end(), three.begin(), three.end())
+            << "\nlc(three, two) " << lc(three.begin(), three.end(), two.begin(), two.end())
+            << "\noperator== " << operator==(two, three)
+            << "\noperator!= " << operator!=(two, three)
+            << "\noperator<  " << operator<(two, three)
+            << "\noperator<= " << operator<=(two, three)
+            << "\noperator>  " << operator>(two, three)
+            << "\noperator>= " << operator>=(two, three)
+            << "\n";
+
+  CPPUNIT_ASSERT( (s(two) < s(three)) );
+  CPPUNIT_ASSERT( (two < three) );
+
+  CPPUNIT_ASSERT( (s(two) <= s(three)) );
+  CPPUNIT_ASSERT( (two <= three) );
+
+  CPPUNIT_ASSERT(s(two) != s(three));
+  CPPUNIT_ASSERT(two != three);
+
+  CPPUNIT_ASSERT( !(s(two) > s(three)) );
+  CPPUNIT_ASSERT( !(two > three) );
+
+  CPPUNIT_ASSERT( !(s(two) >= s(three)) );
+  CPPUNIT_ASSERT( !(two >= three) );
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::version::String::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("version<<-string");
+  s << call("default", &String::test_default_constructor)
+    << call("iterator", &String::test_iterator_constructor)
+    << call("initializer", &String::test_initializer_list_constructor)
+    << call("operator<<", &String::test_operator_insert)
+    << call("operator==", &String::test_operator_eq)
+    << call("operator!=", &String::test_operator_ne)
+    << call("operator<", &String::test_operator_lt)
+    << call("operator<=", &String::test_operator_le)
+    << call("operator>", &String::test_operator_gt)
+    << call("operator>=", &String::test_operator_ge)
+    << call("lexicographic-prefixing", &String::test_lexicographic_prefixing)
+    ;
+  return finalize(s);
+}
+#endiv

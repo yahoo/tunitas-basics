@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.required.container.Holding
+#import std.string
+#import std.vector
+#import sys.call.Result
+#import sys.call.argument.Stringface
+namespace sys::posix {
+  //
+  // See sys.posix.execp.const_stringz
+  //
+  template<typename CONTAINER> inline auto execp(call::argument::Stringface, CONTAINER const &argv) -> call::Result
+    requires nonstd::required::container::Holding<CONTAINER, std::string>;
+  template<typename CONTAINER1, typename CONTAINER2> inline auto execp(call::argument::Stringface, CONTAINER1 const &argv, CONTAINER2 const &envv) -> call::Result
+    requires nonstd::required::container::Holding<CONTAINER1, std::string> && nonstd::required::container::Holding<CONTAINER2, std::string>;
+  // These are here to preserve ABI compatibility at 462:0:142; obviously they are subsumed by the template variant
+  inline auto execp(call::argument::Stringface, std::vector<std::string> const &argv) -> call::Result;
+  inline auto execp(call::argument::Stringface, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> call::Result;
+  // reminder: the ever-fungible template, nearby, handles the case of 
+  //           execp(command, ...strings...,  std::vector<std::string> const &envv) -> call::Result
+}
+#divert </hpp>
+#divert <ipp>
+#import c.const_stringz
+#import sys.call.argument.as
+#import sys.posix.packaging.exec.vec
+#import sys.posix.execp.const_stringz
+template<typename CONTAINER> auto sys::posix::execp(call::argument::Stringface command, CONTAINER const &argv) -> call::Result
+  requires nonstd::required::container::Holding<CONTAINER, std::string> {
+  using call::argument::as;
+  using packaging::exec::vec;
+  return execp(as<c::const_stringz>(command), vec(argv));
+}
+auto sys::posix::execp(call::argument::Stringface command, std::vector<std::string> const &argv) -> call::Result {
+  using call::argument::as;
+  using packaging::exec::vec;
+  return execp(as<c::const_stringz>(command), vec(argv));
+}
+#import c.const_stringz
+#import sys.posix.packaging.exec.vec
+template<typename CONTAINER1, typename CONTAINER2> auto sys::posix::execp(call::argument::Stringface command, CONTAINER1 const &argv, CONTAINER2 const &envv) -> call::Result
+  requires nonstd::required::container::Holding<CONTAINER1, std::string> && nonstd::required::container::Holding<CONTAINER2, std::string> {
+  using call::argument::as;
+  using packaging::exec::vec;
+  return execp(as<c::const_stringz>(command), vec(argv), vec(envv));
+}
+auto sys::posix::execp(call::argument::Stringface command, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> call::Result {
+  using call::argument::as;
+  using packaging::exec::vec;
+  return execp(as<c::const_stringz>(command), vec(argv), vec(envv));
+}
+#endiv

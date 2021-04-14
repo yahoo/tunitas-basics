@@ -1,0 +1,45 @@
+// -*- c++ -*- in the SCOLD stylings which are so popular these days
+#divert <hpp>
+#import std.string
+namespace ish {
+  namespace shell {
+    namespace detail {
+      inline auto dirname(std::string const &, std::string::size_type last) -> std::string;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import std.out_of_range
+auto ish::shell::detail::dirname(std::string const &path, std::string::size_type final) -> std::string {
+  //
+  // First, trim of any trailing '/' because that is what /bin/dirname does
+  // Witness:
+  //   $ /bin/dirname a/b/c////
+  //   a/b
+  //
+  if ( ! (0 < final && final < path.size()) ) {
+    throw std::out_of_range{"dirname"};
+  }
+  while (final > 0 && '/' == path[final]) {
+    final--;
+  }
+  std::string::size_type slash = path.rfind('/', final);
+  if (std::string::npos == slash) {
+    return ".";
+  } else {
+    //
+    // Specimen: banana/apple////cherry
+    //
+    while (slash > 0 && '/' == path[slash-1]) {
+      slash--;
+    }
+    if (0 == slash) {
+      return "/";
+    } else {
+      std::string result(path.substr(0, slash));
+      return result;
+    }
+  }
+}
+#endiv

@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.false_type // ... need the complete type
+#import std.true_type // .... ibidem.
+#import sys.id.required.Process
+#forward sys.wait.Status
+#forward sys.w.Options
+#forward sys.sig.Info
+#forward sys.r.Usages
+namespace sys::call::result::wait::required {
+  namespace constraint {
+    using id::required::Process;
+    using wait::Status;
+    using w::Options;
+    using Siginfo = sig::Info;
+    using r::Usages;
+    template<typename...> struct Registration : public std::false_type { };
+    template<Process PROCESS> struct Registration<PROCESS> : public std::true_type { };
+    template<Process PROCESS> struct Registration<PROCESS, Status> : public std::true_type { };
+    template<Process PROCESS> struct Registration<PROCESS, Siginfo> : public std::true_type { };
+    template<Process PROCESS> struct Registration<PROCESS, Usages> : public std::true_type { };
+    template<Process PROCESS> struct Registration<PROCESS, Status, Usages> : public std::true_type { };
+    template<typename... TYPES> concept bool Constraint = Registration<TYPES...>::value;
+  }
+  using constraint::Constraint;
+}
+#endiv
+#divert <cpp>
+#import id_t
+#import sys.wait.Identifier
+#import sys.id.Process
+namespace {
+  namespace tests {
+    using namespace sys;
+    namespace required = call::result::wait::required;
+    static_assert(required::Constraint<id::Process>);
+    static_assert(required::Constraint<pid_t>);
+    static_assert(required::Constraint<id::Process, wait::Status>);
+    static_assert(required::Constraint<pid_t, wait::Status>);
+    static_assert(required::Constraint<id::Process, sig::Info>);
+    static_assert(required::Constraint<pid_t, sig::Info>);
+    static_assert(required::Constraint<id::Process, r::Usages>);
+    static_assert(required::Constraint<pid_t, r::Usages>);
+    static_assert(required::Constraint<id::Process, wait::Status, r::Usages>);
+    static_assert(required::Constraint<pid_t, wait::Status, r::Usages>);
+    //
+    static_assert(!required::Constraint<wait::Identifier>);
+    static_assert(!required::Constraint<id_t>);
+    static_assert(!required::Constraint<wait::Identifier, wait::Status>);
+    static_assert(!required::Constraint<id_t, wait::Status>);
+    static_assert(!required::Constraint<wait::Identifier, sig::Info>);
+    static_assert(!required::Constraint<id_t, sig::Info>);
+    static_assert(!required::Constraint<wait::Identifier, r::Usages>);
+    static_assert(!required::Constraint<id_t, r::Usages>);
+    static_assert(!required::Constraint<wait::Identifier, wait::Status, r::Usages>);
+    static_assert(!required::Constraint<id_t, wait::Status, r::Usages>);
+  }
+}
+#endiv

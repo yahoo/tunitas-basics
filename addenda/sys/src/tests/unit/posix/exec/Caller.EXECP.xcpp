@@ -1,0 +1,99 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.posix.exec.Caller.declaration
+namespace tests::unit::posix::exec {
+  template<> struct Caller<caller::EXECP>;
+}
+#endiv
+#divert <hpp>
+#import c.const_stringz
+#import c.const_environv
+#import nonstd.required.Container
+#import std.string
+#import sys.call.Result
+#import sys.call.argument.Stringface
+namespace tests::unit::posix::exec {
+  template<> struct Caller<caller::EXECP> {
+    static auto name() -> std::string;
+    using Result = sys::call::Result;
+    using Stringface = sys::call::argument::Stringface;
+    //
+    static auto call(Stringface path, std::string const &) -> Result;
+    static auto call(Stringface path, std::string const &, c::const_environv) -> Result;
+    //
+    // We are not testing the overloading at this interface call site, but rather in the definitions of these interfaces
+    static auto call1(Stringface path, char const *) -> Result;
+    static auto call1(Stringface path, char const *, c::const_environv) -> Result;
+    static auto call2(Stringface path, char const *, char const *) -> Result;
+    static auto call2(Stringface path, char const *, char const *, c::const_environv) -> Result;
+    static auto call3(Stringface path, char const *, char const *, char const *) -> Result;
+    static auto call3(Stringface path, char const *, char const *, char const *, c::const_environv) -> Result;
+    static auto call4(Stringface path, char const *, char const *, char const *, char const *) -> Result;
+    static auto call4(Stringface path, char const *, char const *, char const *, char const *, c::const_environv) -> Result;
+    //
+    template<typename CONTAINER> static auto call(Stringface path, CONTAINER const &argv) -> Result requires nonstd::required::Container<CONTAINER>;
+    static auto call(Stringface, std::vector<std::string> const &argv) -> Result;
+    template<typename CONTAINER1, typename CONTAINER2> static auto call(Stringface path, CONTAINER1 const &argv, CONTAINER2 const &envv) -> Result requires nonstd::required::Container<CONTAINER1> && nonstd::required::Container<CONTAINER2>;
+    static auto call(Stringface, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> Result;
+  };
+}
+#endiv
+#divert <tpp>
+#import sys.posix.execp
+namespace tests::unit::posix::exec {
+  template<typename CONTAINER> auto Caller<caller::EXECP>::call(Stringface path, CONTAINER const &argv) -> Result requires nonstd::required::Container<CONTAINER> {
+    return sys::posix::execp(path, argv);
+  }
+  template<typename CONTAINER1, typename CONTAINER2> auto Caller<caller::EXECP>::call(Stringface path, CONTAINER1 const &argv, CONTAINER2 const &envv) -> Result requires nonstd::required::Container<CONTAINER1> && nonstd::required::Container<CONTAINER2> {
+    return sys::posix::execp(path, argv, envv);
+  }
+}
+#endiv
+#divert <cpp>
+#import c.str
+namespace tests::unit::posix::exec {
+  auto Caller<caller::EXECP>::name() -> std::string { return "execp"; }
+  auto Caller<caller::EXECP>::call(Stringface path, std::string const &one) -> Result {
+#if 0
+    // src/tests/unit/posix/exec/Caller.EXECP.xcpp:46:39: error: use of deleted function ‘sys::call::argument::Stringface::operator c::const_stringz() const’
+    return sys::posix::execp(path, one);
+#else
+    return sys::posix::execp(c::str(path), c::str(one));
+#endif
+  }
+  auto Caller<caller::EXECP>::call(Stringface path, std::string const &one, c::const_environv envv) -> Result {
+    return sys::posix::execp(c::str(path), c::str(one), envv);
+  }
+  auto Caller<caller::EXECP>::call1(Stringface path, char const *one) -> Result {
+    return sys::posix::execp(c::str(path), one);
+  }
+  auto Caller<caller::EXECP>::call1(Stringface path, char const *one, c::const_environv envv) -> Result {
+    return sys::posix::execp(c::str(path), one, envv);
+  }
+  auto Caller<caller::EXECP>::call2(Stringface path, char const *one, char const *two) -> Result {
+    return sys::posix::execp(c::str(path), one, two);
+  }
+  auto Caller<caller::EXECP>::call2(Stringface path, char const *one, char const *two, c::const_environv envv) -> Result {
+    return sys::posix::execp(c::str(path), one, two, envv);
+  }
+  auto Caller<caller::EXECP>::call3(Stringface path, char const *one, char const *two, char const *three) -> Result {
+    return sys::posix::execp(c::str(path), one, two, three);
+  }
+  auto Caller<caller::EXECP>::call3(Stringface path, char const *one, char const *two, char const *three, c::const_environv envv) -> Result {
+    return sys::posix::execp(c::str(path), one, two, three, envv);
+  }
+  auto Caller<caller::EXECP>::call4(Stringface path, char const *one, char const *two, char const *three, char const *four) -> Result {
+    return sys::posix::execp(c::str(path), one, two, three, four);
+  }
+  auto Caller<caller::EXECP>::call4(Stringface path, char const *one, char const *two, char const *three, char const *four, c::const_environv envv) -> Result {
+    return sys::posix::execp(c::str(path), one, two, three, four, envv);
+  }
+  auto Caller<caller::EXECP>::call(Stringface path, std::vector<std::string> const &argv) -> Result {
+    return sys::posix::execp(path, argv);
+  }
+  auto Caller<caller::EXECP>::call(Stringface path, std::vector<std::string> const &argv, std::vector<std::string> const &envv) -> Result {
+    return sys::posix::execp(path, argv, envv);
+  }
+}
+#endiv

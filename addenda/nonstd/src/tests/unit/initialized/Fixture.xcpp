@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::initialized { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::initialized::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_usage_basic() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import nonstd.initialized.Type
+auto tests::unit::initialized::Fixture::test_usage_basic() -> void {
+  using Subject = ::nonstd::initialized::Type<int>;
+  Subject subject;
+  CPPUNIT_ASSERT(0 == subject);
+  subject = 1;
+  CPPUNIT_ASSERT(1 == subject);
+  subject = Subject{2};
+  CPPUNIT_ASSERT(2 == subject);
+  auto s2 = (typename Subject::Value) subject;
+  CPPUNIT_ASSERT(s2 == subject);
+}
+#import nonstd.integers
+#import nonstd.initialized.Type
+#import tests.unit.initialized.Type
+#import std.byte
+#import rigging.suite.io
+auto tests::unit::initialized::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream suite("initialized");
+  {
+    Stream use("usage");
+    use << call("basic", &Fixture::test_usage_basic)
+      ;
+    suite << move(use);
+  }
+  namespace rig = tests::unit::initialized;
+  namespace dev = nonstd::initialized;
+  suite << add<rig::Type<dev::Type<bool>>>()
+        << add<rig::Type<dev::Type<char>>>()
+        << add<rig::Type<dev::Type<wchar_t>>>()
+#if 11 <= __GNUC__
+// ergo ccc 10 still does not have it
+// viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
+        << add<rig::Type<dev::Type<char8_t>>>()
+#endif
+        << add<rig::Type<dev::Type<char16_t>>>()
+        << add<rig::Type<dev::Type<char32_t>>>()
+        << add<rig::Type<dev::Type<unsigned char>>>()
+        << add<rig::Type<dev::Type<signed char>>>()
+        << add<rig::Type<dev::Type<int short signed>>>()
+        << add<rig::Type<dev::Type<int long unsigned>>>()
+        << add<rig::Type<dev::Type<int signed>>>()
+        << add<rig::Type<dev::Type<int unsigned>>>()
+        << add<rig::Type<dev::Type<int long signed>>>()
+        << add<rig::Type<dev::Type<int long unsigned>>>()
+        << add<rig::Type<dev::Type<int long long signed>>>()
+        << add<rig::Type<dev::Type<int long long unsigned>>>()
+        << add<rig::Type<dev::Type<nonstd::int128_t>>>()
+        << add<rig::Type<dev::Type<nonstd::uint128_t>>>()
+    ;
+  return finalize(suite);
+}
+#endiv

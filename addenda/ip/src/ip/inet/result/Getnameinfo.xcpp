@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip {
+  namespace inet {
+    namespace result {
+      template<typename... LOOKUPS> class Getnameinfo;
+    }
+  }
+}
+#entail ip.inet.result.Getnameinfo.HOST
+#entail ip.inet.result.Getnameinfo.SERVICE
+#entail ip.inet.result.Getnameinfo.HOST.SERVICE
+#endiv
+#divert <hpp>
+#import std.error_code
+#import ip.inet.error.Code
+namespace ip {
+  namespace inet {
+    namespace result {
+      template<typename... LOOKUPS> inline auto error_code(Getnameinfo<LOOKUPS...> const &) -> std::error_code;
+      template<typename... LOOKUPS> inline auto eai_error_code(Getnameinfo<LOOKUPS...> const &) -> EAI::Code;
+      //
+      // Also by ADL from the Ancestor
+      //     std_error_code(...)
+      //     sys_error_code(...)
+      //
+      // Also from the Ancestor (the moral equivalent of)
+      //     value(Getnameinfo<...> const &) -> SOMETHING const &
+      //     value(Getnameinfo<...> &&) -> SOMETHING &&
+    }
+  }
+}
+
+#import std.tuple
+#import std.tuple_size
+template<typename... LOOKUPS> class ip::inet::result::Getnameinfo {
+  static_assert(0 == std::tuple_size<std::tuple<LOOKUPS...>>::value && 0 != std::tuple_size<std::tuple<LOOKUPS...>>::value, "specializations only");
+};
+#endiv
+#divert <ipp>
+#import ip.inet.network_category
+#import ip.inet.error.Code
+template<typename... LOOKUPS> auto ip::inet::result::error_code(Getnameinfo<LOOKUPS...> const &r) -> std::error_code {
+  inet::error::Code recode(eai_error_code(r), sys_error_code(r));
+  std::error_code ec(recode, network_category());
+  return ec;
+}
+
+template<typename... LOOKUPS> auto ip::inet::result::eai_error_code(Getnameinfo<LOOKUPS...> const &r) -> EAI::Code {
+  return EAI::Code(std::get<4>(r));
+}
+#endiv

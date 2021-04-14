@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.Syscall
+namespace tests::lib {
+  // For testing, name the like syscall ... but encompasses the libc emulations too
+  using sys::posix::Syscall;
+  enum class Call {
+    FCNTL = (int)Syscall::FCNTL,
+    FLOCK = (int)Syscall::FLOCK,
+    SELECT = (int)Syscall::SELECT,
+    __LIBC_EMULATION_FENCE__ = 1<<24, // surely that is enough
+    LEASE,
+    LOCKF,
+    PSELECT, // a.k.a. Syscall::SELECT6 with various embellishments
+  };
+}
+#endiv

@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.regex.Fixture
+#endiv
+#divert <cpp>
+#import nonstd.regex.error.constants
+auto tests::unit::regex::Fixture::test_constants_error() -> void {
+  using namespace ::nonstd::regex;
+  error::Code code = error::Code{};
+  code = error::COLLATE;
+  code = error::CTYPE;
+  code = error::ESCAPE;
+  code = error::BACKREF;
+  code = error::BRACK;
+  code = error::PAREN;
+  code = error::BRACE;
+  code = error::BADBRACE;
+  code = error::RANGE;
+  code = error::SPACE;
+  code = error::BADREPEAT;
+  code = error::COMPLEXITY;
+  code = error::STACK;
+  CPPUNIT_ASSERT(error::Code{} != code);
+}
+#import nonstd.regex.formatting.constants
+auto tests::unit::regex::Fixture::test_constants_formatting() -> void {
+  using namespace ::nonstd::regex;
+  formatting::Flags flags = formatting::Flags{};
+  flags = formatting::DEFAULT;
+  flags = formatting::SED;
+  flags = formatting::NO_COPY;
+  flags = formatting::FIRST_ONLY;
+  CPPUNIT_ASSERT(formatting::Flags{} != flags);
+}
+#import nonstd.regex.matching.constants
+auto tests::unit::regex::Fixture::test_constants_matching() -> void {
+  using namespace ::nonstd::regex;
+  matching::Flags flags = matching::Flags{};
+  flags = matching::DEFAULT;
+  flags = matching::NOT_BOL;
+  flags = matching::NOT_EOL;
+  flags = matching::NOT_BOW;
+  flags = matching::NOT_EOW;
+  flags = matching::ANY;
+  flags = matching::NOT_NULL;
+  flags = matching::CONTINUOUS;
+  flags = matching::PREVIOUS_AVAILABLE;
+  flags = matching::PREV_AVAIL;
+  CPPUNIT_ASSERT(matching::Flags{} != flags);
+}
+#import nonstd.regex.syntax.constants
+auto tests::unit::regex::Fixture::test_constants_syntax() -> void {
+  using namespace ::nonstd::regex;
+  syntax::Flags flags = syntax::Flags{};
+  flags = syntax::ICASE;
+  flags = syntax::NOSUBS;
+  flags = syntax::OPTIMIZE;
+  flags = syntax::COLLATE;
+  flags = syntax::ECMASCRIPT;
+  flags = syntax::ECMAScript;
+  flags = syntax::BASIC;
+  flags = syntax::EXTENDED;
+  flags = syntax::AWK;
+  flags = syntax::GREP;
+  flags = syntax::EGREP;
+#if 0 // is not defined?  See the commentariat over in nonstd.regex.syntax.constants
+  flags = syntax::MULTILINE;
+#endif
+  CPPUNIT_ASSERT(syntax::Flags{} != flags);
+}
+#endiv

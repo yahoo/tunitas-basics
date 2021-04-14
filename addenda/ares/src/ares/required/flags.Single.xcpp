@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_enum
+namespace ares::required::flags {
+  //
+  // An enumeration for use in the "flags" paradigm of (flag, flags)
+  //
+  template<typename ENUM> concept bool Single = std::is_enum<ENUM>::value;
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import ares.Flag
+#import ares.library.Feature
+#import ares.addrinfo.Flag
+#import ares.nameinfo.Flag
+namespace ares::required::flags {
+  static_assert(Single<Flag>);
+  static_assert(Single<library::Feature>);
+  static_assert(Single<addrinfo::Flag>);
+  static_assert(Single<nameinfo::Flag>);
+}
+#endiv

@@ -1,0 +1,8 @@
+// -*- c++ -*- 7049a041-2839-420a-8f5a-90f598797182
+#pragma once
+namespace posix {
+//
+// Reference: https://en.cppreference.com/w/cpp/keyword
+// <quote>The name posix is reserved for a future top-level namespace. The behavior is undefined if a program declares or defines anything in that namespace.</auote>
+//
+}

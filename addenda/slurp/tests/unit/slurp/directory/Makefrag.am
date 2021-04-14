@@ -1,0 +1,3 @@
+tests_unit_slurp_directory_TESTS = \
+  tests/unit/slurp/directory/all.test \
+  $(end)

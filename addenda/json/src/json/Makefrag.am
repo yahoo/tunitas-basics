@@ -1,0 +1,175 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+#
+# CURRENT <= CURRENT+1 if any interfaces were added
+#         <= CURRENT+1 if any interfaces were removed
+#         <= CURRENT+1 if any interfaces were changed
+#         <= CURRENT   if no interface change, but any other (source code) change
+#
+# REVISION <= 0          if any interfaces were added
+#          <= 0          if any interfaces were removed
+#          <= 0          if any interfaces were changed
+#          <= REVISION+1 if no interface change, but any other (source code) change
+#
+# AGE <= AGE+1 if any interaces were added
+#     <= 0     if any interfaces were removed
+#     <= 0     if any interfaces were changed
+#     <= AGE   if no interface change, but any other (source code) change
+#
+# These are not supposed to track PACKAGE_MAJOR, MINOR, PATCHLEVEL
+#
+# <quote ref="https://autotools.io/libtool/version.html">
+# A common mistake is to assume that the three values passed to -version-info map directly into the three numbers at the end of the library name.
+# This is not the case, and indeed, current, revision and age are applied differently depending on the operating system that one is using.
+# For Linux, for instance, while the last two values map directly from the command-line, the first is calculated by subtracting age from current.
+# On the other hand, on modern FreeBSD, only one component is used in the library version, which corresponds to current.
+# </quote>
+#
+# References
+#   https://software.intel.com/sites/default/files/m/a/1/e/dsohowto.pdf
+#   https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+#   https://autotools.io/libtool/version.html
+#   https://www.gnu.org/software/libtool/manual/html_node/Using-Automake.html
+#   
+# At commencement of DSO CRA, the api number is arbitrarily chosen as using a procedure which
+# affords some space between the otherwise unversioned releases (should the need to adopt versioning)
+# the approximate moral equivalent of:
+#
+#   api=0
+#   for branch in remotes/...someting...something...black-platinum-hen remotes/origin/maroon-iron-crow-v0.5 remotes/origin/red-mercury-goose-v0.5 remotes/origin/series/v0.6/04.green-copper-heron ; do
+#       increment=$(git log $branch | grep -c ^commit);
+#       api=$((api+increment));
+#       echo "$branch API $api";
+#   done
+#
+# This policy already in place for the v0.7-series branch.
+# The policy remains consistent with the v0.8-series using C:R:A ~ 237:2:0
+#
+# API 161  herein, for SCOLDing, Release 04 (Green Copper Heron) when DSO C:R:A versioning commences in earnest
+#     ...  time passes
+# API 121  reserved for SCOLDing, Release 03 (Red Mercury Goose), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 80  reserved for SCOLDing, Release 02 (Maroon Iron Crow), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 40   reserved for SCOLDing, Release 01 (Black Platinum Hen), per the arbitrary branch and history estimator formula
+#     ...  time passes
+# API 0  - used in all previous releases as C:R:A=0.0.0
+#          especially baleful-ballad, which was dynamically linked against 0.0.0 in all DSOs
+# 
+lib_libjson_module_la_CURRENT = 238
+lib_libjson_module_la_REVISION = 3
+lib_libjson_module_la_AGE = 1
+lib_libjson_module_la_CRA = $(lib_libjson_module_la_CURRENT):$(lib_libjson_module_la_REVISION):$(lib_libjson_module_la_AGE)
+lib_libjson_module_la_VERSION_INFO = -version-info $(lib_libjson_module_la_CRA)
+
+lib_libjson_module_la = lib/libjson-module.la
+lib_libjson_module_la_LIBADD = $(nothing)
+lib_libjson_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libjson_module_la_VERSION_INFO)
+lib_libjson_module_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libjson_module_la_SOURCES))
+lib_libjson_module_la_SOURCES = \
+  obj/src/json/namespace.cpp \
+  obj/src/json/lexical_cast.cpp \
+  obj/src/json/pairwise.cpp \
+  obj/src/json/parse.cpp \
+  obj/src/json/Features.cpp \
+  obj/src/json/failure.cpp \
+  obj/src/json/failure.constants.cpp \
+  \
+  obj/src/json/as.cpp \
+  obj/src/json/as.RESULT.string.cpp \
+  obj/src/json/as.RESULT.String.cpp \
+  obj/src/json/as.RESULT.Value.cpp \
+  obj/src/json/as.RESULT.disallowed.cpp \
+  obj/src/json/as.String.cpp \
+  obj/src/json/as.String.String.cpp \
+  obj/src/json/as.String.Value.cpp \
+  obj/src/json/as.string.cpp \
+  obj/src/json/as.string.string.cpp \
+  obj/src/json/as.string.String.cpp \
+  obj/src/json/as.string.Value.cpp \
+  obj/src/json/as.Value.cpp \
+  obj/src/json/as.Value.Value.cpp \
+  \
+  obj/src/json/to.cpp \
+  obj/src/json/to.String.cpp \
+  obj/src/json/to.String.ARGUMENT.cpp \
+  obj/src/json/to.String.char_array.cpp \
+  obj/src/json/to.String.char_pointer.cpp \
+  obj/src/json/to.String.String.cpp \
+  obj/src/json/to.Value.cpp \
+  obj/src/json/to.Value.ARGUMENT.cpp \
+  obj/src/json/to.Value.String.cpp \
+  obj/src/json/to.Value.stdint.cpp \
+  obj/src/json/to.Value.Value.cpp \
+  \
+  obj/src/json/detail/namespace.cpp \
+  \
+  obj/src/json/detail/as/namespace.cpp \
+  obj/src/json/detail/as/CharArray.cpp \
+  obj/src/json/detail/as/CharArray.string.cpp \
+  obj/src/json/detail/as/CharArray.String.cpp \
+  obj/src/json/detail/as/CharArray.Value.cpp \
+  \
+  obj/src/json/detail/conversion/namespace.cpp \
+  obj/src/json/detail/conversion/traits.cpp \
+  obj/src/json/detail/conversion/assign.cpp \
+  obj/src/json/detail/conversion/move.cpp \
+  \
+  obj/src/json/detail/pairwise/namespace.cpp \
+  obj/src/json/detail/pairwise/Iterator.cpp \
+  obj/src/json/detail/pairwise/Container.cpp \
+  \
+  obj/src/json/detail/pairwise/traits/namespace.cpp \
+  obj/src/json/detail/pairwise/traits/Iterator.cpp \
+  obj/src/json/detail/pairwise/traits/Value.cpp \
+  obj/src/json/detail/pairwise/traits/ContainerOf.cpp \
+  \
+  obj/src/json/Exception.cpp \
+  obj/src/json/exception/namespace.cpp \
+  obj/src/json/exception/Cast.cpp \
+  obj/src/json/exception/Generic.cpp \
+  obj/src/json/exception/Logic.cpp \
+  obj/src/json/exception/Messaging.cpp \
+  obj/src/json/exception/Runtime.cpp \
+  obj/src/json/exception/Syntax.cpp \
+  obj/src/json/exception/aspect.What.cpp \
+  \
+  obj/src/json/Reader.cpp \
+  obj/src/json/reader/namespace.cpp \
+  obj/src/json/reader/Simple.cpp \
+  obj/src/json/reader/Result.cpp \
+  obj/src/json/reader/Char.cpp \
+  obj/src/json/reader/builder.Char.cpp \
+  \
+  obj/src/json/String.cpp \
+  \
+  obj/src/json/Value.cpp \
+  obj/src/json/value/namespace.cpp \
+  obj/src/json/value/toString.cpp \
+  obj/src/json/value/Type.cpp \
+  obj/src/json/value/constants.cpp \
+  \
+  obj/src/json/Writer.cpp \
+  obj/src/json/writer/Compact.cpp \
+  obj/src/json/writer/Fast.cpp \
+  obj/src/json/writer/Pretty.cpp \
+  obj/src/json/writer/builder.Stream.cpp \
+  obj/src/json/writer/namespace.cpp \
+  obj/src/json/writer/stream/Builder.cpp \
+  obj/src/json/writer/stream/namespace.cpp \
+  obj/src/json/writer/stream/Styled.cpp \
+  obj/src/json/writer/Stream.cpp \
+  obj/src/json/writer/Styled.cpp \
+  $(end)
+$(scold_cxxdir)/json/dependencies.mk: $(lib_libjson_module_la_SOURCES)
+$(lib_libjson_module_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/json/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/json/dependencies.mk
+.PHONY: clean-dependencies
+clean-dependencies::
+	rm -f $(scold_cxxdir)/json/dependencies.mk

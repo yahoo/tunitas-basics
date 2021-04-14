@@ -1,0 +1,4 @@
+// -*- c++ -*- c11e5d85-01b0-4736-b930-eb379bb1f4c2
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/twofish.h>

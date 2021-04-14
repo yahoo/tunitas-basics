@@ -1,0 +1,88 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::x509 { class Name; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.x509.Name
+class tests::unit::x509::Name : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::x509::Name;
+  auto test_oneline() -> void;
+  auto test_add_entry_by_txt_Fields() -> void;
+  auto test_add_entry_by_txt_Field() -> void;
+  auto test_add_entry_by_txt_name_value() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import openssl.x509.Req
+#import openssl.x509.Fields
+auto tests::unit::x509::Name::test_oneline() -> void {
+  using namespace ::openssl::x509;
+  Fields fields;
+  fields.C.value = "US";
+  fields.ST.value = "California";
+  fields.L.value = "Palo Alto";
+  fields.O.value = "Acme Example Inc";
+  fields.OU.value = "Operations";
+  fields.CN.value = "*.example.org";
+  Req req;
+  Subject subject = req.get_subject_name();
+  subject.add_entry_by_txt(fields);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  auto oneline = subject.oneline(); // <----------------------------- test this
+  std::cerr << "oneline: " << oneline << '\n';
+  CPPUNIT_ASSERT(!oneline.empty());
+}
+auto tests::unit::x509::Name::test_add_entry_by_txt_Fields() -> void {
+  using namespace ::openssl::x509;
+  Fields fields;
+  fields.C.value = "US";
+  fields.ST.value = "California";
+  fields.L.value = "Palo Alto";
+  fields.O.value = "Acme Example Inc";
+  fields.OU.value = "Operations";
+  fields.CN.value = "*.example.org";
+  Req req;
+  Subject subject = req.get_subject_name();
+  subject.add_entry_by_txt(fields);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.x509.field.Named
+auto tests::unit::x509::Name::test_add_entry_by_txt_Field() -> void {
+  using namespace ::openssl::x509;
+  Req req;
+  Subject subject = req.get_subject_name();
+  field::Named<field::Name::O> o;
+  o.value = "Acme Inc.";
+  subject.add_entry_by_txt(o);
+  field::Named<field::Name::OU> ou;
+  ou.value = "Widget";
+  subject.add_entry_by_txt(ou);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::x509::Name::test_add_entry_by_txt_name_value() -> void {
+  ::openssl::x509::Req req;
+  Subject subject = req.get_subject_name();
+  subject.add_entry_by_txt("O", "Acme Inc.");
+  subject.add_entry_by_txt("OU", "Widget");
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import rigging.suite.io
+auto tests::unit::x509::Name::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Name");
+  {
+    Stream aet("add_entry_by_txt");
+    aet << call("Fields", &Name::test_add_entry_by_txt_Fields)
+        << call("Field<NAME>", &Name::test_add_entry_by_txt_Field)
+        << call("name,value", &Name::test_add_entry_by_txt_name_value)
+      ;
+    series << move(aet);
+  }
+  return finalize(series);
+}
+#endiv

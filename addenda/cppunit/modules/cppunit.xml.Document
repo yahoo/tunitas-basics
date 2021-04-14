@@ -1,0 +1,6 @@
+// -*- c++ -*- f8d8eeb3-fd6f-4432-8e89-422d5325e818
+#pragma once
+#include <cppunit/tools/XmlDocument.h>
+namespace cppunit::xml {
+  using Document = CppUnit::XmlDocument;
+}

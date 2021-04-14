@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.stream.setting.Width
+namespace nonstd {
+  //
+  // Same as std::setw but a more reasonable name (buy a vowel!)
+  // https://en.cppreference.com/w/cpp/io/manip/setw
+  //
+  // Usage:
+  //
+  //   cout << nonstd::setwidth(1) << thing;
+  //   cin >> nonstd::setwidth(1) >> thing;
+  //
+  inline auto setwidth(int) -> stream::setting::Width;
+}
+#endiv
+#divert <ipp>
+auto nonstd::setwidth(int n) -> stream::setting::Width {
+  return stream::setting::Width{n};
+}
+#endiv

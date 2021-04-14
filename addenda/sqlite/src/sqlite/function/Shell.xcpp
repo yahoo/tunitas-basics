@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace function {
+    class Shell;
+  }
+}
+#endiv
+#divert <hpp>
+#forward sqlite.api.unguarded
+#import sqlite.detail.ShellSafelyGuarding
+class sqlite::function::Shell : public sqlite::detail::ShellSafelyGuarding<api::unguarded::Function> {
+  // The "shell" just give a place to hang member functions
+  // One can copy these things ... it just copies the pointer
+  using Ancestor = sqlite::detail::ShellSafelyGuarding<api::unguarded::Function>;
+public:
+  // "context" => "function context" => "function"
+  using function_type = Ancestor::unguarded_type;
+  using Ancestor::ShellSafelyGuarding;
+  using Ancestor::operator=;
+  // Move semantics, but not copy semantics
+  inline Shell(Shell &&);
+  inline auto operator=(Shell &&) -> Shell &;
+  // These are never destructed
+  // They have the lifetime of the SQL statement whence they came.
+  ~Shell() = default;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+sqlite::function::Shell::Shell(Shell &&anon)
+  : Ancestor(std::forward<Ancestor>(anon)) {
+  ;
+}
+
+auto sqlite::function::Shell::operator=(Shell &&anon) -> Shell & {
+  Ancestor::operator=(std::forward<Ancestor>(anon));
+  return *this;
+}
+#endiv

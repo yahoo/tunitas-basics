@@ -1,0 +1,13 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_nonstd_uninitialized_SUBSOURCES = \
+  obj/src/nonstd/uninitialized_copy.cpp \
+  obj/src/nonstd/uninitialized_fill.cpp \
+  obj/src/nonstd/uninitialized_move.cpp \
+  obj/src/nonstd/uninitialized_zero.cpp \
+  obj/src/nonstd/uninitialized/namespace.cpp \
+  obj/src/nonstd/uninitialized/copy.cpp \
+  obj/src/nonstd/uninitialized/fill.cpp \
+  obj/src/nonstd/uninitialized/move.cpp \
+  obj/src/nonstd/uninitialized/zero.cpp \
+  $(end)

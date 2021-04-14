@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_EXIT.Usage
+//   static_assert(tests::usage::posix_EXIT::Usage<>);
+//
+#import sys.posix.EXIT
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_EXIT {
+  using sys::posix::EXIT;
+  namespace [[detail]] packaging {
+    template<typename E> concept bool Instance = requires(EXIT) {
+      typename EXIT::Code;
+      requires model::Namespace_Object<EXIT>;
+      requires (int)EXIT::SUCCESS == EXIT_SUCCESS;
+      requires (int)EXIT::FAILURE == EXIT_FAILURE;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<EXIT>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

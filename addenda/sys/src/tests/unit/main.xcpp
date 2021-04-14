@@ -1,0 +1,90 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.af.Fixture
+#import tests.unit.at.Fixture
+#import tests.unit.call.Fixture
+#import tests.unit.detail.Fixture
+#import tests.unit.directory.Fixture
+#import tests.unit.dn.Fixture
+#import tests.unit.e.Fixture
+#import tests.unit.error.Fixture
+#import tests.unit.ex.Fixture
+#import tests.unit.exit.Fixture
+#import tests.unit.exits.Fixture
+#import tests.unit.f.Fixture
+#import tests.unit.fd.Fixture
+#import tests.unit.flagset.Fixture
+#import tests.unit.flock.Fixture
+#import tests.unit.id.Fixture
+#import tests.unit.ip.Fixture
+#import tests.unit.itimer.Fixture
+#import tests.unit.lease.Fixture
+#import tests.unit.lock.Fixture
+#import tests.unit.lockf.Fixture
+#import tests.unit.log.Fixture
+#import tests.unit.msg.Fixture
+#import tests.unit.net.Fixture
+#import tests.unit.o.Fixture
+#import tests.unit.ok.Fixture
+#import tests.unit.p.Fixture
+#import tests.unit.pf.Fixture
+#import tests.unit.posix.Fixture
+#import tests.unit.r.Fixture
+#import tests.unit.s.Fixture
+#import tests.unit.sig.Fixture
+#import tests.unit.shut.Fixture
+#import tests.unit.sock.Fixture
+#import tests.unit.sys.Fixture
+#import tests.unit.time.Fixture
+#import tests.unit.un.Fixture
+#import tests.unit.w.Fixture
+#import tests.unit.want.Fixture
+#import tests.unit.wait.Fixture
+#import rigging.bench.Main
+auto main(int argc, char *argv[]) -> int {
+  using namespace rigging::bench;
+  namespace tu = tests::unit;
+  Main remain(tu::af::Fixture::suite(),
+              tu::at::Fixture::suite(),
+              tu::call::Fixture::suite(),
+              tu::detail::Fixture::suite(),
+              tu::directory::Fixture::suite(),
+              tu::dn::Fixture::suite(),
+              tu::e::Fixture::suite(),
+              tu::error::Fixture::suite(),
+              tu::ex::Fixture::suite(),
+              tu::exit::Fixture::suite(),
+              tu::exits::Fixture::suite(),
+              tu::f::Fixture::suite(),
+              tu::fd::Fixture::suite(),
+              tu::flagset::Fixture::suite(),
+              tu::flock::Fixture::suite(),
+              tu::id::Fixture::suite(),
+              tu::ip::Fixture::suite(),
+              tu::itimer::Fixture::suite(),
+              tu::lease::Fixture::suite(),
+              tu::lock::Fixture::suite(),
+              tu::lockf::Fixture::suite(),
+              tu::log::Fixture::suite(),
+              tu::msg::Fixture::suite(),
+              tu::net::Fixture::suite(),
+              tu::o::Fixture::suite(),
+              tu::ok::Fixture::suite(),
+              tu::p::Fixture::suite(),
+              tu::pf::Fixture::suite(),
+              tu::posix::Fixture::suite(),
+              tu::r::Fixture::suite(),
+              tu::s::Fixture::suite(),
+              tu::sig::Fixture::suite(),
+              tu::shut::Fixture::suite(),
+              tu::sock::Fixture::suite(),
+              tu::sys::Fixture::suite(),
+              tu::time::Fixture::suite(),
+              tu::un::Fixture::suite(),
+              tu::w::Fixture::suite(),
+              tu::wait::Fixture::suite(),
+              tu::want::Fixture::suite());
+  return remain(argc, argv);
+}
+#endiv

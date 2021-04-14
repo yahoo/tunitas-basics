@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.Result
+#import sys.id.File
+namespace sys::posix {
+  namespace packaging::listen {
+    using call::Result;
+    using id::File;
+    namespace function {
+      inline auto listen(File, int backlog) -> Result;
+    }
+    namespace native {
+      inline auto listen(int fd, int backlog) -> Result;
+    }
+  }
+  using packaging::listen::function::listen;
+  namespace native { using packaging::listen::native::listen; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+#import listen
+#import std.move
+namespace sys::posix::packaging::listen {
+  auto function::listen(File fd, int backlog) -> Result { return native::listen((int)fd, backlog); }
+  auto native::listen(int fd, int backlog) -> Result    { return idiomatic::syscall<int>(Syscall::LISTEN, fd, backlog); }
+}
+#endiv

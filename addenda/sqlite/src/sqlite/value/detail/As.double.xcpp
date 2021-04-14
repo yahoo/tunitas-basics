@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sqlite
+#import sqlite.value.detail.As
+namespace sqlite {
+  namespace value {
+    namespace detail {
+      template<> class As<double>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#forward sqlite.api.unguarded
+#import sqlite.value.detail.Result
+template<> class sqlite::value::detail::As<double> : public Result<double> {
+  using Ancestor = Result<double>;
+public:
+  inline auto operator()(api::unguarded::Value *) -> Ancestor::result_type;
+};
+#endiv
+#divert <ipp>
+#include <sqlite3.h>
+auto sqlite::value::detail::As<double>::operator()(api::unguarded::Value *value) -> Ancestor::result_type {
+  return ::sqlite3_value_double(value);
+}
+#endiv

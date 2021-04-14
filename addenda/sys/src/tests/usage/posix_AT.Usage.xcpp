@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_AT.Usage
+//   static_assert(tests::usage::posix_AT::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.AT
+#import tests.model.Namespace_Object
+#import tests.model.Namespace_Object_Flags
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_AT {
+  using sys::posix::AT;
+  namespace [[detail]] packaging {
+    using nonstd::convertible_to;
+    template<typename AT> concept bool Instance = requires(AT) {
+      typename AT::Cwd;
+      typename AT::Flag;
+      typename AT::Flags;
+      requires model::Namespace_Object<AT>;
+      requires model::Namespace_Object_Flags<AT, typename AT::Flag, typename AT::Flags>;
+      requires (int)AT::SYMLINK_NOFOLLOW == AT_SYMLINK_NOFOLLOW;
+      requires (int)AT::SYMLINK_FOLLOW == AT_SYMLINK_FOLLOW;
+      requires (int)AT::REMOVE_DIRECTORY == AT_REMOVEDIR;
+      requires (int)AT::NO_AUTOMOUNT == AT_NO_AUTOMOUNT;
+      requires (int)AT::EMPTY_PATH == AT_EMPTY_PATH;
+      requires (int)AT::EACCESS == AT_EACCESS;
+      requires (int)AT::REMOVEDIR == AT_REMOVEDIR;
+      requires requires(AT, typename AT::Flag lag, typename AT::Flags ags) {
+#if 202003L < __cplusplus
+        { AT::template as<typename AT::Flag>(lag) } -> convertible_to<typename AT::Flag>;
+        { AT::template as<typename AT::Flags>(lag) } -> convertible_to<typename AT::Flags>;
+        { AT::template as<typename AT::Flag>(ags) } -> convertible_to<typename AT::Flag>;
+        { AT::template as<typename AT::Flags>(ags) } -> convertible_to<typename AT::Flags>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { AT::template as<typename AT::Flag>(lag) } -> typename AT::Flag;
+        { AT::template as<typename AT::Flags>(lag) } -> typename AT::Flags;
+        { AT::template as<typename AT::Flag>(ags) } -> typename AT::Flag;
+        { AT::template as<typename AT::Flags>(ags) } -> typename AT::Flags;
+#endif
+      };
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<AT>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

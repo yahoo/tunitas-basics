@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.waitpid
+auto tests::unit::posix::fixture::Fixture::test_waitpid() -> void {
+  auto options = six::W::EXITED;
+  auto zero = pid_t{0};
+  auto u = nat::waitpid(zero, options); // <--------- test this
+  CPPUNIT_ASSERT(!good(u));
+}
+#endiv

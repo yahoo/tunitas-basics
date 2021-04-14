@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::log {
+  inline namespace api { }
+}
+#endiv
+#divert <hpp>
+#import nonstd.required.Enumeration
+#import sys.call.argument.Stringface
+#import sys.log.argument.Options
+#import sys.log.argument.Priorities
+#import sys.log.Facility
+#import sys.log.required // cascade the namespaces
+#import va.list
+namespace sys::log {
+  namespace api {
+    namespace [[detail]] arg {
+      using argument::Priorities;
+      using argument::Options; // allows the singular AND the plural (expressive) to be handled in one overload
+      using sys::call::argument::Stringface;
+      template<required::Enumeration ENUMERATION> using Underlying = std::underlying_type_t<ENUMERATION>;
+    }
+    inline auto close() -> void;
+    inline auto open(arg::Stringface identifier, arg::Options, Facility) -> void; // reminder: identifier has a semantic when nullptr == identifier
+    inline auto open(arg::Options, Facility) -> void;
+    inline auto set(arg::Priorities) -> void;
+    inline auto format(Priority, char const *format, ...) noexcept -> void      __attribute__ ((__format__ (__printf__, 2, 3)));
+    inline auto vformat(Priority, char const *format, va_list) noexcept -> void __attribute__ ((__format__ (__printf__, 2, 0)));
+  }
+  //
+  // Push them down into the namespaces so that ADL can find them, as we expect
+  //
+  namespace options { using api::open; }
+  namespace priorities { using api::set; }
+}
+#endiv
+#divert <ipp>
+#import c.str
+#import std.underlying_type
+namespace sys::log {
+  auto api::close() -> void { ::closelog(); }
+  auto api::open(arg::Options options, Facility facility) -> void                             { ::openlog(nullptr, (arg::Options::Underlying) options, std::underlying_type_t<Facility>(facility)); }
+  auto api::open(arg::Stringface identifier, arg::Options options, Facility facility) -> void { ::openlog(identifier, (arg::Options::Underlying) options, std::underlying_type_t<Facility>(facility)); }
+  auto api::set(arg::Priorities priorities) -> void { ::setlogmask((arg::Priorities::Underlying) priorities); }
+}
+#import va.start
+#import va.end
+namespace sys::log {
+  auto api::format(Priority priority, char const *format, ...) noexcept -> void {
+    va_list ap;
+    va_start(ap, format);
+    ::vsyslog(arg::Underlying<Priority>(priority), c::str(format), ap); // c:str(...) because the unprotected C API will segfault when nullptr == format
+    va_end(ap);
+  }
+  auto api::vformat(Priority priority, char const *format, va_list ap) noexcept -> void {
+    ::vsyslog(arg::Underlying<Priority>(priority), c::str(format), ap); // ibidem.  [the unprotected C API ... fault on nullptr]
+  }
+}
+#endiv

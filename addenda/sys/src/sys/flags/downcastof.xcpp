@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::flags {
+  namespace downcastas {
+    // These are Used in the concept check required::Downcast
+    inline auto const COUNT = 0u; 
+    inline auto const INDEX = 1u;
+    inline auto const MASK = 2u;
+  }
+}
+#endiv
+#divert <hpp>
+#import sys.flags.required.Downcast
+#import sys.flags.required.flagset.Class
+#import sys.flags.required.flagset.Enumeration
+#import sys.flags.required.flagset.Integral
+namespace sys::flags {
+  //
+  // 1 == N for when there is a single bit set in the FLAGSET, downgrade to the FLAG type, which is a bit-index
+  // 2 == N for When the FLAG is really just a mask value, e.g. (bitset-mask) 0x100 not (bit-index) 8.
+  //
+  // When there is a single bit set in the FLAGSET, downgrade to the FLAG type, which remains encoded as a mask.
+  // When there is not a single set then std::invalid_argument is thrown.
+  // This is basically a cast.
+  //
+  // [what about std::ios_base::goodbit?]
+  // The zero value is considered NOT "a flag" (it is the empty set, having no members).
+  // So you may want a separate "is legal value" concept to capture "is zero or is a single bit"
+  //
+  // Usage:
+  //
+  //    auto something::something::dark_side::flagof(Flags s) -> Flag { return flags::downcastof<1,Flag>(s); } ................ no bounds
+  //    auto something::something::dark_side::maskof(Flags s) -> Flag { return flags::downcastof<2,Flag>(s, 1, 9); } .......... bounds
+  //
+  template<unsigned N, typename FLAG, typename FLAGSET> inline auto downcastof(FLAGSET, unsigned low = 0, unsigned high = 8*sizeof (FLAGSET)) -> FLAG requires required::Downcast<N> && required::flagset::Class<FLAG, FLAGSET>;
+  template<unsigned N, typename FLAG, typename FLAGSET> inline auto downcastof(FLAGSET, unsigned low = 0, unsigned high = 8*sizeof (FLAGSET)) -> FLAG requires required::Downcast<N> && required::flagset::Enumeration<FLAG, FLAGSET>;
+  template<unsigned N, typename FLAG, typename FLAGSET> inline auto downcastof(FLAGSET, unsigned low = 0, unsigned high = 8*sizeof (FLAGSET)) -> FLAG requires required::Downcast<N> && required::flagset::Integral<FLAG, FLAGSET>;
+}
+#endiv
+#divert <ipp>
+#import sys.flags.get_flag
+#import std.invalid_argument
+#import std.underlying_type
+#import std.get
+namespace sys {
+  template<unsigned N, typename FLAG, typename FLAGSET> auto flags::downcastof(FLAGSET flagset, unsigned low, unsigned high) -> FLAG requires required::Downcast<N> && required::flagset::Class<FLAG, FLAGSET> {
+    using Underlying = typename FLAGSET::Value;
+    return downcastof<N,FLAG>((Underlying)flagset, low, high);
+  }
+  template<unsigned N, typename FLAG, typename FLAGSET> auto flags::downcastof(FLAGSET flagset, unsigned low, unsigned high) -> FLAG requires required::Downcast<N> && required::flagset::Enumeration<FLAG, FLAGSET> {
+    using Underlying = typename std::underlying_type_t<FLAGSET>;
+    return downcastof<N,FLAG>((Underlying)flagset, low, high);
+  }
+  template<unsigned N, typename FLAG, typename FLAGSET> auto flags::downcastof(FLAGSET flagset, unsigned low, unsigned high) -> FLAG requires required::Downcast<N> && required::flagset::Integral<FLAG, FLAGSET> {
+    auto const got = get_flag<FLAG>(flagset, low, high);
+    if (1 != std::get<0>(got)) {
+      throw std::invalid_argument{"not exactly one flag bit, found (zero or multiple)"};
+    }
+    return std::get<N>(got);
+  }
+}
+#endiv

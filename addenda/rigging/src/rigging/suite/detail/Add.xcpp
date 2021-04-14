@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::suite::detail {
+  class Add;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import std.unique_ptr
+#import rigging.suite.io
+class rigging::suite::detail::Add {
+public:
+  using Test = cppunit::Test;
+  inline explicit Add(Test *test);
+  inline auto get() -> Test *;
+  inline auto reset(Test * = nullptr) -> void;
+protected:
+  friend auto suite::operator<<(Stream &, detail::Add &&) -> Stream &;
+  inline auto disgorge() -> Test *;
+  std::unique_ptr<Test> test;
+};
+#endiv
+#divert <ipp>
+#import rigging.suite.io
+rigging::suite::detail::Add::Add(Test *arg_test)
+  : test(arg_test) {
+  ;
+}
+auto rigging::suite::detail::Add::get() -> Test * {
+  return test.get();
+}
+auto rigging::suite::detail::Add::reset(Test *redo) -> void {
+  test.reset(redo);
+}
+auto rigging::suite::detail::Add::disgorge() -> Test * {
+  return test.release();
+}
+#endiv

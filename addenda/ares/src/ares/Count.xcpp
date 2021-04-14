@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.underlying_type
+#import std.numeric_limits
+namespace ares {
+  //
+  // A count.
+  // e.g. of the number of timeouts.
+  //
+  enum class Count : unsigned;
+  namespace count {
+    using Underlying = std::underlying_type<Count>::type;
+    using Limits = std::numeric_limits<Underlying>;
+  }
+}
+#endiv
+#divert <hpp>
+namespace ares {
+  inline constexpr auto zero(Count candidate) -> bool { return Count{} == candidate; }
+  inline constexpr auto underlying(Count specimen) -> std::underlying_type<Count>::type { return std::underlying_type<Count>::type(specimen); }
+  //
+  // These are "safe" in that they throw domain_error on rollover (unlikely) or rollunder (likely)
+  //
+  inline auto operator++(Count &) -> Count &;
+  inline auto operator++(Count &, int) -> Count;
+  inline auto operator--(Count &) -> Count &;
+  inline auto operator--(Count &, int) -> Count;
+}
+#endiv
+#divert <ipp>
+#import std.domain_error
+auto ares::operator++(Count &lhs) -> Count & {
+  if (count::Limits::max() == underlying(lhs)) {
+    throw std::domain_error{"too big"};
+  }
+  lhs = Count{1 + underlying(lhs)};
+  return lhs;
+}
+auto ares::operator++(Count &lhs, int) -> Count {
+  Count old{lhs};
+  ++lhs;
+  return old;
+}
+auto ares::operator--(Count &lhs) -> Count & {
+  if (count::Limits::min() == underlying(lhs)) {
+    throw std::domain_error{"too small"};
+  }
+  lhs = Count{underlying(lhs) - 1};
+  return lhs;
+}
+auto ares::operator--(Count &lhs, int) -> Count {
+  Count old{lhs};
+  --lhs;
+  return old;
+}
+#endiv

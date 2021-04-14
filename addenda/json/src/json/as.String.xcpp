@@ -1,0 +1,11 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+//
+// overloading on the return type of the function
+//
+//       json.as.RESULT.ARGUMENT
+//              |      |
+//              v      v
+#entail json.as.String.String
+#entail json.as.String.Value
+#endiv

@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::f {
+  //
+  // Signal runtime behavior of wait-contra-nowait in the various system calls.
+  // e.g. setlock overloads for setlock(...) being non-waiting
+  //                       and, setlock_waiting(...) being waiting
+  //
+  // Usage:
+  //
+  //   auto funcall(File, layer:;Process, Wait) -> Result;
+  //   auto funcall(File, layer:;File, Wait) -> Result;
+  //   auto funcall(File, layer::Which, Wait) -> Result;
+  //
+  enum class Wait {
+    NO,
+    NOWAIT = NO,
+    YES,
+    WAIT = YES,
+  };
+}
+#endiv

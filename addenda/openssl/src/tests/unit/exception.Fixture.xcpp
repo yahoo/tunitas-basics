@@ -1,0 +1,131 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exception { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::exception::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Alloc() -> void;
+  auto test_Argument() -> void;
+  auto test_Empty() -> void;
+  auto test_Null() -> void;
+  auto test_Range() -> void;
+  auto test_Random() -> void;
+  auto test_System() -> void;
+  auto test_time_Invalid() -> void;
+  auto test_time_No_Well_Defined() -> void;
+  template<typename EXCEPTION> auto test_Aspect() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import openssl.exception.Aspect
+template<typename EXCEPTION> auto tests::unit::exception::Fixture::test_Aspect() -> void {
+  try {
+    throw EXCEPTION{};
+  } catch (::openssl::exception::Aspect const &) {
+    CPPUNIT_ASSERT(true);
+  } catch (...) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+#endiv
+#divert <cpp>
+#import openssl.exception.Alloc
+auto tests::unit::exception::Fixture::test_Alloc() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Alloc subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.Argument
+auto tests::unit::exception::Fixture::test_Argument() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Argument subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.Empty
+auto tests::unit::exception::Fixture::test_Empty() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Empty subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.Null
+auto tests::unit::exception::Fixture::test_Null() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Null subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.Random
+auto tests::unit::exception::Fixture::test_Random() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Random subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.Range
+auto tests::unit::exception::Fixture::test_Range() -> void {
+  namespace ex = ::openssl::exception;
+  ex::Range subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.time.Invalid
+auto tests::unit::exception::Fixture::test_time_Invalid() -> void {
+  namespace ex = ::openssl::exception;
+  ex::time::Invalid subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.time.No_Well_Defined
+auto tests::unit::exception::Fixture::test_time_No_Well_Defined() -> void {
+  namespace ex = ::openssl::exception;
+  ex::time::No_Well_Defined subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import openssl.exception.System
+auto tests::unit::exception::Fixture::test_System() -> void {
+  namespace ex = ::openssl::exception;
+  ex::System subject;
+  CPPUNIT_ASSERT(nullptr != subject.what());
+}
+#import rigging.suite.io
+auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("exception");
+  series << call("Alloc", &Fixture::test_Alloc)
+         << call("Argument", &Fixture::test_Argument)
+         << call("Empty", &Fixture::test_Empty)
+         << call("Null", &Fixture::test_Null)
+         << call("Random", &Fixture::test_Random)
+         << call("Range", &Fixture::test_Range)
+         << call("System", &Fixture::test_System)
+    ;
+  {
+    Stream tim("time");
+    tim << call("Invalid", &Fixture::test_time_Invalid)
+        << call("No_Well_Defined", &Fixture::test_time_No_Well_Defined)
+      ;
+    series << move(tim);
+  } {
+    Stream asp("Aspect");
+    namespace ex = openssl::exception;
+    asp << call("Alloc", &Fixture::test_Aspect<ex::Alloc>)
+        << call("Argument", &Fixture::test_Aspect<ex::Argument>)
+        << call("Empty", &Fixture::test_Aspect<ex::Empty>)
+        << call("Null", &Fixture::test_Aspect<ex::Null>)
+        << call("Random", &Fixture::test_Aspect<ex::Random>)
+        << call("Range", &Fixture::test_Aspect<ex::Range>)
+        << call("System", &Fixture::test_Aspect<ex::System>)
+      ;
+    {
+      Stream tim("time");
+      tim << call("Invalid", &Fixture::test_Aspect<ex::time::Invalid>)
+          << call("No_Well_Defined", &Fixture::test_Aspect<ex::time::No_Well_Defined>)
+        ;
+      asp << move(tim);
+    }
+    series << move(asp);
+  }
+  return finalize(series);
+}
+#endiv

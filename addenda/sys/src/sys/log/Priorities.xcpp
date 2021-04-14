@@ -1,0 +1,70 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.log.argument.Pluralize
+#import sys.log.Priority
+#import std.underlying_type
+#import std.common_type
+#import std.uint32_t
+#import nonstd.required.Enumeration
+#import nonstd.required.Integer
+namespace sys::log {
+  //
+  // The bitset of the priorities.
+  //
+  // From /usr/include/sys/syslog.h
+  // <quote>
+  //   [The] priorities/facilities are encoded into a single 32-bit quantity,
+  //   where the bottom 3 bits are the priority (0-7) and the top 28 bits are the facility (0-big number).
+  //   Both the priorities and the facilities map roughly one-to-one to strings in the syslogd(8) source code. 
+  //   This mapping is included in [<sys/syslog.h>]
+  // </quote>
+  //
+  // Think of the priority as imputed negative numbers and you'll be fine.
+  // EMERGENCY (zero) is "greater" than DEBUG (seven)
+  // But naturally one wants to enforce limits below which the logging doesn't appear (e.g. suppress DEBUG, keep EMERGENCY)
+  //
+  // Usage:
+  //
+  //   auto set = Priority::EMERGENCY | Priority::ALERT | Priority::CRITICAL
+  //   ...and so on...
+  //
+  namespace priorities {
+    using namespace std;
+    template<required::Enumeration E> using Underlying = underlying_type_t<E>;
+    template<typename... I> requires (required::Integer<I> && ...) using Common = common_type_t<I...>;
+    enum Priorities : Common<uint32_t, Underlying<Priority>>;
+  }
+  using priorities::Priorities;
+}
+#endiv
+#divert <hpp>
+#import sys.log.Priority
+namespace sys::log {
+  namespace priorities {
+    template<required::Enumeration E> constexpr auto underlying(E e) -> Underlying<E> { return Underlying<E>(e); }
+    // Priority -> Priorities
+    constexpr auto operator|(Priority a, Priority b) -> Priorities { return Priorities{underlying(a) | underlying(b)}; }
+    constexpr auto upto(Priority p) -> Priorities { return Priorities{ (1u << underlying(p)) - 1u }; }
+    // Priorities -> Priorities
+    constexpr auto operator|(Priorities a, Priority b) -> Priorities  { return Priorities{underlying(a) | underlying(b)}; }
+    constexpr auto operator|(Priority a, Priorities b) -> Priorities  { return Priorities{underlying(a) | underlying(b)}; }
+    constexpr auto operator|(Priorities a, Priorities b) -> Priorities { return Priorities{underlying(a) | underlying(b)}; }
+    constexpr auto upto(Priorities p) -> Priorities {
+      // cute... http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+      auto v = underlying(p);
+      v--;
+      v |= v >> 1;
+      v |= v >> 2;
+      v |= v >> 4;
+      v |= v >> 8;
+      v |= v >> 16;
+      v++;
+      return upto(Priority{v});
+    }
+  }
+  // So that ADL (against Priority) and everyone else can find them.
+  using priorities::operator|;
+  using priorities::upto;
+}
+#endiv

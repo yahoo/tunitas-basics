@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import nonstd.required.iterator.Input
+#import nonstd.required.iterator.Forward
+namespace nonstd {
+  //
+  // https://wiki.scold-lang.org/page/nonstd.uninitialized.move
+  //
+  // A convenience interface to the uninitialized namespace
+  // Copy into an uninitialized area of memory.
+  //
+  template<required::iterator::Input SOURCE, required::iterator::Forward DESTINATION> inline auto uninitialized_move(SOURCE first, SOURCE last, DESTINATION) -> void;
+  template<typename OBJECT, std::size_t N, required::iterator::Forward DESTINATION> inline auto uninitialized_move(OBJECT (&source)[N], DESTINATION) -> void;
+  template<required::iterator::Input SOURCE, required::iterator::Forward DESTINATION> inline auto uninitialized_move(SOURCE, std::size_t N, DESTINATION) -> void;
+}
+#endiv
+#divert <ipp>
+#import nonstd.uninitialized.move
+template<nonstd::required::iterator::Input SOURCE, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized_move(SOURCE first, SOURCE last, DESTINATION dest) -> void {
+  uninitialized::move(first, last, dest);
+}
+template<typename OBJECT, std::size_t N, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized_move(OBJECT (&source)[N], DESTINATION dest) -> void {
+  uninitialized::move(&source[0], N, dest);
+}
+template<nonstd::required::iterator::Input SOURCE, nonstd::required::iterator::Forward DESTINATION> auto nonstd::uninitialized_move(SOURCE source, std::size_t N, DESTINATION dest) -> void {
+  uninitialized::move(source, N, dest);
+}
+#endiv

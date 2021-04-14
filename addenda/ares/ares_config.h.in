@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#ifndef __ares_config_h__
+#define __ares_config_h__
+//
+// Whereas c-ares source code is required to build src/ares/addenda/*.xcpp
+// We will be #include "ares_setup.h" from their code,
+// which in turn wants "ares_config.h"
+// which is created from a fully-configured source code build of c-ares
+//
+// Witnessed: c-ares-devel-1.13.0-5.fc29.x86_64
+//            9f1fdbf5dd633f81352fac0d6bc0d0c4d45be459 (commit circa 2019-05-02)
+// in .../ares_setup.h
+// 
+//   #ifdef HAVE_CONFIG_H
+//   #include "ares_config.h"
+//   #else
+//   ...something for Windows...
+//   #endif
+//
+// So we make ares_config.h earlier in the path and substitute our HAVE_* definitions.
+//
+#include "config.h"
+
+// Either HAVE_SEND and HAVE_RECV or else sread(...) 
+//
+// If HAVE_RECV is defined then RECV_TYPE_ARG1, RECV_TYPE_ARG2, RECV_TYPE_ARG3, RECV_TYPE_ARG4 and RECV_TYPE_RETV
+// If HAVE_SEND is defined then SEND_TYPE_ARG1, SEND_QUAL_ARG2, SEND_TYPE_ARG2, SEND_TYPE_ARG3, SEND_TYPE_ARG4 and SEND_TYPE_RETV
+//
+// also https://gcc.gnu.org/onlinedocs/gcc-8.3.0/cpp/Pragmas.html
+#define sread(x, y, z)  _Pragma (GCC error "REMOVE sread(...) which is a hack around HAVE_RECV")
+#define swrite(x, y, z) _Pragma (GCC error "REMOVE swrite(...) which is a hack around HAVE_RECV")
+#endif

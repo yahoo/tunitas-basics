@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.required.Type
+#import sys.sock.specification.Composer.declaration
+#forward sys.sock.specification.Specification
+namespace sys::sock::specification {
+  //
+  // Useful in socket(2) where the 2nd argument is a Specification
+  // <complaint>the Linux folken should have followed their lead in and made socket4(2) to rhyme with accept4(2)</complaint>
+  //
+  // Usage:
+  //
+  //  auto function(Specification) -> Result;
+  //
+  //  auto result = function(SOCK::STREAM);
+  //  auto result = function(SOCK::STREAM | SOCK::CLOEXEC);
+  //  auto result = function(SOCK::STREAM | SOCK::CLOEXEC | SOCK::NONBLOCK);
+  //
+  template<required::Type TYPE> class Composer<Specification<TYPE>>;
+}
+#endiv
+#divert <hpp>
+#import sys.sock.Options
+#import sys.sock.Option
+namespace sys::sock::specification {
+  template<required::Type TYPE> struct Composer<Specification<TYPE>> {
+    using Type = TYPE;
+    inline constexpr [[implicit]] Composer() : value{0} { }
+    inline constexpr [[implicit]] Composer(Type t) : value{(int) t} { }
+    inline constexpr [[implicit]] Composer(Option o) : value{(int) o} { }
+    inline constexpr [[implicit]] Composer(Options s) : value{(int) s} { }
+    using Value = int; // This is the type of the 2nd argument to socket(2)
+    using value_type [[deprecated]] = Value;
+    inline constexpr operator Value() const { return value; }
+  protected:
+    inline constexpr explicit Composer(Value v) : value{v} { }
+    Value value;
+  };
+}
+#endiv
+#divert <ipp>
+#import sys.sock.specification.Specification
+#endiv

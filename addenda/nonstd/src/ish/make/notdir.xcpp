@@ -1,0 +1,24 @@
+// -*- c++ -*- in the SCOLD stylings which are so popular these days
+#divert <hpp>
+#import std.string
+#import std.allocator
+namespace ish {
+  namespace make {
+    //
+    // Like GNU Make's $(notdir ...)
+    //
+    inline auto notdir(std::string const &) -> std::string;
+    template<template<typename V, typename A> class CONTAINER> inline auto notdir(CONTAINER<std::string, std::allocator<std::string>> const &) -> CONTAINER<std::string, std::allocator<std::string>>;
+  }
+}
+#endiv
+#divert <ipp>
+#import ish.shell.basename
+auto ish::make::notdir(std::string const &path) -> std::string {
+  return shell::basename(path);
+}
+
+template<template<typename V, typename A> class CONTAINER> auto ish::make::notdir(CONTAINER<std::string, std::allocator<std::string>> const &source) -> CONTAINER<std::string, std::allocator<std::string>> {
+  return shell::basename(source);
+}
+#endiv

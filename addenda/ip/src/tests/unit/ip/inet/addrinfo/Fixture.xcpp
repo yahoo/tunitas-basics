@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::inet::addrinfo {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::ip::inet::addrinfo::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_filladdrinfo() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import ip.inet.addrinfo.filladdrinfo
+auto tests::unit::ip::inet::addrinfo::Fixture::test_filladdrinfo() -> void {
+  using namespace ::ip::inet::addrinfo;
+  using ::ip::inet::result::Getaddrinfo;
+  Getaddrinfo gai;
+  Specification def;
+  filladdrinfo(gai, "localhost", "discard", def);
+  CPPUNIT_ASSERT(ok(gai));
+}
+
+#import tests.unit.ip.inet.addrinfo.Iterator
+#import tests.unit.ip.inet.addrinfo.List
+#import tests.unit.ip.inet.addrinfo.Specification
+#import tests.unit.ip.inet.addrinfo.Value
+#import rigging.suite.io
+auto tests::unit::ip::inet::addrinfo::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("addrinfo");
+  series << call("filladdrinfo", &Fixture::test_filladdrinfo)
+         << add<Iterator>()
+         << add<List>()
+         << add<Specification>()
+         << add<Value>()
+    ;
+  return finalize(series);
+}
+#endiv

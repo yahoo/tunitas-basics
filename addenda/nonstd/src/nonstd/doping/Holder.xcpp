@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd:: doping {
+  //
+  // Handles the base-bounds aspect
+  //
+  // Usage:
+  //
+  //   class Prototype<INDIRECTION> : public Holder<INDIRECTION> { }
+  //
+  template<typename INDIRECTION> class Holder;
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+template<typename INDIRECTION> class nonstd::doping::Holder : public INDIRECTION {
+  using ancestor = INDIRECTION;
+protected:
+  // Descendants only, you have to inherit to operationalize this.
+  // DO NOT ----> Holder() = default <----
+  // as that will create a constructor that does not initialize the POD member (the pointer)
+  inline Holder();
+  inline Holder(typename ancestor::Data, std::size_t);
+  ~Holder() = default; // definitely not virtual
+public:
+  inline auto empty() const -> bool;
+  inline auto size() const -> std::size_t;
+  // the 'data' member is implemented in the descendant where the const and non-const variants must appear together
+protected:
+  template<typename CONST_ITERATOR> inline auto endify(CONST_ITERATOR begin) const -> CONST_ITERATOR;
+  template<typename ITERATOR> inline auto endify(ITERATOR begin) -> ITERATOR;
+  template<typename VALUE> inline static auto forward_indexify(VALUE *base, std::size_t length, std::size_t index) -> VALUE &;
+  template<typename VALUE> inline static auto reverse_indexify(VALUE *base, std::size_t length, std::size_t index) -> VALUE &;
+protected:
+  typename ancestor::Data held;
+  std::size_t length;
+};
+#endiv
+#divert <ipp>
+template<typename _> nonstd::doping::Holder<_>::Holder()
+  : held{ancestor::EMPTY()}, // never nullptr
+    length(0) {
+  ;
+}
+template<typename _> nonstd::doping::Holder<_>::Holder(typename ancestor::Data held, std::size_t length)
+  : held{nullptr != held ? held : ancestor::EMPTY()}
+  , length{length} {
+  ;
+}
+template<typename _> auto nonstd::doping::Holder<_>::empty() const -> bool {
+  return 0 == length;
+}
+template<typename _> auto nonstd::doping::Holder<_>::size() const -> std::size_t {
+  return length;
+}
+template<typename _> template<typename CONST_ITERATOR> auto nonstd::doping::Holder<_>::endify(CONST_ITERATOR begin) const -> CONST_ITERATOR {
+  // Valid even if held is nullptr (because length will be 0)
+  return begin + length;
+}
+template<typename _> template<typename ITERATOR> auto nonstd::doping::Holder<_>::endify(ITERATOR begin) -> ITERATOR {
+  // Valid even if held is nullptr (because length will be 0)
+  return begin + length;
+}
+#import std.length_error
+template<typename _> template<typename VALUE> auto nonstd::doping::Holder<_>::forward_indexify(VALUE *base, std::size_t length, std::size_t forward_index) -> VALUE & {
+  if (forward_index >= length) {
+    throw std::length_error("index too big");
+  }
+  auto index = forward_index;
+  return base[index];
+}
+template<typename _> template<typename VALUE> auto nonstd::doping::Holder<_>::reverse_indexify(VALUE *base, std::size_t length, std::size_t reverse_index) -> VALUE & {
+  if (reverse_index >= length) {
+    throw std::length_error("index too big");
+  }
+  auto index = (length-1) - reverse_index;
+  return base[index];
+}
+#endiv

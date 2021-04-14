@@ -1,0 +1,14 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.vector
+namespace nonstd {
+  template<typename T, typename A> struct container_traits<vector<T, A>>;
+}
+#endiv
+#divert <hpp>
+#import nonstd.container.traits.glue.Old
+namespace nonstd {
+  template<typename T, typename A> struct container_traits<vector<T, A>> : public container::traits::glue::Old<vector<T, A>> { };
+}
+#endiv

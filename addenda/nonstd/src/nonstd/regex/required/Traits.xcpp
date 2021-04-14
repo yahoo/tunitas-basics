@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.regex.required.Char
+#import std.basic_string
+#import std.is_same
+#import std.regex_traits
+namespace nonstd::regex::required {
+  //
+  // a std::regex_traits specialization
+  //
+  template<typename TRAITS> concept bool Traits = requires(TRAITS traits) {
+    typename TRAITS::char_type;
+    requires Char<typename TRAITS::char_type>;
+    typename TRAITS::string_type;
+    { typename TRAITS::string_type() } -> std::basic_string<typename TRAITS::char_type>;
+    requires Char<typename TRAITS::string_type::value_type>;
+    typename TRAITS::locale_type;
+    typename TRAITS::char_class_type;
+  };
+}
+#endiv

@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  namespace throwable {
+    namespace detail {
+      class Complaint;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import options.throwable.Usage
+#import options.Program
+#import std.string
+#import sys.exits.Code
+
+class options::throwable::detail::Complaint : public throwable::Usage {
+  using Ancestor = throwable::Usage;
+public:
+  inline Complaint(stringz_type const &argv0, stringz_type const &complaint, sys::exits::Code = sys::exits::CONFIGURATION);
+  inline Complaint(Program const &, stringz_type const &complaint, sys::exits::Code = sys::exits::CONFIGURATION);
+protected:
+  // You have to inherit
+  ~Complaint() = default;
+public:
+  // A default complaint line (but that is still not final)
+  auto unformatted() const -> std::string override;
+protected:
+  std::string complaint;
+  // Extend the Ancestor's to give ${COMPLAINT} in addition to ${NAME} ${____}
+  auto format(std::string const &unformatted_message) const -> std::string override;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+options::throwable::detail::Complaint::Complaint(stringz_type const &the_argv0, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_argv0, the_code)
+  , complaint(the_complaint.begin(), the_complaint.end()) {
+  ;
+}
+
+options::throwable::detail::Complaint::Complaint(Program const &the_program, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_program, the_code)
+  , complaint(the_complaint.begin(), the_complaint.end()) {
+  ;
+}
+#divert </ipp>
+#divert <cpp>
+auto options::throwable::detail::Complaint::unformatted() const -> std::string {
+  return "${NAME}: error, ${COMPLAINT}";
+}
+
+auto options::throwable::detail::Complaint::format(std::string const &unformatted_message) const -> std::string {
+  std::string result = Ancestor::format(unformatted_message);
+  replace(result, "${COMPLAINT}", complaint);
+  return result;
+}
+#divert </cpp>

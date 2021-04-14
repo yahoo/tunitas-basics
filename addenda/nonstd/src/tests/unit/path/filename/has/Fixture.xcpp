@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::path::filename::has {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::path::filename::has::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_has_prefix() -> void;
+  auto test_has_suffix() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import nonstd.path.filename.has_prefix
+auto tests::unit::path::filename::has::Fixture::test_has_prefix() -> void {
+  using ::nonstd::path::filename::has_prefix;
+  CPPUNIT_ASSERT(!has_prefix("", ""));
+  CPPUNIT_ASSERT(has_prefix("file.c", "file"));
+  CPPUNIT_ASSERT(has_prefix("file./c", "file"));
+  CPPUNIT_ASSERT(has_prefix("app.le", "app"));
+  CPPUNIT_ASSERT(has_prefix("o.make.out", "o"));
+  CPPUNIT_ASSERT(has_prefix("rc.d/file.log", "rc"));
+  CPPUNIT_ASSERT(has_prefix(".bashrc", ""));
+}
+
+#import nonstd.path.filename.has_suffix
+auto tests::unit::path::filename::has::Fixture::test_has_suffix() -> void {
+  using ::nonstd::path::filename::has_suffix;
+  CPPUNIT_ASSERT(!has_suffix("", ""));
+  CPPUNIT_ASSERT(has_suffix("app.le", "le"));
+  CPPUNIT_ASSERT(has_suffix("o.make.out", "out"));
+  CPPUNIT_ASSERT(has_suffix("rc.d/file.log", "log"));
+  CPPUNIT_ASSERT(has_suffix(".bashrc", "bashrc"));
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::path::filename::has::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("has");
+  s << call("has_prefix", &Fixture::test_has_prefix)
+    << call("has_suffix", &Fixture::test_has_suffix)
+    ;
+  return finalize(s);
+}
+#endiv

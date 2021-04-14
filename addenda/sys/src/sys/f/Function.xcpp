@@ -1,0 +1,121 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// Acquire the primitive #define values
+#include <fcntl.h>
+namespace sys::f {
+  enum class Function {
+    // These are ordered roughly as they are ordered in <linux/fcntl.h>, <asm-generic/fcntl.h> and by number.
+    // However, we trying to keep the like-minded series together for clarity.
+    // dup(2)
+    DUPFD = F_DUPFD,
+    DUPFD_CLOEXEC = F_DUPFD_CLOEXEC,
+    // The flags of a file descriptor;
+    // there is only one such flag. See O::Create, but only O::CLOEXEC is meaningful
+    GETFD = F_GETFD,
+    SETFD = F_SETFD,                       // bitset<o::Options>, a.k.a. int, int32_t
+    // (Status) flags of a file descriptor, see O::Status
+    GETFL = F_GETFL,                       // void
+    SETFL = F_SETFL,                       // bitset<o::Status>,           a.k.a. int, int32_t
+    // locking
+    GETLOCK_PROCESS = F_GETLK,              // [[out]] flock &,             a.k.a. flock *
+    SETLOCK_PROCESS = F_SETLK,              // [[in]] flock const &,        a.k.a. flock const *
+    SETLOCK_PROCESS_WAITING = F_SETLKW,     // [[in]] flock const &,        a.k.a. flock const *
+    GETLOCK64_PROCESS = F_GETLK64,          // [[out]] flock64 &,           a.k.a. flock64 *
+    SETLOCK64_PROCESS = F_SETLK64,          // [[in]] flock64 const &,      a.k.a. flock64 const *
+    SETLOCK64_PROCESS_WAITING = F_SETLKW64, // [[in]] flock64 onst &,       a.k.a. flock64 const *
+    GETLOCK_FILE = F_OFD_GETLK,             // [[out]] flock &,             a.k.a. flock *
+    SETLOCK_FILE = F_OFD_SETLK,             // [[in]] flock const &,        a.k.a. flock const *
+    SETLOCK_FILE_WAITING = F_OFD_SETLKW,    // [[in]] flock const &,        a.k.a. flock const *
+#ifdef F_OFD_GETLK64 // [[ANSWERTHIS]] Why is there yet no such interface?
+    GETLK64_FILE = F_OFD_GETLK64,           // [[out]] flock64 &,           a.k.a. flock *
+    SETLK64_FILE = F_OFD_SETLK64,           // [[in]] flock64 const &,      a.k.a. flock const *
+    SETLKW64_FILE = F_OFD_SETLKW64,         // [[in]] flock64 const &,      a.k.a. flock const *
+#endif
+    // leasing
+    GETLEASE = F_GETLEASE,                 // void
+    SETLEASE = F_SETLEASE,                 // bitset<f::Lock>,             a.k.a. int
+    // pipe sizing
+    GETPIPE_SIZE = F_GETPIPE_SZ,           // void
+    SETPIPE_SIZE = F_SETPIPE_SZ,           // size in bytes,               a.k.a. int, int32_t
+    // I/O availability signals
+    GETOWNER = F_GETOWN,                   // id_t, pid_t, pgrp_t,         a.k.a. int, int32_t
+    SETOWNER = F_SETOWN,                   // id_t, pid_t, pgrp_t,         a.k.a. int, int32_t
+    GETOWNER_EX = F_GETOWN_EX,             // [[out]] f_owner_ex &,        a.k.a. f_owner_ex *
+    SETOWNER_EX = F_SETOWN_EX,             // [[in]] f_owner_ex const &,   a.k.a. f_owner_ex const *
+    GETSIGNAL = F_GETSIG,                  // void
+    SETSIGNAL = F_SETSIG,                  // Signal,                      a.k.a. int, int32_t
+    // directory notifications, see DN::Notifies
+    NOTIFY = F_NOTIFY,                     // bitset<Notify>               a.k.a. int, int32_t
+    // Seal (and porpoise and walrus?)
+    GET_SEALS = F_GET_SEALS,               // void
+    ADD_SEALS = F_ADD_SEALS,               // bitset<Seal>,                a.k.a. int, int32_t
+    // The read-write hints (as "RWH" in lieu of "READ_WRITE_HINT" or various other abbreviations)
+    GET_RWH_PROCESS = F_GET_RW_HINT,       // [[out]] uint64_t &,          a.k.a. uint64_t *
+    SET_RWH_PROCESS = F_SET_RW_HINT,       // [[in]] uint64_const &,       a.k.a. uint64_t const *
+    GET_RWH_FILE = F_GET_FILE_RW_HINT,     // [[out]] uint64_t &,          a.k.a. uint64_t * 
+    SET_RWH_FILE = F_SET_FILE_RW_HINT,     // [[in]] uint64_t const &,     a.k.a. uint64_t const *
+#ifdef F_GETOWNER_UIDS
+    // [[ANSWERTHIS]] this defined only in <linux/fcntl.h> which does not come with <fcntl.h>  Why?
+    GETOWNER_UIDS = F_GETOWNER_UIDS,       // unclear, undocumented?
+#endif
+    //
+    // old school with all the preciousness of the missing vowels and syllable elisions
+    //
+    GETLK             [[deprecated("instead, prefer Function::GETLOCK_PROCESS")]]           = GETLOCK_PROCESS,
+    SETLK             [[deprecated("instead, prefer Function::SETLOCK_PROCESS")]]           = SETLOCK_PROCESS,
+    SETLKW            [[deprecated("instead, prefer Function::SETLOCK_PROCESS_WAITING")]]   = SETLOCK_PROCESS_WAITING,
+    GETLOCK           [[deprecated("instead, prefer Function::GETLOCK_PROCESS")]]           = GETLOCK_PROCESS,
+    SETLOCK           [[deprecated("instead, prefer Function::SETLOCK_PROCESS")]]           = SETLOCK_PROCESS,
+    SETLOCK_WAITING   [[deprecated("instead, prefer Function::SETLOCK_PROCESS_WAITING")]]   = SETLOCK_PROCESS_WAITING,
+    GETLK64           [[deprecated("instead, prefer Function::GETLOCK64_PROCESS")]]         = GETLOCK64_PROCESS,
+    SETLK64           [[deprecated("instead, prefer Function::SETLOCK64_PROCESS")]]         = SETLOCK64_PROCESS,
+    SETLKW64          [[deprecated("instead, prefer Function::SETLOCK64_PROCESS_WAITING")]] = SETLOCK64_PROCESS_WAITING,
+    GETLOCK64         [[deprecated("instead, prefer Function::GETLOCK64_PROCESS")]]         = GETLOCK64_PROCESS,
+    SETLOCK64         [[deprecated("instead, prefer Function::SETLOCK64_PROCESS")]]         = SETLOCK64_PROCESS,
+    SETLOCK64_WAITING [[deprecated("instead, prefer Function::SETLOCK64_PROCESS_WAITING")]] = SETLOCK64_PROCESS_WAITING,
+    OFD_GETLK         [[deprecated("instead, prefer Function::GETLOCK_FILE")]]              = GETLOCK_FILE,
+    OFD_SETLK         [[deprecated("instead, prefer Function::SETLOCK_FILE")]]              = SETLOCK_FILE,
+    OFD_SETLKW        [[deprecated("instead, prefer Function::SETLOCK_FILE_WAITING")]]      = SETLOCK_FILE_WAITING,
+#ifdef F_OFD_GETLK64
+    OFD_GETLK64       [[deprecated("instead, prefer Function::GETLOCK64_FILE")]]            = GETLOCK64_FILE,
+    OFD_SETLK64       [[deprecated("instead, prefer Function::SETLOCK64_FILE")]]            = SETLOCK64_FILE,
+    OFD_SETLKW64      [[deprecated("instead, prefer Function::SETLOCK64_FILE_WAITING")]]    = SETLOCK64_FILE_WAITING,
+#endif
+    GETPIPE_SZ        [[deprecated("instead, prefer Function::GETPIPE_SIZE")]]              = GETPIPE_SIZE,
+    SETPIPE_SZ        [[deprecated("instead, prefer Function::SETPIPE_SIZE")]]              = SETPIPE_SIZE,
+    GETOWN            [[deprecated("instead, prefer Function::GETOWNER")]]                  = GETOWNER,
+    SETOWN            [[deprecated("instead, prefer Function::SETOWNER")]]                  = SETOWNER,
+    GETOWN_EX         [[deprecated("instead, prefer Function::GETOWNER_EX")]]               = GETOWNER_EX,
+    SETOWN_EX         [[deprecated("instead, prefer Function::SETOWNER_EX")]]               = SETOWNER_EX,
+    GETSIG            [[deprecated("instead, prefer Function::GETSIGNAL")]]                 = GETSIGNAL,
+    SETSIG            [[deprecated("instead, prefer Function::SETSIGNAL")]]                 = SETSIGNAL,
+    GET_RWH           [[deprecated("instead, prefer Function::GET_RWH_PROCESS")]]           = GET_RWH_PROCESS,
+    SET_RWH           [[deprecated("instead, prefer Function::SET_RWH_PROCESS")]]           = SET_RWH_PROCESS,
+    GET_RW_HINT       [[deprecated("instead, prefer Function::GET_RWH_PROCESS")]]           = GET_RWH_PROCESS,
+    SET_RW_HINT       [[deprecated("instead, prefer Function::SET_RWH_PROCESS")]]           = SET_RWH_PROCESS,
+    //
+    // These were our inventions ... which were not a good idea.
+    // ... seemed like a good idea at the time.
+    //
+    PROCESS_GETLOCK           [[deprecated("instead, prefer Function::GETLOCK_PROCESS")]]           = GETLOCK_PROCESS,
+    PROCESS_SETLOCK           [[deprecated("instead, prefer Function::SETLOCK_PROCESS")]]           = SETLOCK_PROCESS,
+    PROCESS_SETLOCK_WAITING   [[deprecated("instead, prefer Function::SETLOCK_PROCESS_WAITING")]]   = SETLOCK_PROCESS_WAITING,
+    PROCESS_GETLOCK64         [[deprecated("instead, prefer Function::GETLOCK64_PROCESS")]]         = GETLOCK64_PROCESS,
+    PROCESS_SETLOCK64         [[deprecated("instead, prefer Function::SETLOCK64_PROCESS")]]         = SETLOCK64_PROCESS,
+    PROCESS_SETLOCK64_WAITING [[deprecated("instead, prefer Function::SETLOCK64_PROCESS_WAITING")]] = SETLOCK64_PROCESS_WAITING,
+    FILE_GETLOCK              [[deprecated("instead, prefer Function::GETLOCK_FILE")]]              = GETLOCK_FILE,
+    FILE_SETLOCK              [[deprecated("instead, prefer Function::SETLOCK_FILE")]]              = SETLOCK_FILE,
+    FILE_SETLOCK_WAITING      [[deprecated("instead, prefer Function::SETLOCK_FILE_WAITING")]]      = SETLOCK_FILE_WAITING,
+#ifdef F_OFD_GETLK64
+    FILE_GETLK64  [[deprecated("instead, prefer Function::GETLK64_FILE")]]  = GETLK64_FILE,
+    FILE_SETLK64  [[deprecated("instead, prefer Function::SETLK64_FILE")]]  = SETLK64_FILE,
+    FILE_SETLKW64 [[deprecated("instead, prefer Function::SETLKW64_FILE")]] = SETLKW64_FILE,
+#endif
+    GET_PROCESS_RW_HINT [[deprecated("instead, prefer Function::GET_RWH_PROCESS")]] = GET_RWH_PROCESS,
+    SET_PROCESS_RW_HINT [[deprecated("instead, prefer Function::SET_RWH_PROCESS")]] = SET_RWH_PROCESS,
+    GET_FILE_RW_HINT    [[deprecated("instead, prefer Function::GET_RWH_FILE")]]    = GET_RWH_FILE,
+    SET_FILE_RW_HINT    [[deprecated("instead, prefer Function::SET_RWH_FILE")]]    = SET_RWH_FILE,
+  };
+}
+#endiv

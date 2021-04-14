@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.fork
+#import sys.posix.wait
+#import sys.posix.daemon
+auto tests::unit::posix::fixture::Fixture::test_daemon() -> void {
+  //
+  // Daemon has the behavior that upon success, the parent dies and the child is "in the background."
+  // Technique: use fork to make a child.
+  // Test daemon in the child, try to recover the child's (successful) exit status.
+  //
+  using six::daemon;
+  using six::fork;
+  using nat::wait; // the posix::native one, not the posix one
+  auto r = fork();
+  if (is_error(r)) {
+    CPPUNIT_ASSERT(false);
+  } else if (is_parent(r)) {
+    // Wait for both (all) children.
+    //
+    auto ALL = six::P::ALL;
+    auto id = id_t(0);
+    auto EXITED = six::W::EXITED;
+    auto u = wait(ALL, id, EXITED)();
+    // the exit should have succeeded; the exit code might be nozero if the child failed its test.
+    CPPUNIT_ASSERT(good(u));
+    // [[FIXTHIS]] test for the exit code(s) of the processes.
+  } else if (is_child(r)) {
+    using namespace ::sys::posix;
+    auto r = daemon(CHDIR, CLOSE);
+    CPPUNIT_ASSERT(good(r));
+    auto ecode = good(r) ? 0 : 1;
+    exit(ecode);
+  }
+}
+#endiv

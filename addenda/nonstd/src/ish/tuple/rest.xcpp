@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+//
+// The inverse of ish::tuple::cat(...)
+//
+#import std.tuple
+namespace ish::tuple {
+  // not found by ADL
+  template<typename TYPE, typename... TYPES> inline auto rest(std::tuple<TYPE, TYPES...> const &) -> std::tuple<TYPES...>;
+  template<typename TYPE, typename... TYPES> inline auto rest(std::tuple<TYPE, TYPES...> &&) -> std::tuple<TYPES...>;
+}
+#endiv
+#divert <ipp>
+#import ish.tuple.detail.rest
+template<typename TYPE, typename... TYPES> auto ish::tuple::rest(std::tuple<TYPE, TYPES...> const &subject) -> std::tuple<TYPES...> {
+  using result_type = std::tuple<TYPES...>;
+  using subject_type = std::tuple<TYPE, TYPES...>;
+  return detail::rest<result_type, subject_type, TYPE, TYPES...>(subject);
+}
+
+#import std.forward
+template<typename TYPE, typename... TYPES> auto ish::tuple::rest(std::tuple<TYPE, TYPES...> &&subject) -> std::tuple<TYPES...> {
+  using result_type = std::tuple<TYPES...>;
+  using subject_type = std::tuple<TYPE, TYPES...>;
+  return detail::rest<result_type, subject_type, TYPE, TYPES...>(std::forward<std::tuple<TYPE, TYPES...>>(subject));
+}
+#endiv

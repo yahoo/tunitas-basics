@@ -1,0 +1,112 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sock.interface
+namespace sys::posix {
+  namespace packaging::accept {
+    using namespace packaging::sock::interface;
+    namespace function {
+      namespace accepted {
+        using Socket = result::accepted::Socket<File>;
+        template<required::Sockaddr SOCKADDR> using Sockaddr = result::accepted::Sockaddr<File, SOCKADDR>;
+      }
+      // accept(2) in traditional form
+      inline auto accept(File, [[out]] Sockaddr *, [[inout]] Socklen *) -> accepted::Socket;
+      inline auto accept(File, [[out]] Sockaddr &, [[inout]] Socklen &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(File, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(File) -> accepted::Sockaddr<SOCKADDR>;
+      // accept4(2) in overloaded form
+      inline auto accept(File, [[out]] Sockaddr *, [[inout]] Socklen *, Options) -> accepted::Socket;
+      inline auto accept(File, [[out]] Sockaddr &, [[inout]] Socklen &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(File, [[out]] SOCKADDR &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(File, Options, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(File, Options) -> accepted::Sockaddr<SOCKADDR>;
+    }
+    namespace native {
+      namespace accepted {
+        using Socket = result::accepted::Socket<int>;
+        template<required::Sockaddr SOCKADDR> using Sockaddr = result::accepted::Sockaddr<int, SOCKADDR>;
+      }
+      // accept(2) in traditional form
+      inline auto accept(int fd, [[out]] Sockaddr *, [[inout]] Socklen *) -> accepted::Socket;
+      inline auto accept(int fd, [[out]] Sockaddr &, [[inout]] Socklen &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(int fd, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(int fd) -> accepted::Sockaddr<SOCKADDR>;
+      // accept4(2) in overloaded form
+      inline auto accept(int fd, [[out]] Sockaddr *, [[inout]] Socklen *, Options) -> accepted::Socket;
+      inline auto accept(int fd, [[out]] Sockaddr &, [[inout]] Socklen &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(int fd, [[out]] SOCKADDR &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(int fd, Options, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept(int fd, Options) -> accepted::Sockaddr<SOCKADDR>;
+    }
+  }
+  using packaging::accept::function::accept;
+  namespace native { using packaging::accept::native::accept; }
+}
+#import sys.sock.addr.upcast
+namespace sys::posix::packaging::accept { namespace upcast = sys::sock::addr::upcast; }
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::accept {
+  namespace upcast = sys::sock::addr::upcast;
+  // accept(2)
+  auto function::accept(File fd, Sockaddr *addr, Socklen *addrlen) -> accepted::Socket                     { return promote(native::accept((int) fd, addr, addrlen)); }
+  auto function::accept(File fd, Sockaddr &addr, Socklen &addrlen) -> accepted::Socket                     { return promote(native::accept((int) fd, addr, addrlen)); }
+  template<required::Sockaddr SOCKADDR> auto function::accept(File fd, SOCKADDR &addr) -> accepted::Socket { return promote(native::accept<SOCKADDR>((int) fd, addr)); }
+  template<required::Sockaddr SOCKADDR> auto function::accept(File fd) -> accepted::Sockaddr<SOCKADDR>     { return promote(native::accept<SOCKADDR>((int) fd)); }
+  // accept4(2)
+  auto function::accept(File fd, Sockaddr *addr, Socklen *addrlen, Options options) -> accepted::Socket                     { return promote(native::accept((int) fd, addr, addrlen, options)); }
+  auto function::accept(File fd, Sockaddr &addr, Socklen &addrlen, Options options) -> accepted::Socket                     { return promote(native::accept((int) fd, addr, addrlen, options)); }
+  template<required::Sockaddr SOCKADDR> auto function::accept(File fd, SOCKADDR &addr, Options options) -> accepted::Socket { return promote(native::accept<SOCKADDR>((int) fd, addr, options)); }
+  template<required::Sockaddr SOCKADDR> auto function::accept(File fd, Options options, SOCKADDR &addr) -> accepted::Socket { return promote(native::accept<SOCKADDR>((int) fd, options, addr)); }
+  template<required::Sockaddr SOCKADDR> auto function::accept(File fd, Options options) -> accepted::Sockaddr<SOCKADDR>     { return promote(native::accept<SOCKADDR>((int) fd, options)); }
+}
+#import sys.posix.syscall
+#import sys.posix.close
+#import std.runtime_error
+namespace sys::posix::packaging::accept {
+  // accept(2)
+  auto native::accept(int oldfd, Sockaddr *addr, Socklen *addrlen) -> accepted::Socket { return idiomatic::syscall<int>(Syscall::ACCEPT, oldfd, addr, addrlen); }
+  auto native::accept(int oldfd, Sockaddr &addr, Socklen &addrlen) -> accepted::Socket { return idiomatic::syscall<int>(Syscall::ACCEPT, oldfd, &addr, &addrlen); }
+  template<required::Sockaddr SOCKADDR> auto native::accept(int oldfd, SOCKADDR &addr) -> accepted::Socket {
+    Socklen proposed{sizeof (addr)};
+    auto called = idiomatic::syscall<int>(Syscall::ACCEPT, oldfd, upcast::to_address(addr), &proposed);
+    if (proposed != sizeof (addr)) {
+      // We got something else (which was unexpected).   What else can we do?
+      // This can happen when SOCKADDR=sockaddr and we get sockaddr_in4 back; or a sockaddr_in6
+      posix::native::close(value(called));
+      throw std::runtime_error{"sockaddr size surprise"};
+    }
+    return called;
+  }
+  template<required::Sockaddr SOCKADDR> auto native::accept(int oldfd) -> accepted::Sockaddr<SOCKADDR> {
+    SOCKADDR addr;
+    Socklen proposed{sizeof (addr)};
+    auto called = idiomatic::syscall<int>(Syscall::ACCEPT, oldfd, upcast::to_address(addr), &proposed);
+    return {good(called), error_num(called), value(called), addr, proposed};
+  }
+}
+namespace sys::posix::packaging::accept {
+  // accept4(2)
+  auto native::accept(int oldfd, Sockaddr *addr, Socklen *addrlen, Options options) -> accepted::Socket { return idiomatic::syscall<int>(Syscall::ACCEPT4, oldfd, addr, addrlen, (int) options); }
+  auto native::accept(int oldfd, Sockaddr &addr, Socklen &addrlen, Options options) -> accepted::Socket { return idiomatic::syscall<int>(Syscall::ACCEPT4, oldfd, &addr, &addrlen, (int) options); }
+  template<required::Sockaddr SOCKADDR> auto native::accept(int oldfd, Options options, SOCKADDR &addr) -> accepted::Socket { return accept(oldfd, addr, options); }
+  template<required::Sockaddr SOCKADDR> auto native::accept(int oldfd, SOCKADDR &addr, Options options) -> accepted::Socket {
+    Socklen proposed{sizeof (addr)};
+    auto called = idiomatic::syscall<int>(Syscall::ACCEPT4, oldfd, upcast::to_address(addr), &proposed, (int) options);
+    if (proposed != sizeof (addr)) {
+      // We got something else (which was unexpected).   What else can we do?
+      // This can happen when SOCKADDR=sockaddr and we get sockaddr_in4 back; or a sockaddr_in6
+      posix::native::close(value(called));
+      throw std::runtime_error{"sockaddr size surprise"};
+    }
+    return called;
+  }
+  template<required::Sockaddr SOCKADDR> auto native::accept(int oldfd, Options options) -> accepted::Sockaddr<SOCKADDR> {
+    SOCKADDR addr;
+    Socklen proposed{sizeof (addr)};
+    auto called = idiomatic::syscall<int>(Syscall::ACCEPT4, oldfd, upcast::to_address(addr), &proposed, (int) options);
+    return {good(called), error_num(called), value(called), addr, proposed};
+  }
+}
+#endiv

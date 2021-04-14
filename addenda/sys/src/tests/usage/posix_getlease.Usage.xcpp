@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_getlease.Usage
+//   static_assert(tests::usage::posix_getlease::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.call.Result
+#import sys.fd.required.Unmanaged
+#import sys.id.File
+#import sys.posix.getlease
+#import sys.posix.LEASE
+#import sys.posix.LOCK
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_getlease {
+  using sys::posix::getlease;
+  using sys::posix::native::getlease;
+  using sys::posix::LEASE;
+  namespace [[detail]] packaging {
+    namespace [[detail]] {
+      using namespace std;
+      using namespace nonstd;
+      namespace required = sys::fd::required;
+      namespace [[detail]] returning {
+        using Returned = sys::call::result::Value<LEASE::Operation>;
+        template<typename UNMANAGED> concept bool Signature = requires(UNMANAGED fd) {
+          requires required::Unmanaged<UNMANAGED>;
+          { getlease(fd) } -> convertible_to<Returned>;
+        };
+      }
+      namespace [[detail]] filling {
+        using Status = sys::call::Result;
+        template<typename UNMANAGED> concept bool Signature = requires(UNMANAGED fd, LEASE::Operation &returned) {
+          requires required::Unmanaged<UNMANAGED>;
+          { getlease(fd, returned) } -> convertible_to<Status>;
+        };
+      }
+    }
+    template<typename UNMANAGED> concept bool Instance = requires(UNMANAGED) {
+      requires sys::fd::required::Unmanaged<UNMANAGED>;
+      requires returning::Signature<UNMANAGED>;
+      requires filling::Signature<UNMANAGED>;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      Instance<int>;
+      Instance<sys::id::File>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

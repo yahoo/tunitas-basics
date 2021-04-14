@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.Status
+#import sys.o.Statuses
+#import std.is_same
+namespace sys::o::required {
+  //
+  // Either the singleton or the (bitset) flags variant of o::Statusess
+  // Normally you'd use overloading to express this.
+  // But when overloading on the return type, a template be used.
+  //
+  // Usage:
+  //
+  //   template<required::Statusess RESULT> inline auto function(...somehow...) -> RESULT;
+  //
+  template<typename STATUSES> concept bool Statuses = std::is_same_v<STATUSES, o::Statuses> || std::is_same_v<STATUSES, o::Status>;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::o;
+    static_assert(required::Statuses<Status>);
+    static_assert(required::Statuses<Statuses>);
+  }
+}
+#endiv

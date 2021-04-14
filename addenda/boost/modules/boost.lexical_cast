@@ -1,0 +1,3 @@
+// -*- c++ -*- 17549745-6fcc-4f70-bc17-b1559c02ed75
+#pragma once
+#include "boost/lexical_cast.hpp"

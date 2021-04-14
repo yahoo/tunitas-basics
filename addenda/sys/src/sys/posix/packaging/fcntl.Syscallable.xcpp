@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Enumeration
+#import nonstd.required.Pointer
+#import nonstd.required.Integral
+#import sys.posix.packaging.required // to cascade namespace required
+namespace sys::posix::packaging::fcntl {
+  namespace syscallable {
+    template<typename TYPE, bool POINTER, bool ENUMERATION, bool INTEGRAL> struct Syscallable;
+    template<typename TYPE> struct Syscallable<TYPE, false, false, true>;
+    template<typename TYPE> struct Syscallable<TYPE, false, true, false>;
+    template<typename TYPE> struct Syscallable< TYPE, true, false, false>;
+  }
+  template<typename TYPE> using Syscallable = typename syscallable::Syscallable<TYPE, required::Pointer<TYPE>, required::Enumeration<TYPE>, required::Integral<TYPE>>::Type;
+}
+#endiv
+#divert <hpp>
+#import std.is_enum
+#import std.is_integral
+#import std.is_pointer
+#import std.underlying_type
+namespace sys::posix::packaging::fcntl::syscallable {
+  template<typename TYPE> struct Syscallable<TYPE, true, false, false> {
+    using Type = TYPE;
+    static_assert(std::is_pointer_v<TYPE>);
+  };
+  template<typename TYPE> struct Syscallable<TYPE, false, true, false> {
+    using Type = std::underlying_type_t<TYPE>;
+    static_assert(std::is_enum_v<TYPE>);
+  };
+  template<typename TYPE> struct Syscallable<TYPE, false, false, true> {
+    using Type = TYPE;
+    static_assert(std::is_integral_v<TYPE>);
+  };
+}
+#endiv

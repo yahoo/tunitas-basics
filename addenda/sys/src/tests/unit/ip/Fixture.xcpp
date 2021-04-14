@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.net.Network
+#import sys.sock.Type
+struct tests::unit::ip::Fixture : public cppunit::test::Fixture {
+  using Network = ::sys::net::Network;
+  using Socket = ::sys::sock::Type;
+  auto test_usage_addr() -> void;
+  auto test_usage_proto() -> void;
+  auto test_usage_sock() -> void;
+  auto test_constants() -> void;
+  auto test_proto_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.ip.addr.Family
+#import sys.ip.proto.Family // protocol
+#import sys.ip.proto.Protocol
+#import sys.ip.sock.Kind
+#import sys.af.constants
+#import sys.ip.constants
+#import sys.ip.proto.constants
+namespace tests::unit::ip {
+  auto Fixture::test_usage_addr() -> void {
+    using namespace ::sys::ip::constants;
+    using namespace ::sys::ip::addr;
+    auto const inet4 = Family<IP4>;
+    auto const inet6 = Family<IP6>;
+    CPPUNIT_ASSERT(inet4 != inet6);
+  }
+  auto Fixture::test_usage_proto() -> void {
+    using namespace ::sys::ip::proto::constants;
+    using namespace ::sys::ip::proto;
+    auto const ip = Protocol::IP;
+    auto const tcp = Protocol::TCP;
+    auto const udp = Protocol::UDP;
+    CPPUNIT_ASSERT(ip != tcp);
+    CPPUNIT_ASSERT(tcp != udp);
+  }
+  auto Fixture::test_usage_sock() -> void {
+    using namespace ::sys::ip::sock;
+    auto const stream = Kind<Socket::STREAM>;
+    auto const datagram = Kind<Socket::DATAGRAM>;
+    auto const raw = Kind<Socket::RAW>;
+    CPPUNIT_ASSERT(stream != datagram);
+    CPPUNIT_ASSERT(datagram != raw);
+  }
+  auto Fixture::test_constants() -> void {
+    using namespace ::sys::ip::constants;
+    static_assert(sizeof (INET4));
+    static_assert(sizeof (INET6));
+  }
+  auto Fixture::test_proto_constants() -> void {
+    using namespace ::sys::ip::proto::constants;
+    static_assert(sizeof (IP));
+    static_assert(sizeof (TCP));
+    static_assert(sizeof (UDP));
+  }
+}
+#import tests.unit.ip.proto.Fixture
+#import rigging.suite.io
+auto tests::unit::ip::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"ip"};
+  series 
+         << []() {
+              Stream use{"usage"};
+              use << call("addr", &Fixture::test_usage_addr)
+                  << call("proto", &Fixture::test_usage_proto)
+                  << call("sock", &Fixture::test_usage_sock)
+                ;
+              return move(use);
+            }()
+         << []() {
+              Stream con{"constants"};
+              con << call("ip", &Fixture::test_constants)
+                  << call("proto", &Fixture::test_proto_constants)
+                ;
+              return move(con);
+            }()
+         << add<proto::Fixture>()
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+namespace sys::posix {
+  //
+  // The Process-Associated locks.
+  // See Open File Descript{or,ion}] (OFD), nearby.
+  //
+  // [[Decision]] The flock struct(ure) is too big and too vaguely defined to offer it inn return as Value<flock> return.
+  //
+  // These are the "orginal" locks: F_GETLK, F_SETLK, F_SETLKW
+  //
+  namespace packaging::getlock_process {
+    using namespace packaging::lock::interface;
+    using namespace bundle::getlock;
+    namespace function {
+      [[deprecated("buy a vowel, prefer getlock(File, F::PROCESS, flock &)")]] inline auto getlock_process(File, [[out]] truct::flock &) -> Status;
+    } 
+    namespace native {
+      [[deprecated("buy a vowel, prefer getlock(File, F::PROCESS, flock &)")]] inline auto getlock_process(int fd, [[out]] truct::flock &) -> Status;
+    } 
+  }
+  using packaging::getlock_process::function::getlock_process;
+  namespace native { using packaging::getlock_process::native::getlock_process; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.getlock
+namespace sys::posix::packaging::getlock_process {
+  auto function::getlock_process(File fd, truct::flock &lock) -> Status { return posix::getlock(fd, F::PROCESS, lock); }
+  auto native::getlock_process(int fd, truct::flock &lock) -> Status    { return posix::native::getlock(fd, F::PROCESS, lock); }
+}
+#endiv

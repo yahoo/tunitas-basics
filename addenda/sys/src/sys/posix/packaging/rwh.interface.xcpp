@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.uint64_t
+#import sys.call.Result
+#import sys.id.File
+#import sys.f.Function
+#import sys.f.layer.Which
+namespace sys::posix::packaging::rwh::interface {
+  using f::Function;
+  using id::File;
+  using Hint = std::uint64_t; // yes unsigned ... but "bigger than an int' and must be passed by reference.
+  namespace layer = f::layer; // for at least f::layer::Which
+  using Filetable = f::layer::File; // to avoid the clash with id::File
+  using f::layer::Process;
+  using f::layer::Which;
+  using Status = call::Result;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.F
+#import sys.posix.fcntl
+namespace sys::posix::packaging::lock::interface {
+  using posix::F;
+}
+#endiv

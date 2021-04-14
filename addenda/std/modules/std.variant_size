@@ -1,0 +1,4 @@
+// -*- c++ -*- a36bcd91-0c97-40f5-bac6-97769809624b
+#pragma once
+// There is special version-specific trickery #ifdefs in here; done once, done right (ahem)
+#include <std.variant>

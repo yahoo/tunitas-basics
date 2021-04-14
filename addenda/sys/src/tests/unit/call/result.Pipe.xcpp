@@ -1,0 +1,161 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::call::result { class Pipe; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.call.result.Pipe
+class tests::unit::call::result::Pipe : public cppunit::test::Fixture { 
+public: 
+  using Subject = ::sys::call::result::Pipe;
+  auto test_construction0() -> void;
+  auto test_construction1() -> void;
+  auto test_construction2() -> void;
+  auto test_construction3() -> void;
+  auto test_ok() -> void;
+  auto test_value() -> void;
+  auto test_read_side() -> void;
+  auto test_write_side() -> void;
+  auto test_get0() -> void;
+  auto test_get1() -> void;
+  auto test_error_code() -> void;
+  auto test_error_condition() -> void;
+  auto test_error_num() -> void;
+  auto test_error_message() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import std.string_literals
+#include <cerrno>
+auto tests::unit::call::result::Pipe::test_construction0() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(ok(subject));
+}
+auto tests::unit::call::result::Pipe::test_construction1() -> void {
+  errno = 14;
+  Subject subject(false);
+  CPPUNIT_ASSERT(!ok(subject));
+  CPPUNIT_ASSERT(14 == errnum(subject));
+}
+auto tests::unit::call::result::Pipe::test_construction2() -> void {
+  Subject subject(true, 99);
+  CPPUNIT_ASSERT(ok(subject));
+  CPPUNIT_ASSERT(99 == errnum(subject));
+}
+auto tests::unit::call::result::Pipe::test_construction3() -> void {
+  Subject subject(false, 45, -1, -2); // <------------------ there is no 3-arg constructor
+  CPPUNIT_ASSERT(!ok(subject));
+  CPPUNIT_ASSERT(45 == errnum(subject));
+  CPPUNIT_ASSERT(-1 == value(subject));
+  CPPUNIT_ASSERT(-1 == read_side(subject));
+  CPPUNIT_ASSERT(-2 == write_side(subject));
+}
+auto tests::unit::call::result::Pipe::test_ok() -> void {
+  Subject subject(false, 45, -1, -2);
+  CPPUNIT_ASSERT(!ok(subject));
+  CPPUNIT_ASSERT(45 == errnum(subject));
+  CPPUNIT_ASSERT(-1 == value(subject));
+  CPPUNIT_ASSERT(-1 == read_side(subject));
+  CPPUNIT_ASSERT(-2 == write_side(subject));
+}
+auto tests::unit::call::result::Pipe::test_value() -> void {
+  Subject subject{false, 45, 3, 4};
+  auto &actual = value(subject);
+  actual = 5;
+  CPPUNIT_ASSERT_EQUAL(5, read_side(subject));
+  CPPUNIT_ASSERT_EQUAL(4, write_side(subject));
+}
+auto tests::unit::call::result::Pipe::test_read_side() -> void {
+  Subject subject{false, 45, 6, 7};
+  CPPUNIT_ASSERT_EQUAL(6, read_side(subject));
+}
+auto tests::unit::call::result::Pipe::test_write_side() -> void {
+  Subject subject{false, 45, 6, 7};
+  CPPUNIT_ASSERT_EQUAL(6, read_side(subject));
+}
+auto tests::unit::call::result::Pipe::test_get0() -> void {
+  Subject subject{true, 0, 8, 9};
+  CPPUNIT_ASSERT_EQUAL(9, sys::call::result::get<0>(subject));
+  CPPUNIT_ASSERT_EQUAL(read_side(subject), sys::call::result::get<0>(subject));
+}
+auto tests::unit::call::result::Pipe::test_get1() -> void {
+  Subject subject{true, 0, 8, 9};
+  CPPUNIT_ASSERT_EQUAL(9, sys::call::result::get<1>(subject));
+  CPPUNIT_ASSERT_EQUAL(write_side(subject), sys::call::result::get<1>(subject));
+}
+#import std.error_code
+#import std.system_category
+auto tests::unit::call::result::Pipe::test_error_code() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  Subject subject{good, errnum, -1, -1};
+  auto ec = error_code(subject);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::system_category() == &ec.category());
+}
+auto tests::unit::call::result::Pipe::test_error_condition() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  Subject subject{good, errnum, returned, returned};
+  auto ec = error_condition(subject);
+  CPPUNIT_ASSERT(errnum == ec.value());
+  CPPUNIT_ASSERT(&std::generic_category() == &ec.category());
+}
+auto tests::unit::call::result::Pipe::test_error_message() -> void {
+  for (int i{-512}, e{512}; e != i; ++i) {
+    bool const good = false;
+    int const errnum = i;
+    int const returned = -1;
+    Subject subject{good, errnum, returned, returned};
+    auto m = error_message(subject);
+    CPPUNIT_ASSERT(!m.empty());
+  }
+}
+auto tests::unit::call::result::Pipe::test_error_num() -> void {
+  bool const good = false;
+  int const errnum = 13;
+  int const returned = -1;
+  Subject subject{good, errnum, returned, returned};
+  auto actual = error_num(subject);
+  CPPUNIT_ASSERT(errnum == actual);
+}
+#import rigging.suite.io
+auto tests::unit::call::result::Pipe::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Pipe");
+  {
+    Stream con("construction");
+    con << call("0", &Pipe::test_construction0)
+        << call("1", &Pipe::test_construction1)
+        << call("2", &Pipe::test_construction2)
+        << call("3", &Pipe::test_construction3)
+      ;
+    series << move(con);
+  }
+  series << call("ok", &Pipe::test_ok)
+    ;
+  {
+    Stream val("value");
+    val << call("value", &Pipe::test_value)
+        << call("readside", &Pipe::test_read_side)
+        << call("writeside", &Pipe::test_write_side)
+      ;
+    series << move(val);
+  } {
+    Stream err("error");
+    err << call("code", &Pipe::test_error_code)
+        << call("condition", &Pipe::test_error_condition)
+        << call("message", &Pipe::test_error_message)
+        << call("num", &Pipe::test_error_num)
+      ;
+    series << move(err);
+  }
+  return finalize(series);
+}
+#endiv

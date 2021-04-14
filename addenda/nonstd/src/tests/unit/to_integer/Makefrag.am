@@ -1,0 +1,13 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_to_integer_SUBSOURCES = \
+  obj/src/tests/unit/to_integer/namespace.cpp \
+  obj/src/tests/unit/to_integer/Fixture.cpp \
+  obj/src/tests/unit/to_integer/Native.cpp \
+  obj/src/tests/unit/to_integer/Modern.cpp \
+  obj/src/tests/unit/to_integer/Widen.cpp \
+  obj/src/tests/unit/to_integer/Locale.cpp \
+  obj/src/tests/unit/to_integer/Validator.cpp \
+  obj/src/tests/unit/to_integer/Dispatcher.cpp \
+  obj/src/tests/unit/to_integer/sto.Fixture.cpp \
+  $(end)

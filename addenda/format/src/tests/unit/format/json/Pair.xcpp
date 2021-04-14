@@ -1,0 +1,323 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::json {
+  class Pair;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import c.const_stringz
+#import c.stringz
+#import std.is_floating_point
+#import std.is_integral
+#import std.is_same
+#import std.string
+#import std.string
+#import std.string_view
+#import std.vector
+#import tests.unit.format.json.Format
+class tests::unit::format::json::Pair : public cppunit::test::Fixture {
+public:
+  template<typename LHS, typename RHS> auto test_generic() -> void;
+  auto test_bool_true() -> void;
+  auto test_bool_false() -> void;
+  auto test_null() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  // The 'formatted_storage' is a place where the 'value' can be laid out, to be captured in XHS
+  template<typename XHS> static auto generate_generic_consty_xhs(std::string &formatted_storage, int value, Format) -> XHS;
+  template<typename XHS> static auto generate_generic_muting_xhs(std::vector<char> &formatted_storage, int value, Format) -> XHS;
+  //
+  // the left-hand side of the binding
+  //
+  static int const LHS_VALUE = 1;
+  template<typename LHS>
+  requires (std::is_integral<LHS>::value ||
+            std::is_floating_point<LHS>::value)
+    static auto generate_lhs() -> LHS;
+  template<typename LHS>
+  requires (std::is_same<LHS, char const *>::value ||
+            std::is_same<LHS, std::string>::value ||
+            std::is_same<LHS, std::string_view>::value ||
+            // NOT std::is_same<LHS, c::stringz>::value ||
+            std::is_same<LHS, c::const_stringz>::value)
+    static auto generate_lhs() -> LHS;
+  template<typename LHS>
+  requires std::is_same<LHS, c::stringz>::value
+  static auto generate_lhs() -> LHS;
+  //
+  // The right-hand side of the binding
+  //
+  static int const RHS_VALUE = 2;
+  template<typename RHS>
+  requires (std::is_integral<RHS>::value ||
+            std::is_floating_point<RHS>::value)
+    static auto generate_rhs() -> RHS;
+  template<typename RHS>
+  requires (std::is_same<RHS, char const *>::value ||
+            std::is_same<RHS, std::string>::value ||
+            std::is_same<RHS, std::string_view>::value ||
+            std::is_same<RHS, c::const_stringz>::value)
+    static auto generate_rhs() -> RHS;
+  template<typename RHS>
+  requires std::is_same<RHS, c::stringz>::value
+    static auto generate_rhs() -> RHS;
+  // expected
+  template<typename LHS, typename RHS> static auto generate_expected() -> std::string;
+};
+
+namespace tests::unit::format::json {
+  template<> auto Pair::generate_generic_consty_xhs<char const *>(std::string &, int, Format) -> char const *;
+}
+#endiv
+#divert <tpp>
+#import format.json.literal
+#import format.json.qq
+#import std.ostringstream
+#import std.invalid_argument
+#import tests.unit.format.json.Format
+#import tests.unit.format.json.Buffer_Layers
+#include <cassert>
+
+#import std.invalid_argument
+template<typename XHS> auto tests::unit::format::json::Pair::generate_generic_consty_xhs(std::string &formatted_storage, int chosen_value, Format format) -> XHS {
+  using ::format::json::literal;
+  using ::format::json::qq;
+  if (formatted_storage.empty()) {
+    std::ostringstream buf;
+    switch (format) {
+    case Format::QUOTE:
+      buf << qq(chosen_value);
+      break;
+    case Format::LITERAL:
+      buf << literal(chosen_value);
+      break;
+    case Format::PURE:
+      buf << chosen_value;
+      break;
+    default:
+      throw std::invalid_argument("Format");
+    }
+    formatted_storage = buf.str();
+  }
+  XHS ret(formatted_storage); // a deep or shallow copy, depending upon the type
+  return ret;
+}
+
+template<typename XHS> auto tests::unit::format::json::Pair::generate_generic_muting_xhs(std::vector<char> &formatted_storage, int chosen_value, Format format) -> XHS {
+  using ::format::json::literal;
+  using ::format::json::qq;
+  if (formatted_storage.empty()) {
+    std::ostringstream buf;
+    switch (format) {
+    case Format::QUOTE:
+      buf << qq(chosen_value);
+      break;
+    case Format::LITERAL:
+      buf << literal(chosen_value);
+      break;
+    case Format::PURE:
+      buf << chosen_value;
+      break;
+    default:
+      throw std::invalid_argument("Format");
+    }
+    auto src = buf.str();
+    auto dest = std::back_inserter(formatted_storage);
+    std::copy(src.begin(), src.end(), dest);
+    dest = '\0';
+    assert(!formatted_storage.empty());
+  }
+  XHS ret(formatted_storage.data()); // a deep or shallow copy, depending upon the type
+  return ret;
+}
+
+template<typename LHS>
+requires std::is_integral<LHS>::value || std::is_floating_point<LHS>::value
+auto tests::unit::format::json::Pair::generate_lhs() -> LHS {
+  static Buffer_Layers<std::string, Format> formatted; // has a special local copy, tuned to the Format
+  constexpr auto const format = Format::PURE;
+  return generate_generic_consty_xhs<LHS>(formatted[format], LHS_VALUE, format);
+}
+
+template<typename LHS>
+requires (std::is_same<LHS, char const *>::value ||
+          std::is_same<LHS, std::string>::value ||
+          std::is_same<LHS, std::string_view>::value ||
+          std::is_same<LHS, c::const_stringz>::value)
+  auto tests::unit::format::json::Pair::generate_lhs() -> LHS {
+  static Buffer_Layers<std::string, Format> formatted; // has a special local copy, tuned to the format5
+  constexpr auto const format = Format::PURE;
+  return generate_generic_consty_xhs<LHS>(formatted[format], LHS_VALUE, format);
+}
+
+template<typename LHS>
+requires std::is_same<LHS, c::stringz>::value
+auto tests::unit::format::json::Pair::generate_lhs() -> LHS {
+  static Buffer_Layers<std::vector<char>, Format> formatted; // has a special local copy, tuned to the format
+  constexpr auto const format = Format::PURE;
+  return generate_generic_muting_xhs<LHS>(formatted[format], LHS_VALUE, format);
+}
+
+template<typename RHS>
+requires std::is_integral<RHS>::value || std::is_floating_point<RHS>::value
+auto tests::unit::format::json::Pair::generate_rhs() -> RHS {
+  return RHS(RHS_VALUE);
+}
+
+template<typename RHS>
+requires (std::is_same<RHS, char const *>::value ||
+          std::is_same<RHS, std::string>::value ||
+          std::is_same<RHS, std::string_view>::value ||
+          std::is_same<RHS, c::const_stringz>::value)
+auto tests::unit::format::json::Pair::generate_rhs() -> RHS {
+  static Buffer_Layers<std::string, Format> formatted; // has a special local copy, tuned to just Format::PURE
+  constexpr auto const format = Format::PURE;
+  return generate_generic_consty_xhs<RHS>(formatted[format], RHS_VALUE, format);
+}
+
+template<typename RHS>
+requires std::is_same<RHS, c::stringz>::value
+auto tests::unit::format::json::Pair::generate_rhs() -> RHS {
+  static Buffer_Layers<std::vector<char>, Format> formatted; // has a special local copy, tuned to just Format::PURE
+  constexpr auto const format = Format::PURE;
+  return generate_generic_muting_xhs<RHS>(formatted[format], RHS_VALUE, format);
+}
+
+template<typename LHS, typename RHS> auto tests::unit::format::json::Pair::generate_expected() -> std::string {
+  using ::format::json::qq;
+  using ::format::json::literal;
+  std::ostringstream buf;
+  auto lhs = generate_lhs<LHS>();
+  auto rhs = generate_rhs<RHS>();
+  // lhs and rhs are strings which are already quoted (or not)
+  buf << '{' << qq(lhs) << ':' << literal(rhs) << '}';
+  return buf.str();
+}
+
+#import c.stringz
+#import c.const_stringz
+#import format.json.pair
+#import std.ostringstream
+#import std.string
+#import std.string_view
+template<typename LHS, typename RHS> auto tests::unit::format::json::Pair::test_generic() -> void {
+  std::ostringstream buf;
+  using ::format::json::pair;
+  auto lhs = generate_lhs<LHS>();
+  auto rhs = generate_rhs<RHS>();
+  using ::format::json::pair;
+  buf << '{' << ::format::json::pair(lhs, rhs) << '}'; // <----------------- test this
+  std::string const expected = generate_expected<LHS, RHS>();
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+} 
+#endiv
+#divert <cpp>
+#import format.json.literal
+#import format.json.qq
+#import std.invalid_argument
+template<> auto tests::unit::format::json::Pair::generate_generic_consty_xhs<char const *>(std::string &formatted_storage, int chosen_value, Format format) -> char const * {
+  using ::format::json::literal;
+  using ::format::json::qq;
+  if (formatted_storage.empty()) {
+    std::ostringstream buf;
+    switch (format) {
+    case Format::QUOTE:
+      buf << qq(chosen_value);
+      break;
+    case Format::LITERAL:
+      buf << literal(chosen_value);
+      break;
+    case Format::PURE:
+      buf << chosen_value;
+      break;
+    default:
+      throw std::invalid_argument("Format");
+    }
+    formatted_storage = buf.str();
+  }
+  char const *ret(formatted_storage.data()); // <----------------- this is what is special about this specialization
+  return ret;
+
+}
+
+auto tests::unit::format::json::Pair::test_bool_false() -> void {
+  std::ostringstream buf;
+  using ::format::json::pair;
+  auto lhs = "something";
+  auto rhs = false; // <----------- test this value (false)
+  using ::format::json::pair;
+  buf << '{' << ::format::json::pair(lhs, rhs) << '}'; // <----------------- test this
+  std::string const expected = R"json({"something":false})json";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::format::json::Pair::test_bool_true() -> void {
+  std::ostringstream buf;
+  using ::format::json::pair;
+  auto lhs = "something";
+  auto rhs = true; // <----------- test this value (true)
+  using ::format::json::pair;
+  buf << '{' << ::format::json::pair(lhs, rhs) << '}'; // <----------------- test this
+  std::string const expected = R"json({"something":true})json";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+auto tests::unit::format::json::Pair::test_null() -> void {
+  std::ostringstream buf;
+  using ::format::json::pair;
+  auto lhs = "something";
+  auto rhs = nullptr; // <----------- test this value (nullptr)
+  using ::format::json::pair;
+  buf << '{' << ::format::json::pair(lhs, rhs) << '}'; // <----------------- test this
+  std::string const expected = R"json({"something":null})json";
+  std::string const actual = buf.str();
+  std::cerr << "expected=qq!" << expected << "!\n"
+            << "actual  =qq!" << actual << "!\n";
+  CPPUNIT_ASSERT_EQUAL(expected, actual);
+}
+
+#import rigging.suite.io
+auto tests::unit::format::json::Pair::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("pair");
+  // varying the rhs (there is no 'char')
+  series << call("string.int short signed", &Pair::test_generic<std::string, int short signed>)
+         << call("string.int short unsigned", &Pair::test_generic<std::string, int short unsigned>)
+         << call("string.int signed", &Pair::test_generic<std::string, int signed>)
+         << call("string.int unsigned", &Pair::test_generic<std::string, int unsigned>)
+         << call("string.int long signed", &Pair::test_generic<std::string, int long signed>)
+         << call("string.int long unsigned", &Pair::test_generic<std::string, int long unsigned>)
+         << call("string.int long long signed", &Pair::test_generic<std::string, int long long signed>)
+         << call("string.int long long unsigned", &Pair::test_generic<std::string, int long long unsigned>)
+         << call("string.char const *", &Pair::test_generic<std::string, char const *>)
+         << call("string.std::string", &Pair::test_generic<std::string, std::string>)
+         << call("string.std::string_view", &Pair::test_generic<std::string, std::string_view>)
+         << call("string.c::stringz", &Pair::test_generic<std::string, c::stringz>)
+         << call("string.c::const_stringz", &Pair::test_generic<std::string, c::const_stringz>)
+    // now ... vary the lhs
+         << call("char const *.int", &Pair::test_generic<char const *, int>)
+         << call("std::string.int", &Pair::test_generic<std::string, int>)
+         << call("std::string_view.int", &Pair::test_generic<std::string_view, int>)
+         << call("c::stringz.int", &Pair::test_generic<c::stringz, int>)
+         << call("c::const_stringz.int", &Pair::test_generic<c::const_stringz, int>)
+    // now the specialized ones
+         << call("string.true", &Pair::test_bool_true)
+         << call("string.false", &Pair::test_bool_false)
+         << call("string.null", &Pair::test_null)
+    ;
+  return finalize(series);
+}
+#endiv

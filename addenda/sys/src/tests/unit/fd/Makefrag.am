@@ -1,0 +1,17 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_fd_SOURCES_SET = \
+  obj/src/tests/unit/fd/namespace.cpp \
+  obj/src/tests/unit/fd/Fixture.cpp \
+  obj/src/tests/unit/fd/Managed.cpp \
+  obj/src/tests/unit/fd/Set.cpp \
+  obj/src/tests/unit/fd/set.Reference.cpp \
+  obj/src/tests/unit/fd/set.Lhs.cpp \
+  obj/src/tests/unit/fd/set.Rhs.cpp \
+  obj/src/tests/unit/fd/set.Find_Last_Set.cpp \
+  obj/src/tests/unit/fd/set.Find_First_Set.cpp \
+  $(end)

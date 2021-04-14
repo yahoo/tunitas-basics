@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result
+#import sys.wait
+namespace sys::call::result::wait { using namespace ::sys::wait; }
+#endiv
+#divert <cpp>
+#import sys.wait.Identifier
+#import sys.wait.Status
+namespace {
+  namespace tests {
+    using namespace sys::call::result::wait;
+    static_assert(sizeof (Identifier));
+    static_assert(sizeof (Status));
+  }
+}
+#endiv

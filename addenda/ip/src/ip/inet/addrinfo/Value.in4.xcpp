@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.in
+#import ip.in4
+#import ip.inet.addrinfo.Value
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      template<> inline auto Value::sockaddr<in4::sockaddr>() const -> in4::sockaddr const &;
+      template<> inline auto Value::addrlen<in4::sockaddr>() const -> in::socklen_t;
+      template<> inline auto Value::addr<in4::sockaddr>() const -> traits::Sockaddr<in4::sockaddr>::addr_type const &;
+      template<> inline auto Value::port<in4::sockaddr>() const -> in::port_t;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+template<> auto ip::inet::addrinfo::Value::sockaddr<ip::in4::sockaddr>() const -> in4::sockaddr const & {
+  if (AF::INET4 != this->family() || sizeof (in4::sockaddr) != subject->ai_addrlen) {
+    throw std::invalid_argument("not an in4::sockaddr");
+  }
+  return *reinterpret_cast<in4::sockaddr const *>(subject->ai_addr);
+}
+
+template<> auto ip::inet::addrinfo::Value::addrlen<ip::in4::sockaddr>() const -> in::socklen_t {
+  // Acquiring sa performs certain consistency checks; in lieu of returning merely sizeof (in4::addr)
+  auto const &sa = this->sockaddr<in4::sockaddr>();
+  return sizeof (sa.sin_addr);
+}
+
+template<> auto ip::inet::addrinfo::Value::addr<ip::in4::sockaddr>() const -> in4::addr const & {
+  auto const &sa = this->sockaddr<in4::sockaddr>();
+  return sa.sin_addr;
+}
+
+template<> auto ip::inet::addrinfo::Value::port<ip::in4::sockaddr>() const -> in4::port_t {
+  auto const &sa = this->sockaddr<in4::sockaddr>();
+  return sa.sin_port;
+}
+#endiv

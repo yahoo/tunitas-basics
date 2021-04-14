@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.range.detail.indexing.Container
+#import nonstd.required.Container
+#import nonstd.required.iterator.Input
+#import nonstd.container_traits
+namespace nonstd::range {
+  //
+  // The iterator produces a running index (the ith)
+  // Also accepts a pair of iterators, reindexing them.
+  //
+  // Usage:
+  //
+  //    auto container = ...somehow...   
+  //    for (auto const &[ith, value] : indexing(container)) {
+  //        ...use...
+  //    }
+  //
+  template<required::Container CONTAINER> inline auto indexing(CONTAINER const &) -> detail::indexing::Container<typename container_traits<CONTAINER>::const_iterator>;
+  template<required::Container CONTAINER> inline auto indexing(CONTAINER &) -> detail::indexing::Container<typename container_traits<CONTAINER>::iterator>;
+  //
+  // Usage:
+  //
+  //    auto start = ITERATOR{...somehow...};
+  //    auto finish = ITERATOR{...somehow...}
+  //    for (auto const &value : indexing(start, finish)) {
+  //        ...use...
+  //    }
+  //
+  template<required::iterator::Input ITERATOR> inline auto indexing(ITERATOR start, ITERATOR finish) -> detail::indexing::Container<ITERATOR>;
+}
+#endiv
+#divert <ipp>
+namespace nonstd {
+  template<required::Container CONTAINER> auto range::indexing(CONTAINER const &container) -> detail::indexing::Container<typename container_traits<CONTAINER>::const_iterator> { return {container.begin(), container.end()}; }
+  template<required::Container CONTAINER> auto range::indexing(CONTAINER &container) -> detail::indexing::Container<typename container_traits<CONTAINER>::iterator>             { return {container.begin(), container.end()}; }
+  template<required::iterator::Input ITERATOR> auto range::indexing(ITERATOR start, ITERATOR finish) -> detail::indexing::Container<ITERATOR>                                   { return {start, finish}; }
+}
+#endiv

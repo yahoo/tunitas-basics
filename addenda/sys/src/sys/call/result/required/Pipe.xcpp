@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.required.Unmanaged
+namespace sys::call::result::required {
+  //
+  // What are the legal types FD for pipe::Value<FD>
+  //
+  // Usage:
+  //
+  //   come on, it's a concept
+  //
+  template<typename FD> concept bool Pipe = sys::fd::required::Unmanaged<FD>;
+}
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import sys.id.Process
+namespace {
+  namespace tests {
+    using namespace sys::call::result;
+    static_assert(required::Pipe<int>);
+    static_assert(required::Pipe<sys::id::File>);
+    static_assert(!required::Pipe<sys::id::Process>);
+  }
+}
+#endiv

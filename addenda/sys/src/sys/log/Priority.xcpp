@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.uint32_t
+#import std.underlying_type
+namespace sys::log {
+  //
+  // In the POSIX C API, The Priority will be blended with the Facility.
+  // See the documentariat near Facility.
+  //
+  // Coding is NOT one-hot, but rather cardinal from zero (0..7)
+  //
+  // Note that EMERGENCY (zero) is not "greater" than DEBUG (seven), rather it is less.
+  //
+  enum class Priority : std::uint32_t {
+    EMERGENCY = LOG_EMERG,
+    EMERG [[deprecated("instead, spell it out, prefer Level::EMERGENCY")]] = EMERGENCY,
+    ALERT = LOG_ALERT,
+    CRITICAL = LOG_CRIT,
+    CRIT [[deprecated("instead, spell it out, prefer Level::CRITICAL")]] = CRITICAL,
+    ERROR = LOG_ERR,
+    ERR [[deprecated("instead, spell it out, prefer Level::ERROR")]] = ERROR,
+    WARNING = LOG_WARNING,
+    NOTICE = LOG_NOTICE,
+    INFORMATION = LOG_INFO,
+    INFO [[deprecated("instead, spell it out, prefer Level::INFORMATION")]] = INFORMATION,
+    VERBOSE = INFORMATION, // we made up "verbose" because it is so commonly used.
+    DEBUG = LOG_DEBUG,
+  };
+}
+#endiv
+#divert <cpp>
+namespace sys::log {
+  static_assert(Priority::INFORMATION == Priority::VERBOSE);
+}
+#endiv

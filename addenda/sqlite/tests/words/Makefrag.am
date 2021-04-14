@@ -1,0 +1,17 @@
+# in the order specified (simple-to-hard)
+tests_words_TESTS = \
+  tests/words/usage.test \
+  tests/words/version.test \
+  tests/words/t001.test \
+  tests/words/ten-words.test \
+  tests/words/hundred-words.test \
+  tests/words/thousand-words.test \
+  tests/words/dict-words.test \
+  $(end)
+
+# c.f. https://sqlite.org/pragma.html 
+# To go fast in SQLite, you need
+# PRAGMA synchronous=OFF;
+# PRAGMA journal_mode=MEMORY;
+too_expensive_to_run = \
+  $(end)

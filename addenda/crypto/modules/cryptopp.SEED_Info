@@ -1,0 +1,4 @@
+// -*- c++ -*- c7f3bebd-c21d-4c76-bf7e-669570ae910a
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/seed.h>

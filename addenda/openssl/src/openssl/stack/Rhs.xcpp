@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::stack {
+  //
+  // The right-hand side of an intra-stack access.
+  //
+  // Usage: see Stack<TYPE>::at(Index) const
+  //        see Stack<TYPE>::operator[](Index) const
+  // Usage: see Stack0<TYPE>::at(Index) const
+  //        see Stack0<TYPE>::operator[](Index) const
+  //
+  template<typename STACK> class Rhs;
+}
+#endiv
+#divert <hpp>
+#import openssl.required.Stacklike
+#import openssl.stack.Xhs
+#import std.is_const
+namespace openssl {
+  template<typename STACK> class stack::Rhs : public Xhs<STACK const> {
+    static_assert(required::Stacklike<STACK>); // requires very late binding
+    using ancestor = Xhs<STACK const>;
+  protected:
+    friend STACK;
+    static_assert(std::is_const<typename ancestor::Owner>::value);
+    inline Rhs(typename ancestor::Owner &owner, typename ancestor::Index index) : ancestor{owner, index} { }
+  };
+}
+#endiv

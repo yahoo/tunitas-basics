@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.posix.Fixture
+#import sys.posix.iovec // <------------------------------- test this (exists)
+// NOT YET OR MAYBE EVER ---> #import sys.posix.clear.iovec // <------------------------- test this (exists)
+// NOT YET OR MAYBE EVER ---> #import sys.posix.zero.iovec // <-------------------------- test this (exists)
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_iovec() -> void {
+    using Subject = ::sys::posix::iovec; // <-------------- test this
+    auto subject = Subject{};
+#if 0
+    // ADL won't find these because iovec is really ::iovec
+    ::sys::posix::clear(subject);
+    ::sys::posix::zero(subject);
+#endif
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+}
+#endiv

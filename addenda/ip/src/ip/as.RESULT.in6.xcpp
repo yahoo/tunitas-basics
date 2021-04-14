@@ -1,0 +1,5 @@
+// -*- c++ -*- in the SCOLD styling as is so popular these days
+#divert <hpp>
+#import ip.as.RESULT.in6.addr
+#import ip.as.RESULT.in6.addr_t
+#endiv

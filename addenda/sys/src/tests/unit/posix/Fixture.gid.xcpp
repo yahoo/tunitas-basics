@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.getgid
+auto tests::unit::posix::fixture::Fixture::test_getgid() -> void {
+  auto g = six::getgid();
+  CPPUNIT_ASSERT(sizeof (g));
+}
+#import sys.posix.getegid
+auto tests::unit::posix::fixture::Fixture::test_getegid() -> void {
+  auto g = six::getegid();
+  CPPUNIT_ASSERT(sizeof (g));
+}
+#import sys.posix.setgid
+auto tests::unit::posix::fixture::Fixture::test_setgid() -> void {
+  auto const something = sys::id::Group(-1);
+  auto sat = six::setgid(something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.setegid
+auto tests::unit::posix::fixture::Fixture::test_setegid() -> void {
+  auto const something = sys::id::Group(-1);
+  auto sat = six::setegid(something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.setregid
+auto tests::unit::posix::fixture::Fixture::test_setregid() -> void {
+  auto const something = sys::id::Group(-1);
+  auto sat = six::setregid(something, something);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#import sys.posix.setresgid
+auto tests::unit::posix::fixture::Fixture::test_setresgid() -> void {
+  auto const dark_side = sys::id::Group(-1);
+  auto const something = sys::id::Group(-1);
+  auto sat = six::setresgid(something, something, dark_side);
+  CPPUNIT_ASSERT(good(sat) || fail(sat)); // who cares?
+}
+#endiv

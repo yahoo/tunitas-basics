@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.specification.Specification
+#import sys.sock.Type
+namespace sys::sock {
+  //
+  // The specification is a composition of the Type and the Options
+  //
+  // Blik. A bitmask of the (singular) Type and the the Option(s)
+  // Blik. A struct-in-word of the (singular) Type and the Option(s)
+  // Constructed with operators and casts.
+  //
+  // Constructors
+  // Specification consists of two components
+  //   1. bitfield as a Type (an enum)
+  //   2. a flagset of two other flags.
+  //
+  // The specification is argument call-site object.
+  //
+  // Thus the concept of is_flag(Specification) is bogus
+  // NO SUCH auto is_flag(Specification) -> bool;
+  //
+  // Usage:
+  //
+  //   auto s = socket(AF::INET4, SOCK::STREAM, IPPROTO::TCP);
+  //   auto s = socket(AF::INET4, SOCK::STREAM | SOCK::CLOEXEC, IPPROTO::UDP);
+  //   auto s = socket(AF::INET4, SOCK::STREAM | SOCK::CLOEXEC | SOCK::NONBLOCK, IPPROTO::TCP);
+  //
+  using Specification = specification::Specification<Type>;
+  static_assert(Type{} == Type::UNSPECIFIED);
+}
+#endiv
+#divert <hpp>
+namespace sys::sock {
+  // Here, operator| is performing "concatenation"
+  // As such, there is no corresponding operator& because these are always  disjoinnt.
+  inline constexpr auto operator|(Options s, Type t) -> Specification { return Specification{s} | Specification{t}; }
+  inline constexpr auto operator|(Type t, Options s) -> Specification { return Specification{t} | Specification{s}; }
+}
+#endiv

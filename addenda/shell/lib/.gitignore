@@ -1,0 +1,5 @@
+# yes, this should exist
+.dirstamp
+.libs
+*.la
+# end

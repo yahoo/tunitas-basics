@@ -1,0 +1,124 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix::packaging::wait4 {
+  using namespace packaging::wait::interface;
+  namespace [[detail]] returned {
+    using namespace bundle::wait4::returned;
+  }
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::wait4::returned {
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options) -> both::Returned<RETURNED>; // ............................................................. both wstatus and rusage are returned
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &) -> usages::Returned<RETURNED>; // ................................. [[out]] parameters are always last in [[detail]] namespace returned
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] usages::Filled &) -> status::Returned<RETURNED>; // ................................. ibidem.
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, status::Unfilled) -> usages::Returned<RETURNED>; // ......................................... [[out]] parameters are always last in [[detail]] namespace returned
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, usages::Unfilled) -> status::Returned<RETURNED>; // ......................................... ibidem.
+
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned<RETURNED>; // ... ibidem.
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned<RETURNED>; // ........... [[out]] parameters are always last in [[detail]] namespace returned
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned<RETURNED>; // ........... ibidem.
+  template<identifier::Process RETURNED, identifier::Matched MATCHED> inline auto wait4(MATCHED, [[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned<RETURNED>; // ................... ibidem
+}
+namespace sys::posix::packaging::wait4::returned {
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options) -> both::Returned<id::Process>; // ............................................................. both wstatus and rusage are returned
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, [[out]] status::Filled &) -> usages::Returned<id::Process>; // ................................. [[out]] parameters are always last in [[detail]] namespace returned
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, [[out]] usages::Filled &) -> status::Returned<id::Process>; // ................................. ibidem.
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, status::Unfilled) -> usages::Returned<id::Process>; // ......................................... [[out]] parameters are always last in [[detail]] namespace returned
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, usages::Unfilled) -> status::Returned<id::Process>; // ......................................... ibidem.
+
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned<id::Process>; // ... ibidem.
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned<id::Process>; // ........... [[out]] parameters are always last in [[detail]] namespace returned
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned<id::Process>; // ........... ibidem.
+  template<> inline auto wait4<id::Process,id::Either>(id::Either, [[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned<id::Process>; // ................... ibidem
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::wait4 {
+  //
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options) -> both::Returned<RETURNED> {
+    auto sutats = Status{};
+    auto segasu = Usages{};
+    auto called = idiomatic::syscall<RETURNED>(Syscall::WAIT4, (pid_t) matched, &sutats, (int) options, &segasu);
+    return both::Returned<RETURNED>{good(called), error_num(called), value(called), sutats, segasu};
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Filled &sutats) -> usages::Returned<RETURNED> {
+    auto segasu = Usages{};
+    auto called = idiomatic::syscall<RETURNED>(Syscall::WAIT4, (pid_t) matched, &sutats, (int) options, &segasu);
+    return {good(called), error_num(called), value(called), segasu};
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, usages::Filled &segasu) -> status::Returned<RETURNED> {
+    auto sutats = Status{};
+    auto called = idiomatic::syscall<RETURNED>(Syscall::WAIT4, (pid_t) matched, &sutats, (int) options, &segasu);
+    return {good(called), error_num(called), value(called), sutats};
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Unfilled) -> usages::Returned<RETURNED> {
+    auto abandoned = status::Filled{};
+    return wait4<RETURNED>(matched, options, abandoned);
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, usages::Unfilled) -> status::Returned<RETURNED> {
+    auto abandoned = Usages{};
+    return wait4<RETURNED>(matched, options, abandoned);
+  }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned<RETURNED> { return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAIT4, (pid_t) matched, &sutats, (int) options, &segasu); }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Unfilled, usages::Filled &segasu) -> identifier::Returned<RETURNED>       { return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAIT4, (pid_t) matched, (int *) 0, (int) options, &segasu); }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Filled &sutats, usages::Unfilled) -> identifier::Returned<RETURNED>       { return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAIT4, (pid_t) matched, &sutats, (int) options, (rusage *) 0); }
+  template<returned::identifier::Process RETURNED, returned::identifier::Matched MATCHED> auto returned::wait4(MATCHED matched, Options options, status::Unfilled, usages::Unfilled) -> identifier::Returned<RETURNED>             { return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAIT4, (pid_t) matched, (int *) 0, (int) options, (rusage *) 0); }
+}
+#import nonstd.Visitor
+#import std.visit // [[FIXTHIS]] move to nonstd::visitor to simplfy the import
+namespace sys::posix::packaging::wait4::returned {
+  namespace {
+    using nonstd::Visitor;
+    using std::visit;
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options) -> both::Returned<id::Process> {
+    auto vv = Visitor{[options](id::Process matched) { return wait4<id::Process>(matched, options); },
+                      [options](id::Group matched) { return wait4<id::Process>(matched, options); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Filled &sutats) -> usages::Returned<id::Process> {
+    auto vv = Visitor{[options, &sutats](id::Process matched) { return wait4<id::Process>(matched, options, sutats); },
+                      [options, &sutats](id::Group matched) { return wait4<id::Process>(matched, options, sutats); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, usages::Filled &segasu) -> status::Returned<id::Process> {
+    auto vv = Visitor{[options, &segasu](id::Process matched) { return wait4<id::Process>(matched, options, segasu); },
+                      [options, &segasu](id::Group matched) { return wait4<id::Process>(matched, options, segasu); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Unfilled sutats) -> usages::Returned<id::Process> {
+    auto vv = Visitor{[options, sutats](id::Process matched) { return wait4<id::Process>(matched, options, sutats); },
+                      [options, sutats](id::Group matched) { return wait4<id::Process>(matched, options, sutats); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, usages::Unfilled segasu) -> status::Returned<id::Process> {
+    auto vv = Visitor{[options, segasu](id::Process matched) { return wait4<id::Process>(matched, options, segasu); },
+                      [options, segasu](id::Group matched) { return wait4<id::Process>(matched, options, segasu); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned<id::Process> {
+    auto vv = Visitor{[options, &sutats, &segasu](id::Process matched) { return wait4<id::Process>(matched, options, sutats, segasu); },
+                      [options, &sutats, &segasu](id::Group matched) { return wait4<id::Process>(matched, options, sutats, segasu); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned<id::Process> {
+    auto vv = Visitor{[options, sutats, &segasu](id::Process matched) { return wait4<id::Process>(matched, options, sutats, segasu); },
+                      [options, sutats, &segasu](id::Group matched) { return wait4<id::Process>(matched, options, sutats, segasu); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned<id::Process> {
+    auto vv = Visitor{[options, &sutats, segasu](id::Process matched) { return wait4<id::Process>(matched, options, sutats, segasu); },
+                      [options, &sutats, segasu](id::Group matched) { return wait4<id::Process>(matched, options, sutats, segasu); }};
+    return visit(vv, matched);
+  }
+  template<> auto wait4<id::Process,id::Either>(id::Either matched, Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned<id::Process> {
+    auto vv = Visitor{[options, sutats, segasu](id::Process matched) { return wait4<id::Process>(matched, options, sutats, segasu); },
+                      [options, sutats, segasu](id::Group matched) { return wait4<id::Process>(matched, options, sutats, segasu); }};
+    return visit(vv, matched);
+  }
+}
+#endiv

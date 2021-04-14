@@ -1,0 +1,26 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# used in ../Makefrag.am; included in the top-level Makefile.am
+src_sys_msg_SOURCES_SET = \
+  obj/src/sys/msg/namespace.cpp \
+  obj/src/sys/msg/constants.cpp \
+  obj/src/sys/msg/Flags.cpp \
+  obj/src/sys/msg/Flag.cpp \
+  obj/src/sys/msg/as.cpp \
+  \
+  obj/src/sys/msg/Header.declaration.cpp \
+  obj/src/sys/msg/Header.msghdr.cpp \
+  obj/src/sys/msg/Header.mmsghdr.cpp \
+  obj/src/sys/msg/Header.cpp \
+  \
+  obj/src/sys/msg/Headers.declaration.cpp \
+  obj/src/sys/msg/Headers.mmsghdr.N.cpp \
+  obj/src/sys/msg/Headers.cpp \
+  \
+  obj/src/sys/msg/required/namespace.cpp \
+  obj/src/sys/msg/required/Hdr.cpp \
+  obj/src/sys/msg/required/hdr.Single.cpp \
+  obj/src/sys/msg/required/hdr.Multiple.cpp \
+  obj/src/sys/msg/required/Flags.cpp \
+  $(end)

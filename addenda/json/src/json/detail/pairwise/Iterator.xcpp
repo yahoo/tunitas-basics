@@ -1,0 +1,164 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.iterator_traits
+namespace json {
+  namespace detail {
+    namespace pairwise {
+      // JSONITERATOR is json::Value::iterator
+      // JSONITERATOR is json::Value::const_iterator
+      template<typename JSONITERATOR, typename VALUE> class Iterator;
+    }
+  }
+}
+namespace std {
+  template<typename JSONITERATOR, typename VALUE> class iterator_traits<json::detail::pairwise::Iterator<JSONITERATOR, VALUE>>;
+}
+#endiv
+#divert <hpp>
+#import json.detail.pairwise.traits.ContainerOf
+#import json.Value
+#import std.enable_if
+#import std.is_same
+#import std.remove_reference
+#import std.pair
+
+template<typename JSONITERATOR, typename VALUE> class std::iterator_traits<json::detail::pairwise::Iterator<JSONITERATOR, VALUE>> : public std::iterator_traits<JSONITERATOR> { };
+
+template<typename JSONITERATOR, typename VALUE> class json::detail::pairwise::Iterator : public JSONITERATOR {
+    using Ancestor = JSONITERATOR;
+public:
+    static_assert((std::is_same<json::Value::iterator, JSONITERATOR>::value &&
+                   std::is_same<json::Value::const_iterator, JSONITERATOR>::value),
+                  "JSONITERATOR must be 'json::Value::iterator' or 'json::Value::const_iterator'");
+    using base_iterator_type = Ancestor;
+    using const_iterator_type = json::Value::const_iterator;
+    using container_type = typename traits::ContainerOf<Iterator>::container_type;
+    //
+    // Observe base_iterator_type and const_iterator_type may or may not be the same thing
+    // Possibilities
+    //   non-const variant
+    //     base_iterator_type = json::Value::iterator
+    //     type_iterator_type = json::Value::const_iterator
+    //   consty variant
+    //     base_iterator_type = json::Value::const_iterator
+    //     const_iterator_type = json::Value::const_iterator
+    //
+    using value_type = VALUE;
+#if (__JSON_CPP_MAJOR__ > 0) || (__JSON_CPP_MAJOR__ == 0 && __JSON_CPP_MINOR__ > 6)
+    //  Maybe they've fixed this in later releases.
+    using json_value_type = Ancestor::value_type;
+#else
+    // NO SUCH --> using Ancestor::value_type
+    // they have 'distance' 'reference' 'pointer' but not 'value_type'
+    // the jsoncpp iterators do not inherit from std::iterator<...>
+    using json_value_type = typename std::remove_reference<typename Ancestor::reference>::type;
+#endif
+    //
+    // Fedora 20
+    //    jsoncpp-devel-0.6.0-0.11.rc2.fc20.x86_64
+    // Fedora 19
+    //   jsoncpp-devel-0.6.0-0.9.rc2.fc19.x86_64
+    //
+    // Reminder, we get the user-defined conversion of the Ancestor *and* the const variant here
+    // The desired effect here is:
+    //     when JSONITERATOR=json::Value::iterator
+    //         Iterator()
+    //         Iterator(json::Value::iterator const &);
+    //         Iterator(json::Value::const_iterator const &);
+    //         auto operator=(json::Value::iterator const &) -> Iterator &;
+    //         auto operator=(json::Value::const_iterator const &) -> Iterator &;
+    //         copy constructor, copy assign
+    //     when JSONITERATOR=json::Value::const_iterator
+    //         Iterator()
+    //         Iterator(json::Value::const_iterator const &);
+    //         auto operator=(json::Value::const_iterator const &) -> Iterator &;
+    //         copy constructor, copy assign
+    //
+    Iterator() = default;
+    using Ancestor::JSONITERATOR; // <--- so this DOES NOT perform const contagion as intended
+    template<typename BASE_ITERATOR> inline explicit Iterator(BASE_ITERATOR const &, typename std::enable_if<std::is_same<BASE_ITERATOR, json::Value::iterator>::value, int>::type = 1);
+    inline explicit Iterator(const_iterator_type const &);
+    Iterator(Iterator const &) = default;
+    using Ancestor::operator=; // <------ so this performs const-contagion as intended because Ancestor::operator=(ValueIteratorBase const &) exists
+    inline auto operator=(const_iterator_type const &) -> Iterator &;
+public:
+    auto operator++() -> Iterator &;
+    auto operator++(int) -> Iterator;
+    auto operator--() -> Iterator &;
+    auto operator--(int) -> Iterator;
+    // The operator* value_type is always returned by value.
+    // there is no return of a reference into the container.
+    auto operator*() -> value_type; // <-------- this is what is interesting and special here
+private:
+    // because we're returning pair_type by value, we can't return a pointer
+    auto operator->() -> void = delete;
+public:
+    struct tests { struct Suite; };
+    friend struct tests::Suite;
+};
+#endiv
+#divert <ipp>
+#import json.as
+
+template<typename JSONITERATOR, typename VALUE> json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::Iterator(const_iterator_type const &the_consty)
+    : Ancestor(the_consty) {
+    ;
+}
+
+template<typename JSONITERATOR, typename VALUE> template<typename BASE_ITERATOR> json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::Iterator(BASE_ITERATOR const &the_base, typename std::enable_if<std::is_same<BASE_ITERATOR, json::Value::iterator>::value, int>::type)
+#if (__JSON_CPP_MAJOR__ > 0) || (__JSON_CPP_MAJOR__ == 0 && __JSON_CPP_MINOR__ > 6)
+    : Ancestor(the_base) {
+    ;
+}
+#else
+    // WATCHOUT -- const contagion does not work on iterators in jsoncpp v0.6 (jsoncpp-devel-0.6.0-0.9.rc2.fc19.x86_64)
+    // but assignment will work because they implemented operator=
+    //
+    // include/ason/detail/pairwise/Iterator.ipp:19:24: error: no matching function for call to 'Json::ValueConstIterator::ValueConstIterator(const Json::ValueIterator&)'
+    //      : Ancestor(the_base) {
+    //
+    // There are two bugs here
+    // 1. Json::ValueIteratorBase::copy(...) does not copy over Json::ValueIteratorBase::isNull_ from the 'other'
+    // 2a Json::ValueIterator(ValueConstIterator const &) exists ... it should not     [think about it]
+    // 2b Json::ValueConstIterator(ValueIterator const &) does not exist ... it should [think about it]
+: Ancestor(/*HACK HACK HACK (OH THE HUMANITY!) HACK HACK HACK*/ *reinterpret_cast<::Json::ValueConstIterator const *>(&the_base)) {
+    ;
+}
+#endif
+
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator=(const_iterator_type const &the_consty) -> Iterator & {
+    Ancestor::operator=(the_consty);
+    return *this;
+}
+
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator++() -> Iterator & {
+    Ancestor::operator++();
+    return *this;
+}
+
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator++(int) -> Iterator {
+    Iterator old(*this);
+    operator++();
+    return old;
+}
+
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator--() -> Iterator & {
+    Ancestor::operator--();
+    return *this;
+}
+
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator--(int) -> Iterator {
+    Iterator old(*this);
+    operator--();
+    return old;
+}
+
+// This is what is special and different about this iterator (it returns the key AND the value, just like std::map<VALUE>)
+template<typename JSONITERATOR, typename VALUE> auto json::detail::pairwise::Iterator<JSONITERATOR, VALUE>::operator*() -> value_type {
+    base_iterator_type &base(*this);
+    value_type both_by_value(json::as<typename value_type::first_type>(base.key()), json::as<typename value_type::second_type>(*base));
+    return both_by_value;
+}
+#endiv
+

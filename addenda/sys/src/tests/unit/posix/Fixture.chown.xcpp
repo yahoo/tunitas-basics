@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.id.User
+#import sys.id.Group
+#import sys.posix.chown
+auto tests::unit::posix::fixture::Fixture::test_chown_Uid() -> void {
+  namespace id = sys::id;
+  auto const noplace = no_such_file_at_all("chown");
+  auto owned = six::chown(noplace, id::User(-1));
+  CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad path, no permissions to chown)
+}
+auto tests::unit::posix::fixture::Fixture::test_chown_Gid() -> void {
+  namespace id = sys::id;
+  auto const noplace = no_such_file_at_all("chown");
+  auto owned = six::chown(noplace, id::Group(-1));
+  CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad path, no permissions to chown)
+}
+auto tests::unit::posix::fixture::Fixture::test_chown_Uid_Gid() -> void {
+  namespace id = sys::id;
+  auto const noplace = no_such_file_at_all("chown");
+  auto owned = six::chown(noplace, id::User{}, id::Group{});
+  CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad path, no permissions to chown)
+}
+auto tests::unit::posix::fixture::Fixture::test_chown_uid_gid() -> void {
+  namespace id = sys::id;
+  auto const noplace = no_such_file_at_all("chown");
+  auto owned = six::chown(noplace, ::uid_t{}, ::gid_t{});
+  CPPUNIT_ASSERT(!good(owned)); // ibidem. (bad path, no permissions to chown)
+}
+#endiv

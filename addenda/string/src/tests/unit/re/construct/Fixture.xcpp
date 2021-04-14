@@ -1,0 +1,312 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::re::construct {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::re::construct::Fixture : public cppunit::test::Fixture {
+public:
+  // These tests are of general usage
+  auto test_usage_string_string() -> void;
+  auto test_usage_string_const_stringz() -> void;
+
+  auto test_usage_buffer_string() -> void;
+  auto test_usage_buffer_buffer() -> void;
+  auto test_usage_buffer_const_buffer() -> void;
+
+  // These tests are of re::string<UNIFIER> which unique to re::string<std::string>
+  auto test_string_string_front() -> void;
+  auto test_string_string_back() -> void;
+
+  // These tests are of re::string<UNIFIER> which unique to re::string<std::string>
+  auto test_buffer_string_front() -> void;
+  auto test_buffer_string_back() -> void;
+
+  auto test_string_view_string_view_char() -> void;
+  auto test_string_view_string_view_wchar_t() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import c.buffer
+#import c.const_buffer
+#import c.str
+#import c.const_stringn
+#import c.const_stringz
+#import re.buffer
+#import re.string
+#import re.string_view
+#import std.string
+#import std.string_view
+#import tests.unit.re.construct.Substring
+
+auto tests::unit::re::construct::Fixture::test_usage_string_string() -> void {
+  using ::re::string;
+  using Subject = string<std::string>;
+  {
+    Subject s;
+    CPPUNIT_ASSERT(s.empty());
+  } {
+    Subject s("that");
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_stringn("thing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_stringz("thing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(std::string("any"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(Substring("subthing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject subject(Substring("whatever"));
+    CPPUNIT_ASSERT(nullptr != ::c::str(subject)); // <--- c::str
+  }
+}
+
+auto tests::unit::re::construct::Fixture::test_usage_string_const_stringz() -> void {
+  using ::re::string;
+  using Subject = string<::c::const_stringz>;
+  {
+    Subject s;
+    CPPUNIT_ASSERT(s.empty());
+  } {
+    Subject s("that");
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_stringn("thing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_stringz("thing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_stringz("any"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(Substring("subthing"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject subject(Substring("whatever"));
+    CPPUNIT_ASSERT(nullptr != ::c::str(subject)); // <--- c::str
+  }
+}
+
+auto tests::unit::re::construct::Fixture::test_usage_buffer_string() -> void {
+  using ::re::buffer;
+  using Subject = buffer<std::string>;
+  {
+    Subject s;
+    CPPUNIT_ASSERT(s.empty());
+  } {
+    char buf[] = "that";
+    Subject s(buf, 4);
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    char const buf[] = "thing";
+    Subject s = ::c::const_buffer(buf, 5);
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(std::string("any"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(Substring("subthing"));
+    CPPUNIT_ASSERT(!s.empty());
+  }
+}
+
+auto tests::unit::re::construct::Fixture::test_usage_buffer_buffer() -> void {
+  using ::re::buffer;
+  using Subject = buffer<::c::buffer>;
+  {
+    Subject s;
+    CPPUNIT_ASSERT(s.empty());
+  } {
+    char buf[] = "that";
+    Subject s(buf, 4);
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    char buf[] = "thing";
+    Subject s = ::c::buffer(buf);
+    CPPUNIT_ASSERT(!s.empty());
+  }
+}
+
+auto tests::unit::re::construct::Fixture::test_usage_buffer_const_buffer() -> void {
+  using ::re::buffer;
+  using Subject = buffer<::c::const_buffer>;
+  {
+    Subject s;
+    CPPUNIT_ASSERT(s.empty());
+  } {
+    Subject s("that", 4);
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(::c::const_buffer("thing", 5));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(std::string("any"));
+    CPPUNIT_ASSERT(!s.empty());
+  } {
+    Subject s(Substring("subthing"));
+    CPPUNIT_ASSERT(!s.empty());
+  }
+}
+
+auto tests::unit::re::construct::Fixture::test_string_string_front() -> void {
+  using Subject = ::re::string<std::string>; // back() is only available here on string<std::string>
+  Subject subject("narwal");
+  CPPUNIT_ASSERT_EQUAL('n', subject.front());
+  CPPUNIT_ASSERT_EQUAL('l', subject.back()); // <------- test this
+  subject.front() = 'N';  // <-------------------------- test this
+  CPPUNIT_ASSERT_EQUAL('N', subject.front());
+}
+
+auto tests::unit::re::construct::Fixture::test_string_string_back() -> void {
+  using Subject = ::re::string<std::string>; // back() is only available here; ibidem.
+  Subject subject("idiot");
+  CPPUNIT_ASSERT_EQUAL('i', subject.front());
+  CPPUNIT_ASSERT_EQUAL('t', subject.back()); // <------ test this
+  subject.back() = 'T';  // <-------------------------- test this
+  CPPUNIT_ASSERT_EQUAL('T', subject.back());
+}
+
+auto tests::unit::re::construct::Fixture::test_buffer_string_front() -> void {
+  using Subject = ::re::buffer<std::string>; // front() is only available here on buffer<std::string>
+  Subject subject("ocelot");
+  CPPUNIT_ASSERT_EQUAL('o', subject.front());
+  CPPUNIT_ASSERT_EQUAL('t', subject.back()); // <------- test this
+  subject.front() = 'O';  // <-------------------------- test this
+  CPPUNIT_ASSERT_EQUAL('O', subject.front());
+}
+
+auto tests::unit::re::construct::Fixture::test_buffer_string_back() -> void {
+  using Subject = ::re::string<std::string>; // back() is only available here; ibidem.
+  Subject subject("possum");
+  CPPUNIT_ASSERT_EQUAL('p', subject.front());
+  CPPUNIT_ASSERT_EQUAL('m', subject.back()); // <------ test this
+  subject.back() = 'P';  // <-------------------------- test this
+  CPPUNIT_ASSERT_EQUAL('P', subject.back());
+}
+
+#import re.string_view
+#import std.string_view
+auto tests::unit::re::construct::Fixture::test_string_view_string_view_char() -> void {
+  using Subject = ::re::string_view<std::string_view>;
+  {
+    Subject subject;
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(view.empty());
+  } {
+    Subject subject("narrow");
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(!view.empty());
+  } {
+    Subject::value_type precursor("narrow");
+    Subject subject(precursor);
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(!view.empty());
+  }
+}
+
+#import re.string_view
+#import std.wstring_view
+auto tests::unit::re::construct::Fixture::test_string_view_string_view_wchar_t() -> void {
+  using Subject = ::re::string_view<std::wstring_view>;
+  {
+    Subject subject;
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(view.empty());
+  } {
+    Subject subject(L"wide");
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(!view.empty());
+  } {
+    Subject::value_type precursor(L"wide");
+    Subject subject(precursor);
+    auto view = (Subject::value_type) subject;
+    CPPUNIT_ASSERT(!view.empty());
+  }
+}
+
+#import c.basic_buffer
+#import c.basic_stringz
+#import std.string
+#import std.basic_string_view
+#import tests.unit.re.construct.Buffer
+#import tests.unit.re.construct.String_View
+#import tests.unit.re.construct.String
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+auto tests::unit::re::construct::Fixture::suite() -> cppunit::Test * {
+  namespace rigging = ::tests::unit::re::construct;
+  using namespace ::rigging::unit::suite;
+  Stream series("construct");
+  {
+    Stream sub("usage");
+    sub << call("string<std::string>", &Fixture::test_usage_string_string)
+        << call("string<c::const_stringz>", &Fixture::test_usage_string_const_stringz)
+        << call("buffer<std::string>", &Fixture::test_usage_buffer_string)
+        << call("buffer<c::buffer>", &Fixture::test_usage_buffer_buffer)
+        << call("buffer<c::const_buffer>", &Fixture::test_usage_buffer_const_buffer)
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("string_view");
+    sub << add(rigging::String_View<std::basic_string_view<char>>::suite())
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("string");
+    sub << add(rigging::String<std::string>::suite())
+        << add(rigging::String<::c::basic_stringz<char const>>::suite())
+      // UNWORKABLE rigging::String<::c::basic_stringz<char>>::suite()
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("string_view");
+    sub << add(rigging::String_View<std::basic_string_view<char>>::suite())
+        << add(rigging::String_View<std::basic_string_view<wchar_t>>::suite())
+        << add(rigging::String_View<std::basic_string_view<char16_t>>::suite())
+        << add(rigging::String_View<std::basic_string_view<char32_t>>::suite())
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("buffer");
+    sub << add(rigging::Buffer<std::string>::suite())
+        << add(rigging::Buffer<::c::basic_buffer<char>>::suite())
+        << add(rigging::Buffer<::c::basic_buffer<char const>>::suite())
+      ;
+    series << add(sub.release());
+  }
+  {
+    Stream sub("front");
+    sub << call("string<std::string>::front()", &Fixture::test_string_string_front)
+        << call("buffer<std::string>::front()", &Fixture::test_buffer_string_front)
+      ;
+    series << add(sub.release());
+  } {
+    Stream sub("back");
+    sub << call("string<std::string>::back()", &Fixture::test_string_string_back)
+        << call("buffer<std::string>::back()", &Fixture::test_buffer_string_back)
+      ;
+    series << add(sub.release());
+  }
+  series << call("string_view<std::string_view>", &Fixture::test_string_view_string_view_char)
+         << call("string_view<std::wstring_view>", &Fixture::test_string_view_string_view_wchar_t)
+    ;
+  return series.release();
+}
+#endiv

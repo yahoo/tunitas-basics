@@ -1,0 +1,147 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import std.shared_ptr
+#import std.char_traits
+namespace nonstd::exception {
+  //
+  // Templatized version that accepts any (reasonable) character.
+  // Throw towards quitting & exit, from anywhere
+  //
+  // Offers different messaging scenarios:
+  //
+  //    Quitting::what() ----------------------> "quitting" (the narrow literal "quitting")
+  //    Quitting::message() -------------------> "sky is cloudy, solar not operable" (no '\n')
+  //    operator<<(ostream &, Quitting &) -----> "error, sky is cloudy, solar not operable" (no '\n')
+  //
+  // Scheme:
+  //
+  //     throw Quitting("quitting", sysexits::FAIL);
+  //     throw Quitting("done", sysexits::OK);
+  //
+  // Example #1
+  //     try {
+  //         ... do stuff ...
+  //     } catch (nonstd::exception::Quitting const &q) {
+  //         q.stream() << autoconfig::package_name() << ": " << q << '\n';
+  //         return q.code();
+  //     }
+  //
+  // Example #2 (more explicit)
+  //     try {
+  //         ... do stuff ...
+  //     } catch (nonstd::exception::Quitting const &q) {
+  //         q.stream() << autoconfig::package_name() << ": " << q << '\n';
+  //         return q.code();
+  //     }
+  //
+  // Example #3 (cruder)
+  //     try {
+  //         ... do stuff ...
+  //     } catch (nonstd::exception::Quitting const &q) {
+  //         q.stream() << q << '\n';
+  //         return q.code();
+  //     }
+  //
+  template<required::Character CHAR, required::Character_Traits TRAITS = std::char_traits<CHAR>> class [[nodiscard]] Basic_Quitting;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace nonstd::exception {
+  template<required::Character CHAR, required::Character_Traits TRAITS> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Basic_Quitting<CHAR, TRAITS> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import std.exception
+#import std.basic_string
+#import nonstd.sysexits.Code
+#import nonstd.sysexits.constants
+namespace nonstd {
+  template<required::Character CHAR, required::Character_Traits TRAITS> class exception::Basic_Quitting : public std::exception {
+    //
+    // [[FIXTHIS?]] - the std::exception, and all its descendants are framed with messaging that is char-based (narrow character),
+    //                as such, the exceptions are not directly suitable for transmitting UX messagerie.
+    //                e.g. std::exception::what() -> char const *
+    //
+    using ancestor = std::exception;
+  public:
+    //
+    // The 'message' should be simplistic
+    //     "quitting"
+    //     "there were errors"
+    //     "something happened"
+    //
+    using Char = CHAR;
+    using Traits = TRAITS;
+    using String = std::basic_string<Char, Traits>;
+    using Stream = std::basic_ostream<Char, Traits>;
+    inline explicit Basic_Quitting(sysexits::Code = sysexits::FAIL);
+    inline explicit Basic_Quitting(String message, sysexits::Code = sysexits::FAIL);
+    inline auto message() const -> String const &;
+    inline auto code() const noexcept -> sysexits::Code;
+    template<typename TYPE> requires sysexits::Is_Convertible_Into<TYPE>::value inline auto code() const noexcept -> TYPE;
+    inline auto stream() const noexcept -> Stream &;
+    inline auto severity_name() const -> String const &;
+    // what() always returns the narrow character literal "quitting"
+    //  ... use message() for richer characters and better wording
+    auto what() const noexcept -> char const * override;
+  protected:
+    // Because the copy constructor of an exception must offer the nothrow guarantee
+    std::shared_ptr<String> offending_message;
+    sysexits::Code offending_code;
+    friend auto ::nonstd::exception::operator<< <>(std::basic_ostream<CHAR, TRAITS> &, Basic_Quitting<CHAR, TRAITS> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+    struct Literals;
+  };
+}
+#endiv
+#divert <ipp>
+#import nonstd.exception.Basic_Quitting.Literals
+namespace nonstd {
+  template<required::Character CHAR, required::Character_Traits TRAITS> auto exception::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Basic_Quitting<CHAR, TRAITS> const &q) -> std::basic_ostream<CHAR, TRAITS> & {
+    return o << q.severity_name() << o.widen(',') << o.widen(' ') << q.message();
+  }
+}
+#import std.make_shared
+namespace nonstd::exception {
+  template<required::Character _1, required::Character_Traits _2> Basic_Quitting<_1, _2>::Basic_Quitting(sysexits::Code code)
+    : ancestor()
+    , offending_message(std::make_shared<String>(Literals::default_message()))
+    , offending_code(code) {
+    ;
+  }
+  template<required::Character _1, required::Character_Traits _2> Basic_Quitting<_1, _2>::Basic_Quitting(String message, sysexits::Code code)
+    : ancestor()
+    , offending_message(std::make_shared<String>(message))
+    , offending_code(code) {
+    ;
+  }
+  template<required::Character _1, required::Character_Traits _2> template<typename TYPE> requires sysexits::Is_Convertible_Into<TYPE>::value auto Basic_Quitting<_1, _2>::code() const noexcept -> TYPE {
+    return (TYPE) offending_code;
+  }
+  template<required::Character _1, required::Character_Traits _2> auto Basic_Quitting<_1, _2>::code() const noexcept -> sysexits::Code {
+    return offending_code;
+  }
+  template<required::Character _1, required::Character_Traits _2> auto Basic_Quitting<_1, _2>::message() const -> String const & {
+    return *offending_message;
+  }
+  template<required::Character _1, required::Character_Traits _2> auto Basic_Quitting<_1, _2>::stream() const noexcept -> Stream & {
+    return ok(offending_code) ? Literals::stream_notice() : Literals::stream_error();
+  }
+  template<required::Character _1, required::Character_Traits _2> auto Basic_Quitting<_1, _2>::severity_name() const -> String const & {
+    // cannot be noexcept because the Literals may construct strings within themselves
+    return ok(offending_code) ? Literals::severity_notice() : Literals::severity_error();
+  }
+}
+#endiv
+#divert <tpp>
+namespace nonstd::exception {
+  template<required::Character _1, required::Character_Traits _2> auto Basic_Quitting<_1, _2>::what() const noexcept -> char const * {
+    // WATCHOUT -- this is always a narrow character message
+    // It is unrelated to operator<<(basic_ostream<C, T> &, Basic_Quitting<C, T> const &)
+    // which works on wide characters and gives much more context.
+    return "quitting";
+  }
+}
+#endiv

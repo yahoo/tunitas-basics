@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.flags.required.Flagset
+namespace sys::flags {
+  //
+  // Assess whether exactly one bit is set or or not.
+  // [[FIXTHIS]] the C++20 era library has an explicit function that deals with this.
+  //
+  // Decision: zero is not "not a flag".  Can't say that enuf.
+  // If you want to support the zero value being a "legal" flag then you must test for that explicitly.
+  //
+  // Again: exactly one flag is set.
+  // Zero flags is false ... true == not is_flag(Flags{})
+  //
+  // Usage:
+  //
+  //    auto something::something::dark_side::is_flag(Flags s) -> bool { return flags::is_flag(s, 0, 7); }
+  //    auto something::something::dark_side::is_flag(Flags s) -> bool { return flags::is_flag(s, 8, 15); }
+  //
+  template<typename FLAG, typename FLAGSET> inline auto is_flag(FLAGSET, unsigned start, unsigned finish) -> bool requires required::Flagset<FLAG, FLAGSET>;
+}
+#endiv
+#divert <ipp>
+#import sys.flags.get_flag
+#forward sys.flags.downcastof
+namespace sys {
+  template<typename FLAG, typename FLAGSET> auto flags::is_flag(FLAGSET flagset, unsigned start, unsigned finish) -> bool requires required::Flagset<FLAG, FLAGSET> { return std::get<downcastas::COUNT>(get_flag<FLAG>(flagset, start, finish)); }
+}
+#endiv

@@ -1,0 +1,16 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#forward sqlite.api.unguarded
+#import sqlite.prepared.BasicResult
+namespace sqlite {
+  namespace prepared {
+    template<> inline auto BasicResult<api::unguarded::Statement *, char const *>::is_prepared() const -> bool;
+  }
+}
+#endiv
+#divert <ipp>
+#import std.get
+template<> auto sqlite::prepared::BasicResult<sqlite::api::unguarded::Statement *, char const *>::is_prepared() const -> bool {
+  return nullptr != std::get<2>(*this);
+}
+#endiv

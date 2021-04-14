@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail::separator {
+  //
+  // The (detailed) implementation of the format::Separator
+  //
+  // Usage:
+  //
+  //   format::Separator<char> sep(',');
+  //   for (auto word : some_container) {
+  //       out << sep << word;
+  //   }
+  //
+  template<typename VALUE, typename ARGUMENT = VALUE const &> class State;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail::separator {
+  template<typename CHAR, typename TRAITS, typename VALUE, typename ARGUMENT> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, State<VALUE, ARGUMENT> const &) -> std::basic_ostream<CHAR, TRAITS> & = delete;
+  template<typename CHAR, typename TRAITS, typename VALUE, typename ARGUMENT> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, State<VALUE, ARGUMENT> &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+template<typename VALUE, typename ARGUMENT> class format::detail::separator::State {
+public:
+  using value_type = VALUE;
+  using argument_type = ARGUMENT;
+  inline explicit State(argument_type);
+  inline auto reset() -> void;
+  inline auto separator() const -> value_type const &;
+  inline auto first() const -> bool;
+  inline auto rest() const -> bool;
+  inline auto operator++() -> State &;
+  inline auto operator++(int) -> State;
+protected:
+  bool positioned_at_head;
+  value_type value;
+};
+#endiv
+#divert <ipp>
+template<typename C, typename T, typename V, typename A> inline auto format::detail::separator::operator<<(std::basic_ostream<C, T> &o, State<V, A> &s) -> std::basic_ostream<C, T> & {
+  if (o) {
+    if (s.first()) {
+      s++;
+    } else {
+      o << s.separator();
+    }
+  }
+  return o;
+}
+
+template<typename V, typename A> format::detail::separator::State<V, A>::State(argument_type arg_value)
+  : positioned_at_head(true)
+  , value(arg_value) {
+  ;
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::reset() -> void {
+  positioned_at_head = true;
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::separator() const -> value_type const & {
+  return value;
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::first() const -> bool {
+  return positioned_at_head;
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::rest() const -> bool {
+  return !first();
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::operator++() -> State & {
+  positioned_at_head = false;
+  return *this;
+}
+
+template<typename V, typename A> auto format::detail::separator::State<V, A>::operator++(int) -> State {
+  State old(*this);
+  operator++();
+  return old;
+}
+#endiv

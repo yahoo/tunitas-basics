@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::ip {
+  //
+  // There are just two versions of IP at this point.
+  // This being ip(7) then there is just the two
+  // [[FIXTHIS]] add support for IPv10
+  //
+  // The constants are Family<INET4> or Family<INET6> in sys.ip.addr.Family
+  //
+  // Scope:
+  //
+  //   ip::socket
+  //   ip::socketpair
+  //
+  // Usage:
+  //
+  //   Type af4 = ip::addr::Family<IPv4>;
+  //   Type af6 = ip::addr::Family<IPv6>;
+  //   auto sd = ip::socket(ip::addr::Family<IPv4>, DATAGRAM, UNSPECIFIED);
+  //   auto sd2 = ip::socketpair(ip::addr::Family<IPv6>, DATAGRAM, UNSPECIFIED);
+  // 
+  enum class Version {
+    IPv4 = 4,
+    IP4 [[deprecated("instead prefer IPv4")]] = IPv4,
+    IPv6 = 6,
+    IP6 [[deprecated("instead prefer IPv6")]] = IPv6,
+  };
+}
+#endiv
+#divert <cpp>
+#import sys.ip.version.Traits
+namespace {
+  namespace tests {
+    using namespace sys::ip;
+    static_assert(Network::INET4 == version::Traits<Version::IPv4>::NETWORK);
+    static_assert(Network::INET6 == version::Traits<Version::IPv6>::NETWORK);
+  }
+}
+#endiv

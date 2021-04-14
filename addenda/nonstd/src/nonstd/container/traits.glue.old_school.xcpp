@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.container.traits.glue // Conditional<...> and Absent<...>
+namespace nonstd::container::traits::glue::old_school {
+  namespace required {
+    using namespace traits::glue::required;
+    template<typename CONTAINER> concept bool Has_Mutable_Iterator = requires(CONTAINER) {
+      typename CONTAINER::iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
+      requires Container<CONTAINER>;
+    };
+    template<typename CONTAINER> concept bool Has_Constie_Iterator = requires(CONTAINER) {
+      typename CONTAINER::const_iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
+      requires Container<CONTAINER>;
+    };
+  }
+  template<required::Container ANCESTOR> struct Present_And_Mutable;
+  template<required::Container ANCESTOR> struct Present_And_Constie;
+  template<required::Container CONTAINER> struct Mutable_Iterator;
+  template<required::Container CONTAINER> struct Constie_Iterator;
+}
+#endiv
+#divert <hpp>
+namespace nonstd::container::traits::glue {
+  template<required::Container CONTAINER> struct old_school::Present_And_Mutable {
+    struct Mixin {
+      using iterator = typename CONTAINER::iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
+      using Iterator = iterator;
+    };
+  };
+  template<required::Container CONTAINER> struct old_school::Present_And_Constie {
+    struct Mixin {
+      using const_iterator = typename CONTAINER::const_iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
+      using Const_Iterator = const_iterator;
+    };
+  };
+  template<required::Container CONTAINER> struct old_school::Mutable_Iterator : public Conditional<required::Has_Mutable_Iterator<CONTAINER>, Present_And_Mutable<CONTAINER>, Absent<CONTAINER>>::Type::Mixin { };
+  template<required::Container CONTAINER> struct old_school::Constie_Iterator : public Conditional<required::Has_Constie_Iterator<CONTAINER>, Present_And_Constie<CONTAINER>, Absent<CONTAINER>>::Type::Mixin { };
+}
+#endiv

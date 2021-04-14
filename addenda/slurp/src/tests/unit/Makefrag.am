@@ -1,0 +1,96 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+check_bin_unit = check/bin/unit
+check_bin_unit_LDADD = \
+  -lslurp-module \
+  -lunit-bench-module \
+  $(end)
+check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+# CXXFLAGS must still be reserved to the caller
+# no need to hear bitching that our test cases are using deprecated declarations; we're testing them!
+$(check_bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET) -Wno-deprecated-declarations
+check_bin_unit_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_bin_unit_SOURCES))
+check_bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  \
+  $(deprecating_check_bin_unit_HGTW_CXX_SOURCES) \
+  \
+  obj/src/tests/unit/slurp/namespace.cpp \
+  obj/src/tests/unit/slurp/Fixture.cpp \
+  obj/src/tests/unit/slurp/Failure.cpp \
+  \
+  obj/src/tests/unit/slurp/directory/namespace.cpp \
+  obj/src/tests/unit/slurp/directory/Fixture.cpp \
+  \
+  obj/src/tests/unit/slurp/directory/named/namespace.cpp \
+  obj/src/tests/unit/slurp/directory/named/Fixture.cpp \
+  obj/src/tests/unit/slurp/directory/named/Result.cpp \
+  obj/src/tests/unit/slurp/directory/named/Result_syscall.cpp \
+  obj/src/tests/unit/slurp/directory/named/Returning.cpp \
+  obj/src/tests/unit/slurp/directory/named/Throwing.cpp \
+  \
+  obj/src/tests/unit/slurp/file/namespace.cpp \
+  obj/src/tests/unit/slurp/file/Fixture.cpp \
+  obj/src/tests/unit/slurp/file/read.Throwing.cpp \
+  obj/src/tests/unit/slurp/file/read.Returning.cpp \
+  obj/src/tests/unit/slurp/file/istream.Iterator.cpp \
+  \
+  obj/src/tests/unit/slurp/file/named/namespace.cpp \
+  obj/src/tests/unit/slurp/file/named/Fixture.cpp \
+  obj/src/tests/unit/slurp/file/named/Returning.cpp \
+  obj/src/tests/unit/slurp/file/named/Throwing.cpp \
+  obj/src/tests/unit/slurp/file/named/Result.cpp \
+  obj/src/tests/unit/slurp/file/named/Result_syscall.cpp \
+  \
+  obj/src/tests/unit/slurp/named/namespace.cpp \
+  obj/src/tests/unit/slurp/named/Fixture.cpp \
+  \
+  obj/src/tests/unit/want/namespace.cpp \
+  obj/src/tests/unit/want/Fixture.cpp \
+  $(end)
+
+#
+# (deprecating)
+#   .../unit/directory/...
+#   .../unit/file/...
+#
+# (current)
+#   .../unit/slurp/directory/...
+#   .../unit/slurp/directory/named/...
+#   .../unit/slurp/file/...
+#   .../unit/slurp/file/named/...
+#
+# Only the "named" variants have a special Result<...> return type
+#
+deprecating_check_bin_unit_HGTW_CXX_SOURCES = \
+  obj/src/tests/unit/directory/namespace.cpp \
+  obj/src/tests/unit/directory/Fixture.cpp \
+  \
+  obj/src/tests/unit/directory/read/namespace.cpp \
+  obj/src/tests/unit/directory/read/Fixture.cpp \
+  \
+  obj/src/tests/unit/file/namespace.cpp \
+  obj/src/tests/unit/file/Fixture.cpp \
+  \
+  obj/src/tests/unit/file/configuration/namespace.cpp \
+  obj/src/tests/unit/file/configuration/Fixture.cpp \
+  \
+  obj/src/tests/unit/file/read/namespace.cpp \
+  obj/src/tests/unit/file/read/Fixture.cpp \
+  obj/src/tests/unit/file/read/Returning.cpp \
+  obj/src/tests/unit/file/read/Throwing.cpp \
+  $(end)
+
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
+$(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

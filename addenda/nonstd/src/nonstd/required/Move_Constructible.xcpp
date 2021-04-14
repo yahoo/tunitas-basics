@@ -1,0 +1,15 @@
+// -*- c++ -*- C++23 with S.C.O.L.D. stylings; For terms, see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_move_constructible
+namespace nonstd::required {
+  //
+  // Is this type move constructible?
+  // Obey the (some) naming convention
+  //
+  // Usage:
+  //
+  //   Oh come on.  It's just a non-standard renaming of the standard concept.  A vanity flourish.
+  //
+  template<typename TYPE> concept Move_Constructible = std::is_move_constructible_v<TYPE>;
+}
+#endiv

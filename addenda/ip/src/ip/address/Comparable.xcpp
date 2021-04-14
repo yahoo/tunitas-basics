@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip {
+  namespace address {
+    template<typename VALUE> class Comparable;
+  }
+}
+#entail ip.address.Comparable.VALUE.N
+//
+// reminder ... there is no need for a specialization for
+//   Comparable<in4::addr_t>
+//   Comparable<in6::addr_t>
+// as those integral quantities will be sufficiently handled by the definition template operator== (herein)
+// but the wacky structures-of-unions specifying data layout require some specialized treatment
+//   Comparable<in4::addr>
+//   Comparable<in6::addr>
+//
+#entail ip.address.Comparable.in4.addr
+#entail ip.address.Comparable.in6.addr
+#endiv
+#divert <hpp>
+namespace ip {
+  namespace address {
+    template<typename VALUE> inline auto operator==(Comparable<VALUE> const &, Comparable<VALUE> const &) -> bool;
+    template<typename VALUE> inline auto operator!=(Comparable<VALUE> const &, Comparable<VALUE> const &) -> bool;
+  }
+}
+
+template<typename VALUE> class ip::address::Comparable {
+public:
+  using value_type = VALUE;
+  inline Comparable(value_type &);
+protected:
+  friend auto address::operator==<>(Comparable const &, Comparable const &) -> bool;
+  value_type &value;
+};
+#endiv
+#divert <ipp>
+template<typename VALUE> ip::address::Comparable<VALUE>::Comparable(value_type &arg_value)
+  : value(arg_value) {
+  ;
+}
+
+template<typename VALUE> auto ip::address::operator==(Comparable<VALUE> const &a, Comparable<VALUE> const &b) -> bool {
+  return a.value == b.value;
+}
+
+template<typename VALUE> auto ip::address::operator!=(Comparable<VALUE> const &a, Comparable<VALUE> const &b) -> bool {
+  return !operator==(a, b);
+}
+#endiv

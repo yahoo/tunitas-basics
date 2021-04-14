@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::detail {
+  //
+  // The "initialized" / "uninitialized" information.
+  // By default, is self-initializing
+  //
+  // For inheritance from system structures which do not naturally initialize.
+  // And using a uniqueness argument to make type aliases work with ADL.
+  //
+  // The ANCESTOR is typically from global scope (pesky).
+  //
+  // Usage:
+  //
+  //   struct something;
+  //   namespace somehow {
+  //     enum Something_Uniqueness { }
+  //     using Something = sys::detail::Initialized<something, Something_Uniqueness>
+  //   }
+  //
+  template<typename ANCESTOR, typename UNIQUENESS = ANCESTOR> struct Initialized;
+}
+#endiv
+#divert <hpp>
+#import nonstd.uninitialized // Uninitialized
+#import nonstd.same_as
+template<typename ANCESTOR, typename UNIQUENESS> class sys::detail::Initialized : public ANCESTOR {
+  using Ancestor = ANCESTOR;
+public:
+  using Uninitialized = nonstd::uninitialized::Uninitialized;
+  inline static constexpr auto uninitialized = nonstd::uninitialized::UNINITIALIZED;;
+  inline Initialized(); // ......................... is zeroed
+  inline explicit Initialized(Uninitialized); // ... not zeroed
+  // We need to surface access to the ancestor's constructor, but we don't know how to make it any more
+  template<typename FIRST, typename... REST> inline explicit Initialized(FIRST, REST...);
+  inline Initialized(Ancestor &&);
+  inline Initialized(Ancestor const &);
+  Initialized(Initialized const &) = default;
+  Initialized(Initialized &&) = default;
+  inline auto operator=(Ancestor &&) -> Initialized &;
+  inline auto operator=(Ancestor const &) -> Initialized &;
+  auto operator=(Initialized const &) -> Initialized & = default;
+  auto operator=(Initialized &&) -> Initialized & = default;
+};
+#endiv
+#divert <ipp>
+#import nonstd.uninitialized.zero
+#import std.move
+namespace sys::detail {
+  template<typename A, typename U> Initialized<A,U>::Initialized() { nonstd::uninitialized::zero(*this); }
+  template<typename A, typename U> Initialized<A,U>::Initialized(Uninitialized) { }
+  template<typename A, typename U> template<typename FIRST, typename... REST> Initialized<A,U>::Initialized(FIRST first, REST ...rest)
+    : Ancestor{std::move(first), std::move(rest)...}
+  { }
+  template<typename A, typename U> Initialized<A,U>::Initialized(Ancestor const &other) : Ancestor{other} { }
+  template<typename A, typename U> Initialized<A,U>::Initialized(Ancestor &&other) : Ancestor{std::forward<Ancestor>(other)} { }
+  template<typename A, typename U> auto Initialized<A,U>::operator=(Ancestor const &other) -> Initialized & { Ancestor::operator=(other); return *this; }
+  template<typename A, typename U> auto Initialized<A,U>::operator=(Ancestor &&other) -> Initialized & { Ancestor::operator=(std::forward<Ancestor>(other)); return *this; }
+}
+#endiv

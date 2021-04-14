@@ -1,0 +1,6 @@
+A C++2a interface to c-ares in the S.C.O.L.D stylings.
+
+Authorities: https://c-ares.haxx.se
+Microsoft's GitHub: https://github.com/c-ares/
+
+This package could reasonably be named "c++-ares" or "cxx-ares" or "cpp-ares" or such.  But instead "module-ares."

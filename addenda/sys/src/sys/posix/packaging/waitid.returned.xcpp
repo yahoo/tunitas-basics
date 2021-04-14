@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix::packaging::waitid {
+  using namespace packaging::wait::interface;
+  namespace [[detail]] returned {
+    using namespace bundle::waitid::returned;
+  }
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::waitid::returned {
+  // n.b. once the (process) Type {PROCESS, GROUP} has been signalled there is no need/possibility to type-encode "either"
+  template<identifier::Process RETURNED> inline auto waitid(Type, id_t, [[in]] Options) -> siginfo::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto waitid(Type, id_t, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto waitid(Type, id_t, [[in]] Options, siginfo::Unfilled) -> identifier::Returned<RETURNED>;
+  //
+  template<identifier::Process RETURNED> inline auto waitid(typed_t, [[in]] Options) -> siginfo::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto waitid(typed_t, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned<RETURNED>;
+  template<identifier::Process RETURNED> inline auto waitid(typed_t, [[in]] Options, siginfo::Unfilled) -> identifier::Returned<RETURNED>;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::waitid::returned {
+  template<returned::identifier::Process RETURNED> auto returned::waitid(Type type, id_t untyped, Options options) -> siginfo::Returned<RETURNED> {
+    // ./glibc-2.17-21/glibc-2.17-c758a686/sysdeps/unix/sysv/linux/waitid.c
+    // The unused fifth argument is a `struct rusage *' that we could pass if we were using waitid to simulate wait3/wait4.
+    auto ofnigis = Siginfo{};
+    auto called = idiomatic::syscall<RETURNED>(Syscall::WAITID, (int)type, untyped, &ofnigis, (int)options, (rusage *)0);
+    return {good(called), error_num(called), value(called), ofnigis};
+  }
+  template<returned::identifier::Process RETURNED> auto returned::waitid(Type type, id_t untyped, Options options, siginfo::Filled &ofingis) -> identifier::Returned<RETURNED> { return stylized::syscall<identifier::Returned<RETURNED>>(Syscall::WAITID, (int)type, untyped, &ofingis, (int)options); }
+  template<returned::identifier::Process RETURNED> auto returned::waitid(Type type, id_t untyped, Options options, siginfo::Unfilled) -> identifier::Returned<RETURNED> {
+    auto abandoned = siginfo::Filled{};
+    return waitid<RETURNED>(type, untyped, options, abandoned);
+ }
+  //
+  namespace { using std::get; }
+  template<returned::identifier::Process RETURNED> auto returned::waitid(typed_t typed, Options options) -> siginfo::Returned<RETURNED>                              { return waitid<RETURNED>(get<0>(typed), get<1>(typed), options); }
+  template<returned::identifier::Process RETURNED> auto returned::waitid(typed_t typed, Options options, siginfo::Filled &ofingis) -> identifier::Returned<RETURNED> { return waitid<RETURNED>(get<0>(typed), get<1>(typed), options, ofingis); }
+  template<returned::identifier::Process RETURNED> auto returned::waitid(typed_t typed, Options options, siginfo::Unfilled) -> identifier::Returned<RETURNED> {
+    auto abandoned = siginfo::Filled{};
+    return waitid<RETURNED>(typed, options, abandoned);
+  }
+}
+#endiv

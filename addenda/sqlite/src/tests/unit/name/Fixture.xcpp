@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace name {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sqlite.open.Name
+class tests::unit::name::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_them() -> void;
+  auto test_name() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+using sqlite::open::Name;
+
+auto tests::unit::name::Fixture::test_them() -> void {
+  auto v1 = Name::DISK;
+  auto v2 = Name::MEMORY;
+  // Oh, look, we uttered them!
+  CPPUNIT_ASSERT(v1 != v2);
+}
+
+namespace {
+  // Ick - ADL fails
+  // the tester's tests::unit::name occludes the identifier sqlite::open::name
+  // so we have to reevaluate the expression in another context to show ADL works
+  inline auto adl_name(sqlite::open::Name n) -> c::const_stringz {
+    return name(n); // ADL finds this
+  }
+}
+
+#import sqlite.open.Name
+auto tests::unit::name::Fixture::test_name() -> void {
+  // These are magic constants to SQLite's open(...)
+  // One of them is indeed the empty string.
+  // So merely proving that ADL works to find name(...) is all that is occurring here 
+  {
+    std::string n1 = (std::string) sqlite::open::name(Name::DISK);
+    std::string n2 = (std::string) sqlite::open::name(Name::MEMORY);
+    CPPUNIT_ASSERT(n1 != n2);
+  } {
+    // and now with ADL doing the lookup
+    auto n1 = adl_name(Name::DISK);
+    auto n2 = adl_name(Name::MEMORY);
+    CPPUNIT_ASSERT(n1 != n2);
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::name::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("name");
+  s << call("them", &Fixture::test_them)
+    << call("name", &Fixture::test_name)
+    ;
+  return s.release();
+}
+#endiv

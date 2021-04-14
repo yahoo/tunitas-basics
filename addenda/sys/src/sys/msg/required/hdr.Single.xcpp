@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import msghdr
+#import std.is_same
+namespace sys::msg::required::hdr {
+  //
+  // The single of message header
+  //
+  // Usage:
+  //
+  //   you know
+  //
+  template<typename HDR> concept bool Single = std::is_same_v<HDR, msghdr>;
+}
+#endiv

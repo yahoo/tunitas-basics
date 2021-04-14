@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.managed.Record.declaration
+namespace tests::unit::managed {
+  template<> class Record<A>;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+template<> class tests::unit::managed::Record<ares::A> : public cppunit::test::Fixture {
+public:
+  auto test_something() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::managed::Record<ares::A>::test_something() -> void {
+#warning WRITETHIS auto tests::unit::managed::Record<::ares::A>::test_something() -> void
+  CPPUNIT_ASSERT(true);
+}
+#import rigging.suite.io
+auto tests::unit::managed::Record<ares::A>::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Record<A>");
+  series << call("something", &Record::test_something)
+    ;
+  return finalize(series);
+}
+#endiv

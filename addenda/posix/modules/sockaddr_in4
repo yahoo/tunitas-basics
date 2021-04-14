@@ -1,0 +1,4 @@
+// -*- c++ -*- 63090100-9960-4940-952a-64a2cfbdc97a
+#pragma once
+#include <netinet/in.h>
+using sockaddr_in4 = sockaddr_in; // yep, we just did that at global scope

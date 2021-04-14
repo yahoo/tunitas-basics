@@ -1,0 +1,6 @@
+// -*- c++ -*- 7fa658bc-f734-4802-bbb4-b953e9d11ad9
+#pragma once
+#include <httpserver>
+namespace httpserver::http {
+  using IP_representation = httpserver::http::ip_representation;
+}

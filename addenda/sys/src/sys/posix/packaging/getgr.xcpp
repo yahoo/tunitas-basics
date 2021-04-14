@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.call.result.Value
+#import sys.entry.Pointer
+#import sys.entry.Buffer
+#import group
+namespace sys::posix::packaging::getgr {
+  //
+  // The buffer management and result for the 'getgr'-sphere of functions.
+  // Is common amongst them all.
+  // Establishes the thread safety by managing per-stack, per-thread buffers.
+  //
+  // Usage: see getgrname(...), getgrgid(...)
+  //
+  using Buffer = entry::Buffer<::group>;
+  using Pointer = entry::Pointer<::group>;
+  using Result = call::result::Value<Pointer, /*raw result*/ ::group *, /*raw result*/ int>;
+}
+#endiv

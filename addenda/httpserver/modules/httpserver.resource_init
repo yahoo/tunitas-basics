@@ -1,0 +1,8 @@
+// -*- c++ -*- 834c261c-12aa-4eaf-aeaf-ec2fc5364c66
+#pragma once
+#include <httpserver>
+namespace httpserver {
+  // This is not part of the public interface.  It should be in a "detail" namespace.
+  // But instead the httpserver folk chose to put it out in public.  Ignore it.
+  using httpserver::resource_init;
+}

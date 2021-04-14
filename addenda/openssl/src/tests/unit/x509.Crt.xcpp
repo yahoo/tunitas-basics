@@ -1,0 +1,385 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::x509 { class Crt; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.x509.Crt
+class tests::unit::x509::Crt : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::x509::Crt;
+  auto test_constructor() -> void;
+  auto test_get_version() -> void;
+  auto test_set_version() -> void;
+  auto test_get_serialNumber() -> void;
+  auto test_set_serialNumber() -> void;
+  auto test_get_issuer_name_consty() -> void;
+  auto test_get_issuer_name_muting() -> void;
+  auto test_set_issuer_name() -> void;
+  auto test_get_subject_name_consty() -> void;
+  auto test_get_subject_name_muting() -> void;
+  auto test_set_subject_name() -> void;
+  auto test_get_notBefore_0() -> void;
+  auto test_get_notBefore_1() -> void;
+  auto test_get_notBefore_2() -> void;
+  auto test_set_notBefore() -> void;
+  auto test_get_notAfter() -> void;
+  auto test_get_notAfter_0() -> void;
+  auto test_get_notAfter_1() -> void;
+  auto test_get_notAfter_2() -> void;
+  auto test_set_notAfter() -> void;
+  auto test_get_pubkey() -> void;
+  auto test_set_pubkey() -> void;
+  auto test_get_extensions_0() -> void;
+  auto test_get_extensions_1() -> void;
+  auto test_get_extensions_2() -> void;
+  auto test_add_ext() -> void;
+  auto test_sign_single() -> void;
+  auto test_sign_multiple() -> void;
+  auto test_all() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import openssl.time.now
+#import openssl.time.literals
+auto tests::unit::x509::Crt::test_constructor() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::x509::Crt::test_get_version() -> void {
+  Subject subject;
+  subject.set_version(::openssl::x509::crt::Version{22});
+  auto version = subject.get_version();
+  CPPUNIT_ASSERT(version == ::openssl::x509::crt::Version{22});
+}
+auto tests::unit::x509::Crt::test_set_version() -> void {
+  Subject subject;
+  subject.set_version(::openssl::x509::crt::Version{2});
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.x509.serial.generate
+auto tests::unit::x509::Crt::test_get_serialNumber() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  auto serial = subject.get_serialNumber();
+  CPPUNIT_ASSERT(nullptr != serial.get());
+}
+auto tests::unit::x509::Crt::test_set_serialNumber() -> void {
+  Subject subject;
+  subject.set_serialNumber(::openssl::x509::serial::generate());
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::x509::Crt::test_get_issuer_name_muting() -> void {
+  Subject subject;
+  auto name = subject.get_issuer_name(); // <-------------------- test this (muting)
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  CPPUNIT_ASSERT(nullptr != name.get());
+}
+auto tests::unit::x509::Crt::test_get_issuer_name_consty() -> void {
+  Subject const subject;
+  auto name = subject.get_issuer_name(); // <-------------------- test this (consty)
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  CPPUNIT_ASSERT(nullptr != name.get());
+}
+auto tests::unit::x509::Crt::test_set_issuer_name() -> void {
+  Subject subject;
+  auto name = subject.get_issuer_name();
+  subject.set_issuer_name(std::move(name)); // <---------------- test this
+}
+auto tests::unit::x509::Crt::test_get_subject_name_muting() -> void {
+  Subject subject;
+  auto name = subject.get_subject_name(); // <------------------ test this (muting)
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  CPPUNIT_ASSERT(nullptr != name.get());
+}
+auto tests::unit::x509::Crt::test_get_subject_name_consty() -> void {
+  Subject const subject;
+  auto name = subject.get_subject_name(); // <------------------ test this (consty)
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  CPPUNIT_ASSERT(nullptr != name.get());
+}
+auto tests::unit::x509::Crt::test_set_subject_name() -> void {
+  Subject subject;
+  auto name = subject.get_subject_name();
+  subject.set_subject_name(std::move(name)); // <--------------- test this
+}
+auto tests::unit::x509::Crt::test_get_notBefore_0() -> void {
+  Subject subject;
+  auto when = subject.get_notBefore(); // <--------------------- test this (default)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+auto tests::unit::x509::Crt::test_get_notBefore_1() -> void {
+  using namespace ::openssl::time::literals;
+  Subject subject;
+  subject.set_notBefore(::openssl::time::now() - 200_days);
+  auto when = subject.get_notBefore(); // <--------------------- test this (muting Time)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+auto tests::unit::x509::Crt::test_get_notBefore_2() -> void {
+  using namespace ::openssl::time::literals;
+  Subject specimen;
+  specimen.set_notBefore(::openssl::time::now() - 400_days);
+  Subject const &subject{specimen};
+  auto when = subject.get_notBefore(); // <--------------------- test this (consty Time0)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+#import openssl.asn1.Time
+#import openssl.time.now
+auto tests::unit::x509::Crt::test_set_notBefore() -> void {
+  auto ttt = sys::time::as<sys::time::t>(::openssl::time::now());
+  std::cerr << "time is " << ttt << '\n';
+  auto then = ::openssl::asn1::Time{::openssl::time::now()};
+  Subject subject;
+  subject.set_notBefore(then); // <---------------------------- test this
+}
+auto tests::unit::x509::Crt::test_get_notAfter_0() -> void {
+  Subject subject;
+  auto when = subject.get_notAfter(); // <--------------------- test this (the default)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+auto tests::unit::x509::Crt::test_get_notAfter_1() -> void {
+  using namespace ::openssl::time::literals;
+  Subject subject;
+  subject.set_notAfter(::openssl::time::now() + 1000_days);
+  auto when = subject.get_notAfter(); // <--------------------- test this (muting Time)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+auto tests::unit::x509::Crt::test_get_notAfter_2() -> void {
+  using namespace ::openssl::time::literals;
+  Subject specimen;
+  specimen.set_notAfter(::openssl::time::now() + 1000_days);
+  Subject const &subject{specimen};
+  auto when = subject.get_notAfter(); // <--------------------- test this (consty Time0)
+  CPPUNIT_ASSERT(nullptr != when.get());
+}
+auto tests::unit::x509::Crt::test_set_notAfter() -> void {
+  auto then = ::openssl::asn1::Time{::openssl::time::now()};
+  Subject subject;
+  subject.set_notAfter(then); // <----------------------------- test this
+}
+#import openssl.exception.Null
+auto tests::unit::x509::Crt::test_get_extensions_0() -> void {
+  try {
+    Subject subject;
+    CPPUNIT_ASSERT(nullptr != subject.get());
+    subject.get_extensions(); // <------------------------------------ test this (on an empty one)
+    CPPUNIT_ASSERT(false);
+  } catch (::openssl::exception::Null const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import openssl.x509.extension.config
+auto tests::unit::x509::Crt::test_get_extensions_1() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  using ::openssl::x509::extension::config;
+  subject.add_ext(config(NID_basic_constraints, "CA:TRUE"));
+  auto extensions = subject.get_extensions(); // <------------------- test this (consty but on a mutable one)
+  CPPUNIT_ASSERT(1 == extensions.size());
+}
+auto tests::unit::x509::Crt::test_get_extensions_2() -> void {
+  Subject subject;
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  using ::openssl::x509::extension::config;
+  subject.add_ext(config(NID_basic_constraints, "CA:TRUE"));
+  Subject const &redo{subject};
+  auto extensions = redo.get_extensions(); // <------------------- test this (consty and on a consty one)
+  CPPUNIT_ASSERT(1 == extensions.size());
+}
+#import openssl.x509.extension.config
+auto tests::unit::x509::Crt::test_add_ext() -> void {
+  using ::openssl::x509::extension::config;
+  Subject subject;
+  subject.add_ext(config(NID_basic_constraints, "CA:TRUE"));
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+#import openssl.evp.PKey
+auto tests::unit::x509::Crt::test_get_pubkey() -> void {
+  namespace ec = ::openssl::ec;
+  namespace evp = ::openssl::evp;
+  using std::move;
+  Subject subject;
+  auto pkey = []() -> evp::PKey {
+                auto pk = evp::PKey{};
+                auto ek = ec::Key{};
+                auto gr = ec::Group{ec::group::Name::PRIME256V1};
+                ek.set_group(move(gr));
+                ek.generate_key();
+                pk.assign(move(ek));
+                return pk;
+              }();
+  subject.set_pubkey(pkey);
+  CPPUNIT_ASSERT(nullptr != subject.get());
+  auto repkey1 = subject.get_pubkey(); // <------------------------- test this
+  auto repkey2 = subject.get_pubkey(); // <------------------------- test this
+}
+auto tests::unit::x509::Crt::test_set_pubkey() -> void {
+  namespace ec = ::openssl::ec;
+  namespace evp = ::openssl::evp;
+  using std::move;
+  Subject subject;
+  auto pkey = []() -> evp::PKey {
+                auto pk = evp::PKey{};
+                auto ek = ec::Key{};
+                auto gr = ec::Group{ec::group::Name::PRIME256V1};
+                ek.set_group(move(gr));
+                ek.generate_key();
+                pk.assign(move(ek));
+                return pk;
+              }();
+  subject.set_pubkey(pkey); // <------------------------- test this
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::x509::Crt::test_sign_single() -> void {
+  namespace ec = ::openssl::ec;
+  namespace evp = ::openssl::evp;
+  using std::move;
+  Subject subject;
+  auto pkey = []() -> evp::PKey {
+                auto pk = evp::PKey{};
+                auto ek = ec::Key{};
+                auto gr = ec::Group{ec::group::Name::PRIME256V1};
+                ek.set_group(move(gr));
+                ek.generate_key();
+                pk.assign(move(ek));
+                return pk;
+              }();
+  subject.set_pubkey(pkey);
+  subject.sign(pkey, EVP_sha256()); // <------------------------- test this
+  CPPUNIT_ASSERT(nullptr != subject.get());
+}
+auto tests::unit::x509::Crt::test_sign_multiple() -> void {
+  namespace ec = ::openssl::ec;
+  namespace evp = ::openssl::evp;
+  using std::move;
+  for (auto i{1}, e{100}; e != i; ++i) {
+    Subject subject;
+    auto pkey = []() -> evp::PKey {
+                  auto pk = evp::PKey{};
+                  auto ek = ec::Key{};
+                  auto gr = ec::Group{ec::group::Name::PRIME256V1};
+                  ek.set_group(move(gr));
+                  ek.generate_key();
+                  pk.assign(move(ek));
+                  return pk;
+                }();
+    subject.set_pubkey(pkey);
+    auto name = subject.get_subject_name();
+    name.add_entry_by_txt("O", "Acme");
+    name.add_entry_by_txt("OU", "Finance");
+    name.add_entry_by_txt("CN", "*.example.com");
+    subject.sign(pkey, EVP_sha256()); // <------------------------- test this
+    CPPUNIT_ASSERT(nullptr != subject.get());
+  }
+}
+auto tests::unit::x509::Crt::test_all() -> void {
+  //
+  // There was some duplicate free problem that only showed up "in the large"
+  // Here is the large.
+  //
+  test_constructor();
+  test_set_version();
+  test_set_serialNumber();
+  test_get_issuer_name_consty();
+  test_get_issuer_name_muting();
+  test_set_issuer_name();
+  test_get_subject_name_consty();
+  test_get_subject_name_muting();
+  test_set_subject_name();
+  test_get_notBefore_0();
+  test_get_notBefore_1();
+  test_get_notBefore_2();
+  test_set_notBefore();
+  {
+    test_set_notBefore();
+    test_set_notBefore();
+    test_set_notBefore();
+    test_set_notBefore();
+    test_set_notBefore();
+  }
+  std::cerr << "moving on beyond notBefore...\n";
+  test_get_notAfter_0();
+  test_get_notAfter_1();
+  test_get_notAfter_2();
+  test_set_notAfter();
+  std::cerr << "moving on beyond notAfter...\n";
+  test_get_pubkey();
+  test_set_pubkey();
+  test_add_ext();
+  test_sign_single();
+  test_sign_multiple();
+}
+#import rigging.suite.io
+auto tests::unit::x509::Crt::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Crt");
+  series << call("constructor", &Crt::test_constructor)
+         << call("get_version", &Crt::test_get_version)
+         << call("set_version", &Crt::test_set_version)
+         << call("get_serialNumber", &Crt::test_get_serialNumber)
+         << call("set_serialNumber", &Crt::test_set_serialNumber)
+    ;
+  {
+    Stream get("get_issuer_name");
+    get << call("muting", &Crt::test_get_issuer_name_muting)
+        << call("consty", &Crt::test_get_issuer_name_consty)
+      ;
+    series << move(get);
+  }
+  series << call("set_issuer_name", &Crt::test_set_issuer_name)
+    ;
+  {
+    Stream get("get_subject_name");
+    get << call("muting", &Crt::test_get_subject_name_muting)
+        << call("consty", &Crt::test_get_subject_name_consty)
+      ;
+  }
+  series << call("set_subject_name", &Crt::test_set_subject_name)
+    ;
+  {
+    Stream get("get_notBefore");
+    get << call("0", &Crt::test_get_notBefore_0)
+        << call("1", &Crt::test_get_notBefore_1)
+        << call("2", &Crt::test_get_notBefore_2)
+      ;
+    series << move(get);
+  }
+  series << call("set_notBefore", &Crt::test_set_notBefore)
+    ;
+  {
+    Stream get("get_notAfter");
+    get << call("0", &Crt::test_get_notAfter_0)
+        << call("1", &Crt::test_get_notAfter_1)
+        << call("2", &Crt::test_get_notAfter_2)
+      ;
+    series << move(get);
+  }
+  series << call("set_notAfter", &Crt::test_set_notAfter)
+    ;
+  {
+    Stream get("get_extensions");
+    get << call("0", &Crt::test_get_extensions_0)
+        << call("1", &Crt::test_get_extensions_1)
+        << call("2", &Crt::test_get_extensions_2)
+      ;
+    series << move(get);
+  }
+  series << call("add_ext", &Crt::test_add_ext)
+         << call("get_pubkey", &Crt::test_get_pubkey)
+         << call("set_pubkey", &Crt::test_set_pubkey)
+    ;
+  {
+    Stream sig("sign");
+    sig << call("single", &Crt::test_sign_single)
+        << call("multiple", &Crt::test_sign_multiple)
+      ;
+    series << move(sig);
+  }
+  series << call("all", &Crt::test_all)
+    ;
+  return finalize(series);
+}
+#endiv

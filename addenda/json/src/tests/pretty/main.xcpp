@@ -1,0 +1,8 @@
+// This is -*- c++ -*- in the SCOLD stylings
+#divert <cpp>
+#import std.cout
+auto main(int argc, char **argv) -> int {
+  std::cout << "Pretty Printer\n";
+  return 0;
+}
+#endiv

@@ -1,0 +1,118 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::initialized {
+  template<typename TYPE> class Type;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import nonstd.initialized.Type
+template<typename TYPE> class tests::unit::initialized::Type : public cppunit::test::Fixture {
+public:
+  using Subject = TYPE; // e.g. TYPE is ::nonstd::initialized::Type<int>
+  auto test_constructor_default() -> void;
+  auto test_constructor_conversion() -> void;
+  auto test_assignment_conversion() -> void;
+  auto test_assignment_copy() -> void;
+  auto test_operator_cast() -> void;
+  auto test_operator_eq() -> void;
+  auto test_operator_ne() -> void;
+  auto test_swap() -> void;
+  static auto suite() -> cppunit::Test *;  
+  inline static auto const ZERO = typename Subject::Value{0};
+  static_assert(ZERO == typename Subject::Value{});
+  inline static auto const ONE = typename Subject::Value{1};
+  static typename Subject::Value const TWO; // WATCHOUT - for bool as Subject::Value which has a very limited range, being 0 and 1
+};
+namespace tests::unit::initialized {
+  template<> inline Type<::nonstd::initialized::Type<bool>>::Subject::Value const Type<::nonstd::initialized::Type<bool>>::TWO = false; // WATCHOUT - TWO is zero (alse)
+  template<typename _>  typename Type<_>::Subject::Value const Type<_>::TWO = typename Subject::Value{2};
+}
+#endiv
+#divert <tpp>
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+namespace tests::unit::initialized {
+  template<typename _> auto Type<_>::test_constructor_default() -> void {
+    Subject subject; // <------------------------- test this
+    auto disgorged = (typename Subject::Value) subject;
+    CPPUNIT_ASSERT(ZERO == disgorged);
+  }
+  template<typename _> auto Type<_>::test_constructor_conversion() -> void {
+    auto specimen = typename Subject::Value(ONE);
+    Subject subject((specimen)); // <------------------------- test this; and double parenthesis to avoid being a function declaration
+    auto disgorged = (typename Subject::Value) subject;
+    CPPUNIT_ASSERT(ONE == disgorged);
+  }
+  template<typename _> auto Type<_>::test_assignment_conversion() -> void {
+    Subject specimen{typename Subject::Value(ONE)};
+    Subject subject;
+    subject = specimen; // <------------------------- test this
+    auto disgorged = (typename Subject::Value) subject;
+    CPPUNIT_ASSERT(ONE == disgorged);
+  }
+  template<typename _> auto Type<_>::test_assignment_copy() -> void {
+    Subject specimen{typename Subject::Value(ONE)};
+    Subject subject;
+    subject = specimen; // <----------------------------------- test this
+    auto disgorged = (typename Subject::Value) subject;
+    CPPUNIT_ASSERT(ONE == disgorged);
+  }
+  template<typename _> auto Type<_>::test_operator_cast() -> void {
+    Subject subject{typename Subject::Value(ONE)};
+    auto disgorged = (typename Subject::Value) subject; // <------------ test this
+    CPPUNIT_ASSERT(ONE == disgorged);
+  }
+  template<typename _> auto Type<_>::test_operator_eq() -> void {
+    Subject lhs{typename Subject::Value(ONE)}; //   brackets
+    Subject rhs((typename Subject::Value(TWO))); // parenthesis, double parenthesis to avoid the function declaration
+    CPPUNIT_ASSERT(!(lhs == rhs)); // <--------------------------- test this
+    CPPUNIT_ASSERT(rhs == rhs);
+  }
+  template<typename _> auto Type<_>::test_operator_ne() -> void {
+    Subject lhs{typename Subject::Value(ONE)};
+    Subject rhs{typename Subject::Value(TWO)};
+    CPPUNIT_ASSERT(lhs != rhs); // <--------------------------- test this
+    CPPUNIT_ASSERT(!(rhs != rhs));
+  }
+  template<typename _> auto Type<_>::test_swap() -> void {
+    Subject lhs{typename Subject::Value(ONE)};
+    Subject rhs{typename Subject::Value(TWO)};
+    CPPUNIT_ASSERT(ONE == (int) (typename Subject::Value) lhs);
+    CPPUNIT_ASSERT(TWO == (int) (typename Subject::Value) rhs);
+    swap(lhs, rhs); // <----------------------------------------- test this
+    CPPUNIT_ASSERT(TWO == (int) (typename Subject::Value) lhs);
+    CPPUNIT_ASSERT(ONE == (int) (typename Subject::Value) rhs);
+  }
+  template<typename _> auto Type<_>::suite() -> cppunit::Test * {
+    using namespace ::unit::rigging::suite;
+    Stream suite("initialized");
+    {
+      Stream con("constructor");
+      con << call("default", &Type::test_constructor_default)
+          << call("conversion", &Type::test_constructor_conversion)
+        ;
+      suite << move(con);
+    } {
+      Stream ass("assignment");
+      ass << call("conversion", &Type::test_assignment_conversion)
+          << call("copy", &Type::test_assignment_copy)
+        ;
+      suite << move(ass);
+    }
+    suite << call("cast", &Type::test_operator_cast)
+          << call("swap", &Type::test_swap)      ;
+    {
+      Stream cmp("comparison");
+      cmp << call("operator==", &Type::test_operator_eq)
+          << call("operator!=", &Type::test_operator_ne)
+        ;
+      suite << move(cmp);
+    }
+    return finalize(suite);
+  }
+}
+#endiv

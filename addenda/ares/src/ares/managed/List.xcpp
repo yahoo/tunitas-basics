@@ -1,0 +1,114 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.required.list.Entry
+namespace ares::managed {
+  //
+  // A list of entries (sub-entries).
+  // Whereas most DNS queries can return multiple resource records; here they are.
+  // Looks and feels like a std::forward_list<ENTRY>
+  // but the storage and entries are managed by the (C-)ares C Runtime system.
+  //
+  // No copy semantics.
+  // Yes move semantics
+  // Destruction of the List<ENTRY> frees the underlying data structure.
+  //
+  // Usage:
+  //
+  //   You know, like std::forward_list<ENTRY>
+  //
+  template<required::list::Entry ENTRY> class List;
+}
+#endiv
+#divert <hpp>
+namespace ares::managed {
+  template<required::list::Entry ENTRY> inline auto swap(List<ENTRY> &, List<ENTRY> &) noexcept -> void;
+}
+#forward ares.managed.list.Iterator
+namespace ares {
+  template<required::list::Entry ENTRY> class managed::List {
+  public:
+    // Must only be freed with the special free function; see the specialiations of ~List()
+    using Unmanaged = typename ENTRY::Unmanaged;
+    // New School
+    using Value = ENTRY;
+    // old_school
+    using value_type = Value;
+    inline List();
+    inline explicit List(Unmanaged *);
+    inline ~List();
+    // Only move semantics, no copy semantics becaues we don't know how to copy the thing
+    List(List const &) = delete;
+    auto operator=(List const &) -> List & = delete;
+    inline List(List &&) noexcept;
+    inline auto operator=(List &&) noexcept -> List &;
+    using const_iterator = list::Iterator<Value>;
+    using iterator = const_iterator;
+    inline auto empty() const -> bool;       // constant time, checks for a "first" element
+    inline auto size() const -> std::size_t; // linear time, walks down the list
+    inline auto begin() const -> const_iterator;
+    inline auto end() const -> const_iterator;
+    // throws Argument(invalid_argument) if the list is empty
+    inline auto front() const -> Value;
+  protected:
+    friend auto managed::swap<>(List &, List &) noexcept -> void;
+    Unmanaged *unmanaged;
+  public:
+    struct tests { struct Accessor; };
+  };
+}
+#endiv
+#divert <ipp>
+#import std.swap
+namespace ares::managed {
+  template<required::list::Entry ENTRY> inline auto swap(List<ENTRY> &b, List<ENTRY> &a) noexcept -> void {
+    std::swap(a.unmanaged, b.unmanaged);
+  }
+}
+#import std.forward
+namespace ares::managed {
+  template<required::list::Entry _> List<_>::List()
+    : unmanaged{nullptr}
+  { }
+  template<required::list::Entry _> List<_>::List(Unmanaged *unmanaged)
+    : unmanaged{unmanaged}
+  { }
+  template<required::list::Entry _> List<_>::List(List &&other) noexcept
+    : unmanaged{nullptr} {
+    swap(*this, other);
+  }
+  template<required::list::Entry _> List<_>::~List() {
+    Unmanaged *doomed{nullptr};
+    std::swap(unmanaged, doomed);
+    if (doomed) {
+      // Per ares_free_data(3) and the other manual pages, the free_data function "just knows" how to delete its (abstract) list.
+      // Despite using C for the implementation language, they are implementing C++ language idioms, manually at the application level.
+      ::ares_free_data(doomed);
+    }
+  }
+  template<required::list::Entry _> auto List<_>::operator=(List &&other) noexcept -> List & {
+    List tmp{std::forward<List>(other)};
+    swap(tmp, *this);
+    return *this;
+  }
+}
+#import ares.managed.list.Iterator
+#import std.distance
+namespace ares::managed {
+  template<required::list::Entry _> auto List<_>::empty() const -> bool {
+    return nullptr == unmanaged;
+  }
+  template<required::list::Entry _> auto List<_>::size() const -> std::size_t {
+    return std::distance(begin(), end());
+  }
+  template<required::list::Entry _> auto List<_>::begin() const -> const_iterator {
+    return const_iterator{unmanaged};
+  }
+  template<required::list::Entry _> auto List<_>::end() const -> const_iterator {
+    return const_iterator();
+  }
+  template<required::list::Entry _> auto List<_>::front() const -> Value {
+    return *begin(); // throws on its own if indirection on begin wasn't valid
+  }
+}
+#endiv

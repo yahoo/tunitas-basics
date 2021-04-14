@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import std.string
+#import sys.posix.OK
+#import sys.posix.mktemp
+#import sys.posix.link
+#import sys.posix.touch
+#import sys.posix.access
+auto tests::unit::posix::fixture::Fixture::test_link() -> void {
+  using OK = six::OK;
+  auto r = six::mktemp("/tmp/t99.tests.unit.posix.link.XXXXXX");
+  CPPUNIT_ASSERT(good(r));
+  std::string const specimen_a = value(r).native() + ".a";
+  std::string const specimen_b = value(r).native() + ".b";
+  guardian::Cleanup_Spackled_Names cleanup_a{specimen_a};
+  guardian::Cleanup_Spackled_Names cleanup_b{specimen_b};
+  auto ta = six::touch(specimen_a, 0666);
+  CPPUNIT_ASSERT(good(ta));
+  auto tb = six::link(specimen_a, specimen_b); // <---------------- test this
+  CPPUNIT_ASSERT(good(tb));
+  auto aa = six::access(specimen_a, OK::F);
+  CPPUNIT_ASSERT(good(aa));
+  auto ab = six::access(specimen_b, OK::F);
+  CPPUNIT_ASSERT(good(ab));
+}
+#endiv

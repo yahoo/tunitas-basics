@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::endian {
+  //
+  // A palette of helpers for the endian reorder test Fixtures
+  //
+  class Palette;
+}
+#endiv
+#divert <hpp>
+#import std.is_integral
+#import std.ostream
+#import std.is_unsigned
+#import ip // ::ip::uint128_t
+class tests::unit::ip::endian::Palette {
+protected:
+  ~Palette() = default; // descendants only
+public:
+  template<typename INTEGER> auto dump_expected_actual(std::ostream &, INTEGER expected, INTEGER actual) -> void
+    requires std::is_unsigned<INTEGER>::value || std::is_same<INTEGER, ::ip::uint128_t>::value;
+  template<typename INTEGER> struct Operator_Insert;
+};
+#endiv
+#divert <tpp>
+#import std.hex
+#import std.dec
+#import std.setw
+#import std.setfill
+#import want.cppunit.int128
+template<typename INTEGER> auto tests::unit::ip::endian::Palette::dump_expected_actual(std::ostream &outbound, INTEGER expected, INTEGER actual) -> void
+  requires std::is_unsigned<INTEGER>::value || std::is_same<INTEGER, ::ip::uint128_t>::value {
+  using ::want::cppunit::operator<<; // in case INTEGER is a 128-bit integer
+  struct Scope {
+    std::ostream &outbound;
+    explicit Scope(std::ostream &outbound) : outbound(outbound) { }
+    ~Scope() { if (outbound) { outbound << std::dec; } }
+  } scope(outbound);
+  outbound << std::hex
+           << "expected=" << std::setw(sizeof (expected)) << std::setfill('0') << expected
+           << "\nactual=" << std::setw(sizeof (actual)) << std::setfill('0') << actual
+           << '\n';
+}
+#endiv

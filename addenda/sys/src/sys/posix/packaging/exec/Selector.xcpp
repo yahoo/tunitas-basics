@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.tuple
+#import std.tuple_size
+#import std.size_t
+namespace sys::posix::packaging::exec {
+  template<bool STOP, std::size_t N, template<typename...> class ROTATED, typename... ARGUMENTS> struct Rotater;
+  template<std::size_t N, template<typename...> class ROTATED, typename... ARGUMENTS> struct Rotater<true, N, ROTATED, ARGUMENTS...> { using type = ROTATED<ARGUMENTS...>; };
+  template<std::size_t N, template<typename...> class ROTATED, typename ARGUMENT, typename... ARGUMENTS> struct Rotater<false, N, ROTATED, ARGUMENT, ARGUMENTS...> : public Rotater<0 == N-1, N-1, ROTATED, ARGUMENTS..., ARGUMENT> { };
+
+  //
+  // Instantiates Dispatcher<FINAL, A, B, C, D, E>  where FINAL is (was) the last in the parameter pack.
+  //
+  // Usage:
+  //     using dispatcher_type = Selector<Dispatcher, A, B, C, D, E, FINAL>;
+  //     dispatcher_type call(a, b, c, d, e, final);
+  //
+  template<template<typename...> class ROTATED, typename... ARGUMENTS> struct Selector : public Rotater<0 == std::tuple_size<std::tuple<ARGUMENTS...>>::value-1, std::tuple_size<std::tuple<ARGUMENTS...>>::value-1, ROTATED, ARGUMENTS...> { };
+}
+#endiv

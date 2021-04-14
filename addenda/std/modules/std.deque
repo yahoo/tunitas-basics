@@ -1,0 +1,3 @@
+// -*- c++ -*- 1aa6000d-9e9d-4780-b8de-91737130d528
+#pragma once
+#include <deque>

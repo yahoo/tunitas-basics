@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <fcntl.h>
+namespace sys::o {
+  // The individual status flags.  Other flags are in Create.
+  // The "status flags" are enumerated on the manual page fcntl(2)
+  // <quote ref=fcntl(2)>
+  //   On Linux, this command can change only the O_APPEND, O_ASYNC, O_DIRECT, O_NOATIME, and O_NONBLOCK flags.
+  //    It is not possible to change the O_DSYNC and O_SYNC flags.
+  // </quote>
+  // The "status flags" are any other flags not enumerated as "access flags" or "creation flags"
+  enum class Status {
+    NONE = 0,
+    APPEND    = O_APPEND,
+    ASYNC     = O_ASYNC,
+    DIRECT    = O_DIRECT, // since Linux 2.4.10
+    DSYNC     = O_DSYNC,
+    LARGEFILE = O_LARGEFILE,
+    NOATIME   = O_NOATIME, // since Linux 2.6.8
+    NONBLOCK  = O_NONBLOCK,
+    PATH      = O_PATH, // since Linux 2.6.39
+    SYNC      = O_SYNC,
+    TMPFILE   = O_TMPFILE,
+    NDELAY [[deprecated("prefer Status::NONBLOCK")]] = NONBLOCK,
+  };
+  static_assert(O_NONBLOCK == O_NDELAY);
+}
+#endiv

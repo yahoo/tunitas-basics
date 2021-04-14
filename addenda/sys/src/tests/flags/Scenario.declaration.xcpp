@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.flags.required.Palette
+namespace tests::flags {
+  //
+  // A test fixture on a Palette of Flags
+  //
+  // Usage:
+  //
+  //   struct Scenario<1, my::Palette<Flag, Flags>>
+  // 
+  template<unsigned NTH, required::Palette PALETTE> struct Scenario;
+}
+#endiv

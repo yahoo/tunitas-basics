@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import rigging.suite.Iterator
+#import rigging.unit.suite.Iterator
+#import unit.rigging
+#endiv
+#divert <cpp>
+#import std.is_same
+namespace {
+  using rsI = ::rigging::suite::Iterator;
+  using rusI = ::rigging::unit::suite::Iterator;
+  using ursI = ::unit::rigging::suite::Iterator;
+  static_assert(std::is_same<rsI, rusI>::value);
+  static_assert(std::is_same<rusI, ursI>::value);
+  static_assert(std::is_same<ursI, rsI>::value);
+}
+#endiv

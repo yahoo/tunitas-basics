@@ -1,0 +1,6 @@
+// -*- c++ -*- a0234cc6-cde2-4e97-a524-de6359f0a80a
+#pragma once
+#include <cppunit/BriefTestProgressListener.h>
+namespace cppunit {
+  using CppUnit::BriefTestProgressListener;
+}

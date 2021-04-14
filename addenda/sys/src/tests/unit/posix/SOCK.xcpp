@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class SOCK; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.SOCK // this is how you should say it
+struct tests::unit::posix::SOCK : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::SOCK;
+  auto test_object() -> void;
+  auto test_as() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto tests::unit::posix::SOCK::test_object() -> void {
+    auto ss1 = Subject::CLOEXEC;
+    auto ss2 = Subject::CLOSE_ON_EXEC;
+    auto ss3 = Subject::NONBLOCK;
+    CPPUNIT_ASSERT(ss1 == ss2);
+    CPPUNIT_ASSERT(ss2 != ss3);
+    CPPUNIT_ASSERT(ss3 != ss1);
+  }
+  auto SOCK::test_as() -> void {
+#warning WRITETHIS SOCK::test_as() -> void
+  }
+  auto SOCK::test_constants() -> void {
+    auto t = Subject::UNSPEC;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    t = Subject::PACKET; 
+#pragma GCC diagnostic pop
+    t = Subject::NONE;
+    t = Subject::STREAM;
+    t = Subject::DGRAM;
+    t = Subject::SEQPACKET;
+    t = Subject::RAW;
+    t = Subject::RDM;
+    CPPUNIT_ASSERT(Subject::RDM == t);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::SOCK::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("SOCK");
+  series << call("object", &SOCK::test_object)
+         << call("constants", &SOCK::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,3 @@
+// -*- c++ -*- 7469232b-bfa7-4d13-be64-c151d5bafa78
+#pragma once
+#include <cctype>

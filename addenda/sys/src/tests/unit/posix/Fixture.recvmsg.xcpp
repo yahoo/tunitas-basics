@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import msghdr
+#import sys.posix.MSG
+#import sys.posix.recvmsg
+auto tests::unit::posix::fixture::Fixture::test_recvmsg() -> void {
+  auto const fd = int{-1};
+  msghdr buf;
+  auto received = six::native::recvmsg(fd, buf, six::MSG::NONE);
+  CPPUNIT_ASSERT(!good(received)); // ibidem.
+}
+#endiv

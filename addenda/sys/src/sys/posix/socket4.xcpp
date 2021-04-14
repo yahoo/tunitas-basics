@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.socket
+namespace sys::posix {
+  //
+  // socket4(2) rhymes with access4(2)
+  // But it's just an overload of sys::posix::socket(...)
+  // Sure, why not.  socket4(2) follows access4(2)
+  // Breaks out the blended Specification into two distinct options.
+  //
+  namespace packaging::socket4 {
+    using namespace packaging::socket::interface;
+    namespace function {
+      using Result = result::Single<File>;
+      inline auto socket4(Address, Socket, Options, Protocol = UNSPECIFIED) -> Result;
+      inline auto socket4(Address, Socket, Protocol, Options) -> Result;
+    }
+    namespace native {
+      using Result = result::Single<int>;
+      inline auto socket4(Address, Socket, Options, Protocol = UNSPECIFIED) -> Result;
+      inline auto socket4(Address, Socket, Protocol, Options) -> Result;
+    }
+    namespace direct {
+      using Result = result::Single<int>;
+      inline auto socket4(int address, int type, int protocol, int options) -> Result; // and good luck!
+    }
+  }
+  using packaging::socket4::function::socket4;
+  namespace native { using packaging::socket4::native::socket4; }
+  namespace direct { using packaging::socket4::direct::socket4; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.socket
+namespace sys::posix::packaging::socket4 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  auto function::socket4(Address address, Socket type, Options options, Protocol protocol) -> Result { return posix::socket(address, type, options, protocol); }
+  auto function::socket4(Address address, Socket type, Protocol protocol, Options options) -> Result { return posix::socket(address, type, options, protocol); }
+  //
+  auto native::socket4(Address address, Socket type, Options options, Protocol protocol) -> Result   { return posix::native::socket(address, type, options, protocol); }
+  auto native::socket4(Address address, Socket type, Protocol protocol, Options options) -> Result   { return posix::native::socket(address, type, options, protocol); }
+  //
+  auto direct::socket4(int address, int type, int protocol, int options) -> Result                   { return posix::direct::socket(address, type | options, protocol); }
+#pragma GCC diagnostic pop
+}
+#endiv

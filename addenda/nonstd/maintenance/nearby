@@ -1,0 +1,52 @@
+#!/bin/bash
+# For terms and provenance see the LICENSE file at the top of this repository.
+cd ${0%/*}/.. || exit 70
+: ${with_siblings:=$(realpath ${0%/*}/..)}
+: ${with_nearby:=$(realpath ${0%/*}/../..)}
+: ${with_submodules:=no} # $(realpath ${0%/*}/../submodules)
+function guess_nearby() {
+    local guess=$(realpath ${with_siblings?}/..)
+    if ! { [[ -d $guess ]] && [[ -d $guess/hypogeal-twilight ]]; }; then
+        guess=/build/scold
+    fi
+    echo $guess
+    echo "${0##*/}: notice, guessing the normal nearby for modules as $guess" 1>&2
+}
+: ${with_nearby:=$(guess_nearby)}
+function guess_special() {
+    local guess
+    if false && [[ -d $guess ]] && [[ -d $guess/hypogeal-twilight ]]; then
+        guess=${with_nearby?}
+    else
+        guess=/build/scold
+    fi
+    echo $guess
+    echo "${0##*/}: notice, guessing the special nearby for hypogeal-twilight as $guess" 1>&2
+}
+# this sets up for a nearby or far away hypogeal-twilight to be special and interesting ... and a convenient default
+: ${with_hypogeal_twilight:=$(guess_special)/hypogeal-twilight}
+: ${with_nonstd_half:=/opt/nonstd/half}
+: ${with_module_half:=${with_nearby?}/module-half}
+: ${with_module_std:=${with_nearby?}/module-std}
+: ${with_module_rigging:=${with_nearby?}/module-rigging}
+: ${enable_configure_debug:=no}
+: ${enable_configure_verbose:=no}
+eval \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    ${enable_configure_debug:+--enable-configure-debug=$enable_configure_debug} \
+    ${enable_configure_verbose:+--enable-configure-verbose=$enable_configure_verbose} \
+    ${with_nearby:+--with-nearby=$with_nearby} \
+    ${with_siblings:+--with-siblings=$with_siblings} \
+    ${with_submodules:+--with-submodules=$with_submodules} \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_module_half:+--with-module-half=$with_module_half} \
+    ${with_module_rigging:+--with-module-rigging=$with_module_rigging} \
+    ${with_module_std:+--with-module-std=$with_module_std} \
+    ${with_nonstd_half:+--with-nonstd-half=$with_nonstd_half} \
+    --with-std-scold=/opt/scold \
+    ${end} &&
+make &&
+make check &&
+echo OK DONE

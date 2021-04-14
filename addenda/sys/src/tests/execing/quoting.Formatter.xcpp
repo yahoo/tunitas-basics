@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+#import nonstd.required.container.Holding
+namespace tests::execing::quoting {
+  //
+  // The quote formatter for a container
+  // The lifetime of the referenced container must be longer than that of the formatter.
+  //
+  // REMINDER - this code is duplicated, if not copied, from module-format
+  // It is copied here into the test rigging because we don't want a dependence upon module-format for building or testing.
+  //
+  // All the magic happens in operator<<
+  //
+  // Usage, see nearby, execing::quote(...) 
+  //
+  //   auto argv = std::vector<std::string>{...somehow...};
+  //   cout << quote(argv) << '\n';
+  //
+  namespace required {
+    template<typename CONTAINER> concept bool Container = nonstd::required::container::Holding<CONTAINER, std::string>;
+  }
+  template<required::Container CONTAINER> class Formatter;
+  namespace detail {
+    inline auto const QUOTE_START = '\''; // yes, we doing single quotes 
+    inline auto const QUOTE_END = QUOTE_START;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+namespace tests::execing::quoting {
+  template<required::Container CONTAINER> inline auto operator<<(std::ostream &, Formatter<CONTAINER> const &) -> std::ostream &;
+}
+namespace tests::execing {
+  template<quoting::required::Container CONTAINER> class quoting::Formatter {
+  public:
+    using Value = CONTAINER;
+    inline explicit Formatter(Value const &value) : value{value} { }
+    Value const &value;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.copy
+#import std.make_ostream_joiner
+namespace tests::execing {
+  template<quoting::required::Container CONTAINER> inline auto quoting::operator<<(std::ostream &o, Formatter<CONTAINER> const &f) -> std::ostream & {
+    if constexpr (false) {
+      // this is cute but not give the quote effect surrounding each word after the first
+      std::copy(f.value.begin(), f.value.end(), std::make_ostream_joiner(o, ' '));
+    } else {
+      auto i = f.value.begin();
+      auto const e = f.value.end();
+      if (e != i) {
+        o << *i++;
+        for (; e != i; ++i) {
+          using namespace detail;
+          o << ' ' << QUOTE_START << *i << QUOTE_END;
+        }
+      }
+    }
+    return o;
+  }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.vector
+#import std.string
+namespace tests::execing::quoting::required {
+  static_assert(nonstd::required::container::Holding<std::vector<std::string>, std::string>);
+  static_assert(Container<std::vector<std::string>>);
+}
+namespace tests::execing::quoting {
+  using Usage = Formatter<std::vector<std::string>>;
+  static_assert(0 != sizeof (Usage));
+}
+#endiv

@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::binutils::exception {
+  //
+  // The exception of the binutils indicating that the access mode argument is wrong.
+  //
+  // Usage:
+  //
+  //   auto main(int c, char *v[]) -> int {
+  //     Main remain("program", [](c::const_argv av) {
+  //        auto const candidate = std::stoi(av[2]);
+  //        if (candidate < 0 && 7 < candidate) {
+  //            throw Argument_Access(av[2]);
+  //        }}
+  //        return ...successfully...;
+  //     });
+  //     return remain(c, v);
+  //   }
+  //   
+  class Argument_Access;
+}
+#endiv
+#divert <hpp>
+#import std.invalid_argument
+#import std.string
+#import tests.binutils.exception.Generic
+class tests::binutils::exception::Argument_Access : public std::invalid_argument, public Generic {
+  using Ancestor = std::invalid_argument;
+public:
+  inline Argument_Access();
+  using Ancestor::invalid_argument;
+  inline explicit Argument_Access(std::string const &candidate_syntax);
+  // this must be unified in the descendant's MI context.
+  auto what() const noexcept -> char const * override final { return Ancestor::what(); }
+};
+#endiv
+#divert <ipp>
+tests::binutils::exception::Argument_Access::Argument_Access()
+  : Ancestor{"not an Access mode argument for access(2), access(path, mode)"} { }
+tests::binutils::exception::Argument_Access::Argument_Access(std::string const &candidate_syntax)
+  : Ancestor{candidate_syntax + " is not a mode argument for access(2), access(path, mode)"} { }
+#endiv

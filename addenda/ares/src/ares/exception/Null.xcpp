@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::exception {
+  //
+  // An null pointer was encountered.
+  //
+  // As with std::runtime_error, the "reason" argument is always copied.
+  // The constructor interface attempts to provide a way to avoid duplicate construction of a std::string at the call site.
+  //
+  // Usage:
+  //
+  //   try {
+  //     throw Null{};
+  //     throw Null{"function-name"};
+  //   } catch (Aspect const &) {
+  //     ...recover...
+  //   }
+  //
+  class Null;
+}
+#endiv
+#divert <hpp>
+#import ares.exception.Aspect
+#import std.invalid_argument
+#import re.string
+#import c.const_stringz
+class ares::exception::Null : public Aspect, public std::invalid_argument {
+  struct ancestors {
+    using Aspect = ares::exception::Aspect;
+    using Exception = std::invalid_argument;
+  };
+public:
+  inline Null();
+  inline explicit Null(re::string<c::const_stringz> reason);
+  auto what() const noexcept -> char const * override;
+};
+#endiv
+#divert <ipp>
+namespace ares::exception {
+  Null::Null()
+    : ancestors::Exception{"nullptr"}
+  { }
+  Null::Null(re::string<c::const_stringz> reason)
+    : ancestors::Exception{reason.c_str()}
+  { }
+}
+#endiv
+#divert <cpp>
+auto ares::exception::Null::what() const noexcept -> char const * {
+  return ancestors::Exception::what();
+}
+#endiv

@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.time.Duration
+#import openssl.time.duration_cast
+namespace openssl::time::literals {
+  //
+  // Sure these are non-normative, but ... close enough.
+  // We are making approximate certificate deadlines.
+  //
+  // [[FIXME]] these are already in c++20
+  //
+  inline constexpr auto operator""_seconds(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Seconds{d}); }
+  inline constexpr auto operator""_second(unsigned long long d) -> Duration { return operator""_seconds(d); }
+  //
+  inline constexpr auto operator""_minutes(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Minutes{d}); }
+  inline constexpr auto operator""_minute(unsigned long long d) -> Duration { return operator""_minutes(d); }
+  //
+  inline constexpr auto operator""_hours(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Hours{d}); }
+  inline constexpr auto operator""_hour(unsigned long long d) -> Duration { return operator""_hours(d); }
+  //
+  inline constexpr auto operator""_days(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Days{d}); }
+  inline constexpr auto operator""_day(unsigned long long d) -> Duration { return operator""_days(d); }
+  //
+  inline constexpr auto operator""_weeks(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Weeks{d}); }
+  inline constexpr auto operator""_week(unsigned long long d) -> Duration { return operator""_weeks(d); }
+  //
+  inline constexpr auto operator""_months(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Months{d}); }
+  inline constexpr auto operator""_month(unsigned long long d) -> Duration { return operator""_months(d); }
+  //
+  inline constexpr auto operator""_years(unsigned long long d) -> Duration { return duration_cast<Point::duration>(duration::Years{d}); }
+  inline constexpr auto operator""_year(unsigned long long d) -> Duration { return operator""_years(d); }
+}
+#endiv

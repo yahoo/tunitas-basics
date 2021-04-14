@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::bio { class File; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.bio.File
+class tests::unit::bio::File : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::bio::File;
+  auto test_constructor() -> void;
+  auto test_read() -> void;
+  auto test_write() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.ios
+#import openssl.bio.new_file
+auto tests::unit::bio::File::test_constructor() -> void {
+  using ::openssl::bio::File;
+  using ::openssl::bio::new_file;
+  // This will work, of course.
+  File in = new_file("/dev/null", std::ios::in);
+  File out = new_file("/dev/null", std::ios::out);
+}
+auto tests::unit::bio::File::test_read() -> void {
+  using ::openssl::bio::File;
+  using ::openssl::bio::new_file;
+  File in = new_file("/dev/null", std::ios::in);
+  char buf[1];
+  auto got = BIO_gets(in.get(), buf, sizeof (buf));
+  CPPUNIT_ASSERT(0 == got);
+}
+auto tests::unit::bio::File::test_write() -> void {
+  using ::openssl::bio::File;
+  using ::openssl::bio::new_file;
+  File out = new_file("/dev/null", std::ios::out);
+  auto put = BIO_puts(out.get(), "Hello World\n");
+  CPPUNIT_ASSERT(0 != put);
+}
+#import rigging.suite.io
+auto tests::unit::bio::File::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("File");
+  series << call("constructor", &File::test_constructor)
+         << call("read", &File::test_read)
+         << call("write", &File::test_write)
+    ;
+  return finalize(series);
+}
+#endiv

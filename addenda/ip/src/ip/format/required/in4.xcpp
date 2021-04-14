@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in4
+#import std.is_same
+#import std.optional
+namespace ip::format::required::in4 {
+  //
+  // What exactly is an IPv4 address anyway?
+  // The representations are not subject to any good ADL
+  //
+  template<typename ADDRESS> concept bool Address = std::is_same<ADDRESS, ip::in4::addr_t>::value || std::is_same<ADDRESS, ip::in4::addr>::value;
+  template<typename OPTIONAL> concept bool Optional = std::is_same<OPTIONAL, std::optional<typename OPTIONAL::value_type>>::value && Address<typename OPTIONAL::value_type>;
+  template<typename EITHER> concept bool Either = Address<EITHER> || Optional<EITHER>;
+}
+#endiv

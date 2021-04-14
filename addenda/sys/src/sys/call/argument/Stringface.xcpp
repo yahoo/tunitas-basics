@@ -1,0 +1,130 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::call::argument {
+  //
+  // System call pathnames can be of a variety of types.
+  // they all have a "string interface" to them.
+  //
+  // This class is an implementation detail of glue at the interface of those functions.
+  // You aren't expected to use this class directly.
+  // It is a helper class to facilitate overload resolution in the syscalls.
+  // e.g. see sys::posix::access(...)
+  //
+  // The Stringface can be passed by value or by reference.
+  // There is no semantic difference between passing by value or by reference.
+  // The Stringface captures a pointer into the '\0'-terminated storage
+  // which must be stable over the lifetime of the temporary object.
+  // So use pass-by-value semantics.
+  //
+  // Lifetimes:
+  //
+  //   The lifetime of the constructor arguments must be longer than that of the Stringsite.
+  //   WATCHOUT - this can't be checked or enforced in the type system.
+  //
+  // Usage:
+  //
+  //     auto syscall(Stringface p) -> Result {
+  //        return real_syscall(p);
+  //     }
+  //     ...
+  //     auto r = syscall("/tmp/filename");
+  //     auto r = syscall(c::const_stringz("/tmp/filename"));
+  //     auto r = syscall(c::const_stringn("/tmp/filename"), length("/tmp/filename"));
+  //     auto r = syscall(std::string("/tmp/filename"));
+  //     auto r = syscall(std::filesystem::path("/tmp/filename"));
+  //
+  // Allows
+  //
+  //     char const *                ... the very paradigmatic stringz!
+  //     c::const_stringz            ... maintains a 0 terminator.
+  //     c::const_stringn            ... maintains a 0 terminator.
+  //     std::string
+  //     std::filesystem::path
+  //
+  // Disallows
+  //
+  //     std::vector<char>    ... does not guarantee a '\0' terminator sentinel.
+  //     std::string_view     ... does not guarantee a '\0' terminator sentinel.
+  //
+  // Without having to write multiple overloads for the same syscall (wrapper)
+  //
+  class Stringface;
+}
+#endiv
+#divert <hpp>
+#import c.basic_stringn
+#import c.basic_stringz
+#import c.const_stringz
+#import std.filesystem.path
+#import std.move
+#import std.size_t
+#import std.string
+#import std.string_view
+#import sys.call.argument.as.Stringface
+#import sys.call.argument.required.stringface.Resultable
+#import sys.call.argument.required.character.Narrow
+#import sys.call.argument.str.Stringface
+namespace sys::call {
+  namespace argument {
+    using std::move;
+  }
+  class argument::Stringface {
+  public:
+    // These templates are necessary to avoid the ambiguity inherent in all the implicit conversion constructors
+    template<required::character::Narrow CHAR> inline [[implicit]] Stringface(CHAR *);
+    template<required::character::Narrow CHAR> inline [[implicit]] Stringface(c::basic_stringz<CHAR>);
+    template<required::character::Narrow CHAR> inline [[implicit]] Stringface(c::basic_stringn<CHAR>);
+    inline [[implicit]] Stringface(std::string const &);
+    inline [[implicit]] Stringface(std::string_view const &) = delete; // because string_view is not guaranteed '\0'-terminated
+    inline [[implicit]] Stringface(std::filesystem::path const &);
+    inline operator char const *() const;
+    inline auto data() const -> char const *;
+    inline auto size() const -> std::size_t;
+    inline auto empty() const -> bool;
+    // Instead use argument::as<RESULT>(Stringface const &)
+    operator c::const_stringz() const = delete;
+    operator c::const_stringn() const = delete;
+  private:
+    template<required::stringface::Resultable RESULT> friend auto argument::as(Stringface const &) -> RESULT;
+    using Prepared = c::const_stringz;
+    Prepared prepared;
+  };
+}
+#import std.is_copy_constructible
+#import std.is_copy_assignable
+#import std.is_move_constructible
+#import std.is_move_assignable
+namespace sys::call::argument {
+  static_assert(std::is_copy_constructible_v<Stringface>);
+  static_assert(std::is_copy_assignable_v<Stringface>);
+  static_assert(std::is_move_constructible_v<Stringface>);
+  static_assert(std::is_move_assignable_v<Stringface>);
+}
+#endiv
+#divert <ipp>
+namespace sys::call::argument {
+  template<required::character::Narrow CHAR> Stringface::Stringface(CHAR *raw)
+    : prepared(raw) { }
+  template<required::character::Narrow CHAR> Stringface::Stringface(c::basic_stringz<CHAR> raw)
+    : prepared(raw) { }
+  template<required::character::Narrow CHAR> Stringface::Stringface(c::basic_stringn<CHAR> raw)
+    : prepared(raw) { }
+  Stringface::Stringface(std::string const &raw)
+    : prepared(raw.c_str()) { }
+  Stringface::Stringface(std::filesystem::path const &raw)
+    : prepared(raw.c_str()) { } // this is safe per https://en.cppreference.com/w/cpp/filesystem/path/native
+  Stringface::operator char const *() const {
+    return prepared.c_str();
+  }
+  auto Stringface::data() const -> char const * {
+    return prepared.data();
+  }
+  auto Stringface::size() const -> std::size_t {
+    return prepared.size();
+  }
+  auto Stringface::empty() const -> bool {
+    return prepared.empty();
+  }
+}
+#endiv

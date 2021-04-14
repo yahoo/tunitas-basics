@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::exits { class Quitting; } 
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::exits::Quitting : public cppunit::test::Fixture { 
+public: 
+  auto test_construction_1() -> void;
+  auto test_construction_2() -> void;
+  auto test_throwing() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string
+#import std.literals
+using namespace std::literals;
+#import sys.exits.constants
+#import nonstd.exception.Quitting
+auto tests::unit::exits::Quitting::test_construction_1() -> void {
+  //
+  // This is supposed to avail itself of the nonstd::sysexits::Is_Constructible_From system
+  //
+  // template<typename TYPE>
+  // requires Is_Constructible_From<TYPE>::value
+  // nonstd::sysexits::Code::Code(TYPE const &)
+  //
+  // nonstd::exception::Basic_Quitting(nonstd::sysexits::Code = nonstd::sysexits::FAIL);
+  //
+  ::nonstd::exception::Quitting quit{::sys::exits::SOFTWARE};
+  CPPUNIT_ASSERT((int)::sys::exits::SOFTWARE == (int)quit.code());
+  CPPUNIT_ASSERT(::sys::exits::SOFTWARE == quit.code<sys::exits::Code>());
+}
+auto tests::unit::exits::Quitting::test_construction_2() -> void {
+  //
+  // The 2-arg variant
+  //
+  ::nonstd::exception::Quitting quit{"bad", ::sys::exits::CONFIG};
+  CPPUNIT_ASSERT((int)::sys::exits::CONFIG == (int)quit.code());
+  CPPUNIT_ASSERT(::sys::exits::CONFIG == quit.code<sys::exits::Code>());
+}
+auto tests::unit::exits::Quitting::test_throwing() -> void {
+  try {
+    throw ::nonstd::exception::Quitting{"error", ::sys::exits::FAIL};
+  } catch (::nonstd::exception::Quitting const &q) {
+    CPPUNIT_ASSERT(true); // <--- yup, we should have reached here
+    CPPUNIT_ASSERT("quitting"s == q.what());
+    CPPUNIT_ASSERT("error"s == q.message());
+    CPPUNIT_ASSERT(::sys::exits::FAIL == (int) q.code());
+    CPPUNIT_ASSERT(::sys::exits::FAIL == q.code<sys::exits::Code>());
+  }
+}
+#import rigging.suite.io
+auto tests::unit::exits::Quitting::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Quitting");
+  {
+    Stream con("construction");
+    con << call("1", &Quitting::test_construction_1)
+        << call("2", &Quitting::test_construction_2)
+      ;
+    series << add(std::move(con));
+  }
+  series << call("throwing", &Quitting::test_throwing)
+    ;
+  return finalize(series);
+}
+#endiv

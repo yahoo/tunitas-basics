@@ -1,0 +1,10 @@
+tests_unit_posix_TESTS = \
+  tests/unit/posix/cases.test \
+  tests/unit/posix/AT.test \
+  tests/unit/posix/F.test \
+  tests/unit/posix/FD.test \
+  tests/unit/posix/O.test \
+  tests/unit/posix/OK.test \
+  tests/unit/posix/S.test \
+  tests/unit/posix/environment.test \
+  $(end)

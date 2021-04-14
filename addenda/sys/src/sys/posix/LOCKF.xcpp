@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // Constants suitable for use in lockf(3)
+  //
+  // Compatibility and uniformity.
+  //
+  // Alternatives:
+  //   struct F
+  //   namespace f
+  //
+  // Pattern:
+  //   struct-as-namespace.
+  //
+  // Usage:
+  //
+  //   auto got = lockf(fd, LOCKF::LOCK, offset);
+  //   auto got = lockf(fd, LOCKF::TEST_AND_LOCK, offset);
+  //   auto got = lockf(fd, LOCKF::TEST, offset);
+  //   auto got = lockf(fd, LOCKF::END, offset);
+  //
+  // Compatibility (with old naming schemes, lack of vowels, preciousness in the elision of consonants)
+  //
+  //   auto got = lockf(fd, LOCKF::UNLOCK, offset);
+  //   auto got = lockf(fd, LOCKF::TLOCK, offset);
+  //   auto got = lockf(fd, LOCKF::ULOCK, offset);
+  //
+  struct LOCKF;
+}
+#endiv
+#divert <hpp>
+#import off_t
+#import sys.lockf.constants
+struct sys::posix::LOCKF {
+  using Operation = lockf::Operation;
+  using Offset = off_t;
+  inline static constexpr auto LOCK          = lockf::LOCK;
+  inline static constexpr auto TEST_AND_LOCK = lockf::TEST_AND_LOCK;
+  inline static constexpr auto TEST          = lockf::TEST;
+  inline static constexpr auto END           = lockf::UNLOCK;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  [[deprecated("spell it out! instead, prefer LOCKF::TEST_AND_LOCK")]] inline static constexpr auto TLOCK = lockf::TLOCK;
+  [[deprecated("spell it out! instead, prefer LOCKF::UNLOCK")]]        inline static constexpr auto ULOCK = lockf::ULOCK;
+  [[deprecated("spell it out! instead, prefer LOCKF::UNLOCK")]]        inline static constexpr auto UNLOCK = lockf::UNLOCK;
+#pragma GCC diagnostic pop
+  LOCKF() = delete;
+  LOCKF(LOCKF const &) = delete;
+  auto operator=(LOCKF const &) -> LOCKF & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_LOCKF.Usage
+static_assert(tests::usage::posix_LOCKF::Usage<>);
+#endiv

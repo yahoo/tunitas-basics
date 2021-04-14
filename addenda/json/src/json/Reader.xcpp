@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace json {
+  //
+  // The reader, the simple reader
+  // With a robust modern value-or-error return.
+  //
+  // Usage:
+  //
+  //   Features features = ...somehow...
+  //   Reader reader(features);
+  //   auto read = reader(document);
+  //   if (ok(read)) {
+  //      auto value = value(std::move(read));
+  //   } else {
+  //      ...errors...
+  //      ...are hard to get to in this interface... [[FIXTHIS]]
+  //   }
+  //
+  class Reader;
+}
+#endiv
+#divert <hpp>
+#import json.reader.Simple
+#import json.reader.Result
+#import json.String
+class json::Reader : public reader::Simple {
+  using Ancestor = reader::Simple;
+public:
+  using Ancestor::Simple;
+  auto operator()(String const &syntax, bool collectComments = false) -> reader::Result;
+};
+#endiv
+#divert <cpp>
+#import json.Value
+#import json.as
+#import std.move
+auto json::Reader::operator()(String const &syntax, bool collectComments) -> reader::Result {
+  using Result = reader::Result;
+  json::Value root;
+  bool ok = Ancestor::parse(as<std::string>(syntax), root, collectComments);
+  return Result{ok, std::move(root)};
+}
+#endiv

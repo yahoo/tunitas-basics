@@ -1,0 +1,152 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace exception {
+      class Prepared;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::exception::Prepared : public cppunit::test::Fixture {
+public:
+  auto test_construction_2arg() -> void;
+  auto test_construction_3arg() -> void;
+  auto test_throwing() -> void;
+  // other tests?
+  auto test_what() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.Application
+#import sqlite.Connection
+#import sqlite.open.Name
+#import sqlite.open.Flags
+#import sqlite.prepared.Exception
+#import sqlite.statement.Shell
+#import std.cerr
+#import std.move
+#import std.string
+
+auto tests::unit::exception::Prepared::test_construction_2arg() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  CPPUNIT_ASSERT(ok(conn.open(Name::MEMORY, flags)));
+  auto statement = "select 66;";
+  using exception_type = sqlite::prepared::Exception<sqlite::statement::Shell, char const *>;
+  auto prepared = conn.prepare<sqlite::statement::Shell>(statement);
+  try {
+    throw exception_type(std::move(prepared), (std::string)("that should have worked"));
+  } catch (exception_type /*nonconst*/ &e) {
+    bool good = ok(e.result);
+    CPPUNIT_ASSERT(good);
+    sqlite::statement::Shell st = std::move(value(e.result));
+    CPPUNIT_ASSERT(st.is_prepared());
+    char const *rest = remaining(e.result);
+    CPPUNIT_ASSERT('\0' == *rest); // <--- by construction statement ends at end-of-string
+    std::cerr << "sql-2arg " << e.sql() << '\n';
+    CPPUNIT_ASSERT(!e.sql().empty());
+  }
+}
+
+auto tests::unit::exception::Prepared::test_construction_3arg() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  CPPUNIT_ASSERT(ok(conn.open(Name::MEMORY, flags)));
+  auto statement = "select 33;";
+  using exception_type = sqlite::prepared::Exception<sqlite::statement::Shell, char const *>;
+  auto prepared = conn.prepare<sqlite::statement::Shell>(statement);
+  try {
+    throw exception_type(std::move(prepared), (std::string)("that should have worked"), "SOME SQL STATEMENT");
+  } catch (exception_type /*nonconst*/ &e) {
+    bool good = ok(e.result);
+    CPPUNIT_ASSERT(good);
+    sqlite::statement::Shell st = std::move(value(e.result));
+    CPPUNIT_ASSERT(st.is_prepared());
+    char const *rest = remaining(e.result);
+    CPPUNIT_ASSERT('\0' == *rest); // <--- by construction statement ends at end-of-string
+    std::cerr << "sql-3arg " << e.sql() << '\n';
+    CPPUNIT_ASSERT_EQUAL(std::string("select 33;"), e.sql());
+  }
+}
+
+#import sqlite.prepared.Exception
+#import sqlite.statement.Shell
+#import sqlite.exception.Generic
+#import sqlite.Statement
+#import std.runtime_error
+#import std.exception
+#import std.cout
+#import std.move
+auto tests::unit::exception::Prepared::test_throwing() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  CPPUNIT_ASSERT(ok(conn.open(Name::MEMORY, flags)));
+  using exception_type = sqlite::prepared::Exception<sqlite::statement::Shell, char const *>; // <--------- on Statement (which destructs), not statenemt::Shell which does not
+  try {
+    auto statement = "select 44;";
+    auto prepared = conn.prepare<sqlite::statement::Shell>(statement);
+    throw exception_type(std::move(prepared), "we are prepared");
+  } catch (exception_type /*nonconst*/ &e) {
+    std::cout << "good: " << e.what() << '\n';
+    CPPUNIT_ASSERT(ok(e.result));
+    sqlite::Statement st(std::move(value(e.result)));
+    CPPUNIT_ASSERT(st.is_prepared());
+    CPPUNIT_ASSERT(true); 
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (std::runtime_error const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(false);
+  } catch (...) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+#import std.string
+auto tests::unit::exception::Prepared::test_what() -> void {
+  sqlite::Application app;
+  sqlite::Connection conn(app);
+  using namespace sqlite::open;
+  auto flags = Flag::CREATE | Flag::READWRITE;
+  CPPUNIT_ASSERT(ok(conn.open(Name::MEMORY, flags)));
+  constexpr auto select = "select 55;";
+  using exception_type = sqlite::prepared::Exception<sqlite::statement::Shell, char const *>;
+  std::string const message = "badness of badness";
+  try {
+    auto prepared = conn.prepare<sqlite::statement::Shell>(select);
+    throw exception_type(std::move(prepared), message);
+  } catch (exception_type const &e) {
+    std::cout << "recovered " << e.what() << '\n';// <--- this is all we came for
+    bool good = ok(e.result);
+    CPPUNIT_ASSERT(good);
+    CPPUNIT_ASSERT(message == e.what());
+  }
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::exception::Prepared::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Prepared");
+  s << call("construction-2arg", &Prepared::test_construction_2arg)
+    << call("construction-3arg", &Prepared::test_construction_3arg)
+    << call("throwing", &Prepared::test_throwing)
+    << call("what", &Prepared::test_what)
+    ;
+  return s.release();
+}
+#endiv

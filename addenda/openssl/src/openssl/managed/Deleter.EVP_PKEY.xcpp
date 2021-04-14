@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.managed.Deleter
+#import openssl.types // EVP_PKEY
+namespace openssl::managed {
+  template<> struct Deleter<EVP_PKEY>;
+}
+#endiv
+#divert <hpp>
+template<> struct openssl::managed::Deleter<EVP_PKEY> {
+  using Value = EVP_PKEY;
+  inline auto operator()(Value *) const -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+auto openssl::managed::Deleter<EVP_PKEY>::operator()(Value *value) const -> void {
+  if (value) {
+    EVP_PKEY_free(value);
+  }
+}
+#endiv

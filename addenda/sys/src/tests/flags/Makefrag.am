@@ -1,0 +1,25 @@
+# -*- Makefile -*-
+
+check_lib_libtests_flags_la = check/lib/libtests-flags.la
+check_lib_libtests_flags_la_LIBADD = $(nothing)
+check_lib_libtests_flags_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_lib_libtests_flags_la_SOURCES))
+check_lib_libtests_flags_la_SOURCES = \
+  obj/src/tests/flags/namespace.cpp \
+  obj/src/tests/flags/required/namespace.cpp \
+  obj/src/tests/flags/required/Palette.cpp \
+  \
+  obj/src/tests/flags/Scenario.declaration.cpp \
+  obj/src/tests/flags/Scenario.1.PALETTE.cpp \
+  obj/src/tests/flags/Scenario.cpp \
+  $(end)
+$(scold_cxxdir)/tests/flags/dependencies.mk: $(check_lib_libtests_flags_la_SOURCES)
+$(check_lib_libtests_flags_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/flags/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/flags/dependencies.mk #      automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/sys/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/flags/dependencies.mk

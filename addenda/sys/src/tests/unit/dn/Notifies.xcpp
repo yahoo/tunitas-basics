@@ -1,0 +1,112 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::dn { class Notifies; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import sys.dn.Notifies
+class tests::unit::dn::Notifies : public cppunit::test::Fixture {
+public:
+  using Single = ::sys::dn::Notify;
+  using Plural = ::sys::dn::Notifies;
+  auto test_combinations() -> void;
+  auto test_operator_and() -> void;
+  auto test_operator_or() -> void;
+  auto test_operator_invert() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.hex
+#import std.dec
+#import std.cerr
+namespace tests::unit::dn {
+  auto Notifies::test_combinations() -> void { 
+    std::cerr << std::hex;
+    auto subject = Plural{};
+    subject = Single::ACCESS | Single::ACCESS;
+    std::cerr << "\nDEBUG access = " << (unsigned) subject;
+    CPPUNIT_ASSERT(Single::ACCESS == subject);
+    CPPUNIT_ASSERT(DN_ACCESS == (unsigned)subject);
+    subject = Single::MODIFY | Single::MODIFY;
+    CPPUNIT_ASSERT(Single::MODIFY == subject);
+    CPPUNIT_ASSERT(DN_MODIFY == (unsigned)subject);
+    subject = Single::CREATE | Single::CREATE;
+    CPPUNIT_ASSERT(Single::CREATE == subject);
+    CPPUNIT_ASSERT(DN_CREATE == (unsigned)subject);
+    subject = Single::DELETE | Single::DELETE;
+    CPPUNIT_ASSERT(Single::DELETE == subject);
+    CPPUNIT_ASSERT(DN_DELETE == (unsigned)subject);
+    subject = Single::RENAME | Single::RENAME;
+    CPPUNIT_ASSERT(Single::RENAME == subject);
+    CPPUNIT_ASSERT(DN_RENAME == (unsigned)subject);
+    subject = Single::ATTRIB | Single::ATTRIB;
+    CPPUNIT_ASSERT(Single::ATTRIB == subject);
+    CPPUNIT_ASSERT(DN_ATTRIB == (unsigned)subject);
+    subject = Single::ATTRIBUTE | Single::ATTRIBUTE;
+    CPPUNIT_ASSERT(Single::ATTRIBUTE == subject);
+    CPPUNIT_ASSERT(DN_ATTRIB == (unsigned)subject);
+    subject = Single::MULTISHOT | Single::MULTISHOT;
+    CPPUNIT_ASSERT(Single::MULTISHOT == subject);
+    CPPUNIT_ASSERT(DN_MULTISHOT == (unsigned)subject);
+    subject = Single::ACCESS | Single::MODIFY | Single::CREATE | Single::DELETE | Single::RENAME | Single::ATTRIB | Single::ATTRIBUTE | Single::MULTISHOT;
+    { auto const expected = Plural{DN_ACCESS | DN_MODIFY | DN_CREATE | DN_DELETE | DN_RENAME | DN_ATTRIB | DN_MULTISHOT};
+      auto const actual = subject;
+      std::cerr << "\nNotifies: expected " << (unsigned) expected
+                << "\nNotifies: actual " << (unsigned) actual
+                << "\nNotifies: one " << (unsigned) (Single::ACCESS)
+                << "\nNotifies: two " << (unsigned) (Single::ACCESS | Single::MODIFY)
+                << "\nNotifies: two.5 " << (unsigned) (Single::MODIFY | Single::ACCESS)
+                << "\nNotifies: three " << (unsigned) (Single::ACCESS | Single::MODIFY | Single::CREATE)
+                << "\nNotifies: four " << (unsigned) (Single::ACCESS | Single::MODIFY | Single::CREATE | Single::DELETE)
+                << '\n';
+      CPPUNIT_ASSERT(expected == actual); }
+    std::cerr << std::dec;
+  }
+  auto Notifies::test_operator_and() -> void {
+  }
+  auto Notifies::test_operator_or() -> void {
+    auto const none = Plural{};
+    auto const access = none | Single::ACCESS;
+    CPPUNIT_ASSERT(Single::ACCESS == access);
+    auto const modify = none | Single::MODIFY;
+    CPPUNIT_ASSERT(Single::MODIFY == modify);
+    auto const create = none | Single::CREATE;
+    CPPUNIT_ASSERT(Single::CREATE == create);
+    auto const deleet = none | Single::DELETE;
+    CPPUNIT_ASSERT(Single::DELETE == deleet);
+    auto const rename = none | Single::RENAME;
+    CPPUNIT_ASSERT(Single::RENAME == rename);
+    auto const attrib = none | Single::ATTRIB;
+    CPPUNIT_ASSERT(Single::ATTRIB == attrib);
+    auto const attribute = none | Single::ATTRIBUTE;
+    CPPUNIT_ASSERT(Single::ATTRIBUTE == attribute);
+    auto const multishot = none | Single::MULTISHOT;
+    CPPUNIT_ASSERT(Single::MULTISHOT == multishot);
+    { auto const expected = Plural{DN_ACCESS | DN_MODIFY | DN_CREATE | DN_DELETE | DN_RENAME | DN_ATTRIB | DN_MULTISHOT};
+      auto const actual = access | modify | create | deleet | rename | attrib | attribute | multishot;
+      CPPUNIT_ASSERT(expected == actual); }
+  }
+  auto Notifies::test_operator_invert() -> void {
+    auto const none = Plural{};
+    auto const known = Single::ACCESS | Single::MODIFY | Single::CREATE | Single::DELETE | Single::RENAME | Single::ATTRIB | Single::ATTRIBUTE | Single::MULTISHOT;
+    auto const inverted = ~none;
+    CPPUNIT_ASSERT(known == (known & inverted));
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::dn {
+  auto Notifies::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    Stream series{"Notifies"};
+    series << call("combinations", &Notifies::test_combinations)
+           << call("and", &Notifies::test_operator_and)
+           << call("or", &Notifies::test_operator_or)
+           << call("invert", &Notifies::test_operator_invert)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

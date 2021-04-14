@@ -1,0 +1,105 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import openssl.required.Stackable
+namespace openssl::stack {
+  //
+  // A consty stack of (consty) things.
+  // These stacks are pointers into some other storage.
+  // The stack is immutable, and so are the managed entities.
+  //
+  // Most of the design is the same as the Stack<TYPE>
+  //
+  // Usage:
+  //
+  //   Stack0<Extension> extensions = crt.get_extensions()
+  //
+  template<required::Stackable> struct Stack0;
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+#import openssl.types // OPENSSL_STACK
+#import openssl.Outcome
+#forward openssl.Stack
+#import openssl.stack.Aspect
+#import openssl.stack.Iteratable
+#import openssl.stack.Iterator
+#import openssl.stack.Traits // traits::Specification, etc.
+#forward openssl.stack.Rhs
+namespace openssl {
+  template<required::Stackable TYPE> struct stack::Stack0 : public Aspect, public Iteratable<OPENSSL_STACK const> {
+    using Ancestor = Iteratable<OPENSSL_STACK const>;
+  protected:
+    friend class stack::Traits<TYPE>;
+    friend class stack::traits::Specification0<typename stack::Traits<TYPE>::Wrapping, typename stack::Traits<TYPE>::Underlying>;
+    Stack0(OPENSSL_STACK const *);
+  public:
+    // New School
+    using Value = TYPE;
+    using Index = std::size_t;
+    using Ancestor::Size; // reminder size() and get() arrive from the Ancestor
+    using Traits = stack::Traits<Value>;
+    using Iterator = stack::Iterator<Ancestor>;
+    using Const_Iterator = Iterator;
+    // old_school
+    using value_type = Value;
+    using iterator = Iterator;
+    using const_iterator = Const_Iterator;
+    Stack0() = delete; // you have to acquire one of these from an existing Stack
+    inline Stack0(Stack<TYPE> const &); // ibidem.
+    Stack0(Stack0 const &) = delete;
+    auto operator=(Stack0 const &) -> Stack0 & = delete;
+    Stack0(Stack0 &&) = default;
+    inline auto begin() const -> const_iterator;
+    inline auto end() const -> const_iterator;
+    inline auto begin() -> iterator;
+    inline auto end() -> iterator;
+    using Ancestor::empty;
+    using Ancestor::size;
+    inline auto at(Index) const -> stack::Rhs<Stack0>; // ................ checked
+    inline auto operator[](Index) const -> stack::Rhs<Stack0>; // ........ same
+    inline auto find(Value const &) const -> Outcome<Index>;
+    inline auto find_ex(Value const &) const -> Outcome<Index>;
+    inline auto is_sorted() const -> bool;
+  };
+}
+#endiv
+#divert <ipp>
+#import openssl.stack.Rhs
+#import openssl.Stack
+#import openssl.functions
+namespace openssl::stack {
+  template<required::Stackable _> Stack0<_>::Stack0(OPENSSL_STACK const *elsewhere)
+    : Ancestor{elsewhere}
+  { }
+  template<required::Stackable _> Stack0<_>::Stack0(Stack<Value> const &other)
+    : Ancestor{other.get()}
+  { }
+  template<required::Stackable _> auto Stack0<_>::at(Index index) const -> stack::Rhs<Stack0> {
+    return stack::Rhs<Stack0>{*this, index};
+  }
+  template<required::Stackable _> auto Stack0<_>::operator[](Index index) const -> stack::Rhs<Stack0> {
+    return stack::Rhs<Stack0>{*this, index};
+  }
+  template<required::Stackable _> auto Stack0<_>::find(Value const &match) const -> Outcome<Index> {
+    auto found = OPENSSL_sk_find(get(), match.get());
+    if (found) {
+      return Outcome<Index>{found};
+    } else {
+      return Outcome<Index>{std::error_code{error::Code::MISSING}};
+    }
+  }
+  template<required::Stackable _> auto Stack0<_>::find_ex(Value const &match) const -> Outcome<Index> {
+    auto found = OPENSSL_sk_find_ex(get(), match.get());
+    if (found) {
+      return Outcome<Index>{found};
+    } else {
+      return Outcome<Index>{std::error_code{error::Code::MISSING}};
+    }
+  }
+  template<required::Stackable _> auto Stack0<_>::is_sorted() const -> bool {
+    return OPENSSL_sk_is_sorted(get());
+  }
+}
+#endiv

@@ -1,0 +1,7 @@
+#!/bin/bash
+source ${0%/*}/rigging.sh || exit 70
+execing execp-path-string-series echo echo
+execing execp-path-string-series echo echo a
+execing execp-path-string-series echo echo a b
+execing execp-path-string-series echo echo a b c
+execing execp-path-string-series echo echo a b c d

@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.stream.posix.Basic_Streambuf
+namespace nonstd::stream::posix {
+  //
+  // The narrow character (POSIX) Streambuf
+  //
+  // See Basic_Stream<C, T> or Streambuf<C, T>
+  //
+  //    Associates a file stream buffer with an open POSIX file descriptor.
+  //    The file descriptor will be closed upon destruction.
+  //
+  // Usage:
+  //
+  //   int fd = ...get-one...   open(...), dup(...), socket(...), etc.
+  //   Stream six(fd)
+  //   six.pubseekoff(0, std::ios_base::beg);
+  //   six.read(buf, sizeof (buf));
+  //   ...etc...
+  //
+  using Streambuf = Basic_Streambuf<char>;
+}
+#endiv

@@ -1,0 +1,59 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.uint32_t
+namespace sys::log {
+  //
+  // The facility is a hardcoding of service names into the language level.
+  // Oh they were young then in the sweet summer time!
+  //
+  // From /usr/include/sys/syslog.h
+  // <quote>
+  //   [The] priorities/facilities are encoded into a single 32-bit quantity,
+  //   where the bottom 3 bits are the priority (0-7) and the top 28 bits are the facility (0-big number).
+  //   Both the priorities and the facilities map roughly one-to-one to strings in the syslogd(8) source code. 
+  //   This mapping is included in [<sys/syslog.h>]
+  // </quote>
+  //
+  // Coding:
+  //
+  // Profligately the facilities are done in one-hot encoding [[why? There was no need]].
+  //
+  // Whereas the POSIX C API of syslog is ostensibly (sic) 32-bits being an 'int'
+  // Whereas we are at LP64 https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models
+  //
+  // There are only twenty four (24) defined facilities.
+  // Recall that the priority is encoded in the low three bits of that integer (see sys.log.Priority)
+  // So there's room for (um) four more... in that thirty-two bit integer.
+  //
+  enum class Facility : std::uint32_t {
+    KERNEL = LOG_KERN,
+    KERN [[deprecated("kern is a verb in the field of typography; prefer Facility::KERNEL")]] = LOG_KERN,
+    USER = LOG_USER,
+    MAIL = LOG_MAIL,
+    MARK = 0x10,
+    DAEMON = LOG_DAEMON,
+    AUTH = LOG_AUTH, // ........... not gonna make yous pell this out
+    AUTHPRIV = LOG_AUTHPRIV, // ... ibidem.
+    SYSLOG = LOG_SYSLOG,
+    PRINTER = LOG_LPR,
+    LPR [[deprecated("lpr is a specific instance of a print server; prefer Facility::PRINTER")]] = LOG_LPR,
+    NEWS = LOG_NEWS,
+    UUCP = LOG_UUCP,
+    CRON = LOG_CRON,
+    FTP = LOG_FTP,
+    // reserved 12 ... for whom?
+    // reserved 13 ... for what
+    // reserved 14 ... why
+    // reserved 15 ... where fore art thou?
+    LOCAL0 = LOG_LOCAL0,
+    LOCAL1 = LOG_LOCAL1,
+    LOCAL2 = LOG_LOCAL2,
+    LOCAL3 = LOG_LOCAL3,
+    LOCAL4 = LOG_LOCAL4,
+    LOCAL5 = LOG_LOCAL5,
+    LOCAL6 = LOG_LOCAL6,
+    LOCAL7 = LOG_LOCAL7,
+  };
+}
+#endiv

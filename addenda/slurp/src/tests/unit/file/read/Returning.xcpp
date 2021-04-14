@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace file {
+      namespace read {
+        class Returning;
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::file::read::Returning : public cppunit::test::Fixture {
+public:
+  auto test_slurp_nothing() -> void;
+  auto test_slurp_something() -> void;
+  auto test_slurp_erroneous() -> void;
+  auto test_returnable() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.nothrow
+#import slurp.file.read
+#import std.cerr
+
+auto tests::unit::file::read::Returning::test_slurp_nothing() -> void {
+  char const *const subject_file_by_name = "/dev/null";
+  auto red = ::slurp::file::read<std::string>(std::nothrow, subject_file_by_name);
+  std::cerr << __FILE__ << ':' << __LINE__ << ", reading " << subject_file_by_name << " recovered ok=" << ok(red) << ", error_num=" << error_num(red) << '\n';
+  // can't look at errno because it can be arbitrary, not necessarily 0==success
+  CPPUNIT_ASSERT(ok(red));
+  CPPUNIT_ASSERT(0 <= error_num(red));
+  auto const &corpus = value(red);
+  CPPUNIT_ASSERT(corpus.empty());
+}
+
+auto tests::unit::file::read::Returning::test_slurp_something() -> void {
+  char const *const subject_file_by_name = "/etc/group";
+  auto red = ::slurp::file::read<std::string>(std::nothrow, subject_file_by_name);
+  std::cerr << __FILE__ << ':' << __LINE__ << ", reading " << subject_file_by_name << " recovered ok=" << ok(red) << ", error_num=" << error_num(red) << '\n';
+  // Ibidem.
+  CPPUNIT_ASSERT(ok(red));
+  CPPUNIT_ASSERT(0 <= error_num(red));
+  auto const &corpus = value(red);
+  CPPUNIT_ASSERT(!corpus.empty());
+}
+
+auto tests::unit::file::read::Returning::test_slurp_erroneous() -> void {
+  auto red = ::slurp::file::read<std::string>(std::nothrow, "/does/not/exist/at/all/no/way");
+  CPPUNIT_ASSERT(!ok(red));
+  CPPUNIT_ASSERT(0 < error_num(red)); // <------- errno had some value because of the failure
+  auto const &corpus = value(red);
+  CPPUNIT_ASSERT(corpus.empty());
+
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::file::read::Returning::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("Returning");
+  s << call("nothing", &Returning::test_slurp_nothing)
+    << call("something", &Returning::test_slurp_something)
+    << call("errnoneous", &Returning::test_slurp_erroneous)
+    ;
+  return s.release();
+}
+#endiv

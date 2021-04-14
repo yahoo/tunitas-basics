@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import flock // a struct and a function
+#import flock64
+#import f_owner_ex
+#import std.int64_t
+#import std.size_t
+#import sys.call.Result
+#import sys.call.result.Value
+#import sys.dn.Notifies
+#import sys.f.Function
+#import sys.f.layer.Which
+#import sys.f.Seals
+#import sys.f.Wait
+#import sys.fd.Flags
+#import sys.id.File
+#import sys.id.Process
+#import sys.id.process.Either
+#import sys.id.process.Group
+#import sys.id.process.Process
+#import sys.id.Signal
+#import sys.lease.Operation
+#import sys.lock.Operation
+#import sys.o.Flags // ..... a.k.a. Options<Access,Create,Status>
+#import sys.o.Options
+#import sys.o.options.required.Names
+#import sys.posix.required.rebundled // cascade namespace required for fd::required<-->required::fd, etc.
+#import sys.posix.packaging.required
+#import sys.fd.required.Unmanaged
+namespace sys::posix::packaging::fcntl::interface {
+  namespace truct {
+    using flock = struct flock;  // [[yuk]] because there is a ::flock and a (struct) ::flock
+    using ::flock64;
+  }
+  using flock [[deprecated("prefer truct::flock")]] = struct flock;
+  using flock64 [[deprecated("prefer truct::flock64")]] = ::flock64;
+  using ::f_owner_ex;
+  using id::File;
+  using f::Function;
+  namespace layer = f::layer; // for at least f::layer::Which
+  using Lock = sys::lock::Operation;
+  using Lease = sys::lease::Operation;
+  using dn::Notifies;
+  using std::int64_t;
+  using f::Seals;
+  using Size = std::size_t;
+  using f::Wait;
+  namespace id = sys::id; // id::Process, id::process::Process, Group, Either, id::Signal
+  namespace fd = sys::fd; // especially sys::fd::Flags
+  namespace o = sys::o; // especially o::Status, o::Statuses, o::Options<NAMES...>, etc.
+  using sys::o::options::required::Names;
+  using Result = call::Result;
+  namespace result {
+    // These are only useful in the convenience functions, many of which have their own simpler subinterfaces.
+    // Prefer the simpler subinterfaces, where available, rather than this sprawling fcntl::interace.
+    //
+    // The generic result (but also see Status for the generic syscall return)
+    template<required::Integral RESULT> using Value = call::result::Value<RESULT>;
+    template<required::fd::Unmanaged RESULT> using Descriptor = call::result::Value<RESULT>;
+    using Flags = call::result::Value<fd::Flags>; // for getfd, setfd
+    using Lock = call::result::Value<interface::Lock>;
+    using Lease = call::result::Value<interface::Lease>;
+    using Owner = call::result::Value<f_owner_ex>;
+    namespace process {
+      using Process = call::result::Value<id::process::Process>;
+      using Group = call::result::Value<id::process::Group>;
+      using Either = call::result::Value<id::process::Either>;
+    }
+    using Status = call::Result;
+    using Truth = call::result::Value<bool>;
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.F
+#import sys.posix.FD
+#import sys.posix.O
+#import sys.posix.fcntl
+#import sys.posix.packaging.fcntl.Syscallable
+namespace sys::posix::packaging::fcntl::interface {
+  using fcntl::Syscallable;
+  using posix::F;
+  using posix::FD;
+  using posix::O;
+}
+#endiv

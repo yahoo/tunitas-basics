@@ -1,0 +1,23 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+check_lib_libtests_la = check/lib/libtests.la
+check_lib_libtests_la_LIBADD = $(nothing)
+check_lib_libtests_la_MODULES = $(call HGTW_SOURCEStoMODULES, $(check_lib_libtests_la_SOURCES))
+check_lib_libtests_la_SOURCES = \
+  obj/src/tests/namespace.cpp \
+  obj/src/tests/lib.Call.cpp \
+  $(src_tests_model_SOURCES_SET) \
+  $(src_tests_usage_SOURCES_SET) \
+  $(end)
+$(scold_cxxdir)/tests/dependencies.mk: $(check_lib_libtests_la_SOURCES)
+$(check_lib_libtests_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/dependencies.mk #      automake deletes am--include-marker during make am--depfiles
+am--depfiles: $(scold_cxxdir)/sys/dependencies.mk # automake during configure
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/dependencies.mk

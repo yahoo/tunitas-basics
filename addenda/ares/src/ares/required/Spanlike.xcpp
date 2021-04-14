@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Octet
+#import nonstd.required.Spanlike
+#import std.is_const
+#import std.remove_const
+#import std.remove_pointer
+namespace ares::required {
+  //
+  // Within the sphere of the managed data types,
+  // a span approximates a string with a pointer and a length.
+  //
+  // The value must be an octet, and consty, which is more specific than the nonstd::required::Spanlike
+  //
+  template<typename SPANLIKE> concept bool Spanlike = requires(SPANLIKE) {
+    typename SPANLIKE::value_type;
+    requires nonstd::required::Spanlike<SPANLIKE>; 
+    requires nonstd::required::Octet<typename std::remove_const<typename SPANLIKE::value_type>::type>;
+    requires (std::is_const<typename SPANLIKE::value_type>::value || // .................................................... for std::span<OCTET const>
+              std::is_const<typename std::remove_pointer< decltype(std::declval<SPANLIKE>().data()) >::type>::value); // ... for std::string_view
+  };
+}
+#endiv
+#divert <cpp>
+// This is, of course, test code.
+#import std.byte
+#import nonstd.basic_string_view // REQUIRD to enable the spanlike behavior of std::string_view
+#import nonstd.span
+namespace ares::required {
+  // Does this really work like this?
+  static_assert(nonstd::required::Spanlike<std::string_view>);
+  static_assert(Spanlike<std::string_view>);
+  //
+  static_assert(Spanlike<nonstd::span<char const>>);
+  static_assert(Spanlike<nonstd::span<unsigned char const>>);
+  static_assert(Spanlike<nonstd::span<signed char const>>);
+  static_assert(Spanlike<nonstd::span<std::byte const>>);
+  // odd cases
+  static_assert(Spanlike<std::string_view>); // ... because ...  it is
+  static_assert(!Spanlike<std::string>); // ....... because ...  it is heavy; it carries its own storage
+  // because they are not consty
+  static_assert(!Spanlike<nonstd::span<char>>);
+  static_assert(!Spanlike<nonstd::span<unsigned char>>);
+  static_assert(!Spanlike<nonstd::span<signed char>>);
+  static_assert(!Spanlike<nonstd::span<std::byte>>);
+}
+#endiv

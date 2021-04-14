@@ -1,0 +1,182 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Integer
+#import nonstd.integers
+namespace nonstd::detail::to_integer {
+  //
+  // Capture the sto(...) API to be used with the smallish integer types.
+  // The "smallish integers" are every integer size except the native machine width.
+  // So ... in this day & age that means anything smaller than 64-bit.
+  //
+  // [[FIXTHIS]] tie this in with the std::intmax_t, std::uintmax_t system
+  //
+  // These do a coarse estimation of the conversion, applying the base (base=10)
+  // It is up to the caller to resolve an further bounds checking for the smaller
+  //     integer sizes; e.g. 16-bit and 8-bit.
+  // It is up to the caller to resolve any further trailing-token problems
+  //    e.g. "123abc" is returned as "123"
+  //         "0x123abc" may be returned as 1194684 (a.k.a. 0x0'123'ABC)
+  //
+  // Specializations only.
+  //
+  template<required::Integer> struct Native;
+  using namespace integers;
+  template<> struct Native<uint8_t>;
+  template<> struct Native<uint16_t>;
+  template<> struct Native<uint32_t>;
+  template<> struct Native<uint64_t>;
+  template<> struct Native<int unsigned long long>;
+  template<> struct Native<int8_t>;
+  template<> struct Native<int16_t>;
+  template<> struct Native<int32_t>;
+  template<> struct Native<int64_t>;
+  template<> struct Native<int signed long long>;
+}
+#endiv
+#divert <hpp>
+#import std.uintmax_t
+#import std.size_t
+#import std.string_view
+#import std.is_unsigned
+#import std.tuple
+namespace nonstd::detail::to_integer {
+  template<typename CARRIER, typename VALUE> struct Basis {
+    using Carrier = CARRIER;
+    using Value = VALUE;
+    static_assert(sizeof (Value) <= sizeof (Carrier));
+    static_assert(std::is_unsigned<Value>::value == std::is_unsigned<Carrier>::value);
+    using Result = std::tuple<Carrier, std::size_t>;
+    using Argument = std::string_view;
+  };
+  template<> struct Native<uint8_t> : public Basis<uintmax_t, uint8_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<uint16_t> : public Basis<uintmax_t, uint16_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<uint32_t> : public Basis<uintmax_t, uint32_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<uint64_t> : public Basis<uintmax_t, uint64_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<int unsigned long long> : public Basis<uintmax_t, int unsigned long long> {
+    static_assert(sizeof (uintmax_t) >= sizeof (int unsigned long long));
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+}
+#import std.intmax_t
+namespace nonstd::detail::to_integer {
+  template<> struct Native<int8_t> : public Basis<intmax_t, int8_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<int16_t> : public Basis<intmax_t, int16_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<int32_t> : public Basis<intmax_t, int32_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<int64_t> : public Basis<intmax_t, int64_t> {
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+  template<> struct Native<int signed long long> : public Basis<intmax_t, int signed long long> {
+    static_assert(sizeof (intmax_t) >= sizeof (int signed long long));
+    inline auto operator()(Argument const &syntax, int base) -> Result;
+  };
+}
+#endiv
+#divert <ipp>
+// BAD PAIR missing the unsigned side
+// NO SUCH std.strtou ... mothing matches strtoi(...)
+#import std.strtoi
+// GOOD PAIR of signed & unsigned
+#import std.strtoul
+#import std.strtol
+// GOOD PAIR of signed & unsigned
+#import std.strtoull // <strike>never needed on modern 64-bit architectures as long == long long</strike> it could happen
+#import std.strtoll //  <strike>never needed</strike> ibidem.
+#import std.strtoul
+namespace nonstd::detail::to_integer {
+  auto Native<uint8_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    // blik ... the 2nd argument of C-legacy is non-const, though the 1st whence it is derived is const
+    //          auto strtol( const char *begin, char **end, int base) -> long;
+    auto value = std::strtoul(begin, &end, base);
+    return Result{value, end - begin};
+    // WATCHOUT - there being no strtou (matching strtoi)
+    // we have to apply strtoul and catch the out-of-range problems in the caller
+    static_assert(sizeof (uint8_t) <= sizeof (decltype(value)));
+    static_assert(sizeof (uint8_t) <= sizeof (int unsigned));
+  }
+  auto Native<uint16_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtoul(begin, &end, base); // WATCHOUT - ibidem.
+    return Result{value, end - begin};
+    static_assert(sizeof (uint16_t) <= sizeof (value));
+  }
+  auto Native<uint32_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtoul(begin, &end, base); // WATCHOUT - ibidem.
+    return Result{value, end - begin};
+    static_assert(sizeof (uint32_t) <= sizeof (value));
+  }
+  auto Native<uint64_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtoul(begin, &end, base);
+    return Result{value, end - begin};
+    static_assert(sizeof (uint64_t) <= sizeof (value));
+    static_assert(sizeof (uint64_t) <= sizeof (int long unsigned));
+    static_assert(sizeof (uint64_t) <= sizeof (int long long unsigned)); // this is new
+  }
+  auto Native<int unsigned long long>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtoull(begin, &end, base);
+    return {value, end - begin};
+  }
+}
+#import std.strtol
+namespace nonstd::detail::to_integer {
+  auto Native<int8_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtol(begin, &end, base);
+    return Result{value, end - begin};
+    static_assert(sizeof (int8_t) <= sizeof (decltype(value)));
+  }
+  auto Native<int16_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtol(begin, &end, base);
+    return Result{value, end - begin};
+    static_assert(sizeof (int16_t) <= sizeof (decltype(value)));
+  }
+  auto Native<int32_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtol(begin, &end, base);
+    return Result{value, end - begin};
+    static_assert(sizeof (int32_t) <= sizeof (decltype(value)));
+  }
+  auto Native<int64_t>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtol(begin, &end, base);
+    return Result{value, end - begin};
+    static_assert(sizeof (int64_t) <= sizeof (decltype(value)));
+    static_assert(sizeof (int64_t) <= sizeof (int long signed));
+    static_assert(sizeof (int64_t) <= sizeof (int long long signed)); // this is new
+  }
+  auto Native<int signed long long>::operator()(Argument const &syntax, int base) -> Result {
+    auto begin{syntax.data()};
+    char *end{nullptr};
+    auto value = std::strtoll(begin, &end, base);
+    return {value, end - begin};
+  }
+}
+#endiv

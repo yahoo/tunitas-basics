@@ -1,0 +1,4 @@
+// -*- c++ -*- 4f728ae2-38bc-4023-9de8-1b86c5529174
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/pssr.h>

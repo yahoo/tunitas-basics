@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.log.Priority
+#import sys.log.Priorities
+#import sys.log.argument.Pluralize
+namespace sys::log::argument {
+  //
+  // Construct the promotion of the single value to the plural version at the call site
+  //
+  // Usage:
+  //
+  //   auto function(Pluralize<Priority, log::Priorities>) -> void
+  //
+  //   function(Priority::EMERGENCY);
+  //   function(Priority::WARNING);
+  //   function(Priority::WARNING | Priority::EMERGENCY);
+  //
+  using Priorities = Pluralize<Priority, log::Priorities>;
+}
+#endiv

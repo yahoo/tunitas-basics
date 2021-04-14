@@ -1,0 +1,3 @@
+tests_unit_inet_TESTS = \
+  tests/unit/inet/all.test \
+  $(end)

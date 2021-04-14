@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.regex.required.iterator.Input
+namespace nonstd::regex::required::iterator {
+  //
+  // An input iterator that produces a specific sort of value
+  // [[FIXTHIS]] when the nonstd::required::iterator::Producing<ITERATOR, RESULT> is defined, then use that.
+  //
+  template<typename ITERATOR, typename RESULT> concept bool Producing = Input<ITERATOR> && requires(ITERATOR iterator) {
+    { *iterator } -> RESULT;
+  };
+}
+#endiv
+divert <cpp>
+// This is test code
+#import std.string
+#import std.wstring
+namespace nonstd::regex::required::iterator {
+  static_assert(Input<char *, char>);
+  static_assert(Input<char const *, char>);
+  static_assert(Input<std::string::const_iterator, char>);
+  static_assert(Input<std::string::iterator, char>);
+  static_assert(Input<std::wstring::const_iterator, wchar_t>);
+  static_assert(Input<std::wstring::iterator, wchar_t>);
+}
+#endiv

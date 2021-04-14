@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.unlock.Call
+namespace sys::unlock::call {
+  template<Call> struct Traits;
+  template<> struct Traits<Call::FLOCK>;
+  template<> struct Traits<Call::LEASE>;
+  template<> struct Traits<Call::LOCK>;
+  template<> struct Traits<Call::LOCKF>;
+}
+#endiv
+#divert <hpp>
+#import sys.flock.constants
+#import sys.lease.constants
+#import sys.lock.constants
+#import sys.lockf.constants
+namespace sys::unlock::call {
+  template<> struct Traits<Call::FLOCK> {
+    using Operation = flock::Operation;
+    using Options = flock::Options;
+    inline static constexpr auto UNLOCK = flock::UNLOCK;
+  };
+  template<> struct Traits<Call::LEASE> {
+    using Operation = lease::Operation;
+    inline static constexpr auto UNLOCK = lease::UNLOCK;
+  };
+  template<> struct Traits<Call::LOCK>  {
+    using Operation = lock::Operation;
+    inline static constexpr auto UNLOCK = lock::UNLOCK;
+  };
+  template<> struct Traits<Call::LOCKF> {
+    using Operation = flock::Operation;
+    inline static constexpr auto UNLOCK = lockf::UNLOCK;
+  };
+}
+#endiv

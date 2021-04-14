@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import f_owner_ex
+#import sys.id.process.Process
+#import sys.id.process.Group
+#import std.is_same
+namespace sys::f::required {
+  //
+  // For the purpose here, for fcntl(2) the owner can be either the number of a process or a group (process group)
+  // OR it can be the f_owner_ex structure as a "boxed integer" number-and-type the THREAD, PROCESS, GROUP
+  //
+  // Usage:
+  //
+  //   template<required::Owner RESULT> inline auto getthat(...somehow...) -> RESULT;
+  //
+  template<typename OWNER> concept bool Owner = (std::is_same_v<OWNER, id::process::Process> ||
+                                                 std::is_same_v<OWNER, id::process::Group> ||
+                                                 std::is_same_v<OWNER, f_owner_ex>);
+}
+#endiv

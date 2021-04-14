@@ -1,0 +1,87 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ip::proto { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.ip.proto.Protocol
+struct tests::unit::ip::proto::Fixture : public cppunit::test::Fixture {
+  using Subject = ::sys::ip::proto::Protocol;
+  auto test_Protocol() -> void;
+  auto test_Family() -> void;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::ip::proto::Fixture::test_Protocol() -> void {
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+  CPPUNIT_ASSERT(Subject{} == Subject::IP);
+  CPPUNIT_ASSERT(Subject{} != Subject::NONE);
+}
+#import sys.ip.proto.Family
+auto tests::unit::ip::proto::Fixture::test_Family() -> void {
+  //
+  // n.b. You're supposed to be preferring ip::proto::Protocol (Subject) instead of this archaic mode.
+  //
+  using ::sys::ip::Version;
+  using ::sys::net::Network;
+  using namespace ::sys::ip::proto;
+  CPPUNIT_ASSERT((int)Network::UNSPECIFIED == 0);
+  CPPUNIT_ASSERT((int)Network::UNSPECIFIED == (int)Family<Version::IPv4>);
+  CPPUNIT_ASSERT((int)Network::UNSPECIFIED == (int)Family<Version::IPv6>);
+}
+#import sys.ip.proto.constants
+auto tests::unit::ip::proto::Fixture::test_constants() -> void {
+  using ::sys::ip::proto::Protocol;
+  using namespace ::sys::ip::proto::constants;
+  CPPUNIT_ASSERT(Protocol{IPPROTO_IP} == Subject::IP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_ICMP} == Subject::ICMP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_IGMP} == Subject::IGMP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_IPIP} == Subject::IPIP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_TCP} == Subject::TCP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_EGP} == Subject::EGP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_PUP} == Subject::PUP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_UDP} == Subject::UDP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_IDP} == Subject::IDP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_TP} == Subject::TP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_DCCP} == Subject::DCCP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_IPV6} == Subject::IPV6);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_RSVP} == Subject::RSVP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_GRE} == Subject::GRE);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_ESP} == Subject::ESP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_AH} == Subject::AH);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_MTP} == Subject::MTP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_BEETPH} == Subject::BEETPH);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_ENCAP} == Subject::ENCAP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_PIM} == Subject::PIM);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_COMP} == Subject::COMP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_SCTP} == Subject::SCTP);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_UDPLITE} == Subject::UDPLITE);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_MPLS} == Subject::MPLS);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_RAW} == Subject::RAW);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_HOPOPTS} == Subject::HOPOPTS);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_ROUTING} == Subject::ROUTING);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_FRAGMENT} == Subject::FRAGMENT);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_ICMPV6} == Subject::ICMPV6);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_NONE} == Subject::NONE);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_DSTOPTS} == Subject::DSTOPTS);
+  CPPUNIT_ASSERT(Protocol{IPPROTO_MH} == Subject::MH);
+#ifdef IPPROTO_L2TP // <linux/l2tp.h>
+  CPPUNIT_ASSERT(Protocol{IPPROTO_L2TP} == Subject::L2TP);
+#endif
+}
+#import rigging.suite.io
+auto tests::unit::ip::proto::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("proto");
+  series << call("Protocol", &Fixture::test_Protocol)
+         << call("Family", &Fixture::test_Family)
+         << call("constants", &Fixture::test_constants)
+    ;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,138 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Exception
+namespace nonstd::exception::detail {
+  //
+  // An exception (descendant) that reports the function, file & line number.
+  // e.g. Unimplemented, Unreachable or such.
+  //
+  // A code-level (subsystem, function) is unimplemented at a file & line number.
+  // Reminder __FUNCTION__ gives the member function name, not the fully-qualified class name to identify it.
+  //
+  // Usage:
+  //
+  //   using Unimplemented = detail::Function_File_Line<std::runtime_error>;
+  //   using Unreachable = detail::Function_File_Line<std::logic_error>;
+  //
+  //   old_school with the special C Preprocessor symbols
+  //
+  //     throw Unimplemented{__FUNCTION__, __FILE__, __LINE__};
+  //     throw Unreachable{"switch-default", __FILE__, __LINE__};
+  //
+  //   New School with the C++ std::source_location special-magic introspection class
+  //
+  //     throw Unimplemented{};      throw Unimplemented{std::source_location::current()};
+  //     throw Unreachable{};        throw Unreachable{std::source+location::current};
+  //
+  template<required::Exception EXCEPTION> class [[nodiscard]] Function_File_Line;
+}
+#endiv
+#divert <hpp>
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import std.char_traits
+#import std.basic_ostream
+namespace nonstd::exception::detail {
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Exception EXCEPTION> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Function_File_Line<EXCEPTION> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+  template<required::Exception EXCEPTION> auto operator<<(std::basic_ostream<char, std::char_traits<char>> &, Function_File_Line<EXCEPTION> const &) -> std::basic_ostream<char, std::char_traits<char>> &;
+}
+#import std.runtime_error
+#import std.string
+#import c.const_stringz
+#import re.string
+#import std.source_location
+#import std.uint_least32_t
+template<nonstd::required::Exception EXCEPTION> class nonstd::exception::detail::Function_File_Line : public EXCEPTION {
+  using Ancestor = EXCEPTION;
+public:
+  // e.g. __FUNCTION__, __FILE__, __LINE__
+  using String_Literal = re::string<c::const_stringz>;
+  struct Line_Number {
+    using Source_Location = std::uint_least32_t; // ... [[seems "more natural-er" in theory, but isn't in practice]] because that's what std::source_location::line() returns ... what?  we can only have ~4 billion lines? in a translation unit?
+    using C_Preprocessor = int; // .................... as was foretold in the writings of the ancients and was ever thus
+    Line_Number() = delete;
+    ~Line_Number() = delete;
+  };
+  [[deprecated("instead prefer the variant with std::source_location as Function_File_Line(Location)")]] explicit Function_File_Line(String_Literal function, String_Literal file, Line_Number::C_Preprocessor line);
+  [[deprecated("instead prefer the variant with std::source_location as Function_File_Line(Location)")]] explicit Function_File_Line(String_Literal function, String_Literal file, Line_Number::Source_Location line);
+  using Location = std::source_location;
+  inline explicit Function_File_Line(Location = Location::current());
+  template<typename CHAR, typename TRAITS> inline static auto widen(std::basic_ostream<CHAR, TRAITS> &, char) -> CHAR;
+private:
+  static auto format(String_Literal function, String_Literal file, Line_Number::Source_Location line) -> std::string;
+};
+#endiv
+#divert <ipp>
+#import std.bad_cast
+#import std.make_unsigned
+namespace nonstd::exception {
+  template<required::Exception EXCEPTION> auto detail::operator<<(std::basic_ostream<char, std::char_traits<char>> &o, Function_File_Line<EXCEPTION> const &u) -> std::basic_ostream<char, std::char_traits<char>> & {
+    return o << u.what();
+  }
+  namespace detail {
+    template<nonstd::required::Exception _> Function_File_Line<_>::Function_File_Line(String_Literal function, String_Literal file, Line_Number::Source_Location line)
+      : Ancestor{format(function, file, line)}
+    { }
+    template<nonstd::required::Exception _> Function_File_Line<_>::Function_File_Line(String_Literal function, String_Literal file, Line_Number::C_Preprocessor line)
+      : Ancestor{format(function, file, std::make_unsigned_t<decltype(line)>(line))} // so now we own the quirk of narrowing the C Preprocessor's wisdom in signedness down to the C++ wisddom in unsignedness
+    { }
+    template<nonstd::required::Exception _> Function_File_Line<_>::Function_File_Line(Location location)
+      : Ancestor{format(location.function_name(), location.file_name(), location.line())}
+    { }
+    template<nonstd::required::Exception _> template<typename CHAR, typename TRAITS> auto Function_File_Line<_>::widen(std::basic_ostream<CHAR, TRAITS> &o, char c) -> CHAR try {
+      return o.widen(c);
+    } catch (std::bad_cast const &) { // WATCHOUT - this appears to be a no-op when applied in a lambda (see the commentariat in <tpp> gcc (GCC) 9.3.1 20200413
+      return CHAR('?'); // [[FIXTHIS]] what else to do here?   This happens when trying to widen from char to char16_t or char32_t.  Good luck.
+    }
+  }
+}
+#endiv
+#divert <tpp>
+#import std.ostream_iterator
+#import std.transform
+#import std.bad_cast
+#import std.ostringstream
+#import nonstd.exception.detail.format.inn
+namespace nonstd::exception {
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Exception EXCEPTION> auto detail::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Function_File_Line<EXCEPTION> const &u) -> std::basic_ostream<CHAR, TRAITS> & try {
+    // [[FIXTHIS]] ... how to widen this out?  The strings originally came from the compiler itself.  And yet they are naturally narrow characters (char).
+    std::ostream_iterator<char, CHAR> sunk(o);
+    auto const start = u.what();
+    auto const finish = start + std::char_traits<char>::length(start);
+    constexpr auto WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH = 3;
+    auto xform1 = [&o](char c) -> CHAR {
+                    try {
+                      return o.widen(c);
+                    } catch (std::bad_cast const &) {
+                      return CHAR('?'); // [[FIXTHIS]] what else to do here?   This happens when trying to widen from char to char16_t or char32_t.  Good luck.
+                    }
+                  };
+    auto xform2 = [&o](char c) -> CHAR { return Function_File_Line<EXCEPTION>::widen(o, c); };
+    if constexpr(1 == WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH) {
+        std::transform(start, finish, sunk, xform1);
+    } else if constexpr(2 == WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH) {
+        std::transform(start, finish, sunk, xform2);
+    } else {
+      for (auto here=start; finish!=here; ++here) {
+        o << xform2(*here);
+      }
+    }
+    return o;
+  } catch (std::bad_cast const &) {
+    return o << CHAR('F') << CHAR('A') << CHAR('I') << CHAR('L') << CHAR(' ') << CHAR('l') << CHAR('a') << CHAR('m') << CHAR('b') << CHAR('d') << CHAR('a');
+  } catch (std::exception const &) {
+    return o << CHAR('F') << CHAR('A') << CHAR('I') << CHAR('L') << CHAR(' ') << CHAR('R') << CHAR('T') << CHAR('T') << CHAR('I');
+  }
+  namespace detail {
+    template<nonstd::required::Exception _> auto Function_File_Line<_>::format(String_Literal function, String_Literal file, typename Line_Number::Source_Location line) -> std::string {
+      std::ostringstream buf;
+      buf << "unimplemented function " << format::inn(function) << " at " << format::inn(file) << ':' << line;
+      return buf.str();
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#warning WATCHOUT - try-catch does not seem to work in lambda ... at all.  Is this expected  g++ (GCC) 9.3.1 20200413
+#endiv

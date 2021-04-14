@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::f { class Owner; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import sys.f.Owner
+class tests::unit::f::Owner : public cppunit::test::Fixture {
+public:
+  using Subject = sys::f::Owner;
+  auto test_literals() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::f {
+  auto Owner::test_literals() -> void {
+    Subject o;
+    o = Subject::TID;
+    o = Subject::PID;
+    o = Subject::PGRP;
+    CPPUNIT_ASSERT(o != Subject::TID);
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::f {
+  auto Owner::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    Stream series{"Owner"};
+    series << call("literals", &Owner::test_literals)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

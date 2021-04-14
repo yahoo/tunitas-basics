@@ -1,0 +1,74 @@
+// -*- c++ -*- with the SCOLD stylings
+#divert <fpp>
+namespace nonstd::path::filename::mount {
+  template<typename SEPARATOR, typename CONTAINER> class Joiner;
+}
+#entail nonstd.path.filename.mount.Joiner.ITERATOR
+#endiv
+#divert <hpp>
+#import nonstd.path.filename.mount.Value
+#import nonstd.path.filename.mount.Unbound
+namespace nonstd::path::filename::mount {
+  //
+  // Concept: BOUND is { Value | Reference }
+  //
+  template<typename BOUND, typename SEPARATOR, typename CONTAINER> inline auto operator/(BOUND &&, Joiner<SEPARATOR, CONTAINER> const &) -> BOUND &&;
+  template<typename BOUND, typename SEPARATOR, typename CONTAINER> inline auto operator/(Joiner<SEPARATOR, CONTAINER> const &, BOUND &&) -> BOUND &&;
+
+  template<typename SEPARATOR, typename CONTAINER> inline auto operator*(Unbound &&, Joiner<SEPARATOR, CONTAINER> const &) -> Value; 
+  namespace detail {
+    template<typename SEPARATOR, typename CONTAINER> inline auto stringify(Joiner<SEPARATOR, CONTAINER> const &) -> std::string; 
+  }
+}
+template<typename SEPARATOR, typename CONTAINER> class nonstd::path::filename::mount::Joiner {
+public:
+  inline Joiner(SEPARATOR, CONTAINER const &);
+  SEPARATOR separator;
+  CONTAINER const &subject;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+template<typename BOUND, typename SEPARATOR, typename CONTAINER> auto nonstd::path::filename::mount::operator/(BOUND &&anon, Joiner<SEPARATOR, CONTAINER> const &spec) -> BOUND && {
+  // append to the existing string in the rhs
+  anon.subject += '/';
+  bool rest = false;
+  for (auto const &item : spec.subject) {
+    if (rest) {
+      anon.subject += spec.separator;
+    }
+    anon.subject += item;
+    rest=true; 
+  }
+  return std::forward<BOUND>(anon);
+}
+
+#import std.string
+template<typename BOUND, typename SEPARATOR, typename CONTAINER> auto nonstd::path::filename::mount::operator/(Joiner<SEPARATOR, CONTAINER> const &spec, BOUND &&anon) -> BOUND && {
+  // prepending to a string is hard, so only do that once
+  return detail::stringify(spec) / std::forward<BOUND>(anon);
+}
+
+template<typename SEPARATOR, typename CONTAINER> auto nonstd::path::filename::mount::operator*(Unbound &&anon, Joiner<SEPARATOR, CONTAINER> const &spec) -> Value {
+  return Value(detail::stringify(spec));
+}
+
+template<typename SEPARATOR, typename CONTAINER> auto nonstd::path::filename::mount::detail::stringify(Joiner<SEPARATOR, CONTAINER> const &spec) -> std::string {
+  std::string ret;
+  bool rest = false;
+  for (auto const &item : spec.subject) {
+    if (rest) {
+      ret += spec.separator;
+    }
+    ret += item;
+    rest = true; 
+  }
+  return ret;
+}
+
+template<typename SEPARATOR, typename CONTAINER> nonstd::path::filename::mount::Joiner<SEPARATOR, CONTAINER>::Joiner(SEPARATOR arg_separator, CONTAINER const &arg_subject)
+  : separator(arg_separator)
+  , subject(arg_subject) {
+  ;
+}
+#endiv

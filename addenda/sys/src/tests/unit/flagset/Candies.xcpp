@@ -1,0 +1,155 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flagset.Shift
+#import sys.flagset.Container
+#import std.uint8_t
+namespace tests::unit::flagset {
+  //
+  // A very very small set of candies.
+  // Booorrring.
+  // But this is a tester, so it is supposed to be didactic.
+  //
+  namespace candies {
+    enum class Single { C0, C1, C2, C3, C4, C5, C6, C7 };
+    using Plural = ::sys::flagset::Container<Single, std::uint8_t, ::sys::flagset::Shift<Single, std::uint8_t>>;
+  }
+  class Candies;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::flagset::candies {
+  constexpr auto operator&(Single a, Single b) -> Plural { return Plural::meet(a, b); }
+  constexpr auto operator|(Single a, Single b) -> Plural { return Plural::join(a, b); }
+  constexpr auto operator~(Single a) -> Plural { return Plural::complement(a); }
+}
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::flagset::Candies : public cppunit::test::Fixture {
+public:
+  auto test_constructor_default() -> void;
+  auto test_constructor_empty() -> void;
+  auto test_literal_none() -> void;
+  auto test_literal_one() -> void;
+  auto test_literal_two() -> void;
+  auto test_literal_three() -> void;
+  auto test_literal_all() -> void;
+  auto test_single_and() -> void;
+  auto test_single_or() -> void;
+  auto test_single_invert() -> void;
+  auto test_contains() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.hex
+#import std.dec
+#import std.cerr
+namespace tests::unit::flagset {
+  auto Candies::test_constructor_default() -> void {
+    auto subject = candies::Plural{};
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+  auto Candies::test_constructor_empty() -> void {
+    auto subject = candies::Plural::NONE;
+    CPPUNIT_ASSERT(sizeof (subject));
+  }
+  auto Candies::test_literal_none() -> void {
+    auto const none = candies::Plural::NONE;
+    auto expected = 0;
+    auto actual = (int) none;
+    CPPUNIT_ASSERT(expected == actual);
+  }
+  auto Candies::test_literal_one() -> void {
+    auto const one = candies::Single::C4 | candies::Plural::NONE;
+    std::cerr << "\nDEBUG_one " << std::hex << (unsigned) (std::uint8_t) one << std::dec << '\n';
+    auto expected = 16;
+    auto actual = (int) (std::uint8_t) one;
+    CPPUNIT_ASSERT(expected == actual);
+  }
+  auto Candies::test_literal_two() -> void {
+    auto const two = candies::Single::C7 | candies::Single::C6;
+    auto expected = 128 + 64;
+    int actual = (candies::Plural::Value) two;
+    CPPUNIT_ASSERT(expected == actual);
+  }
+  auto Candies::test_literal_three() -> void {
+    auto const three = candies::Single::C1 | candies::Single::C3 | candies::Single::C5;
+    auto expected = 2 + 8 + 32;
+    int actual = (candies::Plural::Value) three;
+    CPPUNIT_ASSERT(expected == actual);
+  }
+  auto Candies::test_literal_all() -> void {
+    auto const all = ~candies::Plural::NONE;
+    auto expected = 0xff;
+    int actual = (candies::Plural::Value) all;
+    CPPUNIT_ASSERT(expected == actual);
+  }
+  auto Candies::test_single_and() -> void {
+    { auto const expected = candies::Plural{1};
+      auto const actual = candies::Single::C0 & /* <---- test this */  candies::Single::C0;
+      CPPUNIT_ASSERT(expected == actual); }
+    { auto const expected = candies::Plural{2};
+      auto const actual = candies::Single::C1 & /* <---- test this */  candies::Single::C1;
+      CPPUNIT_ASSERT(expected == actual); }
+  }
+  auto Candies::test_single_or() -> void {
+    { auto const expected = candies::Plural{1};
+      auto const actual = candies::Single::C0 | /* <---- test this */  candies::Single::C0;
+      CPPUNIT_ASSERT(expected == actual); }
+    { auto const expected = candies::Plural{2};
+      auto const actual = candies::Single::C1 | /* <---- test this */ candies::Single::C1;
+      CPPUNIT_ASSERT(expected == actual); }
+  }
+  auto Candies::test_single_invert() -> void {
+    auto const none = candies::Plural::NONE;
+    auto const all = ~none;
+    { auto const expected = all;
+      auto const actual = candies::Single::C0 | /* test this ---> */ ~candies::Single::C0;
+      CPPUNIT_ASSERT(expected == actual); }
+    { auto const expected = candies::Plural{2};
+      auto const actual = candies::Single::C1 | candies::Single::C1;
+      CPPUNIT_ASSERT(expected == actual); }
+    { auto const expected = all;
+      auto const actual = candies::Single::C1 | /* test this ---> */ ~candies::Single::C1;
+      CPPUNIT_ASSERT(expected == actual); }
+  }
+  auto Candies::test_contains() -> void {
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::flagset {
+  auto Candies::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    Stream series{"Candies"};
+    series << []() {
+                Stream con{"constructor"};
+                con << call("default", &Candies::test_constructor_default)
+                    << call("empty", &Candies::test_constructor_empty)
+                  ;
+                return move(con);
+              }()
+           << []() {
+                Stream lit{"literal"};
+                lit << call("none", &Candies::test_literal_none)
+                    << call("one", &Candies::test_literal_one)
+                    << call("two", &Candies::test_literal_two)
+                    << call("three", &Candies::test_literal_three)
+                    << call("all", &Candies::test_literal_all)
+                  ;
+                return move(lit);
+              }()
+           << []() {
+                Stream sin{"single"};
+                sin << call("and", &Candies::test_single_and)
+                    << call("or", &Candies::test_single_or)
+                    << call("invert", &Candies::test_single_invert)
+                  ;
+                return move(sin);
+              }()
+           << call("contains", &Candies::test_contains)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

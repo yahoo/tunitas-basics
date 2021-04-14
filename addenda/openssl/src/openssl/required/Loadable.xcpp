@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward openssl.evp.PKey
+#forward openssl.x509.Crl
+#forward openssl.x509.Crt
+#forward openssl.x509.Req
+#import std.is_same
+namespace openssl::required {
+  //
+  // Is this type a valid loadable type?
+  // Can such a type be loaded with pem::load<TYPE>(std::filesystem::path)
+  // Only these types, as enumerated
+  //
+  template<typename LOADABLE> concept bool Loadable = (std::is_same<LOADABLE, evp::PKey>::value ||
+                                                       std::is_same<LOADABLE, x509::Crl>::value ||
+                                                       std::is_same<LOADABLE, x509::Crt>::value ||
+                                                       std::is_same<LOADABLE, x509::Req>::value);
+}
+#endiv

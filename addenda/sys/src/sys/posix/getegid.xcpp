@@ -1,0 +1,10 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.gid
+namespace sys::posix {
+  using packaging::gid::function::getegid;
+  namespace native { using packaging::gid::native::getegid; }
+}
+// CANNOT export these to global scope (no potential overload)
+#endiv

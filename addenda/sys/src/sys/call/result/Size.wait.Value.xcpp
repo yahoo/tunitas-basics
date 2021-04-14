@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Size.declaration
+#forward sys.call.result.wait.Value
+#import sys.call.result.required.Wait
+namespace sys::call::result {
+  //
+  // Specialized for the various wait::Value<...specializations...>
+  //
+  // Usage:
+  //
+  //     using t99 = call::result::wait::Value<id::Process>; .......................... one template argument
+  //     using t99 = call::result::wait::Value<id::Process, wait::Status>; ............ two template arguments
+  //     using t99 = call::result::wait::Value<id::Process, sig::Info>; ............... two template arguments
+  //     using t99 = call::result::wait::Value<id::Process, r::Usage>; ................ two template arguments
+  //     using t99 = call::result::wait::Value<id::Process, wait:Status, r::Usage>; ... three template arguments
+  //     constexpr auto const t99_size = Size<t99>::value;
+  //     ... blah blah blah ... you know how this works ...
+  //
+  template<typename... SEVERAL> requires required::Wait<SEVERAL...> struct Size<wait::Value<SEVERAL...>>;
+}
+#endiv
+#divert <hpp>
+#import sys.call.result.Size.Value
+#import sys.call.result.wait.Value
+namespace sys::call {
+  template<typename... SEVERAL> requires result::required::Wait<SEVERAL...> struct result::Size<result::wait::Value<SEVERAL...>> : public Size<typename wait::Value<SEVERAL...>::Ancestor> { };
+}
+#endiv

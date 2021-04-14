@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_stringz
+namespace nonstd::path::filename::has {
+  //
+  // has::prefix of a filename (stopping at path boundaries)
+  // Using '.' as an implicit separator, which is implicitly supplied.
+  //
+  // has::prefix("app.le", "app") -> true
+  // has::prefix("o.make.out", "o") -> true
+  // has::prefix("rc.d/file.log", "rc") -> true
+  // has::prefix(".bashrc", "") -> true
+  //
+  // The empty subject cannot match any prefix.
+  // The empty prefix matches "dotfiles"
+  //
+  // A detailed specification is in the implementation detail has::somefix(...)
+  //
+  inline auto prefix(c::const_stringz subject, c::const_stringz prefix) -> bool;
+}
+#endiv
+#divert <ipp>
+#import nonstd.path.filename.has.somefix
+auto nonstd::path::filename::has::prefix(c::const_stringz subject, c::const_stringz prefix) -> bool {
+  using iterator = c::const_stringz::const_iterator;
+  iterator const sb(subject.begin());
+  iterator const se(subject.end());
+  iterator const pb(prefix.begin());
+  iterator const pe(prefix.end());
+  return somefix(sb, se, pb, pe);
+}
+#endiv

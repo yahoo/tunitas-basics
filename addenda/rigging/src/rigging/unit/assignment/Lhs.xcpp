@@ -1,0 +1,57 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::unit::assignment {
+  template<typename TYPE> class Lhs;
+}
+#entail rigging.unit.assignment.Lhs.array.muting
+#entail rigging.unit.assignment.Lhs.pointer.char.consty
+#entail rigging.unit.assignment.Lhs.pointer.char.muting
+#entail rigging.unit.assignment.Lhs.pointer.std.string.consty
+#entail rigging.unit.assignment.Lhs.pointer.std.string.muting
+#entail rigging.unit.assignment.Lhs.std.array
+#entail rigging.unit.assignment.Lhs.std.string
+#entail rigging.unit.assignment.Lhs.std.vector.char
+#entail rigging.unit.assignment.Lhs.std.unique_ptr.char_array
+#entail rigging.unit.assignment.Lhs.std.unique_ptr.std.string
+#endiv
+#divert <hpp>
+#import rigging.unit.assignment.Clear
+template<typename TYPE> class rigging::unit::assignment::Lhs {
+public:
+  using value_type = TYPE;
+  inline explicit Lhs(value_type &lhs);
+  inline auto operator=(Clear) -> Lhs &;
+  // copy semantic
+  inline auto operator=(value_type const &) -> Lhs &;
+  // move semantic (out of an unnamed object)
+  inline auto operator=(value_type &&) -> Lhs &;
+protected:
+  value_type &lhs;
+};
+#endiv
+#divert <ipp>
+template<typename TYPE> rigging::unit::assignment::Lhs<TYPE>::Lhs(value_type &arg)
+  : lhs(arg) {
+  ;
+}
+  
+template<typename TYPE> auto rigging::unit::assignment::Lhs<TYPE>::operator=(Clear) -> Lhs & {
+  // specializations may have a better way of doing this
+  lhs = value_type();
+  return *this;
+}
+
+template<typename TYPE> auto rigging::unit::assignment::Lhs<TYPE>::operator=(value_type const &rhs) -> Lhs & {
+  lhs = rhs;
+  return *this;
+}
+
+#import std.forward
+template<typename TYPE> auto rigging::unit::assignment::Lhs<TYPE>::operator=(value_type &&rhs) -> Lhs & {
+  // The expectation is that the lhs' TYPE::operator(TYPE &&) will reach
+  // into rhs and move data from rhs to lhs, emptying the rhs.
+  lhs = std::forward<value_type>(rhs);
+  return *this;
+}
+#endiv

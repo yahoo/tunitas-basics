@@ -1,0 +1,5 @@
+// -*- c++ -*- 0246f994-02c4-4aaf-ac93-a9e4566b3b23
+#pragma once
+// See http://en.cppreference.com/w/cpp/utility/declval
+// See http://www.cplusplus.com/reference/utility/declval/
+#include <utility>

@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+namespace sys::posix::packaging::required::readlink {
+  //
+  // Is this a readlink thunk?
+  // The thunk of is one of the thunks from posix::readlink(...) or posix::readlinkat(...) nearby.
+  //
+  // The thunk is expected to "behave like a system call"
+  // and set the value of global errno upon failure (a negative return value)
+  //
+  // Usage:
+  //
+  //   template<required:Thunk THUNK> auto perform(THUNK) -> Result
+  //
+  template<typename THUNK> concept bool Thunk = requires(THUNK thunk, char  *buf, std::size_t buf_size) {
+    { thunk(buf, buf_size) } -> int;
+  };
+}
+#endiv

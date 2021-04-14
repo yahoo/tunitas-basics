@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+//
+// WATCHOUT - both systems produce a type alias :uuid_t
+// AND <uuid.h> attempts to work around <linux/uuid.h> with #defines
+//
+// AVOID ---> #include <uuid.h>       uuid-devel-1.6.2-21.fc20.x86_64
+// WANT ----> #include <uuid/uuid.h>  libuuid-devel-2.24.2-1.fc20.x86_64
+//
+// rpm -q -f /usr/lib64/pkgconfig/uuid.pc 
+// libuuid-devel-2.24.2-1.fc20.x86_64
+//
+// Yet <uuid.h> is ambiguous
+//     # pkg-config --cflags uuid
+//     -I/usr/include/uuid
+//
+// /usr/include/uuid/uuid.h    libuuid-devel-2.23.2-5.fc19.x86_64 
+// /usr/include/uuid.h         uuid-devel-1.6.2-17.fc19.x86_64
+// /usr/include/linux/uuid.h   kernel-headers-3.14.4-100.fc19.x86_64    
+//
+
+#if defined(__UUID_H__)
+// AVOID   <uuid.h>      defines __UUID_H__
+// WANT    <uuid/uuid.h> defines _UUID_UUID_H
+#error <uuid.h> cannot be used with <uuid/uuid.h>.  Fix your code (they broke your world).
+#endif
+
+// NOT #include <uuid.h>    AVOID: uuid-devel     e.g. uuid-devel-1.6.2-17.fc19.x86_64
+#include <uuid/uuid.h> //    want: libuuid-devel  e.g. libuuid-devel-2.24.2-1.fc20.x86_64
+
+namespace uuid {
+  namespace generate { }
+  namespace time { }
+  namespace detail { }
+  // There are no class name declarations in here (they are elsewhere)
+}
+#endiv

@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::unit {
+  class Stringz;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.vector
+#import rigging.unit.detail.Bufferized
+class rigging::unit::Stringz : public rigging::unit::detail::Bufferized {
+  // like c::const_stringz but simpler
+  using ancestor = rigging::unit::detail::Bufferized;
+public:
+  Stringz() = default;
+  inline /*implicit*/ Stringz(value_type *);
+  // Yet there is expected to be a '\0' embedded within 0..N-1
+  template<std::size_t N> inline /*implicit*/ Stringz(value_type (&)[N]);
+  inline /*implicit*/ Stringz(std::string const &);
+};
+#endiv
+#divert <ipp>
+#import std.strlen
+rigging::unit::Stringz::Stringz(char const *arg_value)
+  : ancestor(arg_value, nullptr == arg_value ? 0u : std::strlen(arg_value)) {
+  ;
+}
+
+template<std::size_t N> rigging::unit::Stringz::Stringz(char const (&arg)[N])
+  : ancestor(arg, std::strlen(arg)) {
+  ;
+}
+
+rigging::unit::Stringz::Stringz(std::string const &arg)
+  : ancestor(arg.data(), arg.size()) {
+  ;
+}
+#endiv

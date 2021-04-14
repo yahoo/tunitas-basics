@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::pem { class To_String; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::pem::To_String : public cppunit::test::Fixture {
+public:
+  template<typename OBJECT> auto test_to_string() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import tests.unit.pem.Maker
+#import openssl.pem.to_string
+#import std.cerr
+namespace tests::unit::pem {
+  template<typename OBJECT> auto To_String::test_to_string() -> void {
+    Maker<OBJECT> maker;
+    auto stringy = ::openssl::pem::to_string(maker());
+    CPPUNIT_ASSERT(!stringy.empty());
+    std::cerr << stringy;
+  }
+}
+#endiv
+#divert <cpp>
+#import openssl.evp.PKey
+#import openssl.x509.Req
+#import openssl.x509.Crt
+#import rigging.suite.io
+auto tests::unit::pem::To_String::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("to_string");
+  series << call("evp::PKey", &To_String::test_to_string<::openssl::evp::PKey>)
+         << call("x509::Req", &To_String::test_to_string<::openssl::x509::Req>)
+         << call("x509::Crt", &To_String::test_to_string<::openssl::x509::Crt>)
+    ;
+  return finalize(series);
+}
+#endiv

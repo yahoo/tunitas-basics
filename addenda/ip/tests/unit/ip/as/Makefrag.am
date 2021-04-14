@@ -1,0 +1,3 @@
+tests_unit_ip_as_TESTS = \
+  tests/unit/ip/as/all.test \
+  $(end)

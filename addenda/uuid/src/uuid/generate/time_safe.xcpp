@@ -1,0 +1,34 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.tuple
+#import uuid.detail.Wrapper
+#import uuid.Container
+namespace uuid {
+  namespace generate {
+    // recall: the bool is whether the uuid was generated in a "safe" manner.
+    inline auto time_safe(detail::Wrapper &out) -> bool;
+    inline auto time_safe() -> std::tuple<Container, bool>;
+  }
+}
+#endiv
+#divert <ipp>
+#import uuid.detail.generate.scheme
+auto uuid::generate::time_safe(detail::Wrapper &out) -> bool {
+  //
+  // Returns a truth value indicating whether it was created "safely" or not
+  // WATCHOUT - the man page declares that the truth value is encoded oddly.
+  // <quote>
+  //   uuid_generate_time_safe returns zero if the UUID has been generated in a safe manner, -1 otherwise.
+  // </quote>
+  //
+  auto assessment = uuid_generate_time_safe(out.value);
+  auto is_safe = 0 == assessment;
+  return is_safe;
+}
+
+auto uuid::generate::time_safe() -> std::tuple<Container, bool> {
+  Container ret;
+  bool safeness = time_safe(ret);
+  return std::tuple<Container, bool>(ret, safeness);
+}
+#endiv

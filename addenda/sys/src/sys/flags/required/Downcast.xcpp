@@ -1,0 +1,11 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sys.flags.downcastof
+namespace sys::flags::required {
+  //
+  // Only two indices N are allowed in downcastof<N>(flagset, low, high)
+  //
+  template<unsigned N> concept bool Downcast = downcastas::INDEX == N || downcastas::MASK == N;
+}
+#endiv

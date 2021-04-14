@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.msg.Flags
+#import sys.msg.required.Flags
+namespace sys::msg {
+  template<required::Flags RESULT> auto as(Flags) -> RESULT = delete;
+  template<required::Flags RESULT> auto as(Flag) -> RESULT = delete;
+  template<> inline auto as<Flag>(Flag) -> Flag;  //   unexceptional (identity)
+  template<> inline auto as<Flag>(Flags) -> Flag;  //  demotion can throw because it demotion of multi-flag values is ambiguous.
+  template<> inline auto as<Flags>(Flag) -> Flags; //  unexceptional (simple promotion)
+  template<> inline auto as<Flags>(Flags) -> Flags; // unexceptional (identity)
+}
+#endiv
+#divert <ipp>
+#import sys.flags.maskof
+namespace sys {
+  template<> auto msg::as<msg::Flag>(Flag f) -> Flag    { return f; }
+  template<> auto msg::as<msg::Flag>(Flags s) -> Flag   { return sys::flags::maskof<Flag>(s, Flags::Limits::begin(), Flags::Limits::end()); }
+  template<> auto msg::as<msg::Flags>(Flag f) -> Flags  { return Flags{f}; }
+  template<> auto msg::as<msg::Flags>(Flags s) -> Flags { return s; }
+}
+#endiv

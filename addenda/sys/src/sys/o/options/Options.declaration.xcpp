@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.o.options.required.Names
+namespace sys::o::options {
+  //
+  // The composer (aggregator) of disparate disjoint bitmask-enumerations.
+  // Descendants, but also stand-alone as an argument to the descendant.
+  // Uses CRTP.
+  //
+  // Usage: (by inheritance)
+  //
+  //   struct my::Specification : public Composer<Specification> {
+  //     Specification()
+  //     [[impliict]] Specification(Composer)
+  //     ...etc...
+  //   };
+  //
+  template<typename... NAMES> requires required::Names<NAMES...> struct Options;
+}
+#endiv

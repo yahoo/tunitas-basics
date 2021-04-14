@@ -1,0 +1,80 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::asn1 {
+  //
+  // An ASN.1 Time (UTC)
+  //
+  // A time point, is wrapped in the ASN.1 typing system.
+  // Constructible and assignable from the std::chrono::time_point
+  //
+  // See https://tools.ietf.org/html/rfc5280
+  //     UTCTime
+  //     GeneralizedTime
+  //
+  // Usage:
+  //
+  //   auto nowthen = now();
+  //   auto point = asn1::Time{nowthen};
+  //   point = nowthen;
+  //
+  class Time;
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#import openssl.managed.Pointer
+#import openssl.managed.deleter.Abstract.TIME
+#import openssl.time.Point
+#forward openssl.x509.Crl
+#forward openssl.x509.Crt
+#forward openssl.x509.Req
+class openssl::asn1::Time : public managed::Pointer<ASN1_TIME, managed::deleter::Abstract<ASN1_TIME, managed::deleter::Usage::TIME>> {
+  using ancestor = managed::Pointer<ASN1_TIME, managed::deleter::Abstract<ASN1_TIME, managed::deleter::Usage::TIME>>;
+  friend class x509::Crl;
+  friend class x509::Crt;
+  friend class x509::Req;
+  inline explicit Time(ASN1_TIME *, Deleter const & = Deleter{});
+public:
+  inline Time();
+  inline explicit Time(time::Point);
+  Time(Time &&) = default;
+  inline auto operator=(time::Point) -> Time &;
+  auto operator=(Time &&) -> Time & = default;
+};
+#import openssl.asn1.as
+#endiv
+#divert <ipp>
+#import openssl.functions
+#import sys.time.as
+namespace openssl::asn1 {
+  Time::Time()
+    : ancestor{ASN1_TIME_set(nullptr, 0)}
+  { }
+  Time::Time(ASN1_TIME *time, Deleter const &del)
+    : ancestor{time, del}
+  { }
+  Time::Time(time::Point other)
+    : ancestor{ASN1_TIME_set(nullptr, sys::time::as<sys::time::t>(other))}
+  { }
+  auto Time::operator=(time::Point other) -> Time & {
+    ASN1_TIME_set(get(), sys::time::as<sys::time::t>(other));
+    return *this;
+  }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+namespace openssl::asn1 {
+  static_assert(std::is_default_constructible<Time>::value);
+  static_assert(!std::is_copy_constructible<Time>::value);
+  static_assert(std::is_move_constructible<Time>::value);
+  static_assert(!std::is_copy_assignable<Time>::value);
+  static_assert(std::is_move_assignable<Time>::value);
+}
+#endiv

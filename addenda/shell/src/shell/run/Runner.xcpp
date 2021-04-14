@@ -1,0 +1,194 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace shell::run {
+  //
+  // The prototype of a program runner
+  // Descendants only
+  //
+  // Reminder all of the running functions need ot be non-const because the object
+  // knows what state it is, being among unstarted, started, waiting.  This allows
+  // start(...) and run(...) to be idempotent and called without state dependence.
+  // Cannot be const: start(...), run(...) and wait(...)
+  //
+  // Usage:
+  //
+  //   class my::Program : public Runner {
+  //   public:
+  //     Program(...); ....    must choose 'exec' or 'execp' and establish argv[0]
+  //   };
+  //
+  //   Program prog{...};
+  //   auto f = prog.start();
+  //   auto w = prog.wait();
+  //
+  //   auto w = prog.run();
+  //
+  class Runner;
+}
+#endiv
+#divert <hpp>
+#import c.const_stringz
+#import std.filesystem.path
+#import sys.call.Result
+#import sys.exits.Code
+#import sys.id.Process
+#import sys.call.result.wait.Value
+#import sys.call.result.fork.Value
+#import id_t
+class shell::run::Runner {
+public:
+  enum Exec { EXEC, EXECP }; // scoped by the class
+  inline explicit Runner(std::filesystem::path);
+  inline Runner(Exec, std::filesystem::path);
+  inline explicit Runner(std::filesystem::path, std::string name);
+  inline Runner(Exec, std::filesystem::path, std::string name);
+  virtual ~Runner() = default;
+  struct Result {
+    using Start = sys::call::result::fork::Value<sys::id::Process>;
+    using Wait = sys::call::result::wait::Value<sys::id::Process, sys::wait::Status>;
+    using Run = Wait;
+  };
+  using results [[deprecated("instead prefer Runner::Result")]] = Result;
+  virtual auto run() -> Result::Run;
+  virtual auto start() -> Result::Start;
+  virtual auto wait() -> Result::Wait;
+protected:
+  using Process = sys::id::Process;
+  Process running;
+  Exec exec;
+  std::filesystem::path arg0;
+  std::vector<std::string> args;
+  inline static constexpr auto DEBUGGING = true;
+  auto dying_utterance(c::const_stringz fragment) const noexcept -> void;
+  inline auto do_exec() const -> sys::call::Result;
+  auto do_wait() -> Result::Wait;
+  using Forked = sys::call::result::fork::Value<sys::id::Process>;
+  inline auto fork_invariance_check(Forked const &forked) const -> void;
+  inline static auto which_exec_flavor(std::filesystem::path const &) -> Exec;
+private:
+  auto grow_child() noexcept -> sys::exits::Code;
+};
+#endiv
+#divert <ipp>
+#import std.move
+shell::run::Runner::Runner(std::filesystem::path path)
+  : Runner{which_exec_flavor(path), std::move(path)}
+{ }
+shell::run::Runner::Runner(Exec exec, std::filesystem::path path)
+  : running{0}
+  , exec{exec}
+  , arg0{std::move(path)}
+  , args{} {
+    args.push_back(arg0);
+}
+shell::run::Runner::Runner(std::filesystem::path path, std::string name)
+  : Runner{which_exec_flavor(path), std::move(path), std::move(name)}
+{ }
+shell::run::Runner::Runner(Exec exec, std::filesystem::path path, std::string name)
+  : running{0}
+  , exec{exec}
+  , arg0{std::move(path)}
+  , args{} {
+    args.push_back(std::move(name));
+}
+#import sys.posix.exec
+#import sys.posix.execp
+auto shell::run::Runner::do_exec() const -> sys::call::Result {
+  // Returning from exec is an error on its face;
+  // e.g. arg0 is not valid, No such file or directory.
+  // e.g. SELinux prevents such
+  // e.g. Sunspots.
+  if (EXEC == exec) {
+    return sys::posix::exec(arg0, args);
+  } else {
+    return sys::posix::execp(arg0, args);
+  }
+}
+auto shell::run::Runner::which_exec_flavor(std::filesystem::path const &path) -> Exec {
+  return path.has_parent_path() ? EXEC : EXECP;
+}
+#import nonstd.exception.Unexpected
+auto shell::run::Runner::fork_invariance_check(Forked const &forked) const -> void {
+  if constexpr (DEBUGGING) {
+    auto expected = true;
+    expected &= !ok(forked) || (ok(forked) && is_parent(forked));
+    expected &= is_error(forked) || is_parent(forked);
+    if (!expected) {
+      throw nonstd::exception::Unexpected{"fork"};
+    }
+  }
+}
+#endiv
+#divert <cpp>
+#import sys.posix.fork
+#import exit
+auto shell::run::Runner::start() -> Result::Start {
+  auto forked = sys::posix::fork();
+  if (is_parent(forked)) {
+    running = process(forked);
+  } else if (is_child(forked)) {
+    exit(grow_child());
+  }
+  fork_invariance_check(forked);
+  return forked;
+}
+#import sys.wait.Status
+auto shell::run::Runner::run() -> Result::Run {
+  if (Process{} == running) {
+    auto started = start();
+    if (!ok(started)) {
+      // convert the forked-shaped result int o a waited-shaped result.
+      return {ok(started), error_num(started), Process{}, sys::wait::Status{}};
+    }
+  }
+  return wait();
+}
+auto shell::run::Runner::wait() -> Result::Wait {
+  return do_wait();
+}
+#import sys.posix.wait
+#import sys.posix.W
+auto shell::run::Runner::do_wait() -> Result::Wait {
+  // WATCHOUT - you MUST NOT use W::EXITED when waiting for a pid via waitpid(2)
+  //            otherwise you'll receive E::INVAL all the time .... invalid argument
+  return sys::posix::wait(this->running, W::NONE)(W::NOUSAGES);
+#if 0 // [[REMOVETHIS]]
+#warning instead find a way to use use sys::posix::wait()()
+  int status{-1};
+  std::cerr << "waiting for process: " << this->running << '\n';
+  auto actual = ::waitpid(this->running, &status, 0);
+  std::cerr << "... waited " << actual << ' ' << status << '\n';
+  int errnum = errno; // capture this immediately
+  return Result::Wait(actual >= 0, errnum, this->running, sys::wait::Status{status});
+#endif
+}
+#import sys.exits.constants
+#import sys.exits.constants
+#import std.exception
+auto shell::run::Runner::grow_child() noexcept -> sys::exits::Code {
+  // We're in the child now, NOTHING ESCAPES
+  try {
+    auto execed = do_exec();
+    dying_utterance(error_code(execed).message());
+  } catch (std::exception const &e) {
+    dying_utterance(e.what());
+  } catch (...) {
+    dying_utterance("unknown");
+  }
+  return sys::exits::OS;
+}
+#import autotools.autoconf.Config.shell.CONFIG
+#import write
+auto shell::run::Runner::dying_utterance(c::const_stringz frag) const noexcept -> void {
+  using ac = autotools::autoconf::Config<CONFIG>;
+  auto const pack = c::const_stringz{ac::package_name()};
+  auto const pref = c::const_stringz{"-Runner: "};
+  auto const crnl = c::const_stringz{"\n"};
+  auto errfd{2};
+  ::write(errfd, pack.data(), pack.size());
+  ::write(errfd, pref.data(), pref.size());
+  ::write(errfd, frag.data(), frag.size());
+  ::write(errfd, crnl.data(), crnl.size());
+}
+#endiv

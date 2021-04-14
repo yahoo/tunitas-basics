@@ -1,0 +1,182 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.lock.interface
+namespace sys::posix {
+  namespace packaging::setlock {
+    using namespace packaging::lock::interface;
+    using namespace bundle::setlock;
+    namespace function {
+      // infix
+      inline auto setlock(File, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(File, Process, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(File, Filetable, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(File, Which, Wait, [[in]] truct::flock const &) -> Status;
+      // postfix (optional)
+      inline auto setlock(File, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(File, Process, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(File, Filetable, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(File, Which, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+    } 
+    namespace native {
+      // infix
+      inline auto setlock(int fd, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(int fd, Process, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(int fd, Filetable, Wait, [[in]] truct::flock const &) -> Status;
+      inline auto setlock(int fd, Which, Wait, [[in]] truct::flock const &) -> Status;
+      // postfix (optional)
+      inline auto setlock(int fd, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(int fd, Process, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(int fd, Filetable, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+      inline auto setlock(int fd, Which, [[in]] truct::flock const &, Wait = Wait::NOWAIT) -> Status;
+    } 
+    namespace detail {
+      inline constexpr auto witcher(Which, Wait) -> Function;
+    }
+  }
+  using packaging::setlock::function::setlock;
+  namespace native { using packaging::setlock::native::setlock; }
+}
+#endiv
+#divert <ipp>
+namespace sys::posix::packaging::setlock {
+  constexpr auto detail::witcher(Which which, Wait wait) -> Function {
+    if (Which::FILE == which) { return Wait::WAIT == wait ? F::SETLOCK_FILE : F::SETLOCK_FILE_WAITING; }
+    // indeed, anything but Which::FILE defaults to the original "Process-Associated" locks.
+    else                      { return Wait::WAIT == wait ? F::SETLOCK_PROCESS : F::SETLOCK_PROCESS_WAITING; }
+  }
+  // function postfix
+  auto function::setlock(File fd, truct::flock const &lock, Wait wait) -> Status                  { return native::setlock((int)fd, F::PROCESS, F::NOWAIT, lock); }
+  auto function::setlock(File fd, Process which, truct::flock const &lock, Wait wait) -> Status   { return native::setlock((int)fd, which, wait, lock); }
+  auto function::setlock(File fd, Filetable which, truct::flock const &lock, Wait wait) -> Status { return native::setlock((int)fd, which, wait, lock); }
+  auto function::setlock(File fd, Which which, truct::flock const &lock, Wait wait) -> Status     { return native::setlock((int)fd, which, wait, lock); }
+  // function infix
+  auto function::setlock(File fd, Wait wait, truct::flock const &lock) -> Status                  { return native::setlock((int)fd, F::PROCESS, wait, lock); }
+  auto function::setlock(File fd, Process which, Wait wait, truct::flock const &lock) -> Status   { return native::setlock((int)fd, which, wait, lock); }
+  auto function::setlock(File fd, Filetable which, Wait wait, truct::flock const &lock) -> Status { return native::setlock((int)fd, which, wait, lock); }
+  auto function::setlock(File fd, Which which, Wait wait, truct::flock const &lock) -> Status     { return native::setlock((int)fd, which, wait, lock); }
+  // native postfix
+  auto native::setlock(int fd, truct::flock const &lock, Wait wait) -> Status                  { return setlock((int)fd, F::PROCESS, wait, lock); }
+  auto native::setlock(int fd, Process which, truct::flock const &lock, Wait wait) -> Status   { return setlock((int)fd, which, wait, lock); }
+  auto native::setlock(int fd, Filetable which, truct::flock const &lock, Wait wait) -> Status { return setlock((int)fd, which, wait, lock); }
+  auto native::setlock(int fd, Which which, truct::flock const &lock, Wait wait) -> Status     { return setlock((int)fd, which, wait, lock); }
+  // native infix
+  auto native::setlock(int fd, Wait wait, truct::flock const &lock) -> Status                  { return setlock((int)fd, F::PROCESS, wait, lock); }
+  auto native::setlock(int fd, Process which, Wait wait, truct::flock const &lock) -> Status   { return posix::native::fcntl(fd, detail::witcher(Which::PROCESS, wait), lock); }
+  auto native::setlock(int fd, Filetable which, Wait wait, truct::flock const &lock) -> Status { return posix::native::fcntl(fd, detail::witcher(Which::FILE, wait), lock); }
+  auto native::setlock(int fd, Which which, Wait wait, truct::flock const &lock) -> Status     { return posix::native::fcntl(fd, detail::witcher(which, wait), lock); }
+}
+#endiv
+#divert <cpp>
+#import nonstd.convertible_to
+#import sys.fd.required.Unmanaged
+#import sys.id.File
+#import sys.posix.LOCK
+namespace {
+  namespace tests {
+    namespace usage {
+      using namespace sys::posix;
+      using namespace native;
+      using nonstd::convertible_to;
+      using Argument = packaging::lock::interface::truct::flock;
+      template<typename UNMANAGED> concept bool Signature2Installed = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, installed)) } -> convertible_to<int>;
+        { setlock(fd, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature3WaitInstalled = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::NOWAIT, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::NOWAIT, installed)) } -> convertible_to<int>;
+        { setlock(fd, F::NOWAIT, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature3InstalledWait = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, installed, F::WAIT)) } -> convertible_to<bool>;
+        { value(setlock(fd, installed, F::WAIT)) } -> convertible_to<int>;
+        { setlock(fd, installed, F::WAIT) };
+      };
+      //
+      template<typename UNMANAGED> concept bool Signature3ProcessInstalled = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::PROCESS, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::PROCESS, installed)) } -> convertible_to<int>;
+        { setlock(fd, F::PROCESS, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature3FileInstalled = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::FILE, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::FILE, installed)) } -> convertible_to<int>;
+        { setlock(fd, F::FILE, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature3WhichInstalled = requires(UNMANAGED fd, F::Which which, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, which, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, which, installed)) } -> convertible_to<int>;
+        { setlock(fd, which, installed) };
+      };
+      // Wait is infix
+      template<typename UNMANAGED> concept bool Signature4WaitProcessInstalled = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::PROCESS, F::NOWAIT, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::PROCESS, F::NOWAIT, installed)) } -> convertible_to<int>;
+        { setlock(fd, F::PROCESS, F::NOWAIT, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature4WaitFileInstalled = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::FILE, F::NOWAIT, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::FILE, F::NOWAIT, installed)) } -> convertible_to<int>;
+        { setlock(fd, F::FILE, F::NOWAIT, installed) };
+      };
+      template<typename UNMANAGED> concept bool Signature4WaitWhichInstalled = requires(UNMANAGED fd, F::Which which, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, which, F::NOWAIT, installed)) } -> convertible_to<bool>;
+        { value(setlock(fd, which, F::NOWAIT, installed)) } -> convertible_to<int>;
+        { setlock(fd, which, F::NOWAIT, installed) };
+      };
+      // Wait is last
+      template<typename UNMANAGED> concept bool Signature4ProcessInstalledWait = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::PROCESS, installed, F::WAIT)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::PROCESS, installed, F::WAIT)) } -> convertible_to<int>;
+        { setlock(fd, F::PROCESS, installed, F::WAIT) };
+      };
+      template<typename UNMANAGED> concept bool Signature4FileInstalledWait = requires(UNMANAGED fd, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, F::FILE, installed, F::WAIT)) } -> convertible_to<bool>;
+        { value(setlock(fd, F::FILE, installed, F::WAIT)) } -> convertible_to<int>;
+        { setlock(fd, F::FILE, installed, F::WAIT) };
+      };
+      template<typename UNMANAGED> concept bool Signature4WhichInstalledWait = requires(UNMANAGED fd, F::Which which, Argument const &installed) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        { good(setlock(fd, which, installed, F::WAIT)) } -> convertible_to<bool>;
+        { value(setlock(fd, which, installed, F::WAIT)) } -> convertible_to<int>;
+        { setlock(fd, which, installed, F::WAIT) };
+      };     
+      template<typename UNMANAGED> concept bool Usage = requires(UNMANAGED) {
+        requires sys::fd::required::Unmanaged<UNMANAGED>;
+        requires Signature2Installed<UNMANAGED>;
+        //
+        requires Signature3WaitInstalled<UNMANAGED>;
+        requires Signature3InstalledWait<UNMANAGED>;
+        //
+        requires Signature3ProcessInstalled<UNMANAGED>;
+        requires Signature3FileInstalled<UNMANAGED>;
+        requires Signature3WhichInstalled<UNMANAGED>;
+        //
+        requires Signature4WaitProcessInstalled<UNMANAGED>;
+        requires Signature4WaitFileInstalled<UNMANAGED>;
+        requires Signature4WaitWhichInstalled<UNMANAGED>;
+        //
+        requires Signature4ProcessInstalledWait<UNMANAGED>;
+        requires Signature4FileInstalledWait<UNMANAGED>;
+        requires Signature4WhichInstalledWait<UNMANAGED>;
+      };
+    }
+    using usage::Usage;
+    static_assert(Usage<int>);
+    static_assert(Usage<sys::id::File>);
+  }
+}
+#endiv

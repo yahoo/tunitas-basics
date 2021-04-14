@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.wait.Status
+#import sys.r.Usages // yes, plural, the singular being the index enumerator
+#import sys.call.result.required.Process
+#import sys.call.result.wait.Value.declaration
+namespace sys::call::result::wait {
+  //
+  // The outome of a wait(2) family of calls that returns the (process) identifier, (wait) status and resource usage.
+  //
+  // This needs to be a distinct type (not a type alias) so that ADL will find it.
+  //
+  // Usage:
+  //
+  //   auto called = sys::posix::wait<Value<Process,Status,Usages>>()
+  //   if (good(called)) {
+  //     auto p = process(called)
+  //     auto s = status(called)
+  //     auto u = usages(called)
+  //     ...use them...
+  //   } else {
+  //     ...complain...
+  //   }
+  //
+  using r::Usages; // because only this one is not inherited from 'namespace wait'
+  template<required::Process ID> struct Value<ID,Status,Usages>;
+}
+#endiv
+#divert <hpp>
+#import sys.call.result.Value
+#forward sys.call.result.Size
+#forward sys.call.result.Element
+namespace sys::call::result::wait {
+  template<required::Process ID> [[deprecated("spell it out!; prefer process<ID>(Value<ID,Status,Usages>)")]] inline auto pid(Value<ID,Status,Usages> const &) -> ID;
+  template<required::Process ID> inline auto process(Value<ID,Status,Usages> const &) -> ID;
+  //
+  template<required::Process ID> inline auto status(Value<ID,Status,Usages> const &) -> Status const &;
+  template<required::Process ID> inline auto status(Value<ID,Status,Usages> &) -> Status &;
+  //
+  template<required::Process ID> [[deprecated("unfortunately this is naturally plural. instead, prefer usages(Value<ID,Status,Usages>)")]] inline auto usage(Value<ID,Status,Usages> const &) -> Usages const &;
+  template<required::Process ID> [[deprecated("unfortunately this is naturally plural. instead, prefer usages(Value<ID,Status,Usages>)")]] inline auto usage(Value<ID,Status,Usages> &) -> Usages &;
+  template<required::Process ID> inline auto usages(Value<ID,Status,Usages> const &) -> Usages const &;
+  template<required::Process ID> inline auto usages(Value<ID,Status,Usages> &) -> Usages &;
+  //
+  template<required::Process ID> struct Value<ID,Status,Usages> : public result::Value<ID,Status,Usages> {
+    using Ancestor = result::Value<ID,Status,Usages>;
+    friend class result::Element<0, Value<ID,Status,Usages>>;
+    friend class result::Element<1, Value<ID,Status,Usages>>;
+    friend class result::Element<2, Value<ID,Status,Usages>>;
+    friend class result::Size<Value<ID,Status,Usages>>;
+  public:
+    Value() = default;
+    using Ancestor::Value;
+  };
+}
+#endiv
+#divert <ipp>
+namespace sys::call::result {
+  template<wait::required::Process ID> auto wait::pid(Value<ID,Status,Usages> const &r) -> ID     { return ID{result::get<0>(r)}; }
+  template<wait::required::Process ID> auto wait::process(Value<ID,Status,Usages> const &r) -> ID { return ID{result::get<0>(r)}; }
+  //
+  template<wait::required::Process ID> auto wait::status(Value<ID,Status,Usages> const &r) -> Status const & { return result::get<1>(r); }
+  template<wait::required::Process ID> auto wait::status(Value<ID,Status,Usages> &r) -> Status &             { return result::get<1>(r); }
+  //
+  template<wait::required::Process ID> auto wait::usage(Value<ID,Status,Usages> const &r) -> Usages const &  { return usages(r); }
+  template<wait::required::Process ID> auto wait::usage(Value<ID,Status,Usages> &r) -> Usages &              { return usages(r); }
+  template<wait::required::Process ID> auto wait::usages(Value<ID,Status,Usages> const &r) -> Usages const & { return result::get<2>(r); }
+  template<wait::required::Process ID> auto wait::usages(Value<ID,Status,Usages> &r) -> Usages &             { return result::get<2>(r); }
+}
+#endiv

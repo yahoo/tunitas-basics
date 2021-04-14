@@ -1,0 +1,31 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+check_bin_parse = check/bin/parse
+check_bin_parse_LDADD = \
+  $(lib_liboptions_module_la) \
+  $(end)
+check_bin_parse_LDFLAGS = $(CHECK_LDFLAGS_SET)
+$(check_bin_parse_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(check_bin_parse_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET)
+check_bin_parse_MODULES = $(call HT_SOURCEStoMODULES, $(check_bin_parse_SCOLD_CXX_SOURCES))
+check_bin_parse_SOURCES = \
+  obj/src/tests/parse/main.cpp \
+  obj/src/tests/parse/namespace.cpp \
+  obj/src/tests/parse/go/namespace.cpp \
+  obj/src/tests/parse/go/detail/namespace.cpp \
+  obj/src/tests/parse/Mode.cpp \
+  obj/src/tests/parse/Configuration.cpp \
+  obj/src/tests/parse/Dispatcher.cpp \
+  obj/src/tests/parse/Usage.cpp \
+  $(end)
+$(scold_cxxdir)/tests/parse/dependencies.mk: $(check_bin_parse_SOURCES)
+$(check_bin_parse_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/parse/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/parse/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/parse/dependencies.mk

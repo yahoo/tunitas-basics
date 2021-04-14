@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.managed.list.Entry
+#import ares.managed.List
+namespace ares::reply {
+  //
+  // The common managed list idiom, with all dependencies
+  // Whta this accomplishes is the removal of some multi-line cut & past throughout the Record<RECORD> specializations
+  //
+  //  Usage:
+  //
+  //   #import ares.reply.List
+  //   template<> class ares::reply::Record<XYZZY> : public List<XYZZY> {
+  //     using ancestor = List<XYZZY>; <------------------------------------- avoid 2nd cut & paste
+  //   public:
+  //     Record() = default;
+  //     using ancestor::List;
+  //   };
+  //
+  template<Resource_Record RECORD> using List = managed::List<managed::list::Entry<RECORD>>;;
+}
+#endiv

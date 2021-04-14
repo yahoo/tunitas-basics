@@ -1,0 +1,15 @@
+// -*- c++ -*- 4f466bfc-b4c2-4d0c-802e-3b5ef392d855
+#pragma once
+#include <cppunit/tools/StringTools.h>
+namespace cppunit::string_tools {
+  // Whereas the base-level API uses a struct(?) to package the static functions.
+  // We use namespaces, and so the unpack.
+  using Strings = CppUnit::StringTools::Strings;
+
+  // just use std::to_string
+  [[deprecated]] inline auto toString(int value) -> std::string { return CppUnit::StringTools::toString(value); }
+  [[deprecated]] inline auto toString(double value) -> std::string { return CppUnit::StringTools::toString(value); }
+
+  inline auto split(std::string const &text, char separator) -> Strings { return CppUnit::StringTools::split(text, separator); }
+  inline auto wrap(std::string const &text, int column = CPPUNIT_WRAP_COLUMN) -> std::string { return CppUnit::StringTools::wrap(text, column); }
+}

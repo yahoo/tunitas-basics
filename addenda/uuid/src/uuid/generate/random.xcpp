@@ -1,0 +1,23 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import uuid.detail.Wrapper
+#import uuid.Container
+namespace uuid {
+  namespace generate {
+    inline auto random(detail::Wrapper &out) -> void;
+    inline auto random() -> Container;
+  }
+}
+#endiv
+#divert <ipp>
+#import uuid.detail.generate.scheme
+auto uuid::generate::random(detail::Wrapper &out) -> void {
+  detail::generate::scheme(out, &uuid_generate_random);
+}
+
+auto uuid::generate::random() -> Container {
+  Container ret;
+  random(ret);
+  return ret;
+}
+#endiv

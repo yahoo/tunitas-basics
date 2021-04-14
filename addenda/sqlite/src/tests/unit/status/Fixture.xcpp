@@ -1,0 +1,295 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::status {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import std.vector
+#import std.set
+#import sqlite.status.Code
+class tests::unit::status::Fixture : public cppunit::test::Fixture {
+public:
+  using set_type = std::set<sqlite::status::Code>;
+  using vector_type = std::vector<sqlite::status::Code>;
+
+  vector_type all_codes_except_OK;
+
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  auto test_ok() -> void;
+  auto test_okdone() -> void;
+  auto test_failure() -> void;
+  auto test_check() -> void;
+  auto test_check_message() -> void;
+  auto test_row() -> void;
+  auto test_done() -> void;
+  auto test_min() -> void;
+  auto test_max() -> void;
+  auto test_ok_if_done() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.status.Code
+
+#import unit.rigging.lhs
+using unit::rigging::lhs;
+#import unit.rigging.clear
+using unit::rigging::clear;
+
+auto tests::unit::status::Fixture::setUp() -> void {
+  using sqlite::status::Code;
+  using v = std::vector<sqlite::status::Code>;
+  lhs(all_codes_except_OK) = v{Code::ERROR,
+                               Code::INTERNAL,
+                               Code::PERM,
+                               Code::ABORT,
+                               Code::BUSY,
+                               Code::LOCKED,
+                               Code::NOMEM,
+                               Code::READONLY,
+                               Code::INTERRUPT,
+                               Code::IOERR,
+                               Code::CORRUPT,
+                               Code::NOTFOUND,
+                               Code::FULL,
+                               Code::CANTOPEN,
+                               Code::PROTOCOL,
+                               Code::EMPTY,
+                               Code::SCHEMA,
+                               Code::TOOBIG,
+                               Code::CONSTRAINT,
+                               Code::MISMATCH,
+                               Code::MISUSE,
+                               Code::NOLFS,
+                               Code::AUTH,
+                               Code::FORMAT,
+                               Code::RANGE,
+                               Code::NOTADB,
+                               Code::NOTICE,
+                               Code::WARNING,
+                               Code::ROW,
+                               Code::DONE,
+                               Code::IOERR_READ,
+                               Code::IOERR_SHORT_READ,
+                               Code::IOERR_WRITE,
+                               Code::IOERR_FSYNC,
+                               Code::IOERR_DIR_FSYNC,
+                               Code::IOERR_TRUNCATE,
+                               Code::IOERR_FSTAT,
+                               Code::IOERR_UNLOCK,
+                               Code::IOERR_RDLOCK,
+                               Code::IOERR_DELETE,
+                               Code::IOERR_BLOCKED,
+                               Code::IOERR_NOMEM,
+                               Code::IOERR_ACCESS,
+                               Code::IOERR_CHECKRESERVEDLOCK,
+                               Code::IOERR_LOCK,
+                               Code::IOERR_CLOSE,
+                               Code::IOERR_DIR_CLOSE,
+                               Code::IOERR_SHMOPEN,
+                               Code::IOERR_SHMSIZE,
+                               Code::IOERR_SHMLOCK,
+                               Code::IOERR_SHMMAP,
+                               Code::IOERR_SEEK,
+                               Code::IOERR_DELETE_NOENT,
+                               Code::IOERR_MMAP,
+                               Code::IOERR_GETTEMPPATH,
+                               Code::IOERR_CONVPATH,
+                               Code::LOCKED_SHAREDCACHE,
+                               Code::BUSY_RECOVERY,
+                               Code::BUSY_SNAPSHOT,
+                               Code::CANTOPEN_NOTEMPDIR,
+                               Code::CANTOPEN_ISDIR,
+                               Code::CANTOPEN_FULLPATH,
+                               Code::CANTOPEN_CONVPATH,
+                               Code::CORRUPT_VTAB,
+                               Code::READONLY_RECOVERY,
+                               Code::READONLY_CANTLOCK,
+                               Code::READONLY_ROLLBACK,
+                               Code::READONLY_DBMOVED,
+                               Code::ABORT_ROLLBACK,
+                               Code::CONSTRAINT_CHECK,
+                               Code::CONSTRAINT_COMMITHOOK,
+                               Code::CONSTRAINT_FOREIGNKEY,
+                               Code::CONSTRAINT_FUNCTION,
+                               Code::CONSTRAINT_NOTNULL,
+                               Code::CONSTRAINT_PRIMARYKEY,
+                               Code::CONSTRAINT_TRIGGER,
+                               Code::CONSTRAINT_UNIQUE,
+                               Code::CONSTRAINT_VTAB,
+                               Code::CONSTRAINT_ROWID,
+                               Code::NOTICE_RECOVER_WAL,
+                               Code::NOTICE_RECOVER_ROLLBACK,
+                               Code::WARNING_AUTOINDEX };
+}
+
+auto tests::unit::status::Fixture::tearDown() -> void {
+  lhs(all_codes_except_OK) = clear;
+}
+
+auto tests::unit::status::Fixture::test_ok() -> void {
+  set_type already;
+  CPPUNIT_ASSERT(ok(sqlite::status::Code::OK)); // <------ test this
+  already.insert(sqlite::status::Code::OK);
+  // but not the others
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(!ok(specimen)); // <----------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+auto tests::unit::status::Fixture::test_okdone() -> void {
+  set_type already;
+  // OK or DONE
+  CPPUNIT_ASSERT(okdone(sqlite::status::Code::OK));
+  already.insert(sqlite::status::Code::OK); // <----------- test this
+  CPPUNIT_ASSERT(okdone(sqlite::status::Code::DONE));
+  already.insert(sqlite::status::Code::DONE); // <--------- test this
+  // but not the others
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(!okdone(specimen)); // <-------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+auto tests::unit::status::Fixture::test_failure() -> void {
+  set_type already;
+  // being OK is not a failure
+  CPPUNIT_ASSERT(!failure(sqlite::status::Code::OK)); // <------- test this
+  already.insert(sqlite::status::Code::OK);
+  // being DONE is not a failure
+  CPPUNIT_ASSERT(!failure(sqlite::status::Code::DONE)); // <----- test this
+  already.insert(sqlite::status::Code::DONE);
+  // but the others are "failures" of some sort
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(failure(specimen)); // <-------------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+#import sqlite.exception.Generic
+#import std.string
+auto tests::unit::status::Fixture::test_check() -> void {
+  try {
+    check(sqlite::status::Code::ERROR);
+    CPPUNIT_ASSERT(false);
+  } catch (sqlite::exception::Generic const &e) {
+    CPPUNIT_ASSERT((std::string)"failed" == e.what());
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    check(sqlite::status::Code::OK);
+    check(sqlite::status::Code::DONE);
+    CPPUNIT_ASSERT(true);
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+auto tests::unit::status::Fixture::test_check_message() -> void {
+  std::string const LITERAL = "BAD, VERY BAD";
+  try {
+    check(sqlite::status::Code::ERROR, LITERAL);
+    CPPUNIT_ASSERT(false);
+  } catch (sqlite::exception::Generic const &e) {
+    CPPUNIT_ASSERT(LITERAL == e.what());
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    check(sqlite::status::Code::OK, LITERAL);
+    check(sqlite::status::Code::DONE, LITERAL);
+    CPPUNIT_ASSERT(true);
+  } catch (sqlite::exception::Generic const &) {
+    CPPUNIT_ASSERT(false);
+  }
+}
+
+auto tests::unit::status::Fixture::test_row() -> void {
+  set_type already;
+  CPPUNIT_ASSERT(row(sqlite::status::Code::ROW)); // <---------------- test this
+  already.insert(sqlite::status::Code::ROW);
+  // but the others are "failures" of some sort
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(!row(specimen)); // <---------------------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+auto tests::unit::status::Fixture::test_done() -> void {
+  set_type already;
+  CPPUNIT_ASSERT(done(sqlite::status::Code::DONE)); // <--------------- test this
+  already.insert(sqlite::status::Code::DONE);
+  // but the others are "failures" of some sort
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(!done(specimen)); // <---------------------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+auto tests::unit::status::Fixture::test_min() -> void {
+  using sqlite::status::Code;
+  for (auto specimen : all_codes_except_OK) {
+    CPPUNIT_ASSERT(Code::OK == std::min(Code::OK, specimen));
+  }
+}
+
+auto tests::unit::status::Fixture::test_max() -> void {
+  using sqlite::status::Code;
+  for (auto specimen : all_codes_except_OK) {
+    CPPUNIT_ASSERT(specimen == std::max(Code::OK, specimen));
+  }
+}
+
+auto tests::unit::status::Fixture::test_ok_if_done() -> void {
+  set_type already;
+  CPPUNIT_ASSERT(ok(ok_if_done(sqlite::status::Code::OK)));// <--------- test this
+  already.insert(sqlite::status::Code::OK);
+  CPPUNIT_ASSERT(ok(ok_if_done(sqlite::status::Code::DONE))); // <------ test this
+  already.insert(sqlite::status::Code::DONE);
+  // but the others are "failures" of some sort
+  for (auto specimen : all_codes_except_OK) {
+    if (!already.count(specimen)) {
+      CPPUNIT_ASSERT(!ok(ok_if_done(specimen))); // <------------------- test this
+      already.insert(specimen);
+    }
+  }
+}
+
+#import tests.unit.status.Constants
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::status::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("status");
+  s << call("ok", &Fixture::test_ok)
+    << call("failure", &Fixture::test_failure)
+    << call("check", &Fixture::test_check)
+    << call("check_message", &Fixture::test_check_message)
+    << call("row", &Fixture::test_row)
+    << call("done", &Fixture::test_done)
+    << call("min", &Fixture::test_min)
+    << call("max", &Fixture::test_max)
+    << call("ok_if_done", &Fixture::test_ok_if_done)
+    << add(Constants::suite())
+    ;
+  return s.release();
+}
+#endiv

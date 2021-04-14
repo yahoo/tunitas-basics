@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::flock { class Operation; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.flock.Operation
+struct tests::unit::flock::Operation : public cppunit::test::Fixture {
+  using Subject = ::sys::flock::Operation;
+  auto test_constants_preferred() -> void;
+  auto test_constants_deprecated() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.flock.constants
+namespace tests::unit::flock {
+  using namespace ::sys::flock::constants;
+  auto Operation::test_constants_preferred() -> void {
+    auto const shared = Subject::SHARED;
+    CPPUNIT_ASSERT(SHARED == shared);
+    auto const exclusive = Subject::EXCLUSIVE;
+    CPPUNIT_ASSERT(EXCLUSIVE == exclusive);
+    auto const unlock = Subject::UNLOCK;
+    CPPUNIT_ASSERT(UNLOCK == unlock);
+  }
+  auto Operation::test_constants_deprecated() -> void {
+    auto const sh = Subject::SH;
+    CPPUNIT_ASSERT(SH == sh);
+    auto const ex = Subject::EX;
+    CPPUNIT_ASSERT(EX == ex);
+    auto const un = Subject::UN;
+    CPPUNIT_ASSERT(UN == un);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::flock::Operation::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Operation");
+  series << []() {
+              Stream con{"constants"};
+              con << call("preferred", &Operation::test_constants_preferred)
+                  << call("deprecated", &Operation::test_constants_deprecated)
+                  << END;
+              return move(con);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,416 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+#import sys.posix.packaging.wait.continuation.bundle
+namespace sys::posix {
+  //
+  // wait(2) with overloading to subsume all of them
+  //
+  // wait(2)  ..... cistinguished by accepting NO process::Process; and returning Waited (w::Status)
+  // waitpid(3) ... distinguished by accepting process::Process, Group, Either; and returning Waited (w::Status)
+  // waitid(2) .... distinguished by accepting p::Type
+  // wait3(2) ..... distinguished by accepting NO id::Process and returning r::Usages
+  // wait4(2) ..... distingiuished by accepting an id::Process and returning r::Usages
+  //
+  // waitpid(2) the id_t can be a pid_t (positive) or a pgid_t (negative)
+  // to wit:
+  //    id  < -1    meaning wait for any child process whose process group ID is equal to the absolute value of pid.
+  //    id == -1    meaning wait for any child process.
+  //    id ==  0    meaning wait for any child process whose process group ID is equal to that of the calling process.
+  //    id  >  0    meaning wait for the child whose process ID is equal to the value of pid.
+  //
+  namespace packaging::wait {
+    using namespace interface;
+    using namespace continuation::bundle;
+    namespace function {
+      namespace wait2   { using namespace bundle::wait2::function;   namespace variant {} }
+      namespace waitpid { using namespace bundle::waitpid::function; namespace variant {} }
+      namespace waitid  { using namespace bundle::waitid::function;  namespace variant {} }
+      namespace wait3   { using namespace bundle::wait3::function;   namespace variant {} }
+      namespace wait4   { using namespace bundle::wait4::function;   namespace variant {} }
+    }
+    namespace native {
+      namespace wait2   { using namespace bundle::wait2::native;   namespace variant {} }
+      namespace waitpid { using namespace bundle::waitpid::native; namespace variant {} }
+      namespace waitid  { using namespace bundle::waitid::native;  namespace variant {} }
+      namespace wait3   { using namespace bundle::wait3::native;   namespace variant {} }
+      namespace wait4   { using namespace bundle::wait4::native;   namespace variant {} }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sys.posix.packaging.wait.continuation.Output
+namespace sys::posix::packaging::wait {
+  namespace function {
+    namespace wait2::variant {
+      //
+      // wait() is the same "wait" as ::waitpid(-1, &status, 0);
+      // wait() for wait2::variant is the ambiguous with wait3::variant, prefer the wait3::variant
+      //
+      inline auto wait() -> Output<WAIT2, Unmatched, id::Process>;
+#if 0
+      inline auto wait() -> status::Returned;
+      inline auto wait([[out]] status::Filled &) -> identifier::Returned;
+#endif
+    }
+    namespace waitpid::variant {
+      // template<identifier::Matched MATCHED> inline auto wait(MATCHED)          -> Output<WAITPID, MATCHED, id::Process>;
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED, Options = Options{}) -> Output<WAITPID, MATCHED, id::Process>;
+#if 0
+      template<required::Same<status::Returned> RESULT, identifier::Indicated ID> inline auto wait(ID) -> RESULT;
+      template<required::Same<status::Returned> RESULT, identifier::Indicated ID> inline auto wait(ID, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT, identifier::Indicated ID> inline auto wait(ID, [[in]] Options, [[out]] status::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT, identifier::Indicated ID> [[signature("original ordering")]] inline auto wait(ID, [[out]] status::Filled &, [[in]] Options) -> RESULT;
+      // still a template, but not overloaded on the return type
+      template<identifier::Indicated ID> inline auto wait(ID, [[in]] Options, [[out]] status::Filled &) -> identifier::Returned;
+      template<identifier::Indicated ID> [[signature("original ordering")]] inline auto wait(ID, [[out]] status::Filled &, [[in]] Options) -> identifier::Returned;
+#endif
+    }
+    namespace waitid::variant {
+#if 0 // ambiguous with wait4
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED)          -> Output<WAITID, id::wait::Typed, id::Process>;
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED, Options) -> Output<WAITID, id::wait::Typed, id::Process>;
+#endif
+      inline auto wait(id::wait::Typed, Options = Options{})                             -> Output<WAITID, id::wait::Typed, id::Process>;
+      inline auto wait(id::wait::Type, id::wait::Untyped, Options = Options{})           -> Output<WAITID, id::wait::Typed, id::Process>;
+#if 0
+      // WATCHOUT -  the 'type' option CAN be subsumed into the identifier type by overloading.
+      // OTHERWISE - the 'type' option must be supplied and the 'id' option is an unflavored bare integer 'id_t'
+      //             this makes the 'namespace function' variant callsite-similar to the 'namespace native' version
+      //             in this case, the overload is only distinguished by the return type
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(identifier::Indicated) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(identifier::Indicated, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait(identifier::Indicated, [[in]] Options, [[out]] siginfo::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait(identifier::Indicated, [[out]] siginfo::Filled &, [[in]] Options) -> RESULT;
+      //
+      inline auto wait(identifier::Indicated) -> siginfo::Returned;
+      inline auto wait(identifier::Indicated, [[in]] Options) -> siginfo::Returned;
+      inline auto wait(identifier::Indicated, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(identifier::Indicated, [[out]] siginfo::Filled &, [[in]] Options) -> identifier::Returned;
+      //
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Tuple<Type,id_t>) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Tuple<Type,id_t>, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait(Tuple<Type,id_t>, [[in]] Options, [[out]] siginfo::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait(Tuple<Type,id_t>, [[out]] siginfo::Filled &, [[in]] Options) -> RESULT;
+      //
+      inline auto wait(Tuple<Type,id_t>) -> siginfo::Returned;
+      inline auto wait(Tuple<Type,id_t>, [[in]] Options) -> siginfo::Returned;
+      inline auto wait(Tuple<Type,id_t>, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(Tuple<Type,id_t>, [[out]] siginfo::Filled &, [[in]] Options) -> identifier::Returned;
+      //
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Type, id_t) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Type, id_t, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait(Type, id_t, [[in]] Options, [[out]] siginfo::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait(Type, id_t, [[out]] siginfo::Filled &, [[in]] Options) -> RESULT;
+      //
+      inline auto wait(Type, id_t) -> siginfo::Returned;
+      inline auto wait(Type, id_t, [[in]] Options) -> siginfo::Returned;
+      inline auto wait(Type, id_t, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(Type, id_t, [[out]] siginfo::Filled &, [[in]] Options) -> identifier::Returned;
+#endif
+    }
+    namespace wait3::variant {
+      // inline auto wait()               -> Output<WAIT3, Unmatched, id::Process>;
+      inline auto wait(Options = Options{}) -> Output<WAIT3, Unmatched, id::Process>;
+#if 0
+      template<required::Same<both::Returned> RESULT> inline auto wait() -> RESULT;
+      template<required::Same<both::Returned> RESULT> inline auto wait([[in]] Options) -> RESULT;
+      template<required::Same<usages::Returned> RESULT> inline auto wait([[in]] Options, [[out]] status::Filled &) -> RESULT;
+      template<required::Same<status::Returned> RESULT> inline auto wait([[in]] Options, [[out]] usages::Filled &) -> RESULT;
+      // and the non-template variants are unambiguous too
+      // CANNOT ---> inline auto wait() -> both::Returned; <--- CANNOT (ambiguous with wait2 ... either call wait3 directly or supply more arguments)
+      inline auto wait([[in]] Options) -> both::Returned;
+      inline auto wait([[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+      inline auto wait([[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+      inline auto wait([[in]] Options options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+      inline auto wait([[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+#endif
+    }
+    namespace wait4::variant {
+      // template<identifier::Matched MATCHED> inline auto wait(MATCHED)                 -> Output<WAIT4, MATCHED, id::Process>;
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED, Options = Options{}) -> Output<WAIT4, MATCHED, id::Process>;
+#if 0
+      template<required::Same<both::Returned> RESULT> inline auto wait(identifier::Indicated) -> RESULT;
+      template<required::Same<both::Returned> RESULT> inline auto wait(identifier::Indicated, [[in]] Options) -> RESULT;
+      template<required::Same<status::Returned> RESULT> inline auto wait(identifier::Indicated, [[in]] Options, [[out]] usages::Filled &) -> RESULT;
+      template<required::Same<usages::Returned> RESULT> inline auto wait(identifier::Indicated, [[in]] Options, [[out]] status::Filled &) -> RESULT;
+      inline auto wait(identifier::Indicated, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(identifier::Indicated, [[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+#endif 
+    }
+  }
+  namespace native {
+    namespace wait2::variant {
+      //
+      // wait() is the same "wait" as ::waitpid(-1, &status, 0);
+      // wait() for wait2::variant is the ambiguous with wait3::variant, prefer the wait3::variant
+      //
+      inline auto wait() -> Output<WAIT2, Unmatched, pid_t>;
+#if 0
+      inline auto wait() -> status::Returned;
+      inline auto wait([[out]] status::Filled &) -> identifier::Returned;
+#endif
+    }
+    namespace waitpid::variant {
+      // template<identifier::Matched MATCHED> auto wait(MATCHED)          -> Output<WAITPID, MATCHED, pid_t>;
+      template<identifier::Matched MATCHED> auto wait(MATCHED, Options = Options{}) -> Output<WAITPID, MATCHED, pid_t>;
+#if 0
+      template<required::Same<status::Returned> RESULT> inline auto wait(pid_t) -> RESULT;
+      template<required::Same<status::Returned> RESULT> inline auto wait(pid_t, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait(pid_t, [[in]] Options, [[out]] status::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait(pid_t, [[out]] status::Filled &, [[in]] Options) -> RESULT;
+      // these can be non-template (and unambiguous)
+      inline auto wait(pid_t) -> status::Returned;
+      inline auto wait(pid_t, [[in]] Options) -> status::Returned;
+      inline auto wait(pid_t, [[in]] Options, [[out]] status::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(pid_t, [[out]] status::Filled &, [[in]] Options) -> identifier::Returned;
+#endif
+    }
+    namespace waitid::variant { 
+#if 0 // ambiguous with wait4
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED)          -> Output<WAITID, id::wait::typed_t, pid_t>;
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED, Options) -> Output<WAITID, id::wait::typed_t, pid_t>;
+#endif
+      inline auto wait(id::wait::typed_t, Options = Options{})                           -> Output<WAITID, id::wait::typed_t, pid_t>;
+      inline auto wait(id::wait::Type, id_t, Options = Options{})                        -> Output<WAITID, id::wait::typed_t, pid_t>;
+#if 0
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Tuple<Type,id_t>) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Tuple<Type,id_t>, [[in]] Options) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Tuple<Type,id_t>, [[in]] Options, [[out]] siginfo::Filled &) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> [[signature("original ordering")]] inline auto wait(Tuple<Type,id_t>, [[out]] siginfo::Filled &, [[in]] Options) -> RESULT;
+      //
+      inline auto wait(Tuple<Type,id_t>) -> siginfo::Returned;
+      inline auto wait(Tuple<Type,id_t>, [[in]] Options) -> siginfo::Returned;
+      inline auto wait(Tuple<Type,id_t>, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(Tuple<Type,id_t>, [[out]] siginfo::Filled &, [[in]] Options) -> identifier::Returned;
+      //
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Type, id_t) -> RESULT;
+      template<required::Same<siginfo::Returned> RESULT> inline auto wait(Type, id_t, [[in]] Options) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait(Type, id_t, [[in]] Options, [[out]] siginfo::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait(Type, id_t, [[out]] siginfo::Filled &, [[in]] Options) -> RESULT;
+      //
+      inline auto wait(Type, id_t) -> siginfo::Returned;
+      inline auto wait(Type, id_t, [[in]] Options) -> siginfo::Returned;
+      inline auto wait(Type, id_t, [[in]] Options, [[out]] siginfo::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(Type, id_t, [[out]] siginfo::Filled &, [[in]] Options) -> identifier::Returned;
+#endif
+    }
+    namespace wait3::variant {
+      // inline auto wait()               -> Output<WAIT3, Unmatched, pid_t>;
+      inline auto wait(Options = Options{}) -> Output<WAIT3, Unmatched, pid_t>;
+#if 0
+      template<required::Same<both::Returned> RESULT> inline auto wait() -> RESULT;
+      template<required::Same<both::Returned> RESULT> inline auto wait([[in]] Options) -> RESULT;
+      template<required::Same<status::Returned> RESULT> inline auto wait([[in]] Options, [[out]] usages::Filled &) -> RESULT;
+      template<required::Same<usages::Returned> RESULT> inline auto wait([[in]] Options, [[out]] status::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> inline auto wait([[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> RESULT;
+      template<required::Same<identifier::Returned> RESULT> [[signature("original ordering")]] inline auto wait([[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> RESULT;
+      // and the template variants are unambiguous too
+      // CANNOT ---> inline auto wait() -> both::Returned; <--- CANNOT (ambiguous with wait2 ... either call wait3 directly or supply more arguments)
+      inline auto wait([[in]] Options) -> both::Returned;
+      inline auto wait([[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+      inline auto wait([[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+      inline auto wait([[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait([[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+#endif
+    }
+    namespace wait4::variant {
+      // template<identifier::Matched MATCHED> inline auto wait(MATCHED)                 -> Output<WAIT4, MATCHED, pid_t>;
+      template<identifier::Matched MATCHED> inline auto wait(MATCHED, Options = Options{}) -> Output<WAIT4, MATCHED, pid_t>;
+#if 0
+      template<required::Same<both::Returned> RESULT> inline auto wait(pid_t) -> RESULT;
+      template<required::Same<both::Returned> RESULT> inline auto wait(pid_t, [[in]] Options) -> RESULT;
+      template<required::Same<status::Returned> RESULT> inline auto wait(pid_t, [[in]] Options, [[out]] usages::Filled &) -> RESULT;
+      template<required::Same<usages::Returned> RESULT> inline auto wait(pid_t, [[in]] Options, [[out]] status::Filled &) -> RESULT;
+      inline auto wait(pid_t, [[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+      [[signature("original ordering")]] inline auto wait(pid_t, [[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+#endif
+    }
+  }
+}
+namespace sys::posix {
+  // AMBIGUOUS ---> using packaging::wait::function::wait2::variant::wait;
+  // AMBIGUOUS ---> using packaging::wait::function::waitpid::variant::wait;
+  using packaging::wait::function::waitid::variant::wait;
+  using packaging::wait::function::wait3::variant::wait;
+  using packaging::wait::function::wait4::variant::wait;
+  namespace native {
+    // AMBIGUOUS ---> using packaging::wait::native::wait2::variant::wait;
+    // AMBIGUOUS ---> using packaging::wait::native::waitpid::variant::wait;
+    using packaging::wait::native::waitid::variant::wait;
+    using packaging::wait::native::wait3::variant::wait;
+    using packaging::wait::native::wait4::variant::wait;
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.wait.returned
+namespace sys::posix::packaging::wait::function {
+  //
+  // As defined in man::wait(2)
+  //
+  //    wait(&status) <--> waitpid(-1, &wstatus, 0);
+  //
+  namespace wait2 {
+    auto variant::wait() -> Output<WAIT2, Unmatched, id::Process> { return {}; }
+#if 0
+    auto variant::wait() -> status::Returned                           { return waitpid::variant::wait<status::Returned>(Process(-1)); }
+    auto variant::wait(status::Filled &sutats) -> identifier::Returned { return waitpid::variant::wait(Process(-1), sutats, Options{}}; }
+#endif
+  }
+  namespace waitpid {
+    // template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched)                  -> Output<WAITPID, MATCHED, id::Process> { return {matched, Options{}}; }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAITPID, MATCHED, id::Process> { return {matched, options}; }
+#if 0
+    template<required::Same<status::Returned> RESULT, identifier::Matched MATCHED> auto variant::wait(MATCHED matched) -> RESULT                  { return returned::waitpid(matched, Options{}}; }
+    template<required::Same<status::Returned> RESULT, identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> RESULT { return returned::waitpid(matched, options}; }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options, status::Filled &sutats) -> identifier::Returned    { return returned::waitpid(matched, options, sutats); }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, status::Filled &sutats, Options options) -> identifier::Returned    { return returned::waitpid(matched, options, sutats); }
+#endif
+  }
+  namespace waitid {
+#if 0
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched)                  -> Output<WAITID, MATCHED, id::Process>           { return {identify(matched), Options{}}; }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAITID, MATCHED, id::Process>           { return {identify(matched), options}; }
+#endif
+    auto variant::wait(id::wait::Typed typed, Options options)                                           -> Output<WAITID, id::wait::Typed, id::Process>   { return {typed, options}; }
+    auto variant::wait(id::wait::Type type, id::wait::Untyped untyped, Options options)                  -> Output<WAITID, id::wait::Typed, id::Process>   { return {{type, untyped}, options}; }
+#if 0
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(identifier::Indicated matched) -> RESULT                                               { return wait<RESULT>(identify(matched), Options{}}; }
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(identifier::Indicated matched, Options options) -> RESULT                              { return wait<RESULT>(identify(matched), options}; }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(identifier::Indicated matched, Options options, siginfo::Filled &ofnigis) -> RESULT { return wait<RESULT>(identify(matched), options, ofnigis); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(identifier::Indicated matched, siginfo::Filled &ofnigis, Options options) -> RESULT { return wait<RESULT>(identify(matched), options, ofnigis); }
+    auto variant::wait(identifier::Indicated matched) -> siginfo::Returned                                                                                       { return wait<siginfo::Returned>(identify(matched), Options{}}; }
+    auto variant::wait(identifier::Indicated matched, Options options) -> siginfo::Returned                                                                      { return wait<siginfo::Returned>(identify(matched), options}; }
+    auto variant::wait(identifier::Indicated matched, Options options, siginfo::Filled &ofnigis) -> identifier::Returned                                         { return wait(identify(matched), options, ofnigis); }
+    auto variant::wait(identifier::Indicated matched, siginfo::Filled &ofnigis, Options options) -> identifier::Returned                                         { return wait(identify(matched), options, ofnigis); }
+    //
+    namespace { using std::get; }
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Tuple<Type,id_t> tup) -> RESULT                                               { return returned::waitid<Process>(get<0>(tup), get<1>(tup), Options{}}; }
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Tuple<Type,id_t> tup, Options options) -> RESULT                              { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options}; }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Tuple<Type,id_t> tup, Options options, siginfo::Filled &ofnigis) -> RESULT { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options, ofnigis); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Tuple<Type,id_t> tup, siginfo::Filled &ofnigis, Options options) -> RESULT { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options, ofnigis); }
+    auto variant::wait(Tuple<Type,id_t> tup) -> siginfo::Returned                                                                                       { return returned::waitid<Process>(get<0>(tup), get<1>(tup), Options{}}; }
+    auto variant::wait(Tuple<Type,id_t> tup, Options options) -> siginfo::Returned                                                                      { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options}; }
+    auto variant::wait(Tuple<Type,id_t> tup, Options options, siginfo::Filled &ofnigis) -> identifier::Returned                                         { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options, ofnigis); }
+    auto variant::wait(Tuple<Type,id_t> tup, siginfo::Filled &ofnigis, Options options) -> identifier::Returned                                         { return returned::waitid<Process>(get<0>(tup), get<1>(tup), options, ofnigis); }
+    //
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Type ty, id_t matched) -> RESULT                                               { return returned::waitid<Process>(ty, matched, Options{}}; }
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Type ty, id_t matched, Options options) -> RESULT                              { return returned::waitid<Process>(ty, matched, options}; }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Type ty, id_t matched, Options options, siginfo::Filled &ofnigis) -> RESULT { return returned::waitid<Process>(ty, matched, options, ofnigis); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Type ty, id_t matched, siginfo::Filled &ofnigis, Options options) -> RESULT { return returned::waitid<Process>(ty, matched, options, ofnigis); }
+    auto variant::wait(Type ty, id_t matched) -> siginfo::Returned                                                                                       { return returned::waitid<Process>(ty, matched, Options{}}; }
+    auto variant::wait(Type ty, id_t matched, Options options) -> siginfo::Returned                                                                      { return returned::waitid<Process>(ty, matched, options}; }
+    auto variant::wait(Type ty, id_t matched, Options options, siginfo::Filled &ofnigis) -> identifier::Returned                                         { return returned::waitid<Process>(ty, matched, options, ofnigis); }
+    auto variant::wait(Type ty, id_t matched, siginfo::Filled &ofnigis, Options options) -> identifier::Returned                                         { return returned::waitid<Process>(ty, matched, options, ofnigis); }
+#endif
+  }
+  namespace wait3 {
+    // auto variant::wait()                -> Output<WAIT3, Unmatched, id::Process> { return {Options{}}; }
+    auto variant::wait(Options options) -> Output<WAIT3, Unmatched, id::Process> { return {options}; }
+#if 0
+    template<required::Same<both::Returned> RESULT> auto variant::wait() -> RESULT                                                                      { return returned::wait4(Process(-1), Options{}}; }
+    template<required::Same<both::Returned> RESULT> auto variant::wait(Options options) -> RESULT                                                       { return returned::wait4(Process(-1), options}; }
+    template<required::Same<usages::Returned> RESULT> auto variant::wait(Options options, status::Filled &sutats) -> RESULT                             { return returned::wait4(Process(-1), options, sutats); }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(Options options, usages::Filled &segasu) -> RESULT                             { return returned::wait4(Process(-1), options, segasu); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Options options, status::Filled &sutats, usages::Filled &segasu) -> RESULT { return returned::wait4(Process(-1), options, sutats, segasu); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(status::Filled &sutats, Options options, usages::Filled &segasu) -> RESULT { return returned::wait4(Process(-1), options, sutats, segasu); }
+    // the non-template version
+    auto variant::wait(Options options) -> both::Returned                                                       { return returned::wait4(Process(-1), options}; }
+    auto variant::wait(Options options, status::Filled &sutats) -> usages::Returned                             { return returned::wait4(Process(-1), options, sutats); }
+    auto variant::wait(Options options, usages::Filled &segasu) -> status::Returned                             { return returned::wait4(Process(-1), options, segasu); }
+    auto variant::wait(Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned { return returned::wait4(Process(-1), options, sutats, segasu); }
+    auto variant::wait(status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned { return returned::wait4(Process(-1), options, sutats, segasu); }
+#endif
+  }
+  namespace wait4 {
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAIT4, MATCHED, id::Process> { return {matched, options}; }
+#if 0
+    template<required::Same<both::Returned> RESULT> auto variant::wait(identifier::Indicated matched) -> RESULT                                            { return returned::wait4(matched, Options{}}; }
+    template<required::Same<both::Returned> RESULT> auto variant::wait(identifier::Indicated matched, Options options) -> RESULT                           { return returned::wait4(matched, options}; }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(identifier::Indicated matched, Options options, usages::Filled &segasu) -> RESULT { return returned::wait4(matched, options, segasu); }
+    template<required::Same<usages::Returned> RESULT> auto variant::wait(identifier::Indicated matched, Options options, status::Filled &tusats) -> RESULT { return returned::wait4(matched, options, tusats); }
+    auto variant::wait(identifier::Indicated matched, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned             { return returned::wait4(matched, options, sutats, segasu); }
+    auto variant::wait(identifier::Indicated matched, status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned             { return returned::wait4(matched, options, sutats, segasu); }
+#endif
+  }
+}
+namespace sys::posix::packaging::wait::native {
+  namespace wait2 {
+    auto variant::wait() -> Output<WAIT2, Unmatched, pid_t> { return {}; }
+#if 0
+    auto variant::wait() -> status::Returned                           { return waitpid::variant::wait<status::Returned>(pid_t(-1)); }
+    auto variant::wait(status::Filled &sutats) -> identifier::Returned { return waitpid::variant::wait(pid_t(-1), sutats, Options{}}; }
+#endif
+  }
+  namespace waitpid {
+    // template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched)                  -> Output<WAITPID, MATCHED, pid_t> { return {matched, Options{}}; }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAITPID, MATCHED, pid_t> { return {matched, options}; }
+#if 0
+    template<required::Same<status::Returned> RESULT> auto variant::wait(pid_t matched) -> RESULT                                          { return returned::waitpid(matched, Options{}}; }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(pid_t matched, Options options) -> RESULT                         { return returned::waitpid(matched, options}; }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(pid_t matched, Options options, status::Filled &sutats) -> RESULT { return returned::waitpid(matched, options, sutats); }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(pid_t matched, status::Filled &sutats, Options options) -> RESULT { return returned::waitpid(matched, options, sutats); }
+    // and the non-template variants
+    auto variant::wait(pid_t matched) -> status::Returned                                              { return returned::waitpid(matched, Options{}}; }
+    auto variant::wait(pid_t matched, Options options) -> status::Returned                             { return returned::waitpid(matched, options}; }
+    auto variant::wait(pid_t matched, Options options, status::Filled &sutats) -> identifier::Returned { return returned::waitpid(matched, options, sutats); }
+    auto variant::wait(pid_t matched, status::Filled &sutats, Options options) -> identifier::Returned { return returned::waitpid(matched, options, sutats); }
+#endif
+  }
+  namespace waitid {
+#if 0
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched)                  -> Output<WAITID, MATCHED, pid_t>             { return {identify(matched), Options{}}; }
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAITID, MATCHED, pid_t>             { return {identify(matched), options}; }
+#endif
+    auto variant::wait(id::wait::typed_t typed, Options options)                                         -> Output<WAITID, id::wait::typed_t, pid_t>   { return {typed, options}; }
+    auto variant::wait(id::wait::Type type, id_t untyped, Options options)                               -> Output<WAITID, id::wait::typed_t, pid_t>   { return {{type, untyped}, options}; }
+#if 0
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Type ty, id_t matched) -> RESULT                                               { return returned::waitid<pid_t>(ty, matched, Options{}}; }
+    template<required::Same<siginfo::Returned> RESULT> auto variant::wait(Type ty, id_t matched, Options options) -> RESULT                              { return returned::waitid<pid_t>(ty, matched, options}; }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Type ty, id_t matched, Options options, siginfo::Filled &ofnigis) -> RESULT { return returned::waitid<pid_t>(ty, matched, options, ofnigis); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Type ty, id_t matched, siginfo::Filled &ofnigis, Options options) -> RESULT { return returned::waitid<pid_t>(ty, matched, options, ofnigis); }
+    // and the non-template variants
+    auto variant::wait(Type ty, id_t matched) -> siginfo::Returned                                               { return returned::waitid<pid_t>(ty, matched, Options{}}; }
+    auto variant::wait(Type ty, id_t matched, Options options) -> siginfo::Returned                              { return returned::waitid<pid_t>(ty, matched, options}; }
+    auto variant::wait(Type ty, id_t matched, Options options, siginfo::Filled &ofnigis) -> identifier::Returned { return returned::waitid<pid_t>(ty, matched, options, ofnigis); }
+    auto variant::wait(Type ty, id_t matched, siginfo::Filled &ofnigis, Options options) -> identifier::Returned { return returned::waitid<pid_t>(ty, matched, options, ofnigis); }
+#endif
+  }
+  namespace wait3 {
+    // auto variant::wait()                -> Output<WAIT3, Unmatched, pid_t> { return {Options{}}; }
+    auto variant::wait(Options options) -> Output<WAIT3, Unmatched, pid_t> { return {options}; }
+#if 0
+    template<required::Same<both::Returned> RESULT> auto variant::wait() -> RESULT                                                                      { return returned::wait4(pid_t(-1), Options{}}; }
+    template<required::Same<both::Returned> RESULT> auto variant::wait(Options options) -> RESULT                                                       { return returned::wait4(pid_t(-1), options}; }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(Options options, usages::Filled &segasu) -> RESULT                             { return returned::wait4(pid_t(-1), options, segasu); }
+    template<required::Same<usages::Returned> RESULT> auto variant::wait(Options options, status::Filled &sutats) -> RESULT                             { return returned::wait4(pid_t(-1), options, sutats); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(Options options, status::Filled &sutats, usages::Filled &segasu) -> RESULT { return returned::wait4(pid_t(-1), options, sutats, segasu); }
+    template<required::Same<identifier::Returned> RESULT> auto variant::wait(status::Filled &sutats, Options options, usages::Filled &segasu) -> RESULT { return returned::wait4(pid_t(-1), options, sutats, segasu); }
+    // the non-template version
+    auto variant::wait(Options options) -> both::Returned                                                       { return returned::wait4(pid_t(-1), options}; }
+    auto variant::wait(Options options, usages::Filled &segasu) -> status::Returned                             { return returned::wait4(pid_t(-1), options, segasu); }
+    auto variant::wait(Options options, status::Filled &sutats) -> usages::Returned                             { return returned::wait4(pid_t(-1), options, sutats); }
+    auto variant::wait(Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned { return returned::wait4(pid_t(-1), options, sutats, segasu); }
+    auto variant::wait(status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned { return returned::wait4(pid_t(-1), options, sutats, segasu); }
+#endif
+  }
+  namespace wait4 {
+    template<identifier::Matched MATCHED> auto variant::wait(MATCHED matched, Options options) -> Output<WAIT4, MATCHED, pid_t> { return {matched, options}; }
+#if 0
+    template<required::Same<both::Returned> RESULT> auto variant::wait(pid_t matched) -> RESULT                                            { return returned::wait4(matched, Options{}}; }
+    template<required::Same<both::Returned> RESULT> auto variant::wait(pid_t matched, Options options) -> RESULT                           { return returned::wait4(matched, options}; }
+    template<required::Same<status::Returned> RESULT> auto variant::wait(pid_t matched, Options options, usages::Filled &segasu) -> RESULT { return returned::wait4(matched, options, segasu); }
+    template<required::Same<usages::Returned> RESULT> auto variant::wait(pid_t matched, Options options, status::Filled &tusats) -> RESULT { return returned::wait4(matched, options, tusats); }
+    auto variant::wait(pid_t matched, Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned             { return returned::wait4(matched, options, sutats, segasu); }
+    auto variant::wait(pid_t matched, status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned             { return returned::wait4(matched, options, sutats, segasu); }
+#endif
+  }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_wait.Usage
+static_assert(tests::usage::posix_wait::Usage<>);
+#endiv

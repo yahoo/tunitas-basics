@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.regex.Fixture
+#endiv
+#divert <cpp>
+#import nonstd.regex.required.Char
+auto tests::unit::regex::Fixture::test_required_Char() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(required::Char<char>);
+  static_assert(required::Char<wchar_t>);
+  // [[C++20]] static_assert(required::Char<char8_t>);
+  static_assert(required::Char<char16_t>);
+  static_assert(required::Char<char32_t>);
+}
+#import nonstd.regex.required.Char_Traits
+#import std.char_traits
+auto tests::unit::regex::Fixture::test_required_Char_Traits() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(required::Char_Traits<std::char_traits<char>>);
+  static_assert(required::Char_Traits<std::char_traits<wchar_t>>);
+  // [[C++20]] static_assert(required::Char_Traits<std::char_traits<char8_t>>);
+  static_assert(required::Char_Traits<std::char_traits<char16_t>>);
+  static_assert(required::Char_Traits<std::char_traits<char32_t>>);
+}
+#import nonstd.regex.Traits
+#import nonstd.regex.required.Traits
+auto tests::unit::regex::Fixture::test_required_Traits() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(required::Traits<std::regex_traits<char>>);
+  static_assert(required::Traits<std::regex_traits<wchar_t>>);
+  // [[C++20]] static_assert(required::Traits<std::regex_traits<char8_t>>);
+  static_assert(required::Traits<std::regex_traits<char16_t>>);
+  static_assert(required::Traits<std::regex_traits<char32_t>>);
+}
+#import nonstd.regex.required.iterator.Bidirectional
+auto tests::unit::regex::Fixture::test_required_iterator_Bidirectional() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(required::iterator::Bidirectional<char const *>);
+}
+#import nonstd.regex.required.iterator.Input
+auto tests::unit::regex::Fixture::test_required_iterator_Input() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(required::iterator::Input<char const *>);
+}
+#import nonstd.regex.required.iterator.Output
+auto tests::unit::regex::Fixture::test_required_iterator_Output() -> void {
+  using namespace ::nonstd::regex;
+  static_assert(!required::iterator::Output<char const *, char>);
+  static_assert(required::iterator::Output<char *, char>);
+}
+#endiv

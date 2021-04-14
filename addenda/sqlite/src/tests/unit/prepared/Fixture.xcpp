@@ -1,0 +1,209 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace prepared {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.size_t
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::prepared::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_manage_limit_truncation_standard_cases() -> void;
+  auto test_manage_limit_truncation_boundary_cases() -> void;
+
+  auto test_ok() -> void;
+  auto test_check_1arg() -> void;
+  auto test_check_2arg() -> void;
+  auto test_check_3arg_string() -> void;
+  auto test_check_3arg_conection() -> void;
+  auto test_end() -> void;
+  auto test_code() -> void;
+  auto test_value_move() -> void;
+  auto test_value_forward() -> void;
+  auto test_value_remaining() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.clog
+#import std.int32_t
+#import std.numeric_limits
+#import sqlite.prepared.manage_limit_truncation
+using sqlite::prepared::manage_limit_truncation;
+
+auto tests::unit::prepared::Fixture::test_manage_limit_truncation_standard_cases() -> void {
+  CPPUNIT_ASSERT(0 == manage_limit_truncation(0));
+  CPPUNIT_ASSERT(1 == manage_limit_truncation(1));
+  std::size_t maximum_possible_value = std::numeric_limits<std::size_t>::max();
+  CPPUNIT_ASSERT(-1 == manage_limit_truncation(maximum_possible_value));
+  CPPUNIT_ASSERT(sqlite::prepared::UNBOUNDED_PARSING_UNTIL_THE_NULCHAR == manage_limit_truncation(maximum_possible_value));
+  // and now the int32-vs-int64 issues
+  CPPUNIT_ASSERT(std::numeric_limits<std::int32_t>::max() == manage_limit_truncation(std::numeric_limits<std::int32_t>::max()));
+}
+
+#import std.vector
+#import std.uint64_t
+#import std.boolalpha
+auto tests::unit::prepared::Fixture::test_manage_limit_truncation_boundary_cases() -> void {
+  using v = std::vector<std::uint64_t>;
+  auto series = v{0,1,2,10,100,1000,10000,
+                  std::numeric_limits<std::int32_t>::max() - (std::uint64_t)2,
+                  std::numeric_limits<std::int32_t>::max() - (std::uint64_t)1,
+                  std::numeric_limits<std::int32_t>::max() + (std::uint64_t)0,
+                  std::numeric_limits<std::int32_t>::max() + (std::uint64_t)1,
+                  std::numeric_limits<std::int32_t>::max() + (std::uint64_t)2,
+                  std::numeric_limits<std::int64_t>::max() - (std::uint64_t)2,
+                  std::numeric_limits<std::int64_t>::max() - (std::uint64_t)1,
+                  std::numeric_limits<std::int64_t>::max() - (std::uint64_t)0};
+  std::ostream &out(std::clog);
+  out << std::boolalpha;
+  for (auto limit : series) {
+    bool expect_throw = std::numeric_limits<std::int32_t>::max() < limit;
+    bool expect_value = !expect_throw;
+    out << "manage_limit_truncation on " << limit << " expected throw=" << expect_throw << ", value=" << expect_value << '\n';
+    try {
+      static_assert(4 == sizeof (int), "int is not 32 bits");
+      int nBytes = manage_limit_truncation(limit);
+      std::clog << "    ... nBytes=" << nBytes << '\n';
+      CPPUNIT_ASSERT(expect_value);
+    } catch (std::out_of_range const &e) {
+      // The thing throws an out_of_range error if the parsing is bigger than the 31-bit API can handle.
+      std::clog << "    ... exception " << e.what() << '\n';
+      CPPUNIT_ASSERT(expect_throw);
+    }
+  }
+}
+
+#import sqlite.prepared.BasicResult
+#import sqlite.Statement
+#import sqlite.api.unguarded // Statement
+auto tests::unit::prepared::Fixture::test_ok() -> void {
+  { ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r;
+    CPPUNIT_ASSERT(ok(r)); }
+  { ::sqlite::prepared::BasicResult<::sqlite::api::unguarded::Statement *, char const *> r;
+    CPPUNIT_ASSERT(ok(r)); }
+  { ::sqlite::prepared::BasicResult<::sqlite::api::unguarded::Statement *, wchar_t const *> r;
+    CPPUNIT_ASSERT(ok(r)); }
+}
+
+#import std.exception
+#import sqlite.status.Code
+#import std.move
+auto tests::unit::prepared::Fixture::test_check_1arg() -> void {
+  auto adl = ::sqlite::prepared::Lookup::ADL;
+  char const remaining[1] = { '\0' };
+  char const *continuation = &remaining[0];
+  try {
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r; // <--- using this
+    check(r); // <--------------------------------------------------------------- test this
+  } catch (std::exception const &) {
+    // We did not expect to see an exception
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    sqlite::Statement specimen;
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r(adl, ::sqlite::status::OK, std::move(specimen), continuation);
+    check(r); // Ibidem.
+    CPPUNIT_ASSERT(false); // check(...) was supposed to fail
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    sqlite::Statement specimen;
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r(adl, ::sqlite::status::ERROR, std::move(specimen), continuation);
+    check(r); // Ibidem.
+    CPPUNIT_ASSERT(false); // check(...) was suppoed to fail
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::prepared::Fixture::test_check_2arg() -> void {
+  auto adl = ::sqlite::prepared::Lookup::ADL;
+  char const remaining[1] = { '\0' };
+  char const *continuation = &remaining[0];
+  try {
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r; // <--- using this
+    check(r, "bad bad bad"); // <------------------------------------------------ test this
+  } catch (std::exception const &) {
+    // We did not expect to see an exception
+    CPPUNIT_ASSERT(false);
+  }
+  try {
+    ::sqlite::Statement specimen;
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r(adl, ::sqlite::status::OK, std::move(specimen), continuation);
+    check(r, "bad bad bad"); // Ibidem.
+    CPPUNIT_ASSERT(false); // check(...) was supposed to fail
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+  try {
+    ::sqlite::Statement specimen;
+    ::sqlite::prepared::BasicResult<::sqlite::Statement, char const *> r(adl, ::sqlite::status::ERROR, std::move(specimen), continuation);
+    check(r, "bad bad bad"); // Ibidem.
+    CPPUNIT_ASSERT(false); // check(...) was suppoed to fail
+  } catch (std::exception const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+
+auto tests::unit::prepared::Fixture::test_check_3arg_string() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_check_3arg_string() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_check_3arg_conection() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_check_3arg_conection() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_end() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_end() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_code() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_code() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_value_move() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_value_move() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_value_forward() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_value_forward() -> void 
+}
+
+auto tests::unit::prepared::Fixture::test_value_remaining() -> void {
+#warning WRITEME auto tests::unit::prepared::Fixture::test_value_remaining() -> void 
+}
+
+#import tests.unit.prepared.BasicResult
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::prepared::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("prepared");
+  s << call("manage_limit_truncation", &Fixture::test_manage_limit_truncation_standard_cases)
+    << call("manage_limit_truncation", &Fixture::test_manage_limit_truncation_boundary_cases)
+    << call("ok", &Fixture::test_ok)
+    << call("check-1arg", &Fixture::test_check_1arg)
+    << call("check-2arg", &Fixture::test_check_2arg)
+    << call("check-3arg_string", &Fixture::test_check_3arg_string)
+    << call("check-3arg_conection", &Fixture::test_check_3arg_conection)
+    << call("end", &Fixture::test_end)
+    << call("code", &Fixture::test_code)
+    << call("value0move", &Fixture::test_value_move)
+    << call("value-forward", &Fixture::test_value_forward)
+    << call("value-remaining", &Fixture::test_value_remaining)
+    << add(BasicResult::suite())
+    ;
+  return s.release();
+}
+#endiv

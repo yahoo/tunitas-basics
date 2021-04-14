@@ -1,0 +1,103 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward c.detail.specification.Bound
+#import c.detail.specification.Indirection
+#import c.detail.specification.Mutability
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> struct Bound<Indirection<Mutability::YES, CORE, VALUE>>;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import c.detail.specification.Sizable.STORING
+#import c.detail.specification.Prototype
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> class Bound<Indirection<Mutability::YES, CORE, VALUE>> : public Prototype<Indirection<Mutability::YES, CORE, VALUE>>, public Sizable<STORING> {
+	using ancestor = Prototype<Indirection<Mutability::YES, CORE, VALUE>>;
+	using sizable = Sizable<STORING>;
+      public:
+        Bound() = default;
+	inline Bound(typename ancestor::data_type, std::size_t);
+	template<std::size_t N> inline explicit Bound(typename ancestor::value_type (&)[N]);
+      protected:
+	~Bound() = default; // must inherit
+      public:
+	inline auto end() const -> typename ancestor::const_iterator;
+	inline auto end() -> typename ancestor::iterator;
+	inline auto operator[](std::size_t) const -> typename ancestor::const_value_type;
+	inline auto operator[](std::size_t) -> typename ancestor::value_type &;
+	inline auto front() const -> typename ancestor::const_value_type;
+	inline auto front() -> typename ancestor::value_type &;
+	inline auto back() const -> typename ancestor::const_value_type;
+	inline auto back() -> typename ancestor::value_type &;
+      public:
+	struct tests { struct Suite; };
+	friend struct tests::Suite;
+      };
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import std.length_error
+namespace c {
+  namespace detail {
+    namespace specification {
+      template<typename CORE, typename VALUE> Bound<Indirection<Mutability::YES, CORE, VALUE>>::Bound(typename ancestor::data_type subject, std::size_t n)
+	: ancestor(subject) // may be nullptr
+	, sizable(nullptr == subject ? 0 : n) {
+	;
+      }
+
+      template<typename CORE, typename VALUE> template<std::size_t N> Bound<Indirection<Mutability::YES, CORE, VALUE>>::Bound(typename ancestor::value_type (&subject)[N])
+	: ancestor(subject) // should not be nullptr because the compiler sized the array
+	, sizable(N) {
+	;
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::end() -> typename ancestor::iterator {
+	return sizable::endify<typename ancestor::iterator>(this->begin());
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::end() const -> typename ancestor::const_iterator {
+	return sizable::endify<typename ancestor::const_iterator>(this->begin());
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::operator[](std::size_t index) const -> typename ancestor::const_value_type {
+	return sizable::forward_indexify<typename ancestor::const_value_type>(this->held, this->length, index);
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::operator[](std::size_t index) -> typename ancestor::value_type & {
+	return sizable::forward_indexify<typename ancestor::value_type>(this->held, this->length, index);
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::front() const -> typename ancestor::const_value_type {
+	return sizable::forward_indexify(this->held, this->length, 0u);
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::front() -> typename ancestor::value_type & {
+	return sizable::forward_indexify(this->held, this->length, 0u);
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::back() const -> typename ancestor::const_value_type {
+	return sizable::reverse_indexify(this->held, this->length, 0u);
+      }
+
+      template<typename CORE, typename VALUE> auto Bound<Indirection<Mutability::YES, CORE, VALUE>>::back() -> typename ancestor::value_type & {
+	return sizable::reverse_indexify(this->held, this->length, 0u);
+      }
+    }
+  }
+}
+#divert </ipp>

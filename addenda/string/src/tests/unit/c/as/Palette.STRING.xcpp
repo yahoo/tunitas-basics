@@ -1,0 +1,107 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#forward tests.unit.c.as.Palette
+namespace tests::unit::c::as {
+  enum class STRING { };
+  template<> class Palette<STRING>;
+}
+#divert </fpp>
+#divert <hpp>
+#import c.basic_stringz
+#import c.basic_stringn
+#import c.basic_buffer
+#import std.array
+#import std.basic_string
+#import std.size_t
+#import std.vector
+template<> class tests::unit::c::as::Palette<tests::unit::c::as::STRING> { 
+protected:
+  // descendants only
+  virtual ~Palette() = default;
+  // The MI is unified in the descendant
+  virtual auto setUp() -> void;
+  virtual auto tearDown() -> void;
+public: 
+  Palette() = default;
+
+  ::std::basic_string<char> bsc;         // (::std::)basic_string of char
+  ::c::basic_stringn<char> bsnc;         // (::c::)basic_stringn of char
+  ::c::basic_stringn<char const> bsncc;  // (::c::)basic_stringn of const_char
+
+  ::c::basic_stringz<char> bszc;         // (::c::)basic_stringz of char
+  ::c::basic_stringz<char const> bszcc;  // (::c::)basic_stringz of const_char
+  ::std::array<char, 11> ac;             // (::std::)array-of-char
+protected:
+  template<typename CONTAINER_A, typename CONTAINER_B> auto prove_is_same(CONTAINER_A const &, CONTAINER_B const &) -> void;
+  template<typename CONTAINER_A, typename CONTAINER_B> auto prove_is_same_MOSTLY(CONTAINER_A const &, CONTAINER_B const &) -> void;
+
+  template<typename ITERATOR_A, typename ITERATOR_B> auto prove_is_same(ITERATOR_A start_a, ITERATOR_A finish_a, ITERATOR_B start_b, ITERATOR_B finish_b) -> void;
+};
+#divert </hpp>
+#divert <tpp>
+#import cppunit.test.Assert // CPPUNIT_ASSERT
+#import std.begin
+#import std.end
+#import std.find
+template<typename CONTAINER_A, typename CONTAINER_B> auto tests::unit::c::as::Palette<tests::unit::c::as::STRING>::prove_is_same(CONTAINER_A const &a, CONTAINER_B const &b) -> void {
+  prove_is_same(::std::begin(a), ::std::end(a), ::std::begin(b), ::std::end(b));
+}
+
+template<typename CONTAINER_A, typename CONTAINER_B> auto tests::unit::c::as::Palette<tests::unit::c::as::STRING>::prove_is_same_MOSTLY(CONTAINER_A const &a, CONTAINER_B const &b) -> void {
+  prove_is_same(::std::begin(a), ::std::find(a.begin(), a.end(), '\0'), ::std::begin(b), ::std::find(b.begin(), b.end(), '\0'));
+}
+
+#import std.distance
+#import std.string
+#import std.iterator_traits
+template<typename ITERATOR_A, typename ITERATOR_B> auto tests::unit::c::as::Palette<tests::unit::c::as::STRING>::prove_is_same(ITERATOR_A start_a, ITERATOR_A finish_a, ITERATOR_B start_b, ITERATOR_B finish_b) -> void {
+  auto size_a = ::std::distance(start_a, finish_a);
+  auto size_b = ::std::distance(start_b, finish_b);
+  CPPUNIT_ASSERT_EQUAL(size_a, size_b);
+  // DO NOT
+  //    CPPUNIT_ASSERT(0 != size_a);
+  // it is acceptable if 0 == size_a
+  ITERATOR_A ai, ae;
+  ITERATOR_B bi, be;
+  using value_a_type = typename ::std::iterator_traits<ITERATOR_A>::value_type;
+  using value_b_type = typename ::std::iterator_traits<ITERATOR_B>::value_type;
+  for (ai=start_a, ae=finish_a, bi=start_b, be=finish_b; ae != ai && be != bi; ++ai, ++bi) {
+    value_a_type avalue(*ai); 
+    value_b_type bvalue(*bi);
+    CPPUNIT_ASSERT_EQUAL(avalue, bvalue);
+  }
+}
+#endiv
+#divert <cpp>
+#import c.as
+
+#import rigging.unit.lhs
+using ::rigging::unit::lhs;
+#import rigging.unit.clear
+using ::rigging::unit::clear;
+
+auto tests::unit::c::as::Palette<tests::unit::c::as::STRING>::setUp() -> void {
+  ac = decltype(ac){'k','a','n','g','a','r','o','o','\0'};
+  auto terminator = ::std::find(ac.begin(), ac.end(), '\0');
+  auto size = terminator - ac.begin();
+  bsc = decltype(bsc)(ac.data());
+  bsnc = decltype(bsnc)(ac.data(), size);
+  bsncc = decltype(bsncc)(ac.data(), size);
+  bszc = decltype(bszc)(ac.data());
+  bszcc = decltype(bszcc)(ac.data());
+}
+
+auto tests::unit::c::as::Palette<tests::unit::c::as::STRING>::tearDown() -> void {
+  lhs(ac) = clear; 
+  lhs(bsc) = clear; 
+  lhs(bsnc) = clear; 
+  lhs(bsncc) = clear; 
+  lhs(bszc) = clear; 
+  lhs(bszcc) = clear; 
+}
+#divert </cpp>

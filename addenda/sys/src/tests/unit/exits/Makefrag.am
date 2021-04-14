@@ -1,0 +1,15 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+# Only the variable setting, which is used in ../Makefrag.
+# This Makefrag MUST be listed in the top-level Makefile.am
+#
+src_tests_unit_exits_SOURCES_SET = \
+  obj/src/tests/unit/exits/namespace.cpp \
+  obj/src/tests/unit/exits/Category.cpp \
+  obj/src/tests/unit/exits/Code.cpp \
+  obj/src/tests/unit/exits/Condition.cpp \
+  obj/src/tests/unit/exits/Exception.cpp \
+  obj/src/tests/unit/exits/Fixture.cpp \
+  obj/src/tests/unit/exits/Quitting.cpp \
+  $(end)

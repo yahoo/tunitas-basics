@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An (immutable) X.509 Certificate Name
+  //
+  // Usage:
+  //
+  //   Req req;
+  //   Name0 name = req.get_subject_name();
+  //   name.oneline()
+  //
+  class Name0;
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_NAME_const
+#forward openssl.x509.Crt
+#forward openssl.x509.Crl
+#forward openssl.x509.Req
+#forward openssl.x509.Name
+#import std.string
+#import std.string_view
+class openssl::x509::Name0 : public managed::Pointer<X509_NAME const> {
+  using ancestor = managed::Pointer<X509_NAME const>;
+  friend class Crl;
+  friend class Crt;
+  friend class Req;
+  friend class Name;
+  inline explicit Name0(X509_NAME const *);
+public:
+  inline auto oneline() const -> std::string;
+};
+#endiv
+#divert <ipp>
+#import openssl.functions
+#import openssl.error.Code
+#import std.error_code
+namespace openssl::x509 {
+  Name0::Name0(X509_NAME const *name)
+    : ancestor{name}
+  { }
+  auto Name0::oneline() const -> std::string {
+    // [[FIXTHIS]] there is a copy of this code over in Name::oneline()
+    char buffer[1<<16]; // [[FIXME]] sloppy ... see the size limits of RFC2459 in field.Name0d.xcpp
+    auto const buffer_size = sizeof (buffer)/sizeof (buffer[0]);
+    auto oneline = X509_NAME_oneline(get(), &buffer[0], buffer_size);
+    if (nullptr == oneline) {
+      throw std::error_code{error::Code::X509};
+    }
+    return oneline;
+  }
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.is_default_constructible
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+namespace openssl::x509 {
+  static_assert(!std::is_default_constructible<Name0>::value);
+  static_assert(!std::is_copy_constructible<Name0>::value);
+  static_assert(std::is_move_constructible<Name0>::value);
+  static_assert(!std::is_copy_assignable<Name0>::value);
+  static_assert(std::is_move_assignable<Name0>::value);
+}
+#endiv

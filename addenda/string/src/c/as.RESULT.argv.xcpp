@@ -1,0 +1,6 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.as
+#import c.argv
+#import c.as.RESULT.basic_argv
+#divert </hpp>

@@ -1,0 +1,44 @@
+// -*- c++ -*- 726e84e5-a1af-488b-b2d7-2556ac8cd51a
+#pragma once
+// namespace std.literals
+// ... generally
+// c.f. http://en.cppreference.com/w/cpp/language/user_literal
+
+// c.f. http://en.cppreference.com/w/cpp/chrono/operator%22%22h and operator""m, operator""s.
+#include <chrono>
+
+// c.f. http://en.cppreference.com/w/cpp/string/basic_string/operator%22%22s
+#include <string>
+
+// c.f. http://en.cppreference.com/w/cpp/string/basic_string_view/operator%22%22sv
+//
+// These operators are declared in the namespaces
+//     std::literals::string_view_literals, where both literals and string_view_literals are inline namespaces.
+// Access to these operators can be gained with 
+//     using namespace std::literals,
+//     using namespace std::string_view_literals,
+// and using namespace std::literals::string_view_literals. 
+
+// There is special version-specific trickery #ifdefs in here; done once, done right (ahem)
+#include <std.basic_string_view>
+
+#if __cplusplus <= 201103L
+#error Need C++14 plus more, Want C++17.
+#elif !defined(__GNUC__)
+// Good Luck  (Unknown C++ compiler.  C++17?)
+#elif __GNUC__ < 6
+#error GCC is too old to support C++17
+#elif 6 < __GNUC__
+// OK
+#elif 6 == __GNUC__
+// recall though that basic_string_view is actually in 'namespace std::experimental' so we have to hack some more
+namespace std {
+  namespace literals {
+    using namespace std::experimental::literals;
+    namespace string_view_literals {
+      using namespace std::experimental::literals::string_view_literals;
+    }
+  }
+  namespace string_view_literals = literals::string_view_literals;
+}
+#endif

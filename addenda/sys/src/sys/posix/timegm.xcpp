@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.from_tm.interface
+#import sys.posix.packaging.required.from_tm.Result
+namespace sys::posix {
+  namespace packaging::timegm {
+    using namespace packaging::from_tm::interface;
+    namespace required = packaging::required;
+    namespace function {
+      inline auto timegm(Disaggregated const &) -> Result<Point>;
+      template<required::from_tm::Result RESULT> auto timegm(Disaggregated const &) -> Result<RESULT> = delete;
+      template<> inline auto timegm<Old>(Disaggregated const &) -> Result<Old>;
+      template<> inline auto timegm<Point>(Disaggregated const &) -> Result<Point>;
+    }
+  }
+  using packaging::timegm::function::timegm;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.from_tm.perform
+#import sys.posix.packaging.const_tm
+#import timegm
+namespace sys::posix::packaging::timegm {
+  namespace function {
+    using namespace packaging::from_tm;
+    namespace happier = packaging::const_tm;
+  }
+  auto function::timegm(Disaggregated const &in) -> Result<Point> { return timegm<Point>(in); }
+  template<> auto function::timegm<Point>(Disaggregated const &in) -> Result<Point> { return perform<Point>(happier::timegm, in); }
+  template<> auto function::timegm<Old>(Disaggregated const &in) -> Result<Old>     { return perform<Old>(happier::timegm, in); }
+}
+#endiv

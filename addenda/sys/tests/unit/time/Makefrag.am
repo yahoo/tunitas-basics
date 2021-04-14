@@ -1,0 +1,3 @@
+tests_unit_time_TESTS = \
+  tests/unit/time/cases.test \
+  $(end)

@@ -1,0 +1,30 @@
+tests_unit_XFAIL_TESTS = \
+  $(end)
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  \
+  tests/unit/asn1.test \
+  tests/unit/big.test \
+  tests/unit/bio.test \
+  tests/unit/easy.test \
+  tests/unit/ec.test \
+  tests/unit/error.test \
+  tests/unit/evp.test \
+  tests/unit/exception.test \
+  tests/unit/managed.test \
+  tests/unit/openssl.test \
+  tests/unit/pem.test \
+  tests/unit/rsa.test \
+  tests/unit/stack.test \
+  tests/unit/time.test \
+  tests/unit/want.test \
+  tests/unit/x509.test \
+  \
+  tests/unit/all.test \
+  $(tests_unit_XFAIL_TESTS) \
+  $(end)
+
+tests_unit_TESTS_DECLARED = $(tests_unit_TESTS)
+tests_unit_TESTS_OBSERVED = $(wildcard tests/unit/*.test)
+tests_unit_TESTS_ORPHANED = $(filter-out $(tests_unit_TESTS_DECLARED), $(tests_unit_TESTS_OBSERVED))
+$(if $(tests_unit_TESTS_ORPHANED),$(warning there are orphaned tests $(tests_unit_TESTS_ORPHANED)))

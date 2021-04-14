@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.binutils.Main
+#import sys.call.Result
+namespace tests::binutils {
+  //
+  // Dubious: return the errno value as the exit code.
+  //
+  template<> auto Main<sys::call::Result>::call(c::const_argv) -> sys::exits::Code;
+}
+#endiv
+#divert <cpp>
+namespace tests::binutils {
+  template<> auto Main<sys::call::Result>::call(c::const_argv av) -> sys::exits::Code {
+    auto const called = function(av);
+    if (ok(called)) {
+      if (verbose_mode) {
+        verbout() << name << ": OK\n";
+      }
+      return {}; // WATCHOUT - error_num may not be zero because of previous assignment to it (other failed syscalls)
+    } else {
+      std::cerr << name << ": error,"
+                << " exiting with errno " << error_num(called)
+                << " (" << error_code(called).message() << ")\n"; 
+      return sys::exits::Code{error_num(called)};
+    }
+  }
+}
+#endiv

@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::o { class Create; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.o.Create
+struct tests::unit::o::Create : public cppunit::test::Fixture {
+  using Subject = ::sys::o::Create;
+  auto test_mentioning() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::o {
+  auto Create::test_mentioning() -> void {
+    auto c = Subject{};
+    c = Subject::CLOEXEC;
+    c = Subject::CREAT;
+    c = Subject::DIRECTORY;
+    c = Subject::EXCL;
+    c = Subject::NOCTTY;
+    c = Subject::NOFOLLOW;
+    c = Subject::TRUNC;
+    CPPUNIT_ASSERT(Subject{} != c);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::o::Create::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Create");
+  series << call("mentioning", &Create::test_mentioning)
+         << END;
+  return finalize(series);
+}
+#endiv

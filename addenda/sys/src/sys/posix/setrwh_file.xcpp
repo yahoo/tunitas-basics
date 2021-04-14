@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.rwh.interface
+namespace sys::posix {
+  namespace packaging::setrwh_file {
+    using namespace packaging::rwh::interface;
+    namespace function {
+      inline auto setrwh_file(File, [[in]] Hint) -> Status;
+    } 
+    namespace native {
+      inline auto setrwh_file(int fd, [[in]] Hint) -> Status;
+    } 
+  }
+  using packaging::setrwh_file::function::setrwh_file;
+  namespace native { using packaging::setrwh_file::native::setrwh_file; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.setrwh
+namespace sys::posix::packaging::setrwh_file {
+  auto function::setrwh_file(File fd, Hint arg) -> Status { return posix::setrwh(fd, F::FILE, arg); }
+  auto native::setrwh_file(int fd, Hint arg) -> Status    { return posix::native::setrwh(fd, F::FILE, arg); }
+}
+#endiv

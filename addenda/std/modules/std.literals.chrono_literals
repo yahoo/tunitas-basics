@@ -1,0 +1,4 @@
+// -*- c++ -*- c14a50ad-f099-49fd-ab0e-f25f2a99d4b5
+#pragma once
+// c.f. http://en.cppreference.com/w/cpp/chrono/operator%22%22h and m, s.
+#include <chrono>

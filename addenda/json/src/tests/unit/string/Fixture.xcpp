@@ -1,0 +1,152 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace string {
+      class Fixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::string::Fixture : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_constructor() -> void;
+  auto test_destructor() -> void;
+  auto test_toas_wrap1() -> void;
+  auto test_toas_wrap2() -> void;
+  auto test_toas_wrap3() -> void;
+  auto test_toas_wrap4() -> void;
+  auto test_toas_unwrap1() -> void;
+  auto test_toas_unwrap2() -> void;
+  auto test_toas_unwrap3() -> void;
+  auto test_toas_unwrap4() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import json.String
+#import json.as
+#import json.to
+
+auto tests::unit::string::Fixture::test_constructor() -> void {
+  ::json::String s; // <-------- test the constructor
+}
+
+auto tests::unit::string::Fixture::test_destructor() -> void {
+  {
+    ::json::String s;
+    // <--- test the destructor
+  }
+}
+
+#import json.String
+#import std.get
+#import std.string
+auto tests::unit::string::Fixture::test_toas_wrap1() -> void {
+  ::json::String cooked_literal = ::json::to(::json::STRING(), "a string literal");
+  CPPUNIT_ASSERT(!std::get<1>(cooked_literal).empty());
+}
+
+auto tests::unit::string::Fixture::test_toas_wrap2() -> void {
+  char const raw_consty_manifest[] = "manifest";
+  ::json::String cooked_consty_manifest = ::json::to(::json::STRING(), raw_consty_manifest);
+  CPPUNIT_ASSERT(!std::get<1>(cooked_consty_manifest).empty());
+}
+
+auto tests::unit::string::Fixture::test_toas_wrap3() -> void {
+  char raw_muting_manifest[] = "manifest";
+#if 4 == __GNUC__ && 8 == __GNUC_MINOR__
+  ::json::String cooked_muting_manifest = ::json::to(::json::STRING(), const_cast<char const (&)[sizeof (raw_muting_manifest)]>(raw_muting_manifest));
+#else
+  // this is fixed by gcc6
+  ::json::String cooked_muting_manifest = ::json::to(::json::STRING(), raw_muting_manifest);
+#endif
+  CPPUNIT_ASSERT(!std::get<1>(cooked_muting_manifest).empty());
+}
+
+auto tests::unit::string::Fixture::test_toas_wrap4() -> void {
+  std::string raw_string = "string";
+#if 4 == __GNUC__ && 8 == __GNUC_MINOR__
+  ::json::String cooked_string = ::json::to(::json::STRING(), const_cast<std::string const &>(raw_string));
+#else
+  // this is fixed by gcc6
+  ::json::String cooked_string = ::json::to(::json::STRING(), raw_string);
+#endif
+  CPPUNIT_ASSERT(!std::get<1>(cooked_string).empty());
+}
+
+auto tests::unit::string::Fixture::test_toas_unwrap1() -> void {
+  ::json::String cooked_literal = ::json::to(::json::STRING(), "a string literal");
+  std::string recooked_literal = ::json::as<std::string>(cooked_literal);
+  CPPUNIT_ASSERT(!recooked_literal.empty());
+  std::string requoted_literal = "a string literal"; // NOT requoted;
+  std::cerr << "recooked_literal = qq!" << recooked_literal << "!\n";
+  std::cerr << "requoted_literal = qq!" << requoted_literal << "!\n";
+  CPPUNIT_ASSERT(recooked_literal == requoted_literal);
+}
+
+auto tests::unit::string::Fixture::test_toas_unwrap2() -> void {
+  char const raw_consty_manifest[] = "manifest";
+  ::json::String cooked_consty_manifest = ::json::to(::json::STRING(), raw_consty_manifest);
+  std::string recooked_consty_manifest = ::json::as<std::string>(cooked_consty_manifest);
+  CPPUNIT_ASSERT(!recooked_consty_manifest.empty());
+  std::string requoted_consty_manifest = raw_consty_manifest; // NOT requoted
+  std::cerr << "recooked_consty_manifest = qq!" << recooked_consty_manifest << "!\n";
+  std::cerr << "requoted_consty_manifest = qq!" << requoted_consty_manifest << "!\n";
+  CPPUNIT_ASSERT(recooked_consty_manifest == requoted_consty_manifest);
+}
+
+auto tests::unit::string::Fixture::test_toas_unwrap3() -> void {
+  char raw_muting_manifest[] = "manifest";
+#if 4 == __GNUC__ && 8 == __GNUC_MINOR__
+  ::json::String cooked_muting_manifest = ::json::to(::json::STRING(), const_cast<char const (&)[sizeof (raw_muting_manifest)]>(raw_muting_manifest));
+#else
+  // this is fixed by gcc6
+  ::json::String cooked_muting_manifest = ::json::to(::json::STRING(), raw_muting_manifest);
+#endif
+  std::string recooked_muting_manifest = ::json::as<std::string>(cooked_muting_manifest);
+  CPPUNIT_ASSERT(!recooked_muting_manifest.empty());
+  std::string requoted_muting_manifest = raw_muting_manifest; // NOT requoted
+  std::cerr << "recooked_muting_manifest = qq!" << recooked_muting_manifest << "!\n";
+  std::cerr << "requoted_muting_manifest = qq!" << requoted_muting_manifest << "!\n";
+  CPPUNIT_ASSERT(recooked_muting_manifest == requoted_muting_manifest);
+}
+
+auto tests::unit::string::Fixture::test_toas_unwrap4() -> void {
+  std::string raw_string = "string";
+#if 4 == __GNUC__ && 8 == __GNUC_MINOR__
+  ::json::String cooked_string = ::json::to(::json::STRING(), const_cast<std::string const &>(raw_string));
+#else
+  // this is fixed by gcc6
+  ::json::String cooked_string = ::json::to(::json::STRING(), raw_string);
+#endif
+  std::string recooked_string =  ::json::as<std::string>(cooked_string);
+  CPPUNIT_ASSERT(!recooked_string.empty());
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::string::Fixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("string");
+  s << call("constructor", &Fixture::test_constructor)
+    << call("destructor", &Fixture::test_destructor)
+    << call("toas-wrap.1", &Fixture::test_toas_wrap1)
+    << call("toas-wrap.2", &Fixture::test_toas_wrap2)
+    << call("toas-wrap.3", &Fixture::test_toas_wrap3)
+    << call("toas-wrap.4", &Fixture::test_toas_wrap4)
+    << call("toas-unwrap.1", &Fixture::test_toas_unwrap1)
+    << call("toas-unwrap.2", &Fixture::test_toas_unwrap2)
+    << call("toas-unwrap.3", &Fixture::test_toas_unwrap3)
+    << call("toas-unwrap.4", &Fixture::test_toas_unwrap4)
+    ;
+  return s.release();
+}
+#endiv

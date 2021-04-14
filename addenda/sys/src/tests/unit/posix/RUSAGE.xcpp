@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { struct RUSAGE; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.RUSAGE
+struct tests::unit::posix::RUSAGE : public cppunit::test::Fixture {
+  using Subject = ::sys::posix::RUSAGE;
+  auto test_constants() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  // Most of these will already have been tested in tests::usage::posix_RUSAGE
+  auto RUSAGE::test_constants() -> void {
+    Subject::Usage u;
+    u = Subject::SELF;
+    u = Subject::CHILDREN;
+    u = Subject::THREAD;
+    CPPUNIT_ASSERT(sizeof (u));
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::RUSAGE::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("RUSAGE");
+  series << call("constants", &RUSAGE::test_constants)
+         << END;
+  return finalize(series);
+}
+#endiv

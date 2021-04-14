@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.regex.Fixture
+#endiv
+#divert <cpp>
+#import nonstd.regex.search
+#import nonstd.regex.matching.Results
+#import nonstd.regex.Pattern
+auto tests::unit::regex::Fixture::test_function_search() -> void {
+  using ::nonstd::regex::search;
+  using ::nonstd::regex::matching::Results;
+  using ::nonstd::regex::Pattern;
+  auto const specimen = generate_a_to_z();
+  auto const pattern = Pattern{".*harpie.*"};
+  { Results<std::string::const_iterator> results;
+    auto searched = search(specimen.begin(), specimen.end(), results, pattern);
+    CPPUNIT_ASSERT(searched); }
+  { Results<char const *> results;
+    auto searched = search(specimen.c_str(), results, pattern);
+    CPPUNIT_ASSERT(searched); }
+  { Results<std::string::const_iterator> results;
+    auto searched = search(specimen, results, pattern);
+    CPPUNIT_ASSERT(searched); }
+}
+#endiv

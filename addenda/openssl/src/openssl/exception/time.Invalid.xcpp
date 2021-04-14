@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::exception::time {
+  //
+  // An time with no representation is discovered.
+  // This is an invalid time.
+  // This is an ASN1 Time which is outright bogus,
+  //
+  // Usage:
+  //
+  //   try {
+  //     throw time::Invalid{};
+  //   } catch (Aspect const &) {
+  //     ...recover...
+  //   }
+  //
+  class Invalid;
+}
+#endiv
+#divert <hpp>
+#import openssl.exception.Time
+class openssl::exception::time::Invalid : public Time {
+  using ancestor = Time;
+public:
+  Invalid() = default;
+  auto what() const noexcept -> char const * override;
+};
+#endiv
+#divert <cpp>
+auto openssl::exception::time::Invalid::what() const noexcept -> char const * {
+  return "time";
+}
+#endiv

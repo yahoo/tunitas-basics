@@ -1,0 +1,6 @@
+// -*- c++ -*- 931a25a0-d09f-40c4-ba4b-12f7cdae9247
+#pragma once
+#include <httpserver>
+namespace httpserver {
+  using Request = httpserver::http_request;
+}

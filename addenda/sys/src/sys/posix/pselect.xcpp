@@ -1,0 +1,92 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.select.interface
+namespace sys::posix {
+  namespace packaging::pselect {
+    using namespace packaging::select::interface;
+    using namespace bundle::pselect;
+    namespace required = bundle::required;
+    //
+    // n.b. because pselect(2) does not trade in file descriptors *directly* there is no 'native' variant subinterface.
+    //
+    // The pselect(2) interface does not offer timeout precision conversion.
+    // If you want that then use the nearby select(2) interface with an explicit optional<sigset>.
+    //
+    namespace function {
+      // sigset-timeout
+      inline auto pselect(Reads, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Writes, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Reads, Writes, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Reads, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Writes, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(Reads, Writes, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      // timeout-sigset int max because ... see select.xcpp
+      inline auto pselect(int max, Reads, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Writes, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Reads, Writes, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Reads, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Writes, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      inline auto pselect(int max, Reads, Writes, Excepts, Timeout = Timeout{}, Sigset = Sigset{}) -> Count;
+      // timeout-sigset
+      inline auto pselect(Reads, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Writes, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Reads, Writes, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Reads, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Writes, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(Reads, Writes, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      // timeout-sigset int max because ... see select.xcpp
+      inline auto pselect(int max, Reads, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Writes, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Reads, Writes, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Reads, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Writes, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+      inline auto pselect(int max, Reads, Writes, Excepts, Sigset, Timeout = Timeout{}) -> Count;
+    }
+  }
+  using packaging::pselect::function::pselect;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.select
+namespace sys::posix::packaging::pselect {
+  // timeout-sigset
+  auto function::pselect(Reads reads__, Timeout timeout, Sigset sigset) -> Count                                              { return posix::select(reads__, Writes{}, Excepts{}, sigset, timeout); }
+  auto function::pselect(Writes writes__, Timeout timeout, Sigset sigset) -> Count                                            { return posix::select(Reads{}, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                                          { return posix::select(Reads{}, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(Reads reads__, Writes writes__, Timeout timeout, Sigset sigset) -> Count                             { return posix::select(reads__, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(Reads reads__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                           { return posix::select(reads__, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(Writes writes__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                         { return posix::select(Reads{}, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(Reads reads__, Writes writes__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count          { return posix::select(reads__, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Timeout timeout, Sigset sigset) -> Count                                     { return posix::select(max, reads__, Writes{}, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Writes writes__, Timeout timeout, Sigset sigset) -> Count                                   { return posix::select(max, Reads{}, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                                 { return posix::select(max, Reads{}, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Writes writes__, Timeout timeout, Sigset sigset) -> Count                    { return posix::select(max, reads__, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                  { return posix::select(max, reads__, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Writes writes__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count                { return posix::select(max, Reads{}, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Writes writes__, Excepts excepts__, Timeout timeout, Sigset sigset) -> Count { return posix::select(max, Reads{}, writes__, excepts__, sigset, timeout); }
+  // sigset-timeout
+  auto function::pselect(Reads reads__, Sigset sigset, Timeout timeout) -> Count                                              { return posix::select(reads__, Writes{}, Excepts{}, sigset, timeout); }
+  auto function::pselect(Writes writes__, Sigset sigset, Timeout timeout) -> Count                                            { return posix::select(Reads{}, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                                          { return posix::select(Reads{}, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(Reads reads__, Writes writes__, Sigset sigset, Timeout timeout) -> Count                             { return posix::select(reads__, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(Reads reads__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                           { return posix::select(reads__, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(Writes writes__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                         { return posix::select(Reads{}, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(Reads reads__, Writes writes__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count          { return posix::select(reads__, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Sigset sigset, Timeout timeout) -> Count                                     { return posix::select(max, reads__, Writes{}, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Writes writes__, Sigset sigset, Timeout timeout) -> Count                                   { return posix::select(max, Reads{}, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                                 { return posix::select(max, Reads{}, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Writes writes__, Sigset sigset, Timeout timeout) -> Count                    { return posix::select(max, reads__, writes__, Excepts{}, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                  { return posix::select(max, reads__, Writes{}, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Writes writes__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count                { return posix::select(max, Reads{}, writes__, excepts__, sigset, timeout); }
+  auto function::pselect(int max, Reads reads__, Writes writes__, Excepts excepts__, Sigset sigset, Timeout timeout) -> Count { return posix::select(max, reads__, writes__, excepts__, sigset, timeout); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_pselect.Usage
+static_assert(tests::usage::posix_pselect::Usage<>);
+#endiv

@@ -1,0 +1,11 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import nonstd.stream.posix.Basic_Streambuf
+#import std.char_traits
+namespace nonstd::stream {
+  template<required::Character CHAR, required::Character_Traits TRAITS = std::char_traits<CHAR>> using Basic_Posixbuf = posix::Basic_Streambuf<CHAR, TRAITS>;
+}
+#endiv

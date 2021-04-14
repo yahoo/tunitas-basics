@@ -1,0 +1,85 @@
+// -*- c++ -*- and wrapped in the SCOLD stylings
+#divert <hpp>
+#import slurp.directory.named.Result
+#import slurp.directory.named.Result.syscall
+#import std.string
+#import std.nothrow_t
+#import sys.call.result.Value
+namespace slurp::directory::named {
+  //
+  // Read the directory, returning the directory name and the CONTAINER of directory entries.
+  // Only the directory entry names are returned; else see sys::directory::scan<...>(...)
+  // Throws slurp::Failure if the directory cannot be opened or read.
+  //
+  // See the ADL-discovered accessors
+  //   name(...)
+  //   contents(...) <------------- this is the content that was just slurped
+  template<typename CONTAINER> auto read(std::string directory_name) -> Result<CONTAINER>;
+
+  // Does not throw, does return a "standard" syscall result
+  //
+  // See the ADL-discovered accessors
+  //   name(...)
+  //   contents(...) <------------- this is the content that was just slurped if ok(...)
+  template<typename CONTAINER> auto read(std::nothrow_t, std::string directory_name) -> sys::call::result::Value<Result<CONTAINER>>;
+}
+#endiv
+#divert <tpp>
+#import slurp.Failure
+#import std.back_inserter
+#import std.deque
+#import std.is_same
+#import std.move
+#import std.string
+#import std.system_error
+#import std.transform
+#import sys.directory.Entry
+#import sys.directory.scan
+
+template<typename CONTAINER> auto slurp::directory::named::read(std::string directory_name) -> Result<CONTAINER> {
+  static_assert(std::is_same<std::string, typename CONTAINER::value_type>::value, "CONTAINER is not a container of std::string");
+  try {
+    // scan(...) returns a sys-call-result sort of a thing entailing the failure status and (maybe) the success result.
+    auto scanned = sys::directory::scan<std::deque<sys::directory::Entry>>(directory_name);
+    if (!ok(scanned)) {
+      auto ec = error_code(scanned);
+      throw Failure(ec, ec.message(), directory_name);
+    }
+    auto extract_name = [](sys::directory::Entry &item) -> std::string {
+      return std::move(item.name);
+    };
+    auto &entries = value(scanned);
+    CONTAINER contents;
+    std::transform(entries.begin(), entries.end(), std::back_inserter(contents), extract_name);
+    using result_type = Result<CONTAINER>;
+    using adl_type = named::ADL; 
+    return result_type{adl_type(), std::move(directory_name), std::move(contents)};
+  } catch (std::system_error const &se) {
+    throw Failure(se, directory_name);
+  }
+}
+
+template<typename CONTAINER> auto slurp::directory::named::read(std::nothrow_t, std::string directory_name) -> sys::call::result::Value<Result<CONTAINER>> {
+  static_assert(std::is_same<std::string, typename CONTAINER::value_type>::value, "CONTAINER is not a container of std::string");
+  using payload_type = Result<CONTAINER>;
+  using result_type = sys::call::result::Value<payload_type>;
+  // scan(...) returns a sys-call-result sort of a thing entailing the failure status and (maybe) the success result.
+  auto scanned = sys::directory::scan<std::deque<sys::directory::Entry>>(directory_name);
+  bool b = ok(scanned);
+  int e;
+  CONTAINER contents;
+  if (!b) {
+    e = error_num(scanned);
+  } else {
+    e = 0;
+    auto extract_name = [](sys::directory::Entry &item) -> std::string {
+      return std::move(item.name);
+    };
+    auto &entries = value(scanned); // nonconst because we move entries over.
+    std::transform(entries.begin(), entries.end(), std::back_inserter(contents), extract_name);
+  }
+  using adl_type = named::ADL; 
+  payload_type payload(adl_type(), std::move(directory_name), std::move(contents));
+  return result_type(b, e, std::move(payload));
+}
+#endiv

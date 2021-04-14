@@ -1,0 +1,14 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.Value.PROTECTED
+#import sqlite.api.detail.Parameter
+namespace sqlite {
+  template<typename VALUE> inline auto parameter(Value<PROTECTED> &) -> typename api::detail::Parameter<VALUE>::result_type; // a.k.a. "sqlite3_value"
+}
+#endiv
+#divert <ipp>
+#import sqlite.api.unguarded
+template<typename VALUE> auto sqlite::parameter(Value<PROTECTED> &param) -> typename api::detail::Parameter<VALUE>::result_type {
+  return api::unguarded::parameter<VALUE>(param.safe());
+}
+#endiv

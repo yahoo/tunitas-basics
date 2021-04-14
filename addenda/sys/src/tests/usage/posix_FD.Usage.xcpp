@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_FD.Usage
+//   static_assert(tests::usage::posix_FD::Usage<>);
+//
+#import nonstd.convertible_to
+#import sys.posix.FD
+#import tests.model.Namespace_Object
+#import tests.model.Namespace_Object_Flags
+#import tests.usage.countof
+namespace tests::usage::posix_FD {
+  using sys::posix::FD;
+  namespace [[detail]] packaging {
+    using nonstd::convertible_to;
+    template<typename FD> concept bool Instance = requires(FD) {
+      typename FD::Flag;
+      typename FD::Flags;
+      requires model::Namespace_Object<FD>;
+      requires model::Namespace_Object_Flags<FD, typename FD::Flag, typename FD::Flags>;
+      requires (int)FD::NONE == 0;
+      requires (int)FD::CLOEXEC == FD_CLOEXEC;
+      requires requires(FD, typename FD::Flag lag, typename FD::Flags ags) {
+#if 202003L < __cplusplus
+        { FD::template as<typename FD::Flag>(lag) } -> convertible_to<typename FD::Flag>;
+        { FD::template as<typename FD::Flags>(lag) } -> convertible_to<typename FD::Flags>;
+        { FD::template as<typename FD::Flag>(ags) } -> convertible_to<typename FD::Flag>;
+        { FD::template as<typename FD::Flags>(ags) } -> convertible_to<typename FD::Flags>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
+        { FD::template as<typename FD::Flag>(lag) } -> typename FD::Flag;
+        { FD::template as<typename FD::Flags>(lag) } -> typename FD::Flags;
+        { FD::template as<typename FD::Flag>(ags) } -> typename FD::Flag;
+        { FD::template as<typename FD::Flags>(ags) } -> typename FD::Flags;
+#endif
+      };
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<FD>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

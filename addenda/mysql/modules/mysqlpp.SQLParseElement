@@ -1,0 +1,4 @@
+// -*- c++ -*- b6ce061f-e35b-4c23-9d1a-fdb634348709
+#pragma once
+// The unguarded antecedents are taken care therein.
+#include <mysqlpp.SQLQueryParms>

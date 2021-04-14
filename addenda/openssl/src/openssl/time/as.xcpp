@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.required.Time
+#import openssl.time.Point
+#import openssl.time.Posix
+namespace openssl::time {
+  //
+  // Convert from time::Posix to time::Point and vice versa
+  //
+  // Usage:
+  //
+  //   auto ttt = as<Posix>(then);
+  //   auto ppp = as<Point>(then);
+  //
+  template<required::Time RESULT> inline auto as(Posix const &) -> RESULT = delete;
+  template<> inline auto as<Point>(Posix const &) -> Point;
+  template<> inline auto as<Posix>(Posix const &) -> Posix;
+  template<required::Time RESULT> inline auto as(Point const &) -> RESULT = delete;
+  template<> inline auto as<Posix>(Point const &) -> Posix;
+  template<> inline auto as<Point>(Point const &) -> Point;
+}
+#endiv
+#divert <ipp>
+#import sys.time.as
+namespace openssl::time {
+  template<> auto as<Point>(Posix const &original) -> Point {
+    return sys::time::as<Point>(original);
+  }
+  template<> auto as<Posix>(Posix const &original) -> Posix {
+    return original;
+  }
+  template<> auto as<Posix>(Point const &original) -> Posix {
+    return sys::time::as<Posix>(original);
+  }
+  template<> auto as<Point>(Point const &original) -> Point {
+    return original;
+  }
+}
+#endiv

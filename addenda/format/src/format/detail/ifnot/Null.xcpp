@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace format::detail::ifnot {
+  //
+  // If not null then insert it (print it)
+  // see format::inn(...)
+  //
+  //
+  // Insert one of three eventualities
+  //    (null)
+  //    the value itself
+  //
+  // Usage
+  //    std::cout << ine(nullptr);
+  //    std::cout << ine(quote(nullptr));
+  //    std::cout << ine(quote(std::string()));
+  //
+  template<typename VALUE> class Null;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail::ifnot {
+  template<typename CHAR, typename TRAITS, typename VALUE> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Null<VALUE> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import format.detail.ifnot.expected.Operations
+#import format.detail.ifnot.traits.Operations
+#import format.detail.Formatter
+template<typename VALUE> class format::detail::ifnot::Null : public Formatter<VALUE> {
+  using ancestor = Formatter<VALUE>;
+public:
+  using ancestor::Formatter;
+  using Traits = traits::Operations<VALUE>;
+  static_assert(expected::Operations<Traits>, "fail");
+};
+#endiv
+#divert <ipp>
+#import format.detail.ifnot.literals.Palette
+template<typename CHAR, typename TRAITS, typename VALUE> auto format::detail::ifnot::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Null<VALUE> const &n) -> std::basic_ostream<CHAR, TRAITS> & {
+  using Traits = typename Null<VALUE>::Traits;
+  using Palette = literals::Palette<CHAR, TRAITS>;
+  if (Traits::is_null(n.value)) {
+    return o << Palette::null();
+  } else {
+    return o << Traits::insertable_notnull_nonempty(n.value);
+  }
+}
+#endiv

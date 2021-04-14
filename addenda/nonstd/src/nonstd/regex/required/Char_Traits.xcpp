@@ -1,0 +1,20 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character_Traits
+namespace nonstd::regex::required {
+  //
+  // Same thing, different name.
+  //
+  template<typename CHAR> concept bool Char_Traits = nonstd::required::Character_Traits<CHAR>;
+}
+#endiv
+#divert <cpp>
+namespace nonstd::regex::required {
+  // Testify! - All known character types are Chars
+  static_assert(Char_Traits<std::char_traits<char>>);
+  static_assert(Char_Traits<std::char_traits<wchar_t>>);
+  static_assert(Char_Traits<std::char_traits<char16_t>>);
+  static_assert(Char_Traits<std::char_traits<char32_t>>);
+}
+#endiv

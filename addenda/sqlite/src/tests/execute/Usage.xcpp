@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace execute {
+    class Usage;
+  }
+}
+#endiv
+#divert <hpp>
+#include <options.throwable.Usage>
+class tests::execute::Usage : public options::throwable::Usage {
+  using Ancestor = options::throwable::Usage;
+public:
+  using Ancestor::Usage;
+  auto unformatted() const -> std::string override final;
+};
+#endiv
+#divert <cpp>
+#import std.ostringstream
+auto tests::execute::Usage::unformatted() const -> std::string {
+  std::ostringstream buf; // okay, this is overkill
+  buf << ("usage ${NAME} [ --usage ]              emit this message\n"
+          "      ${____} [ --create ]             create the database if it does not exist\n"
+          "      ${____} [ --readonly ]           open the database as readonly\n"
+          "      ${____} [ --readwrite ]          open the database for writing\n"
+          "      ${____} [ --separator=SEPARATOR ]\n"
+          "      database sql-querycommand");
+  return buf.str();
+}
+#endiv

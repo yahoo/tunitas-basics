@@ -1,0 +1,210 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509 {
+  //
+  // An X.509 Certificate (CRT)
+  //
+  // Usage:
+  //
+  //   Crt crt;
+  //   ... this being RAII, either you got it or you're out of here...
+  //   crt.set_version(crt::Version{2});
+  //   ...etc...
+  //
+  class Crt;
+  namespace crt {
+    enum Version : int long;
+    inline auto const VERSION = Version{2}; // x509v1 is Version 2
+  }
+}
+#endiv
+#divert <hpp>
+#import openssl.asn1.Integer
+#import openssl.asn1.Integer0
+#import openssl.asn1.Time
+#import openssl.asn1.Time0
+#import openssl.evp.PKey
+#import openssl.evp.PKey0
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.X509_CRT
+#import openssl.pem.load.declaration
+#import openssl.pem.from_string_view.declaration
+#import openssl.types
+#forward openssl.x509.Extension
+#forward openssl.x509.Name
+#forward openssl.x509.Name0
+#forward openssl.Stack0
+class openssl::x509::Crt : public managed::Pointer<x509::CRT> {
+  using ancestor = managed::Pointer<x509::CRT>;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::load::detail::open_read_close(Filepath, std::function<POINTER *(BIO *)>) -> RESULT;
+  template<required::Loadable RESULT, typename POINTER> friend auto pem::packaging::from_string_view::detail::copy_read(std::string_view, std::function<POINTER *(BIO *)>) -> RESULT;
+  inline explicit Crt(x509::CRT *);
+public:
+  inline Crt();
+  inline auto get_version() -> crt::Version;
+  inline auto set_version(crt::Version) -> void;
+  inline auto get_serialNumber() const -> asn1::Integer0;
+  inline auto set_serialNumber(asn1::Integer const &) -> void;
+  inline auto get_issuer_name() const -> Name0;
+  inline auto get_issuer_name() -> Name;
+  inline auto set_issuer_name(Name0 const &) -> void;
+  inline auto get_subject_name() const -> Name0;
+  inline auto get_subject_name() -> Name;
+  inline auto set_subject_name(Name0 const &) -> void;
+  inline auto get_notBefore() const -> asn1::Time0;
+  inline auto get_notBefore() -> asn1::Time;
+  inline auto set_notBefore(time::Point const &) -> void;
+  inline auto set_notBefore(asn1::Time const &) -> void;
+  inline auto get_notAfter() const -> asn1::Time0;
+  inline auto get_notAfter() -> asn1::Time;
+  inline auto set_notAfter(time::Point const &) -> void;
+  inline auto set_notAfter(asn1::Time const &) -> void;
+  inline auto get_extensions() const -> Stack0<Extension0>;
+  inline auto add_ext(Extension const &) -> void;
+  inline auto get_pubkey() const -> evp::PKey0;
+  inline auto get_pubkey() -> evp::PKey;
+  inline auto set_pubkey(evp::PKey0 const &) -> void;
+  // EVP_sha1(), EVP_sha256(), etc.
+  inline auto sign(evp::PKey0 const &, EVP_MD const *function) -> void;
+};
+#endiv
+#divert <ipp>
+#import openssl.error.Code
+#import openssl.functions
+#import openssl.x509.Extension
+#import openssl.x509.Name
+#import openssl.x509.Name0
+#import openssl.Stack0
+#import std.error_code
+#import std.underlying_type
+namespace openssl::x509 {
+  Crt::Crt()
+    : ancestor{X509_new()}
+  { }
+  Crt::Crt(x509::CRT *crt)
+    : ancestor{crt}
+  { }
+  auto Crt::get_version() -> crt::Version {
+    return crt::Version{X509_get_version(get())};
+  }
+  auto Crt::set_version(crt::Version version) -> void {
+    if (!X509_set_version(get(), (std::underlying_type<crt::Version>::type) version)) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_serialNumber() const -> asn1::Integer0 {
+    return asn1::Integer0{X509_get0_serialNumber(get())};
+  }
+  auto Crt::set_serialNumber(asn1::Integer const &serial) -> void {
+    if (!X509_set_serialNumber(get(), serial.get())) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_issuer_name() const -> Name0 {
+    return Name0{X509_get_issuer_name(get())};
+  }
+  auto Crt::get_issuer_name() -> Name {
+    return Name{X509_get_issuer_name(get()), Name::Deleter{Name::Deleter::DROPPING}};
+  }
+  auto Crt::set_issuer_name(Name0 const &name) -> void {
+    auto ok = X509_set_issuer_name(get(), const_cast<Name::Value *>(name.get()));
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_subject_name() const -> Name0 {
+    return Name0{X509_get_subject_name(get())};
+  }
+  auto Crt::get_subject_name() -> Name {
+    return Name{X509_get_subject_name(get()), Name::Deleter{Name::Deleter::DROPPING}};
+  }
+  auto Crt::set_subject_name(Name0 const &name) -> void {
+    auto ok = X509_set_subject_name(get(), const_cast<Name::Value *>(name.get()));
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_notBefore() const -> asn1::Time0 {
+    return asn1::Time0{X509_get0_notBefore(get())};
+  }
+  auto Crt::get_notBefore() -> asn1::Time {
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_CRL_set1_lastUpdate.html
+    // Either way, do not free
+    //   X509_get0_notBefore(X509 *} returns a pointer onto constant data in the certificate.
+    //   X509_getm_notBefore(x509 *} returns a pointer onto mutable data in the certificate.
+    using Deleter = asn1::Time::Deleter;
+    return asn1::Time{X509_getm_notBefore(get()), Deleter{Deleter::DROPPING}};
+  }
+  auto Crt::set_notBefore(time::Point const &then) -> void {
+    set_notBefore(asn1::Time{then});
+  }
+  auto Crt::set_notBefore(asn1::Time const &then) -> void {
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_CRL_set1_lastUpdate.html
+    // X509_set1_notBefore(X509 *, ASN1_TIME const *) -> int does not take possession of the data (you free it)
+    //
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_set1_notAfter.html
+    //   <quote>
+    //     X509_set1_notBefore() and X509_set1_notAfter() set the notBefore and notAfter fields of x to tm.
+    //     Ownership of the passed parameter tm is not transferred by these functions so it must be freed up after the call.
+    //   </quote>
+    //
+    auto ok = X509_set1_notBefore(get(), then.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_notAfter() const -> asn1::Time0 {
+    return asn1::Time0{X509_get0_notAfter(get())};
+  }
+  auto Crt::get_notAfter() -> asn1::Time {
+    // https://www.openssl.org/docs/man1.1.0/man3/X509_CRL_set1_lastUpdate.html
+    // ... the documentation pertains to CRT_set1_notAfter as well
+    // Either way, do not free
+    //   X509_get0_notAfter(X509 *} returns a pointer onto constant data in the certificate.
+    //   X509_getm_notAfter(x509 *} returns a pointer onto mutable data in the certificate.
+    using Deleter = asn1::Time::Deleter;
+    return asn1::Time{X509_getm_notAfter(get()), Deleter{Deleter::DROPPING}};
+  }
+  auto Crt::set_notAfter(time::Point const &then) -> void {
+    set_notAfter(asn1::Time{then});
+  }
+  auto Crt::set_notAfter(asn1::Time const &then) -> void {
+    auto ok = X509_set1_notAfter(get(), then.get());
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_extensions() const -> Stack0<Extension0> {
+    // These stacks (sets?) always contain immutable objects, so "get0"
+    // The stack itself is an object under allocation.
+    // The referenced extensions are, as with all stacks, immutable.
+    return Stack0<Extension0>::Traits::construct(X509_get0_extensions(get()));
+  }
+  auto Crt::add_ext(Extension const &ext) -> void {
+    auto const LAST = -1;
+    auto ok = X509_add_ext(get(), ext.get(), LAST);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::get_pubkey() const -> evp::PKey0 {
+    return evp::PKey{X509_get0_pubkey(get())};
+  }
+  auto Crt::get_pubkey() -> evp::PKey {
+    return evp::PKey{X509_get_pubkey(get())};
+  }
+  auto Crt::set_pubkey(evp::PKey0 const &pk) -> void {
+    auto ok = X509_set_pubkey(get(), const_cast<EVP_PKEY *>(pk.get()));
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+  auto Crt::sign(evp::PKey0 const &pk, EVP_MD const *function) -> void {
+    auto ok = X509_sign(get(), const_cast<EVP_PKEY *>(pk.get()), function);
+    if (!ok) {
+      throw std::error_code{error::Code::X509};
+    }
+  }
+}
+#endiv

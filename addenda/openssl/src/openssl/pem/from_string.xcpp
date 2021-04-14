@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward openssl.required.Loadable
+#import std.string
+namespace openssl::pem {
+  //
+  // Covert from a std::string to a one of the loadable types; e.g. PKey, Crt, Req, Crl
+  // Nearby is from_string_view(...) which must be named differently to avoid overloading ambiguities.
+  //
+  // Usage:
+  //
+  //   #import openssl.pem.from_string
+  //
+  //   auto thing = from_string<THING>(...pem-string...)
+  //
+  template<required::Loadable RESULT> inline auto from_string(std::string const &pemmican) -> RESULT;
+}
+#endiv
+#divert <ipp>
+#import std.string_view
+#import openssl.pem.from_string_view
+namespace openssl {
+  template<required::Loadable RESULT> auto pem::from_string(std::string const &pemmican) -> RESULT {
+    auto view = std::string_view{pemmican.data(), pemmican.size()};
+    return from_string_view<RESULT>(view);
+  }
+}
+#endiv

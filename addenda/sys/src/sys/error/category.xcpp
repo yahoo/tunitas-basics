@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward sys.error.Category
+namespace sys::error {
+  //
+  // The system error category.
+  // Everywhere a different name for this very same thing.
+  //
+  // It will always be std::system_category() which is useful for std::error_code
+  // It will never be std::generic_category() which is the anodyne version.
+  // That system is quirky, incomplete and not well thought out.  [[offer: show otherwise]]
+  // <editorial>Surely there is some greater theory and legacy obligation that is being followed therein.</editorial>
+  //
+  // Usage:
+  //
+  //   auto const &c = sys::error::category();
+  //   ... you know the rest...
+  //
+  inline auto category() -> Category const &;
+}
+#endiv
+#divert <ipp>
+#import std.system_category
+namespace sys {
+  auto error::category() -> Category const & { return std::system_category(); }
+}
+#endiv

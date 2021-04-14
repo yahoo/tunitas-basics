@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.stat.interface
+namespace sys::posix {
+  namespace packaging::fstatat {
+    using namespace packaging::stat::interface;
+    namespace function {
+      using Position = argument::Position<File>;
+      inline auto fstatat(Position, Pathname, Flags) -> result::Buffer;
+    }
+    namespace native {
+      using Position = argument::Position<int>;
+      inline auto fstatat(Position, Pathname, Flags) -> result::Buffer;
+    }
+  }
+  using packaging::fstatat::function::fstatat;
+  namespace native { using packaging::fstatat::native::fstatat; }
+}
+using sys::posix::fstatat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import errno
+#import sys.posix.packaging.stat.Buffer
+#import sys.posix.packaging.stat.Version
+namespace sys::posix::packaging::fstatat {
+  auto function::fstatat(Position position, Pathname pathname, Flags flags) -> result::Buffer { return native::fstatat(position, move(pathname), flags); }
+  auto native::fstatat(Position position, Pathname pathname, Flags flags) -> result::Buffer {
+    using namespace packaging::stat;
+    Buffer buf;
+    int called = Version<Call::FSTATAT>::call((int)position, (char const *)pathname, &buf, (int)flags);
+    auto errnum = errno; // capture the value of errno before doing anything else
+    auto ok = 0 == called;
+    return {ok, errnum, buf, called};
+  }
+}
+#endiv

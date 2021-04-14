@@ -1,0 +1,8 @@
+// -*- c++ -*- e0306561-81c2-4cd6-8ec6-32cd33b39df2
+#pragma once
+// Via timegm(3)
+// The timelocal() function is equivalent to the POSIX standard function mktime(3).
+// There is no reason to ever use it.
+//
+// Yet here it is in module form.
+#include <time.h>

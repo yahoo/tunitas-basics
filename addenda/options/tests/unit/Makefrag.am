@@ -1,0 +1,14 @@
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  tests/unit/all.test \
+  tests/unit/argument.test \
+  tests/unit/config.test \
+  tests/unit/indicator.test \
+  tests/unit/longish.test \
+  tests/unit/options.test \
+  tests/unit/program.test \
+  tests/unit/shortish.test \
+  tests/unit/string.test \
+  tests/unit/usage.test \
+  tests/unit/version.test \
+  $(end)

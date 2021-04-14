@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.w.Options
+#import sys.w.required.Options
+namespace sys::w {
+  template<required::Options RESULT> auto as(Options) -> RESULT = delete;
+  template<required::Options RESULT> auto as(Option) -> RESULT = delete;
+  template<> inline auto as<Option>(Option) -> Option;  //   unexceptional (identity)
+  template<> inline auto as<Option>(Options) -> Option;  //  demotion can throw because it demotion of multi-flag values is ambiguous.
+  template<> inline auto as<Options>(Option) -> Options; //  unexceptional (simple promotion)
+  template<> inline auto as<Options>(Options) -> Options; // unexceptional (identity)
+}
+#endiv
+#divert <ipp>
+#import sys.flags.maskof
+namespace sys {
+  template<> auto w::as<w::Option>(Option b) -> Option    { return b; }
+  template<> auto w::as<w::Option>(Options s) -> Option   { return sys::flags::maskof<Option>(s, Options::Limits::begin(), Options::Limits::end()); }
+  template<> auto w::as<w::Options>(Option b) -> Options  { return Options{b}; }
+  template<> auto w::as<w::Options>(Options s) -> Options { return s; }
+}
+#endiv

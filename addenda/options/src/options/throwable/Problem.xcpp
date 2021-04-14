@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  namespace throwable {
+    class Problem;
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import options.throwable.detail.Complaint
+#import sys.exits
+
+// There was some problem; "Houston, we have a problem"
+class options::throwable::Problem : public detail::Complaint {
+  using Ancestor = detail::Complaint;
+public:
+  inline Problem(stringz_type const &argv0, stringz_type const &complaint, sys::exits::Code = sys::exits::SOFTWARE);
+  inline Problem(Program const &, stringz_type const &complaint, sys::exits::Code = sys::exits::SOFTWARE);
+  // You do not have to inherit (you can use this one right away)
+  ~Problem() = default;
+public:
+  struct tests { struct Suite; };
+  friend struct tests::Suite;
+};
+#divert </hpp>
+#divert <ipp>
+options::throwable::Problem::Problem(stringz_type const &the_argv0, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_argv0, the_complaint, the_code) {
+  ;
+}
+
+options::throwable::Problem::Problem(Program const &the_program, stringz_type const &the_complaint, sys::exits::Code the_code)
+  : Ancestor(the_program, the_complaint, the_code) {
+  ;
+}
+#divert </ipp>

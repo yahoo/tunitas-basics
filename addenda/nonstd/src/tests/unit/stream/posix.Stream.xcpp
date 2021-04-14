@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::stream::posix { class Stream; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import nonstd.stream.Posix
+class tests::unit::stream::posix::Stream : public cppunit::test::Fixture {
+public:
+  using Subject = ::nonstd::stream::Posix;
+  auto test_constructor_defaulting() -> void;
+  auto test_constructor_duplicating() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.string_literals
+using namespace std::string_literals;
+#import nonstd.stream.Posixbuf
+#import sys.posix.dup
+auto tests::unit::stream::posix::Stream::test_constructor_defaulting() -> void {
+  auto duped = sys::posix::dup(0);
+  CPPUNIT_ASSERT(ok(duped));
+  Subject defaulting(value(duped));
+  CPPUNIT_ASSERT(true); // anything else we can say here?
+}
+auto tests::unit::stream::posix::Stream::test_constructor_duplicating() -> void {
+  auto duped = sys::posix::dup(2);
+  CPPUNIT_ASSERT(ok(duped));
+  Subject duplicating(value(duped));
+  auto const message = "hello world"s;
+  duplicating << message << '\n';
+}
+#import rigging.suite.io
+auto tests::unit::stream::posix::Stream::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using Rig_Stream = ::rigging::suite::Stream;
+  Rig_Stream series("Stream");
+  {
+    Rig_Stream con("constructor");
+    con << call("defaulting", &Stream::test_constructor_defaulting)
+        << call("duplicating", &Stream::test_constructor_duplicating)
+      ;
+    series << move(con);
+  }
+  return finalize(series);
+}
+#endiv

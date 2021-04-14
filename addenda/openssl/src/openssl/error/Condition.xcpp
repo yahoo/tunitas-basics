@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::error {
+  //
+  // The simplistic error condition
+  //
+  enum class Condition { SUCCESS, FAILURE };
+}
+#import std.is_error_condition_enum
+namespace std {
+  template<> struct is_error_condition_enum<openssl::error::Condition>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_condition_enum<openssl::error::Condition> : public std::true_type { };
+#import std.error_condition
+namespace openssl::error {
+  inline auto make_error_condition(Condition) -> std::error_condition;
+}
+#endiv
+#divert <ipp>
+#import openssl.error.category
+auto openssl::error::make_error_condition(Condition condition) -> std::error_condition {
+  return std::error_condition{(int) condition, category()};
+}
+#endiv

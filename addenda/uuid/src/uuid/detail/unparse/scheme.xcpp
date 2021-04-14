@@ -1,0 +1,39 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.function
+#import std.string
+#import std.vector
+#import uuid.detail.t
+#import uuid.detail.Wrapper
+namespace uuid {
+  namespace detail {
+    namespace unparse {
+      using function = std::function<void (detail::t const &src, char *dst)>;
+      inline auto scheme(Wrapper const &, char *append, function) -> void;
+      inline auto scheme(Wrapper const &, std::string &append, function) -> void;
+      inline auto scheme(Wrapper const &, std::vector<char> &append, function) -> void;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+auto uuid::detail::unparse::scheme(Wrapper const &in, char *buf, function unparser) -> void {
+  // WATCHOUT -- [unchecked, uncheckable] buf had better hold at least SYNTAX_SIZE more characters
+  unparser(in.value, buf);
+}
+
+auto uuid::detail::unparse::scheme(Wrapper const &in, std::string &buf, function unparser) -> void {
+  std::vector<char> rebuf;
+  scheme(in, rebuf, unparser);
+  buf.append(rebuf.begin(), rebuf.end());
+}
+
+auto uuid::detail::unparse::scheme(Wrapper const &in, std::vector<char> &buf, function unparser) -> void {
+  std::vector<char>::size_type before(buf.size());
+  std::vector<char>::size_type after(before+BUFFER_SIZE); // <--- account for the extra '\0' at the end
+  buf.resize(after);
+  unparser(in.value, buf.data()+before);
+  // Get rid of the '\0' character at the end
+  buf.erase(buf.end()-1);
+}
+#endiv

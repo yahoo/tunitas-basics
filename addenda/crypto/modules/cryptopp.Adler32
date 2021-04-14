@@ -1,0 +1,4 @@
+// -*- c++ -*- fd94e298-82d2-40c5-867a-4042af2ad28c
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/adler32.h>

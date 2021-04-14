@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.readlink.interface
+namespace sys::posix {
+  namespace packaging::readlinkat {
+    using namespace packaging::readlink::interface; // NOT packaging::at::interface because of result::String
+    namespace function {
+      using Position = argument::Position<File>;
+      inline auto readlinkat(Position, Pathname) -> result::String;
+    }
+    namespace native {
+      using Position = argument::Position<int>;
+      inline auto readlinkat(Position, Pathname) -> result::String;
+    }
+  }
+  using packaging::readlinkat::function::readlinkat;
+  namespace native { using packaging::readlinkat::native::readlinkat; }
+}
+using sys::posix::readlinkat; // avoid ambiguity with the POSIX C API
+#endiv
+#divert <ipp>
+#import std.size_t
+#import sys.posix.syscall
+#import sys.posix.packaging.readlink.perform
+namespace sys::posix::packaging::readlinkat {
+  auto function::readlinkat(Position directory, Pathname source) -> result::String { return native::readlinkat(directory, source); }
+  auto native::readlinkat(Position directory, Pathname source) -> result::String {
+    auto thunk = [&directory, &source](char *buf, std::size_t buf_size) -> int {
+                   return direct::syscall(Syscall::READLINKAT, (int) directory, (char const *)source, buf, buf_size);
+                 };
+    return packaging::readlink::perform(thunk);
+  }
+}
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- eb7e36ca-f7ea-4ff3-b427-0f7e84e56a66
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/ec2n.h>

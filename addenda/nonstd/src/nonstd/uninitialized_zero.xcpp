@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import nonstd.required.iterator.Forward
+namespace nonstd {
+  //
+  // https://wiki.scold-lang.org/page/nonstd.uninitialized_zero
+  //
+  // A convenience interface to the uninitialized namespace
+  // Zero out an uninitialized area of memory.
+  //
+  template<typename OBJECT> inline auto uninitialized_zero(OBJECT &) -> void;
+  template<typename OBJECT, std::size_t N> inline auto uninitialized_zero(OBJECT (&)[N]) -> void;
+  template<typename OBJECT> inline auto uninitialized_zero(OBJECT *, std::size_t N) -> void;
+  template<required::iterator::Forward ITERATOR> inline auto uninitialized_zero(ITERATOR first, ITERATOR last) -> void;
+}
+#endiv
+#divert <ipp>
+#import nonstd.uninitialized.zero
+template<typename OBJECT> auto nonstd::uninitialized_zero(OBJECT &subject) -> void {
+  uninitialized::zero(subject);
+}
+template<typename OBJECT, std::size_t N> auto nonstd::uninitialized_zero(OBJECT (&subject)[N]) -> void {
+  uninitialized::zero(subject);
+}
+template<typename OBJECT> auto nonstd::uninitialized_zero(OBJECT *subject, std::size_t N) -> void {
+  uninitialized::zero(subject, N);
+}
+template<nonstd::required::iterator::Forward ITERATOR> auto nonstd::uninitialized_zero(ITERATOR first, ITERATOR last) -> void {
+  // Will re-choose the Forward or Random_Access variant in the recursive call
+  uninitialized::zero(first, last);
+}
+#endiv

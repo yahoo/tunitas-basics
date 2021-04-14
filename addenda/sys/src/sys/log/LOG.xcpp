@@ -1,0 +1,110 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::log {
+  //
+  // That certain struct trick to allow the old-style C nomenclature to work
+  // C++ people hate it.
+  //
+  // Usage:
+  //
+  //   #import sys.log.LOG
+  //   using sys::log::LOG
+  //   auto options = LOG::PID | LOG::CONSOLE;
+  //   auto facility = LOG::FTP; .............. rly? here in 2525, if man is still alive?
+  //   auto levels = LOG::NOTICE | LOG::INFORMATION;
+  //
+  //   format(levels, "#%d. hello %s", 99, "world");
+  //
+  struct LOG;
+}
+#endiv
+#divert <hpp>
+#import sys.log.Priorities
+#import sys.log.Options
+#import sys.log.Facility
+#import sys.log.api // at least for arg::Stringface
+#import va.list
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+struct sys::log::LOG {
+  using Facility = log::Facility;
+  inline static constexpr auto KERNEL = Facility::KERNEL;
+  inline static constexpr auto KERN [[deprecated("kern is a verb in the field of typography; prefer Facility::KERNEL")]] = Facility::KERN;
+  inline static constexpr auto USER = Facility::USER;
+  inline static constexpr auto MAIL = Facility::MAIL;
+  inline static constexpr auto DAEMON = Facility::DAEMON;
+  inline static constexpr auto AUTH = Facility::AUTH;
+  inline static constexpr auto AUTHPRIV = Facility::AUTHPRIV;
+  inline static constexpr auto SYSLOG = Facility::SYSLOG;
+  inline static constexpr auto PRINTER = Facility::PRINTER;
+  inline static constexpr auto LPR [[deprecated("lpr is a specific instance of a print server; prefer Facility::PRINTER")]] = Facility::LPR;
+  inline static constexpr auto NEWS = Facility::NEWS;
+  inline static constexpr auto UUCP = Facility::UUCP;
+  inline static constexpr auto CRON = Facility::CRON;
+  inline static constexpr auto FTP = Facility::FTP;
+  inline static constexpr auto LOCAL0 = Facility::LOCAL0;
+  inline static constexpr auto LOCAL1 = Facility::LOCAL1;
+  inline static constexpr auto LOCAL2 = Facility::LOCAL2;
+  inline static constexpr auto LOCAL3 = Facility::LOCAL3;
+  inline static constexpr auto LOCAL4 = Facility::LOCAL4;
+  inline static constexpr auto LOCAL5 = Facility::LOCAL5;
+  inline static constexpr auto LOCAL6 = Facility::LOCAL6;
+  inline static constexpr auto LOCAL7 = Facility::LOCAL7;
+  using Priority = log::Priority;
+  using Priorities = log::Priorities;
+  inline static constexpr auto EMERGENCY = Priority::EMERGENCY;
+  inline static constexpr auto EMERG [[deprecated("instead, spell it out, prefer Priority::EMERGENCY")]] = Priority::EMERG;
+  inline static constexpr auto ALERT = Priority::ALERT;
+  inline static constexpr auto CRITICAL = Priority::CRITICAL;
+  inline static constexpr auto CRIT [[deprecated("instead, spell it out, prefer Priority::CRITICAL")]] = Priority::CRIT;
+  inline static constexpr auto ERROR = Priority::ERROR;
+  inline static constexpr auto ERR [[deprecated("instead, spell it out, prefer Priority::ERROR")]] = Priority::ERR;
+  inline static constexpr auto WARNING = Priority::WARNING;
+  inline static constexpr auto NOTICE = Priority::NOTICE;
+  inline static constexpr auto INFORMATION = Priority::INFORMATION;
+  inline static constexpr auto INFO [[deprecated("instead, spell it out, prefer Priority::INFORMATION")]] = Priority::INFO;
+  inline static constexpr auto VERBOSE = Priority::VERBOSE;
+  inline static constexpr auto DEBUG = Priority::DEBUG;
+  using Option = log::Option;
+  using Options = log::Options;
+  inline static constexpr auto PID = Options{Option::PID};
+  inline static constexpr auto CONSOLE = Options{Option::CONSOLE};
+  inline static constexpr auto CONS [[deprecated("instead, spell it out, prefer Option::CONSOLE")]] = Options{Option::CONS};
+  inline static constexpr auto NODELAY = Options{Option::NODELAY};
+  inline static constexpr auto ODELAY [[deprecated("does not do anything")]] = Options{Option::ODELAY};
+  inline static constexpr auto NDELAY [[deprecated("instead prefer Option::NODELAY")]] = Options{Option::NDELAY};
+  inline static constexpr auto NOWAIT [[deprecated("avoid in new work")]] = Options{Option::NOWAIT};
+  inline static constexpr auto PERROR = Options{Option::PERROR};
+  // the API
+private:
+  using Stringface = api::arg::Stringface; // a filepath interface convertible into the C API's use of 'char const *'
+public:
+  inline static auto open(Stringface identifier, Options, Facility) -> void;
+  inline static auto open(Options, Facility) -> void;
+  inline static auto close() -> void;
+  inline static auto set(Priorities) -> void;
+  inline static auto format(Priority, char const *format, ...) noexcept -> void      __attribute__ ((__format__ (__printf__, 2, 3)));
+  inline static auto vformat(Priority, char const *format, va_list) noexcept -> void __attribute__ ((__format__ (__printf__, 2, 0)));
+  // struct-as-namespace
+  LOG() = delete;
+  LOG(LOG const &) = delete;
+  auto operator=(LOG const &) -> LOG & = delete;
+};
+#pragma GCC diagnostic pop
+#endiv
+#divert <ipp>
+namespace sys::log {
+  auto LOG::open(Stringface i, Options o, Facility f) -> void { api::open(i, o, f); }
+  auto LOG::open(Options o, Facility f) -> void { api::open(o, f); }
+  auto LOG::close() -> void { api::close(); }
+  auto LOG::set(Priorities o) -> void { api::set(o); }
+  auto LOG::format(Priority p, char const *format, ...) noexcept -> void {
+    va_list ap;
+    va_start(ap, format);
+    vformat(p, format, ap);
+    va_end(ap);
+  }
+  auto LOG::vformat(Priority p, char const *format, va_list ap) noexcept -> void { api::vformat(p, format, ap); }
+}
+#endiv

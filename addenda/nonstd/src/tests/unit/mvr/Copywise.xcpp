@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::mvr {
+  class Copywise;
+}
+#endiv
+#divert <hpp>
+class tests::unit::mvr::Copywise {
+public:
+  Copywise();
+  Copywise(Copywise const &);
+  auto operator=(Copywise const &) -> Copywise &;
+  Copywise(Copywise &&);
+  auto operator=(Copywise &&) -> Copywise &;
+  ~Copywise();
+  static unsigned serial;
+};
+#endiv
+#divert <cpp>
+unsigned tests::unit::mvr::Copywise::serial = 0;
+
+#import std.cout
+tests::unit::mvr::Copywise::Copywise() {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (constructor)\n";
+}
+
+tests::unit::mvr::Copywise::Copywise(Copywise const &other) {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (copy constructor)\n";
+}
+
+auto tests::unit::mvr::Copywise::operator=(Copywise const &other) -> Copywise & {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (copy assignment)\n";
+  return *this;
+}
+
+tests::unit::mvr::Copywise::Copywise(Copywise &&other) {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (move constructor)\n";
+}
+
+auto tests::unit::mvr::Copywise::operator=(Copywise &&other) -> Copywise & {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (move assignment)\n";
+  return *this;
+}
+
+tests::unit::mvr::Copywise::~Copywise() {
+  std::cout << "serial " << serial++ << " in " << __FUNCTION__ << " (destructor)\n";
+}
+#endiv

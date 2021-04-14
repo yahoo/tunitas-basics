@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// A stalking horse for pipe-from execution.
+//
+// Usage:
+//
+//   same as Pipe_From
+//
+#include <tests.unit.run.Pipe_From>
+#endiv
+#divert <hpp>
+#import shell.run.Pipe_From
+class tests::unit::run::Pipe_From::Horse : public ::shell::run::Pipe_From {
+  using Ancestor = ::shell::run::Pipe_From;
+public:
+  Horse();
+};
+#endiv
+#divert <cpp>
+tests::unit::run::Pipe_From::Horse::Horse()
+  : Ancestor{EXEC, "/bin/date"}
+{ }
+#endiv

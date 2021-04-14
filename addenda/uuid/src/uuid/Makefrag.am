@@ -1,0 +1,54 @@
+# -*- Makefile -*-
+
+lib_libuuid_module_la = lib/libuuid-module.la
+lib_libuuid_module_la_LIBADD = \
+  $(OBSERVE_that_minusluuid_already_in_PACKAGE_FLAGS_SET) \
+  $(end)
+lib_libuuid_module_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+lib_libuuid_module_la_MODULES = $(call SCOLD_SOURCEStoMODULES, $(lib_libuuid_module_la_SOURCES))
+lib_libuuid_module_la_SOURCES = \
+  obj/src/uuid/namespace.cpp \
+  obj/src/uuid/clear.cpp \
+  obj/src/uuid/compare.cpp \
+  obj/src/uuid/Container.cpp \
+  obj/src/uuid/copy.cpp \
+  obj/src/uuid/is_null.cpp \
+  obj/src/uuid/parse.cpp \
+  obj/src/uuid/Type.cpp \
+  obj/src/uuid/type.cpp \
+  obj/src/uuid/unparse.cpp \
+  obj/src/uuid/Variant.cpp \
+  obj/src/uuid/variant.cpp \
+  \
+  obj/src/uuid/generate/namespace.cpp \
+  obj/src/uuid/generate/basic.cpp \
+  obj/src/uuid/generate/random.cpp \
+  obj/src/uuid/generate/time_safe.cpp \
+  obj/src/uuid/generate/time_unsafe.cpp \
+  \
+  obj/src/uuid/time/namespace.cpp \
+  obj/src/uuid/time/point.cpp \
+  obj/src/uuid/time/t.cpp \
+  obj/src/uuid/time/val.cpp \
+  \
+  obj/src/uuid/unparsing/namespace.cpp \
+  obj/src/uuid/unparsing/lower.cpp \
+  obj/src/uuid/unparsing/upper.cpp \
+  \
+  obj/src/uuid/detail/namespace.cpp \
+  obj/src/uuid/detail/t.cpp \
+  obj/src/uuid/detail/Wrapper.cpp \
+  \
+  obj/src/uuid/detail/generate/namespace.cpp \
+  obj/src/uuid/detail/generate/scheme.cpp \
+  obj/src/uuid/detail/unparse/namespace.cpp \
+  obj/src/uuid/detail/unparse/scheme.cpp \
+  $(end)
+
+$(scold_cxxdir)/uuid/dependencies.mk: Makefile
+	$(AM_V_BB1ST) $(call bbSCOLD_DISAGGREGATE_COMPILE, $(lib_libuuid_module_la_SOURCES))
+	$(AM_V_BB2ND) $(call bbSCOLD_DEPENDENCIES_COMPILE, $(lib_libuuid_module_la_SOURCES))
+	@test -e $@
+include $(scold_cxxdir)/uuid/dependencies.mk
+clean-dependencies::
+	rm -f $(scold_cxxdir)/uuid/dependencies.mk

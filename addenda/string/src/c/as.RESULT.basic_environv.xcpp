@@ -1,0 +1,29 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.as
+#import c.basic_environv
+namespace c {
+  // environv (a pointer, with a length); not '\0'-terminated
+  template<typename RESULT, typename CHAR> inline auto as(basic_environv<CHAR const> const &) -> RESULT;
+  template<typename RESULT, typename CHAR> inline auto as(basic_environv<CHAR> const &) -> RESULT;
+}
+#divert </hpp>
+#divert <ipp>
+#import std.is_same
+template<typename RESULT, typename CHAR> auto c::as(basic_environv<CHAR const> const &subject) -> RESULT {
+  static_assert(std::is_same<RESULT, basic_environv<CHAR const>>::value, "RESULT is not appropriate here");
+  return subject;
+}
+
+template<typename RESULT, typename CHAR> auto c::as(basic_environv<CHAR> const &subject) -> RESULT {
+  // Allow:
+  //   as<basic_environv<char const>>(basic_environv<char>) ..... cast to const
+  //   as<basic_environv<char>>(basic_environv<char>) ........... identity transform
+  static_assert((std::is_same<RESULT, basic_environv<CHAR const>>::value
+		 ||
+		 std::is_same<RESULT, basic_environv<CHAR>>::value),
+		"RESULT is not appropriate here");
+  // Because it may be a cast, we need to recompose
+  return RESULT(subject.data());
+}
+#divert </ipp>

@@ -1,0 +1,3 @@
+tests_unit_ip_format_TESTS = \
+  tests/unit/ip/format/all.test \
+  $(end)

@@ -1,0 +1,55 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.iterator.Bidirectional
+namespace nonstd::range::detail {
+  //
+  // Recontain a pair of iterators, producing their reverse upon iteration
+  //
+  // Usage:
+  //     ITERATOR start = ...somehow...
+  //     ITERATOR finish = ...somehow...
+  //     Recontainer<ITERATOR> redo(start, finish);
+  //
+  template<required::iterator::Bidirectional> class Reverse;
+}
+#endiv
+#divert <hpp>
+#import std.pair
+#import std.size_t
+#import std.reverse_iterator
+namespace nonstd::range {
+  template<required::iterator::Bidirectional ITERATOR> class detail::Reverse : private std::pair<ITERATOR, ITERATOR> {
+    using ancestor = std::pair<ITERATOR, ITERATOR>;
+    struct base {
+      using Iterator = ITERATOR;
+    };
+  public:
+    using Iterator = std::reverse_iterator<typename base::Iterator>;
+    Reverse() = default;
+    using ancestor::pair;
+    using Size = std::size_t;
+    inline auto empty() const -> bool;
+    inline auto size() const -> Size;
+    inline auto begin() const -> Iterator;
+    inline auto end() const -> Iterator;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.distance
+namespace nonstd::range::detail {
+  template<required::iterator::Bidirectional _> auto Reverse<_>::empty() const -> bool {
+    return ancestor::first == ancestor::second;
+  }
+  template<required::iterator::Bidirectional _> auto Reverse<_>::size() const -> Size {
+    return std::distance(ancestor::first, ancestor::second);
+  }
+  template<required::iterator::Bidirectional _> auto Reverse<_>::begin() const -> Iterator {
+    return Iterator{ancestor::second};
+  }
+  template<required::iterator::Bidirectional _> auto Reverse<_>::end() const -> Iterator {
+    return Iterator{ancestor::first};
+  }
+}
+#endiv

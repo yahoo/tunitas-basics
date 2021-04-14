@@ -1,0 +1,37 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#include <sqlite3.h>
+namespace sqlite {
+  namespace api {
+    namespace utf {
+      // some overload trivialities to make the nearby unguarded function templates "just work"
+      // These overload against char and wchar_t, whereas the C interface of SQLite must use 'void *' for UTF-16
+      // These have the same signature as the declarations in <sqlite3.h> except s/void/wchar_t/
+      inline auto prepare(::sqlite3 *db, char const *zSql, int nByte, ::sqlite3_stmt **ppStmt, char const **pzTail) -> int; 
+      inline auto prepare(::sqlite3 *db, wchar_t const *zSql, int nByte, ::sqlite3_stmt **ppStmt, wchar_t const **pzTail) -> int;
+      inline auto prepare_v2(::sqlite3 *db, char const *zSql, int nByte, ::sqlite3_stmt **ppStmt, char const **pzTail) -> int;
+      inline auto prepare_v2(::sqlite3 *db, wchar_t const *zSql, int nByte, ::sqlite3_stmt **ppStmt, wchar_t const **pzTail) -> int;
+    } 
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.c89
+// c89::utf16 is the best-effort UTF-16 character type in the C language; a.k.a. 'void'
+
+auto sqlite::api::utf::prepare(::sqlite3 *db, char const *zSql, int nByte, ::sqlite3_stmt **ppStmt, char const **pzTail) -> int {
+  return ::sqlite3_prepare(db, zSql, nByte, ppStmt, pzTail);
+}
+
+auto sqlite::api::utf::prepare(::sqlite3 *db, wchar_t const *zSql, int nByte, ::sqlite3_stmt **ppStmt, wchar_t const **pzTail) -> int {
+  return ::sqlite3_prepare16(db, zSql, nByte, ppStmt, reinterpret_cast<c89::utf16 const **>(pzTail));
+}
+
+auto sqlite::api::utf::prepare_v2(::sqlite3 *db, char const *zSql, int nByte, ::sqlite3_stmt **ppStmt, char const **pzTail) -> int {
+  return ::sqlite3_prepare_v2(db, zSql, nByte, ppStmt, pzTail);
+}
+
+auto sqlite::api::utf::prepare_v2(::sqlite3 *db, wchar_t const *zSql, int nByte, ::sqlite3_stmt **ppStmt, wchar_t const **pzTail) -> int {
+  return ::sqlite3_prepare16_v2(db, zSql, nByte, ppStmt, reinterpret_cast<c89::utf16 const **>(pzTail));
+}
+#endiv

@@ -1,0 +1,70 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::managed::host {
+  //
+  // The addresses of a managed::Host (of an unmanaged::Host, a.k.a. struct ::hostent of <netdb.h>)
+  // Normally they are stored in some sort of char** thingy
+  // - without a nullptr sentinel at the end,
+  // - but with a nearby h_length field.
+  //
+  // Robust Safety being the order of the day, herewith is a typesafe interface
+  //
+  // Const semantics only; value-generating on access.
+  // Shallow copy semantics; but it's const semantics so there is no point
+  // Move semantics: default.
+  // No destruction; the containing List manages that; being List<Entry<HOST4>>, List<Entry<HOST6>>.
+  // 
+  // Usage: see Host<HOST4>, Host<HOST6>.
+  //
+  //   auto const *entry = ::hostent{....somehow...}
+  //   auto const *entry = unmanaged::Host{....somehow...}
+  //
+  //   When we "know" that the address type is IPv4 (as :: ip::in4::addr)
+  //
+  //     auto addresses = Addresses<ADDR4>{entry->h_length, entry->h_host_list};
+  //
+  //   When we "know" that the address type is IPv6 (as :: ip::in6::addr)
+  //
+  //     auto addresses = Addresses<ADDR6>{entry->h_length, entry->h_host_list};
+  //
+  //   for (auto address : addresses) {
+  //     ...
+  //     ...do something with the address...
+  //     ...
+  //   }
+  //
+  template<Address_Genre> struct Addresses;
+}
+#endiv
+#divert <hpp>
+#import c.const_vector
+#import ares.managed.host.addresses.Iterator
+namespace ares::managed {
+  template<Address_Genre THE_GENRE> struct host::Addresses : private c::const_vector {
+    using ancestor = c::const_vector;
+    inline static constexpr auto GENRE = THE_GENRE;
+  public:
+    inline Addresses(std::size_t, char const *const *);
+    using ancestor::empty;
+    using ancestor::size;
+    using const_iterator = addresses::Iterator<GENRE>;
+    using iterator = const_iterator;
+    inline auto begin() const -> const_iterator;
+    inline auto end() const -> const_iterator;
+  };
+}
+#endiv
+#divert <ipp>
+namespace ares::managed::host {
+  template<Address_Genre _> Addresses<_>::Addresses(std::size_t length, char const *const *hosts_list)
+    : ancestor{length, hosts_list}
+  { }
+  template<Address_Genre _> auto Addresses<_>::begin() const -> const_iterator {
+    return const_iterator{ancestor:begin()};
+  }
+  template<Address_Genre _> auto Addresses<_>::end() const -> const_iterator {
+    return const_iterator{ancestor:end()};
+  }
+}
+#endiv

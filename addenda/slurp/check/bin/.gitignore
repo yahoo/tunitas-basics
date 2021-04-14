@@ -1,0 +1,9 @@
+# yes, this should exist
+.dirstamp
+.libs
+cat
+rev
+tac
+ver
+unit
+#end

@@ -1,0 +1,11 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 1
+cd ${0%/*}
+output="$name".out
+golden="$name".gold
+set -e
+(
+    # call and see what happens
+    parse -S -abc -d beagle -e bald -fbull -gbilly
+) >& $output
+diff $golden $output

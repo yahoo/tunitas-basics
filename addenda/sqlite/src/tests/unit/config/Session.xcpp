@@ -1,0 +1,316 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace config {
+      class Session;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::config::Session : public cppunit::test::Fixture {
+public:
+  // This is the safe interface (see config::unsafe::Session for the unsafe variants)
+  auto test_nop()-> void;
+  auto test_singlethread()-> void;
+  auto test_multithread()-> void;
+  auto test_serialized()-> void;
+  auto test_malloc()-> void;
+  auto test_getmalloc()-> void;
+  auto test_scratch()-> void;
+  auto test_pagecache()-> void;
+  auto test_heap()-> void;
+  auto test_memstatus()-> void;
+  auto test_mutex()-> void;
+  auto test_getmutex()-> void;
+  auto test_lookaside()-> void;
+  auto test_pcache()-> void;
+  auto test_getpcache()-> void;
+  auto test_log()-> void;
+  auto test_uri()-> void;
+  auto test_pcache2()-> void;
+  auto test_getpcache2()-> void;
+  auto test_covering_index_scan()-> void;
+  auto test_sqllog_on()-> void;
+  auto test_sqllog_off()-> void;
+  auto test_mmap_size()-> void;
+  auto test_win32_heapsize()-> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sqlite.api.config
+#import std.clog
+
+using namespace sqlite::config::session;
+
+auto tests::unit::config::Session::test_nop()-> void {
+  CPPUNIT_ASSERT(ok(sqlite::api::config(NOP::VALUE)));
+}
+
+auto tests::unit::config::Session::test_singlethread()-> void {
+  auto r = sqlite::api::config(SINGLETHREAD::VALUE);
+  CPPUNIT_ASSERT(ok(r) || !ok(r));
+}
+
+auto tests::unit::config::Session::test_multithread()-> void {
+  auto r = sqlite::api::config(MULTITHREAD::VALUE);
+  CPPUNIT_ASSERT(ok(r) || !ok(r));
+}
+
+auto tests::unit::config::Session::test_serialized()-> void {
+  auto r = sqlite::api::config(SERIALIZED::VALUE);
+  CPPUNIT_ASSERT(ok(r) || !ok(r));
+}
+
+auto tests::unit::config::Session::test_malloc()-> void {
+  sqlite::methods::memory buf;
+  auto get = ok(sqlite::api::config(GETMALLOC::VALUE, &buf));
+  auto set = get && ok(sqlite::api::config(MALLOC::VALUE, &buf));
+  CPPUNIT_ASSERT(set || !set);
+}
+
+auto tests::unit::config::Session::test_getmalloc()-> void {
+  sqlite::methods::memory buf;
+  auto r = sqlite::api::config(GETMALLOC::VALUE, &buf);
+  CPPUNIT_ASSERT(ok(r) || !ok(r));
+}
+
+auto tests::unit::config::Session::test_scratch()-> void {
+  CPPUNIT_ASSERT(true);
+  std::clog << "UNTESTED: ok(sqlite::api::config(SCRATCH::VALUE))\n";
+}
+
+auto tests::unit::config::Session::test_pagecache()-> void {
+  CPPUNIT_ASSERT(true);
+  std::clog << "UNTESTED: ok(sqlite::api::config(PAGECACHE::VALUE)))\n";
+}
+
+auto tests::unit::config::Session::test_heap()-> void {
+  CPPUNIT_ASSERT(true);
+  std::clog << "UNTESTED: ok(sqlite::api::config(HEAP::VALUE)))\n";
+}
+
+auto tests::unit::config::Session::test_memstatus()-> void {
+  {
+    bool status = true;
+    auto val = sqlite::api::config(MEMSTATUS::VALUE, status);
+    CPPUNIT_ASSERT( ok(val) || !ok(val) );
+  } {
+    bool status = false;
+    auto val = sqlite::api::config(MEMSTATUS::VALUE, status);
+    CPPUNIT_ASSERT( ok(val) || !ok(val) );
+  }
+}
+
+auto tests::unit::config::Session::test_mutex()-> void {
+  sqlite::methods::mutex buf;
+  auto get = ok(sqlite::api::config(GETMUTEX::VALUE, &buf));
+  auto set = get && ok(sqlite::api::config(MUTEX::VALUE, &buf));
+  CPPUNIT_ASSERT(set || !set);
+}
+
+auto tests::unit::config::Session::test_getmutex()-> void {
+  sqlite::methods::mutex buf;
+  auto r = sqlite::api::config(GETMUTEX::VALUE, &buf);
+  CPPUNIT_ASSERT(ok(r) || !ok(r));
+}
+
+auto tests::unit::config::Session::test_lookaside()-> void {
+  // [[SQLITE_CONFIG_LOOKASIDE]] <dt>SQLITE_CONFIG_LOOKASIDE</dt>
+  // <dd> ^(This option takes two arguments that determine the default
+  // memory allocation for the lookaside memory allocator on each
+  // [database connection].  The first argument is the
+  // size of each lookaside buffer slot and the second is the number of
+  // slots allocated to each database connection.)^  ^(This option sets the
+  // <i>default</i> lookaside size. The [SQLITE_DBCONFIG_LOOKASIDE]
+  // verb to [sqlite3_db_config()] can be used to change the lookaside
+  // configuration on individual connections.)^ </dd>
+  std::size_t const SIZE1 = 1024;
+  std::size_t const SIZE2 = 10;
+  auto val = sqlite::api::config(LOOKASIDE::VALUE, SIZE1, SIZE2);
+  auto good = ok(val);
+  CPPUNIT_ASSERT(good || !good);
+}
+
+auto tests::unit::config::Session::test_pcache()-> void {
+  // reminder "v1" of pcache is a no-op, only "v2" does something
+  sqlite::methods::obsolete::pcache1 buf1;
+  auto get = ok(sqlite::api::config(GETPCACHE::VALUE, &buf1));
+  auto set = get && ok(sqlite::api::config(PCACHE::VALUE, &buf1));
+  bool const expected = false; // this interface is old and deprecated, it always fails (use v2 instead)
+  CPPUNIT_ASSERT(expected == set);
+}
+
+auto tests::unit::config::Session::test_getpcache()-> void {
+  sqlite::methods::obsolete::pcache1 buf1;
+  auto set = ok(sqlite::api::config(GETPCACHE::VALUE, &buf1));
+  bool const expected = false; // this interface is old and deprecated, it always fails (use v2 instead)
+  CPPUNIT_ASSERT(expected == set);
+}
+
+namespace {
+  namespace test_log {
+    char buffer[10];
+    auto logger(void *, int, char const *) -> void {
+      // do notihng
+    }
+  }
+}
+
+#import std.is_same
+auto tests::unit::config::Session::test_log()-> void {
+  // [[SQLITE_CONFIG_LOG]] <dt>SQLITE_CONFIG_LOG</dt>
+  // <dd> The SQLITE_CONFIG_LOG option is used to configure the SQLite
+  // global [error log].
+  // (^The SQLITE_CONFIG_LOG option takes two arguments: a pointer to a
+  // function with a call signature of void(*)(void*,int,const char*), 
+  // and a pointer to void. ^If the function pointer is not NULL, it is
+  // invoked by [sqlite3_log()] to process each logging event.  ^If the
+  // function pointer is NULL, the [sqlite3_log()] interface becomes a no-op.
+  static_assert(std::is_same<sqlite::c89::Log, decltype(&test_log::logger)>::value, "not a Log function");
+  auto set_logger = test_log::logger;
+  auto set_buffer = test_log::buffer;
+  // set
+  { auto r = sqlite::api::config(LOG::VALUE, set_logger, set_buffer);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+  // unset
+  decltype(set_logger) unset_logger = nullptr;
+  decltype(set_buffer) unset_buffer = nullptr;
+  { auto r = sqlite::api::config(LOG::VALUE, unset_logger, unset_buffer);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+}
+
+auto tests::unit::config::Session::test_uri()-> void {
+  // [[SQLITE_CONFIG_URI]] <dt>SQLITE_CONFIG_URI
+  // <dd>^(This option takes a single argument of type int. If non-zero, then
+  // URI handling is globally enabled. If the parameter is zero, then URI handling
+  // is globally disabled.)^
+  { auto r = sqlite::api::config(URI::VALUE, false);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+  { auto r = sqlite::api::config(URI::VALUE, true);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+}
+
+auto tests::unit::config::Session::test_pcache2()-> void {
+  // reminder "v1" of pcache is a no-op, only "v2" does something
+  sqlite::methods::pcache2 buf2;
+  auto get = ok(sqlite::api::config(GETPCACHE2::VALUE, &buf2));
+  auto set = get && ok(sqlite::api::config(PCACHE2::VALUE, &buf2));
+  CPPUNIT_ASSERT(set || !set);
+}
+
+auto tests::unit::config::Session::test_getpcache2()-> void {
+  sqlite::methods::pcache2 buf2;
+  auto get = ok(sqlite::api::config(GETPCACHE2::VALUE, &buf2));
+  CPPUNIT_ASSERT(get || !get);
+}
+
+auto tests::unit::config::Session::test_covering_index_scan()-> void {
+  // <dd>^This option takes a single integer argument which is interpreted as
+  // a boolean in order to enable or disable the use of covering indices for
+  // full table scans in the query optimizer.  ^The default setting is determined
+  { auto r = sqlite::api::config(COVERING_INDEX_SCAN::VALUE, true);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+  { auto r = sqlite::api::config(COVERING_INDEX_SCAN::VALUE, false);
+    CPPUNIT_ASSERT(ok(r) || !ok(r)); }
+}
+
+namespace {
+  namespace test_sqllog {
+    char buffer[10];
+    auto logger(void *, ::sqlite3 *, char const *, int) -> void {
+      // do nothing
+    }
+  }
+}
+
+#import std.is_same
+auto tests::unit::config::Session::test_sqllog_on()-> void {
+  static_assert(std::is_same<sqlite::c89::Sqllog, decltype(&test_sqllog::logger)>::value, "not a Sqllog function");
+  auto set_logger = test_sqllog::logger;
+  auto set_buffer = test_sqllog::buffer;
+  // set
+  auto set = ok(sqlite::api::config(SQLLOG::VALUE, set_logger, set_buffer));
+  bool const expected = false;
+  CPPUNIT_ASSERT(expected == set); // the API doesn't work
+}
+
+auto tests::unit::config::Session::test_sqllog_off()-> void {
+  // unset
+  auto unset_logger = test_sqllog::logger;
+  unset_logger = nullptr;
+  auto unset_buffer = test_sqllog::buffer;
+  unset_buffer = nullptr;
+  auto unset = ok(sqlite::api::config(SQLLOG::VALUE, unset_logger, unset_buffer));
+  bool const expected = false;
+  CPPUNIT_ASSERT(expected == unset); // the API doesn't work
+}
+
+auto tests::unit::config::Session::test_mmap_size()-> void {
+  // <dd>^SQLITE_CONFIG_MMAP_SIZE takes two 64-bit integer (sqlite3_int64) values
+  // that are the default mmap size limit (the default setting for
+  // [PRAGMA mmap_size]) and the maximum allowed mmap size limit.
+  std::size_t DEFAULT_SIZE = (1<<16);
+  std::size_t MAXIMUM_SIZE = (1<<20);
+  auto set = ok(sqlite::api::config(MMAP_SIZE::VALUE, DEFAULT_SIZE, MAXIMUM_SIZE));
+  CPPUNIT_ASSERT(set || !set);
+  // ^If either argument to this option is negative, then that argument is
+  // changed to its compile-time default.
+  auto unset = ok(sqlite::api::config(MMAP_SIZE::VALUE, -1, -1));
+  CPPUNIT_ASSERT(unset || !unset);
+}
+
+auto tests::unit::config::Session::test_win32_heapsize()-> void {
+  // <dd>^This option is only available if SQLite is compiled for Windows
+  // with the [SQLITE_WIN32_MALLOC] pre-processor macro defined.
+  // SQLITE_CONFIG_WIN32_HEAPSIZE takes a 32-bit unsigned integer value
+  // that specifies the maximum size of the created heap.
+  std::uint32_t MAXIMUM_SIZE = (1<<24);
+  // This is supposed to be a no-op unless Win32 is available
+  auto set = ok(sqlite::api::config(WIN32_HEAPSIZE::VALUE, MAXIMUM_SIZE));
+  bool const expected = false; // we are not on Windows, so this is declared to fail here
+  CPPUNIT_ASSERT(expected == set);
+}
+
+#import tests.unit.config.Session
+#import tests.unit.config.Connection
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::config::Session::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("session");
+  s << call("nop", &Session::test_nop)
+    << call("singlethread", &Session::test_singlethread)
+    << call("multithread", &Session::test_multithread)
+    << call("serialized", &Session::test_serialized)
+    << call("malloc", &Session::test_malloc)
+    << call("getmalloc", &Session::test_getmalloc)
+    << call("scratch", &Session::test_scratch)
+    << call("pagecache", &Session::test_pagecache)
+    << call("heap", &Session::test_heap)
+    << call("memstatus", &Session::test_memstatus)
+    << call("mutex", &Session::test_mutex)
+    << call("getmutex", &Session::test_getmutex)
+    << call("lookaside", &Session::test_lookaside)
+    << call("pcache", &Session::test_pcache)
+    << call("getpcache", &Session::test_getpcache)
+    << call("log", &Session::test_log)
+    << call("uri", &Session::test_uri)
+    << call("pcache2", &Session::test_pcache2)
+    << call("getpcache2", &Session::test_getpcache2)
+    << call("covering", &Session::test_covering_index_scan)
+    << call("sqllog-on", &Session::test_sqllog_on)
+    << call("sqllog-off", &Session::test_sqllog_off)
+    << call("mmap", &Session::test_mmap_size)
+    << call("win32", &Session::test_win32_heapsize)
+    ;
+  return s.release();
+}
+#endiv

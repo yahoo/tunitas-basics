@@ -1,0 +1,6 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+// "as if" they are part of the sqlite::api
+#entail sqlite.type
+#entail sqlite.numeric_coercion
+#endiv

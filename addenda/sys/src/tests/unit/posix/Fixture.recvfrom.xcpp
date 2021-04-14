@@ -1,0 +1,150 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.sockaddr_in //  [[FIXTHIS]] needed to enable the conceps used in sys.posix.recvfrom
+#import sys.posix.sockaddr_in6 // [[FIXTHIS]] ibidem.
+#import sys.posix.MSG
+#import sys.posix.recvfrom
+auto tests::unit::posix::fixture::Fixture::test_recvfrom_0() -> void {
+  auto const fd = int{-1};
+  { char buf[10];
+    sockaddr_in sa;
+    socklen_t sal = sizeof (sa); 
+    auto received = six::avoid::recvfrom(fd, reinterpret_cast<void *>(&buf), sizeof (buf), six::MSG::NONE, reinterpret_cast<sockaddr *>(&sa), &sal);
+    CPPUNIT_ASSERT(!good(received)); } // of course, because the fd was invalid, but it was callable
+  { char buf[10];
+    sockaddr_in6 sa;
+    socklen_t sal = sizeof (sa); 
+    auto received = six::avoid::recvfrom(fd, reinterpret_cast<void *>(&buf), sizeof (buf), six::MSG::NONE, reinterpret_cast<sockaddr *>(&sa), &sal);
+    CPPUNIT_ASSERT(!good(received)); } // of course, because the fd was invalid, but it was callable
+}
+auto tests::unit::posix::fixture::Fixture::test_recvfrom_1() -> void {
+  auto const fd = int{-1};
+  { char buf[10];
+    sockaddr_in sa;
+    static_assert(sys::posix::required::Sockaddr<sockaddr_in>);
+    auto received = six::avoid::recvfrom(fd, reinterpret_cast<void *>(&buf), sizeof (buf), six::MSG::NONE, sa);
+    CPPUNIT_ASSERT(!good(received)); } // of course, because the fd was invalid, but it was callable
+  { char buf[10];
+    sockaddr_in6 sa;
+    static_assert(sys::posix::required::Sockaddr<sockaddr_in6>);
+    auto received = six::avoid::recvfrom(fd, reinterpret_cast<void *>(&buf), sizeof (buf), six::MSG::NONE, sa);
+    CPPUNIT_ASSERT(!good(received)); } // of course, because the fd was invalid, but it was callable
+}
+#import nonstd.dope
+#import std.byte
+auto tests::unit::posix::fixture::Fixture::test_recvfrom_2() -> void {
+  auto const fd = int{-1};
+  { char buf[10];
+    auto doped = ::nonstd::dope<char>{&buf[0], sizeof (buf)};
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { std::byte buf[10];
+    auto doped = ::nonstd::dope<std::byte>{&buf[0], sizeof (buf)};
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { char unsigned buf[10];
+    auto doped = ::nonstd::dope<char unsigned>{&buf[0], sizeof (buf)};
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { char signed buf[10];
+    auto doped = ::nonstd::dope<char signed>{&buf[0], sizeof (buf)};
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, doped, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+}
+auto tests::unit::posix::fixture::Fixture::test_recvfrom_3() -> void {
+  auto const fd = int{-1};
+  { char buf;
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } } // ibidem.
+  { short buf;
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { int buf;
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { double buf;
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { struct Thing { char internal_buffer[10]; } buf;
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+}
+auto tests::unit::posix::fixture::Fixture::test_recvfrom_4() -> void {
+  auto const fd = int{-1};
+  { char buf[10];
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { short buf[10];
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { int buf[10];
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { double buf[10];
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+  { struct Thing { char internal_buffer[10]; } buf[10];
+    { sockaddr_in sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } // ibidem.
+    { sockaddr_in6 sa;
+      auto received = six::native::recvfrom(fd, buf, six::MSG::NONE, sa);
+      CPPUNIT_ASSERT(!good(received)); } }
+}
+#endiv

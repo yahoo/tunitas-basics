@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.error_code
+namespace sys::error {
+  //
+  // Like std::error_code, but ... the same.
+  //
+  // Rhyming:
+  //
+  //   sys::error::Code <--> std::error_code
+  //   sys::e::Code <------> int
+  //
+  //   sys::error::Condition <--> std::error_condition
+  //   sys::e::Condition <------> std::errc
+  //
+  // Usage:
+  //
+  //   auto ec = sys::error::Code{e::Code::BADF};
+  //   auto ec = sys::error::Code{(int)e::Code::BADF, std::system_category{}};
+  //
+  using Code = std::error_code;
+}
+#import sys.e.Code
+#import std.is_error_code_enum.sys.e.Code
+#endiv
+#divert <hpp>
+#import error_t
+namespace sys::error {
+  [[deprecated("avoid, prefer calling the constructor directly as sys::error::Code{errno, system_category()}")]] inline auto code() -> Code;
+  [[deprecated("avoid, prefer calling the constructor directly as sys::error::Code{error_t, Category const &}")]] inline auto code(error_t) -> Code;
+  //
+  // Rhymes with sys::call::Result
+  //
+  inline auto ok(Code const &) -> bool;
+  inline auto good(Code const &) -> bool;
+  inline auto fail(Code const &) -> bool;
+  [[deprecated("oddlly, prefer the shorter form fail(Code)")]] inline auto failure(Code const &) -> bool;
+}
+#endiv
+#divert <ipp>
+#import errno
+#import std.system_category
+#import sys.e.Code
+namespace sys {
+  auto error::code() -> Code            { return Code{errno, std::system_category()}; }
+  auto error::code(error_t num) -> Code { return Code{num, std::system_category()}; }
+  //
+  auto error::ok(Code const &c) -> bool   { return good(c); }
+  auto error::good(Code const &c) -> bool { return sys::e::Code::SUCCESS == c; }
+  auto error::fail(Code const &c) -> bool { return !good(c); }
+  auto error::failure(Code const &c) -> bool { return fail(c); }
+}
+#endiv

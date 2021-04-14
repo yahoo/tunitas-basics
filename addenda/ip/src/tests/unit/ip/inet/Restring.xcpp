@@ -1,0 +1,277 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tests.unit.ip.inet.Restringable
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> class Restring;
+}
+#endiv
+#divert <hpp>
+#import re.string
+#import c.const_stringz
+#import std.string
+#import std.is_same
+#import cppunit.Test
+#import cppunit.test.Fixture
+namespace tests::unit::ip {
+  template<inet::Restringable SPECIMEN> class inet::Restring : public cppunit::test::Fixture {
+  public:
+    using Specimen = SPECIMEN;
+  
+    auto test_aton_in4_addr() -> void;
+    auto test_aton_in6_addr() -> void;
+    auto test_aton_in4_addr_t() -> void;
+    auto test_aton_in6_addr_t() -> void;
+
+    auto test_pton_in4_addr() -> void;
+    auto test_pton_in6_addr() -> void;
+    auto test_pton_in4_addr_t() -> void;
+    auto test_pton_in6_addr_t() -> void;
+
+    auto test_getaddrinfo_host_service() -> void;
+    auto test_getaddrinfo_host() -> void;
+    auto test_getaddrinfo_service() -> void;
+
+    static auto suite() -> cppunit::Test *;
+  };
+}
+#endiv
+#divert <tpp>
+#import c.str
+#import ip.inet.aton
+#import ip.inet.ntop
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_aton_in4_addr() -> void {
+    // basically the same as pton
+    // respect ... RFC 5737
+    {
+      Specimen specimen = "198.51.100.101";
+      auto ton = ::ip::inet::aton<::ip::in4::addr>(specimen); // <----------- test this (addr)
+      CPPUNIT_ASSERT(ok(ton));
+      auto addr = value(ton);
+      auto top = ::ip::inet::ntop(addr);
+      CPPUNIT_ASSERT(ok(top));
+      std::string const actual = value(top);
+      std::string const expected = ::c::str(specimen);
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    } {
+      Specimen specimen = "19851.10099";
+      auto ton = ::ip::inet::aton<::ip::in4::addr>(specimen); // <----------- test this (addr)
+      CPPUNIT_ASSERT(!ok(ton));
+    }
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_aton_in6_addr() -> void {
+    // basically the same as aton
+    // respect ... RFC 3849
+    {
+      Specimen specimen = "2001:db8:6aba:4921:b0d1:448:3068:e1ee";
+      auto ton = ::ip::inet::aton<::ip::in6::addr>(specimen); // <------------- test this (addr)
+      CPPUNIT_ASSERT(ok(ton));
+      auto addr = value(ton);
+      auto top = ::ip::inet::ntop(addr);
+      CPPUNIT_ASSERT(ok(top));
+      std::string const actual = value(top);
+      std::string const expected = ::c::str(specimen);
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    } {
+      Specimen specimen = "2001:db8:::::";
+      auto ton = ::ip::inet::aton<::ip::in6::addr>(specimen); // <------------ test this (addr)
+      CPPUNIT_ASSERT(!ok(ton));
+    }
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_aton_in4_addr_t() -> void {
+    // basically the same as pton
+    // respect ... RFC 5737
+    {
+      Specimen specimen = "198.51.100.100";
+      auto ton = ::ip::inet::aton<::ip::in4::addr_t>(specimen); // <----------- test this (addr_t)
+      CPPUNIT_ASSERT(ok(ton));
+      auto addr = value(ton);
+      auto top = ::ip::inet::ntop(addr);
+      CPPUNIT_ASSERT(ok(top));
+      std::string const actual = value(top);
+      std::string const expected = ::c::str(specimen);
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    } {
+      Specimen specimen = "19851.10099";
+      auto ton = ::ip::inet::aton<::ip::in4::addr_t>(specimen); // <----------- test this (addr_t)
+      CPPUNIT_ASSERT(!ok(ton));
+    }
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_aton_in6_addr_t() -> void {
+    // basically the same as aton
+    // respect ... RFC 3849
+    {
+      Specimen specimen = "2001:db8:6bcf:f26f:5095:4ed8:ac24:5ac";
+      auto ton = ::ip::inet::aton<::ip::in6::addr_t>(specimen); // <------------- test this (addr_t)
+      CPPUNIT_ASSERT(ok(ton));
+      auto addr = value(ton);
+      auto top = ::ip::inet::ntop(addr);
+      CPPUNIT_ASSERT(ok(top));
+      std::string const actual = value(top);
+      std::string const expected = ::c::str(specimen);
+      CPPUNIT_ASSERT_EQUAL(expected, actual);
+    } {
+      Specimen specimen = "2001:db8:::::";
+      auto ton = ::ip::inet::aton<::ip::in6::addr_t>(specimen); // <------------ test this (addr_t)
+      CPPUNIT_ASSERT(!ok(ton));
+    }
+  }
+}
+
+#import ip.inet.pton
+#import ip.inet.ntop
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_pton_in4_addr() -> void {
+    // respect ... RFC 5737
+    Specimen specimen = "198.51.100.134";
+    auto ton = ::ip::inet::pton<::ip::in4::addr>(specimen); // <----------- test this
+    CPPUNIT_ASSERT(ok(ton));
+    auto addr = value(ton);
+    auto top = ::ip::inet::ntop(addr);
+    CPPUNIT_ASSERT(ok(top));
+    std::string const actual = value(top);
+    std::string const expected = ::c::str(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_pton_in6_addr() -> void {
+    Specimen specimen = "2001:db8:de56:a2:4bae:4b4b:83e8:d8ec";
+    auto ton = ::ip::inet::pton<::ip::in6::addr>(specimen);  // <------------- test this
+    CPPUNIT_ASSERT(ok(ton));
+    auto addr = value(ton);
+    auto top = ::ip::inet::ntop(addr);
+    CPPUNIT_ASSERT(ok(top));
+    std::string const actual = value(top);
+    std::string const expected = ::c::str(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_pton_in4_addr_t() -> void {
+    // respect ... RFC 5737
+    Specimen specimen = "198.51.100.133";
+    auto ton = ::ip::inet::pton<::ip::in4::addr_t>(specimen); // <------------------------------- test this (addr_t)
+    CPPUNIT_ASSERT(ok(ton));
+    auto t = value(ton);
+    auto top = ::ip::inet::ntop(t);
+    CPPUNIT_ASSERT(ok(top));
+    std::string const actual = value(top);
+    std::string const expected = ::c::str(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_pton_in6_addr_t() -> void {
+    Specimen specimen = "2001:db8:361c:613:7ec:49a6:8e4f:99ea";
+    auto ton = ::ip::inet::pton<::ip::in6::addr_t>(specimen); // <--------------------------------- test this (addr_t)
+    CPPUNIT_ASSERT(ok(ton));
+    auto t = value(ton);
+    auto top = ::ip::inet::ntop(t);
+    CPPUNIT_ASSERT(ok(top));
+    std::string const actual = value(top);
+    std::string const expected = ::c::str(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+#import ip.inet.getaddrinfo
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_getaddrinfo_host_service() -> void {
+    using ::ip::inet::getaddrinfo;
+    Specimen hostname = "localhost";
+    Specimen service = "discard";
+    auto got = getaddrinfo(hostname, service);
+    CPPUNIT_ASSERT(ok(got));
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_getaddrinfo_host() -> void {
+    using namespace ::ip::inet::addrinfo;
+    using ::ip::inet::getaddrinfo;
+    Specimen hostname = "localhost";
+    auto got = getaddrinfo<HOST>(hostname);
+    CPPUNIT_ASSERT(ok(got));
+  }
+}
+
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::test_getaddrinfo_service() -> void {
+    using ::ip::inet::getaddrinfo;
+    using namespace ::ip::inet::addrinfo;
+    Specimen service = "discard";
+    auto got = getaddrinfo<SERVICE>(service);
+    CPPUNIT_ASSERT(ok(got));
+  }
+}
+
+#import c.const_stringz
+#import std.string
+#import std.string_literals
+#import tests.unit.ip.inet.Restring
+#import rigging.suite.io
+namespace tests::unit::ip::inet {
+  template<Restringable SPECIMEN> auto Restring<SPECIMEN>::suite() -> cppunit::Test * {
+    using namespace std::string_literals;
+    using namespace ::rigging::suite;
+    Stream aton("aton");
+    {
+      Stream in4("in4");
+      in4
+        << call("addr", &Restring<SPECIMEN>::test_aton_in4_addr)
+        << call("addr_t", &Restring<SPECIMEN>::test_aton_in4_addr_t)
+        ;
+      Stream in6("in6");
+      in6
+        << call("addr", &Restring<SPECIMEN>::test_aton_in6_addr)
+        << call("addr_t", &Restring<SPECIMEN>::test_aton_in6_addr_t)
+        ;
+      aton << move(in4)
+           << move(in6)
+        ;
+    }
+    Stream pton("pton");
+    {
+      Stream in4("in4");
+      in4
+        << call("addr", &Restring<SPECIMEN>::test_pton_in4_addr)
+        << call("addr_t", &Restring<SPECIMEN>::test_pton_in4_addr_t)
+        ;
+      Stream in6("in6");
+      in6
+        << call("addr", &Restring<SPECIMEN>::test_pton_in6_addr)
+        << call("addr_t", &Restring<SPECIMEN>::test_pton_in6_addr_t)
+        ;
+      pton
+        << move(in4)
+        << move(in6);
+      ;
+    }
+    Stream gni("getaddrinfo");
+    gni << call("host+service", &Restring<SPECIMEN>::test_getaddrinfo_host_service)
+        << call("host", &Restring<SPECIMEN>::test_getaddrinfo_host)
+        << call("service", &Restring<SPECIMEN>::test_getaddrinfo_service)
+      ;
+    Stream series("Restring<"s + typeid(SPECIMEN).name() + ">"s);
+    series << move(aton)
+           << move(pton)
+           << move(gni)
+      ;
+    return finalize(series);
+  }
+}
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- 9bbe046f-ac3c-48c2-a7dc-86a141a402ec
+#pragma once
+// Whereas there is no header file that only gives this namespace, we utter it ourselves.
+namespace std { }

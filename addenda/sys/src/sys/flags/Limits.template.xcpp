@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.flags.Limits.declaration
+#forward sys.flags.Flags
+#import sys.flags.required
+#import sys.required.Enumeration
+#import sys.required.Integral
+namespace sys::flags {
+  //
+  // What are the general limits of the Flags?
+  //
+  // Usage:
+  //
+  //   using Limn = flags::Limits<flags::Flags<Query, int>>;
+  //
+  template<required::Enumeration SINGLE, required::Integral CARRIER> struct Limits<Flags<SINGLE, CARRIER>>;
+}
+#endiv
+#divert <hpp>
+namespace sys::flags {
+  template<required::Enumeration SINGLE, required::Integral CARRIER> struct Limits<Flags<SINGLE, CARRIER>> : public limits::Generic<Flags<SINGLE, CARRIER>, SINGLE, CARRIER, 8*sizeof (CARRIER)> { };
+}
+#endiv
+#divert <ipp>
+#import sys.flags.Flags
+#endiv

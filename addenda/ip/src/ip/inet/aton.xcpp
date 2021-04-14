@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import re.string
+#import ip.in4 // ip::in4::addr
+#import ip.inet.result.Value
+#import std.string
+namespace ip {
+  namespace inet {
+    // Indeed, aton (inet_aton) only operates on DNS names and IPv4 "dotted-quad" notation.
+    inline auto aton(re::string<c::const_stringz> hostname) -> result::Value<in4::addr>;
+    template<typename ADDR> inline auto aton(re::string<c::const_stringz> hostname) -> result::Value<ADDR>;
+  }
+}
+#import ip.inet.aton.in4
+#import ip.inet.aton.in6
+#endiv
+#divert <ipp>
+auto ip::inet::aton(re::string<c::const_stringz> hostname) -> result::Value<in4::addr> {
+  return aton<in4::addr>(hostname);
+}
+
+template<typename ADDR> auto ip::inet::aton(re::string<c::const_stringz> hostname) -> result::Value<ADDR> {
+  static_assert(0 == sizeof (ADDR) && 0 != sizeof (ADDR), "specializations only");
+  return result::Value<ADDR>();
+}
+#endiv
+

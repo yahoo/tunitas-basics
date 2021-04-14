@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_argv
+#import c.const_argv
+#import c.const_environv
+#import c.const_stringz
+#import sys.call.Result
+#import sys.posix.packaging.exec
+#import sys.posix.packaging.exec.function
+#import sys.call.argument.Pathname
+namespace sys::posix::packaging::exec {
+  // In the 'call' series, the 'path' names the executable exactly
+  inline auto call(declared::execl *, call::argument::Pathname, c::const_stringz const &arg0) -> call::Result;
+  inline auto call(declared::execle *, call::argument::Pathname, c::const_stringz const &arg0, c::const_environv const &envv) -> call::Result;
+  inline auto call(declared::execv *, call::argument::Pathname, c::const_argv const &argv) -> call::Result;
+  inline auto call(declared::execve *, call::argument::Pathname, c::const_argv const &argv, c::const_environv const &envv) -> call::Result;
+  inline auto call(declared::fexecve *, int fd, c::const_argv const &argv, c::const_environv const &envv) -> call::Result;
+}
+#divert </hpp>
+#divert <ipp>
+#import c.str
+#include <cerrno>
+auto sys::posix::packaging::exec::call(declared::execl *function, call::argument::Pathname path, c::const_stringz const &arg0) -> call::Result {
+  // exec returned ... this is bad.  There was an error.
+  int r = function(path, c::str(arg0), END_SENTINEL);
+  return call::Result(false, errno, r);
+}
+
+auto sys::posix::packaging::exec::call(declared::execle *function, call::argument::Pathname path, c::const_stringz const &arg0, c::const_environv const &envv) -> call::Result {
+  // recall: exec is from the "C era" where they did not have const... so we have to cast away our constness to call the legacy-style interface.
+  int r = function(path, c::str(arg0), END_SENTINEL, weird_pointless_execv_vector_cast(envv));
+  return call::Result(false, errno, r);
+}
+
+auto sys::posix::packaging::exec::call(declared::execv *function, call::argument::Pathname path, c::const_argv const &argv) -> call::Result {
+  // cast away the const ... ibidem.
+  int r = function(path, weird_pointless_execv_vector_cast(argv));
+  return call::Result(false, errno, r);
+}
+
+auto sys::posix::packaging::exec::call(declared::execve *function, call::argument::Pathname path, c::const_argv const &argv, c::const_environv const &envv) -> call::Result {
+  // cast away the const ... ibidem.
+  int r = function(path, weird_pointless_execv_vector_cast(argv), weird_pointless_execv_vector_cast(envv));
+  return call::Result(false, errno, r);
+}
+
+auto sys::posix::packaging::exec::call(declared::fexecve *function, int fd, c::const_argv const &argv, c::const_environv const &envv) -> call::Result {
+  // cast away the const ... ibidem.
+  int r = function(fd, weird_pointless_execv_vector_cast(argv), weird_pointless_execv_vector_cast(envv));
+  return call::Result(false, errno, r);
+}
+#divert </ipp>

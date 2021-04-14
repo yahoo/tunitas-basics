@@ -1,0 +1,25 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+#import c.detail.normcore.Palette
+#import std.tuple
+namespace c {
+  namespace detail {
+    namespace normcore {
+      // Because std::tuple<...> really is a variadic template, and only in insantiation does it reify down to a 2-arg template.
+      // This is a "detail" namespace so we can do stuffl ike this here
+      template<typename FIRST, typename SECOND> using tuple = std::tuple<FIRST, SECOND>;
+      template<typename FIRST, typename SECOND> struct Palette<std::tuple<FIRST, SECOND>>;
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import std.is_integral
+#import c.detail.normcore.Components
+template<typename FIRST, typename SECOND> struct c::detail::normcore::Palette<c::detail::normcore::tuple<FIRST, SECOND>> : public Components<tuple, FIRST, SECOND, std::is_integral<FIRST>::value> { };
+#divert </hpp>

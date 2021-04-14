@@ -1,0 +1,30 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringz
+#import std.size_t
+namespace c {
+  namespace detail {
+    // stringz (a pointer, with a length); is '\0'-terminated
+    template<typename CHAR> inline auto as(CHAR const *) -> basic_stringz<CHAR const>;
+    template<typename CHAR> inline auto as(CHAR *) -> basic_stringz<CHAR>;
+
+    // reminder: subsumes the consty case (where CHAR is 'char' and where 'char const')
+    template<typename CHAR N> inline auto as(CHAR (&)[N]) -> basic_stringz<CHAR>;
+  }
+}
+#divert </hpp>
+#divert <ipp>
+template<typename CHAR> auto c::detail::as(CHAR const *buf) -> basic_stringz<CHAR const> {
+  basic_stringz<CHAR const> ret(buf);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::as(CHAR *buf) -> basic_stringz<CHAR> {
+  basic_stringz<CHAR> ret(buf);
+  return ret;
+}
+
+template<typename CHAR, std::size_t N> auto as(CHAR (&buf)[N]) -> basic_stringz<CHAR> {
+  basic_stringz<CHAR> ret(buf);
+}
+#divert </ipp>

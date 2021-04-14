@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.reply.Record.declaration
+namespace ares::reply {
+  //
+  // The PTR RR (Pointer)
+  // Comprises a list of QDN (Qualified Domain Names)
+  // n.b. the gratuitous IP (Pv4, IPv6) address which was required
+  //      (which was required to be supplied) in the (C-)Ares API is not available here.
+  //
+  // Usage:
+  //
+  //   fill = FILL{raw} ..................... in reply::detail::parse(...)
+  //
+  // Construction:
+  //
+  //   Record<PTR> duhfault; ........................... trivial
+  //   Record<PTR> capture{ptr_reply_list}; ............ from ares_parse_ptr_reply(...)
+  //
+  template<> class Record<PTR>;
+}
+#endiv
+#divert <hpp>
+#import ares.managed.Names
+namespace ares::reply {
+  template<> struct Record<PTR> : public managed::Names {
+    using ancestor = managed::Names;
+  public:
+    Record() = default;
+    using ancestor::Names;
+  };
+}
+#endiv

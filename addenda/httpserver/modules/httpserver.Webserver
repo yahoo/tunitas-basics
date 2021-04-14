@@ -1,0 +1,6 @@
+// -*- c++ -*- 726c9be1-75a6-476a-bdaf-a9e806a4ed7b
+#pragma once
+#include <httpserver>
+namespace httpserver {
+  using Webserver [[deprecated("instead use httpserver::Service")]] = httpserver::webserver;
+}

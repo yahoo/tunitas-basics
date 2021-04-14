@@ -1,0 +1,24 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.entry
+#include <pwd.h> // [[FIXTHIS]] module-posix-os #import passwd
+#include <grp.h> // [[FIXTHIS]] module-posix-os #import group
+#import std.is_same
+namespace sys::entry::required {
+  //
+  // The Buffer for the reentrant family of "entries" databases.
+  // e.g. getpwnam_r(...),
+  //      getgrnam_r(...),
+  //      etc.
+  //
+  // Usage:
+  //
+  //   entry::Pointer<::passwd> ptr{new entry::Buffer<::passwd>{}};
+  //   ::passwd *result{nullptr};
+  //   int got = ::getpwuid_r(...some_uid..., ptr->entry(), ptr->data(), ptr->size(), &result);
+  //
+  template<typename ENTRY> concept bool Entry = (std::is_same<ENTRY, ::passwd>::value ||
+						 std::is_same<ENTRY, ::group>::value);
+}
+#endiv

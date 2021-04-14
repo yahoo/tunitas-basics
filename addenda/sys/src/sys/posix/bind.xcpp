@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sock.interface
+#import socklen_t
+namespace sys::posix {
+  namespace packaging::bind {
+    using namespace packaging::sock::interface;
+    using Result = result::status::Status;
+    namespace function {
+      inline auto bind(File, [[in]] Sockaddr const &, Socklen) -> Result;
+      template<required::Sockaddr SOCKADDR> inline auto bind(File, [[in]] SOCKADDR const &) -> call::Result;
+    }
+    namespace native {
+      inline auto bind(int fd, [[in]] Sockaddr const &, Socklen) -> Result;
+      template<required::Sockaddr SOCKADDR> inline auto bind(int fd, [[in]] SOCKADDR const &) -> call::Result;
+    }
+  }
+  using packaging::bind::function::bind;
+  namespace native { using packaging::bind::native::bind; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::bind {
+  auto function::bind(File fd, Sockaddr const &addr, Socklen addrlen) -> Result                      { return native::bind((int)fd, addr, addrlen); }
+  template<required::Sockaddr SOCKADDR> auto function::bind(File fd, SOCKADDR const &addr) -> Result { return native::bind((int)fd, addr); }
+  //
+  auto native::bind(int fd, Sockaddr const &addr, Socklen addrlen) -> Result                      { return idiomatic::syscall<int>(Syscall::BIND, fd, &addr, addrlen); }
+  template<required::Sockaddr SOCKADDR> auto native::bind(int fd, SOCKADDR const &addr) -> Result { return idiomatic::syscall<int>(Syscall::BIND, fd, &addr, sizeof (addr)); }
+}
+#endiv

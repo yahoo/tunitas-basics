@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::s {
+  //
+  // Folklore:
+  // S is for 'stat'
+  // I is for 'inode'
+  //
+  //  From Wikipedia (it is claimed, [cite?])
+  //
+  //   <quote>
+  //      In truth, I don't know either.
+  //       It was just a term that we started to use.
+  //       "Index" is my best guess, because of the slightly unusual file system structure
+  //          that stored the access information of files as a flat array on the disk,
+  //          with all the hierarchical directory information living aside from this.
+  //      Thus the i-number is an index in this array, the i-node is the selected element of the array.
+  //   </quote>
+  //
+}
+#endiv

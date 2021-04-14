@@ -1,0 +1,30 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.ec.Group
+#import openssl.ec.Key
+namespace openssl::ec {
+  //
+  // Generate an EC Key
+  //
+  // Usage:
+  //
+  //   auto k = generate(Group);
+  //   auto k = generate(group::Name::SOME_NAME);
+  //
+  inline auto generate(Group) -> Key;
+  inline auto generate(group::Name) -> Key;
+}
+#endiv
+#divert <ipp>
+#import std.move
+auto openssl::ec::generate(Group group) -> Key {
+  Key key;
+  key.set_group(std::move(group));
+  key.generate_key();
+  return key;
+}
+auto openssl::ec::generate(group::Name name) -> Key {
+  return generate(Group{name});
+}
+#endiv

@@ -1,0 +1,4 @@
+// -*- c++ -*- 80a6858b-f9b2-4579-b74f-5702f16116b9
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/fips140.h>

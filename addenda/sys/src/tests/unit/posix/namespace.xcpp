@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.af
+#import sys.fd
+#import sys.id
+#import sys.msg
+#import sys.pf
+#import sys.posix
+#import sys.sock
+#import tests.unit
+namespace tests::unit::posix {
+  namespace af = ::sys::af;
+  namespace id = ::sys::id;
+  namespace fd = ::sys::fd;
+  namespace msg = ::sys::msg;
+  namespace sock = ::sys::sock;
+  namespace pf = ::sys::pf;
+  namespace six = ::sys::posix;
+  namespace nat = ::sys::posix::native;
+  namespace library = ::sys::posix;
+}
+#endiv

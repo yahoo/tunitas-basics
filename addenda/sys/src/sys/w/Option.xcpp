@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <sys/wait.h> // for the #defines of W_CONTINUED etc.
+namespace sys::w {
+  enum class Option {
+    NONE      = 0,
+    CONTINUED = WCONTINUED,
+    EXITED    = WEXITED,
+    NOHANG    = WNOHANG,
+    NOWAIT    = WNOWAIT,
+    STOPPED   = WSTOPPED,
+    UNTRACED  = WUNTRACED,
+    // See clone(2) for __WCLONE, __WALL, __WNOTHREAD which are unrepresented here.
+    // especially see sys::w::packaging::options::ALL nearby in Options.scpp
+  };
+}
+#endiv

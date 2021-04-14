@@ -1,0 +1,95 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+namespace sqlite {
+  namespace exception {
+    // Template args follow those of prepared::BasicResult<S, C>
+    template<typename STATEMENT, typename CONTINUATION> struct Prepared;
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.exception.Generic
+#import sqlite.prepared.BasicResult
+#import std.string
+template<typename STATEMENT, typename CONTINUATION> class sqlite::exception::Prepared : public Generic {
+  using Ancestor = Generic;
+public:
+  using result_type = prepared::BasicResult<STATEMENT, CONTINUATION>;
+  //
+  // Only move-in semantics, never copy-in semantics
+  // WATCHOUT - because this is an exception that is treating failed prepared statements, there is a very high
+  // probability that prepared::value(this->result).empty().  So test for validity before using it.
+  //
+  inline Prepared(result_type &&, std::string const &message);
+  inline Prepared(result_type &&, std::string const &message, std::string const &unprepared_sql_syntax);
+  //
+  // FIXME? WATCHOUT - seems like storing an actual object in the exception is ill-posed
+  // To Wit: http://en.cppreference.com/w/cpp/error/runtime_error
+  //   Because copying std::exception is not permitted to throw exceptions,
+  //   this message is typically stored internally as a copy-on-write string.
+  //   This is also why there is no constructor taking std::string&&:
+  //      it would have to copy the content anyway. 
+  //
+  // Reminder, to access the value of result, use the accessors from BasicResult<...>
+  //   ok(this->result) <-------------- success, or not
+  //   code(this->result) <------------ the offeinding status::Code
+  //   value(this->result) <----------- the offending STATEMENT - WATCHOUT, may be Shell::empty()
+  //   end(this->result)
+  //   remaining(this->result)
+  //
+  result_type result;
+  inline auto code() const -> status::Code;
+  inline auto sql() const -> std::string;
+protected:
+  // Acquired from either
+  //   the (valid) prepared::value(this->result).sql()
+  //   or from the constructor itself
+  std::string offending_sql_syntax;
+  inline static auto get_statement_by_preference(result_type const &) -> std::string;
+  inline static auto get_statement_by_preference(result_type const &, std::string const &prefer_the_supplied) -> std::string;
+};
+#endiv
+#divert <ipp>
+#import std.forward
+template<typename STATEMENT, typename CONTINUATION> sqlite::exception::Prepared<STATEMENT, CONTINUATION>::Prepared(result_type &&anon, std::string const &arg_message)
+  : Ancestor(arg_message)
+  , result(std::forward<result_type>(anon))
+  , offending_sql_syntax(get_statement_by_preference(this->result)) {
+  ;
+}
+
+template<typename STATEMENT, typename CONTINUATION> sqlite::exception::Prepared<STATEMENT, CONTINUATION>::Prepared(result_type &&anon, std::string const &arg_message, std::string const &arg_unprepared_sql_syntax)
+  : Ancestor(arg_message)
+  , result(std::forward<result_type>(anon))
+  , offending_sql_syntax(get_statement_by_preference(this->result, arg_unprepared_sql_syntax)) {
+  ;
+}
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::exception::Prepared<STATEMENT, CONTINUATION>::code() const -> status::Code {
+  return this->result.code();
+}
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::exception::Prepared<STATEMENT, CONTINUATION>::sql() const -> std::string {
+  // recall ... upon construction this was either supplied explicitly or was extracted from the this->result
+  return offending_sql_syntax;
+}
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::exception::Prepared<STATEMENT, CONTINUATION>::get_statement_by_preference(result_type const &result) -> std::string {
+  char const *const NOT_AVAILABLE = "no SQL statement available";
+  return get_statement_by_preference(result, NOT_AVAILABLE);
+}
+
+template<typename STATEMENT, typename CONTINUATION> auto sqlite::exception::Prepared<STATEMENT, CONTINUATION>::get_statement_by_preference(result_type const &result, std::string const &prefer_the_supplied) -> std::string {
+  STATEMENT const &st = prepared::value(result);
+  if (st.empty()) {
+    return prefer_the_supplied;
+  } else {
+    auto syntax = st.sql();
+    if (syntax.empty()) {
+      return prefer_the_supplied;
+    } else {
+      return syntax;
+    }
+  }
+}
+#endiv

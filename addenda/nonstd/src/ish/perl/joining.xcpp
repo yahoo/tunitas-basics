@@ -1,0 +1,27 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.string
+namespace ish {
+  namespace perl {
+    //
+    // Like perl's 'join' but C++
+    //
+    // Concepts:
+    //    SEPARATOR has an operator<< overload; e.g. a char, a character string literal, a std::string, an int
+    //    CONTAINER is any container with a begin() & end()
+    //
+    template<typename SEPARATOR, typename VALUE, typename... VALUES> inline auto joining(SEPARATOR separator, VALUE const &value, VALUES const &...values) -> std::string;
+  }
+}
+#entail ish.perl.join
+#endiv
+#divert <ipp>
+#import ish.perl.detail.joining
+#import std.ostringstream
+template<typename SEPARATOR, typename VALUE, typename... VALUES> auto ish::perl::joining(SEPARATOR separator, VALUE const &value, VALUES const &...values) -> std::string {
+  std::ostringstream buf;
+  buf << value;
+  detail::joining(buf, separator, values...);
+  return buf.str();
+}
+#endiv

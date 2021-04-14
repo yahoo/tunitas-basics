@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ares::library {
+  //
+  // Manages the initialization of the library by RAII.
+  //
+  // See ares_init_library(3)
+  // See ares_init_library_mem(3).
+  //
+  // This activity is not thread safe and must be called prior to any threading because it calls thread-unsafe APIs itself.
+  // You must call it before any threading occurs at all.
+  //
+  // Usage:
+  //
+  //   try {
+  //     Library library;
+  //     ...use the library...
+  //
+  //   } catch (exception::Library const &e) {
+  //     auto code = e.code();
+  //     cout << e.what();
+  //     ...upon failure, the library is totally unusable...
+  //
+  struct Library;
+}
+#endiv
+#divert <hpp>
+#import ares.flags.Argument
+#import ares.library.Allocator
+#import ares.library.Features
+struct ares::library::Library {
+  using Features = flags::Argument<library::Feature, library::Features>;
+  inline Library();
+  explicit Library(Features);
+  Library(Features, Allocator);
+  Library(Library const &) = delete;
+  auto operator=(Library const &) -> Library & = delete;
+  ~Library();
+};
+#endiv
+#divert <ipp>
+#import ares.library.features.constants
+namespace ares::library {
+  Library::Library()
+    : Library{features::ALL}
+  { }
+}
+#endiv
+#divert <cpp>
+#import ares.exception.Library
+namespace ares::library {
+  Library::Library(Features features) {
+    auto called = ::ares_library_init(features.get<unsigned>());
+    if (0 != called) {
+      throw exception::Library{std::error_code{called, error::category()}};
+    }
+  }
+  Library::Library(Features features, Allocator allocator) {
+    auto called = ::ares_library_init_mem(features.get<unsigned>(), allocator.malloc, allocator.free, allocator.realloc);
+    if (0 != called) {
+      throw exception::Library{std::error_code{called, error::category()}};
+    }
+  }
+  Library::~Library() {
+    ares_library_cleanup();
+  }
+}
+#endiv

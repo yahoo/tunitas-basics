@@ -1,0 +1,24 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <fpp>
+#forward sqlite.api.detail.Result
+#import std.vector
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<> struct Result<std::vector<char>>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.api.detail.Result
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+#import sqlite.api.detail.WithDestructor
+template<> struct sqlite::api::detail::Result<std::vector<char>>
+  : public sqlite::detail::ResultSFINAE<void>
+  , public sqlite::detail::pass_by_const_reference<std::vector<char>>
+  , public sqlite::detail::specialization_is_valid
+  , public WithDestructor
+{ };
+#endiv

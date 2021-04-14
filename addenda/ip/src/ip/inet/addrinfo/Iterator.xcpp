@@ -1,0 +1,82 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      class Iterator;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+namespace ip {
+  namespace inet {
+    namespace addrinfo {
+      inline auto operator==(Iterator const &, Iterator const &) -> bool;
+      inline auto operator!=(Iterator const &, Iterator const &) -> bool;
+    }
+  }
+}
+
+#forward ip.inet.addrinfo.List
+#forward ip.inet.addrinfo.Value
+#import ip.inet.addrinfo.Value
+#import std.iterator
+#import std.forward_iterator_tag
+class ip::inet::addrinfo::Iterator : public std::iterator<std::forward_iterator_tag, Value, void, void, void> {
+  using Ancestor = std::iterator<std::forward_iterator_tag, Value, void, void, void>;
+public:
+  inline Iterator();
+  inline auto operator++() -> Iterator &;
+  inline auto operator++(int) -> Iterator;
+  inline auto operator*() const -> Value;
+protected:
+  friend class addrinfo::List;
+  friend auto operator==(Iterator const &a, Iterator const &b) -> bool;
+  inline explicit Iterator(::addrinfo const *);
+  ::addrinfo const *position;
+};
+#endiv
+#divert <ipp>
+auto ip::inet::addrinfo::operator==(Iterator const &a, Iterator const &b) -> bool {
+  return a.position == b.position;
+}
+
+auto ip::inet::addrinfo::operator!=(Iterator const &a, Iterator const &b) -> bool {
+  return !operator==(a, b);
+}
+
+ip::inet::addrinfo::Iterator::Iterator()
+  : Ancestor()
+  , position(nullptr) {
+  ;
+}
+  
+ip::inet::addrinfo::Iterator::Iterator(::addrinfo const *arg_position)
+  : Ancestor()
+  , position(arg_position) {
+  ;
+}
+
+#import std.invalid_argument
+auto ip::inet::addrinfo::Iterator::operator++() -> Iterator & {
+  if (nullptr == position) {
+    throw std::invalid_argument("null position");
+  }
+  position = position->ai_next;
+  return *this;
+}
+
+auto ip::inet::addrinfo::Iterator::operator++(int) -> Iterator {
+  Iterator old(*this);
+  operator++();
+  return old;
+}
+
+#import ip.inet.addrinfo.Value
+#import std.move
+auto ip::inet::addrinfo::Iterator::operator*() const -> Value {
+  return Value{position};
+}
+#endiv

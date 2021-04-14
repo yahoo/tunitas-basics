@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_LOCKF.Usage
+//   static_assert(tests::usage::posix_LOCKF::Usage<>);
+//
+#import sys.posix.LOCKF
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace tests::usage::posix_LOCKF {
+  using sys::posix::LOCKF;
+  namespace [[detail]] packaging {
+    template<typename LOCKF> concept bool Instance = requires(LOCKF) {
+      typename LOCKF::Operation;
+      typename LOCKF::Offset;
+      requires model::Namespace_Object<LOCKF>;
+      requires (int)LOCKF::LOCK == F_LOCK;
+      requires (int)LOCKF::TEST == F_TEST;
+      requires (int)LOCKF::TEST_AND_LOCK == F_TLOCK;
+      requires (int)LOCKF::END == F_ULOCK;
+      requires (int)LOCKF::UNLOCK == F_ULOCK;
+      requires (int)LOCKF::TLOCK == F_TLOCK;
+      requires (int)LOCKF::ULOCK == F_ULOCK;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<LOCKF>;
+    };
+  }
+  using packaging::Usage;
+}
+#pragma GCC diagnostic pop
+#endiv

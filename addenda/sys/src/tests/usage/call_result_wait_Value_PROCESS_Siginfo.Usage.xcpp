@@ -1,0 +1,61 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.call_result_wait_Value_PROCESS_Siginfo.Usage
+//   static_assert(tests::usage::call_result_wait_Value_PROCESS_Siginfo::Usage<>);
+//
+#import pid_t
+#import error_t
+#import nonstd.convertible_to
+#import nonstd.same_as
+#import sys.call.result.Element
+#import sys.call.result.Size
+#import sys.call.result.wait.Value.PROCESS.Siginfo
+#import sys.call.result.required.Wait
+#import sys.id.Process
+#import sys.id.required.Process
+#import sys.sig.Info
+#import tests.usage.call_result_Value.Usage
+#import tests.usage.countof
+namespace tests::usage::call_result_wait_Value_PROCESS_Siginfo {
+  using sys::call::result::wait::Value;
+  namespace [[detail]] packaging {
+    using namespace nonstd;
+    using namespace std;
+    namespace [[detail]] result {
+      namespace required {
+        using sys::id::required::Process;
+        using sys::call::result::required::Wait;
+      }
+      using Siginfo = sys::sig::Info;
+      template<typename RESULT, typename PROCESS, typename SIGINFO> concept bool Process_Siginfo = requires(RESULT result, bool good, error_t error, PROCESS ssecorp, SIGINFO ofnigis) {
+        requires required::Wait<PROCESS, SIGINFO>;
+        requires call_result_Value::Scenario<RESULT>;
+        requires required::Process<PROCESS>;
+        requires same_as<SIGINFO, Siginfo>;
+        { RESULT{} };
+        { RESULT{good, error, ssecorp, ofnigis} };
+        { pid(result) } -> convertible_to<PROCESS>;
+        { process(result) } -> convertible_to<PROCESS>;
+        { siginfo(result) } -> convertible_to<SIGINFO>;
+      };
+    }
+    namespace [[detail]] {
+      using sys::call::result::Element;
+      using sys::call::result::Size;
+      template<typename RESULT> concept bool Instance = requires(RESULT) {
+        requires 2 == Size<RESULT>::value;
+        requires result::Process_Siginfo<RESULT, typename Element<0, RESULT>::Type, typename Element<1, RESULT>::Type>;
+      };
+    }
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<Value>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

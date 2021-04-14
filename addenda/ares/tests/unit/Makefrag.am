@@ -1,0 +1,23 @@
+tests_unit_XFAIL_TESTS = \
+  $(end)
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  \
+  tests/unit/ares.test \
+  tests/unit/channel.test \
+  tests/unit/count.test \
+  tests/unit/error.test \
+  tests/unit/exception.test \
+  tests/unit/fd.test \
+  tests/unit/library.test \
+  tests/unit/query.test \
+  tests/unit/want.test \
+  \
+  tests/unit/all.test \
+  $(tests_unit_XFAIL_TESTS) \
+  $(end)
+
+tests_unit_TESTS_DECLARED = $(tests_unit_TESTS)
+tests_unit_TESTS_OBSERVED = $(wildcard tests/unit/*.test)
+tests_unit_TESTS_ORPHANED = $(filter-out $(tests_unit_TESTS_DECLARED), $(tests_unit_TESTS_OBSERVED))
+$(if $(tests_unit_TESTS_ORPHANED),$(warning there are orphaned tests $(tests_unit_TESTS_ORPHANED)))

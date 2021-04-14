@@ -1,0 +1,100 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::to_string {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+
+class tests::unit::c::to_string::Fixture : public cppunit::test::Fixture { 
+public: 
+  Fixture() = default;
+
+  auto setUp() -> void;
+  auto tearDown() -> void;
+public:
+  auto test_std_basic_string() -> void;
+  auto test_char_array_N() -> void;
+  auto test_char_pointer() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import c.to_string
+
+#import std.unique_ptr
+auto tests::unit::c::to_string::Fixture::setUp() -> void {
+  // TODO ... something, nope, nothing to do.
+}
+
+auto tests::unit::c::to_string::Fixture::tearDown() -> void {
+}
+
+#import std.move
+auto tests::unit::c::to_string::Fixture::test_std_basic_string() -> void {
+  {
+    // template<typename CHAR, typename TRAITS, typename ALLOC> inline auto to_string(std::basic_string<CHAR, TRAITS, ALLOC> const &) -> ::std::basic_string<CHAR, TRAITS, ALLOC> const &;
+    ::std::string specimen("chameleon");
+    CPPUNIT_ASSERT(::c::to_string(specimen) == specimen);
+  } {
+    // template<typename CHAR, typename TRAITS, typename ALLOC> inline auto to_string(::std::basic_string<CHAR, TRAITS, ALLOC> &&) -> ::std::basic_string<CHAR, TRAITS, ALLOC>;
+    ::std::string const original("browbeat");
+    ::std::string movable(original);
+    ::std::string const actual = ::c::to_string(::std::move(movable));
+    ::std::string const expected = original;
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+auto tests::unit::c::to_string::Fixture::test_char_array_N() -> void {
+  {
+    // template<typename CHAR, ::std::size_t N> inline auto to_string(CHAR (&)[N]) -> ::std::basic_string<CHAR>;
+    char specimen[] = { "incommodious" };
+    ::std::string const actual = ::c::to_string(specimen);
+    ::std::string const expected(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    // template<typename CHAR, ::std::size_t N> inline auto to_string(CHAR const (&)[N]) -> ::std::basic_string<CHAR>;
+    char const specimen[] = { "pedagogy" };
+    ::std::string const actual = ::c::to_string(specimen);
+    ::std::string const expected(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+auto tests::unit::c::to_string::Fixture::test_char_pointer() -> void {
+  {
+    // template<typename CHAR, ::std::size_t N> inline auto to_string(CHAR (&)[N]) -> ::std::basic_string<CHAR>;
+    char specimen[] = { "incrustation" };
+    ::std::string const actual = ::c::to_string(specimen);
+    ::std::string const expected(specimen);
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  } {
+    // template<typename CHAR, ::std::size_t N> inline auto to_string(CHAR const (&)[N]) -> ::std::basic_string<CHAR>;
+    char const *specimen = "abstemious";
+    ::std::string const actual = ::c::to_string(specimen);
+    ::std::string const expected = "abstemious";
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+
+#import cppunit.test.Caller
+#import cppunit.test.Suite
+#import std.unique_ptr
+auto tests::unit::c::to_string::Fixture::suite() -> cppunit::Test * {
+  using namespace cppunit::test;
+  ::std::unique_ptr<Suite> s(new Suite("to_string"));
+  s->addTest(new Caller<Fixture>("std::basic_string", &Fixture::test_std_basic_string));
+  s->addTest(new Caller<Fixture>("char_array_N", &Fixture::test_char_array_N));
+  s->addTest(new Caller<Fixture>("char_pointer", &Fixture::test_char_pointer));
+  return s.release();
+}
+#endiv

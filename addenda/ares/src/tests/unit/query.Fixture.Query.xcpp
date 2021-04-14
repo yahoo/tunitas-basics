@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.query.Fixture>
+#endiv
+#divert <hpp>
+#import ares.error.Code
+#import ares.Count
+#import ares.Buffer
+#import std.byte
+#import ares.continuation.Query
+#forward tests.unit.query.Fixture.State
+namespace ares::continuation {
+  static_assert(0 <= sizeof (Query<::tests::unit::query::Fixture::State>));
+  template<> auto Query<::tests::unit::query::Fixture::State>::receive(::tests::unit::query::Fixture::State &, error::Code, Count, Buffer<std::byte const>) -> void;
+}
+#endiv
+#divert <ipp>
+#import tests.unit.query.Fixture.State
+#endiv
+#divert <cpp>
+#import std.error_code
+template<> auto ares::continuation::Query<::tests::unit::query::Fixture::State>::receive(::tests::unit::query::Fixture::State &state, error::Code code, Count count, Buffer<std::byte const>) -> void {
+  std::error_code ec{code};
+  if (::ares::error::Code::SUCCESS == code) {
+    state.result = ip::in6::addr{};
+  } else {
+    std::cerr << __FUNCTION__ << ' ' << __FILE__ << ':' << __LINE__ << ':'
+              << " failed to find " << state.query_fqdn << " because " << ec.message()
+              << '\n';
+  }
+}
+#endiv

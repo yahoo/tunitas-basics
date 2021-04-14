@@ -1,0 +1,3 @@
+// -*- c++ -*- 5df607a1-d340-4057-90fe-9653521c2add
+#pragma once
+#include <stdexcept>

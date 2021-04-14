@@ -1,0 +1,14 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.const_stringz
+#import uuid.detail.Wrapper
+namespace uuid {
+  inline auto parse(c::const_stringz const &in, detail::Wrapper &fill) -> bool;
+}
+#endiv
+#divert <ipp>
+#import c.str
+auto uuid::parse(c::const_stringz const &in, detail::Wrapper &fill) -> bool {
+  return 0 == ::uuid_parse(c::str(in), fill.value);
+}
+#endiv

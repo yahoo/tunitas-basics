@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::bio {
+  //
+  // A Guardian of the BIO (file)
+  // Is RAII.  So either you get the open file or you get an exception.
+  // The file is closed upon destruction of the guard.
+  //
+  // Usage:
+  //
+  //   { bio::File guard{bio::new_file(filepath, "w")};
+  //     ...use the guarded file... }
+  // 
+  //   { bio::File guard{bio::read_file(filepath)};
+  //     ...use the guarded file... }
+  //
+  //   { bio::File guard{bio::write_file(filepath)};
+  //     ...use the guarded file... }
+  //
+  struct File;
+}
+#endiv
+#divert <hpp>
+#import openssl.types
+#forward openssl.bio.Mode
+#import openssl.bio.new_file
+#import openssl.bio.read_file
+#import openssl.bio.write_file
+#import openssl.managed.Pointer
+#import openssl.managed.Deleter.BIO
+class openssl::bio::File : public managed::Pointer<BIO> {
+  using ancestor = managed::Pointer<BIO>;
+  friend auto bio::packaging::new_file::function::new_file() -> Result;
+  friend auto bio::packaging::new_file::function::new_file(Filepath, Mode const &) -> Result;
+  friend auto bio::packaging::read_file::function::read_file(Filepath) -> Result;
+  friend auto bio::packaging::write_file::function::write_file(Filepath) -> Result;
+  inline explicit File(BIO *);
+public:
+  inline File();
+};
+#endiv
+#divert <ipp>
+#import openssl.bio.Mode
+namespace openssl::bio {
+  File::File()
+    : ancestor{new_file()}
+  { }
+  File::File(BIO *io)
+    : ancestor{io}
+  { }
+}
+#endiv

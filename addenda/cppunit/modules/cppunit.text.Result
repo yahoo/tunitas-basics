@@ -1,0 +1,6 @@
+// -*- c++ -*- e9dea04d-3967-45eb-ba1f-221a473526ef
+#pragma once
+#include <cppunit/TextTestResult.h>
+namespace cppunit::text {
+  using Result = CppUnit::TextTestResult;
+}

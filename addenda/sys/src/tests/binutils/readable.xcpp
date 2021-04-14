@@ -1,0 +1,19 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import c.const_argv
+#import sys.posix.readable
+#import tests.binutils.Main
+#import tests.binutils.exception.Argument_Count
+auto main(int c, char *v[]) -> int {
+  tests::binutils::Main<bool> remain("readable", [](c::const_argv av) {
+      using namespace sys::posix;
+      using namespace tests::binutils::exception;
+      if (av.size() < 2) {
+        throw Argument_Count();
+      }
+      return readable(av[1]);
+    });
+  return remain(c::const_argv(c, v));
+}
+#endiv

@@ -1,0 +1,283 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix { class OK; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.OK
+#import std.vector
+struct tests::unit::posix::OK : public cppunit::test::Fixture {
+  auto setUp() -> void override;
+  auto tearDown() -> void override;
+  using Subject = ::sys::posix::OK;
+  std::vector<Subject::Axis> some_flag_mode_series;
+  Subject::Access no_mode;
+  Subject::Access all_mode;
+  auto test_flag_mode_universe() -> void;
+  auto test_mode_universe() -> void;
+  auto test_flag_mode_constants() -> void;
+  auto test_mode_constants() -> void;
+  auto test_and_ss() -> void;
+  auto test_and_s1() -> void;
+  auto test_and_1s() -> void;
+  auto test_and_11() -> void;
+  auto test_and_assign() -> void;
+  auto test_decumulate_and_assign() -> void;
+  auto test_decumulate_via_rhs() -> void;
+  auto test_or_ss() -> void;
+  auto test_or_s1() -> void;
+  auto test_or_1s() -> void;
+  auto test_or_11() -> void;
+  auto test_or_assign() -> void;
+  auto test_accumulate_or_assign() -> void;
+  auto test_accumulate_via_rhs() -> void;
+  auto test_contains() -> void;
+  auto test_mode_operator_unary_plus() -> void;
+  auto test_flag_mode_operator_unary_plus() -> void;
+  auto test_is_flag() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.hex
+#import std.cerr
+#import rigging.unit.lhs
+#import rigging.unit.clear
+namespace tests::unit::posix {
+  using rigging::unit::lhs;
+  using rigging::unit::clear;
+  auto OK::setUp() -> void {
+    using v = std::vector<Subject::Axis>;
+    lhs(some_flag_mode_series) = v{Subject::Axis::EXISTS, 
+                                   Subject::Axis::READABLE, 
+                                   Subject::Axis::WRITABLE, 
+                                   Subject::Axis::EXECUTABLE};
+    lhs(no_mode) = Subject::F;
+    lhs(all_mode) = Subject::RWX;
+    CPPUNIT_ASSERT(0 != some_flag_mode_series.size());
+    CPPUNIT_ASSERT(0 == (int)no_mode);
+    CPPUNIT_ASSERT(0 != (int)all_mode);
+  }
+  auto OK::tearDown() -> void {
+    lhs(some_flag_mode_series) = clear;
+    lhs(no_mode) = clear;
+    lhs(all_mode) = clear;
+  }
+  auto OK::test_flag_mode_universe() -> void {
+    unsigned count = 0;
+    bool first = true;
+    for (auto f : some_flag_mode_series) {
+      if ( ! first ) {
+        CPPUNIT_ASSERT((int) f != 0);
+      }
+      count++;
+      first = false;
+    }
+    CPPUNIT_ASSERT(0 < count);
+  }
+  auto OK::test_mode_universe() -> void {
+    unsigned count = 0;
+    Subject::Access accumulate = Subject::Access();
+    bool first = true;
+    for (auto f : some_flag_mode_series) {
+      if ( ! first ) {
+        CPPUNIT_ASSERT((int) f != 0);
+      }
+      accumulate |= f;
+      if ( ! first ) {
+        CPPUNIT_ASSERT((int) accumulate != 0);
+      }
+      CPPUNIT_ASSERT((Subject::Access)f == (f & accumulate));
+      count++;
+      first = false;
+    }
+    CPPUNIT_ASSERT(0 < count);
+  }
+  auto OK::test_flag_mode_constants() -> void {
+    // utter them all
+    Subject::Axis f;
+    f = Subject::Axis::EXISTS;
+    f = Subject::Axis::READABLE;
+    f = Subject::Axis::WRITABLE;
+    f = Subject::Axis::EXECUTABLE;
+    CPPUNIT_ASSERT(Subject::Axis::EXECUTABLE == f);
+  }
+  auto OK::test_mode_constants() -> void {
+    // utter them all
+    Subject::Access s;
+    s = Subject::F;
+    s = Subject::X;
+    s = Subject::W;
+    s = Subject::WX;
+    s = Subject::R;
+    s = Subject::RX;
+    s = Subject::RW;
+    s = Subject::RWX;
+    CPPUNIT_ASSERT(Subject::RWX == s);
+  }
+  auto OK::test_and_ss() -> void {
+    for (auto f : some_flag_mode_series) {
+      Subject::Access fs = Subject::Access(f);
+      CPPUNIT_ASSERT(fs == (all_mode & fs));
+      CPPUNIT_ASSERT(fs == (fs & fs));
+    }
+  }
+  auto OK::test_and_s1() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(Subject::Access(f) == (all_mode & f));
+    }
+  }
+  auto OK::test_and_1s() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(Subject::Access(f) == (f & all_mode));
+    }
+  }
+  auto OK::test_and_11() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(Subject::Access(f) == (f & f));
+    }
+  }
+  auto OK::test_and_assign() -> void {
+    for (auto f : some_flag_mode_series) {
+      Subject::Access fs = all_mode;
+      fs &= f;
+      CPPUNIT_ASSERT(Subject::Access(f) == fs);
+    }
+  }
+  auto OK::test_decumulate_and_assign() -> void {
+    Subject::Access decumulator = all_mode;
+    for (auto f : some_flag_mode_series) {
+      decumulator &= ~f;
+    }
+    CPPUNIT_ASSERT(0 == (int)Subject::Access());
+    CPPUNIT_ASSERT(decumulator == Subject::Access());
+  }
+  auto OK::test_decumulate_via_rhs() -> void {
+    Subject::Access decumulator = all_mode;
+    for (auto f : some_flag_mode_series) {
+      decumulator = decumulator & ~f;
+    }
+    CPPUNIT_ASSERT(0 == (int)Subject::Access());
+    CPPUNIT_ASSERT(decumulator == Subject::Access());
+  }
+  auto OK::test_or_ss() -> void {
+    for (auto f : some_flag_mode_series) {
+      Subject::Access fs = Subject::Access(f);
+      CPPUNIT_ASSERT(all_mode == (all_mode | fs));
+      CPPUNIT_ASSERT(fs == (Subject::Access() | fs));
+      CPPUNIT_ASSERT(fs == (fs | fs));
+    }
+  }
+  auto OK::test_or_s1() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(all_mode == (all_mode | f));
+      CPPUNIT_ASSERT(Subject::Access(f) == (Subject::Access() | f));
+    }
+  }
+  auto OK::test_or_1s() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(all_mode == (f | all_mode));
+      CPPUNIT_ASSERT(Subject::Access(f) == (f | Subject::Access()));
+    }
+  }
+  auto OK::test_or_11() -> void {
+    for (auto f : some_flag_mode_series) {
+      CPPUNIT_ASSERT(Subject::Access(f) == (f | f));
+      CPPUNIT_ASSERT(Subject::Access(f) == (Subject::Access() | f));
+      CPPUNIT_ASSERT(Subject::Access(f) == (f | Subject::Access()));
+    }
+  }
+  auto OK::test_or_assign() -> void {
+    for (auto f : some_flag_mode_series) {
+      Subject::Access fs = Subject::Access();
+      fs |= f;
+      CPPUNIT_ASSERT(Subject::Access(f) == fs);
+    }
+  }
+  auto OK::test_accumulate_or_assign() -> void {
+    Subject::Access accumulator = no_mode;
+    for (auto f : some_flag_mode_series) {
+      accumulator |= f;
+    }
+    CPPUNIT_ASSERT(0 != (int)all_mode);
+    CPPUNIT_ASSERT(accumulator == all_mode);
+  }
+  auto OK::test_accumulate_via_rhs() -> void {
+    Subject::Access accumulator = no_mode;
+    for (auto f : some_flag_mode_series) {
+      accumulator = accumulator | f;
+    }
+    CPPUNIT_ASSERT(0 != (int)all_mode);
+    CPPUNIT_ASSERT(accumulator == all_mode);
+  }
+  auto OK::test_contains() -> void {
+    for (auto f : some_flag_mode_series) {
+      if (Subject::Axis::EXISTS != f) {
+        CPPUNIT_ASSERT(contains(all_mode, f));
+        CPPUNIT_ASSERT(!contains(no_mode, f));
+        CPPUNIT_ASSERT(!contains(all_mode & ~f, f));
+        CPPUNIT_ASSERT(!contains(no_mode & ~f, f));
+      }
+    }
+  }
+  auto OK::test_mode_operator_unary_plus() -> void {
+    for (auto item : some_flag_mode_series) {
+      Subject::Access fs1 = item;
+      Subject::Access fs2 = fs1;
+      CPPUNIT_ASSERT(fs2 == fs1);
+    }
+  }
+  auto OK::test_flag_mode_operator_unary_plus() -> void {
+    for (auto item : some_flag_mode_series) {
+      Subject::Access s = item;
+      Subject::Axis f = item; // <---- test this
+      CPPUNIT_ASSERT(item == f);
+      std::cerr << __FILE__ << ':' << __LINE__ << " in test_flag " << std::hex << (int)(s) << ' ' << (int)(f) << '\n';
+      CPPUNIT_ASSERT(s == f);
+    }
+  }
+  auto OK::test_is_flag() -> void {
+    CPPUNIT_ASSERT(!is_flag(all_mode)); // ... too many bits
+    CPPUNIT_ASSERT(!is_flag(no_mode)); // .... zero bits
+    for (auto item : some_flag_mode_series) {
+      auto const really_is_a_flag = Subject::EXISTS != item; // ... this is not a flllag (it is zero)
+      Subject::Axis f = item;
+      CPPUNIT_ASSERT(really_is_a_flag == is_flag(f|f)); // <---- is_flag(Subject::Access) because there is no is_flag(Axis)
+      Subject::Access fs = f;
+      CPPUNIT_ASSERT(really_is_a_flag == is_flag(fs)); // <--- is_flag(Subject::Access)
+    }
+  }
+}
+#import rigging.suite.io
+auto tests::unit::posix::OK::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("OK");
+  series << call("flag_mode_universe", &OK::test_flag_mode_universe)
+         << call("mode_universe", &OK::test_mode_universe)
+         << call("flag_mode_constants", &OK::test_flag_mode_constants)
+         << call("mode_constants", &OK::test_mode_constants)
+         << call("and_ss", &OK::test_and_ss)
+         << call("and_s1", &OK::test_and_s1)
+         << call("and_1s", &OK::test_and_1s)
+         << call("and_11", &OK::test_and_11)
+         << call("and_assign", &OK::test_and_assign)
+         << call("decumulate_and_assign", &OK::test_decumulate_and_assign)
+         << call("decumulate_via_rhs", &OK::test_decumulate_via_rhs)
+         << call("or_ss", &OK::test_or_ss)
+         << call("or_s1", &OK::test_or_s1)
+         << call("or_1s", &OK::test_or_1s)
+         << call("or_11", &OK::test_or_11)
+         << call("or_assign", &OK::test_or_assign)
+         << call("accumulate_or_assign", &OK::test_accumulate_or_assign)
+         << call("accumulate_via_rhs", &OK::test_accumulate_via_rhs)
+         << call("contains", &OK::test_contains)
+         << call("+OK::Access", &OK::test_mode_operator_unary_plus)
+         << call("+OK::Axis", &OK::test_flag_mode_operator_unary_plus)
+         << call("is_flag", &OK::test_is_flag)
+         << END;
+  return finalize(series);
+}
+#endiv

@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Element.declaration
+#import sys.call.result.Value
+#import error_t
+namespace sys::call::result {
+  //
+  // like std::tuple_element, but works on the Value<...>
+  //
+  template<std::size_t N, typename VALUE, typename... VALUES> struct Element<N, Value<VALUE, VALUES...>>;
+}
+#endiv
+#divert <hpp>
+namespace sys::call {
+  template<std::size_t N, typename VALUE, typename... VALUES> struct result::Element<N, result::Value<VALUE, VALUES...>> {
+    using Type = typename std::tuple_element<N+2, std::tuple<bool, error_t, VALUE, VALUES...>>::type;
+    using type [[deprecated("use the New School; instead prefer Element<N, VALUES...>::Type")]] = Type;
+  };
+}
+#endiv

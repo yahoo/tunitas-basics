@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+namespace rigging::suite::detail {
+  using name_type = std::string;
+  template<typename FIXTURE> using Method = void (FIXTURE::*)(void);
+  template<typename FIXTURE> class Call;
+}
+#endiv
+#divert <hpp>
+#import rigging.suite.detail.Add
+template<typename FIXTURE> class rigging::suite::detail::Call : public Add {
+public:
+  using method_type = Method<FIXTURE>;
+  inline Call(name_type name, method_type method);
+};
+#endiv
+#divert <ipp>
+#import cppunit.test.Caller
+template<typename FIXTURE> rigging::suite::detail::Call<FIXTURE>::Call(name_type name, method_type method)
+  : Add(new cppunit::test::Caller<FIXTURE>(name, method)) {
+  ;
+}
+#endiv

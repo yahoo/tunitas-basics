@@ -1,0 +1,78 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::format::stream {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::format::stream::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_something() -> void;
+  auto test_use_Nullbuf() -> void;
+  auto test_use_null() -> void;
+  auto test_use_wnull() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import format.stream.null
+#import format.stream.wnull
+#import format.stream.basic_null
+#import format.stream.Nullbuf
+
+auto tests::unit::format::stream::Fixture::test_something() -> void {
+  // but what?
+  CPPUNIT_ASSERT(true);
+}
+
+#import std.string
+#import std.ostringstream
+#import std.unique_ptr
+#import format.stream.Nullbuf
+auto tests::unit::format::stream::Fixture::test_use_Nullbuf() -> void {
+  std::ostringstream buf;
+  std::unique_ptr<::format::stream::Nullbuf<char>> n( new ::format::stream::Nullbuf<char>());
+  buf << "[see this]";
+  static_cast<std::ios&>(buf).rdbuf(n.get()); // <----- tricky. reach up into the ios and modify the streambuf pointer of the stringstream
+  buf << "[NOT SEE THIS]";
+  std::string const expected("[see this]");
+  std::string const actual(buf.str());
+  CPPUNIT_ASSERT(expected == actual);
+}
+
+#import format.stream.null
+auto tests::unit::format::stream::Fixture::test_use_null() -> void {
+  ::format::stream::null buf;
+  buf << "[NOT SEE THIS]";
+  // and no coredumps(!)
+  CPPUNIT_ASSERT(true);
+  // And input fails too
+  CPPUNIT_ASSERT_EQUAL(::format::stream::null::traits_type::eof(), buf.get());
+}
+
+#import format.stream.wnull
+auto tests::unit::format::stream::Fixture::test_use_wnull() -> void {
+  ::format::stream::wnull buf;
+  buf << L"[NOT SEE THIS]";
+  // and no coredumps(!)
+  CPPUNIT_ASSERT(true);
+  // And input fails too
+  CPPUNIT_ASSERT_EQUAL(::format::stream::wnull::traits_type::eof(), buf.get());
+}
+
+#import rigging.suite.io
+auto tests::unit::format::stream::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("stream");
+  series << call("something", &Fixture::test_something)
+         << call("Nullbuf", &Fixture::test_use_Nullbuf)
+         << call("use_null", &Fixture::test_use_null)
+         << call("use_wnull", &Fixture::test_use_wnull)
+    ;
+  return finalize(series);
+}
+#endiv

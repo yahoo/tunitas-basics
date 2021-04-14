@@ -1,0 +1,23 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+#import sqlite.api.statement
+#forward sqlite.Column
+#forward sqlite.column.Shell
+namespace sqlite {
+  namespace api {
+    template<> inline auto column<sqlite::column::Shell>(statement::Shell &, column_index) -> typename detail::Column<sqlite::column::Shell>::result_type;
+    template<> inline auto column<sqlite::Column>(statement::Shell &, column_index) -> typename detail::Column<sqlite::Column>::result_type;
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.column.Shell
+template<> auto sqlite::api::column<sqlite::column::Shell>(statement::Shell &statement, column_index idx) -> typename detail::Column<sqlite::column::Shell>::result_type {
+  return column::Shell(statement, idx);
+}
+
+#import sqlite.Column
+template<> auto sqlite::api::column<sqlite::Column>(statement::Shell &statement, column_index idx) -> typename detail::Column<sqlite::Column>::result_type {
+  return Column(statement, idx);
+}
+#endiv

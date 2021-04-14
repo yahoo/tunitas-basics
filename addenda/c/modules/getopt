@@ -1,0 +1,3 @@
+// -*- c++ -*- 22837492-b413-486e-b1bf-916d772e567e
+#pragma once
+#include <getopt.h>

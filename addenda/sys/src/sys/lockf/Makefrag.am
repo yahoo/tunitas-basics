@@ -1,0 +1,8 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+
+src_sys_lockf_SOURCES_SET = \
+  obj/src/sys/lockf/namespace.cpp \
+  obj/src/sys/lockf/Operation.cpp \
+  obj/src/sys/lockf/constants.cpp \
+  $(end)

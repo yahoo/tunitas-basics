@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import c.const_stringz
+#import sys.posix.packaging.exec.Core.declaration
+#import sys.posix.packaging.exec.function
+namespace sys::posix::packaging::exec {
+  //
+  // The Core<FUNCTION, FINAL, PRECEEDNG...> offers operator()(preceding..., final)
+  // where the preceding must be any type amenable to c::str(TYPE) -> char const *
+  //
+  // All the boilerplate and this is what we came for; the pattern matching on the tail of final_type
+  // Concept
+  //   final_type is c::const_stringz      signalling the 'execl' configuration <------------- this is us
+  //   final_type is c::const_environv     signalling the 'execle' configuration
+  //
+  // use 'char const *' (c::const_stringz) --------------------\ (here)
+  //                                                           |
+  // use execl -------------------------------\ (here)         |
+  //                                          |                |
+  //                                          v                v
+  template<typename... PRECEEDING> class Core<function::execl, c::const_stringz, PRECEEDING...>;
+}
+#endiv
+#divert <hpp>
+#import sys.call.Result
+template<typename... PRECEEDING> class sys::posix::packaging::exec::Core<sys::posix::packaging::exec::function::execl, c::const_stringz, PRECEEDING...> {
+public:
+  // new school
+  using Call = exec::function::execl *;
+  using Final = c::const_stringz;
+  using Result = call::Result;
+  // old school
+  using call_type = Call;
+  using final_type = Final;
+  using result_type = Result;
+  inline explicit Core(Call call) : call{call} { }
+  inline auto operator()(PRECEEDING const &..., Final const &) -> Result;
+protected:
+  ~Core() = default; // must inherit
+  Call call;
+};
+#endiv
+#divert <ipp>
+#import c.str
+#include <cerrno>
+template<typename... PRECEEDING> auto sys::posix::packaging::exec::Core<sys::posix::packaging::exec::function::execl, c::const_stringz, PRECEEDING...>::operator()(PRECEEDING const &...preceeding, Final const &final) -> Result {
+  auto r = call(c::str(preceeding)..., c::str(final), END_SENTINEL); // <-------------- WATCHOUT (the peeling), this is what we came for ... not having to utter SENTINEL at the call site
+  bool b = false; // if we got here then exec didn't happen
+  return Result{b, errno, r};
+}
+#endiv

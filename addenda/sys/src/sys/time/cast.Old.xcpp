@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.time.Point
+#import sys.time.Duration
+#import sys.time.Managed
+#import sys.time.Old
+#import sys.time.Since
+#import sys.time.Spec
+#import sys.time.Val
+namespace sys::time {
+  template<typename RESULT> auto cast(Old const &) -> RESULT = delete;
+  template<> inline auto cast<Point>(Old const &) -> Point; // .................. because Old is explicitly "a time point" semantic thing
+  template<> inline auto cast<Duration>(Old const &) -> Duration = delete; // ... ibidem. Old is explicitly a Time Point.
+  template<> inline auto cast<Since>(Old const &) -> Since;
+  template<> inline auto cast<Old>(Old const &) -> Old;
+  template<> inline auto cast<Spec>(Old const &) -> Spec;
+  template<> inline auto cast<Val>(Old const &) -> Val;
+  template<> inline auto cast<Managed>(Old const &) -> Managed;
+}
+#endiv
+#divert <ipp>
+template<> auto sys::time::cast<sys::time::Point>(Old const &v0) -> Point { return time::clock::base::from_time_t(v0.t_sec); }
+template<> auto sys::time::cast<sys::time::Since>(Old const &v0) -> Since { return Since{v0.t_sec}; }
+template<> auto sys::time::cast<sys::time::Old>(Old const &v0) -> Old     { return v0; }
+template<> auto sys::time::cast<sys::time::Val>(Old const &v0) -> Val     { return {v0.t_sec, 0u}; }
+template<> auto sys::time::cast<sys::time::Spec>(Old const &v0) -> Spec   { return {v0.t_sec, 0u}; }
+#import gmtime_r
+#import std.invalid_argument
+template<> auto sys::time::cast<sys::time::Managed>(Old const &v0) -> Managed {
+  auto v1 = Managed{};
+  if (nullptr == ::gmtime_r(&v0.t_sec, &v1)) {
+    throw std::invalid_argument("gmtime_r fails");
+  }
+  return v1;
+}
+#endiv

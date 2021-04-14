@@ -1,0 +1,36 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.basic_stringn
+#import std.pair
+#import std.size_t
+namespace c {
+  namespace detail {
+    namespace stringn {
+      template<typename CHAR> inline auto as(std::pair<CHAR const *const *, std::size_t> const &) -> basic_stringn<CHAR const>;
+      template<typename CHAR> inline auto as(std::pair<CHAR **, std::size_t> const &) -> basic_stringn<CHAR const>;
+      template<typename CHAR> inline auto as(std::pair<CHAR **, std::size_t> &) -> basic_stringn<CHAR>;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.stringy.enforce_terminating_nulchar_invariant
+
+template<typename CHAR> auto c::detail::stringn::as(std::pair<CHAR const *const *, std::size_t> const &par) -> basic_stringn<CHAR const> {
+  stringy::enforce_terminating_nulchar_invariant(&par.first[0], &par.first[par.second]);
+  basic_stringn<CHAR const> ret(par.second, par.first);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::stringn::as(std::pair<CHAR **, std::size_t> const &par) -> basic_stringn<CHAR const> {
+  stringy::enforce_terminating_nulchar_invariant(&par.first[0], &par.first[par.second]);
+  basic_stringn<CHAR const> ret(par.second, par.first);
+  return ret;
+}
+
+template<typename CHAR> auto c::detail::stringn::as(std::pair<CHAR **, std::size_t> &par) -> basic_stringn<CHAR> {
+  stringy::enforce_terminating_nulchar_invariant(&par.first[0], &par.first[par.second]);
+  basic_stringn<CHAR> ret(par.second, par.first);
+  return ret;
+}
+#divert </ipp>

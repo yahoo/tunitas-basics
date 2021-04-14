@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.sock.interface
+namespace sys::posix {
+  namespace packaging::accept4 {
+    using namespace packaging::sock::interface;
+    namespace function {
+      namespace accepted {
+        using Socket = result::accepted::Socket<File>;
+        template<required::Sockaddr SOCKADDR> using Sockaddr = result::accepted::Sockaddr<File, SOCKADDR>;
+      }
+      inline auto accept4(File, [[out]] Sockaddr *, [[inout]] Socklen *, Options) -> accepted::Socket;
+      inline auto accept4(File, [[out]] Sockaddr &, [[inout]] Socklen &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(File, [[out]] SOCKADDR &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(File, Options, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(File, Options) -> accepted::Sockaddr<SOCKADDR>;
+    }
+    namespace native {
+      namespace accepted {
+        using Socket = result::accepted::Socket<int>;
+        template<required::Sockaddr SOCKADDR> using Sockaddr = result::accepted::Sockaddr<int, SOCKADDR>;
+      }
+      inline auto accept4(int fd, [[out]] Sockaddr *, [[inout]] Socklen *, Options) -> accepted::Socket;
+      inline auto accept4(int fd, [[out]] Sockaddr &, [[inout]] Socklen &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(int fd, [[out]] SOCKADDR &, Options) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(int fd, Options, [[out]] SOCKADDR &) -> accepted::Socket;
+      template<required::Sockaddr SOCKADDR> inline auto accept4(int fd, Options) -> accepted::Sockaddr<SOCKADDR>;
+    }
+  }
+  using packaging::accept4::function::accept4;
+  namespace native { using packaging::accept4::native::accept4; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.accept
+namespace sys::posix::packaging::accept4 {
+  // Just call the overloads against 'accept'
+  //
+  auto function::accept4(File fd, Sockaddr *addr, Socklen *addrlen, Options options) -> accepted::Socket                     { return posix::accept(fd, addr, addrlen, options); }
+  auto function::accept4(File fd, Sockaddr &addr, Socklen &addrlen, Options options) -> accepted::Socket                     { return posix::accept(fd, addr, addrlen, options); }
+  template<required::Sockaddr SOCKADDR> auto function::accept4(File fd, SOCKADDR &addr, Options options) -> accepted::Socket { return posix::accept<SOCKADDR>(fd, addr, options); }
+  template<required::Sockaddr SOCKADDR> auto function::accept4(File fd, Options options, SOCKADDR &addr) -> accepted::Socket { return posix::accept<SOCKADDR>(fd, options, addr); }
+  template<required::Sockaddr SOCKADDR> auto function::accept4(File fd, Options options) -> accepted::Sockaddr<SOCKADDR>     { return posix::accept<SOCKADDR>(fd, options); }
+  //
+  auto native::accept4(int fd, Sockaddr *addr, Socklen *addrlen, Options options) -> accepted::Socket                        { return posix::native::accept(fd, addr, addrlen, options); }
+  auto native::accept4(int fd, Sockaddr &addr, Socklen &addrlen, Options options) -> accepted::Socket                        { return posix::native::accept(fd, addr, addrlen, options); }
+  template<required::Sockaddr SOCKADDR> auto native::accept4(int fd, SOCKADDR &addr, Options options) -> accepted::Socket    { return posix::native::accept<SOCKADDR>(fd, addr, options); }
+  template<required::Sockaddr SOCKADDR> auto native::accept4(int fd, Options options, SOCKADDR &addr) -> accepted::Socket    { return posix::native::accept<SOCKADDR>(fd, options, addr); }
+  template<required::Sockaddr SOCKADDR> auto native::accept4(int fd, Options options) -> accepted::Sockaddr<SOCKADDR>        { return posix::native::accept<SOCKADDR>(fd, options); }
+}
+#endiv

@@ -1,0 +1,11 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import tests.words.detail.Formatter
+#import std.string
+namespace tests {
+  namespace words {
+    // ADL will find it down with Formatter; we want it up here
+    using detail::finalize;
+  }
+}
+#endiv

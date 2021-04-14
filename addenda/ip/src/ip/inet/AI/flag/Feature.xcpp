@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <module-ip/netdb.h> // for "AI_"-prefixed constants
+namespace ip {
+  namespace inet {
+    namespace AI {
+      namespace flag {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated" // has no effect gcc-c++-8.2.1-5.fc28.x86_64
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // has no effect in  gcc-c++-8.2.1-5.fc28.x86_64
+#ifdef __glibc_macro_warning // [[FIXTHIS]] ugly ... netdb.h uses GCC CPP warning messages from cdefs.h
+#define __glibc_macro_warning_restore__
+#undef __glibc_macro_warning
+#define __glibc_macro_warning(msg)
+#endif
+        enum class Feature
+          { NONE = 0,
+            PASSIVE	= AI_PASSIVE,          // Socket address is intended for `bind'. 
+            CANONNAME	= AI_CANONNAME,        // Request for canonical name. 
+            NUMERICHOST	= AI_NUMERICHOST,      // Don't use name resolution. 
+            V4MAPPED	= AI_V4MAPPED,	       // IPv4 mapped addresses are acceptable. 
+            ALL		= AI_ALL,	       // Return IPv4 mapped and IPv6 addresses. 
+            ADDRCONFIG	= AI_ADDRCONFIG,       // Use configuration of this host to choose returned address type.. 
+            NUMERICSERV	= AI_NUMERICSERV,      // Don't use name resolution. 
+            // ifdef __USE_GNU
+            IDN                      = AI_IDN,	                      // IDN encode input before looking it up. 
+            CANONIDN                 = AI_CANONIDN,	              // Translate canonical name from IDN format. 
+            // [[deprecated]] Validate strings according to STD3 rules. 
+            // Shutup the deprecation warning on their member
+            // Transfer the deprecation warning from the #define to our enum member
+#ifdef AI_IDN_ALLOW_UNASSIGNED
+            IDN_ALLOW_UNASSIGNED [[deprecated]]     = AI_IDN_ALLOW_UNASSIGNED,       // Don't reject unassigned Unicode code points. 
+#endif
+#ifdef AI_IDN_USE_STD3_ASCII_RULES
+            IDN_USE_STD3_ASCII_RULES [[deprecated]] = AI_IDN_USE_STD3_ASCII_RULES
+#endif
+          };
+#ifdef __glibc_macro_warning_restore__
+#undef __glibc_macro_warning_restore__
+#undef  __glibc_macro_warning
+#define __glibc_macro_warning(message) __glibc_macro_warning1 (GCC warning message)
+#endif
+#pragma GCC diagnostic pop
+      }
+    }
+  }
+}
+#endiv
+#divert <hpp>
+namespace ip {
+  namespace inet {
+    namespace AI {
+      namespace flag {
+        inline auto is_flag(Feature) -> bool;
+
+        // And for convenience, they are supplied as constants.
+        constexpr auto const NONE        = Feature::NONE;
+        constexpr auto const PASSIVE     = Feature::PASSIVE;
+        constexpr auto const CANONNAME   = Feature::CANONNAME;
+        constexpr auto const NUMERICHOST = Feature::NUMERICHOST;
+        constexpr auto const V4MAPPED    = Feature::V4MAPPED;
+        constexpr auto const ALL	 = Feature::ALL	;
+        constexpr auto const ADDRCONFIG  = Feature::ADDRCONFIG;
+        constexpr auto const NUMERICSERV = Feature::NUMERICSERV;
+        // the GNU-specific ones
+        constexpr auto const IDN                      = Feature::IDN;
+        constexpr auto const CANONIDN                 = Feature::CANONIDN;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated" // has no effect gcc-c++-8.2.1-5.fc28.x86_64
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" // has no effect in  gcc-c++-8.2.1-5.fc28.x86_64
+        constexpr auto const IDN_ALLOW_UNASSIGNED     = Feature::IDN_ALLOW_UNASSIGNED;
+        constexpr auto const IDN_USE_STD3_ASCII_RULES = Feature::IDN_USE_STD3_ASCII_RULES;
+#pragma GCC diagnostic pop
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+auto ip::inet::AI::flag::is_flag(Feature) -> bool {
+  // They are all flags, by definition
+  return true;
+}
+#endiv

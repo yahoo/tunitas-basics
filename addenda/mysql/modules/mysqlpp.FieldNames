@@ -1,0 +1,24 @@
+// -*- c++ -*- 84db80c9-e780-423c-97b0-950ebf9a9d6a
+#pragma once
+//
+// WATCHOUT - there is an order to the MySQL++ include files.
+//
+#include "mysql++/common.h"
+//
+// /opt/mysqlpp/include/mysql++/field_names.h:38:22: error: aggregate ‘mysqlpp::MYSQLPP_EXPORT mysqlpp::ResultBase’ has incomplete type and cannot be defined
+//   class MYSQLPP_EXPORT ResultBase;
+//                      ^~~~~~~~~~
+// /opt/mysqlpp/include/mysql++/field_names.h:56:19: error: ‘ResultBase’ does not name a type
+//   FieldNames(const ResultBase* res) :
+//                   ^~~~~~~~~~
+// /opt/mysqlpp/include/mysql++/field_names.h:70:31: error: ‘ResultBase’ does not name a type
+//   FieldNames& operator =(const ResultBase* res)
+//                               ^~~~~~~~~~
+// /opt/mysqlpp/include/mysql++/field_names.h:113:18: error: ‘ResultBase’ does not name a type
+//   void init(const ResultBase* res);
+//                   ^~~~~~~~~~
+//
+
+// What we came for
+#include "mysql++/field_names.h"
+

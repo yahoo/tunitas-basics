@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace source {
+      class Cleanup;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import std.string
+class tests::unit::source::Cleanup {
+public:
+  inline explicit Cleanup(std::string doomed_filename);
+  inline ~Cleanup();
+  Cleanup(Cleanup const &) = delete;
+  auto operator=(Cleanup const &) -> Cleanup & = delete;
+protected:
+  std::string doomed_filename;
+};
+#endiv
+#divert <ipp>
+tests::unit::source::Cleanup::Cleanup(std::string arg_doomed_filename)
+  : doomed_filename(arg_doomed_filename) {
+  ;
+}
+
+#import sys.posix.unlink
+tests::unit::source::Cleanup::~Cleanup() {
+  // Don't throw .. .this is a destructor
+  sys::posix::unlink(doomed_filename);
+}
+#endiv
+

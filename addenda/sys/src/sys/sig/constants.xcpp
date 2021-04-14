@@ -1,0 +1,104 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::sig {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import sys.sig.Handler
+#import sys.sig.Number
+namespace sys::sig::constants {
+  //
+  // The (symbolic) signal handlers
+  //
+  inline auto const IGNORE  = Handler{SIG_IGN};
+  inline auto const DEFAULT = Handler{SIG_DFL};
+  inline auto const ERROR   = Handler{SIG_ERR};;
+  [[deprecated("buy a vowel, spell it out! prefer sig::IGNORE")]]  inline auto const IGN = Handler{SIG_IGN};
+  [[deprecated("buy a vowel, spell it out! prefer sig::DEFAULT")]] inline auto const DFL = Handler{SIG_DFL};
+  [[deprecated("buy a vowel, spell it out! prefer sig::ERROR")]]   inline auto const ERR = Handler{SIG_ERR};
+  //
+  // The signal numbers
+  //
+  // ISO C99 Signals
+  inline constexpr auto INT  = Number::INT; // ........ Interactive attention signal.
+  inline constexpr auto ILL  = Number::ILL; // ........ Illegal instruction.
+  inline constexpr auto ABRT = Number::ABRT; // ....... Abnormal termination.
+  inline constexpr auto FPE  = Number::FPE; // ........ Erroneous arithmetic operation.
+  inline constexpr auto SEGV = Number::SEGV; // ....... Invalid access to storage.
+  inline constexpr auto TERM = Number::TERM; // ....... Termination request.
+  //
+  // Historical signals specified by POSIX.
+  inline constexpr auto HUP  = Number::HUP; // ........ Hangup.
+  inline constexpr auto QUIT = Number::QUIT; // ....... Quit.
+  inline constexpr auto TRAP = Number::TRAP; // ....... Trace/breakpoint trap.
+  inline constexpr auto KILL = Number::KILL; // ....... Killed.
+  inline constexpr auto BUS  = Number::BUS; // ........ Bus error.
+  inline constexpr auto SYS  = Number::SYS; // ........ Bad system call.
+  inline constexpr auto PIPE = Number::PIPE; // ....... Broken pipe.
+  inline constexpr auto ALRM = Number::ALRM; // ....... Alarm clock.
+  //
+  // New(er) POSIX signals (1003.1-2008; 1003.1-2013).
+  inline constexpr auto URG    = Number::URG; // ...... Urgent data is available at a socket.
+  inline constexpr auto STOP   = Number::STOP; // ..... Stop; unblockable.
+  inline constexpr auto TSTP   = Number::TSTP; // ..... Keyboard stop.
+  inline constexpr auto CONT   = Number::CONT; // ..... Continue.
+  inline constexpr auto CHLD   = Number::CHLD; // ..... Child terminated or stopped.
+  inline constexpr auto TTIN   = Number::TTIN; // ..... Background read from control terminal.
+  inline constexpr auto TTOU   = Number::TTOU; // ..... Background write to control terminal.
+  inline constexpr auto POLL   = Number::POLL; // ..... Pollable event occurred (System V).
+  inline constexpr auto XCPU   = Number::XCPU; // ..... CPU time limit exceeded.
+  inline constexpr auto XFSZ   = Number::XFSZ; // ..... File size limit exceeded.
+  inline constexpr auto VTALRM = Number::VTALRM; // ... Virtual timer expired.
+  inline constexpr auto PROF   = Number::PROF; // ..... Profiling timer expired.
+  inline constexpr auto USR1   = Number::USR1; // ..... User-defined signal 1.
+  inline constexpr auto USR2   = Number::USR2; // ..... User-defined signal 2.
+  //
+  // Nonstandard signals found in all modern POSIX systems (including both BSD and Linux).
+  inline constexpr auto WINCH = Number::WINCH; // ..... Window size change (4.3 BSD; Sun).
+  //
+  // Archaic names for compatibility.
+  inline constexpr auto IO  = Number::IO; // .......... I/O now possible (4.2 BSD).
+  inline constexpr auto IOT = Number::IOT; // ......... IOT instruction; abort() on a PDP-11.
+  inline constexpr auto CLD = Number::CLD; // ......... Old System V name
+  //
+  // WATCHOUT - SIGRTMIN and SIGRTMAX are actually function calls
+  // They are modeled nearby and in the SIG object
+  //
+  // New Names with all the vowels and all the consonants
+  // These are our inventions because we now know how to spell.
+  //
+  inline constexpr auto ZERO                     = Number::ZERO;
+  inline constexpr auto INTERACTIVE              = Number::INTERACTIVE;
+  inline constexpr auto ILLEGAL                  = Number::ILLEGAL;
+  inline constexpr auto ABORT                    = Number::ABORT;
+  inline constexpr auto FLOATING_POINT_EXCEPTION = Number::FLOATING_POINT_EXCEPTION;
+  inline constexpr auto SEGMENTATION_VIOLATION   = Number::SEGMENTATION_VIOLATION;
+  inline constexpr auto TERMINATE                = Number::TERMINATE;
+  //
+  // Historical signals specified by POSIX.
+  inline constexpr auto HANGUP      = Number::HANGUP;
+  inline constexpr auto BREAKPOINT  = Number::BREAKPOINT;
+  inline constexpr auto BUS_ERROR   = Number::BUS_ERROR;
+  inline constexpr auto SYSTEM_CALL = Number::SYSTEM_CALL;
+  inline constexpr auto ALARM       = Number::ALARM;
+  //
+  // New(er) POSIX signals (1003.1-2008; 1003.1-2013).
+  inline constexpr auto URGENT               = Number::URGENT;
+  inline constexpr auto TERMINAL_STOP        = Number::TERMINAL_STOP;
+  inline constexpr auto CONTINUE             = Number::CONTINUE;
+  inline constexpr auto CHILD                = Number::CHILD;
+  inline constexpr auto TERMINAL_INPUT       = Number::TERMINAL_INPUT;
+  inline constexpr auto TERMINAL_OUTPUT      = Number::TERMINAL_OUTPUT;
+  inline constexpr auto EXCEEDED_CPU         = Number::EXCEEDED_CPU;
+  inline constexpr auto EXCEEDED_FILE_SIZE   = Number::EXCEEDED_FILE_SIZE;
+  inline constexpr auto VIRTUAL_TIMER_ALARM  = Number::VIRTUAL_TIMER_ALARM;
+  inline constexpr auto PROFILE_TIMER_EXPIRY = Number::PROFILE_TIMER_EXPIRY;
+  inline constexpr auto USER1                = Number::USER1;
+  inline constexpr auto USER2                = Number::USER2;
+  //
+  // Nonstandard signals found in all modern POSIX systems (including both BSD and Linux).
+  inline constexpr auto WINDOW_SIZE_CHANGE = Number::WINDOW_SIZE_CHANGE;
+}
+#endiv

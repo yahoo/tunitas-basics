@@ -1,0 +1,146 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ares.Count
+#import ares.fd.Set
+#import ares.fd.Sets
+#import ares.required.time.Duration
+#import sys.call.result.Value
+namespace ares::fd {
+  //
+  // Perform select(2) on the identified socket sets.
+  // This is a wrapping of sys::posix::select(...) which wraps select(2)
+  // ADL will find this instance
+  // This instance plays well with the read/write fd:: Set pair of ares.
+  //
+  // Usage:
+  //
+  //   auto channel = Channel{...somehow...};
+  //   ...send off some queries...
+  //   ...
+  //   fd::Set r, w;
+  //   auto ccc = count(channel, r, w);
+  //   auto selected = select(ccc, r, w);
+  //
+  //   fd::Sets rw;
+  //   auto ccc = count(channel, rw);
+  //   auto limit = ...optionaly...
+  //   auto selected = select(ccc, rw, limit);
+  //
+#if 0
+  namespace packaging::select::function {
+    using fd::set::Reference;
+    using fd::set::Purpose;
+    using fd::ANCHOR;
+    using Reads = Reference<Purpose::READ>;
+    using Writes = Reference<Purpose::WRITE>;
+    using Result = sys::call::result::Value<Count>;
+    inline auto select(Count, Reads, Writes) -> Result;
+    inline auto select(Count, Sets &) -> Result;
+    inline auto select(Reads, Writes) -> Result;
+    inline auto select(Sets &) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Count, Reads, Writes, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Count, Sets &, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Reads, Writes, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Sets &, DURATION) -> Result;
+    inline auto find_maximum_set(Set const &, Set const &) -> Count;
+  }
+  // ADL will find these against Reads, Writes or Sets
+  using packaging::select::function::select;
+#endif
+  namespace packaging::select::function {
+    using Result = sys::call::result::Value<Count>;
+    inline auto select(Count, Set &r, Set &w) -> Result;
+    inline auto select(Count, Sets &rw) -> Result;
+    inline auto select(Set &r, Set &w) -> Result;
+    inline auto select(Sets &rw) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Count, Set &r, Set &w, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Count, Sets &rw, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Set &r, Set &w, DURATION) -> Result;
+    template<required::time::Duration DURATION> inline auto select(Sets &rw, DURATION) -> Result;
+    inline auto find_maximum_set(Set const &r, Set const &w) -> Count;
+  }
+  // ADL will find these against Reads, Writes or Sets
+  using packaging::select::function::select;
+}
+#endiv
+#divert <ipp>
+#import ares.time.duration_cast
+#import sys.fd.set.Reference
+#import sys.posix.select
+#import sys.time.as
+#import sys.time.val
+#import sys.fd.fls
+namespace ares::fd::packaging::select {
+  auto function::find_maximum_set(Set const &first, Set const &second) -> Count {
+    auto const &base_first = static_cast<sys::fd::Set const &>(first); // [[FIXTHAT]] sys::fd::find_last_set should tolerate descendants; use std::is_base_of not std::is_set
+    auto const &base_second = static_cast<sys::fd::Set const &>(second);
+    return Count(1+sys::fd::find_last_set(base_first, base_second));
+  }
+#if 0
+  auto function::select(Count count, Reads r, Writes w) -> Result {
+    auto selected = sys::posix::select((int)count, r, w);
+    return Result{ok(selected), error_num(selected), Count(value(selected))};
+  }
+  auto function::select(Count count, Sets &rw) -> Result {
+    return select(count, reads(ANCHOR, rw.reads), writes(ANCHOR, rw.writes));
+  }
+  auto function::select(Reads r, Writes w) -> Result {
+    return select(find_maximum_set(r, w), r, w);
+  }
+  auto function::select(Sets &rw) -> Result {
+    return select(find_maximum_set(rw.reads, rw.writes), reads(ANCHOR, rw.reads), writes(ANCHOR, rw.writes));
+  }
+  template<required::time::Duration DURATION> auto function::select(Count count, Reads r, Writes w, DURATION timeout) -> Result {
+    auto selected = sys::posix::select((int)count, r, w, sys::time::as<sys::time::val>(time::duration_cast<time::Select>(timeout)));
+    return Result{ok(selected), error_num(selected), Count(value(selected))};
+  }
+  template<required::time::Duration DURATION> auto function::select(Count count, Sets &rw, DURATION timeout) -> Result {
+    return select(count, reads(ANCHOR, rw.reads), writes(ANCHOR, rw.writes), timeout);
+  }
+  template<required::time::Duration DURATION> auto function::select(Reads r, Writes w, DURATION timeout) -> Result {
+    return select(find_maximum_set(r, w), r, w, timeout);
+  }
+  template<required::time::Duration DURATION> auto function::select(Sets &rw, DURATION timeout) -> Result {
+    return select(find_maximum_set(rw.reads, rw.writes), reads(ANCHOR, rw.reads), writes(ANCHOR, rw.writes), timeout);
+  }
+#endif
+  auto function::select(Count count, Set &r, Set &w) -> Result {
+    // WATCHOUT - if 0 == max and there is no timeout, then select waits "forever" on an event that can never present itself.
+    // This appears to be a "feature" of select(2)
+    if (zero(count)) {
+      return {true, 0, Count{}};
+    } else {
+      auto selected = sys::posix::select(int(count), read(r), write(w));
+      return Result{ok(selected), error_num(selected), Count(value(selected))};
+    }
+  }
+  auto function::select(Count count, Sets &rw) -> Result {
+    return select(count, rw.reads, rw.writes);
+  }
+  auto function::select(Set &r, Set &w) -> Result {
+    return select(find_maximum_set(r, w), r, w);
+  }
+  auto function::select(Sets &rw) -> Result {
+    return select(find_maximum_set(rw.reads, rw.writes), rw.reads, rw.writes);
+  }
+  template<required::time::Duration DURATION> auto function::select(Count count, Set &r, Set &w, DURATION timeout) -> Result {
+    if (zero(count)) {
+      return {true, 0, Count{}};
+    } else {
+      auto retimeout = sys::time::as<sys::time::val>(time::duration_cast<time::Select>(timeout));
+      auto selected = sys::posix::select(int(count), read(r), write(w), retimeout);
+      return Result{ok(selected), error_num(selected), Count(value(selected))};
+    }
+  }
+  template<required::time::Duration DURATION> auto function::select(Count count, Sets &rw, DURATION timeout) -> Result {
+    return select(count, rw.reads, rw.writes, timeout);
+  }
+  template<required::time::Duration DURATION> auto function::select(Set &r, Set &w, DURATION timeout) -> Result {
+    return select(find_maximum_set(r, w), r, w, timeout);
+  }
+  template<required::time::Duration DURATION> auto function::select(Sets &rw, DURATION timeout) -> Result {
+    return select(find_maximum_set(rw.reads, rw.writes), rw.reads, rw.writes, timeout);
+  }
+}
+#endiv

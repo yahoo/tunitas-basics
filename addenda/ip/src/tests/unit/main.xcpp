@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.ip.Fixture
+#import tests.unit.make.Fixture
+#import tests.unit.want.Fixture
+#import unit.bench.Main
+auto main(int argc, char **argv) -> int {
+  using namespace tests::unit;
+  using namespace rigging::bench;
+  Main remain(ip::Fixture::suite(),
+              make::Fixture::suite(),
+              want::Fixture::suite());
+  return remain(argc, argv);
+}
+#endiv

@@ -1,0 +1,94 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.interface
+namespace sys::posix {
+  namespace packaging::wait3 {
+    using namespace packaging::wait::interface;
+    namespace function { using namespace bundle::wait3::function; }
+    namespace native { using namespace bundle::wait3::native; }
+  }
+}
+#endiv
+#divert <hpp>
+#import sys.posix.wait4
+namespace sys::posix::packaging::wait3 {
+  //
+  // From wait3(2) of man-pages-4.16-3.fc29.noarch
+  //
+  //   <quote>
+  //     C library/kernel differences
+  //     On Linux, wait3() is a library function implemented on top of the wait4() system call.
+  //   </quote>
+  //
+  // If you are looking for the flexibility surrounding recovering the [[out]] arguments
+  // through the use of std::optional then use the overloaded 'wait' interface to access wait3(2).
+  //
+  namespace function {
+    using namespace bundle::wait3::function;
+    inline auto wait3([[in]] Options = Options{}) -> both::Returned;
+    inline auto wait3([[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    //
+    inline auto wait3([[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned;
+    inline auto wait3([[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Unfilled, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Filled &, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Unfilled, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+  }
+  namespace native {
+    using namespace bundle::wait3::native;
+    inline auto wait3([[in]] Options = Options{}) -> both::Returned;
+    inline auto wait3([[in]] Options, [[out]] usages::Filled &) -> status::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &) -> usages::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Filled &, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    //
+    inline auto wait3([[in]] Options, status::Unfilled, [[out]] usages::Filled &) -> identifier::Returned;
+    inline auto wait3([[in]] Options, [[out]] status::Filled &, usages::Unfilled) -> identifier::Returned;
+    inline auto wait3([[in]] Options, status::Unfilled, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Unfilled, [[in]] Options, [[out]] usages::Filled &) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Filled &, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+    [[signature("original ordering")]] inline auto wait3([[out]] status::Unfilled, [[in]] Options, usages::Unfilled) -> identifier::Returned;
+  }
+}
+namespace sys::posix {
+  using packaging::wait3::function::wait3;
+  namespace native { using packaging::wait3::native::wait3; }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.wait3.returned
+namespace sys::posix::packaging::wait3 {
+  auto function::wait3(Options options) -> both::Returned                                                         { return returned::wait3<id::Process>(options); }
+  auto function::wait3(Options options, status::Filled &sutats) -> usages::Returned                               { return returned::wait3<id::Process>(options, sutats); }
+  auto function::wait3(Options options, usages::Filled &segasu) -> status::Returned                               { return returned::wait3<id::Process>(options, segasu); }
+  auto function::wait3(Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned   { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned   { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned  { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(status::Unfilled sutats, Options options, usages::Filled &segasu) -> identifier::Returned  { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(status::Filled &sutats, Options options, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait3<id::Process>(options, sutats, segasu); }
+  auto function::wait3(status::Unfilled sutats, Options options, usages::Unfilled segasu) -> identifier::Returned { return returned::wait3<id::Process>(options, sutats, segasu); }
+  //
+  auto native::wait3(Options options) -> both::Returned                                                         { return returned::wait3<pid_t>(options); }
+  auto native::wait3(Options options, status::Filled &sutats) -> usages::Returned                               { return returned::wait3<pid_t>(options, sutats); }
+  auto native::wait3(Options options, usages::Filled &segasu) -> status::Returned                               { return returned::wait3<pid_t>(options, segasu); }
+  auto native::wait3(Options options, status::Filled &sutats, usages::Filled &segasu) -> identifier::Returned   { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(status::Filled &sutats, Options options, usages::Filled &segasu) -> identifier::Returned   { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(Options options, status::Unfilled sutats, usages::Filled &segasu) -> identifier::Returned  { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(Options options, status::Filled &sutats, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(Options options, status::Unfilled sutats, usages::Unfilled segasu) -> identifier::Returned { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(status::Unfilled sutats, Options options, usages::Filled &segasu) -> identifier::Returned  { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(status::Filled &sutats, Options options, usages::Unfilled segasu) -> identifier::Returned  { return returned::wait3<pid_t>(options, sutats, segasu); }
+  auto native::wait3(status::Unfilled sutats, Options options, usages::Unfilled segasu) -> identifier::Returned { return returned::wait3<pid_t>(options, sutats, segasu); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_wait3.Usage
+static_assert(tests::usage::posix_wait3::Usage<>);
+#endiv

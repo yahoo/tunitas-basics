@@ -1,0 +1,53 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <netinet/in.h>
+namespace sys::ip::proto {
+  //
+  // Usage:
+  //
+  //   auto socketed = socket(AF::INET, SOCK::STREAM, IPPROTO::NONE);
+  //
+  enum class Protocol {
+    IP = IPPROTO_IP,
+    ICMP = IPPROTO_ICMP,
+    IGMP = IPPROTO_IGMP,
+    IPIP = IPPROTO_IPIP,
+    TCP = IPPROTO_TCP,
+    EGP = IPPROTO_EGP,
+    PUP = IPPROTO_PUP,
+    UDP = IPPROTO_UDP,
+    IDP = IPPROTO_IDP,
+    TP = IPPROTO_TP,
+    DCCP = IPPROTO_DCCP,
+    IPV6 = IPPROTO_IPV6,
+    RSVP = IPPROTO_RSVP,
+    GRE = IPPROTO_GRE,
+    ESP = IPPROTO_ESP,
+    AH = IPPROTO_AH,
+    MTP = IPPROTO_MTP,
+    BEETPH = IPPROTO_BEETPH,
+    ENCAP = IPPROTO_ENCAP,
+    PIM = IPPROTO_PIM,
+    COMP = IPPROTO_COMP,
+    SCTP = IPPROTO_SCTP,
+    UDPLITE = IPPROTO_UDPLITE,
+    MPLS = IPPROTO_MPLS,
+    RAW = IPPROTO_RAW,
+    HOPOPTS = IPPROTO_HOPOPTS,
+    ROUTING = IPPROTO_ROUTING,
+    FRAGMENT = IPPROTO_FRAGMENT,
+    ICMPV6 = IPPROTO_ICMPV6,
+    NONE = IPPROTO_NONE, // IPv6 no-next-header "protocol"
+    DSTOPTS = IPPROTO_DSTOPTS,
+#ifdef IPPROTO_MH // enable by #include WHAT?
+    MH = IPPROTO_MH,
+#endif
+#ifdef IPPROTO_L2TP // enable by #include WHAT?
+    L2TP = IPPROTO_L2TP,
+#endif
+    // UNSPEC is is an idiomatic usage leftover from confusion of IPPROTO with PF (e.g. PF_UNSPEC=0)
+    UNSPEC [[deprecated("WRONG, you should say Type::NONE")]] = NONE,
+  };
+}
+#endiv

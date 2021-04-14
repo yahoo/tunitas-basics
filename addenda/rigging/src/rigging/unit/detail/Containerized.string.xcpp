@@ -1,0 +1,15 @@
+// -*- c++ -*- more or less but in the SCOLD styling
+#divert <hpp>
+#import rigging.unit.detail.Containerized
+#import std.string
+namespace rigging::unit::detail {
+  // Because std::basic_string<C, T, A>  handles this on its own.
+  template<> inline auto Containerized<std::string>::push_back_null_sentinel() -> void;
+}
+#endiv
+#divert <ipp>
+template<> auto rigging::unit::detail::Containerized<std::string>::push_back_null_sentinel() -> void {
+  // nothing to do...
+  // std::string handles the nullptr sentinel on its own.
+}
+#endiv

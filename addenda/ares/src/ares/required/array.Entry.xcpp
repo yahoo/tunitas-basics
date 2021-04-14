@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.key
+#forward ares.managed.array.Entry
+namespace ares::required::array {
+  //
+  // Is this a valid managed::Array<ENTRY>?
+  // Used to define the concept.
+  // And allows for specializations to extend the concept.
+  //
+  template<typename ENTRY> struct Is_Entry;
+  template<Resource_Record RECORD> struct Is_Entry<managed::array::Entry<RECORD>>;
+  //
+  // Is this a valid managed::Array<ENTRY>?
+  //
+  //  Usage:
+  //
+  //   required::array::Entry<managed::array::Entry<ADDR6>>;
+  //
+  template<typename ENTRY> concept bool Entry = Is_Entry<ENTRY>::value;
+}
+#endiv
+#divert <hpp>
+#import std.false_type
+namespace ares::required {
+  template<typename ENTRY> struct array::Is_Entry : public std::false_type { };
+}
+#import std.true_type
+namespace ares::required::array {
+  template<Resource_Record RECORD> struct Is_Entry<managed::array::Entry<RECORD>> : public std::true_type { };
+}
+#endiv
+#divert <cpp>
+// This is, of course, test code
+namespace ares::required::array {
+  static_assert(Entry<managed::array::Entry<ADDR4>>);
+  static_assert(Entry<managed::array::Entry<ADDR6>>);
+}
+#endiv

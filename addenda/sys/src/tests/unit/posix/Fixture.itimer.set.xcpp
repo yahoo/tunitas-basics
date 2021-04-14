@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <cpp>
+#import tests.unit.itimer.bundle
+#import tests.unit.itimer.unset.Guardian
+#import tests.unit.posix.Fixture
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_setitimer_returning() -> void {
+    using namespace unit::itimer::bundle;
+    auto guard = unset::Guardian{Which::REAL};
+    // Set this far enough in the future that we an remove it before the SIGALRM kills us.
+    auto future = []() -> itimerval {
+                    auto const period = timeval{};
+                    auto const next = as<sys::time::val>(100s);
+                    return {period, next};
+                  }();
+    auto got = setitimer(Which::REAL, future); // <------------------------------ test this
+    CPPUNIT_ASSERT(good(got));
+    itimerval val = value(got);
+    CPPUNIT_ASSERT(sizeof (val));
+  }
+  auto Fixture::test_setitimer_suppressing() -> void {
+    using namespace unit::itimer::bundle;
+    auto guard = unset::Guardian{Which::REAL};
+    // Set this far enough in the future that we an remove it before the SIGALRM kills us.
+    auto future = itimerval{ {}, as<timeval>(100s) };
+    auto got = setitimer(Which::REAL, future, nullptr); // <------------------------------ test this
+    CPPUNIT_ASSERT(good(got));
+  }
+  auto Fixture::test_setitimer_filling() -> void {
+    using namespace unit::itimer::bundle;
+    auto guard = unset::Guardian{Which::REAL};
+    // Set this far enough in the future that we an remove it before the SIGALRM kills us.
+    auto future = itimerval{ {}, as<timeval>(100s) };
+    auto oldie = itimerval{};
+    auto got = setitimer(Which::REAL, future, oldie); // <------------------------------ test this
+    CPPUNIT_ASSERT(good(got));
+  }
+}
+#endiv

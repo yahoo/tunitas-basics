@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace detail {
+    class Destructor;
+  } 
+}
+#endiv
+#divert <hpp>
+#import std.add_pointer
+struct sqlite::detail::Destructor {
+  //
+  // Patterned after a simplified form of std::function<void (void *)> which is
+  // capable of holding the bogus symbolic function pointer values.
+  //
+  // A destructor is a void-returning function that accepts a pointer into the void.
+  //
+  using function_object = void (void *);
+  //
+  // From <sqlite3.h> from sqlite-devel-3.8.3-1.fc19.x86_64
+  //
+  // ^The fifth argument to sqlite3_bind_blob(), sqlite3_bind_text(), and
+  // sqlite3_bind_text16() is a destructor used to dispose of the BLOB or
+  // string after SQLite has finished with it.  ^The destructor is called
+  // to dispose of the BLOB or string even if the call to sqlite3_bind_blob(),
+  // sqlite3_bind_text(), or sqlite3_bind_text16() fails.  
+  //
+  // ^If the fifth argument is the special value [SQLITE_STATIC], then SQLite assumes
+  // that the information is in static, unmanaged space and does not need to be freed.
+  //
+  // ^If the fifth argument has the value [SQLITE_TRANSIENT], then
+  // SQLite makes its own private copy of the data immediately, before
+  // the sqlite3_bind_*() routine returns.
+  //
+  using function_pointer = std::add_pointer<function_object>::type;
+public:
+  inline explicit Destructor(function_pointer);
+  inline auto target() const -> function_pointer;
+protected:
+  ~Destructor() = default;
+  function_pointer value; 
+};
+#endiv
+#divert <ipp>
+sqlite::detail::Destructor::Destructor(function_pointer arg_value)
+  : value(arg_value) {
+  ;
+}
+
+auto sqlite::detail::Destructor::target() const -> function_pointer {
+  return value;
+}
+#endiv

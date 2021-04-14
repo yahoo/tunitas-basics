@@ -1,0 +1,33 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::id {
+  //
+  // An unadorned file descriptor.
+  // Use sys::fd::Descriptor for a managed file descriptor.
+  //
+  namespace file {
+    enum class File : int;
+  }
+  using file::File;
+}
+#endiv
+#divert <hpp>
+namespace sys::id::file {
+  inline namespace constants {
+    // bundled for easy access elsewhere
+    inline auto const INPUT = File{0};
+    inline auto const OUTPUT = File{1};
+    inline auto const ERROR = File{2};
+  }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace sys::id::file;
+    static_assert(INPUT != OUTPUT);
+    static_assert(OUTPUT != ERROR);
+  }
+}
+#endiv

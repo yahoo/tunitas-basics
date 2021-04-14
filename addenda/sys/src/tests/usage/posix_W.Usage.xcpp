@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+//
+// Usage:
+//
+//   #import tests.usage.posix_W.Usage
+//   static_assert(tests::usage::posix_W::Usage<>);
+//
+#import sys.posix.W
+#import tests.model.Namespace_Object
+#import tests.usage.countof
+namespace tests::usage::posix_W {
+  using sys::posix::W;
+  namespace [[detail]] packaging {
+    template<typename W> concept bool Instance = requires(W) {
+      typename W::Option;
+      typename W::Options;
+      requires model::Namespace_Object<W>;
+      requires (int)W::NONE == 0;
+      requires (int)W::CONTINUED == WCONTINUED;
+      requires (int)W::EXITED == WEXITED;
+      requires (int)W::NOHANG == WNOHANG;
+      requires (int)W::NOWAIT == WNOWAIT;
+      requires (int)W::STOPPED == WSTOPPED;
+      requires (int)W::UNTRACED == WUNTRACED;
+    };
+    template<typename... _> concept bool Usage = requires(_...) {
+      requires 0 == countof<_...>;
+      requires Instance<W>;
+    };
+  }
+  using packaging::Usage;
+}
+#endiv

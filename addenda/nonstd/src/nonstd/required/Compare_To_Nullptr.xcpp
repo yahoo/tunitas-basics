@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.Character
+namespace nonstd::required {
+  //
+  // Can the type be compared with nullptr?
+  // i.e. is it a pointer type or a type with an operator-cast to a pointer type?
+  //
+  template<typename POINTERLIKE, typename OBJECT> concept bool Compare_To_Nullptr = requires(POINTERLIKE pointerlike) {
+    { nullptr == (OBJECT const *) pointerlike } -> bool;
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code.
+#import std.byte
+#import c.stringz
+#import c.const_stringz
+#import re.construct.String
+#import std.string
+namespace nonstd::required {
+  // surely
+  static_assert(Compare_To_Nullptr<char *, char>);
+  static_assert(Compare_To_Nullptr<char const *, char>);
+  static_assert(Compare_To_Nullptr<signed char *, char>);
+  static_assert(Compare_To_Nullptr<unsigned char const *, char>);
+  static_assert(Compare_To_Nullptr<std::byte *, char>);
+  static_assert(Compare_To_Nullptr<std::byte const *, char>);
+  static_assert(Compare_To_Nullptr<wchar_t const *, wchar_t>);
+  static_assert(Compare_To_Nullptr<char16_t const *, char16_t>);
+  static_assert(Compare_To_Nullptr<char32_t const *, char32_t>);
+  // yes, because such is designed into the "restring" interface explicitly
+  static_assert(Compare_To_Nullptr<re::construct::String<c::const_stringz>, char>);
+  static_assert(Compare_To_Nullptr<re::construct::String<std::string>, char>);
+  // yes, surprisingly there is an operator-cast to character pointer in addition to the data+size dope vector interface;
+  //      as c::detail::specification::Prototype<...>::operator const_data_type() const
+  static_assert(Compare_To_Nullptr<c::const_stringz, char>);
+  static_assert(Compare_To_Nullptr<c::stringz, char>);
+  // no, of course not
+  static_assert(!Compare_To_Nullptr<std::string, char>);
+  static_assert(!Compare_To_Nullptr<std::string_view, char>);
+}
+#endiv

@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// https://en.cppreference.com/w/cpp/error/logic_error
+// constructs from std::string (copying)
+#import std.logic_error
+namespace substd::exception {
+  using Logic = std::logic_error;
+}
+#import nonstd.exception.constructible.required.From
+#import nonstd.exception.constructible.School
+#import nonstd.exception.string.View.Logic
+namespace nonstd::exception {
+  template<constructible::required::From FROM> using Logic = typename constructible::School<std::logic_error, FROM>::Type;
+}
+#endiv

@@ -1,0 +1,25 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix::exec { struct Palette; }
+#endiv
+#divert <hpp>
+#import nonstd.required.container.Type
+#import nonstd.required.container.Size
+#import std.forward_list
+#import std.string
+struct tests::unit::posix::exec::Palette {
+  //
+  // Remind as to why we are doing this.
+  // The forward_list "is a container" (because it has a begin-end idiomatic usage; but barely because it has no size)
+  // Show that in the assertions
+  //
+  static_assert(nonstd::required::container::Type<std::forward_list<std::string>>);
+  static_assert(!nonstd::required::container::Size<std::forward_list<std::string>>);
+  // So ... this version of Forward_List has a size member, which is just the obvious O(n) implementation.
+  template<typename VALUE> struct Forward_List;
+};
+#endiv
+#divert <ipp>
+#import tests.unit.posix.exec.Palette.Forward_List
+#endiv

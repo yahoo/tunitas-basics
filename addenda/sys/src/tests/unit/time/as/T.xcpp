@@ -1,0 +1,85 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace time {
+      namespace as {
+        class T;
+      }
+    }
+  }
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.time.t
+class tests::unit::time::as::T : public cppunit::test::Fixture {
+public:
+  auto setUp() -> void override;
+  auto tearDown() -> void override;
+  // we're testing sys::time::t (time_t), so this is that type
+  ::sys::time::t now;
+  auto test_as_point() -> void;
+  auto test_as_t() -> void;
+  auto test_as_tm() -> void;
+  auto test_as_spec() -> void;
+  auto test_as_val() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#divert </hpp>
+#divert <cpp>
+#import unit.rigging.lhs
+using unit::rigging::lhs;
+#import unit.rigging.clear
+using unit::rigging::clear;
+#import std.chrono.system_clock
+#import sys.time.as
+using namespace sys::time;
+auto tests::unit::time::as::T::setUp() -> void {
+  using ::sys::time::as;
+  now = as<t>(std::chrono::system_clock::now());
+  CPPUNIT_ASSERT(0 != now);
+}
+auto tests::unit::time::as::T::tearDown() -> void {
+  lhs(now) = clear;
+}
+auto tests::unit::time::as::T::test_as_point() -> void {
+  using ::sys::time::as;
+  auto vv = as<point>(now);
+  CPPUNIT_ASSERT(vv >= as<point>(as<t>(1480856273l)));
+}
+auto tests::unit::time::as::T::test_as_spec() -> void {
+  using ::sys::time::as;
+  auto vv = as<spec>(now);
+  CPPUNIT_ASSERT(vv.tv_sec >= 1480856087l);
+}
+auto tests::unit::time::as::T::test_as_t() -> void {
+  using ::sys::time::as;
+  auto vv = as<t>(now);
+  CPPUNIT_ASSERT(vv >= 1480856037l);
+}
+auto tests::unit::time::as::T::test_as_tm() -> void {
+  using ::sys::time::as;
+  auto vv = as<tm>(now);
+  CPPUNIT_ASSERT(vv.tm_year+1900 >= 2016);
+}
+auto tests::unit::time::as::T::test_as_val() -> void {
+  using ::sys::time::as;
+  auto vv = as<val>(now);
+  CPPUNIT_ASSERT(vv.tv_sec >= 1480856065l);
+}
+#import rigging.suite.io
+auto tests::unit::time::as::T::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream s("t");
+  s << call("point", &T::test_as_point)
+    << call("spec", &T::test_as_spec)
+    << call("t", &T::test_as_t)
+    << call("tm", &T::test_as_tm)
+    << call("val", &T::test_as_val)
+    ;
+  return finalize(s);
+}
+#divert </cpp>

@@ -1,0 +1,58 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::error::to_integer {
+  //
+  // The category of errors in the "to integer" sphere
+  //
+  // Usage:
+  //
+  //   auto const &c = category();
+  //
+  //   auto n = c.name();
+  //   auto n = c.default_error_condition(...);
+  //   auto b = c.equivalent(...);
+  //   auto s = c.message(int);
+  //
+  class Category;
+}
+#endiv
+#divert <hpp>
+#import std.error_category
+#import nonstd.error.to_integer.category
+#import std.string
+class nonstd::error::to_integer::Category : public std::error_category {
+  using ancestor = std::error_category;
+protected:
+  friend auto to_integer::category() -> Category const &;
+  Category() = default;
+public:
+  auto name() const noexcept -> char const * final;
+  auto message(int code) const -> std::string final;
+};
+#endiv
+#divert <cpp>
+auto nonstd::error::to_integer::Category::name() const noexcept -> char const * {
+  return "to_integer";
+}
+#import nonstd.error.to_integer.Code
+#import std.to_string
+auto nonstd::error::to_integer::Category::message(int code) const -> std::string {
+  switch (Code{code}) {
+  case Code::SUCCESS:
+    return "success";
+  case Code::EXTRA_CHARACTERS:
+    return "extra junk beyond the number";
+  case Code::INVALID_ARGUMENT:
+    return "not a number at all";
+  case Code::OUT_OF_RANGE:
+    return "value of of range";
+  case Code::TRANSLUCENT_EXCEPTION:
+    return "there was some exception"; // but we were too lazy to pick up the error message
+  case Code::OPAQUE_EXCEPTION:
+    return "there was some problem"; // catch (...)
+  default:
+    return "error " + std::to_string(code);
+  }
+}
+#endiv

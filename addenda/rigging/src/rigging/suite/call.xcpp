@@ -1,0 +1,16 @@
+// -*- c++ -*- more or less but in the SCOLD styling
+#divert <hpp>
+#import rigging.suite.detail.Call
+namespace rigging::suite {
+  template<typename FIXTURE> inline auto call(detail::name_type, detail::Method<FIXTURE>) -> detail::Call<FIXTURE>;
+  template<typename FIXTURE> inline auto callcall(detail::name_type, detail::Method<FIXTURE>) -> detail::Call<FIXTURE>;
+}
+#endiv
+#divert <ipp>
+template<typename FIXTURE> auto rigging::suite::callcall(detail::name_type name, detail::Method<FIXTURE> method) -> detail::Call<FIXTURE> {
+  return detail::Call<FIXTURE>(name, method);
+}
+template<typename FIXTURE> auto rigging::suite::call(detail::name_type name, detail::Method<FIXTURE> method) -> detail::Call<FIXTURE> {
+  return detail::Call<FIXTURE>(name, method);
+}
+#endiv

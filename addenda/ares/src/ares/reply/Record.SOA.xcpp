@@ -1,0 +1,111 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.reply.Record.declaration
+namespace ares::reply {
+  //
+  // The Start Of Authority, including all the TTLs and intevals, of the SOA record
+  //
+  // Usage:
+  //
+  //   fill = FILL{raw} ..................... in reply::detail::parse(...)
+  //
+  // Construction:
+  //
+  //   Record<soa> duhfault; ........................... trivial
+  //   Record<soa> capture{reply}; ..................... from ares_parse_soa_reply(...)
+  //
+  //
+  template<> struct Record<SOA>;
+}
+#endiv
+#divert <hpp>
+#import ares.unmanaged.Structure
+#import ares.time.durations // time::Seconds
+#import ares.managed // SErial
+#import ares.required.Spanlike
+#import std.string
+namespace ares::reply {
+  template<> class Record<SOA> {
+    using Unmanaged = unmanaged::Structure<SOA>::Item;
+    using Serial = managed::Serial;
+  public:
+    inline Record();
+    inline explicit Record(Unmanaged const *);
+    Record(Record const &) = delete;
+    auto operator=(Record const &) -> Record & = delete;
+    Record(Record &&) noexcept = default;
+    auto operator=(Record &&) noexcept -> Record & = default;
+    inline auto serial() const -> Serial;
+    inline auto refresh() const -> time::Seconds;
+    inline auto retry() const -> time::Seconds;
+    inline auto expire() const -> time::Seconds;
+    inline auto minttl() const -> time::Seconds;
+    inline auto nsname() const -> std::string;
+    template<required::Spanlike SPANLIKE> auto nsname() const -> SPANLIKE;
+    // A VALID (host-)master name is defined as USERNAME.FQDN
+    // A BOGUS (host-)master is when there is no '.' at all in the hostmaster name at all (or it's at either end).
+    inline auto master() const -> std::string; // .................................... throws exception::Invariant on BOGUS
+    inline auto host() const -> std::string; // ...................................... ibidem.
+    template<required::Spanlike SPANLIKE> inline auto host() const -> SPANLIKE; // ... ibidem
+    inline auto hostmaster() const -> std::string;
+    template<required::Spanlike SPANLIKE> inline auto hostmaster() const -> SPANLIKE;
+  private:
+    Unmanaged const *unmanaged;
+  };
+}
+#endiv
+#divert <ipp>
+#import strlen
+#import std.find
+#import nonstd.span
+#import ares.exception.Invariant
+namespace ares::reply {
+  Record<SOA>::Record() : unmanaged{nullptr} { }
+  Record<SOA>::Record(Unmanaged const *un) : unmanaged{un} { }
+  auto Record<SOA>::serial() const -> Serial { return Serial{unmanaged->serial}; }
+  auto Record<SOA>::refresh() const -> time::Seconds { return time::Seconds{unmanaged->refresh}; }
+  auto Record<SOA>::retry() const -> time::Seconds { return time::Seconds{unmanaged->retry}; }
+  auto Record<SOA>::expire() const -> time::Seconds { return time::Seconds{unmanaged->expire}; }
+  auto Record<SOA>::minttl() const -> time::Seconds { return time::Seconds{unmanaged->minttl}; }
+  auto Record<SOA>::nsname() const -> std::string { return unmanaged->nsname; }
+  template<required::Spanlike SPANLIKE> auto Record<SOA>::nsname() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type>(unmanaged->nsname), strlen(unmanaged->nsname)};
+  }
+  auto Record<SOA>::hostmaster() const -> std::string { return unmanaged->hostmaster; }
+  template<required::Spanlike SPANLIKE> auto Record<SOA>::hostmaster() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type const *>(unmanaged->hostmaster), strlen(unmanaged->hostmaster)};
+  }
+  auto Record<SOA>::master() const -> std::string {
+    auto spun = hostmaster<nonstd::span<char const>>();
+    auto begin = spun.data();
+    auto end = begin + spun.size();
+    auto found = std::find(begin, end, '.');
+    if (end == found) {
+      throw exception::Invariant{"no '.'"};
+    }
+    return std::string{begin, found};
+  }
+  auto Record<SOA>::host() const -> std::string {
+    auto spun = host<nonstd::span<char const>>();
+    auto begin = spun.data();
+    auto end = begin + spun.size();
+    return std::string{begin, end};
+  }
+  template<required::Spanlike SPANLIKE> auto Record<SOA>::host() const -> SPANLIKE {
+    auto spun = hostmaster<nonstd::span<char const>>();
+    auto begin = spun.data();
+    auto end = begin + spun.size();
+    auto found = std::find(begin, end, '.');
+    if (end == found) {
+      throw exception::Invariant{"no '.'"};
+    }
+    if (end == 1+found) {
+      throw exception::Invariant{"empty host part"};
+    }
+    auto start = 1+found;
+    std::size_t length = end - start;
+    return SPANLIKE{start, length};
+  }
+}
+#endiv

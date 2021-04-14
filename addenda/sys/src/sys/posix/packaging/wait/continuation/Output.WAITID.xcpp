@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.continuation.Output.declaration
+#import sys.id.required.wait.Typed
+namespace sys::posix::packaging::wait::continuation {
+  //
+  // The continuation for the overloads of wait(2) against waitid(2)
+  //
+  // Reminder:
+  //
+  //   We are looking to avoid the ambiguities among the input and output paramters.
+  //   auto waited = wait(xyzzy); .......... this is ambiguous
+  //
+  // Usage:
+  //
+  //   oh come on
+  //
+  template<required::wait::Typed MATCHED, required::identifier::Returned RETURNED> struct Output<Call::WAITID, MATCHED, RETURNED>;
+}
+#endiv
+#divert <hpp>
+namespace sys::posix::packaging::wait::continuation {
+  template<required::wait::Typed MATCHED, required::identifier::Returned RETURNED> struct Output<Call::WAITID, MATCHED, RETURNED> {
+    using Returned = RETURNED;
+    using Matched = MATCHED;
+    Matched matched;
+    Options options;
+    inline auto operator()() const -> siginfo::Returned<Returned>;
+    inline auto operator()([[out]] siginfo::Filled &) const -> identifier::Returned<Returned>;
+    inline auto operator()(siginfo::Unfilled) const -> identifier::Returned<Returned>;
+  };
+}
+#endiv
+#divert <ipp>
+#import sys.posix.packaging.wait.returned
+#import std.get
+namespace sys::posix::packaging::wait::continuation {
+  namespace { using std::get; }
+  template<required::identifier::Matched _M, required::identifier::Returned _R> auto Output<Call::WAITID, _M, _R>::operator()() const -> siginfo::Returned<Returned>                             { return returned::waitid<Returned>(get<0>(matched), get<1>(matched), options); }
+  template<required::identifier::Matched _M, required::identifier::Returned _R> auto Output<Call::WAITID, _M, _R>::operator()(siginfo::Filled &ofnigis) const -> identifier::Returned<Returned>  { return returned::waitid<Returned>(get<0>(matched), get<1>(matched), options, ofnigis); }
+  template<required::identifier::Matched _M, required::identifier::Returned _R> auto Output<Call::WAITID, _M, _R>::operator()(siginfo::Unfilled ofnigis) const -> identifier::Returned<Returned> { return returned::waitid<Returned>(get<0>(matched), get<1>(matched), options, ofnigis); }
+}
+#endiv

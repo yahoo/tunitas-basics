@@ -1,0 +1,43 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // It's a fake namespace-in-a-struct.
+  // PREFER namespace sys::itimer
+  // PREFER namespace sys::itimer::constants
+  // PREFER sys::itimer::Which
+  //        etc.
+  //
+  // Usage:
+  //
+  //   using ITIMER = sys::posix::ITIMER;
+  //   auto const s0 = ITIMER::REAL;
+  //   auto const s1 = ITIMER::VIRTUAL;
+  //   auto const s2 = ITIMER::PROFILE;
+  //   ...etc...
+  //
+  struct ITIMER;
+}
+#endiv
+#divert <hpp>
+#import sys.itimer.Which
+#import sys.itimer.constants
+struct sys::posix::ITIMER {
+  using Which = itimer::Which;
+  inline static constexpr auto REAL    = itimer::REAL;
+  inline static constexpr auto VIRTUAL = itimer::VIRTUAL;
+  inline static constexpr auto PROFILE = itimer::PROFILE;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  inline static constexpr auto PROF [[deprecated("spell it out! buy a vowel! instead prefer ITIMER::PROFILE")]] = itimer::PROF;
+#pragma GCC diagnostic pop
+  ITIMER() = delete;
+  ITIMER(ITIMER const &) = delete;
+  auto operator=(ITIMER const &) -> ITIMER & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_ITIMER.Usage
+static_assert(tests::usage::posix_ITIMER::Usage<>);
+#endiv

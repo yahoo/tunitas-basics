@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.regex.formatting.Flags
+namespace nonstd::regex::formatting {
+  inline namespace constants { }
+}
+#endiv
+#divert <hpp>
+#import std.regex_constants
+namespace nonstd::regex::formatting::constants {
+  namespace implementation {
+    using namespace std::regex_constants;
+    namespace interface {
+      inline constexpr auto DEFAULT = format_default;
+      inline constexpr auto SED = format_sed;
+      inline constexpr auto NO_COPY = format_no_copy;
+      inline constexpr auto FIRST_ONLY = format_first_only;
+    }
+  }
+  using namespace implementation::interface;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace tests {
+    using namespace nonstd::regex::formatting::constants;
+    // Prove the (all) names are visible
+    static_assert(sizeof (SED));
+  }
+}
+#endiv

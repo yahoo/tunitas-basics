@@ -1,0 +1,136 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.Group
+#import gid_t
+#import std.tuple
+#import sys.call.Result
+#import sys.call.result.Value
+namespace sys::posix::packaging::gid {
+  using id::Group;
+  using call::Result;
+  namespace function {
+    using Triple = std::tuple<Group, Group, Group>;
+    using Result = call::result::Value<Triple>;
+  }
+  namespace native {
+    using Triple = std::tuple<gid_t, gid_t, gid_t>;
+    using Result = call::result::Value<Triple>;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.get
+namespace sys::posix::packaging::gid {
+  //
+  // Get the (real) group id (GID)
+  // Yup, this can't fail.
+  //
+  // getresgid(2) and setresgid(2)
+  // <quote>These calls are nonstandard; they also appear on HP-UX and some of the BSDs.</quote>
+  //
+  // Specification: see getgid(2)
+  //
+  //   #include <sys/types.h>
+  //   #include <unistd.h>
+  //   gid_t getgid();
+  //
+  // Usage:  really?
+  //
+  namespace function {
+    inline auto getgid() -> Group;
+    inline auto getegid() -> Group;
+    inline auto getresgid() -> Result;
+    inline auto setgid(Group) -> gid::Result;
+    inline auto setegid(Group) -> gid::Result;
+    inline auto setregid(Group r, Group e) -> gid::Result;
+    inline auto setresgid(Group r, Group e, Group s) -> gid::Result;
+  }
+  namespace native {
+    inline auto getgid() -> Group;
+    inline auto getegid() -> Group;
+    inline auto getresgid() -> Result;
+    inline auto setgid(gid_t) -> gid::Result;
+    inline auto setegid(gid_t) -> gid::Result;
+    inline auto setregid(gid_t r, gid_t e) -> gid::Result;
+    inline auto setresgid(Triple) -> gid::Result;
+    inline auto setresgid(gid_t r, gid_t e, gid_t s) -> gid::Result;
+    using std::get;
+    template<unsigned N> auto up(Triple) -> Group;
+  }
+}
+#endiv
+#divert <ipp>
+#import errno
+#import sys.posix.syscall
+#import std.get
+namespace sys::posix::packaging::gid {
+  auto function::getgid() -> Group  { return Group(direct::syscall(Syscall::GETGID)); }
+  auto function::getegid() -> Group { return Group(direct::syscall(Syscall::GETEGID)); }
+  auto function::getresgid() -> Result {
+    auto called = native::getresgid();
+    if (fail(called)) {
+      return Result{false, error_num(called), Triple{}};
+    } else {
+      auto const &triple = value(called);
+      using native::up;
+      return Result{true, error_t{}, Triple{up<0>(triple), up<1>(triple), up<2>(triple)}};
+    }
+  }
+  auto native::getgid() -> Group  { return Group(direct::syscall(Syscall::GETGID)); }
+  auto native::getegid() -> Group { return Group(direct::syscall(Syscall::GETEGID)); }
+  auto native::getresgid() -> Result {
+    gid_t real{}, effective{}, saved{};
+    int called = direct::syscall(Syscall::GETRESGID, &real, &effective, &saved);
+    auto errnum = errno; // capture as soon as practical
+    auto ok = 0 == called;
+    return Result{ok, errnum, Triple{real, effective, saved}};
+  }
+  template<unsigned N> auto native::up(Triple t) -> Group { return Group{std::get<N>(t)}; }
+}
+namespace sys::posix::packaging::gid {
+  auto function::setgid(Group gid) -> gid::Result  { return native::setgid((gid_t) gid); }
+  auto function::setegid(Group gid) -> gid::Result { return native::setegid((gid_t) gid); }
+  auto function::setregid(Group real, Group effective) -> gid::Result { return native::setregid((gid_t) real, (gid_t) effective); }
+  auto function::setresgid(Group real, Group effective, Group saved) -> gid::Result {
+    return native::setresgid((gid_t)real, (gid_t)effective, (gid_t)saved);
+  }
+  //
+  // From setresgid(2), package man-pages-4.16-3.fc29.noarch
+  //
+  // <quote>
+  //   The NPTL threading implementation does some work to ensure that any change to group or group credentials
+  //   (e.g., calls to setgid(2), setresgid(2)) is carried through to all of the POSIX threads in a process.
+  //   See nptl(7) for further details.
+  // </quote>
+  //
+  //
+  // Therefore ... we MUST call the library function, never the syscall.
+  //
+  auto native::setgid(gid_t gid) -> gid::Result {
+    int called = ::setgid(gid);
+    auto errnum = errno; // capture as soon as practical
+    auto ok = 0 == called;
+    return gid::Result{ok, errnum, called};
+  }
+  auto native::setegid(gid_t gid) -> gid::Result {
+    int called  = ::setegid(gid);
+    auto errnum = errno; // capture as soon as practical
+    auto ok = 0 == called;
+    return gid::Result{ok, errnum, called};
+  }
+  auto native::setregid(gid_t real, gid_t effective) -> gid::Result {
+    int called  = ::setregid(real, effective);
+    auto errnum = errno; // capture as soon as practical
+    auto ok = 0 == called;
+    return gid::Result{ok, errnum, called};
+  }
+  auto native::setresgid(Triple t) -> gid::Result { return setresgid(get<0>(t), get<0>(t), get<0>(t)); }
+  auto native::setresgid(gid_t real, gid_t effective, gid_t saved) -> gid::Result {
+    int called = ::setresgid(real, effective, saved);
+    auto errnum = errno; // capture as soon as practical
+    auto ok = 0 == called;
+    return gid::Result{ok, errnum, called};
+  }
+}
+#endiv

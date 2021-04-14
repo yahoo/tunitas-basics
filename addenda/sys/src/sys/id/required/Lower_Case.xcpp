@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.id.required.school.Old
+namespace sys::id::required {
+  //
+  // The original POSIX types
+  // (ahem, 32-bit) signed integers and unsigned integers
+  // never enumerations, never structures (classes)
+  //
+  // e.g. pid_t, id_t, and int
+  //
+  template<typename TYPE> concept bool Lower_Case = school::Old<TYPE>;
+}
+#endiv

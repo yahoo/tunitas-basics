@@ -1,0 +1,5 @@
+tests_unit_error_TESTS = \
+  tests/unit/error/cases.test \
+  tests/unit/error/Code.test \
+  tests/unit/error/E.Code.test \
+  $(end)

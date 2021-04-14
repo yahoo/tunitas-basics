@@ -1,0 +1,72 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.posix.packaging.socket.ip.interface
+namespace sys::posix {
+  //
+  // The socket interface, specialized for ip(7) with STREAM, DATAGRAM, RAW
+  //
+  // Preconditions: (invariants, most of which are now in the type system itself)
+  //
+  //   The address (family) can only be INET4 or INET6.
+  //   The socket type (address) can only be STREAM, DATAGRAM, RAW.
+  //   The system call itself does this validation.
+  //
+  // Usage:
+  //
+  //   auto sd = ip::socket(AF::IP::INET4, SOCK::DATAGRAM);
+  //   auto sd = ip::socket(AF::IP::INET6, SOCK::STREAM, SOCK::NONBLOCK | SOCK::CLOEXEC);
+  //   auto sd = ip::socket(AF::IP::INET6, SOCK::RAW | SOCK::NONBLOCK | SOCK::CLOEXEC);
+  //
+  //   auto sd = ip::socket(AF::IP::INET6, SOCK::STREAM, IPPROTO::UNSPECIFIED);
+  //   auto sd = ip::socket(AF::IP::INET4, SOCK::DATAGRAM, IPPROTO::UNSPECIFIED, SOCK::NONBLOCK | SOCK::CLOEXEC);
+  //   auto sd = ip::socket(AF::IP::INET4, SOCK::STREAM | SOCK::NONBLOCK | SOCK::CLOEXEC, IPPROTO::UNSPECIFIED);
+  //   
+  //   auto sd = ip::socket(AF::IP::INET6, SOCK::RAW, IPPROTO::TCP);
+  //   auto sd = ip::socket(AF::IP::INET4, SOCK::RAW, IPPROTO::UDP, SOCK::NONBLOCK | SOCK::CLOEXEC);
+  //   auto sd = ip::socket(AF::IP::INET4, SOCK::RAW | SOCK::NONBLOCK | SOCK::CLOEXEC, IPPROTO::UNSPECIFIED);
+  //
+  namespace packaging::socket::ip {
+    using namespace packaging::socket::ip::interface;
+    namespace function {
+      using Result = result::Single<File>;
+      inline auto socket(Address, Specification) -> Result; // ..... a.k.a. socket(2)
+      inline auto socket(Address, Socket, Options) -> Result; // ... a.k.a. socket4(2)
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Socket, Options)")]] inline auto socket(Address, Socket, Options, Protocol) -> Result; // a.k.a. socket4
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Socket, Options)")]] inline auto socket(Address, Socket, Protocol, Options) -> Result; // a.k.a. socket4
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Specification)")]] inline auto socket(Address, Specification, Protocol) -> Result;
+    }
+    namespace native {
+      using Result = result::Single<int>;
+      inline auto socket(Address, Specification) -> Result; // ..... a.k.a. socket(2)
+      inline auto socket(Address, Socket, Options) -> Result; // ... a.k.a. socket4(2)
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Socket, Options)")]] inline auto socket(Address, Socket, Options, Protocol) -> Result; // a.k.a. socket4
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Socket, Options)")]] inline auto socket(Address, Socket, Protocol, Options) -> Result; // a.k.a. socket4
+      [[deprecated("only works with PF::UNSPECIFIED, instead prefer socket(Address, Specification)")]] inline auto socket(Address, Specification, Protocol) -> Result;
+    }
+  }
+  namespace ip {
+    using posix::packaging::socket::ip::function::socket;
+    namespace native { using posix::packaging::socket::ip::native::socket; }
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::socket::ip {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  auto function::socket(Address address, Specification specification) -> Result                     { return socket(address, specification, UNSPECIFIED); }
+  auto function::socket(Address address, Socket type, Options options) -> Result                    { return socket(address, type | options, UNSPECIFIED); }
+  auto function::socket(Address address, Socket type, Options options, Protocol protocol) -> Result { return socket(address, type | options, protocol); }
+  auto function::socket(Address address, Socket type, Protocol protocol, Options options) -> Result { return socket(address, type | options, protocol); }
+  auto function::socket(Address address, Specification specification, Protocol protocol) -> Result  { return idiomatic::syscall<File>(Syscall::SOCKET, (int) address, (int) specification, (int) protocol); }
+  //
+  auto native::socket(Address address, Specification specification) -> Result                     { return socket(address, specification, UNSPECIFIED); }
+  auto native::socket(Address address, Socket type, Options options) -> Result                    { return socket(address, type | options, UNSPECIFIED); }
+  auto native::socket(Address address, Socket type, Options options, Protocol protocol) -> Result { return socket(address, type | options, protocol); }
+  auto native::socket(Address address, Socket type, Protocol protocol, Options options) -> Result { return socket(address, type | options, protocol); }
+  auto native::socket(Address address, Specification specification, Protocol protocol) -> Result  { return idiomatic::syscall<int>(Syscall::SOCKET, (int) address, (int) specification, (int) protocol); }
+#pragma GCC diagnostic pop
+}
+#endiv

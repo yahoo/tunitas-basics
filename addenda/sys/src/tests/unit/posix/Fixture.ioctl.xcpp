@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.ioctl
+#import sys.posix.close
+#import sys.posix.open
+#import sys.posix.O
+#include <linux/random.h> // for RNDGETENTCNT, a.k.a. (one day) RND::GETENTCNT
+auto tests::unit::posix::fixture::Fixture::test_ioctl_get() -> void {
+  using O = six::O;
+  auto opened = nat::open("/dev/random", O::RDONLY);
+  CPPUNIT_ASSERT(good(opened));
+  auto fd = value(opened);
+  guardian::Cleanup_Descriptor<int> cleanup(fd);
+  auto got = six::ioctl<int>(fd, RNDGETENTCNT);
+  CPPUNIT_ASSERT(good(got));
+  // see ... /proc/sys/kernel/random/entropy_avail
+  // see http://man7.org/linux/man-pages/man4/random.4.html
+  CPPUNIT_ASSERT(0 < value(got)); // some number ... e.g. 3106
+}
+#import std.cerr
+#import sys.posix.ioctl
+#import sys.posix.close
+#import sys.posix.open
+#import sys.posix.O
+#include <termios.h> // struct termios, TCGETS, TCSETS; a.k.a. (one day) TC::GETS, TC::SETS
+auto tests::unit::posix::fixture::Fixture::test_ioctl_set() -> void {
+  using O = six::O;
+  auto const dev_tty = "/dev/tty";
+  auto opened = nat::open(dev_tty, O::RDWR);
+  if (!good(opened)) {
+    // WATCHOUT - in a mock chroot environment, there is no access to /dev/tty
+    // [[FIXTHIS]] find some better way to configure these tests out of the mix when they can't work
+    std::cerr << "warning: " << dev_tty << " cannot be opened because " << error_code(opened).message() << ", so this test will be skipped\n";
+    CPPUNIT_ASSERT(true);
+    return;
+  }
+  CPPUNIT_ASSERT(good(opened));
+  auto fd = value(opened);
+  guardian::Cleanup_Descriptor<int> cleanup(fd);
+  auto got = six::ioctl<termios>(fd, TCGETS);
+  CPPUNIT_ASSERT(good(got));
+  // see ioctl_list(2)
+  auto reterm = value(got);
+  auto set = six::ioctl(fd, TCSETS, reterm); // <------------ test this
+  CPPUNIT_ASSERT(good(set));
+}
+#include <sys/ioctl.h> // TIOCSBRK, TIOCCBRK
+auto tests::unit::posix::fixture::Fixture::test_ioctl_void() -> void {
+  using O = six::O;
+  auto const dev_tty = "/dev/tty";
+  auto opened = nat::open(dev_tty, O::RDWR);
+  if (!good(opened)) {
+    // WATCHOUT - in a mock chroot environment, there is no access to /dev/tty
+    // [[FIXTHIS]] find some better way to configure these tests out of the mix when they can't work
+    std::cerr << "warning: " << dev_tty << " cannot be opened because " << error_code(opened).message() << ", so this test will be skipped\n";
+    CPPUNIT_ASSERT(true);
+    return;
+  }
+  CPPUNIT_ASSERT(good(opened));
+  auto fd = value(opened);
+  guardian::Cleanup_Descriptor<int> cleanup(fd);
+  auto got = six::ioctl<void>(fd, TIOCSBRK);
+  CPPUNIT_ASSERT(good(got));
+  auto ngot = six::ioctl<void>(fd, TIOCCBRK);
+  CPPUNIT_ASSERT(good(ngot));
+}
+#endiv

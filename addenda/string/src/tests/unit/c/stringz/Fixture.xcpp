@@ -1,0 +1,125 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the license file at the top of this repository.
+// Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
+// Also the LICENSE file at https://git.tunitas.technology/all/components/$PACKAGE/tree/LICENSE (as available)
+#divert <fpp>
+namespace tests::unit::c::stringz {
+  class Fixture;
+}
+#divert </fpp>
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.c.stringy.Palette
+#import c.stringz
+#import c.const_stringz
+#import c.basic_stringz
+class tests::unit::c::stringz::Fixture : public cppunit::test::Fixture, stringy::Palette { 
+  using ancestor = cppunit::test::Fixture;
+public: 
+  Fixture() = default;
+  Fixture(Fixture const &) = delete;
+  auto operator=(Fixture const &) -> Fixture & = delete;
+
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  auto test_operator_insert() -> void;
+  auto test_front_consty() -> void;
+  auto test_front_muting() -> void;
+
+  auto test_implicit_conversion_01() -> void;
+  auto test_implicit_conversion_02() -> void;
+
+  static auto suite() -> cppunit::Test *;
+protected:
+  // These don't need to do anything, they just need to show that the implicit conversions are unambiguous
+  static auto accept_consty(::c::const_stringz) -> void { }
+  static auto accept_muting(::c::stringz) -> void { }
+};
+#divert </hpp>
+#divert <cpp>
+auto tests::unit::c::stringz::Fixture::setUp() -> void {
+  Palette::setUp();
+}
+
+auto tests::unit::c::stringz::Fixture::tearDown() -> void {
+  Palette::tearDown();
+}
+
+#import c.stringz
+#import c.const_stringz
+#import std.ostringstream
+auto tests::unit::c::stringz::Fixture::test_operator_insert() -> void {
+  {
+    std::ostringstream actual, expected;
+    ::c::stringz t(this->aNc);
+    actual << "see [" << t << "]";
+    expected << "see [" << this->aNc << "]";
+    CPPUNIT_ASSERT(actual.str() == expected.str());
+  } {
+    ::std::ostringstream actual, expected;
+    ::c::const_stringz t(this->aNcc);
+    actual << "see [" << t << "]";
+    expected << "see [" << this->aNcc << "]";
+    CPPUNIT_ASSERT(actual.str() == expected.str());
+  }
+}
+
+auto tests::unit::c::stringz::Fixture::test_front_consty() -> void {
+  ::c::const_stringz ct(this->aNcc); // <--- the size will be acquired from the manifest array
+  auto c = ct.front();
+  CPPUNIT_ASSERT_EQUAL(this->aNcc[0], c);
+}
+
+auto tests::unit::c::stringz::Fixture::test_front_muting() -> void {
+  ::c::stringz t(this->aNc); // <--- the size will be acquired from the manifest array
+  auto c = t.front();
+  CPPUNIT_ASSERT_EQUAL(this->aNc[0], c);
+}
+
+auto tests::unit::c::stringz::Fixture::test_implicit_conversion_01() -> void {
+  char buf[] = "that";
+  ::c::stringz subject{&buf[0]};
+  accept_consty(subject); // <------------ expect implicit conversion to the consty one
+  accept_muting(subject);
+}
+
+auto tests::unit::c::stringz::Fixture::test_implicit_conversion_02() -> void {
+  char buf[] = "that";
+  ::c::const_stringz subject{&buf[0]};
+  accept_consty(subject);
+}
+
+#import tests.unit.c.stringz.Consty
+#import tests.unit.c.stringz.Muting
+#import tests.unit.c.stringz.Constructors
+#import tests.unit.c.stringz.Nullptr
+#import rigging.unit.suite.Stream
+#import rigging.unit.suite.add
+#import rigging.unit.suite.call
+auto tests::unit::c::stringz::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::unit::suite;
+  Stream series("stringz");
+  series << call("operator<<", &Fixture::test_operator_insert)
+         << call("front-consty", &Fixture::test_front_consty)
+         << call("front-muting", &Fixture::test_front_muting)
+    ;
+  {
+    Stream imp("impliict-conversions");
+    imp << call("01", &Fixture::test_implicit_conversion_01)
+        << call("02", &Fixture::test_implicit_conversion_02)
+      ;
+    series << move(imp);
+  }
+  series << add(Consty::suite())
+         << add(Muting::suite())
+         << add(Constructors::suite())
+         << add(Nullptr<::c::const_stringz>::suite())
+         << add(Nullptr<::c::stringz>::suite())
+    ;
+  return series.release();
+}
+#divert </cpp>

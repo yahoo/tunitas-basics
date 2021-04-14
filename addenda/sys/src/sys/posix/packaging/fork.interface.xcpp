@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.fork.Value
+#import pid_t
+#import sys.id.Process
+#import sys.id.required.Process
+#import sys.posix.packaging.required // cascade the namespaces
+#import sys.posix.required.rebundled // enable the framing as required::id
+namespace sys::posix::packaging::fork::interface {
+  using id::Process;
+  namespace result {
+    template<required::id::Process PROCESS> using Value = call::result::fork::Value<PROCESS>;
+  }
+}
+#endiv
+#divert <ipp>
+#import sys.posix.syscall
+namespace sys::posix::packaging::fork::interface {
+  namespace stylized = packaging::syscall::stylized; // because namespace stylized is not hoisted as is idiomatic
+}
+#endiv

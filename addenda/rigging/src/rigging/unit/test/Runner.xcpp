@@ -1,0 +1,109 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace rigging::unit::test {
+  class Runner;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import std.string
+#import std.unique_ptr
+#import rigging.unit.test.detail.WrappingSuite
+class rigging::unit::test::Runner {
+  // Like cppunit::test::Runner
+  // ... but is self-aware to the extent that it can list its own tests
+public:
+  Runner();
+  virtual ~Runner() = default;
+  Runner(Runner const &) = delete;
+  auto operator=(Runner const &) -> Runner & = delete;
+
+  // reminder (takes ownership of the test)
+  virtual auto addTest(cppunit::Test *) -> void;
+
+  // \brief Runs a test using the specified controller.
+  // \param router Event manager and controller used for testing
+  // \param path the path syntax string.
+  // \exception std::invalid_argument if no test matching \a testPath is found.
+  // \background see cppunit::test::Path::Path(Test*, const std::string &)
+  //             a.k.a. class TestPath
+  //             see cppunit::Test::resolveTestPath()
+  virtual auto run(cppunit::Router &, std::string const &path_syntax) -> void;
+
+  // Dump the tree
+  virtual auto report(std::ostream &) -> void;
+protected:
+  std::unique_ptr<detail::WrappingSuite> suite;
+  static auto convert_external_to_internal(std::string const &external) -> std::string;
+  static std::string const TOP_NAME;
+};
+#endiv
+#divert <cpp>
+// Everything is outline because all member functions are virtual, as is the fashion in cppunit, derived from Java
+
+std::string const rigging::unit::test::Runner::TOP_NAME = "$ALL";
+
+#import rigging.unit.test.detail.SelfAware
+rigging::unit::test::Runner::Runner()
+  : suite(new detail::WrappingSuite(TOP_NAME)) {
+  this->addTest(new detail::SelfAware(this));
+}
+
+auto rigging::unit::test::Runner::addTest(cppunit::Test *test) -> void {
+  suite->addTest(test);
+}
+
+#import std.invalid_argument
+auto rigging::unit::test::Runner::convert_external_to_internal(std::string const &external) -> std::string {
+  //
+  // Whereas resolveTestPath only does "path matching" within the path hierarchy,
+  // we instead want to have
+  // 1. an absolute full path concept               ---    /       a leading "/"
+  // 2. a path matching concept with explicitness   ---    .../    a leading ".../"
+  //
+  // (our) external name       (their) internal name
+  // /                         $ALL
+  // /name1/name2              $ALL/name1/name2     for $ALL = suite->getName()
+  // .../name1/name2           name1/name2
+  //
+  // This is not ironclad, but is sufficient to simulate the fiction of absolute paths.
+  if (external.empty()) {
+    throw std::invalid_argument("empty test path name");
+  }
+  if ('/' == external.front()) {
+    if (1 == external.size()) {
+      // special-case '/' as $ALL (only)
+      return TOP_NAME;
+    } else {
+      // otherwise it's a full path from $ALL
+      return TOP_NAME + external;
+    }
+  } else if (2 < external.size() && "--" == external.substr(0, 2)) {
+    // e.g. --list
+    return TOP_NAME + ("/" + external);
+  } else if (4 < external.size() && ".../" == external.substr(0, 4)) {
+    // e.g. suit/stream
+    return external.substr(4);
+  } else {
+    throw std::invalid_argument("invalid test path name, either '/' or '.../' must prefix");
+  }
+}
+
+#import cppunit.test.Path
+auto rigging::unit::test::Runner::run(cppunit::Router &router, std::string const &external_syntactic_path_to_test) -> void {
+  auto internal_syntactic_path_to_test = convert_external_to_internal(external_syntactic_path_to_test);
+  auto path = suite->resolveTestPath(internal_syntactic_path_to_test);
+  auto runnable = path.getChildTest();
+  router.runTest(runnable);
+}
+
+#import std.cout
+#import rigging.unit.test.detail.TestNameEnumerator
+#import rigging.suite.Traverser
+auto rigging::unit::test::Runner::report(std::ostream &out) -> void {
+  detail::TestNameEnumerator reporter(out);
+  suite::Traverser traveler(suite.get());
+  traveler(reporter);
+}
+#endiv

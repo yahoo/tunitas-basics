@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging.wait.continuation.Output
+#import sys.posix.packaging.wait.continuation.Unmatched
+namespace sys::posix::packaging::wait::continuation::bundle {
+  //
+  // Can't buy the whole namespace because it has some other elements in it that cause ambiguities if exported.
+  //
+  // Usage:
+  //
+  //    using namespace continuation::bundle;     see wait.xcpp, but obviously
+  //
+  using continuation::Output;
+  using continuation::Unmatched;
+#if 202003L <= __cplusplus
+    // C++20? http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1099r5.html
+  using enum continuation::Waitcall;
+#else
+  inline constexpr auto WAIT2 = Call::WAIT2;
+  inline constexpr auto WAITPID = Call::WAITPID;
+  inline constexpr auto WAITID = Call::WAITID;
+  inline constexpr auto WAIT3 = Call::WAIT3;
+  inline constexpr auto WAIT4 = Call::WAIT4;
+#endif
+}
+#endiv

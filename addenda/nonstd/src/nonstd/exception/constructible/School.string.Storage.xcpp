@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+#import nonstd.exception.constructible.standard // that certain inventory of all known namespace std exceptions (that we are willing to treat)
+#import nonstd.exception.constructible.School.template
+namespace nonstd::exception::constructible {
+  template<> struct School<std::logic_error, std::string>;
+  template<> struct School<std::invalid_argument, std::string>;
+  template<> struct School<std::domain_error, std::string>;
+  template<> struct School<std::length_error, std::string>;
+  template<> struct School<std::out_of_range, std::string>;
+  //
+  template<> struct School<std::runtime_error, std::string>;
+  template<> struct School<std::range_error, std::string>;
+  template<> struct School<std::overflow_error, std::string>;
+  template<> struct School<std::underflow_error, std::string>;
+  template<> struct School<std::system_error, std::string>;
+  //
+  // NOT ---> template<> struct School<std::filesystem::filesystem_error, std::string_view>;
+  // INSTEAD
+  // INSTEAD   #import nonstd.exception.constructible.School.std.filesystem.filesystem_error
+  // INSTEAD
+  //
+}
+#endiv
+#divert <hpp>
+namespace nonstd::exception::constructible {
+  template<> struct School<std::logic_error, std::string>      { using Type = std::logic_error; };
+  template<> struct School<std::invalid_argument, std::string> { using Type = std::invalid_argument; };
+  template<> struct School<std::domain_error, std::string>     { using Type = std::domain_error; };
+  template<> struct School<std::length_error, std::string>     { using Type = std::length_error; };
+  template<> struct School<std::out_of_range, std::string>     { using Type = std::out_of_range; };
+  //
+  template<> struct School<std::runtime_error, std::string>   { using Type = std::runtime_error; };
+  template<> struct School<std::range_error, std::string>     { using Type = std::range_error; };
+  template<> struct School<std::overflow_error, std::string>  { using Type = std::overflow_error; };
+  template<> struct School<std::underflow_error, std::string> { using Type = std::underflow_error; };
+  template<> struct School<std::system_error, std::string>    { using Type = std::system_error; };
+}
+#endiv

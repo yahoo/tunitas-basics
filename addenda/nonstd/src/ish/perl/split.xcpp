@@ -1,0 +1,55 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.string
+namespace ish {
+  namespace perl {
+    //
+    // Split a string on a single-character separator
+    // e.g. split on '/'
+    //
+    //     split(separator, subject, ...constraints...)
+    //
+    // Same argument order as perl
+    //
+    // Usage:
+    //     auto words = ish::perl::split<std::vector<std::string>>('/', "/apple/banana/cherry/dog/eagle/frog/goat");
+    //
+    // Note: as such, the full path reads out as a leading emptiness, which is suppressed.
+    // It is up ot the caller to handle the "fullpath" case.
+    //
+    // "/apple/banana/cherry/dog/eagle/frog/goat" -> { "", "apple", "banana", "cherry", "dog", "eagle", "frog", "goat" }
+    //                                                 ^
+    //                                                 |
+    // OBSERVE ----------------------------------------/ (emptiness)
+    //
+    template<typename CONTAINER> inline auto split(char separator, std::string const &subject, bool elide_nonroot_emptiness = true, bool elide_root_emptiness = false) -> CONTAINER;
+  }
+}
+#endiv
+#divert <ipp>
+#import std.istringstream
+#import std.getline
+#import std.move
+template<typename CONTAINER> auto ish::perl::split(char separator, std::string const &subject, bool elide_nonroot_emptiness, bool elide_root_emptiness) -> CONTAINER {
+  CONTAINER ret;
+  std::istringstream in(subject);
+  std::string component;
+  for (bool rest=false; std::getline(in, component, separator); rest=true) {
+    if (component.empty()) {
+      // recall the root emptiness is never elided, that's now one tells it was 
+      if (rest) {
+        if (elide_nonroot_emptiness) {
+          continue;
+        }
+      } else {
+        if (elide_root_emptiness) {
+          continue;
+        }
+      }
+    }
+    ret.push_back(component);
+  }
+  return ret;
+}
+#endiv
+

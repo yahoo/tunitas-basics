@@ -1,0 +1,175 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sqlite {
+  namespace statement {
+    class Shell;
+  }
+}
+#endiv
+#divert <hpp>
+#import c.const_stringz
+#import c.const_stringn
+#import std.basic_string
+#import sqlite.Type
+#import sqlite.Value
+#import sqlite.api.detail.Bind
+#import sqlite.api.detail.Column
+#import sqlite.detail.ShellSafelyGuarding
+class sqlite::statement::Shell : public sqlite::detail::ShellSafelyGuarding<api::unguarded::Statement> {
+  // The "shell" just give a place to hang member functions
+  // One can copy these things ... it just copies the pointer
+  //
+  // The sqlite::statement::Shell does not Shell::finalize() on destruction
+  // The sqlite::Statement does finalize() on destruction
+  using Ancestor = sqlite::detail::ShellSafelyGuarding<api::unguarded::Statement>;
+public:
+  using statement_type = Ancestor::unguarded_type;
+  using Ancestor::ShellSafelyGuarding;
+  //
+  // Reminder: there is only move semantics, not copy semantics
+  // When you move to sqlite::Statement, then the statement will be finalized on destruction
+  // The statement::Shell does not finalize on destruction; on destruction, it does nothing.
+  //
+  inline auto is_prepared() const -> bool;
+
+  inline auto sql() const -> std::string;
+  template<typename STRING> auto sql() const -> STRING; // only specializations
+
+  inline auto readonly() -> bool;
+  inline auto busy() -> bool;
+  inline auto finalize() -> status::Code;
+  inline auto reset() -> status::Code;
+  inline auto step() -> status::Code;
+
+  using bind_index_type = sqlite::bind_index; // n.b. 1-based.
+  inline auto clear_bindings() -> status::Code;
+  inline auto bind_parameter_count() -> bind_index_type;
+  // The leftmost SQL parameter has an index of 1.
+  template<typename VALUE> inline auto bind(bind_index_type, VALUE value) -> typename api::detail::Bind<VALUE>::result_type;
+
+  using column_index_type = sqlite::column_index; // n.b. 0-based.
+  inline auto column_count() -> column_index_type;
+  inline auto type(column_index_type) -> Type;
+  // The leftmost column is number 0; the column_index_type is an unsigned quantity, not just "an integer"
+  template<typename RESULT> inline auto column(column_index_type) -> typename api::detail::Column<RESULT>::result_type;
+};
+
+namespace sqlite {
+  namespace statement {
+    template<> inline auto Shell::sql<c::const_stringz>() const -> c::const_stringz;
+    template<> inline auto Shell::sql<c::const_stringn>() const -> c::const_stringn;
+    template<> inline auto Shell::sql<std::string>() const -> std::string;
+  }
+}
+
+#forward sqlite.column.Shell
+#forward sqlite.Column
+namespace sqlite {
+  namespace statement {
+    template<> inline auto Shell::column<Column>(column_index_type) -> typename api::detail::Column<Column>::result_type;
+    template<> inline auto Shell::column<column::Shell>(column_index_type) -> typename api::detail::Column<column::Shell>::result_type;
+  }
+}
+
+#import want.is_movable_butnot_copyable
+namespace sqlite {
+  namespace statement {
+    namespace tests {
+      namespace Shell {
+        using require = want::is_movable_butnot_copyable<sqlite::statement::Shell>::assertion;
+        static_assert(!std::is_copy_constructible<sqlite::statement::Shell>::value, "has become copy constructible (but must not be so constructible)");
+        static_assert(std::is_move_constructible<sqlite::statement::Shell>::value, "not move constructible (but must be so constructible)");
+        static_assert(!std::is_copy_assignable<sqlite::statement::Shell>::value, "has become copy constructible (but must not be constructible as such)");
+        static_assert(std::is_move_assignable<sqlite::statement::Shell>::value, "not move constructible (but must be constructible as such)");
+      }
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import sqlite.api.statement
+
+auto sqlite::statement::Shell::is_prepared() const -> bool {
+  return nullptr != unguarded_subject;
+}
+
+auto sqlite::statement::Shell::sql() const -> std::string {
+  return api::sql(*this);
+}
+
+template<typename STRING> auto sqlite::statement::Shell::sql() const -> STRING {
+  static_assert(0 != sizeof (STRING) && 0 == sizeof (STRING), "only specializations");
+  return STRING();
+}
+
+template<> auto sqlite::statement::Shell::sql<c::const_stringz>() const -> c::const_stringz {
+  return api::sql<c::const_stringz>(*this);
+}
+
+template<> auto sqlite::statement::Shell::sql<c::const_stringn>() const -> c::const_stringn {
+  return api::sql<c::const_stringn>(*this);
+}
+
+template<> auto sqlite::statement::Shell::sql<std::string>() const -> std::string {
+  return api::sql<std::string>(*this);
+}
+
+auto sqlite::statement::Shell::readonly() -> bool {
+  return api::readonly(*this);
+}
+
+auto sqlite::statement::Shell::busy() -> bool {
+  return api::busy(*this);
+}
+
+#import std.swap
+#import sqlite.api.unguarded
+auto sqlite::statement::Shell::finalize() -> status::Code {
+  decltype(this->unguarded_subject) finalizing = nullptr;
+  std::swap(finalizing, unguarded_subject);
+  return api::unguarded::finalize(finalizing);
+}
+
+auto sqlite::statement::Shell::reset() -> status::Code {
+  return api::reset(*this);
+}
+
+auto sqlite::statement::Shell::step() -> status::Code {
+  return api::step(*this);
+}
+
+auto sqlite::statement::Shell::clear_bindings() -> status::Code {
+  return api::clear_bindings(*this);
+}
+
+auto sqlite::statement::Shell::bind_parameter_count() -> bind_index_type {
+  return api::bind_parameter_count(*this);
+}
+
+template<typename VALUE> auto sqlite::statement::Shell::bind(bind_index_type idx, VALUE value) -> typename api::detail::Bind<VALUE>::result_type  {
+  return api::bind(*this, idx, value);
+}
+
+auto sqlite::statement::Shell::column_count() -> column_index_type {
+  return api::column_count(*this);
+}
+
+auto sqlite::statement::Shell::type(column_index_type idx) -> Type {
+  return api::type(*this, idx);
+}
+
+template<typename RESULT> auto sqlite::statement::Shell::column(column_index_type idx) -> typename api::detail::Column<RESULT>::result_type {
+  return api::column<RESULT>(*this, idx);
+}
+
+#import sqlite.column.Shell
+template<> auto sqlite::statement::Shell::column<sqlite::column::Shell>(column_index_type idx) -> typename api::detail::Column<column::Shell>::result_type {
+  return column::Shell(*this, idx);
+}
+
+#import sqlite.Column
+template<> auto sqlite::statement::Shell::column<sqlite::Column>(column_index_type idx) -> typename api::detail::Column<Column>::result_type {
+return Column(*this, idx);
+}
+#endiv

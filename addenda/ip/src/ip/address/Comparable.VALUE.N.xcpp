@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.address.Comparable
+#import std.size_t
+namespace ip {
+  namespace address {
+    template<typename VALUE, std::size_t N> class Comparable<VALUE[N]>;
+  }
+}
+#endiv
+#divert <hpp>
+namespace ip {
+  namespace address {
+    template<typename VALUE, std::size_t N> inline auto operator==(Comparable<VALUE[N]> const &, Comparable<VALUE[N]> const &) -> bool;
+  }
+}
+
+template<typename VALUE, std::size_t N> class ip::address::Comparable<VALUE[N]> {
+public:
+  using value_type = VALUE;
+  inline Comparable(value_type (&)[N]);
+protected:
+  friend auto address::operator==<>(Comparable const &, Comparable const &) -> bool;
+  value_type (&value)[N];
+};
+#endiv
+#divert <ipp>
+#import std.equal
+template<typename VALUE, std::size_t N> auto ip::address::operator==(Comparable<VALUE[N]> const &a, Comparable<VALUE[N]> const &b) -> bool {
+  // The type system ensures that they are both the same length so this will work just fine
+  return std::equal(a.value, a.value+N, b.value);
+}
+
+template<typename VALUE, std::size_t N> ip::address::Comparable<VALUE[N]>::Comparable(value_type (&arg_value)[N])
+  : value(arg_value) {
+  ;
+}
+#endiv

@@ -1,0 +1,52 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import c.const_argv
+#import c.const_environv
+#import c.const_stringz
+#import sys.call.argument.Pathname
+#import sys.call.Result
+namespace sys::posix {
+  // In the 'exec' series, the 'path' names the executable exactly
+  inline auto exec(call::argument::Pathname, c::const_stringz arg0) -> call::Result;
+  inline auto exec(call::argument::Pathname, c::const_stringz arg0, c::const_environv envv) -> call::Result;
+  inline auto exec(call::argument::Pathname, c::const_argv argv) -> call::Result;
+  inline auto exec(call::argument::Pathname, c::const_argv argv, c::const_environv envv) -> call::Result;
+  // two-in-one
+  // Concept: The final ARGUMENTS is either c::const_stringz or else c::const_environv
+  template<typename... ARGUMENTS> inline auto exec(call::argument::Pathname, c::const_stringz arg0, c::const_stringz arg1, ARGUMENTS ...) -> call::Result;
+}
+#divert </hpp>
+#divert <ipp>
+#import sys.posix.packaging.exec.call
+#import sys.posix.packaging.exec.function
+auto sys::posix::exec(call::argument::Pathname path, c::const_stringz arg0) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRL.exec(), path, arg0);
+}
+auto sys::posix::exec(call::argument::Pathname path, c::const_stringz arg0, c::const_environv envv) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRLE.exec(), path, arg0, envv);
+}
+auto sys::posix::exec(call::argument::Pathname path, c::const_argv argv) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRV.exec(), path, argv);
+}
+auto sys::posix::exec(call::argument::Pathname path, c::const_argv argv, c::const_environv envv) -> call::Result {
+  using namespace packaging::exec;
+  return call(PAIRVE.exec(), path, argv, envv);
+}
+#import sys.posix.packaging.exec.Dispatcher
+#import sys.posix.packaging.exec.Selector
+#import sys.call.argument.as
+#import c.str
+template<typename... ARGUMENTS> auto sys::posix::exec(call::argument::Pathname path, c::const_stringz arg0, c::const_stringz arg1, ARGUMENTS ...arguments) -> call::Result {
+  using namespace packaging::exec;
+  using sys::call::argument::as;
+  using Arg0 = c::const_stringz;
+  using Arg1 = c::const_stringz;
+  using Caller = typename Selector<Dispatcher, Arg0, Arg1, ARGUMENTS...>::type;
+  Caller call{PAIRL.exec(), PAIRLE.exec()};
+  return call(as<c::const_stringz>(path), arg0, arg1, arguments...);
+}
+#endiv

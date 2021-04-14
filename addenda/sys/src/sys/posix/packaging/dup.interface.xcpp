@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.result.Value
+#import sys.fd.Flags
+#import sys.o.Creates
+#import sys.posix.packaging.required // cascade namespace required
+#import sys.posix.required.rebundled
+#import sys.fd.required.Unmanaged
+namespace sys::posix::packaging::dup::interface {
+  //
+  // This is a much simpler and much less noisy interface than packaging::fcntl::interface
+  //
+  using id::File;
+  namespace fd = sys::fd; // ... especially sys::fd::Flags for NON and CLOEXEC
+  namespace o {
+    // Being either NONE or CLOEXEC but none other.
+    using Flag = sys::o::Create;
+    using Flags = sys::o::Creates;
+  }
+  template<required::fd::Unmanaged RESULT> using Result = call::result::Value<RESULT>;
+}
+#endiv
+#divert <ipp>
+#import sys.posix.FD
+#import sys.posix.O
+namespace sys::posix::packaging::fcntl::interface {
+  using posix::FD;
+  using posix::O;
+}
+#endiv

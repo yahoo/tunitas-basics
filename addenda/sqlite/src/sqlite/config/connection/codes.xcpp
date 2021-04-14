@@ -1,0 +1,16 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+// For the #defines that define the values of the enumeration elements
+#include <sqlite3.h>
+namespace sqlite {
+  namespace config  {
+    namespace connection {
+      enum class NOP { VALUE = 0 };
+      enum class LOOKASIDE { VALUE = SQLITE_DBCONFIG_LOOKASIDE };
+      enum class ENABLE_FOREIGN_KEY { VALUE = SQLITE_DBCONFIG_ENABLE_FKEY };
+      enum class ENABLE_TRIGGER { VALUE = SQLITE_DBCONFIG_ENABLE_TRIGGER };
+    }
+  }
+}
+#endiv

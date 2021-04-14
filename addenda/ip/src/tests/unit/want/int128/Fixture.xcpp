@@ -1,0 +1,78 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::want::int128 {
+  class Fixture;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::want::int128::Fixture : public ::cppunit::test::Fixture {
+public:
+  auto test_is_signed() -> void;
+  auto test_is_unsigned() -> void;
+  auto test_numeric_limits() -> void;
+
+  static auto suite() -> ::cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import want.bigint
+#import want.nonstd.is_signed
+#import want.nonstd.is_unsigned
+#import want.nonstd.numeric_limits
+auto tests::unit::want::int128::Fixture::test_is_signed() -> void {
+  using namespace ::want::nonstd;
+  namespace big = ::want::bigint;
+  CPPUNIT_ASSERT( is_signed<big::int128_t>::value);
+  CPPUNIT_ASSERT(!is_signed<big::uint128_t>::value);
+}
+auto tests::unit::want::int128::Fixture::test_is_unsigned() -> void {
+  using namespace ::want::nonstd;
+  namespace big = ::want::bigint;
+  CPPUNIT_ASSERT(!is_unsigned<big::int128_t>::value);
+  CPPUNIT_ASSERT( is_unsigned<big::uint128_t>::value);
+}
+#import std.int64_t
+#import std.uint64_t
+auto tests::unit::want::int128::Fixture::test_numeric_limits() -> void {
+  using namespace ::want::nonstd;
+  namespace big = ::want::bigint;
+  {
+    CPPUNIT_ASSERT(0 != numeric_limits<big::int128_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<big::int128_t>::min() < numeric_limits<big::int128_t>::max());
+    static_assert(numeric_limits<big::int128_t>::min() < 0);
+    CPPUNIT_ASSERT(numeric_limits<big::int128_t>::min() < 0);
+    static_assert(is_signed<decltype(numeric_limits<big::int128_t>::min())>::value);
+    {auto const mm128 = (-numeric_limits<big::int128_t>::max())-1;
+      auto const a128 = numeric_limits<big::int128_t>::min();
+      CPPUNIT_ASSERT(mm128 == a128); }
+    CPPUNIT_ASSERT(numeric_limits<big::int128_t>::min() < numeric_limits<std::int64_t>::min());
+    CPPUNIT_ASSERT(numeric_limits<big::int128_t>::min() < numeric_limits<std::int64_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<std::int64_t>::max() < numeric_limits<big::int128_t>::max());
+  } {
+    CPPUNIT_ASSERT(0 != numeric_limits<big::uint128_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<big::uint128_t>::min() < numeric_limits<big::uint128_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<big::uint128_t>::min() == numeric_limits<std::uint64_t>::min());
+    CPPUNIT_ASSERT(numeric_limits<big::uint128_t>::min() < numeric_limits<std::uint64_t>::max());
+    CPPUNIT_ASSERT(numeric_limits<std::uint64_t>::max() < numeric_limits<big::uint128_t>::max());
+  }
+}
+
+#import tests.unit.want.int128.Integer
+#import tests.unit.want.int128.Traits
+#import tests.unit.want.int128.Fixture
+#import rigging.suite.io
+auto tests::unit::want::int128::Fixture::suite() -> ::cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("int128");
+  series << call("is_signed", &Fixture::test_is_signed)
+         << call("is_unsigned", &Fixture::test_is_unsigned)
+         << call("numeric_limits", &Fixture::test_numeric_limits)
+         << add<Integer<Traits<::want::int128_t, std::int64_t>>>()
+         << add<Integer<Traits<::want::uint128_t, std::uint64_t>>>()
+    ;
+  return finalize(series);
+}
+#endiv

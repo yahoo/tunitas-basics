@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.exception.Basic_Quitting
+#endiv
+#divert <hpp>
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+namespace nonstd::exception {
+  template<required::Character _1, required::Character_Traits _2> struct Basic_Quitting<_1, _2>::Literals {
+    inline static auto default_message() -> String;
+    inline static auto severity_notice() -> String const &;
+    inline static auto severity_error() -> String const &;
+    inline static auto stream_notice() noexcept -> Stream &;
+    inline static auto stream_error() noexcept -> Stream &;
+  };
+}
+#endiv
+#divert <ipp>
+#entail nonstd.exception.Basic_Quitting.Literals.char
+#entail nonstd.exception.Basic_Quitting.Literals.wchar_t
+#endiv

@@ -1,0 +1,36 @@
+#!/bin/sh
+cd ${0%/*}/.. || exit 70
+#
+# The e2e equals:
+#
+#   ./buildconf && ./configure && make check
+#
+# If you find yourself having to specify all of with_nearby, with_siblings,
+# with_hypogeal_twilight, with_vernacular_doggerel as 'no'
+# then just use the default one-liner
+#
+#   with_hypogeal_twilight=no with_vernacular_doggerel=on ./maintenance/e2e
+#
+: ${with_prefix:=/exp/tunitas}
+: ${with_siblings:=$(realpath ${0%/*}/..)}
+: ${with_nearby:=$(realpath ${0%/*}/../..)}
+if [[ no != ${with_nearby?} ]] ; then
+    : ${with_hypogeal_twilight:=${with_nearby?}/hypogeal-twilight}
+    : ${with_vernacular_doggerel:=${with_nearby?}/vernacular-doggerel}
+fi
+eval \
+    ${with_vernacular_doggerel:+with_vernacular_doggerel=$with_vernacular_doggerel} \
+    ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
+    ./buildconf &&
+./configure \
+    ${prefix:+--prefix=$prefix} \
+    ${with_siblings:+--with-siblings=$with_siblings} \
+    ${with_nearby:+--with-nearby=$with_nearby} \
+    ${with_vernacular_doggerel:+--with-vernacular-doggerel=$with_vernacular_doggerel} \
+    ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
+    ${with_incendiary_sophist:+--with-incendiary-sophist=$with_incendiary_sophist} \
+    ${end} &&
+make -s clean &&
+make &&
+make check &&
+echo OK DONE

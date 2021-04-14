@@ -1,0 +1,147 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sys.fd.set.Iterator
+namespace sys::fd::set {
+  //
+  // Componentry for the iterators of fd::Set
+  // These are implementation details
+  //
+  // Usage:
+  //
+  //   fd::Set set{...somehow...};
+  //   for (auto [index, value] : set) {
+  //      if (value) { ... then index is set }
+  //   }
+  //
+  enum Constancy { CONSTANT, MUTABLE };
+  template<Constancy> class Iterator;
+  namespace detail {
+    template<typename OWNER, typename REFERENCE> class Traits; // an implementation detail of the implementation details
+  }
+}
+#import std.iterator_traits
+namespace std {
+  template<> struct iterator_traits<sys::fd::set::Iterator<sys::fd::set::CONSTANT>>;
+  template<> struct iterator_traits<sys::fd::set::Iterator<sys::fd::set::MUTABLE>>;
+}
+#endiv
+#divert <hpp>
+namespace sys::fd::set {
+  // operator== is at class scoped.
+  template<Constancy C> inline auto operator!=(Iterator<C> const &, Iterator<C> const &) -> bool;
+}
+namespace sys::fd::set  {
+  template<typename OWNER, typename REFERENCE> struct detail::Traits {
+    using Owner = OWNER;
+    using Value = bool;
+    using Difference = std::ptrdiff_t;
+    using Pointer = void; // cannot take pointers to bits
+    using Reference = REFERENCE; // being Rhs or Lhs
+    using Category = std::bidirectional_iterator_tag;
+    // old_school, as the standard expects
+    using value_type = Value;
+    using difference_type = Difference;
+    using pointer = Pointer;
+    using reference = Reference;
+    using iterator_category = Category;
+  };
+}
+#forward sys.fd.set.Set
+#forward sys.fd.set.Rhs
+#forward sys.fd.set.Lhs
+template<> struct std::iterator_traits<sys::fd::set::Iterator<sys::fd::set::CONSTANT>>
+  : public sys::fd::set::detail::Traits<sys::fd::set::Set const, sys::fd::set::Rhs> { };
+template<> struct std::iterator_traits<sys::fd::set::Iterator<sys::fd::set::MUTABLE>>
+  : public sys::fd::set::detail::Traits<sys::fd::set::Set, sys::fd::set::Lhs> { };
+#forward sys.fd.set.Set
+#forward sys.fd.set.Lhs
+#forward sys.fd.set.Rhs
+namespace sys::fd {
+  template<set::Constancy CONSTANCY> class set::Iterator {
+    using Traits = std::iterator_traits<Iterator<CONSTANCY>>;
+    using Owner = typename Traits::Owner;
+  public:
+    Iterator();
+    using Index = std::size_t;
+    using Value = bool;
+    inline auto operator*() -> typename Traits::Reference;
+    inline auto operator*() const -> Rhs;
+    inline auto operator++() -> Iterator &;
+    inline auto operator--() -> Iterator &;
+    inline auto operator++(int) -> Iterator;
+    inline auto operator--(int) -> Iterator;
+  protected:
+    friend class set::Set;
+    Iterator(Owner &, Index);
+    Owner *owner;
+    Index index;
+    // templates of friend function definitions for class templates must at class scope.
+    inline friend auto operator==(Iterator const &a, Iterator const &b) -> bool {
+      return a.owner == b.owner && a.index == b.index;
+    }
+  };
+}
+#endiv
+#divert <ipp>
+#import sys.fd.set.Lhs
+#import sys.fd.set.Rhs
+namespace sys::fd {
+  template<set::Constancy C> inline auto set::operator!=(Iterator<C> const &a, Iterator<C> const &b) -> bool {
+    return !operator==(a, b);
+  }
+}
+#import std.invalid_argument
+namespace sys::fd::set {
+  template<Constancy _> Iterator<_>::Iterator() : owner{nullptr}, index{0} { }
+  template<Constancy _> Iterator<_>::Iterator(Owner &owner, Index index) : owner{&owner}, index{index} { }
+  template<Constancy _> auto Iterator<_>::operator*() -> typename Traits::Reference {
+    if (nullptr == owner) { throw std::invalid_argument{"null"}; }
+    if (SIZE <= index) { throw std::invalid_argument{"invalid"}; }
+    return typename Traits::Reference{*owner, index};
+  }
+  template<Constancy _> auto Iterator<_>::operator*() const -> Rhs {
+    if (nullptr == owner) { throw std::invalid_argument{"null"}; }
+    if (SIZE <= index) { throw std::invalid_argument{"invalid"}; }
+    return Rhs{*owner, index};
+  }
+  template<Constancy _> auto Iterator<_>::operator++() -> Iterator & {
+    if (nullptr == owner) { throw std::invalid_argument{"null"}; }
+    if (SIZE <= index) { throw std::invalid_argument{"exhausted"}; }
+    ++index;
+    return *this;
+  }
+  template<Constancy _> auto Iterator<_>::operator--() -> Iterator & {
+    if (nullptr == owner) { throw std::invalid_argument{"null"}; }
+    if (0 == index) { throw std::invalid_argument{"exhausted"}; }
+    --index;
+    return *this;
+  }
+  template<Constancy _> auto Iterator<_>::operator++(int) -> Iterator {
+    Iterator old{*this};
+    operator++();
+    return old;
+  }
+  template<Constancy _> auto Iterator<_>::operator--(int) -> Iterator {
+    Iterator old{*this};
+    operator--();
+    return old;
+  }
+}
+#endiv
+#divert <cpp>
+#import nonstd.required.iterator.Input
+#import nonstd.required.iterator.Forward
+#import nonstd.required.iterator.Bidirectional
+namespace sys::fd::set {
+  namespace {
+    using namespace nonstd::required::iterator;
+    static_assert(Input<Iterator<CONSTANT>>);
+    static_assert(Forward<Iterator<CONSTANT>>);
+    static_assert(Bidirectional<Iterator<CONSTANT>>);
+    static_assert(Input<Iterator<MUTABLE>>);
+    static_assert(Forward<Iterator<MUTABLE>>);
+    static_assert(Bidirectional<Iterator<MUTABLE>>);
+  }
+}
+#endiv

@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.size_t
+#import nonstd.required.iterator.Forward
+namespace nonstd::uninitialized {
+  //
+  // Fill an uninitialized area of memory.
+  //
+  template<typename OBJECT> inline auto fill(OBJECT &lhs, OBJECT const &rhs) -> void;
+  template<typename OBJECT, std::size_t N> inline auto fill(OBJECT (&lhs)[N], OBJECT const &value) -> void;
+  template<typename OBJECT> inline auto fill(OBJECT *lhs, std::size_t N, OBJECT const &value) -> void;
+  template<required::iterator::Forward ITERATOR, typename OBJECT> inline auto fill(ITERATOR first, ITERATOR last, OBJECT const &value) -> void;
+}
+#endiv
+#divert <ipp>
+#import std.uninitialized_fill_n
+template<typename OBJECT> auto nonstd::uninitialized::fill(OBJECT &lhs, OBJECT const &rhs) -> void {
+  std::uninitialized_fill_n(&lhs, 1u, rhs);
+}
+template<typename OBJECT, std::size_t N> auto nonstd::uninitialized::fill(OBJECT (&lhs)[N], OBJECT const &rhs) -> void {
+  std::uninitialized_fill_n(&lhs[0], N, rhs);
+}
+template<typename OBJECT> auto nonstd::uninitialized::fill(OBJECT *lhs, std::size_t N, OBJECT const &rhs) -> void {
+  std::uninitialized_fill_n(lhs, N, rhs);
+}
+#import std.uninitialized_fill
+template<nonstd::required::iterator::Forward ITERATOR, typename OBJECT> auto nonstd::uninitialized::fill(ITERATOR first, ITERATOR last, OBJECT const &rhs) -> void {
+  std::uninitialized_fill(first, last, rhs);
+}
+#endiv

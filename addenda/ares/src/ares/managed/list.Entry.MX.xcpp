@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.list.Entry.declaration
+namespace ares::managed::list {
+  //
+  // A single MX RR (Mail Exchanger)
+  //
+  // Usage: see reply::Record<MX> and managed::List<Entry<MX>>
+  //
+  template<> struct Entry<MX>;
+}
+#endiv
+#divert <hpp>
+#import ares.unmanaged.Structure
+#import ares.managed.list.entry.Basis
+#import ares.required.Spanlike
+#import std.string
+namespace ares::managed::list {
+  template<> struct Entry<MX> : public entry::Basis<unmanaged::Structure<MX>::List_Item> {
+    using ancestor = entry::Basis<unmanaged::Structure<MX>::List_Item>; // declaring ancestor::Unmanaged
+  public:
+    inline explicit Entry(Unmanaged const *);
+    inline auto priority() const -> Priority;
+    inline auto host() const -> std::string;
+    template<required::Spanlike SPANLIKE> auto host() const -> SPANLIKE;
+  };
+}
+#endiv
+#divert <ipp>
+#import strlen
+namespace ares::managed::list {
+  Entry<MX>::Entry(Unmanaged const *un) : ancestor{un} { }
+  auto Entry<MX>::priority() const -> Priority { return Priority{unmanaged->priority}; }
+  auto Entry<MX>::host() const -> std::string { return unmanaged->host; }
+  template<required::Spanlike SPANLIKE> auto Entry<MX>::host() const -> SPANLIKE {
+    return SPANLIKE{reinterpret_cast<typename SPANLIKE::value_type>(unmanaged->host), strlen(unmanaged->host)};
+  }
+}
+#endiv

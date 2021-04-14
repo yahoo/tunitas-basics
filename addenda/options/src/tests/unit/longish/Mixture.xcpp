@@ -1,0 +1,217 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace longish {
+      class Mixture;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.detail.Palette
+class tests::unit::longish::Mixture : public cppunit::test::Fixture, tests::unit::detail::Palette {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto setUp() -> void;
+  auto tearDown() -> void;
+
+  auto test_basic_usage() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import std.begin
+#import std.end
+auto tests::unit::longish::Mixture::setUp() -> void {
+  // The point of this tester is to mix short and long options
+  // YES LONG OPTIONS
+  // YES SHORT OPTIONS
+  char const *const ARGUMENTS_SOURCE[] = {
+    "/bin/a.out",
+    "--usage", "-H",
+    "--this", "-t",
+    "--that", "-T",
+    "--here", "-r",
+    "--there", "-e",
+    "--everywhere", "-E",
+    "--low=3", "--low", "3", "-l", "3",
+    "--high=5", "--high", "5", "-h", "5",
+    "--place=Hoover Park", "--place", "Mitchell Park", "-P", "Bowden Park",
+    "--options=sec=krb5p", "-Osec=krb5p",
+    "--credentials", "-C",
+    "--credentials=secret", "-Csecret",
+    "--with", "-W",
+    "--with=yes", "-Wno",
+    // more added after this
+  };
+  char const *const CHARACTERS_SOURCE[] = {
+    "Adam",
+    "Alkan",
+    "Auber",
+    "Beethoven",
+    "Bellini",
+    "Bennett",
+    "Berlioz",
+    "Bertin",
+    "Berwald",
+    "Chopin",
+    "Dargomyzhsky",
+    "Félicien David",
+    "Ferdinand David",
+    "Donizetti",
+    "Field",
+    "Franck",
+    "Franz",
+    "Glinka",
+    "Gomis",
+    "Halévy",
+    "Kalkbrenner",
+    "Liszt",
+    "Loewe",
+    "Marschner",
+    "Masarnau",
+    "Méhul",
+    "Fanny Mendelssohn",
+    "Felix Mendelssohn",
+    "Méreaux",
+    "Meyerbeer",
+    "Moniuszko",
+    "Moscheles",
+    "Niedermeyer",
+    "Onslow",
+    "Paganini",
+    "Prudent",
+    "Reicha",
+    "Rossini",
+    "Rubinstein",
+    "Schubert",
+    "Clara Schumann",
+    "Robert Schumann",
+    "Smetana",
+    "Sor",
+    "Spohr",
+    "Spontini",
+    "Thalberg",
+    "Verdi",
+    "Voříšek",
+    "Wagner",
+    "Weber ",
+  };
+
+  Palette::bringup(std::begin(ARGUMENTS_SOURCE), std::end(ARGUMENTS_SOURCE),
+                   std::begin(CHARACTERS_SOURCE), std::end(CHARACTERS_SOURCE));
+}
+
+auto tests::unit::longish::Mixture::tearDown() -> void {
+  Palette::bringdown();
+}
+
+#import options.Code
+#import options.argument.constants
+#import options.longish.Specification
+#import options.longish.Getter
+#import options.longish.Step
+#import options.shortish.Specification
+#import std.equal
+#import std.begin
+#import std.end
+#import std.logic_error
+auto tests::unit::longish::Mixture::test_basic_usage() -> void {
+  options::shortish::Specification const sspec{"HtTreEl:h:P:O::C::W::"};
+  options::longish::Specification const lspec{
+    {"usage", options::argument::NO, nullptr, (char)options::Code::HELP},
+      {"help", options::argument::NO, nullptr, (char)options::Code::HELP},
+        {"this", options::argument::NO, nullptr, 't'},
+          {"that", options::argument::NO, nullptr, 'T'},
+            {"here", options::argument::NO, nullptr, 'r'},
+              {"there", options::argument::NO, nullptr, 'e'},
+                {"everywhere", options::argument::NO, nullptr, 'E'},
+                  {"low", options::argument::REQUIRED, nullptr, 'l'},
+                    {"high", options::argument::REQUIRED, nullptr, 'h'},
+                      {"place", options::argument::REQUIRED, nullptr, 'P'},
+                        {"options", options::argument::OPTIONAL, nullptr, 'O'},
+                          {"credentials", options::argument::OPTIONAL, nullptr, 'C'},
+                            {"with", options::argument::OPTIONAL, nullptr, 'W'}}; 
+  // reminder: argv_workspace is reordered and reworked in place.
+  options::longish::Getter get(sspec, lspec, this->argv);
+  options::longish::Step step;
+  while ( ! end(step = get()) ) {
+    switch (code(step)) {
+      // cut & paste from the lspec above
+    case options::Code::HELP:
+    case options::Code::CHR_C:
+    case options::Code::CHR_E:
+    case options::Code::CHR_H:
+    case options::Code::CHR_O:
+    case options::Code::CHR_P:
+    case options::Code::CHR_T:
+    case options::Code::CHR_W:
+    case options::Code::CHR_e:
+    case options::Code::CHR_h:
+    case options::Code::CHR_l:
+    case options::Code::CHR_r:
+    case options::Code::CHR_t:
+      // This was expected but we don't do anything special with it (it's a tester!)
+      CPPUNIT_ASSERT(true);
+      break;
+    case options::Code::MISSING:
+      {
+        std::ostream &out(std::clog);
+        out << "Error: unexpected missing option value for " << flag_in_error(step);
+        if (!word_in_error(step).empty()) {
+          out << " at " << word_in_error(step);
+        }
+        out << '\n';
+      }
+      CPPUNIT_ASSERT(false);
+      break;
+    case options::Code::UNKNOWN:
+      // This was not expected
+      {
+        std::ostream &out(std::clog);
+        out << "Error: unexpected code " << flag_in_error(step);
+        if (!word_in_error(step).empty()) {
+          out << " at " << word_in_error(step);
+        }
+        out << '\n';
+      }
+      CPPUNIT_ASSERT(false);
+      break;
+    default:
+      // This was not expected (and it is our fault)
+      // It is our fault because the Getter returned a valid Code, but
+      // this switch statement isn't set up to capture it.  This is our fault.
+      {
+        std::ostream &out(std::clog);
+        out << "Error: internal error for valid code " << (char)(code(step)) << " at " << word(step) << '\n';
+        throw std::logic_error("our fault");
+      }
+      break;
+    }
+  }
+  // What's left in it?
+  c::argv av(get.size(), get.data());
+  for (auto item : av) {
+    std::clog << "av = \"" << item << "\"\n";
+  }
+  for (auto item : this->characters) {
+    std::clog << "characters = \"" << item << "\"\n";
+  }
+
+  CPPUNIT_ASSERT(std::equal(std::begin(av), std::end(av), std::begin(this->characters), std::end(this->characters)));
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+auto tests::unit::longish::Mixture::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("longish");
+  s << call("basic usage", &Mixture::test_basic_usage);
+  return finalize(s);
+}
+#endiv

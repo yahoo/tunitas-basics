@@ -1,0 +1,3 @@
+#!/bin/sh
+source ${0%/*}/framework.sh || exit 70
+${exe?} ${path?}

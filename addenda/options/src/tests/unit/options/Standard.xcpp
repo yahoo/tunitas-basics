@@ -1,0 +1,215 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace options {
+      class Standard;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::options::Standard : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  auto test_usage_subcommand() -> void;
+  auto test_version_subcommand() -> void;
+  auto test_verbose_mode() -> void;
+  auto test_dry_run_mode() -> void;
+  auto test_debug_mode() -> void;
+
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import options.Code
+#import options.argument.constants
+#import options.longish.Specification
+#import options.longish.Getter
+#import options.longish.Step
+#import std.ostream
+#import std.cout
+#import tests.unit.Argv
+
+auto tests::unit::options::Standard::test_usage_subcommand() -> void {
+  bool tested_something = false;
+  namespace ac = ::options::argument;
+  using oc = ::options::Code;
+  ::options::longish::Specification spec
+  {{"usage", ac::NO, oc::USAGE_SUBCOMMAND},
+      {"help", ac::NO, oc::USAGE_SUBCOMMAND}}; // <-------- test this
+  Argv argv{"argv0", "--usage", nullptr};
+  ::options::longish::Getter get(spec, argv);
+  std::ostream &out(std::cout);
+  out << "Testing --usage\n";
+  ::options::longish::Step step;
+  while (!end(step = get())) {
+    switch (code(step)) {
+    case ::options::Code::USAGE_SUBCOMMAND:
+      CPPUNIT_ASSERT(true);
+      tested_something = true;
+      break;
+    default:
+      out << __FILE__ << ':' << __LINE__ << '\n';
+      out << "FAILING - option is wholly unexpected (error at the default-clause) at"
+          << " code (int)=" << (int)(code(step))
+          << ", code(char)=" << (char)(code(step))
+          << " qq|" << flag_in_error(step) << "|"
+          << " qq|" << word_in_error(step) << "|"
+          << "\n";
+      CPPUNIT_ASSERT(false);
+      break;
+    }
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::options::Standard::test_version_subcommand() -> void {
+  bool tested_something = false;
+  namespace ac = ::options::argument;
+  using oc = ::options::Code;
+  ::options::longish::Specification spec
+  {{"version", ac::NO, oc::VERSION_SUBCOMMAND}}; // <-------- test this
+  Argv argv{"argv0", "--version", nullptr};
+  ::options::longish::Getter get(spec, argv);
+  std::ostream &out(std::cout);
+  out << "Testing --version\n";
+  ::options::longish::Step step;
+  while (!end(step = get())) {
+    switch (code(step)) {
+    case ::options::Code::VERSION_SUBCOMMAND:
+      CPPUNIT_ASSERT(true);
+      tested_something = true;
+      break;
+    default:
+      out << __FILE__ << ':' << __LINE__ << '\n';
+      out << "FAILING - option is wholly unexpected (error at the default-clause) at"
+          << " code (int)=" << (int)(code(step))
+          << ", code(char)=" << (char)(code(step))
+          << " qq|" << flag_in_error(step) << "|"
+          << " qq|" << word_in_error(step) << "|"
+          << "\n";
+      CPPUNIT_ASSERT(false);
+      break;
+    }
+
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::options::Standard::test_verbose_mode() -> void {
+  bool tested_something = false;
+  namespace ac = ::options::argument;
+  using oc = ::options::Code;
+  ::options::longish::Specification spec
+  {{"version", ac::NO, oc::VERSION_SUBCOMMAND},
+   {"verbose", ac::NO, oc::VERBOSE_MODE}}; // <-------- test this
+  Argv argv{"argv0", "--verbose", "--verbose", nullptr};
+  ::options::longish::Getter get(spec, argv);
+  std::ostream &out(std::cout);
+  out << "Testing --verbose\n";
+  ::options::longish::Step step;
+  while (!end(step = get())) {
+    switch (code(step)) {
+    case ::options::Code::VERBOSE_MODE:
+      CPPUNIT_ASSERT(true);
+      tested_something = true;
+      break;
+    default:
+      out << __FILE__ << ':' << __LINE__ << '\n';
+      out << "FAILING - option is wholly unexpected (error at the default-clause) at"
+          << " code (int)=" << (int)(code(step))
+          << ", code(char)=" << (char)(code(step))
+          << " qq|" << flag_in_error(step) << "|"
+          << " qq|" << word_in_error(step) << "|"
+          << "\n";
+      CPPUNIT_ASSERT(false);
+      break;
+    }
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::options::Standard::test_dry_run_mode() -> void {
+  bool tested_something = false;
+  namespace ac = ::options::argument;
+  using oc = ::options::Code;
+  ::options::longish::Specification spec
+  {{"dry-run", ac::NO, oc::DRY_RUN_MODE}}; // <-------- test this
+  Argv argv{"argv0", "--dry-run", nullptr};
+  ::options::longish::Getter get(spec, argv);
+  std::ostream &out(std::cout);
+  out << "Testing --dry-run\n";
+  ::options::longish::Step step;
+  while (!end(step = get())) {
+    switch (code(step)) {
+    case ::options::Code::DRY_RUN_MODE:
+      CPPUNIT_ASSERT(true);
+      tested_something = true;
+      break;
+    default:
+      out << __FILE__ << ':' << __LINE__ << '\n';
+      out << "FAILING - option is wholly unexpected (error at the default-clause) at"
+          << " code (int)=" << (int)(code(step))
+          << ", code(char)=" << (char)(code(step))
+          << " qq|" << flag_in_error(step) << "|"
+          << " qq|" << word_in_error(step) << "|"
+          << "\n";
+      CPPUNIT_ASSERT(false);
+      break;
+    }
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+auto tests::unit::options::Standard::test_debug_mode() -> void {
+  bool tested_something = false;
+  namespace ac = ::options::argument;
+  using oc = ::options::Code;
+  ::options::shortish::Specification sspec;
+  ::options::longish::Specification lspec
+  {{"debug", ac::NO, oc::DEBUG_MODE}}; // <-------- test this
+  Argv argv{"argv0", "--debug", nullptr};
+  ::options::longish::Getter get(sspec, lspec, argv);
+  std::ostream &out(std::cout);
+  out << "Testing --debug\n";
+  ::options::longish::Step step;
+  while (!end(step = get())) {
+    switch (code(step)) {
+    case ::options::Code::DEBUG_MODE:
+      CPPUNIT_ASSERT(true);
+      tested_something = true;
+      break;
+    default:
+      out << __FILE__ << ':' << __LINE__ << '\n';
+      out << "FAILING - option is wholly unexpected (error at the default-clause) at"
+          << " code (int)=" << (int)(code(step))
+          << ", code(char)=" << (char)(code(step))
+          << " qq|" << flag_in_error(step) << "|"
+          << " qq|" << word_in_error(step) << "|"
+          << "\n";
+      CPPUNIT_ASSERT(false);
+      break;
+    }
+  }
+  CPPUNIT_ASSERT(tested_something);
+}
+
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::options::Standard::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream s("standard");
+  s << call("usage", &Standard::test_usage_subcommand)
+    << call("version", &Standard::test_version_subcommand)
+    << call("verbose", &Standard::test_verbose_mode)
+    << call("dry-run", &Standard::test_dry_run_mode)
+    << call("debug", &Standard::test_debug_mode)
+    ;
+  return finalize(s);
+}
+#endiv

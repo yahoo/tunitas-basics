@@ -1,0 +1,30 @@
+// -*- c++ -*- in the SCOLD stylings which are so popular these days
+#divert <hpp>
+#import std.allocator
+#import std.string
+namespace ish {
+  namespace perl {
+    namespace detail {
+      //
+      // Similar to Perl's
+      //
+      //     @LHS = map {...block...} @RHS
+      //
+      template<typename OPERATION, template<typename V, typename A> class CONTAINER> inline auto map(OPERATION, CONTAINER<std::string, std::allocator<std::string>> const &) -> CONTAINER<std::string, std::allocator<std::string>>;
+    }
+  }
+}
+#entail ish.perl.detail.map.forward_list
+#endiv
+#divert <ipp>
+#import std.back_insert_iterator
+#import std.transform
+#import std.move
+template<typename OPERATION, template<typename V, typename A> class CONTAINER> auto ish::perl::detail::map(OPERATION operation, CONTAINER<std::string, std::allocator<std::string>> const &source) -> CONTAINER<std::string, std::allocator<std::string>> {
+  using result_type = CONTAINER<std::string, std::allocator<std::string>>;
+  result_type destination;
+  std::back_insert_iterator<result_type> out(destination); // <------ NO REVERSAL (first-in first-out)
+  std::transform(source.begin(), source.end(), out, operation);
+  return destination;
+}
+#endiv

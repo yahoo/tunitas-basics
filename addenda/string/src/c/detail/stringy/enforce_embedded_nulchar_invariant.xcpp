@@ -1,0 +1,55 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+namespace c {
+  namespace detail {
+    namespace stringy {
+      //
+      // These functions support construction conversion between stringz & stringn,
+      //    whereas as<...>(...) is a conversion operation.
+      // The new data invariant of stringz & stringn must be respected.
+      // These throw std::invalid_argument if the element at [N] is not widen('\0')
+      //
+      // buffer
+      //    size = 10
+      //    range is 0..10
+      //    terminator is n/a
+      //
+      // string min                    string max
+      //    size = 5                       size is 9
+      //    range is 0..5                  range is 0..9
+      //    terminator is at index 5       at index 9
+      //
+      //                    0   1   2   3   4   5    6   7   8   9   10
+      //      kittycat = { 'k' 'i' 't' 't' 'y' '\0' 'c' 'a' 't' '\0' }
+      //                    ^                                ^       ^
+      //                    |                                |       |
+      //                    |                                |       \----------- buffer end (finish)
+      //                    |                                \------------------- string end (finish)
+      //                    \---------------------------------------------------       - begin (start) is unambiguous
+      //
+      // Recall that EMBEDDED means that there can be more ZERO characters within the buffer
+      // and we want to consider the earliest of these ZERO characters as the terminator sentinel.
+      //
+      template<typename CONTAINER> inline auto enforce_embedded_nulchar_invariant(CONTAINER const &) -> void;
+      template<typename ITERATOR> inline auto enforce_embedded_nulchar_invariant(ITERATOR start, ITERATOR finish) -> void;
+    }
+  }
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.enforce_termination_invariant
+#import std.char_traits
+#import std.iterator_traits
+
+template<typename CONTAINER> auto c::detail::stringy::enforce_embedded_nulchar_invariant(CONTAINER const &container) -> void {
+  using char_type = typename CONTAINER::value_type;
+  constexpr char_type const nulchar = std::char_traits<char_type>::to_char_type(0);
+  return enforce_termination_invariant(EMBEDDED(), container.begin(), container.end(), nulchar, "nulchar");
+}
+
+template<typename ITERATOR> auto c::detail::stringy::enforce_embedded_nulchar_invariant(ITERATOR start, ITERATOR finish) -> void {
+  using char_type = typename std::iterator_traits<ITERATOR>::value_type;
+  constexpr char_type const nulchar = std::char_traits<char_type>::to_char_type(0);
+  return enforce_termination_invariant(EMBEDDED(), start, finish, nulchar, "nulchar");
+}
+#divert </ipp>

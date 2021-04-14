@@ -1,0 +1,3 @@
+// -*- c++ -*- 8efacc6e-b457-4cc7-96c4-ac3ff9d5805e
+#pragma once
+#include "mysql++/myset.h"

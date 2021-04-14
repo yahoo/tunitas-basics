@@ -1,0 +1,47 @@
+// -*- c++ -*-  in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import c.as
+#import std.vector
+namespace c {
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR const> const &) -> RESULT;
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR> const &) -> RESULT;
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR> &) -> RESULT;
+
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR const *> const &) -> RESULT;
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR *> const &) -> RESULT;
+  template<typename RESULT, typename CHAR> inline auto as(std::vector<CHAR *> &) -> RESULT;
+}
+#divert </hpp>
+#divert <ipp>
+#import c.detail.Dispatcher
+
+template<typename RESULT, typename CHAR> auto c::as(std::vector<CHAR const> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR> inline auto c::as(std::vector<CHAR> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR> inline auto c::as(std::vector<CHAR> &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR> auto c::as(std::vector<CHAR const *> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR> inline auto c::as(std::vector<CHAR *> const &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+
+template<typename RESULT, typename CHAR> inline auto c::as(std::vector<CHAR *> &subject) -> RESULT {
+  detail::Dispatcher<RESULT> call;
+  return call(subject);
+}
+#divert </ipp>

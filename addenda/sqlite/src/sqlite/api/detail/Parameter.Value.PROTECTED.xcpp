@@ -1,0 +1,21 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sqlite.api.detail.Parameter.Value
+#import sqlite.Value
+namespace sqlite {
+  namespace api {
+    namespace detail {
+      template<> struct Parameter<Value<PROTECTED>>;
+    } 
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.detail
+#import sqlite.detail.ResultSFINAE
+template<> struct sqlite::api::detail::Parameter<sqlite::Value<sqlite::PROTECTED>>
+  : public sqlite::detail::ResultSFINAE<Value<PROTECTED>>
+  , public sqlite::detail::specialization_is_valid
+{ };
+#endiv

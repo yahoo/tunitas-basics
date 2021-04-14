@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.net.Network
+#import sys.pf.Type
+namespace sys::pf {
+  //
+  // The computed constants.
+  // These are (contexpr) variable declarations so they properly belong at <hpp>
+  //
+  // The AF and PF series are basically the same thing.
+  // They even use the same integer codes.
+  // But they are subtly different in purpose and history.
+  //
+  // PREFER this usage with the 'pf' as the namespace name.
+  // AVOID the other usage with the upper case 'PF' as the namespace name.
+  //
+  // To give the flavor of the usage, consider the socket(2) call.
+  //
+  //   auto socketed = socket(AF::INET6, SOCK::STREAM, pf::Family<UNSPECIFIED>);
+  //   auto socketed = socket(AF::INET4, SOCK::STREAM, pf::Family<INET4>);
+  //   auto socketed = socket(AF::INET6, SOCK::STREAM, pf::Family<INET6>);
+  //   auto socketed = socket(AF::LOCAL, SOCK::STREAM, pf::Family<LOCAL>);
+  //
+  template<net::Network NETWORK> [[deprecated("AVOID. instead prefer af::Family<Version>")]] inline constexpr auto Family = Type{(int)NETWORK};
+}
+#endiv
+#divert <cpp>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace {
+  namespace tests {
+    using sys::net::Network;
+    using namespace sys::pf;
+    static_assert(sizeof (Family<Network::UNSPECIFIED>));
+    static_assert(sizeof (Family<Network::UNIX>));
+    static_assert(sizeof (Family<Network::LOCAL>));
+    static_assert(sizeof (Family<Network::INET4>));
+    static_assert(sizeof (Family<Network::INET6>));
+    static_assert(sizeof (Family<Network::IPX>));
+    static_assert(sizeof (Family<Network::NETLINK>));
+    static_assert(sizeof (Family<Network::X25>));
+    static_assert(sizeof (Family<Network::AX25>));
+    static_assert(sizeof (Family<Network::ATMPVC>));
+    static_assert(sizeof (Family<Network::APPLETALK>));
+    static_assert(sizeof (Family<Network::PACKET>));
+    static_assert(sizeof (Family<Network::ALGORITHM>));
+    static_assert(sizeof (Family<Network::UNSPEC>));
+    static_assert(sizeof (Family<Network::INET>));
+    static_assert(sizeof (Family<Network::ALG>));
+  }
+}
+#pragma GCC diagnostic pop
+#endiv

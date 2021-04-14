@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace openssl::x509::field {
+  //
+  // The common basis of all named fields.
+  // Descendants only.
+  // Descendants are keyed to give them the required field name in the default constructor
+  //
+  // Usage: (see field::Named<NAME>
+  //
+  class Basis;
+}
+#endiv
+#divert <hpp>
+#import std.string
+#import std.optional
+#import std.size_t
+class openssl::x509::field::Basis {
+protected:
+  ~Basis() = default;
+public:
+  inline explicit Basis(char const *name);
+  inline Basis(char const *name, std::size_t n); // n is the string length, not counting the '\0';
+  template<std::size_t N> inline explicit Basis(char const (&name)[N]); // assumes a string literal with a final '\0'
+  std::string const name; // WATCHOUT - this cannot be  std::string_view because we need the final '\0' guarantee of c_str()
+  std::optional<std::string> value;
+};
+#endiv
+#divert <ipp>
+namespace openssl::x509::field {
+  Basis::Basis(char const *name)
+    : name{name}
+  { }
+  Basis::Basis(char const *name, std::size_t n)
+    : name{name, n}
+  { }
+  template<typename std::size_t N> Basis::Basis(char const (&name)[N])
+    : name{name, N-1}
+  { }
+}
+#endiv

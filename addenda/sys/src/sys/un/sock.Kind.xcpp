@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.sock.Type
+#import sys.un.sock.Type
+namespace sys::un::sock {
+  //
+  // The constants.
+  // There is just the one (uh two, no three).
+  //
+  template<sys::sock::Type KIND> 
+  requires type::Traits<KIND>::value
+  inline constexpr auto Kind = Type{(int)KIND};
+}
+#endiv
+#divert <cpp>
+#import sys.sock.constants
+namespace {
+  namespace tests {
+    using sys::sock::Type;
+    using namespace sys::un::sock;
+    static_assert((int)Kind<Type::DATAGRAM> == (int)sys::sock::DATAGRAM);
+    static_assert((int)Kind<Type::STREAM> == (int)sys::sock::STREAM);
+    static_assert((int)Kind<Type::SEQUENCED> == (int)sys::sock::SEQUENCED);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    static_assert((int)Kind<Type::DATAGRAM> == (int)sys::sock::DGRAM);
+    static_assert((int)Kind<Type::SEQUENCED> == (int)sys::sock::SEQPACKET);
+#pragma GCC diagnostic pop
+  }
+}
+#endiv

@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::ec { class Group; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+#import openssl.ec.Group
+class tests::unit::ec::Group : public cppunit::test::Fixture {
+public:
+  using Subject = ::openssl::ec::Group;
+  auto test_constructor() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::ec::Group::test_constructor() -> void {
+  namespace ec = ::openssl::ec;
+  ec::Group group{ec::group::Name::PRIME256V1};
+  CPPUNIT_ASSERT(nullptr != group.get());
+}
+#import rigging.suite.io
+auto tests::unit::ec::Group::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("Group");
+  series << call("constructor", &Group::test_constructor)
+    ;
+  return finalize(series);
+}
+#endiv

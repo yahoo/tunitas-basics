@@ -1,0 +1,159 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::posix::exec {
+  template<typename CALLER, typename DATE, typename ECHO> class Scheme;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.posix.exec.Palette
+#import rigging.suite.Stream
+template<typename CALLER, typename DATE, typename ECHO> class tests::unit::posix::exec::Scheme : public cppunit::test::Fixture, protected Palette {
+public:
+  using Caller = CALLER;
+  using Date = DATE;
+  using Echo = ECHO;
+  auto test_arg() -> void;
+  auto test_arg_envv() -> void;
+  auto test_argv_old() -> void;
+  template<typename CONTAINER> auto test_argv() -> void;
+  auto test_argv_envv_old() -> void;
+  template<typename CONTAINER1, typename CONTAINER2> auto test_argv_envv() -> void;
+  auto test_vararg_args_only() -> void;
+  auto test_vararg_args_end_envv() -> void;
+  static auto stream() -> rigging::suite::Stream;
+  static auto suite() -> cppunit::Test *;
+protected:
+  static auto const EIGHT = 8u;
+};
+#endiv
+#divert <tpp>
+#import std.size
+#import sys.posix.fork
+#import tests.unit.posix.exec.complain
+namespace tests::unit::posix::exec {
+  template<typename _C, typename _D, typename _E> template<typename CONTAINER> auto Scheme<_C,_D,_E>::test_argv() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      auto path = Echo::path();
+      CONTAINER argv{Echo::name(), "apple", "banana", "cherry", "dog", "eagle", "frog", "goat"};
+      CPPUNIT_ASSERT(EIGHT == std::size(argv));
+      complain(Caller::call(path, argv));
+    }
+  }
+  template<typename _C, typename _D, typename _E> template<typename CONTAINER1, typename CONTAINER2> auto Scheme<_C,_D,_E>::test_argv_envv() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      auto path = Echo::path();
+      CONTAINER1 argv{Echo::name(), "apple", "banana", "cherry", "dog", "eagle", "frog", "goat"};
+      CPPUNIT_ASSERT(EIGHT == std::size(argv));
+      CONTAINER2 envv{"VAR0=zero", "VAR1=one", "VAR2=two"};
+      complain(Caller::call(path, argv, envv));
+    }
+  }
+}
+#import c.const_argv
+#import c.const_environv
+#import c.const_stringz
+#import sys.posix.fork
+#import tests.unit.posix.exec.complain
+namespace tests::unit::posix::exec {
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_arg() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      complain(Caller::call1("/bin/date", "date"));
+    }
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_arg_envv() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      c::const_environv empty;
+      complain(Caller::call1("/bin/date", "date", empty));
+    }
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_argv_old() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      auto path = Date::path();
+      std::vector<std::string> argv{"date"};
+      complain(Caller::call(path, argv));
+    }
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_argv_envv_old() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      auto path = Date::path();
+      std::vector<std::string> argv{Date::name()};
+      std::vector<std::string> envv{"VAR0=zero", "VAR1=one"};
+      complain(Caller::call(path, argv, envv));
+    }
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_vararg_args_only() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      using csz = c::const_stringz;
+      complain(Caller::call4(Echo::path(), csz(Echo::name()), csz("echo-dater"), csz("echo-truthful"), csz("echo-truthiness")));
+    }
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::test_vararg_args_end_envv() -> void {
+    using ::sys::posix::fork;
+    if (is_child(fork())) {
+      char var0[] = "VAR0=zero";
+      char var1[] = "VAR1=one";
+      char *vars[] = { var0, var1, nullptr };
+      c::const_environv envv(vars);
+      using csz = c::const_stringz;
+      complain(Caller::call4(Echo::path(), csz(Echo::name()), "echo-dater", csz("echo-datie"), csz("echo-dateliness"), envv));
+    }
+  }
+}
+#import std.array
+#import std.deque
+#import std.list
+#import std.move
+#import std.set
+#import std.vector
+#import rigging.suite.io
+namespace tests::unit::posix::exec {
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::suite() -> cppunit::Test * {
+    auto tmp = stream();
+    return finalize(tmp);
+  }
+  template<typename _C, typename _D, typename _E> auto Scheme<_C,_D,_E>::stream() -> rigging::suite::Stream {
+    using namespace ::rigging::suite;
+    using ::rigging::suite::call; // because namespace tests::unit::call occludes call(...)
+    Stream series("Scheme<"s + Caller::name() + ">"s);
+    series << call("arg", &Scheme::test_arg)
+           << call("arg_envv", &Scheme::test_arg_envv)
+           << []() {
+                Stream sub{"argv"};
+                sub << call("old", &Scheme::test_argv_old)
+                    << call("array", &Scheme::test_argv<std::array<std::string, EIGHT>>)
+                    << call("deque", &Scheme::test_argv<std::deque<std::string>>)
+                    << call("forward_list", &Scheme::test_argv<Forward_List<std::string>>)
+                    << call("list", &Scheme::test_argv<std::list<std::string>>)
+                    << call("set", &Scheme::test_argv<std::set<std::string>>)
+                    << call("vector", &Scheme::test_argv<std::vector<std::string>>)
+                  ;
+                return move(sub);
+              }()
+           << []() {
+                Stream sub{"argv_envv"};
+                sub << call("old", &Scheme::test_argv_envv_old)
+                    << call("array,deque", &Scheme::test_argv_envv<std::array<std::string, EIGHT>, std::deque<std::string>>)
+                    << call("forward_list,list", &Scheme::test_argv_envv<Forward_List<std::string>, std::list<std::string>>)
+                    << call("list,set", &Scheme::test_argv_envv<std::list<std::string>, std::set<std::string>>)
+                    << call("set,vector", &Scheme::test_argv_envv<std::set<std::string>, std::vector<std::string>>)
+                    << call("vector,array", &Scheme::test_argv_envv<std::vector<std::string>, std::array<std::string, EIGHT>>)
+                  ;
+                return move(sub);
+              }()
+           << call("vararg_args_only", &Scheme::test_vararg_args_only)
+           << call("vararg_args_end_envv", &Scheme::test_vararg_args_end_envv)
+      ;
+    return series;
+  }
+}
+#endiv

@@ -1,0 +1,23 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+//
+// The 'as<...>(...)' family of functions is overloaded on the return type of the function.
+// The family accepts a more complex type and "casts" it down to a simpler type.
+// In contrast 'to(...)' provides the opposite capability, namely the conversion "to" something else
+// which amounts to construction of more complex types from simpler ones.  e.g. "to string"
+//
+// json::as<std:string>(json::String) is read as "cast json::String as a std::string"
+// json::as<std:string>(json::Value) is read as "cast json::Value as a std::string"
+//
+// Overloading on the return type of the function
+//
+//          json.as.RESULT.ARGUMENT
+//                 |      |
+//                 v      v
+// #import json.as.RESULT.Value <--------- return a RESULT given an ARGUMENT
+// #import json.as.String <--------------- all the String-returning overloads
+//
+#entail json.as.string
+#entail json.as.String
+#entail json.as.Value
+#endiv

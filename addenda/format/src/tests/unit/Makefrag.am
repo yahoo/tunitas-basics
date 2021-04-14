@@ -1,0 +1,86 @@
+# -*- Makefile -*-
+
+bin_unit = bin/unit
+bin_unit_LDADD = \
+  $(lib_libformat_module_la) \
+  -lrigging-bench-module \
+  $(end)
+bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
+$(bin_unit_OBJECTS): AM_CPPFLAGS+=$(AND_CHECK_CPPFLAGS_SET)
+$(bin_unit_OBJECTS): AM_CXXFLAGS+=$(AND_CHECK_CXXFLAGS_SET)
+bin_unit_MODULES = $(call HT_SOURCEStoMODULES, $(bin_unit_SOURCES))
+bin_unit_SOURCES = \
+  obj/src/tests/unit/main.cpp \
+  obj/src/tests/unit/namespace.cpp \
+  \
+  obj/src/tests/unit/format/namespace.cpp \
+  obj/src/tests/unit/format/Fixture.cpp \
+  \
+  obj/src/tests/unit/format/as_empty/namespace.cpp \
+  obj/src/tests/unit/format/as_empty/Fixture.cpp \
+  \
+  obj/src/tests/unit/format/as_null/namespace.cpp \
+  obj/src/tests/unit/format/as_null/Fixture.cpp \
+  \
+  obj/src/tests/unit/format/funcall/namespace.cpp \
+  obj/src/tests/unit/format/funcall/Fixture.cpp \
+  obj/src/tests/unit/format/funcall/Formatter.cpp \
+  obj/src/tests/unit/format/funcall/State.cpp \
+  \
+  obj/src/tests/unit/format/ine/namespace.cpp \
+  obj/src/tests/unit/format/ine/Fixture.cpp \
+  \
+  obj/src/tests/unit/format/inn/namespace.cpp \
+  obj/src/tests/unit/format/inn/Fixture.cpp \
+  \
+  obj/src/tests/unit/format/integer/namespace.cpp \
+  obj/src/tests/unit/format/integer/Fixture.cpp \
+  obj/src/tests/unit/format/integer/careful/namespace.cpp \
+  obj/src/tests/unit/format/integer/careful/Specification.cpp \
+  obj/src/tests/unit/format/integer/careful/Iterator.cpp \
+  obj/src/tests/unit/format/integer/careful/exception/namespace.cpp \
+  obj/src/tests/unit/format/integer/careful/exception/Generic.cpp \
+  obj/src/tests/unit/format/integer/careful/exception/Fixedpoint.cpp \
+  obj/src/tests/unit/format/integer/careful/exception/Boundary.cpp \
+  \
+  obj/src/tests/unit/format/json/namespace.cpp \
+  obj/src/tests/unit/format/json/Buffer_Layers.cpp \
+  obj/src/tests/unit/format/json/Charcode.cpp \
+  obj/src/tests/unit/format/json/Enumeration_Limits.cpp \
+  obj/src/tests/unit/format/json/Fixture.cpp \
+  obj/src/tests/unit/format/json/Format.cpp \
+  obj/src/tests/unit/format/json/Literal.cpp \
+  obj/src/tests/unit/format/json/Pair.cpp \
+  obj/src/tests/unit/format/json/QuoteQuote.cpp \
+  \
+  obj/src/tests/unit/format/separator/namespace.cpp \
+  obj/src/tests/unit/format/separator/Fixture.cpp \
+  obj/src/tests/unit/format/separator/State.cpp \
+  \
+  obj/src/tests/unit/format/stream/namespace.cpp \
+  obj/src/tests/unit/format/stream/Fixture.cpp \
+  \
+  obj/src/tests/unit/want/namespace.cpp \
+  obj/src/tests/unit/want/Fixture.cpp \
+  $(end)
+
+# Shutup our own warnings about our own deprecated API.
+# This is the tester for that deprecated API
+# To wit:
+#
+#    src/tests/unit/format/Fixture.xcpp:145:24: warning: ‘decltype (format::inn(VALUE())) format::as_null(const VALUE&) [with VALUE = const char*; decltype (format::inn(VALUE())) = format::detail::ifnot::Null<const char*>]’ is deprecated: use inn(VALUE) instead [-Wdeprecated-declarations]
+#     buf << as_null(zero);
+#
+$(bin_unit_OBJECTS) : CXXFLAGS+=-Wno-deprecated-declarations
+
+$(scold_cxxdir)/tests/unit/dependencies.mk: $(bin_unit_SOURCES)
+$(bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $^)
+	@test -e $@
+$(scold_cxxdir)/tests/unit/dependencies.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(scold_cxxdir)/tests/unit/dependencies.mk
+.PHONY: clean-dependencies
+clean-dependencies::
+	rm -f $(scold_cxxdir)/tests/unit/dependencies.mk

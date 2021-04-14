@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+//
+// A husk for no-pipe execution.
+// This one is used to exercise the constructors.
+// As such, it provides direct access ot the ancestor's constructors.
+//
+// Usage:
+//
+//   Same as shell::run::Runner
+//
+#include <tests.unit.run.Runner>
+#endiv
+#divert <hpp>
+#import shell.run.Runner
+class tests::unit::run::Runner::Jogger : public ::shell::run::Runner {
+  using Ancestor = ::shell::run::Runner;
+public:
+  using Ancestor::Runner; // direct access to the ancestor's constructors.
+  // and no other new behaviors (no other fields or member functions)
+};
+#endiv

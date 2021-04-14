@@ -1,0 +1,48 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::stream::setting { class Width; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import nonstd.stream.setting.Width
+class tests::unit::stream::setting::Width : public cppunit::test::Fixture {
+public:
+  using Subject = ::nonstd::stream::setting::Width;
+  auto test_constructor() -> void;
+  auto test_insert() -> void;
+  auto test_extract() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::stream::setting::Width::test_constructor() -> void {
+  auto s0 = Subject{0};
+  auto s1 = Subject{1};
+  // See they construct!
+  CPPUNIT_ASSERT(sizeof (s0) == sizeof (s1));
+}
+#import std.ostringstream
+auto tests::unit::stream::setting::Width::test_insert() -> void {
+  std::ostringstream buf;
+  buf << Subject{1} << 'a'  << Subject{4} << 1;
+}
+#import std.istringstream
+auto tests::unit::stream::setting::Width::test_extract() -> void {
+  std::istringstream buf{"apple banana cherry dog eagle"};
+  char ch;
+  int in;
+  buf >> Subject{1} >> ch >> Subject{4} >> in;
+}
+#import rigging.suite.io
+auto tests::unit::stream::setting::Width::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series{"Width"};
+  series << call("constructor", &Width::test_constructor)
+         << call("operator<<", &Width::test_insert)
+         << call("operator>>", &Width::test_extract)
+    ;
+  return finalize(series);
+}
+#endiv

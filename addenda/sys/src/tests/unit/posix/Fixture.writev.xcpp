@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.id.File
+#import nonstd.const_dope
+#import nonstd.uninitialized_zero
+#import sys.posix.writev
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_writev_function_1() -> void {
+    auto const fd = id::File{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto writ = sys::posix::writev(fd, &io[0], COUNT);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_writev_function_2() -> void {
+    auto const fd = id::File{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const dope = nonstd::const_dope<iovec>{&io[0], COUNT};
+    auto writ = sys::posix::writev(fd, dope);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+namespace tests::unit::posix::fixture {
+  auto Fixture::test_writev_native_1() -> void {
+    auto const fd = int{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto writ = sys::posix::native::writev(fd, &io[0], COUNT);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+  auto Fixture::test_writev_native_2() -> void {
+    auto const fd = int{-1};
+    int const COUNT = 3; // yup 'int'
+    char buf[COUNT][10];
+    iovec io[]{{&buf[0],sizeof(buf[0])}, {&buf[1],sizeof(buf[1])}, {&buf[2],sizeof (buf[2])}};
+    auto const dope = nonstd::const_dope<iovec>{&io[0], COUNT};
+    auto writ = sys::posix::native::writev(fd, dope);
+    CPPUNIT_ASSERT(fail(writ));
+  }
+}
+#endiv

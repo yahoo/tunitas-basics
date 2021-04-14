@@ -1,0 +1,4 @@
+// -*- c++ -*- 43441919-1415-4051-8dbc-6a71108ce762
+#pragma once
+// There is special version-specific trickery #ifdefs in here; done once, done right (ahem)
+#include <std.basic_string_view>

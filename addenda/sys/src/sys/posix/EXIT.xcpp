@@ -1,0 +1,44 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace sys::posix {
+  //
+  // You likely want to be using the "sysexits" a.k.a. sys::exits (plural)
+  // Those are accessed via sys::posix::EX which have a much richer taxonomy.
+  //
+  // It's a fake namespace-in-a-struct.
+  //
+  // AVOID as this thing only gives you SUCCESS and FAILURE
+  // but if you have to use it then as follows:
+  //
+  // PREFER namespace sys::exit
+  // PREFER namespace sys::exit::constants
+  // PREFER sys::exit::Code
+  //        etc.
+  //
+  // Usage:
+  //
+  //   using EXIT = sys::posix::EXIT;
+  //   auto const x0 = EXIT::SUCCESS;
+  //   auto const x1 = EXIT::FAILURE;
+  //   ...etc...
+  //
+  struct EXIT;
+}
+#endiv
+#divert <hpp>
+#import sys.exit.Code
+#import sys.exit.constants
+struct sys::posix::EXIT {
+  using Code = exit::Code;
+  inline static constexpr auto SUCCESS = exit::SUCCESS;
+  inline static constexpr auto FAILURE = exit::FAILURE;
+  EXIT() = delete;
+  EXIT(EXIT const &) = delete;
+  auto operator=(EXIT const &) -> EXIT & = delete;
+};
+#endiv
+#divert <cpp>
+#import tests.usage.posix_EXIT.Usage
+static_assert(tests::usage::posix_EXIT::Usage<>);
+#endiv

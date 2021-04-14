@@ -1,0 +1,24 @@
+tests_unit_TESTS = \
+  tests/unit/list.test \
+  \
+  tests/unit/want.test \
+  tests/unit/nonstd.test \
+  tests/unit/nonstd.int128.test \
+  tests/unit/nonstd.float16.test \
+  tests/unit/dope.test \
+  tests/unit/exception.test \
+  tests/unit/ish.test \
+  tests/unit/initialized.test \
+  tests/unit/iterator.test \
+  tests/unit/mvr.test \
+  tests/unit/outcome.test \
+  tests/unit/path.test \
+  tests/unit/required.test \
+  tests/unit/range.test \
+  tests/unit/regex.test \
+  tests/unit/semver.test \
+  tests/unit/stream.test \
+  tests/unit/uninitialized.test \
+  \
+  tests/unit/all.test \
+  $(end)

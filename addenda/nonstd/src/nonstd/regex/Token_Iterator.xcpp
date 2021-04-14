@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.iterator_traits
+#import std.regex_token_iterator
+#import std.string
+#import nonstd.regex.required.ALL
+#import nonstd.regex.Traits
+namespace nonstd::regex {
+  //
+  // The Token Iterator on (wide and narrow) characters
+  //
+  // https://en.cppreference.com/w/cpp/regex/regex_token_iterator//
+  // Can iterate over the matched or the space between the matches.
+  //
+  // See the end-of-sequence iterator descriptio in the documentation
+  // Also called a suffix iterator, which is a state transition for the iterator.
+  // Use an index of -1 in the submatch
+  //
+  template<required::iterator::Bidirectional BI,
+	   required::Char CHAR = typename std::iterator_traits<BI>::value_type,
+	   required::Traits TRAITS = Traits<CHAR>>
+  using Token_Iterator = std::regex_token_iterator<BI, CHAR, TRAITS>;
+  using CToken_Iterator = Token_Iterator<char const *>;
+  using SToken_Iterator = Token_Iterator<std::string::const_iterator>;
+}
+#endiv

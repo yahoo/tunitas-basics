@@ -1,0 +1,42 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.char_traits
+#import nonstd.stream.required.Character
+#import nonstd.stream.required.Character_Traits
+namespace nonstd::stream::output::iterator {
+  //
+  // A prefixing output stream iterator
+  // (recall that std::ostream_iterator is suffixing)
+  //
+  // Usage:
+  //
+  //     auto start = ...iterator...
+  //     auto finish = ...iterator...;
+  //     Prefixing<char, int, char> sink('[', std::cout, ']');
+  //     std::copy(start, finish, sink);
+  //
+  template<typename PREFIX, typename VALUE, required::Character CHAR = char, required::Character_Traits TRAITS = std::char_traits<CHAR>> class Prefixing;
+}
+#endiv
+#divert <hpp>
+#import nonstd.stream.output.iterator.detail.Core
+#import nonstd.stream.output.iterator.detail.Decoration
+#import nonstd.stream.output.iterator.detail.Empty
+namespace nonstd::stream::output {
+  template<typename PREFIX, typename VALUE, required::Character CHAR, required::Character_Traits TRAITS> class iterator::Prefixing : public detail::Core<Prefixing<PREFIX, VALUE, CHAR, TRAITS>, detail::Decoration<PREFIX>, VALUE, detail::Empty, CHAR, TRAITS> {
+    using ancestor = detail::Core<Prefixing, detail::Decoration<PREFIX>, VALUE, detail::Empty, CHAR, TRAITS>;
+  public:
+    inline Prefixing(typename ancestor::prefix_argument_type, typename ancestor::stream_argument_type);
+    using ancestor::operator=;
+  };
+}
+#endiv
+#divert <ipp>
+namespace nonstd::stream::output::iterator {
+  template<typename PREFIX, typename VALUE, required::Character CHAR, required::Character_Traits TRAITS> Prefixing<PREFIX, VALUE, CHAR, TRAITS>::Prefixing(typename ancestor::prefix_argument_type prefix, typename ancestor::stream_argument_type outbound)
+    : ancestor(prefix, outbound, typename ancestor::suffix_type::value_type()) {
+    ;
+  }
+}
+#endiv

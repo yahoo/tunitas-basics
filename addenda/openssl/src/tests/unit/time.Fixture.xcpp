@@ -1,0 +1,141 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::time { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::time::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_units() -> void;
+  auto test_literals_singular() -> void;
+  auto test_literals_plural() -> void;
+  template<typename RESULT, typename ARGUMENT> auto test_as() -> void;
+  auto test_now() -> void;
+  auto test_Clock() -> void;
+  auto test_Duration() -> void;
+  auto test_Point() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <tpp>
+#import openssl.time.now
+#import openssl.time.as
+#import openssl.time.literals
+template<typename RESULT, typename ARGUMENT> auto tests::unit::time::Fixture::test_as() -> void {
+  using namespace ::openssl::time::literals;
+  auto nowthen = ::openssl::time::now();
+  auto argument = sys::time::as<ARGUMENT>(nowthen);
+  auto result = ::openssl::time::as<RESULT>(argument);// <----------------------------- test this
+  auto const expected = nowthen;
+  auto const actual = sys::time::as<decltype(nowthen)>(result);
+  // Fudge the natural truncation of now() from microseconds into seconds
+  CPPUNIT_ASSERT(expected - 2_seconds < actual && actual < expected + 2_seconds);
+}
+#endiv
+#divert <cpp>
+#import openssl.time // [[FIXTHIS]] by naming convention these should be in module openssl.time.duration
+auto tests::unit::time::Fixture::test_units() -> void {
+  using namespace ::openssl::time::duration;
+  auto const y = Years{1};
+  auto const m = Months{1};
+  auto const d = Days{1};
+  auto const H = Hours{1};
+  auto const M = Minutes{1};
+  auto const S = Seconds{1};
+  auto const delay = y + m + d + H + M + S;
+  CPPUNIT_ASSERT(0  < delay.count());
+}
+#import openssl.time.literals
+auto tests::unit::time::Fixture::test_literals_singular() -> void {
+  using namespace ::openssl::time::literals;
+  auto const y = 1_year;
+  auto const m = 1_month;
+  auto const d = 1_day;
+  auto const H = 1_hour;
+  auto const M = 1_minute;
+  auto const S = 1_second;
+  auto const delay = y + m + d + H + M + S;
+  CPPUNIT_ASSERT(0  < delay.count());
+}
+auto tests::unit::time::Fixture::test_literals_plural() -> void {
+  using namespace ::openssl::time::literals;
+  auto const y = 2_years;
+  auto const m = 2_months;
+  auto const d = 2_days;
+  auto const H = 2_hours;
+  auto const M = 2_minutes;
+  auto const S = 2_seconds;
+  auto const delay = y + m + d + H + M + S;
+  CPPUNIT_ASSERT(0  < delay.count());
+}
+#import openssl.time.now
+auto tests::unit::time::Fixture::test_now() -> void {
+  auto zero = ::openssl::time::Point{};
+  auto now = ::openssl::time::now(); // same as Clock::now()
+  CPPUNIT_ASSERT(zero < now);
+}
+#import openssl.time.Clock
+auto tests::unit::time::Fixture::test_Clock() -> void {
+  auto zero = ::openssl::time::Point{};
+  auto now = ::openssl::time::Clock::now();
+  CPPUNIT_ASSERT(zero < now);
+}
+#import openssl.time.Duration
+auto tests::unit::time::Fixture::test_Duration() -> void {
+  using namespace ::openssl::time::literals;
+  using ::openssl::time::duration_cast;
+  ::openssl::time::Duration d1 = duration_cast<::openssl::time::Duration>(::openssl::time::duration::Seconds{10});
+  ::openssl::time::Duration d2 = 10_seconds;
+  CPPUNIT_ASSERT(d1 == d2);
+}
+#import openssl.time.Point
+#import openssl.time.literals
+auto tests::unit::time::Fixture::test_Point() -> void {
+  using namespace ::openssl::time::literals;
+  auto zero = ::openssl::time::Point{};
+  auto point = ::openssl::time::now();
+  auto then = point + 100_minutes;
+  CPPUNIT_ASSERT(zero < point);
+  CPPUNIT_ASSERT(point < then);
+}
+#import rigging.suite.io
+auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  Stream series("time");
+  series << call("units", &Fixture::test_units)
+    ;
+  {
+    Stream lit("literals");
+    lit << call("singular", &Fixture::test_literals_singular)
+        << call("plural", &Fixture::test_literals_plural)
+      ;
+    series << move(lit);
+  } {
+    Stream aas("as");
+    {
+      Stream pos("Posix");
+      //                                                      Result                  Argument
+      pos << call("Posix", &Fixture::test_as<::openssl::time::Posix, ::openssl::time::Point>)
+          << call("Point", &Fixture::test_as<::openssl::time::Posix, ::openssl::time::Posix>)
+        ;
+      aas << move(pos);
+    } {
+      Stream poi("Point");
+      //                                                      Result                  Argument
+      poi << call("Posix", &Fixture::test_as<::openssl::time::Point, ::openssl::time::Point>)
+          << call("Point", &Fixture::test_as<::openssl::time::Point, ::openssl::time::Posix>)
+        ;
+      aas << move(poi);
+    }
+    series << move(aas);
+  }
+  series << call("now", &Fixture::test_now)
+         << call("Clock", &Fixture::test_Clock)
+         << call("Duration", &Fixture::test_Duration)
+         << call("Point", &Fixture::test_Point)
+    ;
+  return finalize(series);
+}
+#endiv

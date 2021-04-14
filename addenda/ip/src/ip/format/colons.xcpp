@@ -1,0 +1,17 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import ip.format.detail.Colons
+#import ip.format.required.in6 // Either
+namespace ip::format {
+  //
+  // Elegant formatting of IPv4 addresses on ostreams
+  //
+  template<required::in6::Either EITHER> inline auto colons(EITHER) -> detail::Colons<EITHER>;
+}
+#endiv
+#divert <ipp>
+template<ip::format::required::in6::Either EITHER> auto ip::format::colons(EITHER either) -> detail::Colons<EITHER> {
+  return detail::Colons<EITHER>(either);
+}
+#endiv

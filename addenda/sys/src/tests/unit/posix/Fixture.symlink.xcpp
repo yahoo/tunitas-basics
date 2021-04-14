@@ -1,0 +1,26 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import std.string
+#import sys.posix.mktemp
+#import sys.posix.symlink
+#import sys.posix.lstat
+#import sys.posix.unlinkat
+auto tests::unit::posix::fixture::Fixture::test_symlink() -> void {
+  auto r = six::mktemp("/tmp/t99.tests.unit.posix.symlink.XXXXXX");
+  CPPUNIT_ASSERT(good(r));
+  std::string const specimen = value(r);
+  guardian::Cleanup_Spackled_Names cleanup{specimen};
+  auto s = six::symlink("inky-linky-dinky-do, what do you think I want to do", specimen); // <------------- test this
+  CPPUNIT_ASSERT(good(s));
+  auto l = six::lstat(specimen);
+  CPPUNIT_ASSERT(good(l)); // <------------------------------- show your work
+  struct ::stat buf = value(l); // <------------------------ prove it
+  CPPUNIT_ASSERT(1528062583 < buf.st_ctime);
+  auto u = six::unlink(specimen);
+  CPPUNIT_ASSERT(good(u));
+}
+#endiv

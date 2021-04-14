@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.required.container.Type
+namespace nonstd::required::container {
+  //
+  // Is this the sort of container that has a push_front(Value) member?
+  //
+  template<typename CONTAINER> concept bool Push_Front = requires(CONTAINER container) {
+    requires Type<CONTAINER>;
+    typename CONTAINER::value_type;
+    { container.push_front(typename CONTAINER::value_type{}) };
+  };
+}
+#endiv
+#divert <cpp>
+// This is test code
+#import std.string
+#import std.deque
+#import std.vector
+namespace {
+  namespace tests {
+    using namespace std;
+    using namespace nonstd::required::container;
+    static_assert(Push_Front<deque<string>>);
+    // These don't have push_front(...) because it would be O(n) to do it.
+    static_assert(not Push_Front<vector<string>>);
+    static_assert(not Push_Front<string>);
+  }
+}
+#endiv

@@ -1,0 +1,104 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::reader { class Simple; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import json.reader.Simple
+class tests::unit::reader::Simple : public cppunit::test::Fixture {
+  using Ancestor = cppunit::test::Fixture;
+public:
+  using Subject = ::json::reader::Simple;
+  auto test_constructor_default() -> void;
+  auto test_constructor_features() -> void;
+  auto test_destructor() -> void;
+  auto test_parse_iterator() -> void;
+  auto test_parse_string() -> void;
+  auto test_parse_istream() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import json.Features
+#import json.String
+#import json.to
+auto tests::unit::reader::Simple::test_constructor_default() -> void {
+  Subject r;
+}
+#import json.Features
+auto tests::unit::reader::Simple::test_constructor_features() -> void {
+  ::json::Features all = ::json::Features::all();
+  Subject read(all);
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::reader::Simple::test_destructor() -> void {
+  {
+    ::json::Features all = ::json::Features::all();
+    Subject read(all);
+    char const *const syntax = R"json( {"apple":2,  "banana" : 3 } )json";
+    ::json::Value recovered;
+    auto result = read.parse(syntax, recovered);
+    CPPUNIT_ASSERT(result);
+    // <-------- the destructor happens here
+  }
+}
+#import c.const_stringz
+auto tests::unit::reader::Simple::test_parse_iterator() -> void {
+  ::json::Features all = ::json::Features::all();
+  Subject read(all);
+  c::const_stringz const some_literal = R"json( {"only":1} )json";
+  ::json::Value recovered;
+  auto const comments = false;
+  auto result = read.parse(some_literal.begin(), some_literal.end(), recovered, comments);
+  CPPUNIT_ASSERT(result);
+}
+auto tests::unit::reader::Simple::test_parse_string() -> void {
+  ::json::Features all = ::json::Features::all();
+  Subject read(all);
+  std::string const syntax = R"json( {"only":1} )json";
+  bool const comments = true; // <-------------------------- test this
+  ::json::Value recovered;
+  auto result = read.parse(syntax, recovered, comments);
+  CPPUNIT_ASSERT(result);
+}
+auto tests::unit::reader::Simple::test_parse_istream() -> void {
+  ::json::Features all = ::json::Features::all();
+  Subject read(all);
+  std::istringstream inbuf{R"json( {"only":1} )json"};
+  bool const comments = true; // <-------------------------- test this
+  ::json::Value recovered;
+  auto result = read.parse(inbuf, recovered, comments);
+  CPPUNIT_ASSERT(result);
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.add
+#import unit.rigging.suite.call
+auto tests::unit::reader::Simple::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("Simple");
+  {
+    Stream con("constructor");
+    con << call("default", &Simple::test_constructor_default)
+        << call("features", &Simple::test_constructor_features)
+      ;
+    series << add(con.release());
+  }
+  series << call("destructor", &Simple::test_destructor)
+    ;
+  {
+    Stream cal("operator()");
+    {
+      Stream par("parse");
+      par << call("iterator", &Simple::test_parse_iterator)
+          << call("string", &Simple::test_parse_string)
+          << call("istream", &Simple::test_parse_istream)
+        ;
+      cal << add(par.release());
+    }
+    series << add(cal.release());
+  }
+  return series.release();
+}
+#endiv

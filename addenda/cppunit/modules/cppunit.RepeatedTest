@@ -1,0 +1,6 @@
+// -*- c++ -*- b4403454-d0f9-4759-8e4b-09db68d14ec4
+#pragma once
+#include <cppunit/extensions/RepeatedTest.h>
+namespace cppunit {
+  using CppUnit::RepeatedTest;
+}

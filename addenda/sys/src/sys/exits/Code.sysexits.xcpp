@@ -1,0 +1,40 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward sys.exits.Code
+#import nonstd.sysexits.Is_Constructible_From
+#import nonstd.sysexits.Is_Convertible_Into
+namespace nonstd::sysexits {
+  //
+  // true in Is_Constructible_From<TYPE>
+  //   enables nonstd::sysexits::Code::Code(TYPE)
+  //   via make(TYPE) -> nonstd::sysexits::Code
+  //
+  // true in Is_Convertible_Into<TYPE>
+  //   enables nonstd::sysexits::Code::operator TYPE() const
+  //   via TYPE::TYPE(nonstd::sysexits::Code)
+  //
+  template<> struct Is_Constructible_From<sys::exits::Code>;
+  template<> struct Is_Convertible_Into<sys::exits::Code>;
+}
+#endiv
+#divert <hpp>
+template<> struct nonstd::sysexits::Is_Constructible_From<sys::exits::Code> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Convertible_Into<sys::exits::Code> : public std::true_type { };
+#import nonstd.sysexits.Code
+namespace sys::exits {
+  // ADL can find "ours"
+  inline auto make(Code const &) -> nonstd::sysexits::Code;
+}
+#import nonstd.sysexits.make
+namespace nonstd::sysexits {
+  // contribute an overload for "theirs"
+  using sys::exits::make;
+}
+#endiv
+#divert <ipp>
+#import sys.exits.Code
+auto sys::exits::make(Code const &proposed) -> nonstd::sysexits::Code {
+  return nonstd::sysexits::make((int) proposed);
+}
+#endiv

@@ -1,0 +1,39 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::error::to_integer {
+  //
+  // The error conditions of the "to_integer" sphere.
+  //   e.g. nonstd::sto<INTEGER>(DOPELIKE const &) -> Outcome<INTEGER>
+  //
+  // As always, these are reductive.
+  //
+  enum class Condition { SUCCESS, FAILURE };
+}
+#import std.is_error_condition_enum
+namespace std {
+  template<> struct is_error_condition_enum<nonstd::error::to_integer::Condition>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_condition_enum<nonstd::error::to_integer::Condition> : public std::true_type { };
+#import std.error_condition
+namespace nonstd::error::to_integer {
+  //
+  // Following:
+  //    https://en.cppreference.com/w/cpp/error/errc/make_error_condition
+  //    https://en.cppreference.com/w/cpp/io/io_errc/make_error_condition
+  //    https://en.cppreference.com/w/cpp/thread/future_errc/make_error_condition
+  //    ... et al. ...
+  //
+  inline auto make_error_condition(Condition) -> std::error_condition;
+}
+namespace std { using nonstd::error::to_integer::make_error_condition; }
+#endiv
+#divert <ipp>
+#import nonstd.error.to_integer.category
+auto nonstd::error::to_integer::make_error_condition(Condition condition) -> std::error_condition {
+  return std::error_condition{(int)condition, category()};
+}
+#endiv

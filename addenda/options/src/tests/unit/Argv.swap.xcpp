@@ -1,0 +1,15 @@
+// -*- c++ -*- in the SCOLD styling
+#divert <hpp>
+#forward tests.unit.Argv
+#import std.swap
+namespace std {
+  inline auto swap(tests::unit::Argv &, tests::unit::Argv &) -> void;
+}
+#endiv
+#divert <ipp>
+#import tests.unit.Argv
+auto std::swap(tests::unit::Argv &a, tests::unit::Argv &b) -> void {
+  using Ancestor = tests::unit::Argv::Ancestor;
+  swap(static_cast<Ancestor&>(a), static_cast<Ancestor&>(b));
+}
+#endiv

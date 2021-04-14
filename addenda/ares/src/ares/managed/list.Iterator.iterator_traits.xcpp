@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward ares.managed.list.Iterator
+#import ares.required.list.Entry
+#import std.iterator_traits
+namespace std {
+  template<ares::required::list::Entry ENTRY> class iterator_traits<ares::managed::list::Iterator<ENTRY>>;
+}
+#endiv
+#divert <hpp>
+#import std.ptrdiff_t
+#import std.forward_iterator_tag
+#forward ares.managed.list.Entry
+template<ares::required::list::Entry ENTRY> struct std::iterator_traits<ares::managed::list::Iterator<ENTRY>> {
+  // New School
+  using Value = ENTRY;
+  using Difference = std::ptrdiff_t;
+  using Pointer = void; // ...... no pointers, iterators can't make pointers to these ephemeral values.
+  using Reference = void; // .... no references, iterators can't return references to their ephemeal values.
+  using Category = std::forward_iterator_tag;
+  // old_school
+  using value_type = Value;
+  using difference_type = Difference;
+  using pointer = Pointer;
+  using reference = Reference;
+  using iterator_category = Category;
+};
+#endiv

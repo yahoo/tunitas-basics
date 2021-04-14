@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.format.required.in4 // Address
+#import ip.format.required.in6 // Address
+#import std.optional
+namespace ip::format::required::in {
+  //
+  // Either an IPv4 or IPv6 Address
+  //
+  template<typename ADDRESS> concept bool Address = in4::Address<ADDRESS> || in6::Address<ADDRESS>;
+  template<typename OPTIONAL> concept bool Optional = in4::Optional<OPTIONAL> || in6::Optional<OPTIONAL>;
+  template<typename EITHER> concept bool Either = in4::Either<EITHER> || in6::Either<EITHER>;
+}
+#endiv

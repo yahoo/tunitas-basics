@@ -1,0 +1,119 @@
+// -*- c++ -*- with SCOLD stylings
+#divert <hpp>
+#import c.const_stringz
+#import sqlite.prepared.Result
+#import sqlite.connection.Shell
+#import sqlite.Statement
+#import sqlite.statement.Shell
+#import sqlite.status.Code
+#import std.function
+namespace sqlite {
+  //
+  // The verb "source" DEPRECATED because it is confusing
+  // Use
+  //     eval(...) -- evaluate a series of SQL statements from a string
+  //     exec(...) -- evaluate a single SQL statement
+  //     read(...) -- read a file for a series of SQL statements
+  // 
+
+  // iterate through (and ignore) all results
+  [[deprecated("use sqlite::eval(...) instead")]]
+  auto source(connection::Shell &, c::const_stringz sql_statements) -> status::Code;
+  // handle the whole
+  [[deprecated("use sqlite::eval(...) instead")]]
+  auto source(connection::Shell &, c::const_stringz sql_statements, std::function<status::Code (prepared::Result<statement::Shell> &)>) -> status::Code;
+  // once per row until "done"
+  [[deprecated("use sqlite::eval(...) instead")]]
+  auto source(connection::Shell &, c::const_stringz sql_statements, std::function<status::Code (statement::Shell &)>) -> status::Code;
+}
+#endiv
+#divert <cpp>
+#import std.max
+#import std.move
+#import sqlite.eval
+#import sqlite.detail.eval.Result
+#import std.nothrow
+auto sqlite::source(connection::Shell &shell, c::const_stringz sql_statements) -> status::Code {
+  auto ignore = [](prepared::Result<statement::Shell> &bundle) -> detail::eval::Result {
+    statement::Shell steppable = std::move(prepared::value(bundle));
+    status::Code last;
+    while (row(last = steppable.step())) {
+      // once per row until "done"
+      continue;
+    }
+    // not allowed to return DONE, only OK or an actual error
+    auto code = std::max(ok_if_done(last), status::Code::OK);
+    return detail::eval::make(code, steppable);
+  };
+  // recall: eval(...) is a richer return value ... [[deprecated]] source(...) merely returns the status code
+  // recall: that source(...) is deprecated because it throws sometimes and sometimes returns (bad) status codes
+  auto evaluated = eval(std::nothrow, shell, sql_statements, ignore);
+  return code(evaluated);
+}
+
+#import sqlite.eval
+#import sqlite.status.Exception
+#import sqlite.detail.eval.Result
+#import std.nothrow
+auto sqlite::source(connection::Shell &shell, c::const_stringz sql_statements, std::function<status::Code (statement::Shell &)> handle) -> status::Code {
+  auto process = [&handle](prepared::Result<statement::Shell> &bundle) -> detail::eval::Result {
+    statement::Shell steppable = std::move(prepared::value(bundle));
+    status::Code last;
+    while (row(last = steppable.step())) {
+      // once per row until "done"
+      // the handler must return OK, the handler must not return DONE
+      auto handled = handle(steppable);
+      if (done(handled)) {
+        // the handler is not allowed to return DONE, it was to have been mapped to OK.
+        throw sqlite::status::Exception(handled, "handler returns DONE, inappropriately");
+      }
+      if (!ok(handled)) {
+        last = handled;
+        break;
+      }
+    }
+    auto code = std::max(ok_if_done(last), status::Code::OK);
+    return detail::eval::make(code, steppable);
+  };
+  // recall: eval(...) is a richer return value ... [[deprecated]] source(...) merely returns the status code
+  // recall: that source(...) is deprecated because it throws sometimes and sometimes returns (bad) status codes
+  auto evaluated = eval(std::nothrow, shell, sql_statements, process);
+  return code(evaluated);
+}
+
+#import sqlite.status.Code
+#import sqlite.status.Exception
+#import sqlite.prepared.abstract
+#import std.cerr
+auto sqlite::source(connection::Shell &shell, c::const_stringz sql_statements, std::function<status::Code (prepared::Result<statement::Shell> &)> handle) -> status::Code {
+  auto position = sql_statements.data();
+  status::Code last;
+  do {
+    // sqlite::Statement here so that we own & destruct the statement.
+    auto prepared = shell.prepare<Statement>(position);
+    last = code(prepared);
+    // Check for errors first
+    if (!ok(prepared)) {
+      break;
+    }
+    // Check for vacuousness second (vacuousness is not an error)
+    if (end(prepared)) {
+      break;
+    }
+    // Tricky ... if we give sqlite::Statement to the handler then it will destruct the statement/
+    // We do not want this. So instead we conjure up a result with statement::Shell instead
+    auto abstracted = abstract(prepared);
+    auto handled = handle(abstracted);
+    if (done(handled)) {
+      // the handler is not allowed to return DONE, it was to have been mapped to OK.
+      throw sqlite::status::Exception(handled, "handler returns DONE, inappropriately");
+    }
+    if (!ok(handled)) {
+      last = handled;
+      break;
+    }
+    position = remaining(prepared);
+  } while ('\0' != *position);
+  return std::max(last, status::Code::OK);
+}
+#endiv

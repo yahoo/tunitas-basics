@@ -1,0 +1,99 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::path::filename::mount {
+  //
+  // Usage: see nonstd::path::filename::workbench()
+  // Similar to Value
+  //
+  // The workbench() produces an "unbound mount" (point)
+  // A mount::reference is a bound mount (point)
+  // Work occurs on the string that is mounted as such.
+  //
+  // The string is recovered with
+  //
+  //    auto finalize(Reference &&) -> std::string
+  //    auto operator+(Reference &&) -> std::string
+  //
+  class Reference;
+}
+#endiv
+#divert <hpp>
+#import std.string
+namespace nonstd::path::filename::mount {
+  //
+  // operator* uses '.' as a separator
+  // operator/ uses '/' as a separator
+  //
+  inline auto operator*(std::string const &more, Reference &&) -> Reference &&;
+  inline auto operator*(Reference &&, std::string const &more) -> Reference &&;
+  inline auto operator/(std::string const &more, Reference &&) -> Reference &&;
+  inline auto operator/(Reference &&, std::string const &more) -> Reference &&;
+  inline auto finalize(Reference &&) -> std::string;
+  inline auto operator+(Reference &&) -> std::string; // prefer
+
+  namespace detail {
+    // avoid the cut & paste
+    inline auto operator_separator(char, std::string const &more, Reference &&) -> Reference &&;
+    inline auto operator_separator(char, Reference &&, std::string const &more) -> Reference &&;
+  }
+}
+class nonstd::path::filename::mount::Reference {
+public:
+  inline explicit Reference(std::string &subject);
+  std::string &subject;
+};
+#endiv
+#divert <ipp>
+nonstd::path::filename::mount::Reference::Reference(std::string &arg_subject)
+  : subject(arg_subject) {
+  ;
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator*(std::string const &more, Reference &&anon) -> Reference && {
+  return detail::operator_separator('.', more, std::forward<Reference>(anon));
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator*(Reference &&anon, std::string const &more) -> Reference && {
+  return detail::operator_separator('.', std::forward<Reference>(anon), more);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator/(std::string const &more, Reference &&anon) -> Reference && {
+  return detail::operator_separator('/', more, std::forward<Reference>(anon));
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::operator/(Reference &&anon, std::string const &more) -> Reference && {
+  return detail::operator_separator('/', std::forward<Reference>(anon), more);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::detail::operator_separator(char separator, std::string const &more, Reference &&anon) -> Reference && {
+  if (!more.empty()) {
+    anon.subject.insert(anon.subject.begin(), separator);
+    anon.subject.insert(anon.subject.begin(), more.begin(), more.end());
+  }
+  return std::forward<Reference>(anon);
+}
+
+#import std.forward
+auto nonstd::path::filename::mount::detail::operator_separator(char separator, Reference &&anon, std::string const &more) -> Reference && {
+  if (!more.empty()) {
+    anon.subject += separator;
+    anon.subject += more;
+  }
+  return std::forward<Reference>(anon);
+}
+
+auto nonstd::path::filename::mount::finalize(Reference &&anon) -> std::string {
+  return operator+(std::forward<Reference>(anon));
+}
+
+auto nonstd::path::filename::mount::operator+(Reference &&anon) -> std::string {
+  std::string ret(std::forward<std::string>(anon.subject));
+  return ret;
+}
+#endiv

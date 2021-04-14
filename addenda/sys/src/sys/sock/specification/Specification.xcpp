@@ -1,0 +1,84 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.sock.required.Type
+namespace sys::sock::specification {
+  //
+  // The specification is a composition of the Type and the Options
+  // The Type is one of the many socket types.
+  //   sock::Type
+  //   ip::sock::Type
+  //   un::sock::Type
+  //
+  // Blik. A bitmask of the (singular) Type and the the Option(s)
+  // Blik. A struct-in-word of the (singular) Type and the Option(s)
+  // Constructed with operators and casts.
+  //
+  // Constructors
+  // Specification consists of two components
+  //   1. bitfield as a Type (an enum)
+  //   2. a flagset of two other flags.
+  //
+  // The specification is a function-argument call-site object (DO NOT use it for storage).
+  //
+  // Thus the concept of is_flag(Specification) is bogus
+  // NO SUCH auto is_flag(Specification) -> bool;
+  //
+  // Usage:
+  //
+  //   auto s = socket(AF::INET4, SOCK::STREAM, IPPROTO::TCP);
+  //   auto s = socket(AF::INET4, SOCK::STREAM | SOCK::CLOEXEC, IPPROTO::UDP);
+  //   auto s = socket(AF::INET4, SOCK::STREAM | SOCK::CLOEXEC | SOCK::NONBLOCK, IPPROTO::TCP);
+  //
+  template<required::Type> class Specification;
+}
+#endiv
+#divert <hpp>
+#import sys.sock.specification.Composer
+#import sys.sock.Option
+#import sys.sock.Options
+namespace sys::sock {
+  template<required::Type TYPE> class specification::Specification : public Composer<Specification<TYPE>> {
+    using Ancestor = Composer<Specification<TYPE>>;
+  public:
+    constexpr Specification() : Ancestor{typename Ancestor::Type{}} { }
+    constexpr explicit Specification(typename Ancestor::Value value) : Ancestor{value} { }
+    using Ancestor::Composer;
+    auto operator=(Specification const &) -> Specification & = default;
+    auto operator=(Composer<Specification> c) -> Specification & { Ancestor::value = (typename Ancestor::Value) c; return *this; }
+    inline constexpr auto operator&=(Specification f) -> Specification & { Ancestor::value &= (typename Ancestor::Value) f; return *this; }
+    // DELETE inline constexpr auto operator&=(Composer<Specification> c) -> Specification & { Ancestor::value &= (typename Ancestor::Value) c; return *this; }
+    inline constexpr auto operator|=(Specification f) -> Specification & { Ancestor::value |= (typename Ancestor::Value) f; return *this; }
+    // DELETE inline constexpr auto operator|=(Composer<Specification> c) -> Specification & { Ancestor::value |= (typename Ancestor::Value) c; return *this; }
+    inline constexpr auto operator~() -> Specification & { Ancestor::value = ~Ancestor::value; return *this; }
+    inline constexpr explicit operator typename Ancestor::Value() const { return Ancestor::value; } // this one is explicit, the ancestor's is implicit
+    inline friend constexpr auto operator==(Specification const &a, Specification const &b) -> bool { return a.value == b.value; }
+    inline friend constexpr auto operator!=(Specification const &a, Specification const &b) -> bool { return a.value != b.value; }
+    // c          omposition
+    inline friend constexpr auto operator|(Specification a, Specification b) -> Specification           { return Specification{(typename Specification::Value)a | (typename Specification::Value)b}; }
+    inline friend constexpr auto operator|(Options a, Specification b) -> Specification                 { return Specification{(typename Specification::Value)a | (typename Specification::Value)b}; }
+    inline friend constexpr auto operator|(Option a, Specification b) -> Specification                  { return Specification{(typename Specification::Value)a | (typename Specification::Value)b}; }
+    inline friend constexpr auto operator|(typename Ancestor::Type a, Specification b) -> Specification { return Specification{(typename Specification::Value)a | (typename Specification::Value)b}; }
+    // extraction
+    inline friend constexpr auto operator&(Specification a, Specification b) -> Specification           { return Specification{(typename Specification::Value)a & (typename Specification::Value)b}; }
+    inline friend constexpr auto operator&(Options a, Specification b) -> Specification                 { return Specification{(typename Specification::Value)a & (typename Specification::Value)b}; }
+    inline friend constexpr auto operator&(Option a, Specification b) -> Specification                  { return Specification{(typename Specification::Value)a & (typename Specification::Value)b}; }
+    inline friend constexpr auto operator&(typename Ancestor::Type a, Specification b) -> Specification { return Specification{(typename Specification::Value)a & (typename Specification::Value)b}; }
+    // inversion
+    inline friend constexpr auto contains(Specification a, Specification b) -> bool { return (typename Specification::Value)b == (typename Specification::Value)(b & a); }
+  };
+}
+#endiv
+#divert <cpp>
+#import sys.sock.Type
+#import sys.ip.sock.Type
+#import sys.un.sock.Type
+namespace {
+  namespace tests {
+    using namespace sys::sock::specification;
+    static_assert(sizeof (Specification<sys::sock::Type>));
+    static_assert(sizeof (Specification<sys::ip::sock::Type>));
+    static_assert(sizeof (Specification<sys::un::sock::Type>));
+  }
+}
+#endiv

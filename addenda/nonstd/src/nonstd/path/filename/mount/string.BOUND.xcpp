@@ -1,0 +1,37 @@
+// -*- c++ -*- with the SCOLD stylings
+#divert <hpp>
+#import std.string
+namespace nonstd::path::filename::mount {
+  template<typename BOUND> inline auto operator/(BOUND &&, std::string const &more) -> BOUND &&;
+  template<typename BOUND> inline auto operator/(std::string const &more, BOUND &&) -> BOUND &&;
+  template<typename BOUND> inline auto finalize(BOUND &&) -> std::string;
+  template<typename BOUND> inline auto operator+(BOUND &&) -> std::string; // prefer
+}
+#endiv
+#divert <ipp>
+#import std.forward
+template<typename BOUND> auto nonstd::path::filename::mount::operator/(BOUND &&anon, std::string const &more) -> BOUND && {
+  if (!more.empty()) {
+    anon.subject += '/';
+    anon.subject += more;
+  }
+  return std::forward<BOUND>(anon);
+}
+
+template<typename BOUND> auto nonstd::path::filename::mount::operator/(std::string const &more, BOUND &&anon) -> BOUND && {
+  if (!more.empty()) {
+    anon.subject.insert(anon.subject.begin(), '/');
+    anon.subject.insert(anon.subject.begin(), more.begin(), more.end());
+  }
+  return std::forward<BOUND>(anon);
+}
+
+template<typename BOUND> auto nonstd::path::filename::mount::finalize(BOUND &&anon) -> std::string {
+  return operator+(std::forward<BOUND>(anon));
+}
+
+template<typename BOUND> auto nonstd::path::filename::mount::operator+(BOUND &&anon) -> std::string {
+  std::string ret(std::forward<std::string>(anon.subject));
+  return std::move(ret);
+}
+#endiv

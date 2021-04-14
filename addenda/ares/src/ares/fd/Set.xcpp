@@ -1,0 +1,60 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.Set
+namespace ares::fd {
+#if 0
+  enum Anchor { };
+  constexpr auto ANCHOR = Anchor{};
+  using sys::fd::Set;
+#endif
+  // This must be its own type so that ADL can find select(...) and process(...)
+  class Set;
+}
+#endiv
+#divert <hpp>
+class ares::fd::Set : public sys::fd::Set {
+  using ancestor = sys::fd::Set;
+public:
+  Set() = default;
+  using ancestor::Set;
+  //
+  // [[FIXTHIS]] sloppy ... should define the constructor and operator= against ancestor
+  //
+};
+#endiv
+// DELETETHIS
+// #divert <hpp>
+// #import ares.fd.set.Reference
+// namespace ares::fd {
+//   //
+//   // Usage:
+//   //
+//   //   fd::Set r, w;
+//   //   auto ccc = count(r, w);
+//   //   auto rrr = reads(r);
+//   //   auto www = writes(w);
+//   //   select(ccc, rrr, www);
+//   //
+//   // Usage:
+//   //
+//   //   select(count(r, w), read(r), write(w));
+//   //
+//   // [[FIXTHIS]] ... need a consty variation of these
+//   // n.b. the cryptic sense here is to avoid ambiguity with sys::fd::set::read(...) which returns an Optional, which we do not want
+//   inline auto reads(Anchor, Set &) -> set::Reference<set::Purpose::READ>;
+//   inline auto writes(Anchor, Set &) -> set::Reference<set::Purpose::WRITE>;
+// }
+// #endiv
+// #divert <ipp>
+// #import std.ref
+// namespace ares {
+//   auto fd::reads(Anchor, Set &s) -> set::Reference<set::Purpose::READ> {
+//     return set::Reference<set::Purpose::READ>{std::ref(s)};
+//   }
+//   auto fd::writes(Anchor, Set &s) -> set::Reference<set::Purpose::WRITE> {
+//     return set::Reference<set::Purpose::WRITE>{std::ref(s)};
+//   }
+// }
+// #endiv
+// 

@@ -1,0 +1,71 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import sys.o.Access
+#import sys.o.Create
+#import sys.o.Status
+#import sys.o.Flags
+#import sys.o.required.Accesses
+#import sys.o.required.Creates
+#import sys.o.required.Statuses
+namespace sys::o {
+  // Access is an enumeration, not a mask (so it is tautologically a 'flag', there is no conversion risk)
+  template<required::Accesses RESULT> inline auto as(Access) -> RESULT;
+  template<required::Accesses RESULT> inline auto as(Accesses) -> RESULT;
+  template<required::Accesses RESULT> inline auto as(Flags) -> RESULT;
+  template<> inline auto as<Access>(Access) -> Access;
+  template<> inline auto as<Accesses>(Access) -> Accesses;
+  template<> inline auto as<Access>(Accesses) -> Access;
+  template<> inline auto as<Accesses>(Accesses) -> Accesses;
+  template<> inline auto as<Access>(Flags) -> Access;
+  template<> inline auto as<Accesses>(Flags) -> Accesses;
+  //
+  template<required::Creates RESULT> inline auto as(Create) -> RESULT;
+  template<required::Creates RESULT> inline auto as(Creates) -> RESULT;
+  template<required::Creates RESULT> inline auto as(Flags) -> RESULT;
+  template<> inline auto as<Create>(Create) -> Create;
+  template<> inline auto as<Creates>(Create) -> Creates;
+  template<> inline auto as<Create>(Creates) -> Create;
+  template<> inline auto as<Creates>(Creates) -> Creates;
+  template<> inline auto as<Create>(Flags) -> Create;
+  template<> inline auto as<Creates>(Flags) -> Creates;
+  //
+  template<required::Statuses RESULT> inline auto as(Status) -> RESULT;
+  template<required::Statuses RESULT> inline auto as(Statuses) -> RESULT;
+  template<required::Statuses RESULT> inline auto as(Flags) -> RESULT;
+  template<> inline auto as<Status>(Status) -> Status;
+  template<> inline auto as<Statuses>(Status) -> Statuses;
+  template<> inline auto as<Status>(Statuses) -> Status;
+  template<> inline auto as<Statuses>(Statuses) -> Statuses;
+  template<> inline auto as<Status>(Flags) -> Status;
+  template<> inline auto as<Statuses>(Flags) -> Statuses;
+}
+#endiv
+#divert <ipp>
+#import sys.flags.maskof
+namespace sys::o {
+  template<> auto as<Access>(Access a) -> Access       { return a; }
+  template<> auto as<Accesses>(Access a) -> Accesses   { return Accesses{(int)a}; }
+  template<> auto as<Access>(Accesses f) -> Access     { return sys::flags::maskof<Access>(f, Accesses::Limits::begin(), Accesses::Limits::end()); }
+  template<> auto as<Accesses>(Accesses a) -> Accesses { return a; }
+  //
+  template<> auto as<Create>(Create c) -> Create    { return c; }
+  template<> auto as<Creates>(Create c) -> Creates  { return Creates{(int)c}; }
+  template<> auto as<Create>(Creates f) -> Create   { return sys::flags::maskof<Create>(f, Creates::Limits::begin(), Creates::Limits::end()); }
+  template<> auto as<Creates>(Creates c) -> Creates { return c; }
+  //
+  template<> auto as<Status>(Status s) -> Status       { return s; }
+  template<> auto as<Statuses>(Status s) -> Statuses   { return Statuses{(int)s}; }
+  template<> auto as<Status>(Statuses f) -> Status     { return sys::flags::maskof<Status>(f, Statuses::Limits::begin(), Statuses::Limits::end()); }
+  template<> auto as<Statuses>(Statuses s) -> Statuses { return s; }
+}
+#import sys.o.Traits
+namespace sys::o {
+  template<> auto as<Access>(Flags s) -> Access     { return as<Access>(as<Accesses>(s)); }
+  template<> auto as<Accesses>(Flags s) -> Accesses { return Accesses{Traits<Access>::MASK & (int) s}; }
+  template<> auto as<Create>(Flags s) -> Create     { return as<Create>(as<Creates>(s)); }
+  template<> auto as<Creates>(Flags s) -> Creates   { return Creates{Traits<Create>::MASK & (int)s}; }
+  template<> auto as<Status>(Flags s) -> Status     { return as<Status>(as<Statuses>(s)); }
+  template<> auto as<Statuses>(Flags s) -> Statuses { return Statuses{Traits<Status>::MASK & (int)s}; }
+}
+#endiv

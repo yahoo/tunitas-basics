@@ -1,0 +1,6 @@
+# This is a -*- Makefile -*- fragment.
+# For terms and provenance see the LICENSE file at the top of this repository.
+obj_src_tests_unit_range_SUBSOURCES = \
+  obj/src/tests/unit/range/namespace.cpp \
+  obj/src/tests/unit/range/Fixture.cpp \
+  $(end)

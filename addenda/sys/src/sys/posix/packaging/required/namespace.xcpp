@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.packaging
+#import sys.posix.required
+// cascade the 'required' namespaces
+namespace sys::posix::packaging::required { using namespace sys::posix::required; }
+namespace sys::posix {
+  namespace [[REMOVETHIS]] detail {
+    namespace [[REMOVETHIS]] required { using namespace sys::posix::required; }
+  }
+}
+#endiv

@@ -1,0 +1,3 @@
+# these are synthetic
+cppunit.*.cpp
+# main.cpp is not synthetic, do not ignore it

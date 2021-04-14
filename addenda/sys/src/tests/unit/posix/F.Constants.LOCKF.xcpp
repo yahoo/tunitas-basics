@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/tests.unit.posix.F>
+namespace tests::unit::posix {
+  inline constexpr auto LOCKF = lib::Call::LOCKF;
+  template<> struct F::Constants<LOCKF>;
+}
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import sys.posix.F
+#import sys.lockf.Operation
+namespace tests::unit::posix {
+  template<> struct F::Constants<LOCKF> : public cppunit::test::Fixture {
+    using F = ::sys::posix::F;
+    auto test_call() -> void;
+    auto test_assignment() -> void;
+    static auto suite() -> cppunit::Test *;
+  protected:
+    using Operation = ::sys::lockf::Operation;
+    static auto lockfalike(Operation) -> void; // Merely show that it can be called unambiguously
+  };
+}
+#endiv
+#divert <cpp>
+namespace tests::unit::posix {
+  auto F::Constants<LOCKF>::lockfalike(Operation) -> void { CPPUNIT_ASSERT(true); }
+  auto F::Constants<LOCKF>::test_call() -> void {
+    lockfalike(F::LOCK);
+    lockfalike(F::TEST_AND_LOCK);
+    lockfalike(F::UNLOCK);
+    lockfalike(F::TEST);
+    // the deprecated ones
+    lockfalike(F::ULOCK);
+    lockfalike(F::TLOCK);
+  }
+  auto F::Constants<LOCKF>::test_assignment() -> void {
+    Operation o;
+    o = F::LOCK;
+    o = F::TEST_AND_LOCK;
+    o = F::UNLOCK;
+    o = F::TEST;
+    // the deprecated ones
+    o = F::TLOCK;
+    o = F::ULOCK;
+    CPPUNIT_ASSERT(sizeof (o));
+  }
+}
+#import rigging.suite.io
+namespace tests::unit::posix {
+  auto F::Constants<LOCKF>::suite() -> cppunit::Test * {
+    using namespace ::rigging::suite;
+    using ::rigging::suite::call; // reminder: tests::unit::call occludes this
+    Stream series{"Constants<LOCKF>"};
+    series << call("assignment", &Constants::test_assignment)
+           << call("call", &Constants::test_call)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

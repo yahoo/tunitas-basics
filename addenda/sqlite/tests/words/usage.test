@@ -1,0 +1,6 @@
+#!/bin/sh
+f=${0##*/}
+b=${f%.test}
+export PATH="${0%/*}/../../check/bin:${0%/*}/../../bin:$PATH"
+words --usage
+

@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#forward nonstd.numeric_limits
+#import nonstd.int128_t
+#import nonstd.uint128_t
+namespace nonstd {
+  //
+  // The numeric_limits for GCC's 128-bit types.
+  //
+  // http://en.cppreference.com/w/cpp/types/numeric_limits
+  // Implementations may provide specializations of std::numeric_limits for implementation-specific types: 
+  //     e.g. GCC provides std::numeric_limits<__int128>.
+  //
+  // WATCHOUT - GCC 7 DOES NOT DO THIS -- hence this definition herein.
+  //
+  template<> struct numeric_limits<int128_t>;
+  template<> struct numeric_limits<uint128_t>;
+}
+#endiv
+#divert <hpp>
+#import nonstd.integers
+#import std.numeric_limits
+template<> class nonstd::numeric_limits<nonstd::integers::int128_t> : public std::numeric_limits<int128_t> {
+  using integer_type = nonstd::integers::int128_t;
+  static constexpr auto BITSIZE = 128;
+public:
+  static constexpr bool is_specialized = true; 
+  inline static constexpr auto min() noexcept -> integer_type { return integer_type(1lu<<63) << 64; }
+  inline static constexpr auto max() noexcept -> integer_type { return ~(integer_type(1lu<<63) << 64); }
+  inline static constexpr auto lowest() noexcept -> integer_type { return min(); }
+  static constexpr int digits = BITSIZE - 1; 
+  static constexpr int digits10 = (BITSIZE - 1) * 643L / 2136;      
+  static constexpr bool is_signed = true; 
+  static constexpr bool is_integer = true; 
+  static constexpr bool is_exact = true; 
+  static constexpr int radix = 2; 
+};
+template<> class nonstd::numeric_limits<nonstd::integers::uint128_t> : public std::numeric_limits<uint128_t> {
+  using integer_type = nonstd::integers::uint128_t;
+  static constexpr auto BITSIZE = 128;
+public:
+  static constexpr bool is_specialized = true; 
+  inline static constexpr auto min() noexcept -> integer_type { return integer_type(0); }
+  inline static constexpr auto max() noexcept -> integer_type { return ~integer_type(0); }
+  inline static constexpr auto lowest() noexcept -> integer_type { return min(); }
+  static constexpr int digits = BITSIZE - 1; 
+  static constexpr int digits10 = (BITSIZE - 1) * 643L / 2136; 
+  static constexpr bool is_signed = false; 
+  static constexpr bool is_integer = true; 
+  static constexpr bool is_exact = true; 
+  static constexpr int radix = 2; 
+};
+#endiv

@@ -1,0 +1,47 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import iovec
+#import nonstd.basic_dope
+#import nonstd.required.Octet
+#import off_t
+#import ssize_t
+#import std.is_const
+#import std.size_t
+#import sys.at.Flags
+#import sys.id.File
+#import sys.call.result.Value
+#import sys.posix.packaging.required.io.Vector
+namespace sys::posix::packaging::iov::interface {
+  //
+  // This namespace cluster is named 'packaging::iov::interface'
+  // to allow io::Vec to be a convenient idiomatic usage. (we have to avoid packaging::io::interface)
+  //
+  // Usage:
+  //
+  //   namespace sys::posix {
+  //     namespace packaging::iov {
+  //       using namespace packaging::iov::interface;
+  //       namespace function {
+  //       ...declare... auto read(...) -> Result;
+  //       ...declare... auto write(...) -> Result;
+  //       }
+  //     }
+  //
+  template<required::Octet OCTET> using Buffer = nonstd::basic_dope<OCTET>; // add std::is_const_v<OCTET> as necessary
+  namespace io {
+    //
+    // The "vec" is the single.
+    // The "vector" is the whole contiguous array of them.
+    //
+    using Vec = ::iovec;
+    template<required::Vector VECTOR> using Vector = nonstd::basic_dope<VECTOR>; // add std::is_const_v<VECTOR> as necessary
+  }
+  using id::File;
+  using Count = unsigned int; // indeed POSIX used (signed) 'int' for the count of the arrays
+  using Size = std::size_t;
+  using Offset = off_t;
+  using at::Flags;
+  using Result = call::result::Value<ssize_t>;
+}
+#endiv

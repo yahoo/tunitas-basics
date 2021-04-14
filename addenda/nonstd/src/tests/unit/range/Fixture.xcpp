@@ -1,0 +1,146 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::range { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.test.Fixture
+#import cppunit.Test
+class tests::unit::range::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_forward1_consty() -> void;
+  auto test_forward1_muting() -> void;
+  auto test_forward2() -> void;
+  auto test_reverse1_consty() -> void;
+  auto test_reverse1_muting() -> void;
+  auto test_reverse2() -> void;
+  auto test_indexing1_consty() -> void;
+  auto test_indexing1_muting() -> void;
+  auto test_indexing2() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import nonstd.range.forward
+#import std.copy
+#import std.back_inserter
+namespace tests::unit::range {
+  auto Fixture::test_forward1_consty() -> void {
+    auto const specimen = std::string{"abcdef"}; // <-------------- const
+    auto subject = nonstd::range::forward(specimen); // <---------- test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"abcdef"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_forward1_muting() -> void {
+    auto specimen = std::string{"abcdef"}; // <------------------- mutable
+    auto subject = nonstd::range::forward(specimen); // <--------- test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"abcdef"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_forward2() -> void {
+    auto specimen = std::string{"abcdef"}; // <------------------------------------------ either
+    auto subject = nonstd::range::forward(specimen.begin(), specimen.end()); // <-------- test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"abcdef"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import nonstd.range.reverse
+namespace tests::unit::range {
+  auto Fixture::test_reverse1_consty() -> void {
+    auto const specimen = std::string{"abcdef"}; // <----------------- const
+    auto subject = nonstd::range::reverse(specimen); // <------------ test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"fedcba"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_reverse1_muting() -> void {
+    auto specimen = std::string{"abcdef"}; // <-------------------- mutable
+    auto subject = nonstd::range::reverse(specimen); // <---------- test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"fedcba"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_reverse2() -> void {
+    auto const specimen = std::string{"abcdef"}; // <-------------------------------------- const
+    auto subject = nonstd::range::reverse(specimen.begin(), specimen.end()); // <---------- test this
+    std::string actual;
+    std::copy(subject.begin(), subject.end(), std::back_inserter(actual));
+    std::string const expected{"fedcba"};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+#import nonstd.range.indexing
+#import nonstd.container_traits.basic_string
+namespace tests::unit::range {
+  auto Fixture::test_indexing1_consty() -> void {
+    auto const specimen = std::string{"abcdef"}; // <----------------- const
+    auto actual = 0u;
+    for (auto const [ith, item] : nonstd::range::indexing(specimen)) { // <------------ test this (constie specimen)
+      actual += u(ith);
+    }
+    //                  a b c d e f
+    auto const expected{0u+1+2+3+4+5};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_indexing1_muting() -> void {
+    auto specimen = std::string{"abcdef"}; // <----------------- const
+    auto actual = 0u;
+    for (auto [ith, item] : nonstd::range::indexing(specimen)) { // <------------ test this (mutable specimen)
+      actual += u(ith);
+    }
+    //                  a  b c d e f
+    auto const expected{0u+1+2+3+4+5};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+  auto Fixture::test_indexing2() -> void {
+    auto const specimen = std::string{"abcdef"}; // <-------------------------------------- const
+    auto actual = 0u;
+    for (auto [ith, item] : nonstd::range::indexing(specimen.begin(), specimen.end())) { // <------------ test this (mutable specimen)
+      actual += u(ith);
+    }
+    //                  a  b c d e f
+    auto const expected{0u+1+2+3+4+5};
+    CPPUNIT_ASSERT_EQUAL(expected, actual);
+  }
+}
+#import rigging.suite.io
+auto tests::unit::range::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"range"};
+  series << []() {
+              auto frw = Stream{"forward"};
+              frw << call("1arg-consty", &Fixture::test_forward1_consty)
+                  << call("1arg-muting", &Fixture::test_forward1_muting)
+                  << call("2arg-consty", &Fixture::test_forward2)
+                  << END;
+              return move(frw);
+            }()
+         << []() {
+              Stream rev("reverse");
+              rev << call("1arg-consty", &Fixture::test_reverse1_consty)
+                  << call("1arg-muting", &Fixture::test_reverse1_muting)
+                  << call("2arg-consty", &Fixture::test_reverse2)
+                  << END;
+              return move(rev);
+            }()
+         << []() {
+              Stream rev("indexing");
+              rev << call("1arg-consty", &Fixture::test_indexing1_consty)
+                  << call("1arg-muting", &Fixture::test_indexing1_muting)
+                  << call("2arg-consty", &Fixture::test_indexing2)
+                  << END;
+              return move(rev);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

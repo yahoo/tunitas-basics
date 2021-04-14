@@ -1,0 +1,37 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#include <hpp/sys.posix.F>
+#endiv
+#divert <hpp>
+#import sys.f.Seal
+#import sys.f.Seals
+#import sys.f.constants
+#import sys.posix.required.rebundled
+#import sys.f.required.Seals
+struct sys::posix::F::_SEAL_ {
+  using Seal = f::Seal;
+  using Seals = f::Seals;
+  template<required::f::Seals RESULT> inline static auto as(Seal) -> RESULT;
+  template<required::f::Seals RESULT> inline static auto as(Seals) -> RESULT;
+  inline static constexpr auto NONE = Seals{Seals::NONE};
+  inline static constexpr auto SEAL = f::SEAL;
+  inline static constexpr auto SHRINK = f::SHRINK;
+  inline static constexpr auto GROW = f::GROW;
+  inline static constexpr auto WRITE = f::WRITE;
+  _SEAL_() = delete;
+  _SEAL_(_SEAL_ const &) = delete;
+  auto operator=(_SEAL_ const &) -> _SEAL_ & = delete;
+};
+#endiv
+#divert <ipp>
+#import sys.f.as
+namespace sys::posix {
+  template<required::f::Seals RESULT> auto F::_SEAL_::as(Seal f) -> RESULT { return f::as<RESULT>(f); }
+  template<required::f::Seals RESULT> auto F::_SEAL_::as(Seals s) -> RESULT { return f::as<RESULT>(s); }
+}
+#endiv
+#divert <cpp>
+#import tests.usage.posix_F_SEAL.Usage
+static_assert(tests::usage::posix_F_SEAL::Usage<>);
+#endiv

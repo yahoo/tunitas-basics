@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace ip::inet {
+  //
+  // Just the ones related to the IP-type protocols
+  //
+  struct [[deprecated("instead prefer ip::inet::ipproto::Type")]] IPPROTO;
+}
+#endiv
+#divert <hpp>
+#import sys.posix.IPPROTO
+struct ip::inet::IPPROTO : public sys::posix::IPPROTO {
+  using Type [[deprecated("instead prefer ip::inet::IPPROTO::Protocol")]] = Protocol;
+};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+namespace ip::inet {
+  static_assert(sizeof (IPPROTO::Type));
+  static_assert(sizeof (IPPROTO::Protocol));
+  static_assert(sizeof (IPPROTO::NONE));
+  static_assert(sizeof (IPPROTO::UDP));
+  static_assert(sizeof (IPPROTO::TCP));
+}
+#pragma GCC diagnostic pop
+#endiv
+#divert <cpp>
+#import ip.inet.ipproto.Type
+#import std.is_copy_assignable
+#import std.is_copy_constructible
+#import std.is_default_constructible
+#import std.is_same
+#import sys.ip.proto.Protocol
+// Obviously, this is test code ...
+namespace {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  namespace tests {
+    static_assert(!std::is_default_constructible_v<ip::inet::IPPROTO>);
+    static_assert(!std::is_copy_constructible_v<ip::inet::IPPROTO>);
+    static_assert(!std::is_copy_assignable_v<ip::inet::IPPROTO>);
+    static_assert(std::is_same_v<sys::ip::proto::Protocol, ip::inet::ipproto::Type>);
+  }
+#pragma GCC diagnostic pop
+}
+#endiv

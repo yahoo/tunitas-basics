@@ -1,0 +1,26 @@
+// -*- c++ -*- in the SCOLD styling that is so popular these days
+#divert <hpp>
+#import std.make_tuple
+#import std.tie
+namespace nonstd::mvr {
+  //
+  // Concept: TYPES is a package of types
+  //
+  // Usage
+  //     recv(TYPES...) = send(types...)
+  // ...
+  //     recv(values...) = some_function()
+  //       where
+  //           auto some_function -> anything {
+  //             return send(values...);
+  //           }
+  //
+  template<typename... TYPES> inline constexpr auto send(TYPES &&...args) -> decltype(std::make_tuple(args...));
+}
+#endiv
+#divert <ipp>
+#import std.make_tuple
+template<typename... TYPES> constexpr auto nonstd::mvr::send(TYPES &&...args) -> decltype(std::make_tuple(args...)) {
+    return std::make_tuple(args...);
+}
+#endiv

@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.OK
+#import sys.posix.access
+#import sys.posix.mktemp
+#import sys.posix.mkdirs
+#import sys.posix.rmdir
+auto tests::unit::posix::fixture::Fixture::test_mkdirs() -> void {
+  // Without a unique name ... this fails every now and again because the directory exists
+  auto m = six::mktemp("/tmp/t99.tests.unit.posix.test.EXISTS-by-mkdirs-ing.XXXXXX");
+  CPPUNIT_ASSERT(good(m));
+  std::string directory_exists = value(m);
+  auto m1 = six::mkdirs(directory_exists, 0777);
+  CPPUNIT_ASSERT(good(m1));
+  auto a1 = six::access(directory_exists, six::OK::F);
+  CPPUNIT_ASSERT(good(a1));
+  auto m2 = six::mkdirs(directory_exists, 0777);
+  CPPUNIT_ASSERT(good(m2)); // <--------- test this
+  auto a2 = six::access(directory_exists, six::OK::F);
+  CPPUNIT_ASSERT(good(a2));
+  auto r = six::rmdir(directory_exists);
+  CPPUNIT_ASSERT(good(r));
+}
+#endiv

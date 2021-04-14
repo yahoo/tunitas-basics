@@ -1,0 +1,56 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tests.unit.posix.Fixture
+#endiv
+#divert <cpp>
+#import sys.posix.sockaddr_in6
+#import sys.posix.sockaddr_in
+#import sys.sock.Options
+
+#import sys.posix.accept
+auto tests::unit::posix::fixture::Fixture::test_accept() -> void {
+  auto const sd{-1}; // so they all will fail
+  { sockaddr_in sin;
+    socklen_t sin_size = sizeof (sin);
+    auto r = nat::accept(sd, reinterpret_cast<sockaddr *>(&sin), &sin_size);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in6 sin;
+    socklen_t sin_size = sizeof (sin);
+    auto r = nat::accept(sd, reinterpret_cast<sockaddr *>(&sin), &sin_size);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in sin;
+    auto r = nat::accept(sd, sin);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in6 sin;
+    auto r = nat::accept(sd, sin);
+    CPPUNIT_ASSERT(!good(r)); }
+  { auto r = nat::accept<sockaddr_in>(sd);
+    CPPUNIT_ASSERT(!good(r)); }
+  { auto r = nat::accept<sockaddr_in6>(sd);
+    CPPUNIT_ASSERT(!good(r)); }
+}
+#import sys.posix.accept4
+auto tests::unit::posix::fixture::Fixture::test_accept4() -> void {
+  auto const sd{-1}; // so they all will fail
+  auto const opt = sock::Options{};
+  { sockaddr_in sin;
+    socklen_t sin_size = sizeof (sin);
+    auto r = nat::accept4(sd, reinterpret_cast<sockaddr *>(&sin), &sin_size, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in6 sin;
+    socklen_t sin_size = sizeof (sin);
+    auto r = nat::accept4(sd, reinterpret_cast<sockaddr *>(&sin), &sin_size, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in sin;
+    auto r = nat::accept4(sd, sin, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+  { sockaddr_in6 sin;
+    auto r = nat::accept4(sd, sin, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+  { auto r = nat::accept4<sockaddr_in>(sd, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+  { auto r = nat::accept4<sockaddr_in6>(sd, opt);
+    CPPUNIT_ASSERT(!good(r)); }
+}
+#endiv

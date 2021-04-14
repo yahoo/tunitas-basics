@@ -1,0 +1,41 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.posix.required.syscall.result.Idiomatic
+namespace sys::posix::required::syscall {
+  //
+  // What types can be returned from syscall(2)?
+  // "fits in a (signed) long"
+  //
+  // Usage:
+  //
+  //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
+  //
+  template<typename PAYLOAD> concept bool Result = result::Idiomatic<PAYLOAD>;
+}
+#endiv
+#divert <cpp>
+#import std.size_t
+#import std.ssize_t
+#import size_t
+#import ssize_t
+#import uid_t
+#import gid_t
+#import pid_t
+#import mode_t
+namespace {
+  namespace tests {
+    using namespace sys::posix::required::syscall;
+    static_assert(Result<int>);
+    static_assert(Result<std::ssize_t>);
+    static_assert(Result<std::size_t>);
+    static_assert(Result<size_t>);
+    static_assert(Result<ssize_t>);
+    static_assert(Result<uid_t>);
+    static_assert(Result<gid_t>);
+    static_assert(Result<pid_t>);
+    static_assert(Result<mode_t>);
+    // What else can a system call return?
+  }
+}
+#endiv

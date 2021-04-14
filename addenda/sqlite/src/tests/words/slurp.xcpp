@@ -1,0 +1,60 @@
+// -*- c++ -*- but in the SCOLD stylings
+#divert <hpp>
+#import std.string
+#import std.vector
+namespace tests {
+  namespace words {
+    template<typename RESULT> auto slurp(std::string const &filename) -> RESULT;
+    template<> auto slurp<std::string>(std::string const &filename) -> std::string;
+    template<> auto slurp<std::vector<std::string>>(std::string const &filename) -> std::vector<std::string>;
+  }
+}
+#endiv
+#divert <ipp>
+template<typename RESULT> auto tests::words::slurp(std::string const &filename) -> RESULT {
+  static_assert(0 != sizeof (RESULT) && 0 == sizeof (RESULT), "only specializations");
+}
+#endiv
+#divert <cpp>
+#import std.ifstream
+#import std.move
+template<> auto tests::words::slurp<std::string>(std::string const &filename) -> std::string {
+  std::string ret;
+  std::ifstream in;
+  // Exceptions only on an I/O error
+  // No exceptions for failure to acquire a datum (a character) off the steam
+  in.exceptions(std::ios::badbit);
+  in.open(filename);
+  char c;
+  while (in >> c) {
+    ret.push_back(c);
+  }
+  if (!in.eof()) {
+    // And yet, on in.fail() or in.bad(), an exception was to have been thrown
+    throw std::ios::failure("done but not at eof");
+  }
+  return ret;
+}
+
+#import std.ifstream
+#import std.move
+template<> auto tests::words::slurp<std::vector<std::string>>(std::string const &filename) -> std::vector<std::string> {
+  std::vector<std::string> ret;
+  std::ifstream in;
+  // want: no exception on EOF (fail), only exceptions on I/O error (bad)
+  // unclear http://en.cppreference.com/w/cpp/io/basic_ios/eof
+  in.exceptions(std::ios::badbit);
+  in.open(filename);
+  do {
+    std::string line;
+    if (getline(in, line)) {
+      ret.push_back(std::move(line));
+    }
+  } while (in);
+  if (!in.eof()) {
+    // And yet, on in.fail() or in.bad(), an exception was to have been thrown
+    throw std::ios::failure("done but not at eof");
+  }
+  return ret;
+}
+#endiv

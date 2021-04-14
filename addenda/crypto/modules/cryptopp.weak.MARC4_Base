@@ -1,0 +1,4 @@
+// -*- c++ -*- fe9cd47a-b5f5-4be9-9014-8a7783261257
+#pragma once
+#include <cryptopp> // ours, with our namespace declarations
+#include <cryptopp/arc4.h>

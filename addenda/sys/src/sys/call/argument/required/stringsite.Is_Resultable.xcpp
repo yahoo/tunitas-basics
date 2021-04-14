@@ -1,0 +1,36 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.string
+namespace sys::call::argument::required::stringsite {
+  //
+  // Is the "stringish" RESULT type a possible result of 
+  //   as<RESULT>(Pathstring const &) -> RESULT;
+  //
+  // See also the nearby concept Resultable<RESULT>
+  // See also the nearby function as<<RESULT>(Pathstring const &) -> RESULT
+  //
+  template<typename STRINGY> struct Is_Resultable;
+  template<> struct Is_Resultable<std::string const &>; // enable the specialization as<std::string const &>(...)
+  //
+  // And you could specialize your stringy type here too!
+  // One could imagine:
+  //   template<> struct Is_Resultable<nonstd::const_dope<char>>;
+  //   template<> struct Is_Resultable<c::const_buffer<char>>;
+  // but no system call actually needs those (so they are not provided).
+  //
+}
+#endiv
+#divert <hpp>
+#import sys.call.argument.required.stringlike.Is_Resultable
+#import std.true_type
+#import std.false_type
+namespace sys::call::argument::required {
+  template<typename STRINGY> struct stringsite::Is_Resultable : public stringlike::Is_Resultable<STRINGY> { };
+}
+namespace sys::call::argument::required::stringsite {
+  template<> struct Is_Resultable<std::string const &> : public std::true_type { };
+  // and you could specialize your stringy type here too!
+  // but remember ... only the consty ones
+}
+#endiv

@@ -1,0 +1,4 @@
+tests_pretty_TESTS = \
+  tests/pretty/usage.test \
+  tests/pretty/version.test \
+  $(end)

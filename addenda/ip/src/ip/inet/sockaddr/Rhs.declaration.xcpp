@@ -1,0 +1,29 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ip.in4 // in4::sockaddr
+#import ip.in6 // in6::sockaddr
+#import ip.inet.sockaddr.Xhs.declaration
+#import ip.required.Sockaddr
+namespace ip::inet::sockaddr {
+  //
+  // There are only specializations.
+  //
+  // Record the type of the addr field of the sockaddr
+  //   1. Extract the addr field out of the sockaddr
+  //   2. ???
+  // Indexed by the SOCKADDR type itself
+  //
+  // Usage:
+  //
+  //     #divert <fpp>
+  //     #forward ip.inet.sockaddr.Rhs.declaration <-------------- effecting a phase prior to <fpp>
+  //     template<> struct Rhs<in4::sockaddr> { ... };
+  //     #endiv
+  //     #divert <hpp>
+  //     template<> struct Rhs<in4::sockaddr> { ... };
+  //     #endiv
+  //
+  template<Field, required::Sockaddr> class Rhs;
+}
+#endiv

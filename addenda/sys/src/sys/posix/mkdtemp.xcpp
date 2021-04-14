@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import std.filesystem.path
+#import std.string
+#import std.vector
+#import sys.call.result.Value
+namespace sys::posix {
+  // The TEMPLATE must be a (narrow-)character string specifying a
+  // template pattern in which the last six characters are "XXXXXX"
+  // See mktemp(3).  Perhaps prefer mkstemp(3).   Also see mkdtemp(3)
+  inline auto mkdtemp(std::string TEMPLATE) -> call::result::Value<std::filesystem::path>;
+  // 
+  inline auto mkdtemp(std::vector<char> &TEMPLATE_modified_in_place) -> call::result::Value<bool>;
+}
+#endiv
+#divert <ipp>
+#include <cerrno>
+#import mkdtemp
+#import sys.posix.detail.mk_temp
+#if 0
+auto sys::posix::mkdtemp(c::stringz TEMPLATE) -> call::result::Value<std::filesystem::path> {
+  return detail::mk_temp(TEMPLATE, &::mkdtemp);
+}
+auto sys::posix::mkdtemp(c::const_stringz TEMPLATE) -> call::result::Value<std::filesystem::path> {
+  return detail::mk_temp(TEMPLATE, &::mkdtemp);
+}
+#endif
+auto sys::posix::mkdtemp(std::string TEMPLATE) -> call::result::Value<std::filesystem::path> {
+  return detail::mk_temp(TEMPLATE, &::mkdtemp);
+}
+auto sys::posix::mkdtemp(std::vector<char> &TEMPLATE_modified) -> call::result::Value<bool> {
+  return detail::mk_temp(TEMPLATE_modified, &::mkdtemp);
+}
+#endiv

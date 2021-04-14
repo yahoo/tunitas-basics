@@ -1,0 +1,95 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.call.Result
+#import sys.call.result.Value
+#import std.optional
+#import std.nullptr_t
+#import nonstd.required.Integer
+#import sys.posix.packaging.sleep.duration
+#import sys.posix.packaging.sleep.required
+#import sys.posix.packaging.sleep.time
+namespace sys::posix::packaging::sleep {
+  inline namespace interface { }
+  namespace interface {
+    using std::nullptr_t;
+    namespace duration = sleep::duration; // ... in support of 'using namespace interface' elsewhere
+    namespace required = sleep::required; // ... ibidem. (and yet there is no point to this becaues it has to be repeated on-site to avoid)
+    namespace time = sleep::time; // ........... ibidem.
+    namespace result {
+      using Status = call::Result;
+      // [[FIXTHIS]] use sys::time::required::Duration to dnforce the duration-sense of DURATION
+      template<typename DURATION> using Optional = std::optional<DURATION>;
+      template<typename DURATION> using Returned = call::result::Value<DURATION>;
+    }
+    namespace arguments {
+      // [[FIXTHIS]] ibidem
+      template<typename DURATION> using Optional = std::optional<DURATION>;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#if 0
+namespace sys::posix::packaging::sleep::interface {
+  namespace time {
+    using sys::time::as;
+    using sys::time::cast;
+    using sys::time::duration_cast;
+  }
+  namespace duration {
+    template<typename DURATION, required::Integer REP, required::Ratio RATIO> [[deprecated("REMOVE")]] inline auto truncate(Duration<REP, RATIO> const &) -> Duration<REP, RATIO>;
+    // [[FIXTHIS]] use sys::time::required::Duration to dnforce the duration-sense of DURATION
+    // [[FIXTHIS]] use required::Duration to specify that these result types really really are a duration
+    template<typename DURATION, required::Integer REP, required::Ratio RATIO> inline auto cast(Duration<REP, RATIO> const &) -> DURATION;
+    template<typename DURATION> inline auto cast(time::Val const &) -> DURATION;
+    template<typename DURATION> inline auto cast(time::Spec const &) -> DURATION;
+    template<typename OUT_DURATION, typename IN_DURATION> inline auto cast(call::result::Value<IN_DURATION> const &) -> call::result::Value<OUT_DURATION>;
+  }
+}
+#endif
+#endiv
+#divert <ipp>
+#if 0
+namespace sys::posix::packaging::sleep::interface {
+  template<typename DURATION, required::Integer REP, required::Ratio RATIO> auto duration::truncate(Duration<REP, RATIO> const &v0) -> Duration<REP, RATIO> {
+    auto const v1 = duration_cast<DURATION>(v0); // truncation happens here ... e.g. nanoseconds -> seconds -> nanoseconds
+    auto const v2 = duration_cast<Duration<REP, RATIO>>(v1);
+    return v2;
+  }
+  template<typename OUT_DURATION, typename IN_DURATION> auto duration::cast(call::result::Value<IN_DURATION> const &result) -> call::result::Value<OUT_DURATION> { return {good(result), error_num(result), duration::cast<OUT_DURATION>(value(result))}; }
+  template<typename DURATION, required::Integer REP, required::Ratio RATIO> auto duration::cast(Duration<REP, RATIO> const &interval) -> DURATION {
+    if constexpr (required::POSIX_Time_Structure<DURATION>) {
+      // Convert to system clock precision, then convert ot the oldline POSIX Time Structure
+      return time::cast<DURATION>(time::duration_cast<time::Duration>(interval));
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // Just change the precision and we're all set!
+      return time::duration_cast<DURATION>(interval);
+    }
+  }
+  template<typename DURATION> auto duration::cast(time::Val const &interval) -> DURATION  {
+    if constexpr (same_as<DURATION,time::Val>) {
+      return interval;
+    } else if constexpr (required::POSIX_Time_Structure<DURATION>) {
+      return time::cast<DURATION>(interval);
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // get to system clock precision and the move to the desired return
+      return cast<DURATION>(time::cast<time::Duration>(interval));
+    }
+  }
+  template<typename DURATION> auto duration::cast(time::Spec const &interval) -> DURATION {
+    if constexpr (same_as<DURATION,time::Spec>) {
+      return interval;
+    } else if constexpr (required::POSIX_Time_Structure<DURATION>) {
+      return time::cast<DURATION>(interval);
+    } else {
+      // Otherwise it must be a std::chrono Duration variant
+      // get to system clock precision and the move to the desired return
+      return cast<DURATION>(time::cast<time::Duration>(interval));
+    }
+  }
+}
+#endif
+#endiv

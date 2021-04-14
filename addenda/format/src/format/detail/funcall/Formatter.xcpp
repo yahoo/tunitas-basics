@@ -1,0 +1,46 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import format.required.Element
+namespace format::detail::funcall {
+  //
+  // Usage: see format::funcall(...)
+  //
+  //     std::cout << funcall("read", "fd", "buffer, "size");
+  //     std::cout << funcall("read", 1, "&buf[0]", 99);
+  //
+  template<required::Element NAME, typename... VALUES> class Formatter;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostream
+namespace format::detail::funcall {
+  template<typename CHAR, typename TRAITS, required::Element NAME, typename... VALUES> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Formatter<NAME, VALUES...> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+}
+
+#import format.detail.tuple.Formatter
+template<format::required::Element NAME, typename... VALUES> class format::detail::funcall::Formatter {
+public:
+  using name_type = NAME;
+  inline Formatter(NAME const &, VALUES const &...);
+  inline Formatter(NAME &&, VALUES &&...) = delete;
+  name_type const &name;
+private:
+  using Captured_References = std::tuple<VALUES const &...>;
+  Captured_References captured;
+public:
+  tuple::Formatter<Captured_References> arguments;
+};
+#endiv
+#divert <ipp>
+template<typename CHAR, typename TRAITS, format::required::Element NAME, typename... VALUES> auto format::detail::funcall::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Formatter<NAME, VALUES...> const &f) -> std::basic_ostream<CHAR, TRAITS> & {
+  return o << f.name << f.arguments;
+}
+
+template<format::required::Element NAME, typename... VALUES> format::detail::funcall::Formatter<NAME, VALUES...>::Formatter(NAME const &name, VALUES const &...rest)
+  : name{name}
+  , captured{rest...}
+  , arguments{captured} {
+  ;
+}
+#endiv

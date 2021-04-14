@@ -1,0 +1,45 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests {
+  namespace unit {
+    namespace query {
+      //
+      // This is the recipe shown in sqlite::query::Select
+      //
+      enum SELECTER { };
+      class Selecter;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import sqlite.query.Rows
+#import sqlite.query.Select
+#import std.string
+class tests::unit::query::Selecter : public sqlite::query::Select {
+  using Ancestor = sqlite::query::Select;
+public:
+  explicit Selecter(connection_type &);
+  enum UNQIUENESS { };
+  // See the schema statement in query::Database
+  using rows_type = sqlite::query::Rows<SELECTER, bool, int, double, std::string>;
+  auto operator()(bool value) -> rows_type;
+  static auto format() -> std::string;
+};
+#endiv
+#divert <cpp>
+tests::unit::query::Selecter::Selecter(connection_type &conn)
+  : Ancestor(conn, format()) {
+  ;
+}
+
+auto tests::unit::query::Selecter::operator()(bool value) -> rows_type {
+  this->bind(value);
+  return rows_type(this->prepared);
+}
+
+auto tests::unit::query::Selecter::format() -> std::string {
+  return R"sql(select * from t99 where ? = b1)sql";
+}
+#endiv

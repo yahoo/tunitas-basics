@@ -1,0 +1,50 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.basic_dope
+#import nonstd.required.Octet
+#import nonstd.span
+#import ssize_t
+#import std.remove_const
+#import std.ssize_t
+#import sys.call.result.Value
+#import sys.id.File
+#import sys.msg.Flags
+#import sys.msg.Header
+#import sys.posix.msghdr
+#import sys.posix.packaging.required // cascade the required
+namespace sys::posix::packaging::msg::interface {
+  //
+  // Scope:
+  //
+  //   recv, recvfrom, recvmsg
+  //   send, sendto, sendmsg
+  //
+  // Usage:
+  //
+  //   the usual
+  //
+  namespace size {
+    using Signed = std::ssize_t;
+    using Unsigned = std::size_t; // ... a big size, as in "bytes of memory"
+    using Count = unsigned; // ......... a small size, as in "array bounds"
+  }
+  using sys::msg::Flags;
+  template<typename HDR> using Header = sys::msg::Header<HDR>;
+  using id::File;
+  using Result = call::result::Value<size::Signed>;
+  template<typename OCTET> requires required::Octet<std::remove_const_t<OCTET>> using Dope = nonstd::basic_dope<OCTET>;
+  template<typename OCTET> requires required::Octet<std::remove_const_t<OCTET>> using Span = nonstd::span<OCTET>;
+}
+// (Almost) all interfaces will need these
+#import std.is_const
+#import sys.posix.sockaddr // ............ [[FIXTHIS]] move to sys.sock.Addr<void>, Addr<IN4>, Addr<IN6>, Addr<UN>, etc.
+#import sys.posix.required.Sockaddr // ... [[FIXTHIS]] ibidem.
+#import nonstd.required.Dopelike
+#endiv
+#divert <hpp>
+#import sys.msg.constants
+namespace sys::posix::packaging::msg::interface {
+  using sys::msg::NONE;
+}
+#endiv

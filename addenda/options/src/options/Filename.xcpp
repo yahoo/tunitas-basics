@@ -1,0 +1,108 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace options {
+  class Filename;
+}
+#divert </fpp>
+#divert <hpp>
+#import std.string
+class options::Filename {
+public:
+  inline Filename();
+  inline Filename(std::string const &diranme, std::string const &basename);
+  inline auto operator=(Filename const &) -> Filename & = default;;
+  inline auto operator=(std::string const &) -> Filename &;
+  auto fullpath() const -> std::string;
+  auto fullpath(std::string const &) -> void;
+  inline auto dirname() const -> std::string;
+  inline auto dirname(std::string const &) -> void;
+  inline auto basename() const -> std::string;
+  inline auto basename(std::string const &) -> void;
+protected:
+  std::string directory_component;
+  std::string file_name;
+};
+#endiv
+#divert <ipp>
+options::Filename::Filename()
+  : directory_component()
+  , file_name() {
+  ;
+}
+
+options::Filename::Filename(std::string const &arg_dirname, std::string const &arg_basename)
+  : directory_component(arg_dirname)
+  , file_name(arg_basename) {
+  ;
+}
+
+auto options::Filename::operator=(std::string const &path) -> Filename & {
+  fullpath(path);
+  return *this;
+}
+
+auto options::Filename::basename() const -> std::string {
+  return file_name;
+}
+
+auto options::Filename::basename(std::string const &name) -> void {
+  file_name = name;
+}
+
+auto options::Filename::dirname() const -> std::string {
+  return directory_component;
+}
+
+auto options::Filename::dirname(std::string const &path) -> void {
+  directory_component = path;
+}
+#endiv
+#divert <cpp>
+auto options::Filename::fullpath() const -> std::string {
+  std::string ret;
+  ret += directory_component;
+  // don't add an extra slash where it's not apropos
+  bool needs_slash = (!directory_component.empty()
+                      && '/' != directory_component.back()
+                      && !file_name.empty());
+  if (needs_slash) {
+    ret += '/';
+  }
+  ret += file_name;
+  return ret;
+}
+
+auto options::Filename::fullpath(std::string const &path) -> void {
+  if (!path.empty() && '/' == path.back()) {
+    //
+    // /something/ -> { "/something" "." }
+    // /           -> { "/", "" }
+    // //          -> { "//", "" }
+    //
+    directory_component = path;
+    file_name = "";
+  } else {
+    auto slash = path.rfind('/');
+    if (std::string::npos == slash) {
+      //
+      // "filename" => { "." "filename" }
+      //
+      directory_component = ".";
+      file_name = path;
+    } else {
+      //
+      //  "directory/filename" -> { "directory", "filename" }
+      //
+      if (0 == slash) {
+        // the last slash is a position 0, so the string is "/"
+        directory_component = "/";
+      } else {
+        // the last slash is not at position 0, so the string is "//" or "a/" or "/a/"
+        directory_component = path.substr(0, slash);
+      }
+      file_name = path.substr(slash+1);
+    }    
+  }
+}
+#endiv

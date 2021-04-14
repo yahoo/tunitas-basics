@@ -1,0 +1,23 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import sys.fd.required.Unmanaged
+namespace sys::at::position {
+  //
+  // An actual or symbolic file descriptor for use in the "at"-family of system calls.
+  // This is an implementation detail to be used only in the argument signatures of the "at"-family of system calls.
+  //
+  // The magic is in the constructor, which accepts either
+  //   int             a native file descriptor; untyped, unmanaged
+  //   id::File        a typed file descriptor; typed, but unmanaged
+  //   fd::Managed  a file descriptor; typed & managed .................. dubious uses Managed::get()
+  //   AT::FDCWD       the distinguished symbolic constant 
+  //
+  // Usage:
+  // 
+  //   mkdirat(AT::FDCWD, pathname, mode);
+  //   faccessat(fd, pathname, mode);
+  //
+  template<fd::required::Unmanaged> struct Position;
+}
+#endiv

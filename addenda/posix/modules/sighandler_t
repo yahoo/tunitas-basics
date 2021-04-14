@@ -1,0 +1,4 @@
+// -*- c++ -*- 43e231bf-7ccc-4a6c-9804-2c8245b7e4cf
+#pragma once
+#include <signal.h>
+// sighandler_t is enabled with _GNU_SOURCE

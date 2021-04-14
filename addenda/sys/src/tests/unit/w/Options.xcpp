@@ -1,0 +1,233 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::w { class Options; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+#import tests.unit.w.Palette
+#import sys.w.Options
+#import sys.w.Option
+class tests::unit::w::Options : public cppunit::test::Fixture, private Palette<::sys::w::Options>, private Palette<::sys::w::Option> {
+  struct Ancestors {
+    using Fixture = cppunit::test::Fixture;
+    using Plural = Palette<::sys::w::Options>;
+    using Singular = Palette<::sys::w::Option>;
+  };
+public:
+  struct Subjects {
+    using Options = ::sys::w::Options;
+    using Option = ::sys::w::Option;
+  };
+  // Unify the MI
+  auto setUp() -> void override final;
+  auto tearDown() -> void override final;
+  auto test_flags_universe() -> void;
+  auto test_flags_constants() -> void;
+  auto test_and_ss() -> void;
+  auto test_and_s1() -> void;
+  auto test_and_1s() -> void;
+  auto test_and_11() -> void;
+  auto test_and_assign() -> void;
+  auto test_decumulate_and_assign() -> void;
+  auto test_decumulate_via_rhs() -> void;
+  auto test_or_ss() -> void;
+  auto test_or_s1() -> void;
+  auto test_or_1s() -> void;
+  auto test_or_11() -> void;
+  auto test_or_assign() -> void;
+  auto test_accumulate_or_assign() -> void;
+  auto test_accumulate_via_rhs() -> void;
+  auto test_contains() -> void;
+  auto test_flags() -> void;
+  auto test_flag() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import sys.w.as
+namespace tests::unit::w {
+  auto Options::setUp() -> void {
+    Palette<::sys::w::Options>::setUp();
+    Palette<::sys::w::Option>::setUp();
+  }
+  auto Options::tearDown() -> void {
+    Palette<::sys::w::Options>::tearDown();
+    Palette<::sys::w::Option>::tearDown();
+  }
+  auto Options::test_flags_universe() -> void {
+    unsigned count = 0;
+    Subjects::Options accumulate = Subjects::Options{};
+    for (auto f : some_flag_series) {
+      CPPUNIT_ASSERT((int) f != 0);
+      accumulate |= f;
+      CPPUNIT_ASSERT((int) accumulate != 0);
+      CPPUNIT_ASSERT((Subjects::Options)f == (f & accumulate));
+      count++;
+    }
+    CPPUNIT_ASSERT(0 < count);
+  }
+  auto Options::test_flags_constants() -> void {
+    Subjects::Options s;
+    s = Subjects::Option::NONE;
+    s = Subjects::Option::CONTINUED;
+    s = Subjects::Option::EXITED;
+    s = Subjects::Option::NOHANG;
+    s = Subjects::Option::NOWAIT;
+    s = Subjects::Option::STOPPED;
+    s = Subjects::Option::UNTRACED;
+    CPPUNIT_ASSERT(Subjects::Option::UNTRACED == s);
+  }
+  auto Options::test_and_ss() -> void {
+    for (auto s : some_flags_series) {
+      Subjects::Options ss = Subjects::Options(s);
+      CPPUNIT_ASSERT(ss == (all_flags & ss));
+      CPPUNIT_ASSERT(ss == (ss & ss));
+    }
+  }
+  auto Options::test_and_s1() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(Subjects::Options(s) == (all_flags & s));
+    }
+  }
+  auto Options::test_and_1s() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(Subjects::Options(s) == (s & all_flags));
+    }
+  }
+  auto Options::test_and_11() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(Subjects::Options(s) == (s & s));
+    }
+  }
+  auto Options::test_and_assign() -> void {
+    for (auto s : some_flags_series) {
+      Subjects::Options ss = all_flags;
+      ss &= s;
+      CPPUNIT_ASSERT(Subjects::Options(s) == ss);
+    }
+  }
+  auto Options::test_decumulate_and_assign() -> void {
+    Subjects::Options decumulator = all_flags;
+    for (auto s : some_flags_series) {
+      decumulator &= ~s;
+    }
+    CPPUNIT_ASSERT(0 == (int)Subjects::Options());
+    CPPUNIT_ASSERT(decumulator == Subjects::Options());
+  }
+  auto Options::test_decumulate_via_rhs() -> void {
+    Subjects::Options decumulator = all_flags;
+    for (auto f : some_flags_series) {
+      decumulator = decumulator & ~f;
+    }
+    CPPUNIT_ASSERT(0 == (int)Subjects::Options());
+    CPPUNIT_ASSERT(decumulator == Subjects::Options());
+  }
+  auto Options::test_or_ss() -> void {
+    for (auto s : some_flags_series) {
+      Subjects::Options ss = Subjects::Options(s);
+      CPPUNIT_ASSERT(all_flags == (all_flags | ss));
+      CPPUNIT_ASSERT(ss == (Subjects::Options() | ss));
+      CPPUNIT_ASSERT(ss == (ss | ss));
+    }
+  }
+  auto Options::test_or_s1() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(all_flags == (all_flags | s));
+      CPPUNIT_ASSERT(Subjects::Options(s) == (Subjects::Options() | s));
+    }
+  }
+  auto Options::test_or_1s() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(all_flags == (s | all_flags));
+      CPPUNIT_ASSERT(Subjects::Options(s) == (s | Subjects::Options()));
+    }
+  }
+  auto Options::test_or_11() -> void {
+    for (auto s : some_flags_series) {
+      CPPUNIT_ASSERT(Subjects::Options(s) == (s | s));
+      CPPUNIT_ASSERT(Subjects::Options(s) == (Subjects::Options() | s));
+      CPPUNIT_ASSERT(Subjects::Options(s) == (s | Subjects::Options()));
+    }
+  }
+  auto Options::test_or_assign() -> void {
+    for (auto s : some_flags_series) {
+      Subjects::Options ss = Subjects::Options();
+      ss |= s;
+      CPPUNIT_ASSERT(Subjects::Options(s) == ss);
+    }
+  }
+  auto Options::test_accumulate_or_assign() -> void {
+    Subjects::Options accumulator = no_flags;
+    for (auto s : some_flags_series) {
+      accumulator |= s;
+    }
+    CPPUNIT_ASSERT(0 != (int)all_flags);
+    CPPUNIT_ASSERT(accumulator == all_flags);
+  }
+  auto Options::test_accumulate_via_rhs() -> void {
+    Subjects::Options accumulator = no_flags;
+    for (auto s : some_flags_series) {
+      accumulator = accumulator | s;
+    }
+    CPPUNIT_ASSERT(0 != (int)all_flags);
+    CPPUNIT_ASSERT(accumulator == all_flags);
+  }
+  auto Options::test_contains() -> void {
+    for (auto s : some_flags_series) {
+      if (Subjects::Options::NONE != s) {
+        CPPUNIT_ASSERT(contains(all_flags, s));
+        CPPUNIT_ASSERT(!contains(no_flags, s));
+        CPPUNIT_ASSERT(!contains(all_flags & ~s, s));
+        CPPUNIT_ASSERT(!contains(no_flags & ~s, s));
+      }
+    }
+  }
+  auto Options::test_flags() -> void {
+    using ::sys::w::as;
+    for (auto item : some_flags_series) {
+      Subjects::Options fs1 = as<Subjects::Options>(item);
+      Subjects::Options fs2 = as<Subjects::Options>(fs1);
+      CPPUNIT_ASSERT(fs2 == fs1);
+      CPPUNIT_ASSERT(as<Subjects::Options>(fs2) == as<Subjects::Options>(fs1));
+    }
+  }
+  auto Options::test_flag() -> void {
+    using ::sys::w::as;
+    for (auto item : some_flag_series) {
+      Subjects::Options fs = as<Subjects::Options>(item);
+      Subjects::Option f = as<Subjects::Option>(item); // <---- test this
+      CPPUNIT_ASSERT(item == f);
+      CPPUNIT_ASSERT(as<Subjects::Option>(fs) == as<Subjects::Option>(f));
+    }
+  }
+}
+#import rigging.suite.io
+auto tests::unit::w::Options::suite() -> cppunit::Test * {
+  using namespace ::rigging::suite;
+  using ::rigging::suite::call; // because namespace tests::unit::call occludes
+  Stream series("Options");
+  series << call("flags_universe", &Options::test_flags_universe)
+         << call("flags_constants", &Options::test_flags_constants)
+         << call("and_ss", &Options::test_and_ss)
+         << call("and_s1", &Options::test_and_s1)
+         << call("and_1s", &Options::test_and_1s)
+         << call("and_11", &Options::test_and_11)
+         << call("and_assign", &Options::test_and_assign)
+         << call("decumulate_and_assign", &Options::test_decumulate_and_assign)
+         << call("decumulate_via_rhs", &Options::test_decumulate_via_rhs)
+         << call("or_ss", &Options::test_or_ss)
+         << call("or_s1", &Options::test_or_s1)
+         << call("or_1s", &Options::test_or_1s)
+         << call("or_11", &Options::test_or_11)
+         << call("or_assign", &Options::test_or_assign)
+         << call("accumulate_or_assign", &Options::test_accumulate_or_assign)
+         << call("accumulate_via_rhs", &Options::test_accumulate_via_rhs)
+         << call("contains", &Options::test_contains)
+         << call("flags", &Options::test_flags)
+         << call("flag", &Options::test_flag)
+         << END;
+  return finalize(series);
+}
+#endiv

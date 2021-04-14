@@ -1,0 +1,217 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenace see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.char_traits
+namespace format::stream {
+  //
+  // It's a "sink" like /dev/null.  So we prevaricate that we wrote it all safely.
+  // It's "vacuous"" like /dev/null.  So we prevaricate that it is zero length, immediately EOF.
+  //
+  // Usage: install this nullbuf as the rdbuf of some stream.
+  // Caveats: the caller still own the object, the ostream does not.
+  //
+  // std::cerr << "hi there";
+  // std::cerr.rdbuf(new Nullbuf<char>());
+  // std::cerr << "shout as loud as you want";
+  // 
+  template<typename CHAR, typename TRAITS = std::char_traits<CHAR>> class Nullbuf;
+}
+#endiv
+#divert <hpp>
+#import std.streambuf
+#import std.streamsize
+
+template<typename CHAR, typename TRAITS> class format::stream::Nullbuf : public std::basic_streambuf<CHAR, TRAITS> {
+  using ancestor = std::basic_streambuf<CHAR, TRAITS>;
+public:
+  Nullbuf() = default;
+  Nullbuf(Nullbuf const &) = delete;
+  auto operator=(Nullbuf const &) -> Nullbuf & = delete;
+
+  // See Langer & Kreft, or [27.5.2.4.5]/3-7.
+  // See http://www.cplusplus.com/reference/streambuf/basic_streambuf/
+  // Else see /usr/include/c++/4.8.3/streambuf 
+
+  // output
+  auto xsputn(typename ancestor::char_type const *, std::streamsize) -> std::streamsize override final;
+  auto overflow(typename ancestor::int_type = typename ancestor::traits_type::eof()) -> typename ancestor::int_type override final;
+
+  // input
+  auto showmanyc() -> std::streamsize override final;
+  auto xsgetn(typename ancestor::char_type *, std::streamsize) -> std::streamsize override final;
+  auto underflow() -> typename ancestor::int_type override final;
+  auto uflow() -> typename ancestor::int_type override final;
+  auto pbackfail(typename ancestor::int_type = ancestor::traits_type::eof()) -> typename ancestor::int_type override final;
+
+  // other
+  // leave in place the default implementations (which do nothing)
+  // imbue(...)
+  // setbuf(...)
+  // seekoff(...)
+  // seekpos(...)
+  // sync(...)
+};
+#endiv
+#divert <tpp>
+#import std.char_traits
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::xsputn(typename ancestor::char_type const *buffer, std::streamsize buffer_size) -> std::streamsize {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/xsgetn/
+  //
+  // Behavior
+  // Its default behavior in basic_streambuf is to [write] n characters, as if calling sputc for each,
+  // stopping if any call would return traits_type::eof(). Except it is unspecified whether member
+  // overflow is called or whether other means are used in case of overflows.  i.e. xsputn can bypass the buffering.
+  //
+  // Return Value
+  // The number of characters written.
+  // streamsize is a signed integral type.
+  //
+  static_assert(std::is_signed<std::streamsize>::value, "not signed");
+  return buffer_size;
+}
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::overflow(typename ancestor::int_type c) -> typename ancestor::int_type {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/overflow/
+  //
+  // Behavior
+  // Put character on overflow
+  // Virtual function called by other member functions to put a character into the
+  // controlled output sequence without changing the current position.
+  // 
+  // It is called by public member functions such as sputc to write a character
+  // when there are no writing positions available at the put pointer (pptr).
+  // 
+  // Its default behavior in basic_streambuf is to always return traits_type::eof() (indicating failure),
+  // but derived classes can override this behavior to attempt to write the character directly and/or
+  // to alter pptr and other internal pointers so that more storage is provided, potentially writing
+  // unwritten characters to the controlled output sequence. Both basic_filebuf and basic_stringbuf
+  // override this virtual member function.
+  //
+  // Return Value
+  // On success, the character put is returned, converted to a value of
+  //             type int_type using member traits_type::to_int_type.
+  // Otherwise, it returns the end-of-file value (traits_type::eof()) either if called with
+  //             this value as argument c or to signal a failure
+  //             (some implementations may throw an exception instead).
+  //
+  // i.e. give it back (whatever it was)
+  return c;
+}
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::showmanyc() -> std::streamsize {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/showmanyc/
+  // 
+  // Behavior
+  // Get the number of characters available
+  // Virtual function (to be read s-how-many-c) called by other member functions
+  // to get an estimate on the number of characters available in the associated input sequence.
+  //
+  // It is called by public member function basic_streambuf::in_avail when there are no read positions
+  // available at the get pointer (gptr).  Its default behavior in basic_streambuf is to always return
+  // zero. basic_filebuf overrides this member function (see basic_filebuf::showmanyc).
+  //
+  // Return Value
+  // Return  Description	Expected behavior for underflow and uflow
+  // ------  -----------        -----------------------------------------
+  // >0      characters known	Successive calls will succeed in retrieving characters
+  //         to be available    until at least as many characters as the value returned have been extracted.
+  //
+  // 0	     no information	Further calls may either retrieve more characters or return traits_type::eof().
+  //
+  // -1      sequence is	Further calls will fail (either throwing or returning "immediately").
+  //         unavailable
+  //
+  return 0;
+}
+
+#import std.is_signed
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::xsgetn(typename ancestor::char_type *s, std::streamsize n) -> std::streamsize {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/xsgetn/
+  // 
+  // Behavior
+  // Get sequence of characters
+  // Retrieves characters from the controlled input sequence and stores them in the array pointed by s,
+  // until either n characters have been extracted or the end of the sequence is reached.
+  // 
+  // Its default behavior in basic_streambuf is equivalent to calling sbumpc n times, stopping if any
+  // call would return traits_type::eof().
+  // This is a virtual member function, and derived classes may provide a more efficient implementation.
+  // In fact, most library implementations override it for basic_filebuf and/or basic_stringbuf.
+  //
+  // Return Value
+  // The number of characters copied.
+  //
+  // streamsize is a signed integral type.
+  static_assert(std::is_signed<std::streamsize>::value, "not signed");
+  return 0;
+}
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::underflow() -> typename ancestor::int_type {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/underflow/
+  //
+  // Behavior
+  // It is called by public member functions such as sgetc to request a new character
+  // when there are no read positions available at the get pointer (gptr).
+  // 
+  // Its default behavior in basic_streambuf is to always return traits_type::eof() (indicating failure),
+  // but derived classes can override this behavior to modify the gptr and egptr internal pointers
+  // in such a way that more characters from the input sequence may be made accessible through the buffer
+  // (if these are available). Both basic_filebuf and basic_stringbuf override this virtual member function.
+  //
+  // Return Value
+  // On success, the value of the character put back, converted to a value of type int_type
+  //             using the member function traits_type::to_int_type.
+  // The function returns the end-of-file value (traits_type::eof()) on failure.
+  //
+  return ancestor::traits_type::eof();
+}
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::uflow() -> typename ancestor::int_type {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/uflow/
+  //
+  // Behavior
+  // Virtual function called by other member functions to get the current character in the
+  // controlled input sequence and then advance the position indicator to the next character.
+  //
+  // It is called by public member functions such as sbumpc to request a new character
+  // when there are no read positions available at the get pointer (gptr).
+  // 
+  // Its default behavior in basic_streambuf is to call member underflow, returning the same value
+  // but advancing the position indicator to point to the next character in case of success.
+  // Derived classes can override this behavior if needed to implement a different behavior.
+  //
+  // Return Value
+  // If the call to underflow returns the end-of-file value (traits_type::eof()),
+  // this function returns the same.
+  //
+  // Otherwise, it returns the character at the current position of the controlled input
+  // sequence, converted to a value of type int_type using member traits_type::to_int_type.
+  //
+  return ancestor::traits_type::eof(); 
+}
+
+template<typename CHAR, typename TRAITS> auto format::stream::Nullbuf<CHAR, TRAITS>::pbackfail(typename ancestor::int_type c) -> typename ancestor::int_type {
+  // Via http://www.cplusplus.com/reference/streambuf/basic_streambuf/pbackfail/
+  //
+  // Behavior
+  // Put a character back on underflow
+  // Virtual function called by other member functions to put a character back into
+  // the controlled input sequence and decrease the position indicator.
+  //
+  // It shall only be called (as public member functions sungetc and sputbackc do) either when
+  // there are no putback positions available at the get pointer (gptr), or when the character
+  // being put back does not match the one in the buffer.
+  // 
+  // Its default behavior in basic_streambuf is to always return traits_type::eof() (indicating failure),
+  // but derived classes can override this behavior to modify the buffer or the gptr and egptr
+  // internal pointers to accommodate for the put-back request, if supported.  Both basic_filebuf and
+  // basic_stringbuf override this virtual member function (see basic_filebuf::pbackfail and basic_stringbuf::pbackfail).
+  // 
+  // Return Value
+  // On success, the value of the character put back, converted to a value of type int_type using member traits_type::to_int_type.
+  // The function returns the end-of-file value (traits_type::eof()) on failure.
+  //
+  return c;
+}
+#endiv

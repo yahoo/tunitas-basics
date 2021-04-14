@@ -1,0 +1,24 @@
+// -*- c++ -*- in the stylings of SCOLD 
+#divert <hpp>
+namespace want {
+  //
+  // Whereas gcc 4.8 is not yet C++11 enough to support constexpr on std::min
+  // we "want" and it ourselves.  Supplying a multi-argument version as well.
+  // The key word here is 'constexpr' which is not available in std::min<...>(...) in gcc 4.8
+  //
+  template<typename TYPE, typename ...TYPES> constexpr inline auto minimum(TYPE, TYPES...) -> TYPE;
+  template<typename TYPE> constexpr inline auto minimum(TYPE, TYPE) -> TYPE;
+}
+#endiv
+#divert <ipp>
+template<typename TYPE, typename ...TYPES> constexpr auto want::minimum(TYPE a, TYPES ...rest) -> TYPE {
+    return minimum(a, minimum(rest...));
+}
+
+// recall: can't name this "min" because of the 3-arg variant of std::min
+// recall: the 3-arg form of std::min(TYPE, TYPE, Compare) 
+template<typename TYPE> constexpr auto want::minimum(TYPE a, TYPE b) -> TYPE {
+    // NOT using std::less; we want 'constexpr' and std::less is not constexpr (yet?)
+    return a < b ? a : b;
+}
+#endiv

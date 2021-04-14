@@ -1,0 +1,54 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import openssl.required.Loadable
+#import openssl.types
+#import openssl.bio.String
+#import std.function
+#import std.string
+namespace openssl::pem::detail {
+  //
+  // Convert from a loadable type into PEM, which can then be stored.
+  //
+  // Usage:
+  //
+  //   auto loadable = ...somehow...    among evp::PKey, x509::Crt, x509::Req
+  //   auto pemmican = to_string(loadable);
+  //
+  template<required::Loadable SOURCE> inline auto write_and_recover(SOURCE const &, std::function<int (bio::String &, SOURCE const &)>) -> std::string;
+}
+#endiv
+#divert <ipp>
+#import openssl.functions
+#import openssl.bio.new_string
+#import openssl.error.Code
+#import std.error_code
+#import std.move
+namespace openssl::pem {
+  template<required::Loadable SOURCE> auto detail::write_and_recover(SOURCE const &source, std::function<int (bio::String &, SOURCE const &)> writer) -> std::string {
+    auto buf = bio::new_string();
+    //
+    // https://www.openssl.org/docs/man1.0.2/man3/PEM_write_bio_X509.html
+    // <quote>The write routines return 1 for success or 0 for failure.</quote>
+    //
+    auto wrote = writer(buf, source);
+    if (!wrote) {
+      throw std::error_code{error::Code::PEM};
+    }
+    std::string ret;
+    ret.resize(BIO_pending(buf.get()));
+    //
+    // https://www.openssl.org/docs/man1.0.2/man3/BIO_read.html
+    // <quote>
+    //   <snip/> return either the amount of data successfully read or written (if the return value is positive) or that no data was successfully read or written if the result is 0 or -1.
+    //    If the return value is -2 then the operation is not implemented in the specific BIO type.
+    // </quote>
+    //
+    auto red = BIO_read(buf.get(), ret.data(), ret.size());
+    if (red <= 0 || ret.size() != std::size_t(red)) {
+      throw std::error_code{error::Code::PEM};
+    }
+    return ret;
+  }
+}
+#endiv

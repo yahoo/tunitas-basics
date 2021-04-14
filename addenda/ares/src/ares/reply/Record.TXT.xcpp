@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import ares.reply.Record.declaration
+namespace ares::reply {
+  //
+  // The TXT RR ([short]) Text)
+  // The (extended) Text is elsewhere, nearby
+  // Comprises a list of such RR.
+  //
+  // Usage:
+  //
+  //   fill = FILL{raw} ..................... in reply::detail::parse(...)
+  //
+  // Construction:
+  //
+  //   Record<TXT> duhfault; ........................... trivial
+  //   Record<TXT> capture{reply_list}; ................ from ares_parse_txt_reply(...)
+  //
+  //
+  template<> class Record<TXT>;
+}
+#endiv
+#divert <hpp>
+#import ares.reply.List
+namespace ares::reply {
+  template<> class Record<TXT> : public List<TXT> {
+    using ancestor = reply::List<TXT>;
+  public:
+    Record() = default;
+    using ancestor::List;
+  };
+}
+#endiv

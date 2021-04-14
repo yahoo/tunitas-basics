@@ -1,0 +1,34 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace nonstd::sysexits {
+  //
+  // Declare that sysexits::Code has a user-defined conversion into TYPE.
+  //
+  // true in Is_Convertible_Into<TYPE>
+  //   enables nonstd::sysexits::Code::operator TYPE() const
+  //   via TYPE::TYPE(nonstd::sysexits::Code)
+  //
+  // Usage:
+  //
+  //    template<> code::Is_Convertible_Into<Some_Type> : public std::true_type { };
+  //
+  //    sysexits::Code code = ...;
+  //    auto Some_Type some_type = code;
+  //
+  template<typename TYPE> struct Is_Convertible_Into;
+  template<> struct Is_Convertible_Into<int signed>;     // because auto main(...) -> int
+  template<> struct Is_Convertible_Into<int unsigned>;   // the values 0..255 are returned
+  template<> struct Is_Convertible_Into<std::uint8_t>;   // because exit(2) returns 8 bits; and Code::Value is this type.
+  template<> struct Is_Convertible_Into<Value>;          // the type-rich flavor of it
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+#import std.false_type
+template<typename TYPE> struct nonstd::sysexits::Is_Convertible_Into : public std::false_type { };
+template<> struct nonstd::sysexits::Is_Convertible_Into<int signed> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Convertible_Into<int unsigned> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Convertible_Into<std::uint8_t> : public std::true_type { };
+template<> struct nonstd::sysexits::Is_Convertible_Into<nonstd::sysexits::Value> : public std::true_type { };
+#endiv

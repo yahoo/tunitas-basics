@@ -1,0 +1,5 @@
+tests_unit_ish_shell_TESTS = \
+  tests/unit/ish/shell/cases.test \
+  tests/unit/ish/shell/basename.test \
+  tests/unit/ish/shell/dirname.test \
+  $(end)
