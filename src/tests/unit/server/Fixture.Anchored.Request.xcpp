@@ -8,12 +8,26 @@
 #endiv
 #divert <hpp>
 #import tunitas.server.service // tunitas::server::service::Request ... [[FIXTHAT]] so we don't have to remember a different name
-class tests::unit::server::Fixture::Request : public tunitas::server::service::Request {
-  using Ancestor = tunitas::server::service::Request;
+#import microhttpd.service.Specification
+#import microhttpd.Service
+class tests::unit::server::fixture::Fixture::Anchored::Request {
+protected:
+  using Managed = library::service::Request;
 public:
-  // Under nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd (see the "+tdd" particle?)
-  // the ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
-  // As such:
-  Request() = default;
+  Request();
+  operator Managed &()             { return contained; }
+  operator Managed const &() const { return contained; }
+protected:
+  microhttpd::Service service;
+  using Specification = microhttpd::service::Specification;
+  Managed contained;
 };
+#endiv
+#divert <cpp>
+namespace tests::unit::server::fixture {
+  Fixture::Anchored::Request::Request()
+    : service{Specification{}}
+    , contained{service, "url://localhost/"}
+  { }
+}
 #endiv

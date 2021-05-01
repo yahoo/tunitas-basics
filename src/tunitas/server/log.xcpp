@@ -3,6 +3,11 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::server::log {
+  // Make the namespace available ahead of its population (for 'using namespace')
+}
+#endiv
 #divert <hpp>
 #import std.ostream
 namespace tunitas::server::log {

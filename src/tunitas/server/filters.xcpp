@@ -3,10 +3,21 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
-#divert <hpp>
+#divert <fpp>
 #import tunitas.server.service
+#import tunitas.server.constants
+#import tunitas.string.literals
+#import microhttpd.http.constants // [[FIXTHIS]] one day use #import tunitas.http.constants
 namespace tunitas::server::filters {
-  using namespace service;
+  using namespace service; // Resource, Request, Response, Transport, render::Builder
+  using namespace constants;
+  using namespace microhttpd::http::constants; // ibidem.
+  using namespace string::literals;
+}
+#endiv
+#divert <hpp>
+#import tunitas.Optional
+namespace tunitas::server::filters {
   //
   // Enforce that there are no query parameters.
   // fill in the response and return code, fill
@@ -20,7 +31,7 @@ namespace tunitas::server::filters {
   //      *fill = new Response{bob}
   //   }
   //
-  inline auto enforce_no_query_parameters(Request const &request, Response *&fill) -> void;
+  inline auto enforce_no_query_parameters(Request const &request, [[out]] Optional<Transport> &fill) -> void;
   //
   // Enforce that the content type is "application/json"
   //
@@ -31,35 +42,34 @@ namespace tunitas::server::filters {
   //      ...compute the success response...
   //   }
   //   
-  inline auto enforce_application_json(Request const &request, Response *&fill) -> void;
+  inline auto enforce_application_json(Request const &request, [[out]] Optional<Transport> &fill) -> void;
 }
 #endiv
 #divert <ipp>
-#import tunitas.server.constants
-#import std.string_literals
-auto tunitas::server::filters::enforce_no_query_parameters(Request const &request, Response *&fill) -> void {
-  using namespace constants;
-  using namespace std::literals;
-  auto const &query = request.get_querystring();
+auto tunitas::server::filters::enforce_no_query_parameters(Request const &request, Optional<Transport> &fill) -> void {
+  auto const &query = request.get_query();
   if (!query.empty()) {
-    auto const &content_body = R"text(query parameters are disallowed here)text"s;
+    auto content_body = R"text(query parameters are disallowed here)text"s;
     auto const code = http::R400_BAD_REQUEST;
     auto const &content_type = mime::TEXT_PLAIN;
-    httpserver::response::Builder bob{content_body, code, content_type};
-    fill = new Response{bob};
+    auto bob = render::Builder{};
+    fill = bob.response(code).content_type(content_type).body(move(content_body)).build();
   }
 }
-#import httpserver.http.utils
-auto tunitas::server::filters::enforce_application_json(Request const &request, Response *&fill) -> void {
-  using namespace constants;
-  using namespace std::literals;
-  auto const &content = request.get_header(httpserver::http::utils::http_header_content_type);
+#import tunitas.string.Storage
+#import microhttpd.http.constants
+auto tunitas::server::filters::enforce_application_json(Request const &request, Optional<Transport> &fill) -> void {
+  auto const &content = [&request]{
+                          // [[FIXTHAT]] the containers require string::Storage, never string::View
+                          auto const FIXTHIS = string::Storage{CONTENT_TYPE.begin(), CONTENT_TYPE.end()};
+                          return request.get_header(FIXTHIS);
+                        }();
   if (content != mime::APPLICATION_JSON) {
-    auto const &content_body = R"text(content-type must be JSON)text"s;
+    auto content_body = R"text(content-type must be JSON)text"s;
     auto const code = http::R400_BAD_REQUEST;
     auto const &content_type = mime::TEXT_PLAIN;
-    httpserver::response::Builder bob{content_body, code, content_type};
-    fill = new Response{bob};
+    auto bob = render::Builder{};
+    fill = bob.response(code).content_type(content_type).body(move(content_body)).build();
   }
 }
 #endiv

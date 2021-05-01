@@ -3,10 +3,16 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
-#divert <hpp>
+#divert <fpp>
 #import tunitas.server.service
+#import tunitas.server.constants
 namespace tunitas::server::responses {
-  using namespace service;
+  using namespace service; // Transport, Response, render::Builder
+  using namespace constants;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::server::responses {
   //
   // Standardized (server) responses
   //
@@ -21,41 +27,32 @@ namespace tunitas::server::responses {
   //     internal_server_error(*fill);
   //   }
   //
-  inline auto internal_server_error(Response *&fill) -> void;
-  inline auto internal_server_error(Response *&fill, std::string const &reason) -> void;
+  inline auto internal_server_error() -> Transport;
+  inline auto internal_server_error(std::string const &reason) -> Transport;
   //
   // There was some problem with the input data
   //
-  inline auto bad_request(Response *&fill) -> void;
-  inline auto bad_request(Response *&fill, std::string const &reason) -> void;
+  inline auto bad_request() -> Transport;
+  inline auto bad_request(std::string const &reason) -> Transport;
 }
 #endiv
 #divert <ipp>
-#import httpserver.response.Builder
-#import std.unique_ptr
-#import tunitas.server.constants
-auto tunitas::server::responses::internal_server_error(Response *&fill) -> void {
-  internal_server_error(fill, "internal server error");
-}
-auto tunitas::server::responses::internal_server_error(Response *&fill, std::string const &reason) -> void {
-  using namespace constants;
-  auto const &content_body = reason;
-  auto const code = http::R500_INTERNAL_SERVER_ERROR;
-  auto const &content_type = mime::TEXT_PLAIN;
-  httpserver::response::Builder bob{content_body, code, content_type};
-  std::unique_ptr<Response> doomed(fill);
-  fill = new Response{bob};
-}
-auto tunitas::server::responses::bad_request(Response *&fill) -> void {
-  bad_request(fill, "bad request");
-}
-auto tunitas::server::responses::bad_request(Response *&fill, std::string const &reason) -> void {
-  using namespace constants;
-  auto const &content_body = reason;
-  auto const code = http::R400_BAD_REQUEST;
-  auto const &content_type = mime::TEXT_PLAIN;
-  httpserver::response::Builder bob{content_body, code, content_type};
-  std::unique_ptr<Response> doomed(fill);
-  fill = new Response{bob};
+namespace tunitas::server {
+  auto responses::internal_server_error() -> Transport { return internal_server_error("internal server error"); }
+  auto responses::internal_server_error(std::string const &reason) -> Transport {
+    auto const &content_body = reason;
+    auto const code = http::R500_INTERNAL_SERVER_ERROR;
+    auto const &content_type = mime::TEXT_PLAIN;
+    auto bob = render::Builder{};
+    return bob.response(code).content_type(content_type).body(move(content_body)).build();
+  }
+  auto responses::bad_request() -> Transport { return bad_request("bad request"); }
+  auto responses::bad_request(std::string const &reason) -> Transport {
+    auto content_body = reason;
+    auto const code = http::R400_BAD_REQUEST;
+    auto const &content_type = mime::TEXT_PLAIN;
+    auto bob = render::Builder{};
+    return bob.response(code).content_type(content_type).body(move(content_body)).build();
+  }
 }
 #endiv

@@ -1,0 +1,11 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Verizon Media
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+obj_src_tunitas_tuple_SUBSOURCES = \
+  obj/src/tunitas/tuple/namespace.cpp \
+  obj/src/tunitas/tuple/Tuple.cpp \
+  obj/src/tunitas/tuple/Size.cpp \
+  obj/src/tunitas/tuple/Element.cpp \
+  $(end)

@@ -7,46 +7,47 @@
 #include <hpp/tests.unit.server.Fixture>
 #endiv
 #divert <hpp>
-#import tunitas.server.service // service::Request            -- FIXTHAT -- make this not so hard to remember
-#import tunitas.server.service // service::Resource<RESOURCE> -- FIXTHAT -- make this not so hard to remember
-#import tunitas.server.service // service::Response           -- FIXTHAT -- make this not so hard to remember
-#import tests.unit.server.Fixture.Resource
-class tests::unit::server::Fixture::Resource : public tunitas::server::service::Resource<Fixture::Resource> {
-  using Ancestor = tunitas::server::service::Resource<Fixture::Resource>; // Is it?  Why: yes, no, maybe so ... the CRTP.
-  using Request = ::tunitas::server::service::Request;
-  using Response = ::tunitas::server::service::Response;
+#import tunitas.server.service // service::Request     -- FIXTHAT -- make this not so hard to remember
+#import tunitas.server.service // service::Resource    -- FIXTHAT -- make this not so hard to remember
+#import tunitas.server.service // service::Transport   -- FIXTHAT -- to transport the semi-prepared response
+#import tunitas.string.View
+#import microhttpd.rest.transfer.Assembler
+#import microhttpd.rest.State
+class tests::unit::server::fixture::Fixture::Resource : public tunitas::server::service::Resource {
+  using Ancestor = library::service::Resource;
+  using Request = library::service::Request;
+  using Transport = library::service::Transport;
 public:
   // Recall that a "resource" in web speak is "a page"
   //
-  // Under nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd (see the "+tdd" particle?)
-  // the ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
+  // whereas the ancestor's constructors are protected rather than private.
+  // This allows us to make a test specimen.
   // As such:
   Resource() = default;
-  // These are virtual functions without the virtual table, and managed by other templates elsewhere
-  // with an obvious backoff strategy implemented by the compiler at constexpr time.  Moderately tricky.
-  //
-  // The desired API using modern reference semantics.
-  auto render(Request const &, Response *&desired) -> void;
-  auto render_GET(Request const &, Response *&desiredl) -> void;
-  auto render_HEAD(Request const &, Response *&desired) -> void;
-  //
-  // The original API as called out from the library
-  auto render(Request const &r, Response **FIXTHIS) -> void { render(r, *FIXTHIS); }
-  auto render_GET(Request const &r, Response **FIXTHIS) -> void { render_GET(r, *FIXTHIS); }
-  auto render_HEAD(Request const &r, Response **FIXTHIS) -> void { render_HEAD(r, *FIXTHIS); }
+  auto otherwise(Request const &) -> Transport override;
+  auto GET(Request const &) -> Transport override;
+  auto HEAD(Request const &) -> Transport override;
+private:
+  inline static const auto RETURNING_A_TRIVIALITY = tunitas::string::View{" a trivial response)\n"};;
+  using Assembler = microhttpd::rest::transfer::Assembler;
+  using Transfer = microhttpd::rest::transfer::Transfer;
+  using State = microhttpd::rest::State;
 };
 #endiv
 #divert <cpp>
 #import std.cerr
-namespace tests::unit::server {
-  auto Fixture::Resource::render(Request const &requested, Response *&referenced) -> void {
-    std::cerr << "render <something> (not assigning a response)\n";
+namespace tests::unit::server::fixture {
+  auto Fixture::Resource::otherwise(Request const &requested) -> Transport {
+    std::cerr << "render <something>" << RETURNING_A_TRIVIALITY;
+    return {State{}, Transfer{Assembler::EMPTY}};
   }
-  auto Fixture::Resource::render_GET(Request const &requested, Response *&referencedl) -> void {
-    std::cerr << "render GET (not assigning a response)\n";
+  auto Fixture::Resource::GET(Request const &requested) -> Transport {
+    std::cerr << "render GET" << RETURNING_A_TRIVIALITY;
+    return {State{}, Transfer{Assembler::EMPTY}};
   }
-  auto Fixture::Resource::render_HEAD(Request const &requested, Response *&referenced) -> void {
-    std::cerr << "render HEAD (not assigning a response)\n";
+  auto Fixture::Resource::HEAD(Request const &requested) -> Transport {
+    std::cerr << "render HEAD" << RETURNING_A_TRIVIALITY;
+    return {State{}, Transfer{Assembler::EMPTY}};
   }
 }
 #endiv

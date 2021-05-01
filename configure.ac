@@ -49,9 +49,10 @@ TF_ENABLE_LIBTOOL_NO_INSTALL
 
 TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])
+TF_WITH_SUBSYSTEM([microhttpd++], [], [Micro HTTPd Server])
 
 # minimize these
-TF_WITH_MODULE([httpserver]) dnl indeed --with-module-httpserver=DIR  but --with-nonstd-libhttpserver=DIR (the extra "lib" prefix)
+TF_WITH_MODULE([ip])
 TF_WITH_MODULE([nonstd])
 TF_WITH_MODULE([options])
 TF_WITH_MODULE([posix])
@@ -65,14 +66,6 @@ TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([cppunit])
 TF_WITH_NONSTD([gcc])
-#
-# [[FIXTHIS]] find a way to detect this at configure time rather than just admonishing for it
-# [[FIXTHIS]] WATCHOUT - you MUST have ... nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd or else the unit tests will not compile
-# [[FIXTHIS]]            the use of ...... nonstd-libhttpserver-devel-2:0.9.0-9.3.ipv6+poll+regex+api is no longer sufficient
-# [[FIXTHIS]]
-# [[FIXTHIS]] instead prefer microhttpd++ which is a ground-up rebuild of a server (service) on (lib)microhttpd
-#
-TF_WITH_NONSTD([libhttpserver]) dnl (from above) the extra "lib" prefix here but not there
 
 TF_WITH_STD([scold])
 TF_WITH_STD([tunitas])
@@ -88,6 +81,11 @@ TF_PROG_DC dnl the S.C.O.L.D. disaggregation compiler
 TF_PROG_GCC dnl the correct enfreshend gcc ... we want the one closest to C++23 ...   gcc11 or gcc12 or gcc13
 TF_CHECK_STD_FILESYSTEM dnl defines @libstd_filesystem@
 TF_CHECK_CPPUNIT dnl defines toolflags of cppunit, @CPPFLAGS_cppunit@, @CXXFLAGS_cppunit@, @LDFLAGS_cppunit@, etc.
+
+dnl [[FIXTHIS,TODO]] move this into a captured macro, e.g. TF_CHECK_PACKAGE([microhttpd++-devel]) ... or such
+dnl Just one (1) of these should be enough to probe that (package) microhttpd++-devel is installed, but just in case.
+dnl this checkes whether libhttpd++devel is installed by probing to see if the "module-as-#include-header" so named exists for compilation
+TF_CHECK_PACKAGES([microhttpd microhttpd.Daemon microhttpd.Render microhttpd.Request microhttpd.Response microhttpd.Router microhttpd.Service], [microhttpd++-devel])
 
 dnl WATCHOUT if AC_OUTPUT is not called (transitively from TF_FINALIZE) then
 dnl you will see the fantastically cryptic error

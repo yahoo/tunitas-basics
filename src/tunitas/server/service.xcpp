@@ -4,13 +4,17 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import httpserver.Request
-#import httpserver.Resource
-#import httpserver.Response
-#import httpserver.response.Builder
+#import microhttpd.Request
+#import microhttpd.Resource
+#import microhttpd.Response
+#import microhttpd.render.Builder
 namespace tunitas::server::service {
   //
   // A namespace package.
+  //
+  // From the documentariat in:
+  //   microhttpd::Resource  ..... a.k.a. microhttpd::resource::Resource
+  //   microhttpd::Transport ..... a.k.a. microhttpd::rest::Transport
   //
   // Usage:
   //
@@ -18,10 +22,13 @@ namespace tunitas::server::service {
   //     using namespace tunitas::server::service;
   //   }
   //
-  using httpserver::Resource; // a template, Resource<Descendant>
-  using httpserver::Request;
-  using httpserver::Response;
-  namespace response = httpserver::response;
+  using microhttpd::Resource;
+  using microhttpd::Request;
+  using microhttpd::Response;
+  using microhttpd::Transport;
+  namespace render {
+    using microhttpd::render::Builder;
+  }
 }
 #endiv
 #divert <cpp>
@@ -29,13 +36,14 @@ namespace tunitas::server::service {
 namespace {
   namespace tests {
     using namespace tunitas::server::service;
-    struct Resourceful : public Resource<Resourceful> {
-      auto render(Request const &, Response **) -> void;
+    struct Resourceful : public microhttpd::Resource {
+      auto otherwise(Request const &) -> Transport;
     };
-    static_assert(sizeof (Resourceful));
+    static_assert(sizeof (Resource));
     static_assert(sizeof (Request));
     static_assert(sizeof (Response));
-    static_assert(sizeof (response::Builder));
+    static_assert(sizeof (Transport));
+    static_assert(sizeof (render::Builder));
   }
 }
 #endiv
