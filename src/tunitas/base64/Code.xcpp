@@ -21,10 +21,10 @@ namespace tunitas::base64 {
 #import std.runtime_error
 #import tunitas.base64.Exception
 class tunitas::base64::Code : public std::runtime_error, public base64::Exception {
-  using ancestor = std::runtime_error;
+  using Ancestor = std::runtime_error;
 public:
-  Code() : ancestor("base64") { }
-  using ancestor::runtime_error;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  Code() : Ancestor("base64") { }
+  using Ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

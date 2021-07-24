@@ -21,10 +21,10 @@ namespace tunitas::base64::encoder {
 #import std.runtime_error
 #import tunitas.base64.Exception
 class tunitas::base64::encoder::Invalid : public std::runtime_error, public base64::Exception {
-  using ancestor = std::runtime_error;
+  using Ancestor = std::runtime_error;
 public:
-  Invalid() : ancestor("invalid") { }
-  using ancestor::runtime_error;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  Invalid() : Ancestor("invalid") { }
+  using Ancestor::runtime_error;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

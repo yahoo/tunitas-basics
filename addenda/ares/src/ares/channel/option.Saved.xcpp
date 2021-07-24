@@ -4,7 +4,7 @@
 namespace ares::channel::option {
   //
   // The saved options (blob and mask)
-  // This is deprecated, as is its ancestor.
+  // This is deprecated, as is its Ancestor.
   //
   // The destructor frees the memory created by Channel::save().
   // As such, an option::Saved can only be created by that interface.
@@ -22,7 +22,7 @@ namespace ares::channel::option {
 #import ares.channel.option.Set
 #forward ares.channel.Channel
 class ares::channel::option::Saved : public Blob {
-  using ancestor = Blob;
+  using Ancestor = Blob;
 public:
   inline Saved();
   Saved(Saved &&) noexcept = default;
@@ -38,11 +38,11 @@ protected:
 #import ares.channel.option.constants
 namespace ares::channel::option {
   Saved::Saved()
-    : ancestor{}
+    : Ancestor{}
     , mask{option::NONE}
   { }
   Saved::Saved(Blob blob, Set mask)
-    : ancestor{std::move(blob)}
+    : Ancestor{std::move(blob)}
     , mask{mask}
   { }
   Saved::~Saved() {

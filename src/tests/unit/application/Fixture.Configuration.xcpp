@@ -9,8 +9,8 @@
 #divert <hpp>
 #import tunitas.application.Configuration
 class tests::unit::application::Fixture::Configuration : public tunitas::application::Configuration {
-  using ancestor = tunitas::application::Configuration;
+  using Ancestor = tunitas::application::Configuration;
 public:
-  using ancestor::Configuration;
+  using Ancestor::Configuration;
 };
 #endiv

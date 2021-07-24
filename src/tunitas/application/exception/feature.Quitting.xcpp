@@ -13,7 +13,7 @@ namespace tunitas::application::exception::feature {
   //
   // Current since 1.9.0.
   //
-  // As usual for this genre, it is set up as an ancestor to the mixin tree,
+  // As usual for this genre, it is set up as an Ancestor to the mixin tree,
   // so that STL exceptions can be mixed in as well.
   //
   // There are other descendants that give a more nuanced sense of the type of text UX quitting

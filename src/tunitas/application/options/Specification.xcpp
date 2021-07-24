@@ -19,7 +19,7 @@ namespace tunitas::application::options {
   //     Specification();
   //   };
   //   my::Specification::Specification()
-  //     : ancestor{"hV"
+  //     : Ancestor{"hV"
   //                {{"help", options::argument::NO, options::indicator::USAGE_SUBCOMMAND},
   //                 {"version", options::argument::NO, options::indicator::VERSION_SUBCOMMAND}}}
   //   { }

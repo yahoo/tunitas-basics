@@ -13,7 +13,7 @@ namespace tunitas::exception::feature {
   // This abstraction does not commit to an outbound message (no ostream).
   // Descendants may provide an outbound message or message stream; e.g.  tunitas::app::exception::feature::Quitting
   //
-  // The abstration is set up to be an ancestor to the mixin tree,
+  // The abstration is set up to be an Ancestor to the mixin tree,
   // so that STL exceptions can be mixed in as well.
   //
   // Instead, depending upon your use case, you may want to use a more committed feature:

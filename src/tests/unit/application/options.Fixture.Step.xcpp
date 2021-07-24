@@ -11,8 +11,8 @@
 #import options.shortish.Step
 #import std.string
 class tests::unit::application::options::Fixture::Step : public ::options::longish::Step {
-  using ancestor = ::options::longish::Step;
-  struct ancestors {
+  using Ancestor = ::options::longish::Step;
+  struct Ancestors {
     using Longish = ::options::longish::Step;
     using Shortish = ::options::shortish::Step;
   };
@@ -29,10 +29,10 @@ protected:
 #divert <cpp>
 #import options.argument.constants
 tests::unit::application::options::Fixture::Step::Step(Code c, Value v)
-  : ancestor{c, c::const_stringz{}, dummy_option_line} // seed with the success case
+  : Ancestor{c, c::const_stringz{}, dummy_option_line} // seed with the success case
   , value{v}
   , dummy_option_line{"force", (int) ::options::argument::REQUIRED, nullptr, (char) Code::CHR_f}
 {
-  this->ancestors::Shortish::value = this->value.data(); // <----- and make the ancestor point to our stored storage
+  this->Ancestors::Shortish::value = this->value.data(); // <----- and make the Ancestor point to our stored storage
 }
 #endiv

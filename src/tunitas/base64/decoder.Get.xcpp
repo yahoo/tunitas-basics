@@ -19,10 +19,10 @@ namespace tunitas::base64::decoder {
 #import std.invalid_argument
 #import tunitas.base64.Exception
 class tunitas::base64::decoder::Get : public std::invalid_argument, public base64::Exception {
-  using ancestor = std::invalid_argument;
+  using Ancestor = std::invalid_argument;
 public:
-  inline Get() : ancestor("get") { }
-  using ancestor::invalid_argument;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  inline Get() : Ancestor("get") { }
+  using Ancestor::invalid_argument;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

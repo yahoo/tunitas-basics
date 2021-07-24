@@ -18,7 +18,7 @@ namespace ares::error {
 #import std.error_condition
 #import std.string
 class ares::error::Category : public std::error_category {
-  using ancestor = std::error_category;
+  using Ancestor = std::error_category;
   friend auto error::category() -> Category const &;
   Category() = default;
 public:

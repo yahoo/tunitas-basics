@@ -12,7 +12,7 @@
 #import tunitas.application.exception.Generic
 #import tunitas.application.exception.Messaging
 class tests::unit::application::Fixture::Messaging : public ::tunitas::application::exception::Generic, public ::tunitas::application::exception::Messaging, public ::std::exception {
-  struct ancestors {
+  struct Ancestors {
     using Exception = ::std::exception;
     using Messaging = ::tunitas::application::exception::Messaging;
     using Generic = ::tunitas::application::exception::Messaging;
@@ -31,8 +31,8 @@ private:
 #import sys.exits.constants
 #import std.cout
 namespace tests::unit::application {
-  Fixture::Messaging::Messaging(std::string const &message) : ancestors::Messaging{format(message)} { }
-  auto Fixture::Messaging::what() const noexcept -> char const *     { return ancestors::Messaging::what(); }
+  Fixture::Messaging::Messaging(std::string const &message) : Ancestors::Messaging{format(message)} { }
+  auto Fixture::Messaging::what() const noexcept -> char const *     { return Ancestors::Messaging::what(); }
   auto Fixture::Messaging::stream() const noexcept -> std::ostream & { return std::cout; }
   auto Fixture::Messaging::code() const noexcept -> sys::exits::Code { return sys::exits::FAIL; }
   auto Fixture::Messaging::exit() const noexcept -> sys::exits::Code { return code(); }

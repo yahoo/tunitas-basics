@@ -19,7 +19,7 @@ namespace tunitas::application {
 #import std.string
 #import want.std.filesystem.path
 class tunitas::application::Program : public std::string {
-  using ancestor = std::string;
+  using Ancestor = std::string;
 public:
   inline explicit Program(char const *);
   inline explicit Program(std::string);
@@ -31,19 +31,19 @@ tunitas::application::Program::Program(char const *word)
   : Program(std::string{word})
 { }
 tunitas::application::Program::Program(std::string path)
-  : ancestor{} {
+  : Ancestor{} {
   auto slash = path.rfind('/');
   if (std::string::npos != slash) {
     if (slash+1 == path.size()) {
-      ancestor::operator=(".");
+      Ancestor::operator=(".");
     } else {
-      ancestor::operator=(path.substr(slash+1));
+      Ancestor::operator=(path.substr(slash+1));
     }
   } else {
-    ancestor::operator=(std::move(path));
+    Ancestor::operator=(std::move(path));
   }
 }
 tunitas::application::Program::Program(std::filesystem::path path)
-  : ancestor{path.filename()} {
+  : Ancestor{path.filename()} {
 }
 #endiv

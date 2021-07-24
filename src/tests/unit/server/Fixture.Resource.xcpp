@@ -19,7 +19,7 @@ public:
   // Recall that a "resource" in web speak is "a page"
   //
   // Under nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd (see the "+tdd" particle?)
-  // the ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
+  // the Ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
   // As such:
   Resource() = default;
   // These are virtual functions without the virtual table, and managed by other templates elsewhere

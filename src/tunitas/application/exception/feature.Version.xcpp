@@ -8,7 +8,7 @@ namespace tunitas::application::exception::feature {
   //
   // The "version message" application exception
   // Descendants only.
-  // Set up as an ancestor to the mixin tree,
+  // Set up as an Ancestor to the mixin tree,
   //     so that STL exceptions can be mixed in as well.
   //
   // Usage:

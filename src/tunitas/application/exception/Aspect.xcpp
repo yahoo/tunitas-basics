@@ -9,7 +9,7 @@ namespace tunitas::application::exception {
   // The aspect of a generic application exception.
   // This is a mixin, hence the name.
   // Descendants only.
-  // It is set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well.
+  // It is set up as an Ancestor to the mixin tree so that STL exceptions can be mixed in as well.
   //
   // You will likely want to  mixin tunitas::exception::Aspect as well.
   // Decision: For reasons of (dis-)ambiguity the Tunitas exception aspects do not cascade,

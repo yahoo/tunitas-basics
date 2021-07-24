@@ -6,20 +6,20 @@
 #divert <fpp>
 namespace tunitas::application {
   //
-  // The ancestor of (all) application configurations
+  // The Ancestor of (all) application configurations
   // Descendants only.
   // Entails te logging the facility.
   //
   // [[DOCUMENT]] the Configuration constructor accepts Program as pass-by-value because ... why?
-  // The Program is copied anyway as it is passed back up into the ancestor.
-  // The ancestor likely has the capability to accept the Args (c::argv) but that is not exposed.
+  // The Program is copied anyway as it is passed back up into the Ancestor.
+  // The Ancestor likely has the capability to accept the Args (c::argv) but that is not exposed.
   //
   // Usage:
   //
   //   class my::Configuration : public tunitas::application::Configuration {
-  //     using ancestor = tunitas::application::Configuration;
+  //     using Ancestor = tunitas::application::Configuration;
   //   public:
-  //     using ancestor::Configuration;
+  //     using Ancestor::Configuration;
   //     ...fields...
   //     std::optional<std::uintmax_t> width;
   //   };
@@ -31,7 +31,7 @@ namespace tunitas::application {
 #import tunitas.application.Program
 #import options.config.Generic
 class tunitas::application::Configuration : public ::options::config::Generic {
-  using ancestor = ::options::config::Generic;
+  using Ancestor = ::options::config::Generic;
 protected:
   ~Configuration() = default;
 public:
@@ -42,7 +42,7 @@ public:
 #endiv
 #divert <ipp>
 tunitas::application::Configuration::Configuration(Program program)
-  : ancestor{::options::Program{program}} // [[FIXTHIS]] duplicate copy by eliding ::options::Program and tunitas::application::Program with a type alias pun
+  : Ancestor{::options::Program{program}} // [[FIXTHIS]] duplicate copy by eliding ::options::Program and tunitas::application::Program with a type alias pun
 { }
 #endiv
 

@@ -20,10 +20,10 @@ namespace tunitas::base64::encoder {
 #import std.invalid_argument
 #import tunitas.base64.Exception
 class tunitas::base64::encoder::Put : public std::invalid_argument, public base64::Exception {
-  using ancestor = std::invalid_argument;
+  using Ancestor = std::invalid_argument;
 public:
-  Put() : ancestor("put") { }
-  using ancestor::invalid_argument;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  Put() : Ancestor("put") { }
+  using Ancestor::invalid_argument;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

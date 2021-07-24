@@ -19,10 +19,10 @@ namespace tunitas::base64::decoder {
 #import std.out_of_range
 #import tunitas.base64.Exception
 class tunitas::base64::decoder::Seek : public std::out_of_range, public base64::Exception {
-  using ancestor = std::out_of_range;
+  using Ancestor = std::out_of_range;
 public:
-  inline Seek() : ancestor("seek") { }
-  using ancestor::out_of_range;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  inline Seek() : Ancestor("seek") { }
+  using Ancestor::out_of_range;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

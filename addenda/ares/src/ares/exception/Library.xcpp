@@ -28,13 +28,13 @@ namespace ares::exception {
 #import re.string
 #import c.const_stringz
 class ares::exception::Library : public Aspect, public std::system_error {
-  struct ancestors {
+  struct Ancestors {
     using Aspect = ares::exception::Aspect;
     using Exception = std::system_error;
   };
 public:
   Library() = default;
-  // DO NOT ---> using ancestor::system_error; <--- DO NOT (it does not initialize the vtable)
+  // DO NOT ---> using Ancestor::system_error; <--- DO NOT (it does not initialize the vtable)
   inline explicit Library(std::error_code);
   inline Library(std::error_code, re::string<c::const_stringz> reason);
   explicit inline Library(error::Code);
@@ -45,20 +45,20 @@ public:
 #divert <ipp>
 namespace ares::exception {
   Library::Library(std::error_code ec)
-    : ancestors::Exception{ec}
+    : Ancestors::Exception{ec}
   { }
   Library::Library(std::error_code ec, re::string<c::const_stringz> reason)
-    : ancestors::Exception{ec, reason.c_str()}
+    : Ancestors::Exception{ec, reason.c_str()}
   { }
   Library::Library(error::Code ec)
-    : ancestors::Exception{ec}
+    : Ancestors::Exception{ec}
   { }
   Library::Library(error::Code ec, re::string<c::const_stringz> reason)
-    : ancestors::Exception{ec, reason.c_str()}
+    : Ancestors::Exception{ec, reason.c_str()}
   { }
 }
 #divert <cpp>
 auto ares::exception::Library::what() const noexcept -> char const * {
-  return ancestors::Exception::what();
+  return Ancestors::Exception::what();
 }
 #endiv
