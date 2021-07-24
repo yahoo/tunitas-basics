@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-scarpet/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/services/scarpet/tree/LICENSE
+#divert <fpp>
+#import tunitas.application.options.exception
+namespace tests::unit::application::options::exception {
+  namespace [[eponymous]] fixture {
+    struct Fixture;
+    namespace library = ::tunitas::application::options::exception;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+struct tests::unit::application::options::exception::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_Unspecified() -> void;
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
+#divert <cpp>
+#import tunitas.application.options.exception.Unspecified
+namespace tests::unit::application::options::exception::fixture {
+  auto Fixture::test_Unspecified() -> void {
+    auto subject = library::Unspecified{"a.out"};
+    subject.stream() << subject.what() << '\n';
+    CPPUNIT_ASSERT(!good(subject.exit()));
+    CPPUNIT_ASSERT(sizeof (subject.what()));
+    CPPUNIT_ASSERT(sizeof (subject.stream()));
+    CPPUNIT_ASSERT(sizeof (subject.exit()));
+    CPPUNIT_ASSERT(sizeof (subject.code()));
+  }
+  auto Fixture::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    auto series = Stream{"exception"};
+    series << call("Unspecified", &Fixture::test_Unspecified)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

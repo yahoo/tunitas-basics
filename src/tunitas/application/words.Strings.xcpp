@@ -1,0 +1,29 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.deque
+#import std.string
+namespace tunitas::application::words {
+  //
+  // The (string) words to the program
+  // The "words" are the non-option inputs to the program.
+  // The intent of these is that they are the names of things.
+  // If you want to have filename (filepath) words then use words::Filepath
+  //
+  // Concept:
+  //
+  //    a.out [...options...] [...words...]
+  //
+  // Usage:
+  //
+  //   auto prog = Program{argv[0]};
+  //   auto parser = options::Parser{cfg, specification}
+  //   auto parsed = parser.parse(options::Args{argc, argv});
+  //   words::Strings remainder = value(parsed);
+  //
+  using Strings = std::deque<std::string>;
+}
+#endiv

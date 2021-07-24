@@ -1,0 +1,44 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::application::options { class Specification; }
+#endiv
+#divert <hpp>
+struct tests::unit::application::options::Specification : public cppunit::test::Fixture {
+  auto test_constructor() -> void;
+  auto test_longish() -> void;
+  auto test_shortish() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct [[nodiscard]] Simple;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.application.options.Specification.Simple
+namespace tests::unit::application::options {
+  auto Specification::test_constructor() -> void {
+    Simple spec; // <-------- it constructed (see the constructor definition)
+    CPPUNIT_ASSERT(true);
+  }
+  auto Specification::test_longish() -> void {
+    Simple spec;
+    CPPUNIT_ASSERT(0 != spec.longish().size());
+  }
+  auto Specification::test_shortish() -> void {
+    Simple spec;
+    CPPUNIT_ASSERT(0 != spec.shortish().size());
+  }
+  auto Specification::suite() -> cppunit::Test * {
+    using namespace rigging::suite;
+    auto series = Stream{"Specification"};
+    series << call("constructor", &Specification::test_constructor)
+           << call("longish", &Specification::test_longish)
+           << call("shortish", &Specification::test_shortish)
+           << END;
+    return finalize(series);
+  }
+}
+#endiv

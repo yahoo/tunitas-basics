@@ -1,0 +1,87 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::application { class Drop; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::application::Drop : public cppunit::test::Fixture {
+public:
+  auto test_nouser() -> void;
+  auto test_still_privileged() -> void;
+  auto test_unable_to_seteuid() -> void;
+  auto test_success() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  struct Configuration;
+  struct Quitting;
+};
+#import tests.unit.application.Drop.Configuration
+#import tests.unit.application.Drop.Quitting
+#endiv
+#divert <cpp>
+#import std.move
+#import std.literals
+using namespace std::literals;
+#import tunitas.application.Program
+#import tests.unit.application.Drop.Configuration
+#import tunitas.application.Program
+#import tunitas.application.exception.Generic
+#import tunitas.application.drop
+auto tests::unit::application::Drop::test_nouser() -> void {
+  try {
+    ::tunitas::application::Program prog{"a.out"};
+    Configuration cfg{prog};
+    ::tunitas::application::drop<Quitting>(cfg, "NO-SUCH-USER");
+    CPPUNIT_ASSERT(false);
+  } catch (tunitas::application::exception::Generic const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::application::Drop::test_still_privileged() -> void {
+  try {
+    ::tunitas::application::Program prog{"a.out"};
+    Configuration cfg{prog};
+    ::tunitas::application::drop<Quitting>(cfg, "root"); // you can't drop privileges to "root"
+    CPPUNIT_ASSERT(false);
+  } catch (tunitas::application::exception::Generic const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#import geteuid
+auto tests::unit::application::Drop::test_unable_to_seteuid() -> void {
+  try {
+    ::tunitas::application::Program prog{"a.out"};
+    Configuration cfg{prog};
+    // This will throw because you are not root and you can't "drop" privileges to nobody
+    CPPUNIT_ASSERT(0 != geteuid());
+    ::tunitas::application::drop<Quitting>(cfg, "nobody");
+    CPPUNIT_ASSERT(false);
+  } catch (tunitas::application::exception::Generic const &) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+auto tests::unit::application::Drop::test_success() -> void {
+  // Because you are not foolish enough to run the build and unit tests as root.
+  // You are not that foolish, are you? Are You? ARE YOU?
+  // There is no way to test success in this test rig.
+  CPPUNIT_ASSERT(0 != geteuid());
+}
+#import unit.rigging.suite.Stream
+#import unit.rigging.suite.call
+#import unit.rigging.suite.add
+auto tests::unit::application::Drop::suite() -> cppunit::Test * {
+  using namespace ::unit::rigging::suite;
+  Stream series("drop");
+  series << call("nouser", &Drop::test_nouser)
+	 << call("still_privileged", &Drop::test_still_privileged)
+	 << call("unable_to_seteuid", &Drop::test_unable_to_seteuid)
+	 << call("success", &Drop::test_success)
+    ;
+  return series.release();
+}
+#endiv

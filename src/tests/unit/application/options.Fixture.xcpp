@@ -1,0 +1,193 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+#import tunitas.application.options
+namespace tests::unit::application::options {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::tunitas::application::options;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import std.string
+struct tests::unit::application::options::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_Args() -> void;
+  auto test_c_Args() -> void;
+  auto test_get_filepath_good() -> void;
+  auto test_get_filepath_bad() -> void;
+  auto test_get_identifier_good() -> void;
+  auto test_get_identifier_bad() -> void;
+  auto test_get_port_good() -> void;
+  auto test_get_port_bad() -> void;
+  auto test_get_word_good() -> void;
+  auto test_get_word_bad() -> void;
+  static auto suite() -> cppunit::Test *;
+protected:
+  auto prove_quitting() -> void;
+  using Program = std::string;
+  class Configuration;
+  class Quitting;
+  class Step;
+};
+#import tests.unit.application.options.Fixture.Configuration
+#import tests.unit.application.options.Fixture.Step
+#import tests.unit.application.options.Fixture.Quitting
+#endiv
+#divert <cpp>
+#import std.move
+#import std.literals
+#import tunitas.application.options.get_filepath
+auto tests::unit::application::options::fixture::Fixture::prove_quitting() -> void {
+  // doesn't matter if this is ever called
+  Quitting quitting{"a.out", sys::exits::OK};
+  ::tunitas::exception::Aspect const &teA{quitting};
+  ::tunitas::application::exception::Aspect const &taeA{quitting};
+  CPPUNIT_ASSERT(teA.what() == taeA.what());
+}
+#import tunitas.application.options.Args
+auto tests::unit::application::options::fixture::Fixture::test_Args() -> void {
+  using Subject = library::Args; // yup, it is deprecating
+  char _[] = "a.out";
+  char a[] = "apple";
+  char b[] = "banana";
+  char c[] = "cherry";
+  char *v[] = { _, a, b, c, nullptr };
+  auto n = sizeof (v)/sizeof (v[0]) - 1;
+  Subject args{n, v};
+  CPPUNIT_ASSERT_EQUAL(4lu, args.size());
+}
+#import tunitas.application.options.c.Args
+auto tests::unit::application::options::fixture::Fixture::test_c_Args() -> void {
+  using Subject = library::c::Args; // PREFER this one
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_filepath_good() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "./o.file.out"};
+  prove_quitting();
+  auto filepath = library::get_filepath<Quitting>(cfg, step);
+  CPPUNIT_ASSERT("./o.file.out" == filepath);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(false);
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_filepath_bad() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, ""}; // <------------------------ the only bad filepath is an empty filepath
+  library::get_filepath<Quitting>(cfg, step);
+  CPPUNIT_ASSERT(false);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true);
+}
+#import tunitas.application.options.get_identifier
+auto tests::unit::application::options::fixture::Fixture::test_get_identifier_good() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "cherry123"};
+  auto identifier = library::get_identifier<Quitting>(cfg, step);
+  CPPUNIT_ASSERT("cherry123" == identifier);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(false);
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_identifier_bad() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "!@#$%"}; // <------------------------ there are many bad identifiers
+  library::get_identifier<Quitting>(cfg, step);
+  CPPUNIT_ASSERT(false);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true);
+}
+#import tunitas.application.options.get_port
+auto tests::unit::application::options::fixture::Fixture::test_get_port_good() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "8080"};
+  auto port = library::get_port<Quitting>(cfg, step);
+  CPPUNIT_ASSERT(8080u == port);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(false);
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_port_bad() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "apple"};
+  library::get_port<Quitting>(cfg, step);
+  CPPUNIT_ASSERT(false);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true);
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_word_good() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, "bird"};
+  auto word = library::get_word<Quitting>(cfg, step);
+  CPPUNIT_ASSERT("bird" == word);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(false);
+}
+auto tests::unit::application::options::fixture::Fixture::test_get_word_bad() -> void try {
+  Configuration cfg;
+  Step step{Step::Code::CHR_f, ""}; // <------------------------ the only bad word is an empty word
+  library::get_word<Quitting>(cfg, step);
+  CPPUNIT_ASSERT(false);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true);
+}
+#import tests.unit.application.options.exception.Fixture
+#import tests.unit.application.options.Specification
+auto tests::unit::application::options::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"options"};
+  series << []() {
+              auto dots = Stream{"...args..."};
+              dots << call("Args", &Fixture::test_Args)
+                   << []() {
+                        auto see = Stream{"c"};
+                        see << call("Args", &Fixture::test_c_Args)
+                            << END;
+                        return move(see);
+                      }()
+                   << END;
+              return move(dots);
+            }()
+         << []() {
+              auto get = Stream{"get_filepath"};
+              get << call("good", &Fixture::test_get_filepath_good)
+                  << call("bad", &Fixture::test_get_filepath_bad)
+                  << END;
+              return move(get);
+            }()
+         << []() {
+              auto get = Stream{"get_identifier"};
+              get << call("good", &Fixture::test_get_identifier_good)
+                  << call("bad", &Fixture::test_get_identifier_bad)
+                  << END;
+              return move(get);
+            }()
+         << []() {
+              auto get = Stream{"get_port"};
+              get << call("good", &Fixture::test_get_port_good)
+                  << call("bad", &Fixture::test_get_port_bad)
+                  << END;
+              return move(get);
+            }()
+         << []() {
+              auto get = Stream{"get_word"};
+              get << call("good", &Fixture::test_get_word_good)
+                  << call("bad", &Fixture::test_get_word_bad)
+                  << END;
+              return move(get);
+            }()
+         << add<Specification>()
+         << []{
+              auto exc = Stream{"exception"};
+              exc << add<exception::Fixture>()
+                  << END;
+              return move(exc);
+            }()
+         << END;
+  return finalize(series);
+}
+#endiv

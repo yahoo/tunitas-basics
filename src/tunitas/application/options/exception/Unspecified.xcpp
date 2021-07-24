@@ -1,0 +1,93 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::exception {
+  //
+  // The "options are unspecified" exception.
+  //
+  // Specification:
+  //
+  //   This is signals a programmer's error (that would be you; you misconfigured [miscoded] the options parser).
+  //   It's basically an "unreachable" error; which is a "logic error"
+  //   This problem occurs at a specific point in the code.
+  //
+  // Design:
+  //
+  //   use std::source_location.
+  //   use std::source_location::current() as the implicit argument at the call site.
+  //
+  // Usage:
+  //
+  //   switch (...) {
+  //     ..
+  //     ... other cases ...
+  //     ..
+  //   case oi::MISSING:
+  //     ..."missing value" processing...
+  //     break;
+  //   case oi::UNKNOWN:
+  //     ..."unknown option" processing...
+  //     break;
+  //   default:
+  //     throw tunitas::application::options::exception::Unspecified{};
+  //   }
+  //
+  class [[nodiscard]] Unspecified;
+}
+#endiv
+#divert <hpp>
+#import nonstd.exception.Unreachable
+#import std.source_location
+#import tunitas.exception.Aspect
+#import tunitas.application.exception.Aspect
+#import tunitas.application.options.exception.Aspect
+#import tunitas.application.exception.feature.Quitting
+#import tunitas.application.exits.constants
+class tunitas::application::options::exception::Unspecified final : public tunitas::application::exception::feature::Quitting,
+                                                            public options::exception::Aspect,
+                                                            public application::exception::Aspect,
+                                                            public tunitas::exception::Aspect,
+                                                            public nonstd::exception::Unreachable {
+  struct Ancestors {
+    struct Features {
+      // [[FIXTHIS]] this should be an pure feature (a pure abstract class)
+      // ... all the implementation (of features) are already within nonstd::exception::Unspecified
+      using Quitting = application::exception::feature::Quitting;
+    };
+    using Exception = nonstd::exception::Unreachable;
+  };
+public:
+  //
+  // The magic happens here with the optional location argument.
+  // When the location is not supplied, the location is established at the call site.  Magic!
+  //
+  inline explicit Unspecified(std::string const &NAME, std::source_location = std::source_location::current());
+  auto what() const noexcept -> Results::What override;
+  auto stream() const noexcept -> Results::Stream override final;
+  auto exit() const noexcept -> Results::Exit override final;
+  auto code() const noexcept -> Results::Exit override final;
+private:
+  // By definition it this is an "internal software error" ... i.e. caused by the programmer
+  inline static auto EXIT = exits::SOFTWARE;
+};
+#endiv
+#divert <ipp>
+namespace tunitas::application::options::exception {
+  Unspecified::Unspecified(std::string const &NAME, std::source_location location)
+    : Ancestors::Features::Quitting{EXIT}
+      // NAME is unused
+    , Ancestors::Exception{location}
+  { }
+}
+#endiv
+#divert <cpp>
+namespace tunitas::application::options::exception {
+  auto Unspecified::what() const noexcept -> Results::What     { return Ancestors::Exception::what(); }
+  auto Unspecified::stream() const noexcept -> Results::Stream { return Ancestors::Features::Quitting::stream(); }
+  auto Unspecified::code() const noexcept -> Results::Exit     { return Ancestors::Features::Quitting::code(); }
+  auto Unspecified::exit() const noexcept -> Results::Exit     { return Ancestors::Features::Quitting::code(); }
+}
+#endiv

@@ -3,11 +3,11 @@
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
-
+#
 check_bin_unit = check/bin/unit
 check_bin_unit_LDADD = \
   $(lib_libtunitas_server_la) \
-  $(lib_libtunitas_app_la) \
+  $(lib_libtunitas_application_la) \
   $(lib_libtunitas_la) \
   $(lib_libwant_la) \
   -lrigging-bench-module \
@@ -25,90 +25,34 @@ check_bin_unit_SOURCES = \
   obj/src/tests/unit/main.cpp \
   obj/src/tests/unit/namespace.cpp \
   obj/src/tests/unit/UNREACHABLE.cpp \
-  \
-  obj/src/tests/unit/for_each/namespace.cpp \
-  obj/src/tests/unit/for_each/Counter.cpp \
-  obj/src/tests/unit/for_each/counter.Iterator.cpp \
-  obj/src/tests/unit/for_each/count.cpp \
-  \
-  obj/src/tests/unit/app/namespace.cpp \
-  obj/src/tests/unit/app/exception.compatibility.cpp \
-  obj/src/tests/unit/app/Fixture.cpp \
-  obj/src/tests/unit/app/Fixture.Configuration.cpp \
-  obj/src/tests/unit/app/Fixture.Messaging.cpp \
-  obj/src/tests/unit/app/Fixture.Quitting.cpp \
-  obj/src/tests/unit/app/Fixture.Specification.cpp \
-  obj/src/tests/unit/app/Fixture.Usage.cpp \
-  obj/src/tests/unit/app/Fixture.Version.cpp \
-  obj/src/tests/unit/app/Pidfile.cpp \
-  obj/src/tests/unit/app/Pidfile.guardian.Unlinker.cpp \
-  obj/src/tests/unit/app/Drop.cpp \
-  obj/src/tests/unit/app/Drop.Configuration.cpp \
-  obj/src/tests/unit/app/Drop.Quitting.cpp \
-  \
-  obj/src/tests/unit/app/options.Fixture.cpp \
-  obj/src/tests/unit/app/options.Fixture.Configuration.cpp \
-  obj/src/tests/unit/app/options.Fixture.Quitting.cpp \
-  obj/src/tests/unit/app/options.Fixture.Step.cpp \
-  \
-  obj/src/tests/unit/base64/namespace.cpp \
-  obj/src/tests/unit/base64/Fixture.cpp \
-  obj/src/tests/unit/base64/Roundtrip.cpp \
-  obj/src/tests/unit/base64/Encode.cpp \
-  obj/src/tests/unit/base64/Decode.cpp \
-  obj/src/tests/unit/base64/printable.cpp \
-  obj/src/tests/unit/base64/printability.Formatter.cpp \
-  obj/src/tests/unit/base64/decoder/namespace.cpp \
-  obj/src/tests/unit/base64/decoder/Fixture.cpp \
-  obj/src/tests/unit/base64/encoder/namespace.cpp \
-  obj/src/tests/unit/base64/encoder/Fixture.cpp \
-  obj/src/tests/unit/base64/exception/namespace.cpp \
-  obj/src/tests/unit/base64/exception/Fixture.cpp \
-  \
-  obj/src/tests/unit/exception/namespace.cpp \
-  obj/src/tests/unit/exception/Fixture.cpp \
-  obj/src/tests/unit/exception/Fixture.Message.cpp \
-  obj/src/tests/unit/exception/Fixture.Quitting.cpp \
-  obj/src/tests/unit/exception/Fixture.Aspic.cpp \
-  obj/src/tests/unit/exception/Fixture.Balsam.cpp \
-  obj/src/tests/unit/exception/my.Quitting.cpp \
-  obj/src/tests/unit/exception/my.Message.cpp \
-  obj/src/tests/unit/exception/compatibility.cpp \
-  \
+  $(obj_src_tests_unit_application_SUBSOURCES) \
+  $(obj_src_tests_unit_base64_SUBSOURCES) \
+  $(obj_src_tests_unit_exception_SUBSOURCES) \
   obj/src/tests/unit/exits.Fixture.cpp \
-  \
+  $(obj_src_tests_unit_for_each_SUBSOURCES) \
   obj/src/tests/unit/outcome.Fixture.cpp \
   obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   obj/src/tests/unit/outcome.Usage.cpp \
-  \
   obj/src/tests/unit/required.Fixture.cpp \
-  \
-  obj/src/tests/unit/server/namespace.cpp \
-  obj/src/tests/unit/server/Fixture.cpp \
-  obj/src/tests/unit/server/Fixture.Deleter.cpp \
-  obj/src/tests/unit/server/Fixture.Request.cpp \
-  obj/src/tests/unit/server/Fixture.Resource.cpp \
-  obj/src/tests/unit/server/Fixture.exception.Example.cpp \
-  obj/src/tests/unit/server/exception/namespace.cpp \
-  obj/src/tests/unit/server/exception/Fixture.cpp \
-  obj/src/tests/unit/server/exception/Fixture.Simple.cpp \
-  obj/src/tests/unit/server/exception/my.Problem.cpp \
-  obj/src/tests/unit/server/exception/my.Difficulty.cpp \
-  \
+  $(obj_src_tests_unit_server_SUBSOURCES) \
   obj/src/tests/unit/time.Fixture.cpp \
   obj/src/tests/unit/time.literals.Fixture.cpp \
   obj/src/tests/unit/time.duration.Fixture.cpp \
   obj/src/tests/unit/time.ratio.Fixture.cpp \
-  \
   obj/src/tests/unit/tunitas.Fixture.cpp \
-  \
   obj/src/tests/unit/urlsafe.Fixture.cpp \
-  \
   obj/src/tests/unit/want.Fixture.cpp \
   obj/src/tests/unit/want.nonstd.Fixture.cpp \
   obj/src/tests/unit/want.sys.Fixture.cpp \
   obj/src/tests/unit/want.sys.posix.Fixture.cpp \
   $(end)
+#
+include src/tests/unit/application/Makefrag.am
+include src/tests/unit/base64/Makefrag.am
+include src/tests/unit/exception/Makefrag.am
+include src/tests/unit/for_each/Makefrag.am
+include src/tests/unit/server/Makefrag.am
+#
 $(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
 $(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
 	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)

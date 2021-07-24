@@ -43,15 +43,6 @@ INSTALLATION_AREAS = \
 
 default: all
 
-# install rules from @temerarious_flagship_datadir@/am/install.am
-module_BB_SOURCE_SET = \
-  $(lib_libtunitas_app_la_SOURCES) \
-  $(lib_libtunitas_server_la_SOURCES) \
-  $(lib_libtunitas_la_SOURCES) \
- $(lib_libwant_la_SOURCES) \
-  $(end)
-$(if $(DEBUGGING_CONDITION),$(info DEBUG module_SOURCE_SET=$(module_BB_SOURCE_SET)))
-
 .PHONY: clean-local mostlyclean-local distclean-local
 clean-local mostlyclean-local distclean-local::
 clean-dependencies::
@@ -75,6 +66,7 @@ sys_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module
 
 include src/tunitas/Makefrag.am
 include src/tunitas/app/Makefrag.am
+include src/tunitas/application/Makefrag.am
 include src/tunitas/server/Makefrag.am
 include src/want/Makefrag.am
 include src/tests/unit/Makefrag.am
@@ -82,13 +74,25 @@ include src/tests/base64/Makefrag.am
 include src/tests/outcome/Makefrag.am
 include src/tests/urlsafe/Makefrag.am
 
-$(lib_libtunitas_app_la) : $(lib_libtunitas_la) 
-$(lib_libtunitas_server_la) : $(lib_libtunitas_la) 
+# install rules from @temerarious_flagship_datadir@/am/install.am
+INSTALL_MODULES = \
+  $(lib_libtunitas_application_la_MODULES) \
+  $(lib_libtunitas_server_la_MODULES) \
+  $(lib_libtunitas_la_MODULES) \
+ $(lib_libwant_la_MODULES) \
+  $(end)
+$(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
 
+# Whereas automake already takes care of this dependency (except in the lib_LTLIBRARIES installation ordering)
+# NO NEED ---> $(lib_libtunitas_application_la) : $(lib_libtunitas_la) 
+# NO NEED ---> $(lib_libtunitas_server_la) : $(lib_libtunitas_la) 
+
+# WATCHOUT - the lib_LTLIBRARIES list MUST be in this order so that upon install the final link establishes the dependencies
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
   $(lib_libtunitas_la) \
   $(lib_libtunitas_app_la) \
+  $(lib_libtunitas_application_la) \
   $(lib_libtunitas_server_la) \
   $(end)
 noinst_LTLIBRARIES = \
@@ -108,14 +112,6 @@ check_LTLIBRARIES = \
   $(check_lib_libtests_outcome_la) \
   $(check_lib_libtests_urlsafe_la) \
   $(end)
-
-$(lib_libtunitas_server_la) : $(lib_libtunitas_la)
-
-$(bin_PROGRAMS) : $(lib_LTLIBRARIES)
-$(lib_LTLIBRARIES) : $(noinst_LTLIBRARIES)
-$(check_PROGRAMS) : $(bin_PROGRAMS)
-$(check_PROGRAMS) : $(lib_LTLIBRARIES)
-$(check_PROGRAMS) : $(check_LTLIBRARIES)
 
 include tests/unit/Makefrag.am
 include tests/base64/decode/Makefrag.am
@@ -159,15 +155,15 @@ include $(if $(filter 1,$(hypogeal_twilight_toolflags_mk_included)), /dev/null, 
 
 # configure.ac: TF_ENABLE_GCC enables these @-variables
 Makefile_COMPILER_CPPFLAGS_SET =                @CPPFLAGS_gcc@
-Makefile_COMPILER_CFLAGS_SET   = @CFLAGS_gdb@   @CFLAGS_gcc@
+Makefile_COMPILER_CFLAGS_SET   =   @CFLAGS_gdb@   @CFLAGS_gcc@
 Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gdb@ @CXXFLAGS_gcc@ -Wno-attributes
-Makefile_COMPILER_LDFLAGS_SET  = @LDFLAGS_gdb@  @LDFLAGS_gcc@  @libstd_filesystem@
+Makefile_COMPILER_LDFLAGS_SET  =  @LDFLAGS_gdb@  @LDFLAGS_gcc@  @libstd_filesystem@
 
 # configure.ac: TF_WITH_NONSTD([nonstd-libhttpserver])
 Makefile_nonstd_CPPFLAGS_SET = @nonstd_libhttpserver_CPPFLAGS@
-Makefile_nonstd_CFLAGS_SET   = @nonstd_libhttpserver_CFLAGS@
+Makefile_nonstd_CFLAGS_SET   =   @nonstd_libhttpserver_CFLAGS@
 Makefile_nonstd_CXXLAGS_SET  = @nonstd_libhttpserver_CXXFLAGS@
-Makefile_nonstd_LDFLAGS_SET  = @nonstd_libhttpserver_LDFLAGS@
+Makefile_nonstd_LDFLAGS_SET  =  @nonstd_libhttpserver_LDFLAGS@
 
 # extras not otherwise covered by the TF_WITH_MODULE([...]) declarations
 Makefile_PACKAGE_CPPFLAGS_SET = 

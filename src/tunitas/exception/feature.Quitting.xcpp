@@ -72,7 +72,8 @@ protected:
   inline Quitting();
 public:
   virtual auto what() const noexcept -> char const * = 0;
-  virtual auto code() const noexcept -> sys::exits::Code;
+  [[deprecating_soon("instead prefer auto Quitting::exit() -> Code")]] virtual auto code() const noexcept -> sys::exits::Code;
+  virtual auto exit() const noexcept -> sys::exits::Code;
 protected:
   sys::exits::Code offending_code;
 };
@@ -90,8 +91,8 @@ namespace tunitas::exception::feature {
 #endiv
 #divert <cpp>
 namespace tunitas::exception::feature {
-  auto Quitting::code() const noexcept -> sys::exits::Code {
-    return offending_code;
-  }
+  // DO NOT define code() in terms of exit() or vice vera ... that will cause \infinite recursion in the descendants
+  auto Quitting::code() const noexcept -> sys::exits::Code { return offending_code; }
+  auto Quitting::exit() const noexcept -> sys::exits::Code { return offending_code; }
 }
 #endiv

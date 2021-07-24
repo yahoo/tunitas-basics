@@ -4,12 +4,21 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import tunitas.app.required.exception.Quitting
-namespace tunitas::required::exception::app {
-  //
-  // Whereas there was a general name rationalization in tunitas-basics >= 1.9.0
-  // compatibility is provided for old code that still uses the old organization.
-  //
-  using tunitas::app::required::exception::Quitting;
+#warning [[deprecated]] instead prefer #import tunitas.application.required.exception.Quitting
+#import tunitas.application.required.exception.Quitting
+namespace tunitas::required::exception {
+  namespace [[deprecated("instead reference as namespace tunitas::application::required::exception")]] app {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    //
+    // Whereas there was a general name rationalization in tunitas-basics >= 1.9.0,
+    // compatibility is provided herein for old code that still uses the old organization.
+    // As such, this name reference, and especially namspace app is deprecated
+    //
+    // [[FIXTHIS]] Even late as C++23, it is not possible to declare a concept as [[deprecated]] ... Oopsies.  They forgot.  Maybe C++26?
+    // [[deprecated("instead reference as tunitas::application::required::exception::Quitting")]] 
+    template<typename QUITTING> concept bool Quitting = tunitas::application::required::exception::Quitting<QUITTING>;
+#pragma GCC diagnostic pop
+  }
 }
 #endiv

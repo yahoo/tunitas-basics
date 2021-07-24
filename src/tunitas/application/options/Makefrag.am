@@ -1,0 +1,26 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright 2018, 2019, Oath Inc.; Copyright 2020, Verizon Media
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+obj_src_tunitas_application_options_SUBSOURCES = \
+  obj/src/tunitas/application/options/namespace.cpp \
+  obj/src/tunitas/application/options/Args.cpp \
+  obj/src/tunitas/application/options/c.Args.cpp \
+  obj/src/tunitas/application/options/Specification.cpp \
+  obj/src/tunitas/application/options/get_filepath.cpp \
+  obj/src/tunitas/application/options/get_identifier.cpp \
+  obj/src/tunitas/application/options/get_port.cpp \
+  obj/src/tunitas/application/options/get_word.cpp \
+  \
+  obj/src/tunitas/application/options/argument/namespace.cpp \
+  obj/src/tunitas/application/options/argument/constants.cpp \
+  \
+  obj/src/tunitas/application/options/exception/namespace.cpp \
+  obj/src/tunitas/application/options/exception/Aspect.cpp \
+  obj/src/tunitas/application/options/exception/Unspecified.cpp \
+  \
+  obj/src/tunitas/application/options/indicator/namespace.cpp \
+  obj/src/tunitas/application/options/indicator/constants.cpp \
+  $(end)

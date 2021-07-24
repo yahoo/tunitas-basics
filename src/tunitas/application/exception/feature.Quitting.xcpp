@@ -1,0 +1,88 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::exception::feature {
+  //
+  // The "quitting message" feature, with a committed message stream.
+  // This abstraction is suitable for application (command-line, text ui) usage where ostreams are helpful.
+  // Expects to be paired in MI with an Aspect that provides the obligation for what() and code() and stream()
+  // Descendants only.
+  //
+  // Current since 1.9.0.
+  //
+  // As usual for this genre, it is set up as an ancestor to the mixin tree,
+  // so that STL exceptions can be mixed in as well.
+  //
+  // There are other descendants that give a more nuanced sense of the type of text UX quitting
+  // that is being attempted;
+  //   tunitas:;application::exception::feature::Quitting .... normal ... get out of the application, with message.
+  //   tunitas:;application::exception::feature::Usage ....... graceful exit with a usage message, and any exit code
+  //   tunitas:;application::exception::feature::Version ..... special to emit the version message and exit with success.
+  //
+  // Usage:
+  //
+  //   using namespace tunitas::application::exception;
+  //   class my::Quitting : public Aspect, public feature::Quitting, public std::runtime_error {
+  //     using Feature = tunitas::application::exception::feature::Quitting;
+  //     using Exception = ::std::runtime_error
+  //     explicit Quitting(Program, sys::exits::Code = sys::exits::OK);
+  //     ...must unify the MI...
+  //     auto what() const noexcept -> char const * final { return standard::what(); }
+  //   };
+  //
+  //   try {
+  //     ...
+  //     throw my::Quitting{NAME, sys::exits::FAIL};
+  //     ...
+  //   } catch (exception::Generic const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Quitting;
+}
+#endiv
+#divert <hpp>
+#import std.ostream
+#import sys.exits.Code
+#import tunitas.exception.feature.Quitting
+class tunitas::application::exception::feature::Quitting : public tunitas::exception::feature::Quitting {
+  using Ancestor = tunitas::exception::feature::Quitting;
+protected:
+  virtual ~Quitting() = default;
+  inline Quitting(std::ostream &, sys::exits::Code);
+  inline Quitting(sys::exits::Code);
+  inline Quitting();
+public:
+  virtual auto stream() const noexcept -> std::ostream &;
+protected:
+  std::ostream &offending_stream;
+};
+#endiv
+#divert <ipp>
+#import std.cout
+#import std.cerr
+#import sys.exits.constants
+namespace tunitas::application::exception::feature {
+  Quitting::Quitting()
+    : Quitting(sys::exits::OK)
+  { }
+  Quitting::Quitting(sys::exits::Code c)
+    : Quitting((sys::exits::OK == c ? std::cout : std::cerr), c)
+  { }
+  Quitting::Quitting(std::ostream &o, sys::exits::Code c)
+    : Ancestor{c}
+    , offending_stream{o}
+  { }
+}
+#endiv
+#divert <cpp>
+namespace tunitas::application::exception::feature {
+  auto Quitting::stream() const noexcept -> std::ostream & {
+    return offending_stream;
+  }
+}
+#endiv

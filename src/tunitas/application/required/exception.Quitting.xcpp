@@ -1,0 +1,58 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.exception
+#import std.is_base_of
+#import std.ostream
+#import std.string
+#import sys.exits.Code
+#import tunitas.application.exception.Aspect
+#import tunitas.application.exception.feature.Quitting
+// Need the complete definition for these types.
+#include <hpp/tunitas.application.exception.Aspect>
+#include <hpp/tunitas.application.exception.feature.Quitting>
+// NO NEED #include <hpp/std.exception>
+// NO NEED #include <hpp/std.string>
+#import tunitas.required.exception.Quitting
+namespace tunitas::application::required::exception {
+  //
+  // Is this a possible Quitting exception?
+  //
+  // MUST be a descendant of tunitas::application::exception::Aspect
+  // MUST be a descendant of nonstd::exception::Quitting (where available)
+  //
+  // WATCHOUT - for maintenance, the use of is_base_of in a concept definition at <fpp> is fraught.
+  // 1) It requires that you get the complete definition of the class type so it complicates with #include <hpp/...>
+  // 2) And makes the header dependency order of S.C.O.L.D. ersatz "modules" even more tightly coupled unto impossible
+  // 3) If the class at issue has internal problems anyway then the concept check at the point of use in some other interface
+  //    will fail and the error messages will misidirect you.  Forewarned is forearmed on this, the most difficult to mitigate.
+  //    3.a) the complete type of tunitas::application::excetpion:Aspect must appear
+  //    3.b) the complete type of QUITTING must ALSO appear; typically this is a more difficult dependency to master
+  //
+  // Usage:
+  //
+  //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
+  //
+  template<typename QUITTING> concept bool Quitting =
+    true
+    && requires(QUITTING quitting) {
+      { quitting } -> std::exception const &;
+      { quitting } -> tunitas::application::exception::Aspect const &;
+      { quitting } -> tunitas::application::exception::feature::Quitting const &;
+    }
+    && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
+    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
+        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
+    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
+      { QUITTING{name, code} };
+      { quitting.what() } -> char const *;
+      { quitting.code() } -> sys::exits::Code;
+      { quitting.stream() } -> std::ostream &;
+  }
+  && true;
+}
+#endiv
