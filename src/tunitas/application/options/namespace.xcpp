@@ -4,5 +4,21 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-namespace tunitas::application::options { }
+#import c
+namespace tunitas::application::options {
+  namespace [[nodirectory]] c {
+    using namespace ::c;
+    //
+    // Within which we will find c::args and so on.
+    //
+    // Usage:
+    //
+    //   #import tunitas.application.options
+    //   namespace somehow::something_else::dark_side. {
+    //     namespace c = tunitas::application::options::c;
+    //     ...
+    //   }
+    //
+  }
+}
 #endiv

@@ -4,6 +4,7 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
+#import tunitas.application.options.Program
 namespace tunitas::application {
   //
   // The (string) name of the program, trimmed.
@@ -12,38 +13,6 @@ namespace tunitas::application {
   //
   //   Program prog{argv[0]};
   //
-  class Program;
-}
-#endiv
-#divert <hpp>
-#import std.string
-#import want.std.filesystem.path
-class tunitas::application::Program : public std::string {
-  using Ancestor = std::string;
-public:
-  inline explicit Program(char const *);
-  inline explicit Program(std::string);
-  inline explicit Program(std::filesystem::path);
-};
-#endiv
-#divert <ipp>
-tunitas::application::Program::Program(char const *word)
-  : Program(std::string{word})
-{ }
-tunitas::application::Program::Program(std::string path)
-  : Ancestor{} {
-  auto slash = path.rfind('/');
-  if (std::string::npos != slash) {
-    if (slash+1 == path.size()) {
-      Ancestor::operator=(".");
-    } else {
-      Ancestor::operator=(path.substr(slash+1));
-    }
-  } else {
-    Ancestor::operator=(std::move(path));
-  }
-}
-tunitas::application::Program::Program(std::filesystem::path path)
-  : Ancestor{path.filename()} {
+  using Program [[deprecated("instead prefer tunitas::application::options::Program")]] = options::Program;
 }
 #endiv

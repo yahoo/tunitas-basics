@@ -4,6 +4,7 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
+#import tunitas.server
 #import tunitas.required
 namespace tunitas::server::required {
   using namespace tunitas::required;

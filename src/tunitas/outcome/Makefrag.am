@@ -1,0 +1,16 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Verizon Media.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+obj_src_tunitas_outcome_SUBSOURCES = \
+  obj/src/tunitas/Outcome.cpp \
+  obj/src/tunitas/Success.cpp \
+  obj/src/tunitas/outcome/namespace.cpp \
+  obj/src/tunitas/outcome/Success.cpp \
+  obj/src/tunitas/outcome/Variant.cpp \
+  obj/src/tunitas/outcome/variant.Ancestor.cpp \
+  obj/src/tunitas/outcome/Visitor.cpp \
+  obj/src/tunitas/outcome/visit.cpp \
+  $(end)

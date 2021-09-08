@@ -17,8 +17,12 @@ namespace tests::unit::application::options {
 #divert <hpp>
 #import std.string
 struct tests::unit::application::options::fixture::Fixture : public cppunit::test::Fixture {
+  auto test_Argument() -> void;
+  auto test_Arguments() -> void;
   auto test_Args() -> void;
   auto test_c_Args() -> void;
+  auto test_c_Argv() -> void;
+  auto test_Program() -> void;
   auto test_get_filepath_good() -> void;
   auto test_get_filepath_bad() -> void;
   auto test_get_identifier_good() -> void;
@@ -40,6 +44,26 @@ protected:
 #import tests.unit.application.options.Fixture.Quitting
 #endiv
 #divert <cpp>
+#import tunitas.application.options.Argument
+auto tests::unit::application::options::Fixture::test_Argument() -> void {
+  library::Argument subject{"kittens"};
+  CPPUNIT_ASSERT(7 == subject.size());
+}
+#import tunitas.application.options.Arguments
+auto tests::unit::application::options::Fixture::test_Arguments() -> void {
+  auto subject = library::Arguments{"a.out", "kittens", "dogs", "cats"};
+  CPPUNIT_ASSERT(4 == subject.size());
+}
+#import tunitas.application.options.Program
+auto tests::unit::application::options::Fixture::test_Program() -> void {
+  {
+    library::Program pro{"a.out"};
+    CPPUNIT_ASSERT("a.out"s == pro);
+  } {
+    library::Program pro{"./a.out"};
+    CPPUNIT_ASSERT("a.out"s == pro);
+  }
+}
 #import std.move
 #import std.literals
 #import tunitas.application.options.get_filepath
@@ -64,7 +88,13 @@ auto tests::unit::application::options::fixture::Fixture::test_Args() -> void {
 }
 #import tunitas.application.options.c.Args
 auto tests::unit::application::options::fixture::Fixture::test_c_Args() -> void {
-  using Subject = library::c::Args; // PREFER this one
+  using Subject = library::c::Args; // ALLOW this one
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+#import tunitas.application.options.c.Argv
+auto tests::unit::application::options::fixture::Fixture::test_c_Argv() -> void {
+  using Subject = library::c::Argv; // PREFER this one
   auto subject = Subject{};
   CPPUNIT_ASSERT(sizeof (subject));
 }
@@ -146,12 +176,16 @@ auto tests::unit::application::options::fixture::Fixture::suite() -> cppunit::Te
                    << []() {
                         auto see = Stream{"c"};
                         see << call("Args", &Fixture::test_c_Args)
+                            << call("Argv", &Fixture::test_c_Argv)
                             << END;
                         return move(see);
                       }()
                    << END;
               return move(dots);
             }()
+         << call("Argument", &Fixture::test_Argument)
+         << call("Arguments", &Fixture::test_Arguments)
+         << call("Program", &Fixture::test_Program)
          << []() {
               auto get = Stream{"get_filepath"};
               get << call("good", &Fixture::test_get_filepath_good)

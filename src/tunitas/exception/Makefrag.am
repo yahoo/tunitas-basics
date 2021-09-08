@@ -1,0 +1,15 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Verizon Media.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+obj_src_tunitas_exception_SUBSOURCES = \
+  obj/src/tunitas/exception/namespace.cpp \
+  obj/src/tunitas/exception/Aspect.cpp \
+  obj/src/tunitas/exception/feature.Messaging.cpp \
+  obj/src/tunitas/exception/feature.Quitting.cpp \
+  obj/src/tunitas/exception/aspect/namespace.cpp \
+  obj/src/tunitas/exception/aspect/Quitting.cpp \
+  obj/src/tunitas/exception/aspect/Messaging.cpp \
+  $(end)

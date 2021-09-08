@@ -44,6 +44,8 @@ namespace tunitas::outcome {
 #import std.error_condition
 namespace tunitas::outcome {
   template<required::Outcomable VALUE> inline auto ok(Variant<VALUE> const &) -> bool;
+  template<required::Outcomable VALUE> inline auto good(Variant<VALUE> const &) -> bool;
+  template<required::Outcomable VALUE> inline auto fail(Variant<VALUE> const &) -> bool;
   template<required::Outcomable VALUE> inline auto error_code(Variant<VALUE> const &) -> std::error_code;
   template<required::Outcomable VALUE> inline auto error_condition(Variant<VALUE> const &) -> std::error_condition;
   // these are casts, like std::move or std::forward
@@ -55,7 +57,6 @@ namespace tunitas::outcome {
 #import tunitas.outcome.visit
 template<tunitas::required::Outcomable VALUE> class tunitas::outcome::Variant : /*private?*/ public std::variant<std::error_code, VALUE> {
   using Ancestor = std::variant<std::error_code, VALUE>;
-  using Ancestor [[deprecated("instead, use Ancestor")]] = Ancestor;
 public:
   using Error = std::error_code;
   using Value = VALUE;
@@ -63,7 +64,7 @@ public:
   inline Variant(Error);
   inline Variant(Value &&);
   inline Variant(Value const &);
-  friend auto outcome::ok<>(Variant<VALUE> const &) -> bool;
+  friend auto outcome::good<>(Variant<VALUE> const &) -> bool;
   friend auto outcome::error_code<>(Variant<VALUE> const &) -> std::error_code;
   friend auto outcome::error_condition<>(Variant<VALUE> const &) -> std::error_condition;
   // these are casts, like std::move or std::forward
@@ -81,7 +82,9 @@ namespace std {
 #divert <ipp>
 #import std.invalid_argument
 #import tunitas.outcome.Visitor
-template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::ok(Variant<VALUE> const &r) -> bool {
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::ok(Variant<VALUE> const &r) -> bool { return good(r); }
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::fail(Variant<VALUE> const &r) -> bool { return !good(r); }
+template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::good(Variant<VALUE> const &r) -> bool {
   using Error = typename Variant<VALUE>::Error;
   using Value = typename Variant<VALUE>::Value;
   auto const &a = static_cast<typename Variant<VALUE>::Ancestor const &>(r);
