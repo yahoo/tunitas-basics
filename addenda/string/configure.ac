@@ -1,5 +1,5 @@
 # -*- autoconf -*-
-# Copyright Verizon Media.
+# Copyright Yahoo Inc. 2021.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the license file at the top of this repository.
 # Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
