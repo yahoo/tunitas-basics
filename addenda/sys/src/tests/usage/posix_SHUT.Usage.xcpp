@@ -15,7 +15,7 @@
 namespace tests::usage::posix_SHUT {
   using sys::posix::SHUT;
   namespace [[detail]] packaging {
-    template<typename SHUT> concept bool Instance = requires(SHUT) {
+    template<typename SHUT> concept Instance = requires(SHUT) {
       typename SHUT::Type;
       requires model::Namespace_Object<SHUT>;
       requires (int)SHUT::READ == SHUT_RD;
@@ -25,7 +25,7 @@ namespace tests::usage::posix_SHUT {
       requires (int)SHUT::WR == SHUT_WR;
       requires (int)SHUT::RDWR == SHUT_RDWR;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<SHUT>;
     };

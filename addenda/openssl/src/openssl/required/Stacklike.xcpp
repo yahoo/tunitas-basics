@@ -16,11 +16,11 @@ namespace openssl::required {
   //
   //   template<required::Stacklike STACK> auto function(STACK &) -> void;
   //
-  template<typename STACKLIKE> concept bool Stacklike = requires(STACKLIKE stacklike) {
+  template<typename STACKLIKE> concept Stacklike = requires(STACKLIKE stacklike) {
     typename STACKLIKE::Value;
     requires Stackable<typename STACKLIKE::Value>;
     // requires std::is_base_of<stack::Aspect, STACKLIKE>::value;
-    { stacklike } -> stack::Aspect const &;
+    { stacklike } -> convertible_to<stack::Aspect const &>;
   };
 }
 #endiv

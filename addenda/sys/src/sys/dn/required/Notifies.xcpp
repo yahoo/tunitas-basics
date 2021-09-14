@@ -14,6 +14,6 @@ namespace sys::dn::required {
   //
   //   template<required::Notifies RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename NOTIFIES> concept bool Notifies = std::is_same_v<NOTIFIES, dn::Notifies> || std::is_same_v<NOTIFIES, dn::Notify>;
+  template<typename NOTIFIES> concept Notifies = std::is_same_v<NOTIFIES, dn::Notifies> || std::is_same_v<NOTIFIES, dn::Notify>;
 }
 #endiv

@@ -13,6 +13,6 @@ namespace want::nonstd::required {
   //   using Something = ...somehow...;
   //   static_assert(required::Among<Something, short, int, long>>;
   //
-  template<typename TYPE, typename... AMONG> concept bool Among = (false || ... || std::is_same<TYPE, AMONG>::value);
+  template<typename TYPE, typename... AMONG> concept Among = (false || ... || std::is_same<TYPE, AMONG>::value);
 }
 #endiv

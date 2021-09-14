@@ -18,6 +18,6 @@ namespace sys::required {
   //   c::const_buffer<char>
   //   nonstd::const_dope<char>
   // 
-  template<typename STRINGZ> concept bool Stringz = stringz::Does_Conform<STRINGZ>::value;
+  template<typename STRINGZ> concept Stringz = stringz::Does_Conform<STRINGZ>::value;
 }
 #endiv

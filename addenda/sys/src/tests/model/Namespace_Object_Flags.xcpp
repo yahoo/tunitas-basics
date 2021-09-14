@@ -34,16 +34,16 @@ namespace tests::model {
   //
   namespace [[detail]] namespace_object_flags {
     using namespace std;
-    template<typename FLAG> concept bool Flag = requires(FLAG) {
+    template<typename FLAG> concept Flag = requires(FLAG) {
       requires is_enum_v<FLAG> || is_class_v<FLAG>;
     };
-    template<typename FLAGS> concept bool Flags = requires(FLAGS) {
+    template<typename FLAGS> concept Flags = requires(FLAGS) {
       requires is_enum_v<FLAGS> || is_class_v<FLAGS>;
       requires is_default_constructible_v<FLAGS>;
       requires is_copy_constructible_v<FLAGS>;
       requires is_copy_assignable_v<FLAGS>;
     };
-    template<typename OBJECT, typename FLAG, typename FLAGS> concept bool Namespace_Object_Flags = Flag<FLAG> && Flags<FLAGS> && Namespace_Object<OBJECT>;
+    template<typename OBJECT, typename FLAG, typename FLAGS> concept Namespace_Object_Flags = Flag<FLAG> && Flags<FLAGS> && Namespace_Object<OBJECT>;
   }
   using namespace_object_flags::Namespace_Object_Flags;
 }

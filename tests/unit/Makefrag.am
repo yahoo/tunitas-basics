@@ -11,7 +11,7 @@ tests_unit_TESTS = \
   $(tests_unit_XFAIL_TESTS) \
   tests/unit/list.test \
  \
-  tests/unit/app.test \
+  tests/unit/application.test \
   tests/unit/base64.test \
   tests/unit/exception.test \
   tests/unit/outcome.test \

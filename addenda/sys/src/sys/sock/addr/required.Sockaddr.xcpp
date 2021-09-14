@@ -11,6 +11,6 @@ namespace sys::sock::addr::required {
   //
   //   template<required::Sockaddr SOCKADDR> auto function(SOCKADDR &) -> voiid;
   //
-  template<typename SOCKADDR> concept bool Sockaddr = traits::Sockaddr<SOCKADDR>::value;
+  template<typename SOCKADDR> concept Sockaddr = traits::Sockaddr<SOCKADDR>::value;
 }
 #endiv

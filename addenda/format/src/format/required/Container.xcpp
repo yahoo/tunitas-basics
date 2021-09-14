@@ -1,5 +1,5 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import std.ostream
 #import std.begin
@@ -17,20 +17,20 @@ namespace format::required {
   // shall be treated separately because they contain characters, not "objects"
   // [FIXME who cares?  why make this distinction?]
   //
-  template<typename CONTAINER> concept bool Container = requires(CONTAINER const &container, std::ostream &outbound) {
-    // a container manages some values, iterators over them and can print individual ones
+  template<typename CONTAINER> concept Container = requires(CONTAINER const &container, std::ostream &outbound) {
+      // a container manages some values, iterators over them and can print individual ones
     typename CONTAINER::value_type;
     typename CONTAINER::const_iterator;
-    { std::begin(container) } -> typename CONTAINER::const_iterator;
-    { std::end(container) } -> typename CONTAINER::const_iterator;
-    { std::empty(container) } -> bool;
+    { std::begin(container) } -> convertible_to<typename CONTAINER::const_iterator>;
+    { std::end(container) } -> convertible_to<typename CONTAINER::const_iterator>;
+    { std::empty(container) } -> convertible_to<bool>;
     { outbound << *container.begin() };
   } && ! requires(CONTAINER const &stringlike, std::ostream &outbound) {
-      // but if it manages characters, and the whole can be printed atomically, then it is a "string" not a "container"
-      requires Character<typename CONTAINER::value_type>;
-      requires Stringlike<CONTAINER>;
-      { outbound << stringlike };
-    };
+    // but if it manages characters, and the whole can be printed atomically, then it is a "string" not a "container"
+    requires Character<typename CONTAINER::value_type>;
+    requires Stringlike<CONTAINER>;
+    { outbound << stringlike };
+  };
 }
 #endiv
 #divert <cpp>

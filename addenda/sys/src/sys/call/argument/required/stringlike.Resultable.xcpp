@@ -13,6 +13,6 @@ namespace sys::call::argument::required::stringlike {
   // The test is wrapped up in a concept so that it can be conveniently used as a template requirement.
   // But the actual specification is delegated off to a specialized structure.
   //
-  template<typename STRINGY> concept bool Resultable = Is_Resultable<STRINGY>::value;
+  template<typename STRINGY> concept Resultable = Is_Resultable<STRINGY>::value;
 }
 #endiv

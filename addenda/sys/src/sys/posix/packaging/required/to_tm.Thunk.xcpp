@@ -13,8 +13,8 @@ namespace sys::posix::packaging::required::to_tm {
   //
   namespace implementation {
     using namespace packaging::to_tm::interface;
-    template<typename THUNK> concept bool Thunk = requires(THUNK thunk, Old in, Disaggregated out) {
-      { thunk(&in, &out) } -> Disaggregated const *;
+    template<typename THUNK> concept Thunk = requires(THUNK thunk, Old in, Disaggregated out) {
+    { thunk(&in, &out) } -> convertible_to<Disaggregated const *>;
     };
   }
   using implementation::Thunk;

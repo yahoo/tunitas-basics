@@ -1,0 +1,24 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+#import tunitas.application.options.c.Argv
+namespace tunitas::application::options::c {
+  using namespace ::c; // in lieu of a namespace.xcpp
+  //
+  // The (pointer-based) argument vector input to the program.
+  // The options system reorders these pointers according to getopt(3)
+  //
+  // You maybe thinking of options::Arguments which is the "deque of std::string" shaped version.
+  // That is the preferred form nowadays, however the C runtime and getopt(3) requires the pointer variant.
+  //
+  // Usage:
+  //
+  //   return main(Args{c, v});
+  //
+  using Args [[deprecated("instead prefer c::Argv with a 'v'")]] = Argv;
+}
+#endiv

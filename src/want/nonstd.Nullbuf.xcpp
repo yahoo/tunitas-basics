@@ -21,7 +21,7 @@ namespace want::nonstd {
 #import std.streambuf
 #import std.streamsize
 template<typename CHAR, typename TRAITS> class want::nonstd::Nullbuf : public std::basic_streambuf<CHAR, TRAITS> {
-  using ancestor = std::basic_streambuf<CHAR, TRAITS>;
+  using Ancestor = std::basic_streambuf<CHAR, TRAITS>;
 public:
   Nullbuf() = default;
   Nullbuf(Nullbuf const &) = delete;
@@ -29,17 +29,17 @@ public:
   // See Langer & Kreft, or [27.5.2.4.5]/3-7.
   // See http://www.cplusplus.com/reference/streambuf/basic_streambuf/
   // Else see /usr/include/c++/4.8.3/streambuf 
-  auto xsputn(typename ancestor::char_type const *s, std::streamsize n) -> std::streamsize final;
-  auto overflow(typename ancestor::int_type c = typename ancestor::traits_type::eof()) -> typename ancestor::int_type final;
+  auto xsputn(typename Ancestor::char_type const *s, std::streamsize n) -> std::streamsize final;
+  auto overflow(typename Ancestor::int_type c = typename Ancestor::traits_type::eof()) -> typename Ancestor::int_type final;
 };
 #endiv
 #divert <tpp>
 #import std.char_traits
-template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::xsputn(typename ancestor::char_type const *buffer, std::streamsize buffer_size) -> std::streamsize {
+template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::xsputn(typename Ancestor::char_type const *buffer, std::streamsize buffer_size) -> std::streamsize {
   // It's a "sink" like /dev/null.  So we prevaricate that we wrote it all safely.
   return buffer_size;
 }
-template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::overflow(typename ancestor::int_type c) -> typename ancestor::int_type {
+template<typename _1, typename _2> auto want::nonstd::Nullbuf<_1, _2>::overflow(typename Ancestor::int_type c) -> typename Ancestor::int_type {
   // give it back (whatever it was)
   return c;
 }

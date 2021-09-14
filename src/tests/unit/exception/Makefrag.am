@@ -1,0 +1,17 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc, 2021.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+obj_src_tests_unit_exception_SUBSOURCES = \
+  obj/src/tests/unit/exception/namespace.cpp \
+  obj/src/tests/unit/exception/Fixture.cpp \
+  obj/src/tests/unit/exception/Fixture.Message.cpp \
+  obj/src/tests/unit/exception/Fixture.Quitting.cpp \
+  obj/src/tests/unit/exception/Fixture.Aspic.cpp \
+  obj/src/tests/unit/exception/Fixture.Balsam.cpp \
+  obj/src/tests/unit/exception/my.Quitting.cpp \
+  obj/src/tests/unit/exception/my.Message.cpp \
+  obj/src/tests/unit/exception/compatibility.cpp \
+  $(end)

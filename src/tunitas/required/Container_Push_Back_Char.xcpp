@@ -16,7 +16,7 @@ namespace tunitas::required {
   //     Something(CONTAINER &container);
   //   };
   //
-  template<typename CONTAINER> concept bool Container_Push_Back_Char = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
+  template<typename CONTAINER> concept Container_Push_Back_Char = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
     typename CONTAINER::value_type;
     requires std::is_same_v<char, typename CONTAINER::value_type>;
   };

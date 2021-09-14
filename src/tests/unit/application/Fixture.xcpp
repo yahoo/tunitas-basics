@@ -1,0 +1,239 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::application { class Fixture; }
+#endiv
+#divert <hpp>
+#import cppunit.Test
+#import cppunit.test.Fixture
+class tests::unit::application::Fixture : public cppunit::test::Fixture {
+public:
+  auto test_Configuration() -> void;
+  auto test_Program() -> void;
+  auto test_exception_Messaging_1() -> void;
+  auto test_exception_Messaging_2() -> void;
+  auto test_exception_Quitting_1() -> void;
+  auto test_exception_Quitting_2() -> void;
+  auto test_exception_Quitting_3() -> void;
+  auto test_exception_Usage_1() -> void;
+  auto test_exception_Usage_2() -> void;
+  auto test_exception_Version() -> void;
+  auto test_exception_throwing_1() -> void;
+  auto test_exception_throwing_2() -> void;
+  auto test_exception_throwing_3() -> void;
+  auto test_words_Strings() -> void;
+  auto test_words_Filepaths() -> void;
+  static auto suite() -> cppunit::Test *;
+public:
+  struct [[nodiscard]] Configuration;
+  struct [[nodiscard]] Usage;
+  struct [[nodiscard]] Version;
+  struct [[nodiscard]] Quitting;
+  struct [[nodiscard]] Messaging;
+};
+#endiv
+#divert <cpp>
+#import std.move
+#import std.literals
+using namespace std::literals;
+#import tunitas.application.Program
+#import tests.unit.application.Fixture.Configuration
+auto tests::unit::application::Fixture::test_Configuration() -> void {
+  using namespace ::tunitas::application;
+  Program prog{"a.out"};
+  Fixture::Configuration cfg{prog};
+  CPPUNIT_ASSERT(!cfg.NAME.empty());
+}
+#import tunitas.application.Program
+auto tests::unit::application::Fixture::test_Program() -> void {
+  using namespace ::tunitas::application;
+  {
+    Program pro{"a.out"};
+    CPPUNIT_ASSERT("a.out"s == pro);
+  } {
+    Program pro{"./a.out"};
+    CPPUNIT_ASSERT("a.out"s == pro);
+  }
+}
+#import std.cerr
+#import std.cout
+#import sys.exits.constants
+#import tests.unit.application.Fixture.Messaging
+auto tests::unit::application::Fixture::test_exception_Messaging_1() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Messaging mes{"wow, neat"};
+  std::string const what = mes.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT("[wow, neat]"s == what);
+  CPPUNIT_ASSERT(&std::cout == &mes.stream()); 
+  CPPUNIT_ASSERT(sys::exits::FAIL == mes.code()); 
+}
+auto tests::unit::application::Fixture::test_exception_Messaging_2() -> void {
+  using namespace ::tunitas::application::exception;
+  try {
+    throw Fixture::Messaging{"wow, neat"};
+  } catch (Generic const &gen) {
+    std::string const what = gen.what();
+    CPPUNIT_ASSERT(!what.empty());
+    CPPUNIT_ASSERT("[wow, neat]"s == what);
+    CPPUNIT_ASSERT(&std::cout == &gen.stream()); 
+    CPPUNIT_ASSERT(sys::exits::FAIL == gen.code()); 
+  }
+}
+#import tests.unit.application.Fixture.Quitting
+auto tests::unit::application::Fixture::test_exception_Quitting_1() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Quitting qui{"a.out"};
+  std::string const what = qui.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cerr == &qui.stream()); 
+  CPPUNIT_ASSERT(sys::exits::FAIL == qui.code()); 
+}
+auto tests::unit::application::Fixture::test_exception_Quitting_2() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Quitting qui{"a.out", "because", sys::exits::OK};
+  std::string const what = qui.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cout == &qui.stream()); 
+  CPPUNIT_ASSERT(sys::exits::OK == qui.code()); 
+}
+auto tests::unit::application::Fixture::test_exception_Quitting_3() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Quitting qui{"a.out", "because", sys::exits::CONFIG};
+  std::string const what = qui.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cerr == &qui.stream()); 
+  CPPUNIT_ASSERT(sys::exits::CONFIG == qui.code()); 
+}
+#import tests.unit.application.Fixture.Usage
+auto tests::unit::application::Fixture::test_exception_Usage_1() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Usage usa{"a.out"};
+  std::string const what = usa.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cerr == &usa.stream()); 
+  CPPUNIT_ASSERT(sys::exits::USAGE == usa.code()); 
+}
+auto tests::unit::application::Fixture::test_exception_Usage_2() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Usage usa{"a.out", sys::exits::USAGE};
+  std::string const what = usa.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cerr == &usa.stream()); 
+  CPPUNIT_ASSERT(sys::exits::USAGE == usa.code()); 
+}
+#import tests.unit.application.Fixture.Version
+auto tests::unit::application::Fixture::test_exception_Version() -> void {
+  using namespace ::tunitas::application::exception;
+  Fixture::Version ver{"a.out"};
+  std::string const what = ver.what();
+  CPPUNIT_ASSERT(!what.empty());
+  CPPUNIT_ASSERT(&std::cout == &ver.stream()); 
+  CPPUNIT_ASSERT(sys::exits::OK == ver.code()); 
+}
+#import tests.unit.application.Fixture.Usage
+auto tests::unit::application::Fixture::test_exception_throwing_1() -> void {
+  using namespace ::tunitas::application::exception;
+  try {
+    throw Fixture::Usage{"a.out", sys::exits::FAIL};
+    CPPUNIT_ASSERT(false);
+  } catch (Generic const &g) {
+    g.stream() << g.what() << '\n';
+    CPPUNIT_ASSERT(sys::exits::FAIL == g.code());
+  }
+}
+#import tests.unit.application.Fixture.Version
+auto tests::unit::application::Fixture::test_exception_throwing_2() -> void {
+  using namespace ::tunitas::application::exception;
+  try {
+    throw Fixture::Version{"a.out"};
+    CPPUNIT_ASSERT(false);
+  } catch (Generic const &g) {
+    g.stream() << g.what() << '\n';
+    CPPUNIT_ASSERT(sys::exits::OK == g.code());
+  }
+}
+#import tests.unit.application.Fixture.Quitting
+auto tests::unit::application::Fixture::test_exception_throwing_3() -> void {
+  using namespace ::tunitas::application::exception;
+  try {
+    throw Fixture::Quitting{"a.out", sys::exits::CONFIG};
+    CPPUNIT_ASSERT(false);
+  } catch (Generic const &g) {
+    g.stream() << g.what() << '\n';
+    CPPUNIT_ASSERT(sys::exits::CONFIG == g.code());
+  }
+}
+#import tunitas.application.words.Strings
+auto tests::unit::application::Fixture::test_words_Strings() -> void {
+  using namespace ::tunitas::application::words;
+  Strings strings{"twine", "hawser", "bolo", "nylon"};
+  CPPUNIT_ASSERT_EQUAL(4lu, strings.size());
+}
+#import tunitas.application.words.Filepaths
+auto tests::unit::application::Fixture::test_words_Filepaths() -> void {
+  using namespace ::tunitas::application::words;
+  Filepaths paths{".", "..", "file.c", "file.h"};
+  CPPUNIT_ASSERT_EQUAL(4lu, paths.size());
+}
+#import tests.unit.application.Pidfile
+#import tests.unit.application.Drop
+#import tests.unit.application.options.Fixture
+auto tests::unit::application::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"application"};
+  series << call("Configuration", &Fixture::test_Configuration)
+	 << call("Program", &Fixture::test_Program)
+	 << add<Pidfile>()
+	 << add<Drop>()
+         << []{
+              auto exc = Stream{"exception"};
+              exc << []{
+                       auto usa = Stream{"Usage"};
+                       usa << call("1", &Fixture::test_exception_Usage_1)
+                           << call("2", &Fixture::test_exception_Usage_2)
+                           << END;
+                       return move(usa);
+                     }()
+                  << call("Version", &Fixture::test_exception_Version)
+                  << []{
+                       auto qui = Stream{"Quitting"};
+                       qui << call("1", &Fixture::test_exception_Quitting_1)
+                           << call("2", &Fixture::test_exception_Quitting_2)
+                           << call("3", &Fixture::test_exception_Quitting_3)
+                           << END;
+                       return move(qui);
+                     }()
+                  << []{
+                       auto mes = Stream{"Messaging"};
+                       mes << call("1", &Fixture::test_exception_Messaging_1)
+                           << call("2", &Fixture::test_exception_Messaging_2)
+                           << END;
+                       return move(mes);
+                     }()
+                  << []{
+                       auto thr = Stream{"throwing"};
+                       thr << call("1", &Fixture::test_exception_throwing_1)
+                           << call("2", &Fixture::test_exception_throwing_2)
+                           << call("3", &Fixture::test_exception_throwing_3)
+                           << END;
+                       return move(thr);
+                     }()
+                  << END;
+                return move(exc);
+            }()
+         << []{
+              auto wor = Stream{"words"};
+              wor << call("Strings", &Fixture::test_words_Strings)
+                  << call("Filepaths", &Fixture::test_words_Filepaths)
+                  << END;
+              return move(wor);
+            }()
+         << add<options::Fixture>()
+         << END;
+  return finalize(series);
+}
+#endiv

@@ -74,11 +74,11 @@ namespace sys::posix::packaging::wait::interface {
     namespace identifier {
       // Separate these out so that the overloading works; without the need for in-stanza function specialization special cases
       // c.f. waitpid(...) and waitid(...)
-      template<typename PROCESS> [[deprecated]] concept bool Alternate = is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
-      template<typename PROCESS> [[deprecated]] concept bool Either = is_same_v<PROCESS, id::Either> || is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
-      template<typename PROCESS> [[deprecated]] concept bool Process = sys::id::required::process::Process<PROCESS>; // i.e. Process or pid_t ... a.k.a. "UPPER-CASE or lower-case"
-      template<typename PROCESS> [[deprecated]] concept bool Group = sys::id::required::process::Group<PROCESS>;
-      template<typename PROCESS> [[deprecated]] concept bool Wait = sys::id::required::Wait<PROCESS>; // any for waitid(2)
+      template<typename PROCESS> [[deprecated]] concept Alternate = is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
+      template<typename PROCESS> [[deprecated]] concept Either = is_same_v<PROCESS, id::Either> || is_same_v<PROCESS, id::Process> || is_same_v<PROCESS, id::Group>;
+      template<typename PROCESS> [[deprecated]] concept Process = sys::id::required::process::Process<PROCESS>; // i.e. Process or pid_t ... a.k.a. "UPPER-CASE or lower-case"
+      template<typename PROCESS> [[deprecated]] concept Group = sys::id::required::process::Group<PROCESS>;
+      template<typename PROCESS> [[deprecated]] concept Wait = sys::id::required::Wait<PROCESS>; // any for waitid(2)
       using packaging::wait::required::identifier::Returned;
       using packaging::wait::required::identifier::Matched;
     }
@@ -96,9 +96,9 @@ namespace sys::posix::packaging::wait::interface {
     namespace function {
       using Process = interface::id::Process;
       namespace identifier {
-        template<typename PROCESS> concept bool Matched = required::process::Either<PROCESS>;
+        template<typename PROCESS> concept Matched = required::process::Either<PROCESS>;
         using Returned = result::Identifier<Process>;
-        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept Indicated = Matched<PROCESS>;
       }
       namespace status {
         using Unfilled = wait::no::Status;
@@ -119,9 +119,9 @@ namespace sys::posix::packaging::wait::interface {
     namespace native {
       // no need ---> using pid_t = ::pid_t; <--- no need
       namespace identifier {
-        template<typename PROCESS> concept bool Matched = is_same_v<PROCESS, pid_t>;
+        template<typename PROCESS> concept Matched = is_same_v<PROCESS, pid_t>;
         using Returned = result::Identifier<pid_t>;
-        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+        template<typename PROCESS> [[deprecated("use Matched<PROCESS>")]] concept Indicated = Matched<PROCESS>;
       }
       namespace status {
         using Unfilled = wait::no::Status;
@@ -144,7 +144,7 @@ namespace sys::posix::packaging::wait::interface {
         namespace [[detail]] input {
           using namespace required::process;
           using namespace required::wait;
-          template<typename PROCESS> concept bool Input = Either<PROCESS> || Process<PROCESS> || Group<PROCESS> || Untyped<PROCESS> || Typed<PROCESS>;
+          template<typename PROCESS> concept Input = Either<PROCESS> || Process<PROCESS> || Group<PROCESS> || Untyped<PROCESS> || Typed<PROCESS>;
         }
         namespace [[detail]] output {
           template<input::Input PROCESS> struct Output { using Type = PROCESS; };
@@ -156,8 +156,8 @@ namespace sys::posix::packaging::wait::interface {
         template<typename PROCESS> using Output = typename output::Output<PROCESS>::Type;
       }
       namespace identifier {
-        template<typename PROCESS> [[deprecated("if this is to be used then name it Matched<PROCESS>")]] concept bool Indicated = input::Input<PROCESS>;
-        template<typename PROCESS> concept bool Matched = input::Input<PROCESS>;
+        template<typename PROCESS> [[deprecated("if this is to be used then name it Matched<PROCESS>")]] concept Indicated = input::Input<PROCESS>;
+        template<typename PROCESS> concept Matched = input::Input<PROCESS>;
         using sys::id::required::process::Process;
         template<input::Input PROCESS> using Returned = result::Identifier<Output<PROCESS>>;
       }
@@ -212,9 +212,9 @@ namespace sys::posix::packaging::wait::interface {
           using Typed = id::wait::Typed;
           using Type = id::wait::Type;
           using Untyped = id::wait::Untyped;
-          template<typename PROCESS> concept bool Matched = required::process::Either<PROCESS> || required::wait::Typed<PROCESS>;
+          template<typename PROCESS> concept Matched = required::process::Either<PROCESS> || required::wait::Typed<PROCESS>;
           using Returned = fragments::function::identifier::Returned;
-          template<typename PROCESS> [[deprecated("redefine as Matched<PROCESS>")]] concept bool Indicated = Matched<PROCESS>;
+          template<typename PROCESS> [[deprecated("redefine as Matched<PROCESS>")]] concept Indicated = Matched<PROCESS>;
         }
       }
       namespace native {

@@ -9,6 +9,6 @@ namespace nonstd::required::iterator {
   //
   // Most of https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator
   //
-  template<typename ITERATOR> concept bool Random_Access = Undirected<ITERATOR>;
+  template<typename ITERATOR> concept Random_Access = Undirected<ITERATOR>;
 }
 #endiv

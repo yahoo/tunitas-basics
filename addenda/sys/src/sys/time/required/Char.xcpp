@@ -6,7 +6,7 @@ namespace sys::time::required {
   //
   // A character is ... just that.
   //
-  template<typename CHAR> concept bool Char =
+  template<typename CHAR> concept Char =
     (std::is_same<CHAR, char>::value ||
      std::is_same<CHAR, wchar_t>::value ||
      std::is_same<CHAR, char16_t>::value ||

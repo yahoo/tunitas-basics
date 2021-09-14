@@ -1,0 +1,21 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.application.exception.feature.Quitting
+namespace tunitas::application::exception {
+  //
+  // WATCHOUT - the naming convention changed at tunitas-basics 1.8.0 and again at 1.9.0
+  // s/tunitas::application::exception::Quitting/tunitas::exception::aspect::Quitting/g
+  // s/tunitas::application::exception::aspect::Quitting/tunitas::exception::feature::Quitting/g
+  //
+  // The compiler should give you a reasonable complaint
+  //
+  //     src/application/exception.Quitting.xcpp:26:45: warning: ‘using Quitting = class tunitas::application::exception::feature::Quitting’ is deprecated: instead use tunitas::application::exception::feature::Quitting [-Wdeprecated-declarations]
+  //      using Aspect = tunitas::application::exception::Quitting;
+  //
+  using Quitting [[deprecated("since v1.9.0; for new work, use tunitas::application::exception::feature::Quitting")]] = tunitas::application::exception::feature::Quitting;
+}
+#endiv

@@ -15,25 +15,25 @@ namespace tests::usage::posix_SIG {
   using sys::posix::SIG;
   namespace [[detail]] packaging {
     using namespace nonstd;
-    template<typename SIG> concept bool Instance = requires(SIG) {
+    template<typename SIG> concept Instance = requires(SIG) {
       typename SIG::Handler;
       typename SIG::Number;
       requires model::Namespace_Object<SIG>;
       //
-      { SIG::IGNORE } -> convertible_to<typename SIG::Handler>;
-      { SIG::DEFAULT } -> convertible_to<typename SIG::Handler>;
-      { SIG::ERROR } -> convertible_to<typename SIG::Handler>;
-      { SIG::IGN } -> convertible_to<typename SIG::Handler>;
-      { SIG::DFL } -> convertible_to<typename SIG::Handler>;
-      { SIG::ERR } -> convertible_to<typename SIG::Handler>;
-  // ISO C99 Signals
+      { SIG::IGNORE } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::DEFAULT } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::ERROR } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::IGN } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::DFL } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::ERR } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      // ISO C99 Signals
       requires (int)SIG::INT == SIGINT;
       requires (int)SIG::ILL == SIGILL;
       requires (int)SIG::ABRT == SIGABRT;
       requires (int)SIG::FPE == SIGFPE;
       requires (int)SIG::SEGV == SIGSEGV;
       requires (int)SIG::TERM == SIGTERM;
-  //
+      //
       requires (int)SIG::HUP == SIGHUP;
       requires (int)SIG::QUIT == SIGQUIT;
       requires (int)SIG::TRAP == SIGTRAP;
@@ -42,7 +42,7 @@ namespace tests::usage::posix_SIG {
       requires (int)SIG::SYS == SIGSYS;
       requires (int)SIG::PIPE == SIGPIPE;
       requires (int)SIG::ALRM == SIGALRM;
-  //
+      //
       requires (int)SIG::URG == SIGURG;
       requires (int)SIG::STOP == SIGSTOP;
       requires (int)SIG::TSTP == SIGTSTP;
@@ -57,13 +57,13 @@ namespace tests::usage::posix_SIG {
       requires (int)SIG::PROF == SIGPROF;
       requires (int)SIG::USR1 == SIGUSR1;
       requires (int)SIG::USR2 == SIGUSR2;
-  //
+      //
       requires (int)SIG::WINCH == SIGWINCH;
-  //
+      //
       requires (int)SIG::IO == SIGIO;
       requires (int)SIG::IOT == SIGIOT;
       requires (int)SIG::CLD == SIGCLD;
-  //
+      //
       requires (int)SIG::ZERO == 0;
       requires (int)SIG::INTERACTIVE == SIGINT;
       requires (int)SIG::ILLEGAL == SIGILL;
@@ -71,13 +71,13 @@ namespace tests::usage::posix_SIG {
       requires (int)SIG::FLOATING_POINT_EXCEPTION == SIGFPE;
       requires (int)SIG::SEGMENTATION_VIOLATION == SIGSEGV;
       requires (int)SIG::TERMINATE == SIGTERM;
-  //
+      //
       requires (int)SIG::HANGUP == SIGHUP;
       requires (int)SIG::BREAKPOINT == SIGTRAP;
       requires (int)SIG::BUS_ERROR == SIGBUS;
       requires (int)SIG::SYSTEM_CALL == SIGSYS;
       requires (int)SIG::ALARM == SIGALRM;
-  //
+      //
       requires (int)SIG::URGENT == SIGURG;
       requires (int)SIG::TERMINAL_STOP == SIGTSTP;
       requires (int)SIG::CONTINUE == SIGCONT;
@@ -90,13 +90,13 @@ namespace tests::usage::posix_SIG {
       requires (int)SIG::PROFILE_TIMER_EXPIRY == SIGPROF;
       requires (int)SIG::USER1 == SIGUSR1;
       requires (int)SIG::USER2 == SIGUSR2;
-  //
+      //
       requires (int)SIG::WINDOW_SIZE_CHANGE == SIGWINCH;
       //
-      { SIG::rtmin() } -> convertible_to<typename SIG::Number>;
-      { SIG::rtmax() } -> convertible_to<typename SIG::Number>;
+      { SIG::rtmin() } -> convertible_to<convertible_to<typename SIG::Number>>;
+      { SIG::rtmax() } -> convertible_to<convertible_to<typename SIG::Number>>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<SIG>;
     };

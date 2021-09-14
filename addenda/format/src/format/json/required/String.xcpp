@@ -1,13 +1,13 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import format.json.required.Stringlike
 #import std.char_traits
 #import std.basic_ostream
 namespace format::json::required {
-  // WATCHBOUT - here we use std::char_traits<typename STRING::value_type>
+  // WATCHOUT - here we use std::char_traits<typename STRING::value_type>
   //             we do not use 'typename STRING::traits_type' because not all "String" concept objects have a traits_type, e.g. c::stringz
-  template<typename STRING> concept bool String = requires (STRING string, std::basic_ostream<typename STRING::value_type, std::char_traits<typename STRING::value_type>> &outbound) {
+  template<typename STRING> concept String = requires (STRING string, std::basic_ostream<typename STRING::value_type, std::char_traits<typename STRING::value_type>> &outbound) {
     requires required::stringlike::Object<STRING>;
     outbound << string;
   };

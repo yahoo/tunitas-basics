@@ -14,7 +14,7 @@ namespace tunitas::required {
   //
   //   template<required::Integer INTEGER> Constructor(INTEGER, INTEGER);
   //
-  template<typename INTEGER> concept bool Integer = (std::is_integral<INTEGER>::value &&
-						     ! std::is_enum<INTEGER>::value);
+  template<typename INTEGER> concept Integer = (std::is_integral<INTEGER>::value &&
+                                                ! std::is_enum<INTEGER>::value);
 }
 #endiv

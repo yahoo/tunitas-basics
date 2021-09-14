@@ -15,6 +15,6 @@ namespace sys::posix::packaging::required {
   //
   //   oh come on
   // 
-  template<typename VECTOR> concept bool Vector = std::is_same_v<std::remove_const_t<VECTOR>, ::iovec>;
+  template<typename VECTOR> concept Vector = std::is_same_v<std::remove_const_t<VECTOR>, ::iovec>;
 }
 #endiv

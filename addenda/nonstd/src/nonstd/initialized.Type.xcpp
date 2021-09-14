@@ -13,7 +13,7 @@ namespace nonstd::initialized {
     // POD (Plain Old Data) was too cute to survive
     // TSL (Trivial Standard Layout) is its successor.
     // Whereas std::is_pod is deprecated since C++20, but is rederivable thus.
-    template<typename TYPE> concept bool Trivial_Standard_Layout = std::is_trivial<TYPE>::value && std::is_standard_layout<TYPE>::value;
+    template<typename TYPE> concept Trivial_Standard_Layout = std::is_trivial<TYPE>::value && std::is_standard_layout<TYPE>::value;
   }
   template<required::Trivial_Standard_Layout> class Type;
 }

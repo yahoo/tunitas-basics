@@ -5,7 +5,7 @@ namespace nonstd::required {
   //
   // The concept of a default-constructible type.
   //
-  template<typename TYPE> concept bool Default_Constructible = requires(TYPE type) {
+  template<typename TYPE> concept Default_Constructible = requires(TYPE type) {
     { TYPE() };
   };
 }

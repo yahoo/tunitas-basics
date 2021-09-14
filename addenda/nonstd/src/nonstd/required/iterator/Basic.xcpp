@@ -1,4 +1,4 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenace see the LICENSE file at the top of the repository.
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method; For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import std.iterator_traits // but you may need specializations
 namespace nonstd::required::iterator {
@@ -15,8 +15,8 @@ namespace nonstd::required::iterator {
     typename std::iterator_traits<ITERATOR>::reference;
     typename std::iterator_traits<ITERATOR>::iterator_category;
     { *iterator }; // don't check the type (here) ... might be value_type or reference
-    { ++iterator } -> ITERATOR &;
-    { iterator++ } -> ITERATOR;
+    { ++iterator } -> convertible_to<ITERATOR &>;
+    { iterator++ } -> convertible_to<ITERATOR>;
   };
 }
 #endiv

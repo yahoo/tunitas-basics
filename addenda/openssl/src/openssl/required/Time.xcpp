@@ -10,7 +10,7 @@ namespace openssl::required {
   //
   // Prefer openssl::time::Point
   //
-  template<typename TIME> concept bool Time = (std::is_same<time::Point, TIME>::value ||
-                                               std::is_same<time::Posix, TIME>::value);
+  template<typename TIME> concept Time = (std::is_same<time::Point, TIME>::value ||
+                                          std::is_same<time::Posix, TIME>::value);
 }
 #endiv

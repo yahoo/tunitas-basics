@@ -20,9 +20,9 @@ namespace tests::guardian::required::closer {
   //
 #if 0
   namespace result {
-    template<typename TYPE> concept bool Managed = std::is_same_v<TYPE, fd::Descriptor>;
-    template<typename TYPE> concept bool Unmanaged = Descriptor<TYPE>;
-    template<typename TYPE> concept bool Result = Managed<TYPE> || Unmanaged<TYPE>;
+    template<typename TYPE> concept Managed = std::is_same_v<TYPE, fd::Descriptor>;
+    template<typename TYPE> concept Unmanaged = Descriptor<TYPE>;
+    template<typename TYPE> concept Result = Managed<TYPE> || Unmanaged<TYPE>;
   }
 #else
   namespace result {
@@ -30,16 +30,16 @@ namespace tests::guardian::required::closer {
     namespace pair {
       using namespace ::sys::call::result::pipe;
       // [[FIXTHIS]] there should be a simpler way to do this
-      template<typename RESULT> concept bool Pair = std::is_same_v<RESULT, Value<int>> || std::is_same_v<RESULT, Value<sys::id::File>>;
+      template<typename RESULT> concept Pair = std::is_same_v<RESULT, Value<int>> || std::is_same_v<RESULT, Value<sys::id::File>>;
     }
     namespace single {
       using namespace ::sys::call::result;
-      template<typename RESULT> concept bool Single = requires(RESULT) {
+      template<typename RESULT> concept Single = requires(RESULT) {
         requires sys::fd::required::Descriptor<typename Element<0, RESULT>::type>;
         requires std::is_same_v<RESULT, Value<typename Element<0, RESULT>::type>>;
       };
     }
-    template<typename RESULT> concept bool Result = pair::Pair<RESULT> || single::Single<RESULT>;
+    template<typename RESULT> concept Result = pair::Pair<RESULT> || single::Single<RESULT>;
   }
 #endif
   using result::Result;

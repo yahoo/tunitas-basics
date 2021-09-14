@@ -1,0 +1,27 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+#import tunitas.application.options.c.Argv
+namespace tunitas::application::options::c {
+  //
+  // The (pointer-based) argument (ahem, a mutable char *)
+  // AVOID
+  //
+  // Usage:
+  //
+  //   DON'T.
+  //
+  using Arg [[deprecated("instead prefer options::Arguments which is a string")]] = char *;
+}
+#endiv
+#divert <hpp>
+#import std.is_same
+namespace tunitas::application::options::c {
+  // Once the full type of Argv becomes available
+  static_assert(std::is_same_v<Argv::value_type, char *>);
+}
+#endiv

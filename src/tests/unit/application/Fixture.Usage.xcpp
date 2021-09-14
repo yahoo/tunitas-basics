@@ -1,0 +1,44 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.application.Fixture
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.application.exception.Aspect
+#import tunitas.application.exception.aspect.Usage
+#import std.string
+#import sys.exits.Code
+#import sys.exits.constants
+class tests::unit::application::Fixture::Usage : public tunitas::application::exception::Aspect, public tunitas::application::exception::aspect::Usage, public std::runtime_error {
+  struct Ancestors {
+    using Aspect = tunitas::application::exception::Aspect;
+    using Feature = tunitas::application::exception::aspect::Usage;
+    using Exception = std::runtime_error;
+  };
+public:
+  inline explicit Usage(std::string NAME, sys::exits::Code = sys::exits::USAGE);
+  auto what() const noexcept -> char const * final;
+  auto stream() const noexcept -> std::ostream & final;
+  auto code() const noexcept -> sys::exits::Code final;
+  auto exit() const noexcept -> sys::exits::Code final;
+};
+#endiv
+#divert <ipp>
+#import std.move
+tests::unit::application::Fixture::Usage::Usage(std::string NAME, sys::exits::Code code)
+  : Ancestors::Feature{code}
+  , Ancestors::Exception{std::move(NAME)}
+{ }
+#endiv
+#divert <cpp>
+namespace tests::unit::application {
+  auto Fixture::Usage::what() const noexcept -> char const * { return Ancestors::Exception::what(); }
+  auto Fixture::Usage::stream() const noexcept -> std::ostream & { return Ancestors::Feature::stream(); }
+  auto Fixture::Usage::code() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+  auto Fixture::Usage::exit() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+}
+#endiv

@@ -9,11 +9,11 @@ namespace nonstd::regex::required {
   //
   // a std::regex_traits specialization
   //
-  template<typename TRAITS> concept bool Traits = requires(TRAITS traits) {
+  template<typename TRAITS> concept Traits = requires(TRAITS traits) {
     typename TRAITS::char_type;
     requires Char<typename TRAITS::char_type>;
     typename TRAITS::string_type;
-    { typename TRAITS::string_type() } -> std::basic_string<typename TRAITS::char_type>;
+    { typename TRAITS::string_type() } -> convertible_to<std::basic_string<typename TRAITS::char_type>>;
     requires Char<typename TRAITS::string_type::value_type>;
     typename TRAITS::locale_type;
     typename TRAITS::char_class_type;

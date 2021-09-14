@@ -1,0 +1,27 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+#import tunitas.string.Storage
+namespace tunitas::application::options {
+  //
+  // Like a c::Arg, but better.
+  //
+  // Concept:
+  //
+  //   Provides its own storage.
+  //
+  // Design:
+  //
+  //   [[TODO]] use a type alias of cli::options::Argument when module-options >= 2.0 is ready
+  //
+  // Usage:
+  //
+  //   You know
+  //
+  using Argument = string::Storage;
+}
+#endiv

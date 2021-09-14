@@ -25,8 +25,7 @@ namespace re::construct::detail {
   template<required::Corelike UNIFIER> struct Choose_Constructor_Data_Pointer<UNIFIER, VALUE_TYPE_CONST_STAR>;
   template<required::Corelike UNIFIER> struct Choose_Constructor_Data_Pointer<UNIFIER, DATA_TYPE>;
   template<required::Corelike UNIFIER> using Constructor_Data_Pointer = Choose_Constructor_Data_Pointer<UNIFIER, (std::is_base_of<std::string, UNIFIER>::value ? VALUE_TYPE_CONST_STAR : 
-                                                                                                                  std::is_base_of<std::vector<char>, UNIFIER>::value ? VALUE_TYPE_CONST_STAR :
-                                                                                                                  DATA_TYPE)>;
+                                                                                                                  std::is_base_of<std::vector<char>, UNIFIER>::value ? VALUE_TYPE_CONST_STAR : DATA_TYPE)>;
 }
 #endiv
 #divert <hpp>

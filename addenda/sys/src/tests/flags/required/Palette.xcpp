@@ -13,24 +13,24 @@ namespace tests::flags::required {
   //     ...something...
   //   };
   //
-  template<typename PALETTE> concept bool Palette = requires(PALETTE palette) {
+  template<typename PALETTE> concept Palette = requires(PALETTE palette) {
     typename PALETTE::Flag;
     typename PALETTE::Flags;
     { palette.some_flag_series }; // ... the zero value must not be in this set
     { palette.no_flags }; // ........... this is the zero value
     { palette.all_flags }; // .......... the zero value MUST NOT be in this set
-    { palette.setUp() } -> void;
-    { palette.tearDown() } -> void;
+    { palette.setUp() };
+    { palette.tearDown() };
     // [[FIXTHIS]] want to say FIXTURE for the yet-to-be-defined Fixture
     // Therefore PALETTE must have public default constructor & destructor
     requires std::is_default_constructible_v<PALETTE>;
-    { PALETTE::template series<PALETTE>() } -> Series;
-    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flag{}) } -> typename PALETTE::Flag;
-    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flags{}) } -> typename PALETTE::Flag;
-    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flag{}) } -> typename PALETTE::Flags;
-    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flags{}) } -> typename PALETTE::Flags;
-    { palette.test_flag_constants() } -> void;
-    { palette.test_flags_constants() } -> void;
+    { PALETTE::template series<PALETTE>() } -> convertible_to<Series>;
+    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flag{}) } -> convertible_to<typename PALETTE::Flag>;
+    { PALETTE::template as<typename PALETTE::Flag>(typename PALETTE::Flags{}) } -> convertible_to<typename PALETTE::Flag>;
+    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flag{}) } -> convertible_to<typename PALETTE::Flags>;
+    { PALETTE::template as<typename PALETTE::Flags>(typename PALETTE::Flags{}) } -> convertible_to<typename PALETTE::Flags>;
+    { palette.test_flag_constants() };
+    { palette.test_flags_constants() };
   };
 }
 #endiv

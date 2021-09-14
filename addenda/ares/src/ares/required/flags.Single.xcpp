@@ -6,7 +6,7 @@ namespace ares::required::flags {
   //
   // An enumeration for use in the "flags" paradigm of (flag, flags)
   //
-  template<typename ENUM> concept bool Single = std::is_enum<ENUM>::value;
+  template<typename ENUM> concept Single = std::is_enum<ENUM>::value;
 }
 #endiv
 #divert <cpp>

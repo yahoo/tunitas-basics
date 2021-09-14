@@ -12,8 +12,8 @@
 namespace tests::outcome {
   using Args = std::deque<std::string>;
   namespace required {
-    template<typename ERROR> concept bool Error = (std::is_same<ERROR, std::error_code>::value ||
-						   std::is_same<ERROR, std::error_condition>::value);
+    template<typename ERROR> concept Error = (std::is_same<ERROR, std::error_code>::value ||
+                                              std::is_same<ERROR, std::error_condition>::value);
   }
 }
 #endiv

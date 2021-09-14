@@ -31,25 +31,25 @@ namespace tests::usage::posix_wait2 {
     namespace [[detail]] {
       namespace [[detail]] disambiguate_function {
         using sys::posix::wait2;
-        template<typename RETURNED> concept bool Instance = requires(RETURNED, io::Status &sutats) {
-          requires same_as<RETURNED, sys::id::Process>;
+        template<typename RETURNED> concept Instance = requires(RETURNED, io::Status &sutats) {
+    requires same_as<RETURNED, sys::id::Process>;
           requires required::Process<RETURNED>;
           // WATCHOUT - this is copypasta among the two disambiguation namespaces
-          { wait2() } -> convertible_to<result::Value<RETURNED, io::Status>>;
-          { wait2(sutats) } -> convertible_to<result::Value<RETURNED>>;
+    { wait2() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+    { wait2(sutats) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         };
       }
       namespace [[detail]] disambiguate_native {
         using sys::posix::native::wait2;
-        template<typename RETURNED> concept bool Instance = requires(RETURNED, io::Status &sutats) {
+        template<typename RETURNED> concept Instance = requires(RETURNED, io::Status &sutats) {
           requires same_as<RETURNED, pid_t>;
           requires required::Process<RETURNED>;
-          { wait2() } -> convertible_to<result::Value<RETURNED, io::Status>>;
-          { wait2(sutats) } -> convertible_to<result::Value<RETURNED>>;
+          { wait2() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+          { wait2(sutats) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         };
       }
     }
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires disambiguate_native::Instance<pid_t>;
       requires disambiguate_function::Instance<sys::id::Process>;

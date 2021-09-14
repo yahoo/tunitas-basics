@@ -1,0 +1,43 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.application.Fixture
+#endiv
+#divert <hpp>
+#import std.runtime_error
+#import tunitas.application.exception.Aspect
+#import tunitas.application.exception.aspect.Version
+#import std.string
+#import sys.exits.Code
+#import sys.exits.constants
+class tests::unit::application::Fixture::Version : public tunitas::application::exception::Aspect, public tunitas::application::exception::aspect::Version, public std::runtime_error {
+  struct Ancestors {
+    using Aspect = tunitas::application::exception::Aspect;
+    using Feature = tunitas::application::exception::aspect::Version;
+    using Exception = std::runtime_error;
+  };
+public:
+  inline explicit Version(std::string NAME);
+  auto what() const noexcept -> char const * override final;
+  auto stream() const noexcept -> std::ostream & override final;
+  auto code() const noexcept -> sys::exits::Code override final;
+  auto exit() const noexcept -> sys::exits::Code override final;
+};
+#endiv
+#divert <ipp>
+#import std.move
+tests::unit::application::Fixture::Version::Version(std::string NAME)
+  : Ancestors::Exception{std::move(NAME)}
+{ }
+#endiv
+#divert <cpp>
+namespace tests::unit::application {
+  auto Fixture::Version::what() const noexcept -> char const *     { return Ancestors::Exception::what(); }
+  auto Fixture::Version::stream() const noexcept -> std::ostream & { return Ancestors::Feature::stream(); }
+  auto Fixture::Version::code() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+  auto Fixture::Version::exit() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+}
+#endiv

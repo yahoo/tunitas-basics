@@ -18,7 +18,7 @@ namespace byte::required {
   // But also, a "byte" is not a "char" which is a "character, " a cultural artifact.
   // A character is an element of a character set, being: thin, wide, Unicode (UTF-8, 16, 32).
   //
-  template<typename BYTE> concept bool Byte = std::is_same<type_t, typename std::remove_const<BYTE>::type>::value;
+  template<typename BYTE> concept Byte = std::is_same<type_t, typename std::remove_const<BYTE>::type>::value;
 }
 #endiv
 #divert <cpp>

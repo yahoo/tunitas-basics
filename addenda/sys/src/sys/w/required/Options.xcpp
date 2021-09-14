@@ -14,6 +14,6 @@ namespace sys::w::required {
   //
   //   template<required::Options RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename OPTIONS> concept bool Options = std::is_same_v<OPTIONS, w::Options> || std::is_same_v<OPTIONS, w::Option>;
+  template<typename OPTIONS> concept Options = std::is_same_v<OPTIONS, w::Options> || std::is_same_v<OPTIONS, w::Option>;
 }
 #endiv

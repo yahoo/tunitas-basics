@@ -7,6 +7,6 @@ namespace sys::ip::required {
   //
   // Is this a reasonable IP version?   We admit to four, six and (sic) ten [[NOT]].
   //
-  template<Version VERSION> concept bool Version = version::Traits<VERSION>::value;
+  template<Version VERSION> concept Version = version::Traits<VERSION>::value;
 }
 #endiv

@@ -15,8 +15,8 @@ namespace tunitas::required {
   //     Something(STRINGABLE stringable);
   //   };
   //
-  template<typename STRINGABLE> concept bool Stringable = requires(STRINGABLE stringable) {
-    { std::string{stringable} } -> std::string;
+  template<typename STRINGABLE> concept Stringable = requires(STRINGABLE stringable) {
+    { std::string{stringable} } -> convertible_to<std::string>;
   };
 }
 #endiv

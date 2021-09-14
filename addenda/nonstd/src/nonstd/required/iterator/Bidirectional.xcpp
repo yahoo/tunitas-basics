@@ -10,11 +10,11 @@ namespace nonstd::required::iterator {
   //
   // Most of https://en.cppreference.com/w/cpp/named_req/BidirectionalIterator
   //
-  template<typename ITERATOR> concept bool Bidirectional = Forward<ITERATOR> && requires(ITERATOR iterator) {
+  template<typename ITERATOR> concept Bidirectional = Forward<ITERATOR> && requires(ITERATOR iterator) {
     requires is_base_of_v<bidirectional_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>;
-    { --iterator } -> ITERATOR &;
-    { iterator-- } -> ITERATOR;
-    { *iterator-- } -> typename iterator_traits<ITERATOR>::reference;
+    { --iterator } -> convertible_to<ITERATOR &>;
+    { iterator-- } -> convertible_to<ITERATOR>;
+    { *iterator-- } -> convertible_to<typename iterator_traits<ITERATOR>::reference>;
   };
 }
 #endiv

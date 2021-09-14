@@ -1,0 +1,30 @@
+# This is a GNU -*- Makefile -*- which is managed by automake.
+# Copyright Yahoo Inc, 2021.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-temerarious-flagship/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/build/temerarious-flagship/tree/LICENSE
+#
+obj_src_tunitas_base64_SUBSOURCES = \
+  obj/src/tunitas/base64/namespace.cpp \
+  obj/src/tunitas/base64/Code.cpp \
+  obj/src/tunitas/base64/Exception.cpp \
+  \
+  obj/src/tunitas/base64/decode.cpp \
+  obj/src/tunitas/base64/decode.detail.cpp \
+  obj/src/tunitas/base64/Decoder.cpp \
+  obj/src/tunitas/base64/Decoder.Shaver.cpp \
+  obj/src/tunitas/base64/decoder.Get.cpp \
+  obj/src/tunitas/base64/decoder.Invalid.cpp \
+  obj/src/tunitas/base64/decoder.Seek.cpp \
+  obj/src/tunitas/base64/decoder.Underflow.cpp \
+  obj/src/tunitas/base64/decoder.required.Gettable.cpp \
+  \
+  obj/src/tunitas/base64/encode.cpp \
+  obj/src/tunitas/base64/Encoder.cpp \
+  obj/src/tunitas/base64/encoder.Finalized.cpp \
+  obj/src/tunitas/base64/encoder.Invalid.cpp \
+  obj/src/tunitas/base64/encoder.Put.cpp \
+  \
+  obj/src/tunitas/base64/sized.ByType.cpp \
+  obj/src/tunitas/base64/sized.ByValue.cpp \
+  $(end)

@@ -3,7 +3,7 @@
 #divert <fpp>
 #import std.is_same
 namespace tests::unit::time {
-  template<typename REP> concept bool Representation = std::is_same<int unsigned long long, REP>::value || std::is_same<long double, REP>::value;
+  template<typename REP> concept Representation = std::is_same<int unsigned long long, REP>::value || std::is_same<long double, REP>::value;
   template<Representation REP> class Literals;
 }
 #divert </fpp>

@@ -10,22 +10,22 @@ namespace ares::required::query {
   //
   // The various callback options for ares::query(...)
   //
-  template<typename CONTINUATION, typename STATE> concept bool Continuation = requires() {
+  template<typename CONTINUATION, typename STATE> concept Continuation = requires() {
     // ares::query(channel, dnsclass, dnstype, continuation, state);
     requires requires(void *_state, int _status, int _timeouts, unsigned char *_buffer, int _length) {
-      { CONTINUATION::_receive(_state, _status, _timeouts, _buffer, _length) } -> void;
+      { CONTINUATION::_receive(_state, _status, _timeouts, _buffer, _length) };
     };
     requires requires(STATE &state, error::Code status, Count timeouts, Buffer<std::byte const> buffer) {
-      { CONTINUATION::receive(state, status, timeouts, buffer) } -> void;
+      { CONTINUATION::receive(state, status, timeouts, buffer) };
     };
   };
-  template<typename FUNCTION> concept bool Function = requires() {
+  template<typename FUNCTION> concept Function = requires() {
     // ares::query(channel, dnsclass, dnstype, function);
     requires requires(void *_function, int _status, int _timeouts, unsigned char *_buffer, int _length) {
-      { FUNCTION::template _receive<FUNCTION>(_function, _status, _timeouts, _buffer, _length) } -> void;
+      { FUNCTION::template _receive<FUNCTION>(_function, _status, _timeouts, _buffer, _length) };
     };
     requires requires(FUNCTION function, ares::error::Code status, ares::Count timeouts, ares::Buffer<std::byte const> buffer) {
-      { function.receive(status, timeouts, buffer) } -> void;
+      { function.receive(status, timeouts, buffer) };
     };
   };
 }

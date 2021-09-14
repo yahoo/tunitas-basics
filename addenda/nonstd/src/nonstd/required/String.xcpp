@@ -14,7 +14,7 @@ namespace nonstd::required {
   //   auto function(...) -> Something;
   //   template<required::String STRING> auto function(...) -> STRING;
   //
-  template<typename STRING> concept bool String = requires(STRING string) {
+  template<typename STRING> concept String = requires(STRING string) {
     typename STRING::value_type;
     requires Basic_String<STRING>;
     requires std::is_same<char, typename STRING::value_type>::value;

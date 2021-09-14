@@ -1,5 +1,5 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import nonstd.is_unsigned
 #include <hpp/nonstd.is_unsigned>
@@ -7,7 +7,7 @@ namespace format::required::integer {
   //
   // What constitutes an unsigned integer?
   //
-  template<typename INTEGER> concept bool Unsigned = nonstd::is_unsigned<INTEGER>::value;
+  template<typename INTEGER> concept Unsigned = nonstd::is_unsigned<INTEGER>::value;
 }
 #endiv
 #divert <cpp>

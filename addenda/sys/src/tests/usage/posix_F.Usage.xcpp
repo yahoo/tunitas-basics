@@ -16,13 +16,13 @@
 namespace tests::usage::posix_F {
   using sys::posix::F;
   namespace [[detail]] packaging {
-    template<typename F> concept bool Flock = requires(F) {
+    template<typename F> concept Flock = requires(F) {
       requires (int)F::LOCK == F_LOCK;
       requires (int)F::TEST == F_TEST;
       requires (int)F::TEST_AND_LOCK == F_TLOCK;
       requires (int)F::UNLOCK == F_ULOCK;
     };
-    template<typename F> concept bool Old_School = requires(F) {
+    template<typename F> concept Old_School = requires(F) {
       requires (int)F::DUPFD == F_DUPFD;
       requires (int)F::DUPFD_CLOEXEC == F_DUPFD_CLOEXEC;
       requires (int)F::GETFD == F_GETFD;
@@ -64,8 +64,8 @@ namespace tests::usage::posix_F {
       requires (int)F::GET_RW_HINT == F_GET_RW_HINT;
       requires (int)F::SET_RW_HINT == F_SET_RW_HINT;
     };
-    template<typename F> concept bool New_School = requires(F) {
-      // Buy a Vowel!
+    template<typename F> concept New_School = requires(F) {
+        // Buy a Vowel!
       requires (int)F::GETLOCK == F_GETLK;
       requires (int)F::SETLOCK == F_SETLK;
       requires (int)F::SETLOCK_WAITING == F_SETLKW;
@@ -103,7 +103,7 @@ namespace tests::usage::posix_F {
       requires (int)F::GET_RWH_FILE == F_GET_FILE_RW_HINT;
       requires (int)F::SET_RWH_FILE == F_SET_FILE_RW_HINT;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires model::Namespace_Object<F>;
       requires Old_School<F>;

@@ -10,7 +10,7 @@ namespace ares::exception {
   // Usage:
   //
   //   class my::Problem : public Aspect, public std::runtime_error {
-  //     struct ancestors {
+  //     struct Ancestors {
   //        using Aspect = ares::exception::Aspect;
   //        using Exception = std;:runtime_error;
   //     };
@@ -20,7 +20,7 @@ namespace ares::exception {
   //   };
   //
   //   class my::Invalid : public Aspect, public std::invalid_argument {
-  //     struct ancestors {
+  //     struct Ancestors {
   //        using Aspect = ares::exception::Aspect;
   //        using Exception = std;:invalid_Argument;
   //     };

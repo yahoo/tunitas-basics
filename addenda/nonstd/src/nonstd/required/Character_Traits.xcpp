@@ -20,7 +20,7 @@ namespace nonstd::required {
   //   template<required:;character::Type C, required::character::Traits<C> T> class Something_Else; 
   //   template<required::Character C, required::Character_Traits T> auto operator<<(basic_ostream<C, T> &, ...) -> basic_ostream<C, T> &;
   //
-  template<typename TRAITS> concept bool Character_Traits = requires(TRAITS traits) {
+  template<typename TRAITS> concept Character_Traits = requires(TRAITS traits) {
     typename TRAITS::char_type;
     requires character::Traits<TRAITS, typename TRAITS::char_type>;
   };

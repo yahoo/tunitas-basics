@@ -13,6 +13,6 @@ namespace tunitas::required {
   //
   //   template<required::Default_Constructible TYPE> auto function(TYPE) -> TYPE;
   //
-  template<typename TYPE> concept bool Default_Constructible = std::is_default_constructible<TYPE>::value;
+  template<typename TYPE> concept Default_Constructible = std::is_default_constructible<TYPE>::value;
 }
 #endiv

@@ -13,7 +13,7 @@ namespace nonstd::required {
   //
   //   template<required::Path PATH> auto function(...) -> PATH;
   //
-  template<typename PATH> concept bool Path = requires(PATH path) {
+  template<typename PATH> concept Path = requires(PATH path) {
     typename PATH::value_type;
     typename PATH::string_type;
     requires std::is_same<char, typename PATH::value_type>::value;

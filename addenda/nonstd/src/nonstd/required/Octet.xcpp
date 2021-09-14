@@ -9,7 +9,7 @@ namespace nonstd::required {
   //
   // An 8-bit type.
   //
-  template<typename OCTET> concept bool Octet = requires(OCTET octet) {
+  template<typename OCTET> concept Octet = requires(OCTET octet) {
     requires !std::is_const<OCTET>::value; // to belabor the point
     requires 1 == sizeof (OCTET);
     requires std::is_integral<OCTET>::value || std::is_enum<OCTET>::value;

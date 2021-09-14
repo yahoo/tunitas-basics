@@ -12,8 +12,8 @@ namespace sys::id::required {
   //
   //   Oh come on.
   //
-  template<typename USER> concept bool User = (std::is_same_v<USER, id::User> ||
-                                               std::is_same_v<USER, std::underlying_type_t<id::User>>);
+  template<typename USER> concept User = (std::is_same_v<USER, id::User> ||
+                                          std::is_same_v<USER, std::underlying_type_t<id::User>>);
 }
 #endiv
 #divert <cpp>

@@ -15,8 +15,8 @@ namespace nonstd::required::container {
   //
   template<typename CONTAINER> concept Size = requires(CONTAINER container) {
     requires Basic<CONTAINER>;
-    { std::size(container) } -> std::size_t;
-    { std::empty(container) } -> bool;
+    { std::size(container) } -> convertible_to<std::size_t>;
+    { std::empty(container) } -> convertible_to<bool>;
   };
 }
 #endiv

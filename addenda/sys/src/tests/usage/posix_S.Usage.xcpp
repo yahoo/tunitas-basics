@@ -19,7 +19,7 @@ namespace tests::usage::posix_S {
     //
     // WATCHOUT - a cast to int (operator int()) will NOT work here
     // 
-    template<typename S> concept bool Bits = requires(S) {
+    template<typename S> concept Bits = requires(S) {
       requires (mode_t)S::N == 0u;
       requires (mode_t)S::R == 4u;
       requires (mode_t)S::W == 2u;
@@ -29,7 +29,7 @@ namespace tests::usage::posix_S {
       requires (mode_t)S::WX == 3u;
       requires (mode_t)S::RWX == 7u;
     };
-    template<typename S> concept bool Old_School = requires(S) {
+    template<typename S> concept Old_School = requires(S) {
       requires (mode_t)S::ISUID == S_ISUID;
       requires (mode_t)S::ISGID == S_ISGID;
       requires (mode_t)S::ISVTX == S_ISVTX;
@@ -43,7 +43,7 @@ namespace tests::usage::posix_S {
       requires (mode_t)S::IWOTH == S_IWOTH;
       requires (mode_t)S::IXOTH == S_IXOTH;
     };
-    template<typename S> concept bool New_School = requires(S) {
+    template<typename S> concept New_School = requires(S) {
       requires (mode_t)S::NONE == 0;
       requires (mode_t)S::SETUID == S_ISUID;
       requires (mode_t)S::SETGID == S_ISGID;
@@ -58,7 +58,7 @@ namespace tests::usage::posix_S {
       requires (mode_t)S::WOTHER == S_IWOTH;
       requires (mode_t)S::XOTHER == S_IXOTH;
     };
-    template<typename S> concept bool Instance = requires(S) {
+    template<typename S> concept Instance = requires(S) {
       typename S::Bit;
       typename S::Bits;
       typename S::Flag;
@@ -72,34 +72,34 @@ namespace tests::usage::posix_S {
       requires New_School<S>;
       requires requires(S, typename S::Bit bit, typename S::Bits its) {
 #if 202003L < __cplusplus
+        { S::template as<typename S::Bit>(bit) } -> convertible_to<convertible_to<typename S::Bit>>;
+        { S::template as<typename S::Bits>(bit) } -> convertible_to<convertible_to<typename S::Bits>>;
+        { S::template as<typename S::Bit>(its) } -> convertible_to<convertible_to<typename S::Bit>>;
+        { S::template as<typename S::Bits>(its) } -> convertible_to<convertible_to<typename S::Bits>>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { S::template as<typename S::Bit>(bit) } -> convertible_to<typename S::Bit>;
         { S::template as<typename S::Bits>(bit) } -> convertible_to<typename S::Bits>;
         { S::template as<typename S::Bit>(its) } -> convertible_to<typename S::Bit>;
         { S::template as<typename S::Bits>(its) } -> convertible_to<typename S::Bits>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { S::template as<typename S::Bit>(bit) } -> typename S::Bit;
-        { S::template as<typename S::Bits>(bit) } -> typename S::Bits;
-        { S::template as<typename S::Bit>(its) } -> typename S::Bit;
-        { S::template as<typename S::Bits>(its) } -> typename S::Bits;
 #endif
       };
       requires requires(S, typename S::Flag lag, typename S::Flags ags) {
 #if 202003L < __cplusplus
+        { S::template as<typename S::Flag>(lag) } -> convertible_to<convertible_to<typename S::Flag>>;
+        { S::template as<typename S::Flags>(lag) } -> convertible_to<convertible_to<typename S::Flags>>;
+        { S::template as<typename S::Flag>(ags) } -> convertible_to<convertible_to<typename S::Flag>>;
+        { S::template as<typename S::Flags>(ags) } -> convertible_to<convertible_to<typename S::Flags>>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { S::template as<typename S::Flag>(lag) } -> convertible_to<typename S::Flag>;
         { S::template as<typename S::Flags>(lag) } -> convertible_to<typename S::Flags>;
         { S::template as<typename S::Flag>(ags) } -> convertible_to<typename S::Flag>;
         { S::template as<typename S::Flags>(ags) } -> convertible_to<typename S::Flags>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { S::template as<typename S::Flag>(lag) } -> typename S::Flag;
-        { S::template as<typename S::Flags>(lag) } -> typename S::Flags;
-        { S::template as<typename S::Flag>(ags) } -> typename S::Flag;
-        { S::template as<typename S::Flags>(ags) } -> typename S::Flags;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<S>;
     };

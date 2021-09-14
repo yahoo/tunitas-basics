@@ -14,7 +14,7 @@ namespace sys::posix::packaging::required::from_tm {
   namespace implementation {
     using namespace packaging::from_tm::interface;
     using std::is_same_v;
-    template<typename RESULT> concept bool Result = is_same_v<RESULT, Old> || is_same_v<RESULT, Point>;
+    template<typename RESULT> concept Result = is_same_v<RESULT, Old> || is_same_v<RESULT, Point>;
   }
   using implementation::Result;
 }

@@ -35,32 +35,32 @@ namespace tests::usage::posix_lock {
       using Operation = sys::lock::Operation;
       using Returned = sys::call::result::Value<Operation>;
       using Status = sys::call::Result;
-      template<typename FILE> concept bool Overloading = requires(FILE file, Operation operation) {
+      template<typename FILE> concept Overloading = requires(FILE file, Operation operation) {
         requires required::Unmanaged<FILE>;
-        { getlock(file) } -> convertible_to<Returned>;
-        { getlock(file, operation) } -> convertible_to<Status>;
-        { setlock(file, operation) } -> convertible_to<Status>;
+        { getlock(file) } -> convertible_to<convertible_to<Returned>>;
+        { getlock(file, operation) } -> convertible_to<convertible_to<Status>>;
+        { setlock(file, operation) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_LOCK_Long = requires(FILE file) {
+      template<typename FILE> concept Object_LOCK_Long = requires(FILE file) {
         requires required::Unmanaged<FILE>;
-        { setlock(file, LOCK::READ) } -> convertible_to<Status>;
-        { setlock(file, LOCK::WRITE) } -> convertible_to<Status>;
-        { setlock(file, LOCK::END) } -> convertible_to<Status>;
-        { setlock(file, LOCK::ENDLOCK) } -> convertible_to<Status>;
+        { setlock(file, LOCK::READ) } -> convertible_to<convertible_to<Status>>;
+        { setlock(file, LOCK::WRITE) } -> convertible_to<convertible_to<Status>>;
+        { setlock(file, LOCK::END) } -> convertible_to<convertible_to<Status>>;
+        { setlock(file, LOCK::ENDLOCK) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_LOCK_Short = requires(FILE file) {
+      template<typename FILE> concept Object_LOCK_Short = requires(FILE file) {
         requires required::Unmanaged<FILE>;
-        { lock(file, LOCK::RD) } -> convertible_to<Status>;
-        { lock(file, LOCK::WR) } -> convertible_to<Status>;
-        { lock(file, LOCK::UN) } -> convertible_to<Status>;
+        { lock(file, LOCK::RD) } -> convertible_to<convertible_to<Status>>;
+        { lock(file, LOCK::WR) } -> convertible_to<convertible_to<Status>>;
+        { lock(file, LOCK::UN) } -> convertible_to<convertible_to<Status>>;
       };
     }
-    template<typename FILE> concept bool Instance = requires(FILE) {
+    template<typename FILE> concept Instance = requires(FILE) {
       requires Overloading<FILE>;
       requires Object_LOCK_Short<FILE>;
       requires Object_LOCK_Long<FILE>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       Instance<int>;
       Instance<sys::id::File>;

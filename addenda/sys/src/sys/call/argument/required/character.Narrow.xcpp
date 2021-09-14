@@ -19,6 +19,6 @@ namespace sys::call::argument::required::character {
   //
   //   oh, come on.
   //
-  template<typename CHAR> concept bool Narrow = std::is_same<typename std::remove_const<CHAR>::type, char>::value;
+  template<typename CHAR> concept Narrow = std::is_same<typename std::remove_const<CHAR>::type, char>::value;
 }
 #endiv

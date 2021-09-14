@@ -8,9 +8,9 @@ namespace nonstd::required::iterator {
   //
   // An iterator iterator producing a specified type.
   //
-  template<typename ITERATOR, typename NEEDED> concept bool Producing = Basis<ITERATOR> && requires(ITERATOR iterator) {
+  template<typename ITERATOR, typename NEEDED> concept Producing = Basis<ITERATOR> && requires(ITERATOR iterator) {
     typename std::iterator_traits<ITERATOR>::value_type; // this is overkill
-    { *iterator } -> NEEDED;
+    { *iterator } -> convertible_to<NEEDED>;
   };
 }
 #endiv

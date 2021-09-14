@@ -1,5 +1,5 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import std.basic_ostream
 #import std.char_traits
@@ -20,27 +20,24 @@ namespace format::json::required {
       using char_type = typename std::remove_const<typename std::remove_pointer<typename std::remove_extent<typename std::remove_reference<typename std::remove_const<BASE>::type>::type>::type>::type>::type;
       using stream_type = std::basic_ostream<char_type, std::char_traits<char_type>>;
     };
-    template<typename ARRAY> concept bool Array =
-      ((std::is_array<ARRAY>::value
-        || std::is_array<typename std::remove_reference<ARRAY>::type>::value)
-       && Character<typename assoc_stream<ARRAY>::char_type>)
-      && requires(ARRAY array, typename assoc_stream<ARRAY>::stream_type &outbound) {
-      outbound << array;
-    };
-    template<typename POINTER> concept bool Pointer = 
-                  (std::is_pointer<POINTER>::value && Character<typename std::remove_const<typename std::remove_pointer<POINTER>::type>::type>)
-                  && requires(POINTER pointer) {
-      typename assoc_stream<POINTER>::stream_type;
-    } && 
-    requires (POINTER pointer, typename assoc_stream<POINTER>::stream_type &outbound) {
-        outbound << pointer;
-      };
-    template<typename OBJECT> concept bool Object = requires(OBJECT object, std::basic_ostream<typename std::remove_const<typename OBJECT::value_type>::type, std::char_traits<typename std::remove_const<typename OBJECT::value_type>::type>> &outbound) {
+    template<typename ARRAY> concept Array = (((std::is_array<ARRAY>::value
+                                                || std::is_array<typename std::remove_reference<ARRAY>::type>::value)
+                                               && Character<typename assoc_stream<ARRAY>::char_type>) &&
+                                              requires(ARRAY array, typename assoc_stream<ARRAY>::stream_type &outbound) {
+                                                outbound << array;
+                                              });
+    template<typename POINTER> concept Pointer = ((std::is_pointer<POINTER>::value && Character<typename std::remove_const<typename std::remove_pointer<POINTER>::type>::type>)
+                                                  && requires(POINTER pointer) {
+                                                    typename assoc_stream<POINTER>::stream_type;
+                                                  } && requires (POINTER pointer, typename assoc_stream<POINTER>::stream_type &outbound) {
+                                                    outbound << pointer;
+                                                  });
+    template<typename OBJECT> concept Object = requires(OBJECT object, std::basic_ostream<typename std::remove_const<typename OBJECT::value_type>::type, std::char_traits<typename std::remove_const<typename OBJECT::value_type>::type>> &outbound) {
       typename OBJECT::value_type;
       outbound << object;
     };
   }
-  template<typename STRINGLIKE> concept bool Stringlike = stringlike::Array<STRINGLIKE> || stringlike::Pointer<STRINGLIKE> || stringlike::Object<STRINGLIKE>;
+  template<typename STRINGLIKE> concept Stringlike = stringlike::Array<STRINGLIKE> || stringlike::Pointer<STRINGLIKE> || stringlike::Object<STRINGLIKE>;
 }
 
 #import std.string

@@ -15,7 +15,7 @@ namespace tests::usage::posix_PF_IP {
   namespace [[detail]] packaging {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    template<typename IP> concept bool Instance = requires(IP) {
+    template<typename IP> concept Instance = requires(IP) {
       typename IP::Protocol;
       requires model::Namespace_Object<IP>;
       requires (int)IP::UNSPECIFIED == PF_UNSPEC;
@@ -57,7 +57,7 @@ namespace tests::usage::posix_PF_IP {
       requires (int)IP::UNSPEC == IPPROTO_IP;
     };
 #pragma GCC diagnostic pop
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<PF::IP>;
     };

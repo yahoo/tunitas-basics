@@ -19,7 +19,7 @@ namespace nonstd::regex::required::iterator {
   // INCORRECT ---> template<::nonstd::regex::required::iterator::Output           OUT> struct X;
   // CORRECT -----> template<::nonstd::regex::required::iterator::Output<char16_t> OUT> struct X;
   //
-  template<typename ITERATOR, typename RHS> concept bool Output = requires(ITERATOR iterator, RHS rhs) {
+  template<typename ITERATOR, typename RHS> concept Output = requires(ITERATOR iterator, RHS rhs) {
     requires nonstd::required::iterator::Output<ITERATOR, RHS>;
     { *iterator++ = rhs };
   };

@@ -31,9 +31,9 @@ namespace nonstd::traits::school {
   //
   namespace [[eponymous]] old {
     // These are dectectors for the old_school names and only the old_school names.
-    template<typename CONTAINER> concept bool Value_Type = 0 != sizeof (typename CONTAINER::value_type);
-    template<typename CONTAINER> concept bool Iterator = 0 != sizeof (typename CONTAINER::iterator);
-    template<typename CONTAINER> concept bool Const_Iterator = 0 != sizeof (typename CONTAINER::const_iterator);
+    template<typename CONTAINER> concept Value_Type = 0 != sizeof (typename CONTAINER::value_type);
+    template<typename CONTAINER> concept Iterator = 0 != sizeof (typename CONTAINER::iterator);
+    template<typename CONTAINER> concept Const_Iterator = 0 != sizeof (typename CONTAINER::const_iterator);
     template<typename TYPE> struct Old;
   }
   using old::Old;

@@ -25,17 +25,17 @@ namespace sys::id::required::school {
   //
   namespace [[detail]] old_beau {
     using namespace std;
-    template<typename TYPE> concept bool Basis = is_integral_v<TYPE>;
+    template<typename TYPE> concept Basis = is_integral_v<TYPE>;
     namespace [[detail, cannot("name this namespace tuple")]] two_pull {
       template<typename TYPE> struct Deconstructor : public false_type { };
       template<typename... TYPES> requires (true && ... && Basis<TYPES>) struct Deconstructor<tuple<TYPES...>> : public true_type { };
-      template<typename TYPE> concept bool Tuple = Deconstructor<TYPE>::value;
+      template<typename TYPE> concept Tuple = Deconstructor<TYPE>::value;
     }
     using two_pull::Tuple;
     namespace [[detail]] except_for_the {
-      template<typename TYPE> concept bool Exceptions = is_same_v<TYPE, tuple<p::Type, id_t>>;
+      template<typename TYPE> concept Exceptions = is_same_v<TYPE, tuple<p::Type, id_t>>;
     }
-    template<typename TYPE> concept bool Old = Basis<TYPE> || Tuple<TYPE> || except_for_the::Exceptions<TYPE>;
+    template<typename TYPE> concept Old = Basis<TYPE> || Tuple<TYPE> || except_for_the::Exceptions<TYPE>;
   }
   using old_beau::Old;
 }

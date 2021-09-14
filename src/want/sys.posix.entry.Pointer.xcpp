@@ -37,15 +37,15 @@ namespace want::sys::posix::entry {
 #import want.sys.posix.entry.Buffer
 namespace want::sys::posix {
   template<entry::required::Entry ENTRY> class entry::Pointer : private std::unique_ptr<entry::Buffer<ENTRY>> {
-    using ancestor = std::unique_ptr<entry::Buffer<ENTRY>>;
+    using Ancestor = std::unique_ptr<entry::Buffer<ENTRY>>;
     using Buffer = entry::Buffer<ENTRY>;
     using Entry = ENTRY;
   public:
     Pointer() = default;
-    using ancestor::unique_ptr;
-    using ancestor::reset;
-    using ancestor::release;
-    using ancestor::get;
+    using Ancestor::unique_ptr;
+    using Ancestor::reset;
+    using Ancestor::release;
+    using Ancestor::get;
 #if 0
     inline explicit Pointer(Buffer *);
     inline auto reset(Buffer *) -> void;
@@ -65,7 +65,7 @@ namespace want::sys::posix {
 namespace want::sys::posix::entry {
 #if 0
   template<required::Entry _> Pointer<_>::Pointer(Buffer *buffer)
-    : ancestor{buffer}
+    : Ancestor{buffer}
   { }
   template<required::Entry _> auto Pointer<_>::reset(Buffer *buffer) -> void {
   }
@@ -77,19 +77,19 @@ namespace want::sys::posix::entry {
   }
 #endif
   template<required::Entry _> auto Pointer<_>::operator*() const -> Entry const & {
-    auto const &buffer{this->ancestor::operator*()};
+    auto const &buffer{this->Ancestor::operator*()};
     return *buffer.entry();
   }
   template<required::Entry _> auto Pointer<_>::operator*() -> Entry & {
-    auto &buffer{this->ancestor::operator*()};
+    auto &buffer{this->Ancestor::operator*()};
     return *buffer.entry();
   }
   template<required::Entry _> auto Pointer<_>::operator->() const -> Entry const * {
-    auto const &buffer{this->ancestor::operator*()};
+    auto const &buffer{this->Ancestor::operator*()};
     return buffer.entry();
   }
   template<required::Entry _> auto Pointer<_>::operator->() -> Entry * {
-    auto &buffer{this->ancestor::operator*()};
+    auto &buffer{this->Ancestor::operator*()};
     return buffer.entry();
   }
 }

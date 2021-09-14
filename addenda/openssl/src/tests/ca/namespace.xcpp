@@ -171,4 +171,4 @@ auto tests::ca::packaging::process::function::process(Filepath const &csrfile, F
   return sys::exits::FAIL;
 }
 #endiv
-                                                                            ,
+    ,

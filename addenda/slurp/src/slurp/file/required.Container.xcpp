@@ -7,7 +7,7 @@ namespace slurp::file::required {
   // Is this type a suitable container for slurp::file::read<CONTAINER>(...) ?
   // The concept is contingent upon the existence of the Configuration<CONTAINER> specialization.
   //
-  template<typename CONTAINER> concept bool Container = requires (CONTAINER container) {
+  template<typename CONTAINER> concept Container = requires (CONTAINER container) {
     typename Configuration<CONTAINER>;
     typename CONTAINER::value_type;
     typename Configuration<CONTAINER>::output_iterator;

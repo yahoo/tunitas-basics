@@ -26,7 +26,7 @@ namespace ares::exception {
 #import re.string
 #import c.const_stringz
 class ares::exception::Null : public Aspect, public std::invalid_argument {
-  struct ancestors {
+  struct Ancestors {
     using Aspect = ares::exception::Aspect;
     using Exception = std::invalid_argument;
   };
@@ -39,7 +39,7 @@ public:
 #divert <ipp>
 namespace ares::exception {
   Null::Null()
-    : ancestors::Exception{"nullptr"}
+    : Ancestors::Exception{"nullptr"}
   { }
   Null::Null(re::string<c::const_stringz> reason)
     : ancestors::Exception{reason.c_str()}

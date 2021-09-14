@@ -1,0 +1,62 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::exception {
+  //
+  // The aspect of a generic application exception.
+  // This is a mixin, hence the name.
+  // Descendants only.
+  // It is set up as an Ancestor to the mixin tree so that STL exceptions can be mixed in as well.
+  //
+  // You will likely want to  mixin tunitas::exception::Aspect as well.
+  // Decision: For reasons of (dis-)ambiguity the Tunitas exception aspects do not cascade,
+  // you have to assemble them independently at the point of use.
+  //
+  // The descendants of Aspect will blend in some of the features to satisfy the obligations.
+  // e.g. feature::Quitting, feature::Usage, feature::Version from namespace tunitas::exception::feature.
+  // e.g. feature::Message from tunitas::exception::feature::Message.
+  //
+  // WATCHOUT - the constructor signature of the Tunitas exception hierarchy is subtly different
+  // than that used by the traditional applications of S.C.O.L.D.  That is convention, not a requirement.
+  //
+  // Usage:
+  //
+  //   using tu = tunitas::exception;
+  //   using ap = tunitas::application::exception;
+  //   class my::Usage : public tu::Aspect,
+  //                     public ap::Aspect,
+  //                     public feature::Usage,
+  //                     public std::runtime_error
+  //     { ... };
+  //   class my::Version : public tu::Aspect, public ap::Aspect, public feature::Version, public std::runtime_error { ... };
+  //   class my::Quitting : public tu::Aspect, public ap::Aspect, public feature::Quitting, public std::runtime_error { ... };
+  //
+  //   try {
+  //     ...
+  //     throw my::Usage{NAME, sys::exits::FAIL};
+  //     throw my::Version{NAME};
+  //     throw my::Quitting{NAME, "because"};
+  //     ...
+  //   } catch (tunitas::application::exception::Aspect const &g) {
+  //     g.stream() << g << '\n';
+  //     return g.code();
+  //   }
+  //
+  class Aspect;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.application.exception.Aspect
+class tunitas::application::options::exception::Aspect /* NOT ---> : public tunitas::exception::Aspect ,,, NOT */ {
+  // NOT ---> using Ancestor = tunitas::exception::Aspect; <--- NOT
+protected:
+  virtual ~Aspect() = default;
+  Aspect() = default;
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv

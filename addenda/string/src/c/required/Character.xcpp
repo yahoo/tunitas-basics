@@ -15,13 +15,13 @@ namespace c::required {
   //     'char const'
   //
   namespace detail {
-    template<typename CHARACTER> concept bool Character_Basis =
+    template<typename CHARACTER> concept Character_Basis =
       (std::is_same<char, CHARACTER>::value ||
        std::is_same<wchar_t, CHARACTER>::value ||
        std::is_same<char16_t, CHARACTER>::value ||
        std::is_same<char32_t, CHARACTER>::value);
   }
-  template<typename CHARACTER> concept bool Character =
+  template<typename CHARACTER> concept Character =
     (detail::Character_Basis<CHARACTER> ||
      detail::Character_Basis<typename std::remove_const<CHARACTER>::type>);
 }

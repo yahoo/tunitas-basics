@@ -18,7 +18,7 @@ namespace ares::required::array {
   //
   //   required::array::Entry<managed::array::Entry<ADDR6>>;
   //
-  template<typename ENTRY> concept bool Entry = Is_Entry<ENTRY>::value;
+  template<typename ENTRY> concept Entry = Is_Entry<ENTRY>::value;
 }
 #endiv
 #divert <hpp>

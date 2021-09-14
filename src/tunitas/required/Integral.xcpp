@@ -13,7 +13,7 @@ namespace tunitas::required {
   //
   //   template<required::Integral INTEGRAL> Constructor(INTEGRAL, INTEGRAL);
   //
-  template<typename INTEGRAL> concept bool Integral = std::is_integral<INTEGRAL>::value;
+  template<typename INTEGRAL> concept Integral = std::is_integral<INTEGRAL>::value;
 }
 #endiv
 #divert <cpp>

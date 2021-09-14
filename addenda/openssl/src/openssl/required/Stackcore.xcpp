@@ -19,6 +19,6 @@ namespace openssl::required {
   //   Iteratable<OPENSSL_STACK>
   //   Iteratable<OPENSSL_STACK const>
   //
-  template<typename CORE> concept bool Stackcore = std::is_same_v<std::remove_const_t<CORE>, OPENSSL_STACK>;
+  template<typename CORE> concept Stackcore = std::is_same_v<std::remove_const_t<CORE>, OPENSSL_STACK>;
 }
 #endiv

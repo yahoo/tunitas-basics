@@ -22,9 +22,9 @@
 #       <= 0     if any interfaces were changed
 #       <= AGE   if no interface change, but any other (source code) change
 #
-lib_libtunitas_la_CURRENT = 15
-lib_libtunitas_la_REVISION = 0
-lib_libtunitas_la_AGE = 4
+lib_libtunitas_la_CURRENT = 18
+lib_libtunitas_la_REVISION = 1
+lib_libtunitas_la_AGE = 1
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 
 lib_libtunitas_la = lib/libtunitas.la
@@ -33,83 +33,30 @@ lib_libtunitas_la_LIBADD = -loptions-module -lsys-module $(lib_libwant_la)
 lib_libtunitas_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_la_SOURCES))
 lib_libtunitas_la_SOURCES = \
   obj/src/tunitas/namespace.cpp \
+  obj/src/tunitas/literals.cpp \
+  obj/src/tunitas/Optional.cpp \
   \
-  obj/src/tunitas/required/namespace.cpp \
-  obj/src/tunitas/required/Integral.cpp \
-  obj/src/tunitas/required/Integer.cpp \
-  obj/src/tunitas/required/integer.Signed.cpp \
-  obj/src/tunitas/required/integer.Unsigned.cpp \
-  obj/src/tunitas/required/Iterator_Producing.cpp \
-  obj/src/tunitas/required/Container_Push_Back.cpp \
-  obj/src/tunitas/required/Container_Push_Back_Char.cpp \
-  obj/src/tunitas/required/Container_Push_Back_Octet.cpp \
-  obj/src/tunitas/required/Stringable.cpp \
-  obj/src/tunitas/required/Move_Constructible.cpp \
-  obj/src/tunitas/required/Default_Constructible.cpp \
-  obj/src/tunitas/required/Octet.cpp \
-  obj/src/tunitas/required/Outcomable.cpp \
-  obj/src/tunitas/required/exception/namespace.cpp \
-  obj/src/tunitas/required/exception/Quitting.cpp \
-  obj/src/tunitas/required/exception/app.Quitting.cpp \
-  \
-  obj/src/tunitas/base64/namespace.cpp \
-  obj/src/tunitas/base64/Code.cpp \
-  obj/src/tunitas/base64/Exception.cpp \
-  \
-  obj/src/tunitas/base64/decode.cpp \
-  obj/src/tunitas/base64/decode.detail.cpp \
-  obj/src/tunitas/base64/Decoder.cpp \
-  obj/src/tunitas/base64/Decoder.Shaver.cpp \
-  obj/src/tunitas/base64/decoder.Get.cpp \
-  obj/src/tunitas/base64/decoder.Invalid.cpp \
-  obj/src/tunitas/base64/decoder.Seek.cpp \
-  obj/src/tunitas/base64/decoder.Underflow.cpp \
-  obj/src/tunitas/base64/decoder.required.Gettable.cpp \
-  \
-  obj/src/tunitas/base64/encode.cpp \
-  obj/src/tunitas/base64/Encoder.cpp \
-  obj/src/tunitas/base64/encoder.Finalized.cpp \
-  obj/src/tunitas/base64/encoder.Invalid.cpp \
-  obj/src/tunitas/base64/encoder.Put.cpp \
-  \
-  obj/src/tunitas/base64/sized.ByType.cpp \
-  obj/src/tunitas/base64/sized.ByValue.cpp \
-  \
-  obj/src/tunitas/exception/namespace.cpp \
-  obj/src/tunitas/exception/Aspect.cpp \
-  obj/src/tunitas/exception/feature.Messaging.cpp \
-  obj/src/tunitas/exception/feature.Quitting.cpp \
-  obj/src/tunitas/exception/aspect/namespace.cpp \
-  obj/src/tunitas/exception/aspect/Quitting.cpp \
-  obj/src/tunitas/exception/aspect/Messaging.cpp \
-  \
-  obj/src/tunitas/Outcome.cpp \
-  obj/src/tunitas/Success.cpp \
-  obj/src/tunitas/outcome/namespace.cpp \
-  obj/src/tunitas/outcome/Success.cpp \
-  obj/src/tunitas/outcome/Variant.cpp \
-  obj/src/tunitas/outcome/variant.Ancestor.cpp \
-  obj/src/tunitas/outcome/Visitor.cpp \
-  obj/src/tunitas/outcome/visit.cpp \
-  \
-  obj/src/tunitas/time/namespace.cpp \
-  obj/src/tunitas/time/Clock.cpp \
-  obj/src/tunitas/time/duration.cpp \
-  obj/src/tunitas/time/duration_cast.cpp \
-  obj/src/tunitas/time/Duration.cpp \
-  obj/src/tunitas/time/literals.cpp \
-  obj/src/tunitas/time/Point.cpp \
-  obj/src/tunitas/time/put.cpp \
-  obj/src/tunitas/time/ratio.cpp \
-  \
-  obj/src/tunitas/urlsafe/namespace.cpp \
-  obj/src/tunitas/urlsafe/detail.cpp \
-  obj/src/tunitas/urlsafe/Code.cpp \
-  obj/src/tunitas/urlsafe/Exception.cpp \
-  obj/src/tunitas/urlsafe/decode.cpp \
-  obj/src/tunitas/urlsafe/decoder.Invalid.cpp \
-  obj/src/tunitas/urlsafe/encode.cpp \
+  $(obj_src_tunitas_base64_SUBSOURCES) \
+  $(obj_src_tunitas_exception_SUBSOURCES) \
+  $(obj_src_tunitas_file_SUBSOURCES) \
+  $(obj_src_tunitas_outcome_SUBSOURCES) \
+  $(obj_src_tunitas_required_SUBSOURCES) \
+  $(obj_src_tunitas_string_SUBSOURCES) \
+  $(obj_src_tunitas_time_SUBSOURCES) \
+  $(obj_src_tunitas_tuple_SUBSOURCES) \
+  $(obj_src_tunitas_urlsafe_SUBSOURCES) \
   $(end)
+#
+include src/tunitas/base64/Makefrag.am
+include src/tunitas/exception/Makefrag.am
+include src/tunitas/file/Makefrag.am
+include src/tunitas/outcome/Makefrag.am
+include src/tunitas/required/Makefrag.am
+include src/tunitas/string/Makefrag.am
+include src/tunitas/time/Makefrag.am
+include src/tunitas/tuple/Makefrag.am
+include src/tunitas/urlsafe/Makefrag.am
+#
 $(scold_cxxdir)/tunitas/dependencies.mk: $(lib_libtunitas_la_SOURCES)
 $(lib_libtunitas_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
 	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)

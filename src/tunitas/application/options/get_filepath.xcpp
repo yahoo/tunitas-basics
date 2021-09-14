@@ -1,0 +1,54 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <hpp>
+#import c.const_stringz
+#import options.longish.Step
+#import re.string
+#import std.filesystem.path
+#import tunitas.application.Configuration
+#import tunitas.application.required.exception.Quitting
+namespace tunitas::application::options {
+  //
+  // Acquire a file path from the longish Step
+  //
+  // The filepath is returned, not an outcome.
+  // The filepath value is checked to ensure that it is not empty.
+  // There are no other constraints on the filepath that are checked here.
+  //
+  // Scheme:
+  //
+  //   --file=FILEPATH
+  //
+  // Example:
+  //
+  //   --output=./file.out
+  //
+  // Usage:
+  //
+  //   Configuration cfg{...somehow...}
+  //   options::longish::Step step{...somehow...};
+  //   std::string filepath = get_filepath(cfg, step);
+  //
+  namespace packaging::get_filepath_function {
+    using Step = ::options::longish::Step;
+    using Filepath = std::filesystem::path;
+    using Field_Name = re::string<c::const_stringz>;
+    // [[FIXTHIS]] build a concept for an throwable Quitting exception
+    template<required::exception::Quitting QUITTING> inline auto get_filepath(Configuration const &, Step const &) -> Filepath;
+    template<required::exception::Quitting QUITTING> auto get_filepath(Configuration const &, Step const &, Field_Name field_name) -> Filepath;
+  }
+  using packaging::get_filepath_function::get_filepath;
+}
+#endiv
+#divert <ipp>
+template<tunitas::application::required::exception::Quitting QUITTING> auto tunitas::application::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step) -> Filepath { 
+  return get_filepath<QUITTING>(cfg, step, "filepath");
+}
+#import tunitas.application.options.get_word
+template<tunitas::application::required::exception::Quitting QUITTING> auto tunitas::application::options::packaging::get_filepath_function::get_filepath(Configuration const &cfg, Step const &step, Field_Name field_name) -> Filepath {
+  return Filepath{get_word<QUITTING>(cfg, step, field_name)};
+}
+#endiv

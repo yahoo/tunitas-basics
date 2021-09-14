@@ -13,11 +13,11 @@
 namespace tests::usage::posix_PF_UN {
   using sys::posix::PF;
   namespace [[detail]] packaging {
-    template<typename UN> concept bool Instance = requires(UN) {
+    template<typename UN> concept Instance = requires(UN) {
       requires model::Namespace_Object<UN>;
       requires (int)UN::UNSPECIFIED == PF_UNSPEC;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<PF::UN>;
     };

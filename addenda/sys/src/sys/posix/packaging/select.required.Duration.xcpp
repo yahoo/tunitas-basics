@@ -24,18 +24,18 @@ namespace sys::posix::packaging::select::required {
   //
   namespace duration {
     using namespace std;
-    template<typename DURATION> concept bool Select = is_same_v<DURATION, time::val>;
-    template<typename DURATION> concept bool PSelect = is_same_v<DURATION, time::spec>;
-    template<typename DURATION> concept bool Syscall = Select<DURATION> || PSelect<DURATION>;
+    template<typename DURATION> concept Select = is_same_v<DURATION, time::val>;
+    template<typename DURATION> concept PSelect = is_same_v<DURATION, time::spec>;
+    template<typename DURATION> concept Syscall = Select<DURATION> || PSelect<DURATION>;
     // AVOID using Oldtime except for system calls (which reqwuire it)
     // instead, PREFER using sys::time::duration<R,P>, a.k.a. std::chrono::duration<REP, PERIOD>
-    template<typename DURATION> concept bool Oldtime = (is_same_v<DURATION, time::t> || // ..... seconds
-                                                        // ... time::b (struct timeb) .......... milliseconds
-                                                        is_same_v<DURATION, time::val> || // ... microseconds
-                                                        is_same_v<DURATION, time::spec>); // ... nanoseconds
+    template<typename DURATION> concept Oldtime = (is_same_v<DURATION, time::t> || // ..... seconds
+                                                   // ... time::b (struct timeb) .......... milliseconds
+                                                   is_same_v<DURATION, time::val> || // ... microseconds
+                                                   is_same_v<DURATION, time::spec>); // ... nanoseconds
     using nonstd::required::Ratio;
-    template<typename DURATION> concept bool Duration = Oldtime<DURATION> || requires(DURATION) {
-      typename DURATION::period;
+    template<typename DURATION> concept Duration = Oldtime<DURATION> || requires(DURATION) {
+    typename DURATION::period;
       requires Ratio<typename DURATION::period>;
       requires is_same_v<DURATION, chrono::duration<chrono::seconds::rep, typename DURATION::period>>;
     };

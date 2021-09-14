@@ -14,6 +14,6 @@ namespace sys::s::required {
   //
   //   template<required::Bits RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename BITS> concept bool Bits = std::is_same_v<BITS, s::Bits> || std::is_same_v<BITS, s::Bit>;
+  template<typename BITS> concept Bits = std::is_same_v<BITS, s::Bits> || std::is_same_v<BITS, s::Bit>;
 }
 #endiv

@@ -52,32 +52,32 @@ namespace {
       using namespace native;
       using nonstd::convertible_to;
       using Argument = packaging::rwh::interface::Hint;
-      template<typename UNMANAGED> concept bool Signature2Installed = requires(UNMANAGED fd, Argument installed) {
-        requires sys::fd::required::Unmanaged<UNMANAGED>;
-        { good(setrwh(fd, installed)) } -> convertible_to<bool>;
-        { value(setrwh(fd, installed)) } -> convertible_to<int>;
+      template<typename UNMANAGED> concept Signature2Installed = requires(UNMANAGED fd, Argument installed) {
+    requires sys::fd::required::Unmanaged<UNMANAGED>;
+    { good(setrwh(fd, installed)) } -> convertible_to<convertible_to<bool>>;
+    { value(setrwh(fd, installed)) } -> convertible_to<convertible_to<int>>;
         { setrwh(fd, installed) };
       };
-      template<typename UNMANAGED> concept bool Signature3ProcessInstalled = requires(UNMANAGED fd, Argument installed) {
-        requires sys::fd::required::Unmanaged<UNMANAGED>;
-        { good(setrwh(fd, F::PROCESS, installed)) } -> convertible_to<bool>;
-        { value(setrwh(fd, F::PROCESS, installed)) } -> convertible_to<int>;
+      template<typename UNMANAGED> concept Signature3ProcessInstalled = requires(UNMANAGED fd, Argument installed) {
+    requires sys::fd::required::Unmanaged<UNMANAGED>;
+    { good(setrwh(fd, F::PROCESS, installed)) } -> convertible_to<convertible_to<bool>>;
+    { value(setrwh(fd, F::PROCESS, installed)) } -> convertible_to<convertible_to<int>>;
         { setrwh(fd, F::PROCESS, installed) };
       };
-      template<typename UNMANAGED> concept bool Signature3FileInstalled = requires(UNMANAGED fd, Argument installed) {
-        requires sys::fd::required::Unmanaged<UNMANAGED>;
-        { good(setrwh(fd, F::FILE, installed)) } -> convertible_to<bool>;
-        { value(setrwh(fd, F::FILE, installed)) } -> convertible_to<int>;
+      template<typename UNMANAGED> concept Signature3FileInstalled = requires(UNMANAGED fd, Argument installed) {
+    requires sys::fd::required::Unmanaged<UNMANAGED>;
+    { good(setrwh(fd, F::FILE, installed)) } -> convertible_to<convertible_to<bool>>;
+    { value(setrwh(fd, F::FILE, installed)) } -> convertible_to<convertible_to<int>>;
         { setrwh(fd, F::FILE, installed) };
       };
-      template<typename UNMANAGED> concept bool Signature3WhichInstalled = requires(UNMANAGED fd, F::Which which, Argument installed) {
-        requires sys::fd::required::Unmanaged<UNMANAGED>;
-        { good(setrwh(fd, which, installed)) } -> convertible_to<bool>;
-        { value(setrwh(fd, which, installed)) } -> convertible_to<int>;
+      template<typename UNMANAGED> concept Signature3WhichInstalled = requires(UNMANAGED fd, F::Which which, Argument installed) {
+    requires sys::fd::required::Unmanaged<UNMANAGED>;
+    { good(setrwh(fd, which, installed)) } -> convertible_to<convertible_to<bool>>;
+    { value(setrwh(fd, which, installed)) } -> convertible_to<convertible_to<int>>;
         { setrwh(fd, which, installed) };
       };
-      template<typename UNMANAGED> concept bool Usage = requires(UNMANAGED) {
-        requires sys::fd::required::Unmanaged<UNMANAGED>;
+      template<typename UNMANAGED> concept Usage = requires(UNMANAGED) {
+    requires sys::fd::required::Unmanaged<UNMANAGED>;
         requires Signature2Installed<UNMANAGED>;
         requires Signature3ProcessInstalled<UNMANAGED>;
         requires Signature3FileInstalled<UNMANAGED>;

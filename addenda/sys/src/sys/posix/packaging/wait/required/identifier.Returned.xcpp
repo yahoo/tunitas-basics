@@ -12,7 +12,7 @@ namespace sys::posix::packaging::wait::required::identifier {
   //
   //   template<required::identifier::Returned RETURNED> auto wait() -> Output<WAIT2, Unmatched, RETURNED>;
   //
-  template<typename PROCESS> concept bool Returned = sys::id::required::process::Process<PROCESS>;
+  template<typename PROCESS> concept Returned = sys::id::required::process::Process<PROCESS>;
 }
 #endiv
 #divert <cpp>

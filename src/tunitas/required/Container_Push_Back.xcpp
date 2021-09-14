@@ -16,7 +16,7 @@ namespace tunitas::required {
   //     Something(CONTAINER &container);
   //   };
   //
-  template<typename CONTAINER> concept bool Container_Push_Back = requires(CONTAINER container) {
+  template<typename CONTAINER> concept Container_Push_Back = requires(CONTAINER container) {
     typename CONTAINER::value_type;
     requires requires(typename CONTAINER::value_type value) { requires true; };
     //
@@ -26,7 +26,7 @@ namespace tunitas::required {
     // e.g. requires(CONTAINER container) { requires requires(char c) { container.push_back(c); } };
     //
     requires requires(CONTAINER container, typename CONTAINER::value_type value) {
-      { container.push_back(value) } -> void;
+      { container.push_back(value) };
     };
   };
 }

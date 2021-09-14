@@ -15,7 +15,7 @@ namespace nonstd::required {
   //   auto function(...) -> STRINGLIKE;
   //   template<required::Stringlike STRINGLIKE> auto function(...) -> STRINGLIKE;
   //
-  template<typename STRINGLIKE> concept bool Stringlike = requires(STRINGLIKE stringlike) {
+  template<typename STRINGLIKE> concept Stringlike = requires(STRINGLIKE stringlike) {
     typename STRINGLIKE::value_type;
     requires Basic_String<STRINGLIKE>;
     requires std::is_same<char, typename STRINGLIKE::value_type>::value; // [[FIXTHIS]] this (or something) should admit to wide characters

@@ -27,7 +27,7 @@ namespace ares::exception {
 #import re.string
 #import c.const_stringz
 class ares::exception::Invariant : public Aspect, public std::invalid_argument {
-  struct ancestors {
+  struct Ancestors {
     using Aspect = ares::exception::Aspect;
     using Exception = std::invalid_argument;
   };
@@ -40,15 +40,15 @@ public:
 #divert <ipp>
 namespace ares::exception {
   Invariant::Invariant()
-    : ancestors::Exception{"invariant failure"}
+    : Ancestors::Exception{"invariant failure"}
   { }
   Invariant::Invariant(re::string<c::const_stringz> reason)
-    : ancestors::Exception{reason.c_str()}
+    : Ancestors::Exception{reason.c_str()}
   { }
 }
 #endiv
 #divert <cpp>
 auto ares::exception::Invariant::what() const noexcept -> char const * {
-  return ancestors::Exception::what();
+  return Ancestors::Exception::what();
 }
 #endiv

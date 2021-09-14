@@ -1,5 +1,5 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import std.is_integral
 #import std.is_floating_point
@@ -15,7 +15,7 @@ namespace format::json::required {
   //
   // WATCHOUT - 'long double' is not defined for JSON (but is allowed here)
   //
-  template<typename NUMERIC> concept bool Numeric =
+  template<typename NUMERIC> concept Numeric =
     (std::is_integral<NUMERIC>::value ||
      std::is_floating_point<NUMERIC>::value) && requires(NUMERIC numeric, std::ostream &outbound) {
     outbound << numeric;

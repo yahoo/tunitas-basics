@@ -1,12 +1,12 @@
 // This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenace see the LICENSE file at the top of the repository.
+// For terms and provenance see the LICENSE file at the top of the repository.
 #divert <fpp>
 #import std.ostream
 namespace format::detail::ifnot::expected {
   //
   // What constitutes a traits::Operations<TYPE> specialization?
   //
-  template<typename TRAITS> concept bool Operations = requires(TRAITS traits) {
+  template<typename TRAITS> concept Operations = requires(TRAITS traits) {
     typename TRAITS::value_type;
 #if 0
     // src/tests/unit/format/Fixture.xcpp:100:25:   required from here
@@ -14,8 +14,8 @@ namespace format::detail::ifnot::expected {
     requires requires(typename TRAITS::value_type const &subject, std::ostream &outbound) {
       // because TRAITS::value_type may not have a default constructor 
       // and insertable_nonnull_nonempty(...) may return anything that operator<< can process
-      { TRAITS::is_null(subject) } -> bool;
-      { TRAITS::is_empty(subject) } -> bool;
+      { TRAITS::is_null(subject) } -> convertible_to<bool>;
+      { TRAITS::is_empty(subject) } -> convertible_to<bool>;
       { outbound << TRAITS::insertable_notnull_nonempty(subject) };
     };
 #endif
@@ -23,8 +23,8 @@ namespace format::detail::ifnot::expected {
     requires true;
       // because TRAITS::value_type may not have a default constructor 
       // and insertable_nonnull_nonempty(...) may return anything that operator<< can process
-      { TRAITS::is_null(subject) } -> bool;
-      //{ TRAITS::is_empty(subject) } -> bool; 
+    { TRAITS::is_null(subject) } -> convertible_to<bool>;
+      //{ TRAITS::is_empty(subject) } -> convertible_to<bool>; 
       //{ outbound << TRAITS::insertable_notnull_nonempty(subject) };
    };
 }

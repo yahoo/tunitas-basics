@@ -7,8 +7,8 @@ namespace nonstd::required {
   // Can the type be compared with nullptr?
   // i.e. is it a pointer type or a type with an operator-cast to a pointer type?
   //
-  template<typename POINTERLIKE, typename OBJECT> concept bool Compare_To_Nullptr = requires(POINTERLIKE pointerlike) {
-    { nullptr == (OBJECT const *) pointerlike } -> bool;
+  template<typename POINTERLIKE, typename OBJECT> concept Compare_To_Nullptr = requires(POINTERLIKE pointerlike) {
+    { nullptr == (OBJECT const *) pointerlike } -> convertible_to<bool>;
   };
 }
 #endiv

@@ -17,7 +17,7 @@ namespace tests::usage::posix_F_SEAL {
   using sys::posix::F;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename SEAL> concept bool Instance = requires(SEAL) {
+    template<typename SEAL> concept Instance = requires(SEAL) {
       typename SEAL::Seal;
       typename SEAL::Seals;
       requires model::Namespace_Object<SEAL>;
@@ -29,20 +29,20 @@ namespace tests::usage::posix_F_SEAL {
       requires (int)SEAL::WRITE == F_SEAL_WRITE;
       requires requires(SEAL, typename SEAL::Seal ify, typename SEAL::Seals ies) {
 #if 202003L < __cplusplus
+        { SEAL::template as<typename SEAL::Seals>(ify) } -> convertible_to<convertible_to<typename SEAL::Seals>>;
+        { SEAL::template as<typename SEAL::Seal>(ify) } -> convertible_to<convertible_to<typename SEAL::Seal>>;
+        { SEAL::template as<typename SEAL::Seals>(ies) } -> convertible_to<convertible_to<typename SEAL::Seals>>;
+        { SEAL::template as<typename SEAL::Seal>(ies) } -> convertible_to<convertible_to<typename SEAL::Seal>>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { SEAL::template as<typename SEAL::Seals>(ify) } -> convertible_to<typename SEAL::Seals>;
         { SEAL::template as<typename SEAL::Seal>(ify) } -> convertible_to<typename SEAL::Seal>;
         { SEAL::template as<typename SEAL::Seals>(ies) } -> convertible_to<typename SEAL::Seals>;
         { SEAL::template as<typename SEAL::Seal>(ies) } -> convertible_to<typename SEAL::Seal>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { SEAL::template as<typename SEAL::Seals>(ify) } -> typename SEAL::Seals;
-        { SEAL::template as<typename SEAL::Seal>(ify) } -> typename SEAL::Seal;
-        { SEAL::template as<typename SEAL::Seals>(ies) } -> typename SEAL::Seals;
-        { SEAL::template as<typename SEAL::Seal>(ies) } -> typename SEAL::Seal;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<F::SEAL>;
     };

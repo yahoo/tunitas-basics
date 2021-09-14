@@ -19,7 +19,7 @@ namespace tests::execing::quoting {
   //   cout << quote(argv) << '\n';
   //
   namespace required {
-    template<typename CONTAINER> concept bool Container = nonstd::required::container::Holding<CONTAINER, std::string>;
+    template<typename CONTAINER> concept Container = nonstd::required::container::Holding<CONTAINER, std::string>;
   }
   template<required::Container CONTAINER> class Formatter;
   namespace detail {

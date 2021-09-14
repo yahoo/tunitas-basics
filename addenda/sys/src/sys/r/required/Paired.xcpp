@@ -9,7 +9,7 @@ namespace sys::r::required {
   // Nowadays it's just a singular-plural sort of pairing.
   // In previous iterations it was more intellectually challenging to remember
   //
-  template<typename INDEX, typename INFORMATION> concept bool Paired = (paired::Limits<INDEX, INFORMATION> ||
-                                                                        paired::Usages<INDEX, INFORMATION>);
+  template<typename INDEX, typename INFORMATION> concept Paired = (paired::Limits<INDEX, INFORMATION> ||
+                                                                   paired::Usages<INDEX, INFORMATION>);
 }
 #endiv

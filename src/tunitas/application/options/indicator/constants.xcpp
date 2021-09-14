@@ -1,0 +1,28 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import options.indicator.constants // [[FIXTHIS]] move this to cli::options::indicator when module-cli >= 2.0 has this (a.k.a. module-options)
+namespace tunitas::application::options::indicator {
+  inline namespace constants { using namespace ::options::indicator::constants; }
+}
+#endiv
+#divert <hpp>
+namespace tunitas::application::options::indicator::constants {
+  //
+  // [[TODO]] fill in any general tunitas-application constants here.
+  //
+  // [[hint]] there are none at this point.
+  // As such, this namespace and the #import serve as a hook to which the downstream applications link.
+  // e.g. apanolio, grabtown, lobitos, montara, tarwater, rockaway, scarpet.
+  //
+  // Are there any tunitas-general constants? 
+  // Not yet.
+  // inline auto const SOMETHING = Code::SOMETHING;
+  // inline auto const SOMETHING = prev(SOMETHING);
+  // inline auto const DARK_SIDE = prev(SOMETHING);
+  //
+}
+#endiv

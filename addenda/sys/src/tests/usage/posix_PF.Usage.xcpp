@@ -15,7 +15,7 @@ namespace tests::usage::posix_PF {
   namespace [[detail]] packaging {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    template<typename PF> concept bool Instance = requires(PF) {
+    template<typename PF> concept Instance = requires(PF) {
       typename PF::Protocol;
       requires model::Namespace_Object<PF>;
       requires (int)PF::UNSPECIFIED == PF_UNSPEC;
@@ -36,7 +36,7 @@ namespace tests::usage::posix_PF {
       requires (int)PF::ALG == PF_ALG;
     };
 #pragma GCC diagnostic pop
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<PF>;
     };

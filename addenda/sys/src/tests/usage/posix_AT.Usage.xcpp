@@ -18,7 +18,7 @@ namespace tests::usage::posix_AT {
   using sys::posix::AT;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename AT> concept bool Instance = requires(AT) {
+    template<typename AT> concept Instance = requires(AT) {
       typename AT::Cwd;
       typename AT::Flag;
       typename AT::Flags;
@@ -33,20 +33,20 @@ namespace tests::usage::posix_AT {
       requires (int)AT::REMOVEDIR == AT_REMOVEDIR;
       requires requires(AT, typename AT::Flag lag, typename AT::Flags ags) {
 #if 202003L < __cplusplus
+        { AT::template as<typename AT::Flag>(lag) } -> convertible_to<convertible_to<typename AT::Flag>>;
+        { AT::template as<typename AT::Flags>(lag) } -> convertible_to<convertible_to<typename AT::Flags>>;
+        { AT::template as<typename AT::Flag>(ags) } -> convertible_to<convertible_to<typename AT::Flag>>;
+        { AT::template as<typename AT::Flags>(ags) } -> convertible_to<convertible_to<typename AT::Flags>>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { AT::template as<typename AT::Flag>(lag) } -> convertible_to<typename AT::Flag>;
         { AT::template as<typename AT::Flags>(lag) } -> convertible_to<typename AT::Flags>;
         { AT::template as<typename AT::Flag>(ags) } -> convertible_to<typename AT::Flag>;
         { AT::template as<typename AT::Flags>(ags) } -> convertible_to<typename AT::Flags>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { AT::template as<typename AT::Flag>(lag) } -> typename AT::Flag;
-        { AT::template as<typename AT::Flags>(lag) } -> typename AT::Flags;
-        { AT::template as<typename AT::Flag>(ags) } -> typename AT::Flag;
-        { AT::template as<typename AT::Flags>(ags) } -> typename AT::Flags;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<AT>;
     };

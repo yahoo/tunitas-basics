@@ -15,9 +15,9 @@ namespace sys::id::required::wait {
   namespace untyped {
     using namespace std;
     namespace id = sys::id::wait;
-    template<typename ID> concept bool Title_Case = is_same_v<ID, id::Untyped>;
-    template<typename ID> concept bool Lower_Case = is_same_v<ID, underlying_type_t<id::Untyped>>;
-    template<typename ID> concept bool Untyped = Title_Case<ID> || Lower_Case<ID>;
+    template<typename ID> concept Title_Case = is_same_v<ID, id::Untyped>;
+    template<typename ID> concept Lower_Case = is_same_v<ID, underlying_type_t<id::Untyped>>;
+    template<typename ID> concept Untyped = Title_Case<ID> || Lower_Case<ID>;
   }
   using untyped::Untyped;
 }

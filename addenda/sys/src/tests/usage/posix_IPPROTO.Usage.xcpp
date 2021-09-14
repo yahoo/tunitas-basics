@@ -14,7 +14,7 @@
 namespace tests::usage::posix_IPPROTO {
   using sys::posix::IPPROTO;
   namespace [[detail]] packaging {
-    template<typename E> concept bool Instance = requires(IPPROTO) {
+    template<typename E> concept Instance = requires(IPPROTO) {
       typename IPPROTO::Protocol;
       requires model::Namespace_Object<IPPROTO>;
       requires requires(IPPROTO) {
@@ -60,7 +60,7 @@ namespace tests::usage::posix_IPPROTO {
       requires (int)IPPROTO::L2TP == IPPROTO_L2TP;
 #endif
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<IPPROTO>;
     };

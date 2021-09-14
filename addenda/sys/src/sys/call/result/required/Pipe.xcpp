@@ -10,7 +10,7 @@ namespace sys::call::result::required {
   //
   //   come on, it's a concept
   //
-  template<typename FD> concept bool Pipe = sys::fd::required::Unmanaged<FD>;
+  template<typename FD> concept Pipe = sys::fd::required::Unmanaged<FD>;
 }
 #endiv
 #divert <cpp>

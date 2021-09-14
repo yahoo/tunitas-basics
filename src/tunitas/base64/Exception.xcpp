@@ -15,10 +15,10 @@ namespace tunitas::base64 {
   // Usage:
   //
   //   class tunitas::base64::decoder::UnwelcomeSurprise : public std::out_of_range, public base64::Exception {
-  //     using ancestor = std::out_of_range;
+  //     using Ancestor = std::out_of_range;
   //   public:
-  //     using ancestor::out_of_range;
-  //     auto what() const noexcept -> char const * { return ancestor::what(); }
+  //     using Ancestor::out_of_range;
+  //     auto what() const noexcept -> char const * { return Ancestor::what(); }
   //   };
   //
   //   try {

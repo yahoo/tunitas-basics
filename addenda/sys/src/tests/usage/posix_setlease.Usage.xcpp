@@ -27,22 +27,22 @@ namespace tests::usage::posix_setlease {
       using namespace nonstd;
       namespace required = sys::fd::required;
       using Status = sys::call::Result;
-      template<typename FILE> concept bool Overloading = requires(FILE file, LEASE::Operation operation) {
-        requires required::Unmanaged<FILE>;
-        { setlease(file, operation) } -> convertible_to<Status>;
+      template<typename FILE> concept Overloading = requires(FILE file, LEASE::Operation operation) {
+    requires required::Unmanaged<FILE>;
+    { setlease(file, operation) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Signature = requires(FILE fd) {
-        requires required::Unmanaged<FILE>;
-        { setlease(fd, LEASE::READ) } -> convertible_to<Status>;
-        { setlease(fd, LEASE::WRITE) } -> convertible_to<Status>;
-        { setlease(fd, LEASE::END) } -> convertible_to<Status>;
+      template<typename FILE> concept Signature = requires(FILE fd) {
+    requires required::Unmanaged<FILE>;
+    { setlease(fd, LEASE::READ) } -> convertible_to<convertible_to<Status>>;
+    { setlease(fd, LEASE::WRITE) } -> convertible_to<convertible_to<Status>>;
+    { setlease(fd, LEASE::END) } -> convertible_to<convertible_to<Status>>;
       };
     }
-    template<typename FILE> concept bool Instance = requires(FILE) {
+    template<typename FILE> concept Instance = requires(FILE) {
       requires Overloading<FILE>;
       requires Signature<FILE>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       Instance<int>;
       Instance<sys::id::File>;

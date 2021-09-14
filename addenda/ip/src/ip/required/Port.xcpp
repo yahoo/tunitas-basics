@@ -12,6 +12,6 @@ namespace ip::required {
   //
   //   template<required::Port> struct Thing;
   //
-  template<typename PORT> concept bool Port = want::nonstd::required::Among<PORT, in::port_t>;
+  template<typename PORT> concept Port = want::nonstd::required::Among<PORT, in::port_t>;
 }
 #endiv

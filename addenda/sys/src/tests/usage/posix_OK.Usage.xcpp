@@ -18,7 +18,7 @@ namespace tests::usage::posix_OK {
     using namespace nonstd;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    template<typename OK> concept bool Instance = requires(OK) {
+    template<typename OK> concept Instance = requires(OK) {
       typename OK::Access;
       typename OK::Axis;
       requires model::Namespace_Object<OK>;
@@ -40,21 +40,21 @@ namespace tests::usage::posix_OK {
       requires (int)OK::EXECUTE == X_OK;
       requires requires(typename OK::Access access, typename OK::Axis axis) {
 #if 202003L < __cplusplus
+        { OK::template as<typename OK::Access>(access) } -> convertible_to<convertible_to<typename OK::Access>>;
+        { OK::template as<typename OK::Access>(axis) } -> convertible_to<convertible_to<typename OK::Access>>;
+        { OK::template as<typename OK::Axis>(access) } -> convertible_to<convertible_to<typename OK::Axis>>;
+        { OK::template as<typename OK::Axis>(axis) } -> convertible_to<convertible_to<typename OK::Axis>>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { OK::template as<typename OK::Access>(access) } -> convertible_to<typename OK::Access>;
         { OK::template as<typename OK::Access>(axis) } -> convertible_to<typename OK::Access>;
         { OK::template as<typename OK::Axis>(access) } -> convertible_to<typename OK::Axis>;
         { OK::template as<typename OK::Axis>(axis) } -> convertible_to<typename OK::Axis>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { OK::template as<typename OK::Access>(access) } -> typename OK::Access;
-        { OK::template as<typename OK::Access>(axis) } -> typename OK::Access;
-        { OK::template as<typename OK::Axis>(access) } -> typename OK::Axis;
-        { OK::template as<typename OK::Axis>(axis) } -> typename OK::Axis;
 #endif
       };
     };
 #pragma GCC diagnostic pop
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<OK>;
     };

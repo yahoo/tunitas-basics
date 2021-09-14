@@ -22,14 +22,13 @@ namespace tunitas::required::exception {
   //
   //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
   //
-  template<typename QUITTING> concept bool Quitting =
-    std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
-    && std::is_base_of<std::exception, QUITTING>::value
-    && requires(QUITTING quitting, sys::exits::Code code) {
-      // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
-      { QUITTING{code} };
-      { quitting.what() } -> char const *;
-      { quitting.code() } -> sys::exits::Code;
-  };
+  template<typename QUITTING> concept Quitting = (std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
+                                                  && std::is_base_of<std::exception, QUITTING>::value
+                                                  && requires(QUITTING quitting, sys::exits::Code code) {
+                                                    // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
+                                                    { QUITTING{code} };
+                                                    { quitting.what() } -> convertible_to<char const *>;
+                                                    { quitting.code() } -> convertible_to<sys::exits::Code>;
+                                                  });
 }
 #endiv

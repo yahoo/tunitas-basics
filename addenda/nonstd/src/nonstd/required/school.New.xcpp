@@ -17,6 +17,6 @@ namespace nonstd::required::school {
   //
   //   You will need to present the appropriate specializations of traits::school::New<THING>
   //
-  template<typename TYPE> concept bool New = traits::school::New<TYPE>::value;
+  template<typename TYPE> concept New = traits::school::New<TYPE>::value;
 }
 #endiv

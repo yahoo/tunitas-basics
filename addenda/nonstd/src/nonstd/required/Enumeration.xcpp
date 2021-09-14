@@ -8,7 +8,7 @@ namespace nonstd::required {
   //
   // An enumeration
   //
-  template<typename ENUM> concept bool Enumeration = requires(ENUM) {
+  template<typename ENUM> concept Enumeration = requires(ENUM) {
     requires !std::is_const<ENUM>::value; // ...... to belabor the point
     requires !std::is_volatile<ENUM>::value; // ... why would you do this?
     requires std::is_enum<ENUM>::value;

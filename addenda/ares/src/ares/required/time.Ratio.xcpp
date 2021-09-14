@@ -8,7 +8,7 @@ namespace ares::required::time {
   // Is this a ratio, suitable time duration
   //
   // [[MAYBE]] move this to want::required::Ratio and then into nonstd::required::Ratio
-  template<typename RATIO> concept bool Ratio = requires(RATIO) {
+  template<typename RATIO> concept Ratio = requires(RATIO) {
     { RATIO::num };
     { RATIO::den };
     nonstd::required::Integer<decltype(RATIO::num)>;

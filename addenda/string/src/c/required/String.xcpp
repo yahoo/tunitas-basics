@@ -11,7 +11,7 @@ namespace c::required {
   //
   // Prove that STRING is a std::basic_string template instance
   //
-  template<typename STRING> concept bool String_View = requires(STRING string) {
+  template<typename STRING> concept String_View = requires(STRING string) {
     typename STRING::value_type;
     typename STRING::traits_type;
     typename STRING::allocator_type;

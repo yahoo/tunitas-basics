@@ -5,7 +5,7 @@
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 // For terms, see the LICENSE file at the top of this repository
 #divert <cpp>
-#import tests.unit.app.Fixture
+#import tests.unit.application.Fixture
 #import tests.unit.base64.Fixture
 #import tests.unit.exception.Fixture
 #import tests.unit.exits.Fixture
@@ -19,7 +19,7 @@
 #import rigging.bench.Main
 auto main(int argc, char *argv[]) -> int {
   namespace tu = tests::unit;
-  rigging::bench::Main remain(tu::app::Fixture::suite(),
+  rigging::bench::Main remain(tu::application::Fixture::suite(),
 			      tu::base64::Fixture::suite(),
                               tu::exception::Fixture::suite(),
                               tu::exits::Fixture::suite(),

@@ -1,0 +1,23 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+#import sys.exits.constants // [[FIXTHIS]] move to cli::exits::constants when module-options >= 2.0 is ready
+namespace tunitas::application::exits {
+  inline namespace constants { using namespace sys::exits::constants; } // cascade from their original home
+}
+#endiv
+#divert <hpp>
+namespace tunitas::application::exits::constants {
+  //
+  // Add Tunitas-specific variants here
+  //
+  // constexpr auto const NAME = Code{...somehow...};
+  // constexpr auto const NAME = Code{...somehow...};
+  // constexpr auto const NAME = Code{...somehow...};
+  //
+}
+#endiv

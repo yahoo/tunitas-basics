@@ -11,7 +11,7 @@ namespace c::required {
   //
   // Prove that VIEW is a std::basic_string_view template instance
   //
-  template<typename VIEW> concept bool String_View = requires(VIEW view) {
+  template<typename VIEW> concept String_View = requires(VIEW view) {
     typename VIEW::value_type;
     requires std::is_same<VIEW, std::basic_string_view<typename VIEW::value_type>>::value;
   };

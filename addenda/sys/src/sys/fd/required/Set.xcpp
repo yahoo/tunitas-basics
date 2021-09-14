@@ -15,15 +15,15 @@ namespace sys::fd::required {
   //   rly?
   //
   namespace set {
-    template<typename SET> concept bool Set = std::is_same<SET, fd::set::Set>::value;
+    template<typename SET> concept Set = std::is_same<SET, fd::set::Set>::value;
     // Blik.  Whereas there is no existential quantification in concepts, we have to enumerate all the purposes.
-    template<typename REF> concept bool Reference = (std::is_same<REF, fd::set::Reference<fd::set::Purpose::READ>>::value ||
-                                                     std::is_same<REF, fd::set::Reference<fd::set::Purpose::WRITE>>::value ||
-                                                     std::is_same<REF, fd::set::Reference<fd::set::Purpose::EXCEPT>>::value);
-    template<typename OPT> concept bool Optional_Reference = (std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::READ>>>::value ||
-                                                              std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::WRITE>>>::value ||
-                                                              std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::EXCEPT>>>::value);
-    template<typename ANY> concept bool Any = Set<ANY> || Reference<ANY> || Optional_Reference<ANY>;
+    template<typename REF> concept Reference = (std::is_same<REF, fd::set::Reference<fd::set::Purpose::READ>>::value ||
+                                                std::is_same<REF, fd::set::Reference<fd::set::Purpose::WRITE>>::value ||
+                                                std::is_same<REF, fd::set::Reference<fd::set::Purpose::EXCEPT>>::value);
+    template<typename OPT> concept Optional_Reference = (std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::READ>>>::value ||
+                                                         std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::WRITE>>>::value ||
+                                                         std::is_same<OPT, std::optional<fd::set::Reference<fd::set::Purpose::EXCEPT>>>::value);
+    template<typename ANY> concept Any = Set<ANY> || Reference<ANY> || Optional_Reference<ANY>;
   }
   using set::Set;
 }

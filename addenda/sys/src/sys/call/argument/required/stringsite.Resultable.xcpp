@@ -15,6 +15,6 @@ namespace sys::call::argument::required::stringsite {
   // As such ... its name and organization are not invariant.
   // Perhaps it should be in a 'detail' namespace to signal that explicitly.
   //
-  template<typename STRINGY> concept bool Resultable = Is_Resultable<STRINGY>::value;
+  template<typename STRINGY> concept Resultable = Is_Resultable<STRINGY>::value;
 }
 #endiv

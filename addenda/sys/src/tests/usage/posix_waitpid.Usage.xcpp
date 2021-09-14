@@ -33,19 +33,19 @@ namespace tests::usage::posix_waitpid {
     namespace result { using namespace sys::call::result::wait; }
     namespace required = sys::id::required;
     namespace [[detail]] {
-      template<typename RETURNED, typename MATCHED> concept bool Instance = requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats) {
+      template<typename RETURNED, typename MATCHED> concept Instance = requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats) {
         requires required::Process<RETURNED>;
         requires required::process::Process<MATCHED> || required::process::Either<MATCHED>; // not enforced: that the sense of RETURNED and MATCHED are commensurate
-        { waitpid(matched) } -> convertible_to<result::Value<RETURNED, io::Status>>;
-        { waitpid(matched, options) } -> convertible_to<result::Value<RETURNED, io::Status>>;
-        { waitpid(matched, options, sutats) } -> convertible_to<result::Value<RETURNED>>;
-        { waitpid(matched, sutats, options) } -> convertible_to<result::Value<RETURNED>>;
+        { waitpid(matched) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+        { waitpid(matched, options) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+        { waitpid(matched, options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+        { waitpid(matched, sutats, options) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         // and the null possibilities
-        { waitpid(matched, options, {}) } -> convertible_to<result::Value<RETURNED>>;
-        { waitpid(matched, {}, options) } -> convertible_to<result::Value<RETURNED>>;
+        { waitpid(matched, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+        { waitpid(matched, {}, options) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
       };
     }
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<pid_t, pid_t>;
       requires Instance<sys::id::Process, sys::id::process::Process>;

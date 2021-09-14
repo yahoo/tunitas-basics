@@ -7,7 +7,7 @@ namespace nonstd::required {
   //
   // Is this a basic_string_view (descendant?)
   //
-  template<typename STRING_VIEW> concept bool Basic_String_View = requires(STRING_VIEW string_view) {
+  template<typename STRING_VIEW> concept Basic_String_View = requires(STRING_VIEW string_view) {
     typename STRING_VIEW::value_type;
     typename STRING_VIEW::traits_type;
     requires std::is_base_of<std::basic_string_view<typename STRING_VIEW::value_type, typename STRING_VIEW::traits_type>, STRING_VIEW>::value;

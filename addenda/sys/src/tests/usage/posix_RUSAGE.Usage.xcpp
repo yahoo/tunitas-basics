@@ -13,7 +13,7 @@
 namespace tests::usage::posix_RUSAGE {
   using sys::posix::RUSAGE;
   namespace [[detail]] packaging {
-    template<typename RUSAGE> concept bool Instance = requires(RUSAGE) {
+    template<typename RUSAGE> concept Instance = requires(RUSAGE) {
       typename RUSAGE::Usage;
       typename RUSAGE::Usages;
       requires model::Namespace_Object<RUSAGE>;
@@ -21,7 +21,7 @@ namespace tests::usage::posix_RUSAGE {
       requires (int)RUSAGE::CHILDREN == RUSAGE_CHILDREN;
       requires (int)RUSAGE::THREAD == RUSAGE_THREAD;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<RUSAGE>;
     };

@@ -11,7 +11,7 @@ namespace sys::posix::required::syscall {
   //
   //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
   //
-  template<typename PAYLOAD> concept bool Result = result::Idiomatic<PAYLOAD>;
+  template<typename PAYLOAD> concept Result = result::Idiomatic<PAYLOAD>;
 }
 #endiv
 #divert <cpp>

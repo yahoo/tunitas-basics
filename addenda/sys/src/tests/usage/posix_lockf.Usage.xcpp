@@ -34,43 +34,43 @@ namespace tests::usage::posix_lockf {
       using Operation = sys::lockf::Operation;
       using Offset = off_t;
       using Status = sys::call::Result;
-      template<typename FILE> concept bool Overloading = requires(FILE file, Operation operation, Offset offset) {
+      template<typename FILE> concept Overloading = requires(FILE file, Operation operation, Offset offset) {
         requires required::Unmanaged<FILE>;
-        { lockf(file, operation, offset) } -> convertible_to<Status>;
+        { lockf(file, operation, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_LOCKF_Current = requires(FILE file, Offset offset) {
+      template<typename FILE> concept Object_LOCKF_Current = requires(FILE file, Offset offset) {
         requires required::Unmanaged<FILE>;
-        { lockf(file, LOCKF::LOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, LOCKF::TEST_AND_LOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, LOCKF::TEST, offset) } -> convertible_to<Status>;
-        { lockf(file, LOCKF::UNLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::LOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, LOCKF::TEST_AND_LOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, LOCKF::TEST, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, LOCKF::UNLOCK, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_LOCKF_Consistency = requires(FILE file, Offset offset) {
+      template<typename FILE> concept Object_LOCKF_Consistency = requires(FILE file, Offset offset) {
         requires required::Unmanaged<FILE>;
         // NO SUCH ---> LOCKF::UNLOCKF
-        { lockf(file, LOCKF::END, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::END, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_LOCKF_Legacy = requires(FILE file, Offset offset) {
-        { lockf(file, LOCKF::TLOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, LOCKF::ULOCK, offset) } -> convertible_to<Status>;
+      template<typename FILE> concept Object_LOCKF_Legacy = requires(FILE file, Offset offset) {
+        { lockf(file, LOCKF::TLOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, LOCKF::ULOCK, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_F_Current = requires(FILE file, Offset offset) {
+      template<typename FILE> concept Object_F_Current = requires(FILE file, Offset offset) {
         requires required::Unmanaged<FILE>;
-        { lockf(file, F::LOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, F::TEST_AND_LOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, F::TEST, offset) } -> convertible_to<Status>;
-        { lockf(file, F::UNLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, F::LOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, F::TEST_AND_LOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, F::TEST, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, F::UNLOCK, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_F_Aliases = requires(FILE file, Offset offset) {
+      template<typename FILE> concept Object_F_Aliases = requires(FILE file, Offset offset) {
         // NO SUCH ---> F::UNLOCKF
-        { lockf(file, F::END, offset) } -> convertible_to<Status>;
+        { lockf(file, F::END, offset) } -> convertible_to<convertible_to<Status>>;
       };
-      template<typename FILE> concept bool Object_F_Legacy = requires(FILE file, Offset offset) {
-        { lockf(file, F::TLOCK, offset) } -> convertible_to<Status>;
-        { lockf(file, F::ULOCK, offset) } -> convertible_to<Status>;
+      template<typename FILE> concept Object_F_Legacy = requires(FILE file, Offset offset) {
+        { lockf(file, F::TLOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, F::ULOCK, offset) } -> convertible_to<convertible_to<Status>>;
       };
     }
-    template<typename FILE> concept bool Instance = requires(FILE) {
+    template<typename FILE> concept Instance = requires(FILE) {
       requires Overloading<FILE>;
       requires Object_LOCKF_Current<FILE>;
       requires Object_LOCKF_Consistency<FILE>;
@@ -79,7 +79,7 @@ namespace tests::usage::posix_lockf {
       requires Object_F_Aliases<FILE>;
       requires Object_F_Legacy<FILE>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       Instance<int>;
       Instance<sys::id::File>;

@@ -12,8 +12,8 @@ namespace sys::id::required::process {
   //
   //   Oh come on.
   //
-  template<typename PROCESS> concept bool Process = (std::is_same_v<PROCESS, id::process::Process> ||
-                                                     std::is_same_v<PROCESS, std::underlying_type_t<id::process::Process>>);
+  template<typename PROCESS> concept Process = (std::is_same_v<PROCESS, id::process::Process> ||
+                                                std::is_same_v<PROCESS, std::underlying_type_t<id::process::Process>>);
 }
 #endiv
 #divert <cpp>

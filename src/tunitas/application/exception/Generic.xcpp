@@ -1,0 +1,23 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.application.exception.Aspect
+namespace tunitas::application::exception {
+  //
+  // WATCHOUT - the naming convention changed at tunitas-basics-1.8.0
+  // s/Generic/Aspect/g
+  // s/Message/aspect::Message/g
+  // s/Quitting/aspect::Quitting/g
+  // s/Usage/aspect::Usage/g
+  // s/Version/aspect::Version/g
+  //
+  // The generic application exception
+  // This is a mixin; descendants only.
+  // It is a mixin tree so that STL exceptions can be mixed in as well.
+  //
+  using Generic [[deprecated("since v1.8.0; for new work, use tunitas::application::exception::Aspect")]] = Aspect;
+}
+#endiv

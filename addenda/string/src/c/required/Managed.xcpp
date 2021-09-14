@@ -19,10 +19,10 @@ namespace c::required {
   //
   // If you need to guarantee SQL ITEM type data then use Binary<ITEM>
   //
-  template<typename ITEM> concept bool Managed = requires(ITEM item) {
+  template<typename ITEM> concept Managed = requires(ITEM item) {
     typename ITEM::value_type;
-    { item.data() } -> typename ITEM::value_type const *;
-    { item.size() } -> std::size_t;
+    { item.data() } -> convertible_to<typename ITEM::value_type const *>;
+    { item.size() } -> convertible_to<std::size_t>;
   };
 }
 #endiv

@@ -8,7 +8,7 @@ namespace tunitas::server::exception {
   //
   // The generic server exception aspect
   // Descendants only.
-  // Set up as an ancestor to the mixin tree so that STL exceptions can be mixed in as well.
+  // Set up as an Ancestor to the mixin tree so that STL exceptions can be mixed in as well.
   //
   // These are wholly distinct from the tunitas::app::exceptions which have a
   // text user interface aspect to them. The server exceptions are not expected

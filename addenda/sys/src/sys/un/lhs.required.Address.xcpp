@@ -16,7 +16,7 @@ namespace sys::un::lhs::required {
   //   auto ttt = fam.get<af::Type>();
   //   auto ttt = fam.get<un::addr::Type>();
   //
-  template<typename ADDRESS> concept bool Address = std::is_same_v<ADDRESS, af::Type>  || std::is_same_v<ADDRESS, addr::Type>;
+  template<typename ADDRESS> concept Address = std::is_same_v<ADDRESS, af::Type>  || std::is_same_v<ADDRESS, addr::Type>;
 }
 #endiv
 #divert <cpp>

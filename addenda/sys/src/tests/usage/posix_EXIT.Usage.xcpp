@@ -13,13 +13,13 @@
 namespace tests::usage::posix_EXIT {
   using sys::posix::EXIT;
   namespace [[detail]] packaging {
-    template<typename E> concept bool Instance = requires(EXIT) {
+    template<typename E> concept Instance = requires(EXIT) {
       typename EXIT::Code;
       requires model::Namespace_Object<EXIT>;
       requires (int)EXIT::SUCCESS == EXIT_SUCCESS;
       requires (int)EXIT::FAILURE == EXIT_FAILURE;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<EXIT>;
     };

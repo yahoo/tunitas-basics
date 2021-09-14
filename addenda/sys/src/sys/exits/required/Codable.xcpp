@@ -19,6 +19,6 @@ namespace sys::exits::required {
   //   auto code = exitstatus<sys::exits::Code>(tatus);
   //   static_assert(std::is_same_v<decltype(code), sys::exits::Code>);
   //
-  template<typename CODABLE> concept bool Codable = std::is_constructible_v<CODABLE, sys::exits::Code>;
+  template<typename CODABLE> concept Codable = std::is_constructible_v<CODABLE, sys::exits::Code>;
 }
 #endiv

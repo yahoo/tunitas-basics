@@ -20,6 +20,6 @@ namespace tunitas::base64::decoder::required {
   //
   //   template<required::Gettable RESULT> auto get() -> RESULT;
   //
-  template<typename TYPE> concept bool Gettable = Octet<TYPE> || Integral<TYPE>;
+  template<typename TYPE> concept Gettable = Octet<TYPE> || Integral<TYPE>;
 }
 #endiv

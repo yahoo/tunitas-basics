@@ -8,7 +8,7 @@ namespace nonstd::exception::constructible::required {
   // Is this type one of the types usable in the School<EXCEPTION, FROM> system?
   // They are acknowledged by their traits.
   //
-  template<typename EXCEPTION> concept bool Standard = requires(EXCEPTION) {
+  template<typename EXCEPTION> concept Standard = requires(EXCEPTION) {
     requires standard::Traits<EXCEPTION>::is_standard;
   };
 }

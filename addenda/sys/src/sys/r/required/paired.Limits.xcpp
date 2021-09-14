@@ -8,7 +8,7 @@ namespace sys::r::required::paired {
   //
   // Are these paired?
   //
-  template<typename INDEX, typename INFORMATION> concept bool Limits = (std::is_same_v<INDEX, r::Limit> ||
-                                                                        std::is_same_v<INFORMATION, r::Limits>);
+  template<typename INDEX, typename INFORMATION> concept Limits = (std::is_same_v<INDEX, r::Limit> ||
+                                                                   std::is_same_v<INFORMATION, r::Limits>);
 }
 #endiv

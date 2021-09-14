@@ -11,6 +11,6 @@ namespace nonstd::exception::constructible::required {
   // Is this type one of the types usable in the Constructible_From system?
   // Enumerated by name
   //
-  template<typename STRING> concept bool From = same_as<STRING, basic_string<char>> || same_as<STRING, basic_string_view<char>>;
+  template<typename STRING> concept From = same_as<STRING, basic_string<char>> || same_as<STRING, basic_string_view<char>>;
 }
 #endiv

@@ -16,7 +16,7 @@ namespace tests::unit::exception {
     }
     using ::nonstd::same_as;
     namespace required {
-      template<typename CODE> concept bool Code = same_as<sysexits::Code, CODE> || same_as<sys::exits::Code, CODE>;
+      template<typename CODE> concept Code = same_as<sysexits::Code, CODE> || same_as<sys::exits::Code, CODE>;
     }
   }
   using quitting::Quitting;

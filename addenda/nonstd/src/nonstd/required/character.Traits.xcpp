@@ -21,7 +21,7 @@ namespace nonstd::required::character {
   //
   //   template<required:;character::Type C, required::character::Traits<C> T> class Something;
   //
-  template<typename TRAITS, typename CHAR> concept bool Traits = Type<CHAR> && requires(TRAITS traits) {
+  template<typename TRAITS, typename CHAR> concept Traits = Type<CHAR> && requires(TRAITS traits) {
     typename TRAITS::char_type;
     requires Type<typename TRAITS::char_type>;
     requires std::is_same<CHAR, typename TRAITS::char_type>::value;

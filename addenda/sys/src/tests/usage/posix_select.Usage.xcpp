@@ -46,37 +46,37 @@ namespace tests::usage::posix_select {
     namespace time = sys::time;
     namespace {
       namespace [[detail]] stanza_select {
-        template<typename...> concept bool Select = requires(int n, Reads r, Writes w, Excepts e) {
-          { select(r) } -> same_as<Count>;
-          { select(w) } -> same_as<Count>;
-          { select(e) } -> same_as<Count>;
-          { select(r, w) } -> same_as<Count>;
-          { select(r, e) } -> same_as<Count>;
-          { select(w, e) } -> same_as<Count>;
-          { select(r, w, e) } -> same_as<Count>;
+        template<typename...> concept Select = requires(int n, Reads r, Writes w, Excepts e) {
+          { select(r) } -> convertible_to<same_as<Count>>;
+          { select(w) } -> convertible_to<same_as<Count>>;
+          { select(e) } -> convertible_to<same_as<Count>>;
+          { select(r, w) } -> convertible_to<same_as<Count>>;
+          { select(r, e) } -> convertible_to<same_as<Count>>;
+          { select(w, e) } -> convertible_to<same_as<Count>>;
+          { select(r, w, e) } -> convertible_to<same_as<Count>>;
           //
-          { select(n, r) } -> same_as<Count>;
-          { select(n, w) } -> same_as<Count>;
-          { select(n, e) } -> same_as<Count>;
-          { select(n, r, w) } -> same_as<Count>;
-          { select(n, r, e) } -> same_as<Count>;
-          { select(n, w, e) } -> same_as<Count>;
-          { select(n, r, w, e) } -> same_as<Count>;
+          { select(n, r) } -> convertible_to<same_as<Count>>;
+          { select(n, w) } -> convertible_to<same_as<Count>>;
+          { select(n, e) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w) } -> convertible_to<same_as<Count>>;
+          { select(n, r, e) } -> convertible_to<same_as<Count>>;
+          { select(n, w, e) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, e) } -> convertible_to<same_as<Count>>;
         };
-        template<typename TIMEOUT> concept bool SelectTimeout = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept SelectTimeout = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
-          { select(r, t) } -> same_as<Count>;
-          { select(r, w, t) } -> same_as<Count>;
-          { select(r, e, t) } -> same_as<Count>;
-          { select(w, e, t) } -> same_as<Count>;
-          { select(r, w, e, t) } -> same_as<Count>;
-          { select(n, r, t) } -> same_as<Count>;
-          { select(n, r, w, t) } -> same_as<Count>;
-          { select(n, r, e, t) } -> same_as<Count>;
-          { select(n, w, e, t) } -> same_as<Count>;
-          { select(n, r, w, e, t) } -> same_as<Count>;
+          { select(r, t) } -> convertible_to<same_as<Count>>;
+          { select(r, w, t) } -> convertible_to<same_as<Count>>;
+          { select(r, e, t) } -> convertible_to<same_as<Count>>;
+          { select(w, e, t) } -> convertible_to<same_as<Count>>;
+          { select(r, w, e, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, e, t) } -> convertible_to<same_as<Count>>;
+          { select(n, w, e, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, e, t) } -> convertible_to<same_as<Count>>;
         };
-        template<typename..._> concept bool Stanza = requires(_...) {
+        template<typename..._> concept Stanza = requires(_...) {
           requires 0 == countof<_...>;
           requires Select<>;
           requires SelectTimeout<time::t>;
@@ -89,51 +89,51 @@ namespace tests::usage::posix_select {
         };
       }
       namespace [[dteail]] stanza_pselect {
-        template<typename TIMEOUT> concept bool PSelectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept PSelectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
-          { select(r, s) } -> same_as<Count>;
-          { select(r, w, s) } -> same_as<Count>;
-          { select(r, e, s) } -> same_as<Count>;
-          { select(w, e, s) } -> same_as<Count>;
-          { select(r, w, e, s) } -> same_as<Count>;
-          { select(n, r, s) } -> same_as<Count>;
-          { select(n, r, w, s) } -> same_as<Count>;
-          { select(n, r, e, s) } -> same_as<Count>;
-          { select(n, w, e, s) } -> same_as<Count>;
-          { select(n, r, w, e, s) } -> same_as<Count>;
+          { select(r, s) } -> convertible_to<same_as<Count>>;
+          { select(r, w, s) } -> convertible_to<same_as<Count>>;
+          { select(r, e, s) } -> convertible_to<same_as<Count>>;
+          { select(w, e, s) } -> convertible_to<same_as<Count>>;
+          { select(r, w, e, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, e, s) } -> convertible_to<same_as<Count>>;
+          { select(n, w, e, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, e, s) } -> convertible_to<same_as<Count>>;
         };
-        template<typename TIMEOUT> concept bool PSelectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept PSelectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
-          { select(r, s, t) } -> same_as<Count>;
-          { select(r, w, s, t) } -> same_as<Count>;
-          { select(r, e, s, t) } -> same_as<Count>;
-          { select(w, e, s, t) } -> same_as<Count>;
-          { select(r, w, e, s, t) } -> same_as<Count>;
-          { select(n, r, s, t) } -> same_as<Count>;
-          { select(n, r, w, s, t) } -> same_as<Count>;
-          { select(n, r, e, s, t) } -> same_as<Count>;
-          { select(n, w, e, s, t) } -> same_as<Count>;
-          { select(n, r, w, e, s, t) } -> same_as<Count>;
+          { select(r, s, t) } -> convertible_to<same_as<Count>>;
+          { select(r, w, s, t) } -> convertible_to<same_as<Count>>;
+          { select(r, e, s, t) } -> convertible_to<same_as<Count>>;
+          { select(w, e, s, t) } -> convertible_to<same_as<Count>>;
+          { select(r, w, e, s, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, s, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, s, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, e, s, t) } -> convertible_to<same_as<Count>>;
+          { select(n, w, e, s, t) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, e, s, t) } -> convertible_to<same_as<Count>>;
         };
-        template<typename TIMEOUT> concept bool PSelectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t, Sigset s) {
+        template<typename TIMEOUT> concept PSelectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t, Sigset s) {
           requires required::Duration<TIMEOUT>;
-          { select(r, t, s) } -> same_as<Count>;
-          { select(r, w, t, s) } -> same_as<Count>;
-          { select(r, e, t, s) } -> same_as<Count>;
-          { select(w, e, t, s) } -> same_as<Count>;
-          { select(r, w, e, t, s) } -> same_as<Count>;
-          { select(n, r, t, s) } -> same_as<Count>;
-          { select(n, r, w, t, s) } -> same_as<Count>;
-          { select(n, r, e, t, s) } -> same_as<Count>;
-          { select(n, w, e, t, s) } -> same_as<Count>;
-          { select(n, r, w, e, t, s) } -> same_as<Count>;
+          { select(r, t, s) } -> convertible_to<same_as<Count>>;
+          { select(r, w, t, s) } -> convertible_to<same_as<Count>>;
+          { select(r, e, t, s) } -> convertible_to<same_as<Count>>;
+          { select(w, e, t, s) } -> convertible_to<same_as<Count>>;
+          { select(r, w, e, t, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, t, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, t, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, e, t, s) } -> convertible_to<same_as<Count>>;
+          { select(n, w, e, t, s) } -> convertible_to<same_as<Count>>;
+          { select(n, r, w, e, t, s) } -> convertible_to<same_as<Count>>;
         };
-        template<typename TIMEOUT> concept bool PSelect = requires(TIMEOUT) {
+        template<typename TIMEOUT> concept PSelect = requires(TIMEOUT) {
           requires PSelectSigset<TIMEOUT>;
           requires PSelectSigsetTimeout<TIMEOUT>;
           requires PSelectTimeoutSigset<TIMEOUT>;
         };
-        template<typename..._> concept bool Stanza = requires(_...) {
+        template<typename..._> concept Stanza = requires(_...) {
           requires 0 == countof<_...>;
           requires PSelect<time::t>;
           requires PSelect<time::val>;
@@ -145,7 +145,7 @@ namespace tests::usage::posix_select {
         };
       }
     }
-    template<typename..._> concept bool Usage = requires(_...) {
+    template<typename..._> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires stanza_select::Stanza<>;
       requires stanza_pselect::Stanza<>;

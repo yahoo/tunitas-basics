@@ -19,7 +19,7 @@ namespace c::required {
   // Remember it as a concept for recognizing the BINARY SQL data
   // A BINARY is NOT a 'char const *' with an implicit '\0' terminator.
   //
-  template<typename ITEM> concept bool Binary = requires(ITEM item) {
+  template<typename ITEM> concept Binary = requires(ITEM item) {
     typename ITEM::value_type;
     requires Managed<ITEM>; 
     // Because basic_stringz cannot store '\0' characters (the '\0' is the terminator sentinel)

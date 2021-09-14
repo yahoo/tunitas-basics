@@ -10,6 +10,6 @@ namespace sys::posix::packaging::sleep::required {
   //
   //   packaging::sleep::coerce<OUT>(IN const &) -> OUT
   //
-  template<typename TYPE> concept bool Coercible = POSIX_Time_Structure<TYPE> || Duration<TYPE>;
+  template<typename TYPE> concept Coercible = POSIX_Time_Structure<TYPE> || Duration<TYPE>;
 }
 #endiv

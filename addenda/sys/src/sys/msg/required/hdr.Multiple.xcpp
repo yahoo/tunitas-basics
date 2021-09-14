@@ -11,6 +11,6 @@ namespace sys::msg::required::hdr {
   //
   //   you know
   //
-  template<typename HDR> concept bool Multiple = std::is_same_v<HDR, mmsghdr>;
+  template<typename HDR> concept Multiple = std::is_same_v<HDR, mmsghdr>;
 }
 #endiv

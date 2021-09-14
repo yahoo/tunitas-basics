@@ -17,12 +17,12 @@ namespace re::required {
   // Only these two types can be the implementation choices for the Core<UNIFIER>
   // Yup, just these and no more.
   //
-  template<typename UNIFIER> concept bool Bufferlike = requires(UNIFIER unifier, UNIFIER const cunifier) {
+  template<typename UNIFIER> concept Bufferlike = requires(UNIFIER unifier, UNIFIER const cunifier) {
     requires Corelike<UNIFIER>;
     typename UNIFIER::value_type;
-    { unifier.data() } -> typename UNIFIER::value_type const *; // but maybe non-const too
-    { cunifier.data() } -> typename UNIFIER::value_type const *;
-    { unifier.size() } -> std::size_t;
+    { unifier.data() } -> convertible_to<typename UNIFIER::value_type const *>; // but maybe non-const too
+    { cunifier.data() } -> convertible_to<typename UNIFIER::value_type const *>;
+    { unifier.size() } -> convertible_to<std::size_t>;
     // and many other needs, which are not yet declared here.
     //
     // Loosen the specification a bit to allow other types that match the (above) concept criteria

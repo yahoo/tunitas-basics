@@ -7,7 +7,7 @@ namespace nonstd::required {
   //
   // Is this a basic_string (descendant?)
   //
-  template<typename STRING> concept bool Basic_String = requires(STRING string) {
+  template<typename STRING> concept Basic_String = requires(STRING string) {
     typename STRING::value_type;
     typename STRING::traits_type;
     typename STRING::allocator_type;

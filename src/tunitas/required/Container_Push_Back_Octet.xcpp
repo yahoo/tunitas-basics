@@ -15,7 +15,7 @@ namespace tunitas::required {
   //     Something(CONTAINER &container);
   //   };
   //
-  template<typename CONTAINER> concept bool Container_Push_Back_Octet = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
+  template<typename CONTAINER> concept Container_Push_Back_Octet = Container_Push_Back<CONTAINER> && requires(CONTAINER container) {
     typename CONTAINER::value_type;
     requires nonstd::required::Octet<typename CONTAINER::value_type>;
   };

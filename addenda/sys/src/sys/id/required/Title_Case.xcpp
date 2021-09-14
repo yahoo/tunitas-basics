@@ -9,6 +9,6 @@ namespace sys::id::required {
   //
   // e.g. id::File, id::Signal, id::Wait
   //
-  template<typename TYPE> concept bool Title_Case = school::New<TYPE>;
+  template<typename TYPE> concept Title_Case = school::New<TYPE>;
 }
 #endiv

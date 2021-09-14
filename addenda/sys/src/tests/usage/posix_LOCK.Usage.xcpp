@@ -17,7 +17,7 @@ namespace tests::usage::posix_LOCK {
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
     namespace [[detail]] aspect {
-      template<typename LOCK> concept bool Lease = requires(LOCK) {
+      template<typename LOCK> concept Lease = requires(LOCK) {
         typename LOCK::Lease;
         typename LOCK::template Operation<LOCK::LEASE>;
         requires (int)LOCK::READ == F_RDLCK;
@@ -29,7 +29,7 @@ namespace tests::usage::posix_LOCK {
         requires (int)LOCK::UN == F_UNLCK;
         requires (int)LOCK::template UNLOCK<LOCK::LOCK> == F_UNLCK;
       };
-      template<typename LOCK> concept bool Lock = requires(LOCK) {
+      template<typename LOCK> concept Lock = requires(LOCK) {
         typename LOCK::Lock;
         typename LOCK::template Operation<LOCK::LOCK>;
         typename LOCK::template Options<LOCK::LOCK>;
@@ -42,7 +42,7 @@ namespace tests::usage::posix_LOCK {
         requires (int)LOCK::UN == F_UNLCK;
         requires (int)LOCK::template UNLOCK<LOCK::LOCK> == F_UNLCK;
       };
-      template<typename LOCK> concept bool Flock = requires(LOCK) {
+      template<typename LOCK> concept Flock = requires(LOCK) {
         typename LOCK::Flock;
         typename LOCK::template Operation<LOCK::FLOCK>;
         typename LOCK::template Options<LOCK::FLOCK>;
@@ -50,7 +50,7 @@ namespace tests::usage::posix_LOCK {
         requires (int)LOCK::template UNLOCK<LOCK::FLOCK> == LOCK_UN;
       };
     }
-    template<typename LOCK> concept bool Instance = requires(LOCK) {
+    template<typename LOCK> concept Instance = requires(LOCK) {
       requires model::Namespace_Object<LOCK>;
 #if 0
       requires aspect::Lock<LOCK>;
@@ -58,7 +58,7 @@ namespace tests::usage::posix_LOCK {
       requires aspect::Flock<LOCK>;
 #endif
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<LOCK>;
     };

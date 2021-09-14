@@ -8,7 +8,7 @@ namespace nonstd::required::container {
   //
   // A Container, that holds a particular type.
   //
-  template<typename CONTAINER, typename ELEMENT> concept bool Holding = requires(CONTAINER container, ELEMENT element) {
+  template<typename CONTAINER, typename ELEMENT> concept Holding = requires(CONTAINER container, ELEMENT element) {
     requires Type<CONTAINER>;
     typename CONTAINER::value_type;
     requires std::is_same<typename CONTAINER::value_type, ELEMENT>::value;

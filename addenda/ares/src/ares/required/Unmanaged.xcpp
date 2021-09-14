@@ -20,7 +20,7 @@ namespace ares::required {
   //
   // Is this a legal unmanaged reply structure?
   //
-  template<typename UNMANAGED> concept bool Unmanaged = Is_Unmanaged<UNMANAGED>::value;
+  template<typename UNMANAGED> concept Unmanaged = Is_Unmanaged<UNMANAGED>::value;
 }
 #endiv
 #divert <hpp>

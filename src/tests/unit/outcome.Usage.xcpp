@@ -161,13 +161,13 @@ template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Te
     cod << call("returning", &Usage::test_error_code_returning)
         << call("throwing", &Usage::test_error_code_throwing)
       ;
-    series << add(cod.release());
+    series << move(cod);
   } {
     Stream con("error_condition");
     con << call("returning", &Usage::test_error_condition_returning)
         << call("throwing", &Usage::test_error_condition_throwing)
       ;
-    series << add(con.release());
+    series << move(con);
   } {
     Stream val("value");
     val << call("consty", &Usage::test_value_consty)
@@ -175,15 +175,15 @@ template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Te
         << call("moving", &Usage::test_value_moving)
         << call("throwing", &Usage::test_value_throwing)
       ;
-    series << add(val.release());
+    series << move(val);
   } {
     Stream con("constructor");
     con << call("default", &Usage::test_constructor_default)
         << call("Error", &Usage::test_constructor_Error)
         << call("Value", &Usage::test_constructor_Value)
       ;
-    series << add(con.release());
+    series << move(con);
   }
-  return series.release();
+  return finalize(series);
 }
 #endiv

@@ -16,226 +16,226 @@ namespace tests::usage::posix_E {
     namespace [[detail]] order {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-     template<typename E> concept bool System_errno = requires(E) {
-       requires (int)E::SUCCESS == 0;
-       // /usr/include/asm-generic/errno-base.h via kernel-headers-4.18.16-300.fc29.x86_64
-       requires (int)E::PERM == EPERM;
-       requires (int)E::NOENT == ENOENT;
-       requires (int)E::SRCH == ESRCH;
-       requires (int)E::INTR == EINTR;
-       requires (int)E::IO == EIO;
-       requires (int)E::NXIO == ENXIO;
-       requires (int)E::TOOBIG == E2BIG;
-       requires (int)E::NOEXEC == ENOEXEC;
-       requires (int)E::BADF == EBADF;
-       requires (int)E::CHILD == ECHILD;
-       requires (int)E::AGAIN == EAGAIN;
-       requires (int)E::NOMEM == ENOMEM;
-       requires (int)E::ACCES == EACCES;
-       requires (int)E::FAULT == EFAULT;
-       requires (int)E::NOTBLK == ENOTBLK; // Block device required
-       requires (int)E::BUSY == EBUSY;
-       requires (int)E::EXIST == EEXIST;
-       requires (int)E::XDEV == EXDEV;
-       requires (int)E::NODEV == ENODEV;
-       requires (int)E::NOTDIR == ENOTDIR;
-       requires (int)E::ISDIR == EISDIR;
-       requires (int)E::INVAL == EINVAL;
-       requires (int)E::NFILE == ENFILE;
-       requires (int)E::MFILE == EMFILE;
-       requires (int)E::NOTTY == ENOTTY;
-       requires (int)E::TXTBSY == ETXTBSY;
-       requires (int)E::FBIG == EFBIG;
-       requires (int)E::NOSPC == ENOSPC;
-       requires (int)E::SPIPE == ESPIPE;
-       requires (int)E::ROFS == EROFS;
-       requires (int)E::MLINK == EMLINK;
-       requires (int)E::PIPE == EPIPE;
-       requires (int)E::DOM == EDOM;
-       requires (int)E::RANGE == ERANGE;
-       //
-       // ----------------------------------------------------------------------------------------------------
-       // Linux-specific values
-       //
-       requires (int)E::CHRNG == ECHRNG;
-       requires (int)E::L2NSYNC == EL2NSYNC;
-       requires (int)E::L3HLT == EL3HLT;
-       requires (int)E::L3RST == EL3RST;
-       requires (int)E::LNRNG == ELNRNG;
-       requires (int)E::UNATCH == EUNATCH;
-       requires (int)E::NOCSI == ENOCSI;
-       requires (int)E::L2HLT == EL2HLT;
-       requires (int)E::BADE == EBADE;
-       requires (int)E::BADR == EBADR;
-       requires (int)E::XFULL == EXFULL;
-       requires (int)E::NOANO == ENOANO;
-       requires (int)E::BADRQC == EBADRQC;
-       requires (int)E::BADSLT == EBADSLT;
-       requires (int)E::DEADLOCK == EDEADLOCK;
-       requires (int)E::BFONT == EBFONT;
-       requires (int)E::NONET == ENONET;
-       requires (int)E::NOPKG == ENOPKG;
-       requires (int)E::REMOTE == EREMOTE;
-       requires (int)E::ADV == EADV;
-       requires (int)E::SRMNT == ESRMNT;
-       requires (int)E::COMM == ECOMM;
-       requires (int)E::MULTIHOP == EMULTIHOP;
-       requires (int)E::DOTDOT == EDOTDOT;
-       requires (int)E::NOTUNIQ == ENOTUNIQ;
-       requires (int)E::REMCHG == EREMCHG;
-       requires (int)E::LIBACC == ELIBACC;
-       requires (int)E::LIBBAD == ELIBBAD;
-       requires (int)E::LIBSCN == ELIBSCN;
-       requires (int)E::LIBMAX == ELIBMAX;
-       requires (int)E::LIBEXEC == ELIBEXEC;
-       requires (int)E::RESTART == ERESTART;
-       requires (int)E::USERS == EUSERS;
-       requires (int)E::SOCKTNOSUPPORT == ESOCKTNOSUPPORT;
-       requires (int)E::PFNOSUPPORT == EPFNOSUPPORT;
-       requires (int)E::SHUTDOWN == ESHUTDOWN;
-       requires (int)E::TOOMANYREFS == ETOOMANYREFS;
-       requires (int)E::HOSTDOWN == EHOSTDOWN;
-       requires (int)E::STALE == ESTALE;
-       requires (int)E::UCLEAN == EUCLEAN;
-       requires (int)E::NOTNAM == ENOTNAM;
-       requires (int)E::NAVAIL == ENAVAIL;
-       requires (int)E::ISNAM == EISNAM;
-       requires (int)E::DQUOT == EDQUOT;
-       requires (int)E::NOMEDIUM == ENOMEDIUM;
-       requires (int)E::MEDIUMTYPE == EMEDIUMTYPE;
-       requires (int)E::NOKEY == ENOKEY;
-       requires (int)E::KEYEXPIRED == EKEYEXPIRED;
-       requires (int)E::KEYREVOKED == EKEYREVOKED;
-       requires (int)E::KEYREJECTED == EKEYREJECTED;
-       requires (int)E::RFKILL == ERFKILL;
-       requires (int)E::HWPOISON == EHWPOISON;
-     };
-     template<typename E> concept bool GCC_cplusplus_list = requires(E) {
-       // This copypasta from 
-       //   /usr/include/c++/8/x86_64-redhat-linux/bits/error_constants.h
-       //   libstdc++-devel-8.2.1-5.fc29.x86_64
-       requires (int)E::SUCCESS == 0;
-       requires (int)E::AFNOSUPPORT == EAFNOSUPPORT;
-       requires (int)E::ADDRINUSE == EADDRINUSE;
-       requires (int)E::ADDRNOTAVAIL == EADDRNOTAVAIL;
-       requires (int)E::ISCONN == EISCONN;
-       requires (int)E::TOOBIG == E2BIG;
-       requires (int)E::DOM == EDOM;
-       requires (int)E::FAULT == EFAULT;
-       requires (int)E::BADF == EBADF;
+      template<typename E> concept System_errno = requires(E) {
+        requires (int)E::SUCCESS == 0;
+        // /usr/include/asm-generic/errno-base.h via kernel-headers-4.18.16-300.fc29.x86_64
+        requires (int)E::PERM == EPERM;
+        requires (int)E::NOENT == ENOENT;
+        requires (int)E::SRCH == ESRCH;
+        requires (int)E::INTR == EINTR;
+        requires (int)E::IO == EIO;
+        requires (int)E::NXIO == ENXIO;
+        requires (int)E::TOOBIG == E2BIG;
+        requires (int)E::NOEXEC == ENOEXEC;
+        requires (int)E::BADF == EBADF;
+        requires (int)E::CHILD == ECHILD;
+        requires (int)E::AGAIN == EAGAIN;
+        requires (int)E::NOMEM == ENOMEM;
+        requires (int)E::ACCES == EACCES;
+        requires (int)E::FAULT == EFAULT;
+        requires (int)E::NOTBLK == ENOTBLK; // Block device required
+        requires (int)E::BUSY == EBUSY;
+        requires (int)E::EXIST == EEXIST;
+        requires (int)E::XDEV == EXDEV;
+        requires (int)E::NODEV == ENODEV;
+        requires (int)E::NOTDIR == ENOTDIR;
+        requires (int)E::ISDIR == EISDIR;
+        requires (int)E::INVAL == EINVAL;
+        requires (int)E::NFILE == ENFILE;
+        requires (int)E::MFILE == EMFILE;
+        requires (int)E::NOTTY == ENOTTY;
+        requires (int)E::TXTBSY == ETXTBSY;
+        requires (int)E::FBIG == EFBIG;
+        requires (int)E::NOSPC == ENOSPC;
+        requires (int)E::SPIPE == ESPIPE;
+        requires (int)E::ROFS == EROFS;
+        requires (int)E::MLINK == EMLINK;
+        requires (int)E::PIPE == EPIPE;
+        requires (int)E::DOM == EDOM;
+        requires (int)E::RANGE == ERANGE;
+        //
+        // ----------------------------------------------------------------------------------------------------
+        // Linux-specific values
+        //
+        requires (int)E::CHRNG == ECHRNG;
+        requires (int)E::L2NSYNC == EL2NSYNC;
+        requires (int)E::L3HLT == EL3HLT;
+        requires (int)E::L3RST == EL3RST;
+        requires (int)E::LNRNG == ELNRNG;
+        requires (int)E::UNATCH == EUNATCH;
+        requires (int)E::NOCSI == ENOCSI;
+        requires (int)E::L2HLT == EL2HLT;
+        requires (int)E::BADE == EBADE;
+        requires (int)E::BADR == EBADR;
+        requires (int)E::XFULL == EXFULL;
+        requires (int)E::NOANO == ENOANO;
+        requires (int)E::BADRQC == EBADRQC;
+        requires (int)E::BADSLT == EBADSLT;
+        requires (int)E::DEADLOCK == EDEADLOCK;
+        requires (int)E::BFONT == EBFONT;
+        requires (int)E::NONET == ENONET;
+        requires (int)E::NOPKG == ENOPKG;
+        requires (int)E::REMOTE == EREMOTE;
+        requires (int)E::ADV == EADV;
+        requires (int)E::SRMNT == ESRMNT;
+        requires (int)E::COMM == ECOMM;
+        requires (int)E::MULTIHOP == EMULTIHOP;
+        requires (int)E::DOTDOT == EDOTDOT;
+        requires (int)E::NOTUNIQ == ENOTUNIQ;
+        requires (int)E::REMCHG == EREMCHG;
+        requires (int)E::LIBACC == ELIBACC;
+        requires (int)E::LIBBAD == ELIBBAD;
+        requires (int)E::LIBSCN == ELIBSCN;
+        requires (int)E::LIBMAX == ELIBMAX;
+        requires (int)E::LIBEXEC == ELIBEXEC;
+        requires (int)E::RESTART == ERESTART;
+        requires (int)E::USERS == EUSERS;
+        requires (int)E::SOCKTNOSUPPORT == ESOCKTNOSUPPORT;
+        requires (int)E::PFNOSUPPORT == EPFNOSUPPORT;
+        requires (int)E::SHUTDOWN == ESHUTDOWN;
+        requires (int)E::TOOMANYREFS == ETOOMANYREFS;
+        requires (int)E::HOSTDOWN == EHOSTDOWN;
+        requires (int)E::STALE == ESTALE;
+        requires (int)E::UCLEAN == EUCLEAN;
+        requires (int)E::NOTNAM == ENOTNAM;
+        requires (int)E::NAVAIL == ENAVAIL;
+        requires (int)E::ISNAM == EISNAM;
+        requires (int)E::DQUOT == EDQUOT;
+        requires (int)E::NOMEDIUM == ENOMEDIUM;
+        requires (int)E::MEDIUMTYPE == EMEDIUMTYPE;
+        requires (int)E::NOKEY == ENOKEY;
+        requires (int)E::KEYEXPIRED == EKEYEXPIRED;
+        requires (int)E::KEYREVOKED == EKEYREVOKED;
+        requires (int)E::KEYREJECTED == EKEYREJECTED;
+        requires (int)E::RFKILL == ERFKILL;
+        requires (int)E::HWPOISON == EHWPOISON;
+      };
+      template<typename E> concept GCC_cplusplus_list = requires(E) {
+        // This copypasta from 
+        //   /usr/include/c++/8/x86_64-redhat-linux/bits/error_constants.h
+        //   libstdc++-devel-8.2.1-5.fc29.x86_64
+        requires (int)E::SUCCESS == 0;
+        requires (int)E::AFNOSUPPORT == EAFNOSUPPORT;
+        requires (int)E::ADDRINUSE == EADDRINUSE;
+        requires (int)E::ADDRNOTAVAIL == EADDRNOTAVAIL;
+        requires (int)E::ISCONN == EISCONN;
+        requires (int)E::TOOBIG == E2BIG;
+        requires (int)E::DOM == EDOM;
+        requires (int)E::FAULT == EFAULT;
+        requires (int)E::BADF == EBADF;
 #ifdef EBADMSG
-       requires (int)E::BADMSG == EBADMSG;
+        requires (int)E::BADMSG == EBADMSG;
 #endif
-       requires (int)E::PIPE == EPIPE;
-       requires (int)E::CONNABORTED == ECONNABORTED;
-       requires (int)E::ALREADY == EALREADY;
-       requires (int)E::CONNREFUSED == ECONNREFUSED;
-       requires (int)E::CONNRESET == ECONNRESET;
-       requires (int)E::XDEV == EXDEV;
-       requires (int)E::DESTADDRREQ == EDESTADDRREQ;
-       requires (int)E::BUSY == EBUSY;
-       requires (int)E::NOTEMPTY == ENOTEMPTY;
-       requires (int)E::NOEXEC == ENOEXEC;
-       requires (int)E::EXIST == EEXIST;
-       requires (int)E::TOOBIG == E2BIG;
-       requires (int)E::ARGLISTTOOLONG == E2BIG;
-       requires (int)E::FBIG == EFBIG;
-       requires (int)E::FILETOOBIG == EFBIG;
-       requires (int)E::NAMETOOLONG == ENAMETOOLONG;
-       requires (int)E::NOSYS == ENOSYS;
-       requires (int)E::HOSTUNREACH == EHOSTUNREACH;
+        requires (int)E::PIPE == EPIPE;
+        requires (int)E::CONNABORTED == ECONNABORTED;
+        requires (int)E::ALREADY == EALREADY;
+        requires (int)E::CONNREFUSED == ECONNREFUSED;
+        requires (int)E::CONNRESET == ECONNRESET;
+        requires (int)E::XDEV == EXDEV;
+        requires (int)E::DESTADDRREQ == EDESTADDRREQ;
+        requires (int)E::BUSY == EBUSY;
+        requires (int)E::NOTEMPTY == ENOTEMPTY;
+        requires (int)E::NOEXEC == ENOEXEC;
+        requires (int)E::EXIST == EEXIST;
+        requires (int)E::TOOBIG == E2BIG;
+        requires (int)E::ARGLISTTOOLONG == E2BIG;
+        requires (int)E::FBIG == EFBIG;
+        requires (int)E::FILETOOBIG == EFBIG;
+        requires (int)E::NAMETOOLONG == ENAMETOOLONG;
+        requires (int)E::NOSYS == ENOSYS;
+        requires (int)E::HOSTUNREACH == EHOSTUNREACH;
 #ifdef EIDRM
-       requires (int)E::IDRM == EIDRM;
+        requires (int)E::IDRM == EIDRM;
 #endif
-       requires (int)E::ILSEQ == EILSEQ;
-       requires (int)E::NOTTY == ENOTTY;
-       requires (int)E::INTR == EINTR;
-       requires (int)E::INVAL == EINVAL;
-       requires (int)E::SPIPE == ESPIPE;
-       requires (int)E::SEEK == ESPIPE;
-       requires (int)E::IO == EIO;
-       requires (int)E::ISDIR == EISDIR;
-       requires (int)E::MSGSIZE == EMSGSIZE;
-       requires (int)E::NETDOWN == ENETDOWN;
-       requires (int)E::NETRESET == ENETRESET;
-       requires (int)E::NETUNREACH == ENETUNREACH;
-       requires (int)E::NOBUFS == ENOBUFS;
-       requires (int)E::CHILD == ECHILD;
+        requires (int)E::ILSEQ == EILSEQ;
+        requires (int)E::NOTTY == ENOTTY;
+        requires (int)E::INTR == EINTR;
+        requires (int)E::INVAL == EINVAL;
+        requires (int)E::SPIPE == ESPIPE;
+        requires (int)E::SEEK == ESPIPE;
+        requires (int)E::IO == EIO;
+        requires (int)E::ISDIR == EISDIR;
+        requires (int)E::MSGSIZE == EMSGSIZE;
+        requires (int)E::NETDOWN == ENETDOWN;
+        requires (int)E::NETRESET == ENETRESET;
+        requires (int)E::NETUNREACH == ENETUNREACH;
+        requires (int)E::NOBUFS == ENOBUFS;
+        requires (int)E::CHILD == ECHILD;
 #ifdef ENOLINK
-       requires (int)E::NOLINK == ENOLINK;
+        requires (int)E::NOLINK == ENOLINK;
 #endif
-       requires (int)E::NOLCK == ENOLCK;
-       requires (int)E::NOLOCK == ENOLCK;
+        requires (int)E::NOLCK == ENOLCK;
+        requires (int)E::NOLOCK == ENOLCK;
 #ifdef ENODATA
-       requires (int)E::NODATA == ENODATA;
+        requires (int)E::NODATA == ENODATA;
 #endif
-       requires (int)E::NOMSG == ENOMSG;
-       requires (int)E::NOPROTOOPT == ENOPROTOOPT;
-       requires (int)E::NOSPC == ENOSPC;
+        requires (int)E::NOMSG == ENOMSG;
+        requires (int)E::NOPROTOOPT == ENOPROTOOPT;
+        requires (int)E::NOSPC == ENOSPC;
 #ifdef ENOSR
-       requires (int)E::NOSR == ENOSR;
+        requires (int)E::NOSR == ENOSR;
 #endif
-       requires (int)E::NXIO == ENXIO;
-       requires (int)E::NODEV == ENODEV;
-       requires (int)E::NOENT == ENOENT;
-       requires (int)E::SRCH == ESRCH;
-       requires (int)E::NOTDIR == ENOTDIR;
-       requires (int)E::NOTSOCK == ENOTSOCK;
+        requires (int)E::NXIO == ENXIO;
+        requires (int)E::NODEV == ENODEV;
+        requires (int)E::NOENT == ENOENT;
+        requires (int)E::SRCH == ESRCH;
+        requires (int)E::NOTDIR == ENOTDIR;
+        requires (int)E::NOTSOCK == ENOTSOCK;
 #ifdef ENOSTR
-       requires (int)E::NOSTR == ENOSTR;
+        requires (int)E::NOSTR == ENOSTR;
 #endif
-       requires (int)E::NOTCONN == ENOTCONN;
-       requires (int)E::NOMEM == ENOMEM;
+        requires (int)E::NOTCONN == ENOTCONN;
+        requires (int)E::NOMEM == ENOMEM;
 #ifdef ENOTSUP
-       requires (int)E::NOTSUP == ENOTSUP;
+        requires (int)E::NOTSUP == ENOTSUP;
 #endif
 #ifdef ECANCELED
-       requires (int)E::CANCELED == ECANCELED;
+        requires (int)E::CANCELED == ECANCELED;
 #endif
-       requires (int)E::INPROGRESS == EINPROGRESS;
-       requires (int)E::PERM == EPERM;
-       requires (int)E::OPNOTSUPP == EOPNOTSUPP;
-       requires (int)E::WOULDBLOCK == EWOULDBLOCK;
+        requires (int)E::INPROGRESS == EINPROGRESS;
+        requires (int)E::PERM == EPERM;
+        requires (int)E::OPNOTSUPP == EOPNOTSUPP;
+        requires (int)E::WOULDBLOCK == EWOULDBLOCK;
 #ifdef EOWNERDEAD
-       requires (int)E::OWNERDEAD == EOWNERDEAD;
+        requires (int)E::OWNERDEAD == EOWNERDEAD;
 #endif
-       requires (int)E::ACCES == EACCES;
+        requires (int)E::ACCES == EACCES;
 #ifdef EPROTO
-       requires (int)E::PROTO == EPROTO;
+        requires (int)E::PROTO == EPROTO;
 #endif
-       requires (int)E::PROTONOSUPPORT == EPROTONOSUPPORT;
-       requires (int)E::ROFS == EROFS;
-       requires (int)E::DEADLK == EDEADLK;
-       requires (int)E::AGAIN == EAGAIN;
-       requires (int)E::RANGE == ERANGE;
+        requires (int)E::PROTONOSUPPORT == EPROTONOSUPPORT;
+        requires (int)E::ROFS == EROFS;
+        requires (int)E::DEADLK == EDEADLK;
+        requires (int)E::AGAIN == EAGAIN;
+        requires (int)E::RANGE == ERANGE;
 #ifdef ENOTRECOVERABLE
-       requires (int)E::NOTRECOVERABLE == ENOTRECOVERABLE;
+        requires (int)E::NOTRECOVERABLE == ENOTRECOVERABLE;
 #endif
 #ifdef ETIME
-       requires (int)E::TIME == ETIME;
+        requires (int)E::TIME == ETIME;
 #endif
 #ifdef ETXTBSY
-       requires (int)E::TXTBSY == ETXTBSY;
+        requires (int)E::TXTBSY == ETXTBSY;
 #endif
-       requires (int)E::TIMEDOUT == ETIMEDOUT;
-       requires (int)E::NFILE == ENFILE;
-       requires (int)E::MFILE == EMFILE;
-       requires (int)E::MLINK == EMLINK;
-       requires (int)E::LOOP == ELOOP;
+        requires (int)E::TIMEDOUT == ETIMEDOUT;
+        requires (int)E::NFILE == ENFILE;
+        requires (int)E::MFILE == EMFILE;
+        requires (int)E::MLINK == EMLINK;
+        requires (int)E::LOOP == ELOOP;
 #ifdef EOVERFLOW
-       requires (int)E::OVERFLOW == EOVERFLOW;
+        requires (int)E::OVERFLOW == EOVERFLOW;
 #endif
-       requires (int)E::PROTOTYPE == EPROTOTYPE;
-     };
+        requires (int)E::PROTOTYPE == EPROTOTYPE;
+      };
 #pragma GCC diagnostic pop
     }
-    template<typename E> concept bool Instance = requires(E) {
+    template<typename E> concept Instance = requires(E) {
       typename E::Condition;
       typename E::Code;
       requires order::System_errno<E>;
       requires order::GCC_cplusplus_list<E>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<E>;
     };

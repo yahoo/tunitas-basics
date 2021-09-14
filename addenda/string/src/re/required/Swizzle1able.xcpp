@@ -11,12 +11,12 @@ namespace re::required {
   // Only these two types can be the implementation choices for the Core<OTHER>
   // Yup, just these and no more.
   //
-  template<typename OTHER> concept bool Swizzle1able = requires(OTHER other, OTHER const cother) {
+  template<typename OTHER> concept Swizzle1able = requires(OTHER other, OTHER const cother) {
     typename OTHER::value_type;
-    { other.c_str() } -> typename OTHER::value_type const *;
-    { other.data() } -> typename OTHER::value_type const *;  // every accessor returns consty
-    { cother.data() } -> typename OTHER::value_type const *;
-    { other.size() } -> std::size_t;
+    { other.c_str() } -> convertible_to<typename OTHER::value_type const *>;
+    { other.data() } -> convertible_to<typename OTHER::value_type const *>;  // every accessor returns consty
+    { cother.data() } -> convertible_to<typename OTHER::value_type const *>;
+    { other.size() } -> convertible_to<std::size_t>;
     // ... and no other requirements.
   };
 }

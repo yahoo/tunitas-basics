@@ -47,18 +47,18 @@ namespace nonstd::required::iterator {
   // CORRECT -----> template<::nonstd::required::iterator::Output<std::string> OUT> struct X;
   //
   namespace output {
-    template<typename ITERATOR> concept bool Impure = Basis<ITERATOR> && requires(ITERATOR iterator) {
+    template<typename ITERATOR> concept Impure = Basis<ITERATOR> && requires(ITERATOR iterator) {
       // An output iterator may not have the tag, because it COULD be an input iterator that you can read from AND write to (e.g. char *, std::string:iterator)
       requires (is_same_v<input_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category> ||
                 is_base_of_v<input_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>);
       { *iterator++ = *iterator++ };
     };
-    template<typename ITERATOR> concept bool Pure = Basis<ITERATOR> && requires(ITERATOR iterator) {
+    template<typename ITERATOR> concept Pure = Basis<ITERATOR> && requires(ITERATOR iterator) {
       requires (is_same_v<output_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category> ||
                 is_base_of_v<output_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>);
       { *iterator++ };
     };
-    template<typename ITERATOR, typename RHS> concept bool Output = (Pure<ITERATOR> || Impure<ITERATOR>) && requires(ITERATOR iterator, RHS rhs) {
+    template<typename ITERATOR, typename RHS> concept Output = (Pure<ITERATOR> || Impure<ITERATOR>) && requires(ITERATOR iterator, RHS rhs) {
       { *iterator++ = rhs };
     };
   }

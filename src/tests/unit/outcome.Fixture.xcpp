@@ -37,8 +37,8 @@ public:
   auto test_constructor_Error() -> void;
   auto test_constructor_Value_copy() -> void;
   auto test_constructor_Value_move() -> void;
-  auto test_constructor_ancestor_copy() -> void;
-  auto test_constructor_ancestor_move() -> void;
+  auto test_constructor_Ancestor_copy() -> void;
+  auto test_constructor_Ancestor_move() -> void;
   static auto suite() -> cppunit::Test *;
 private:
   auto compute(bool) -> Success;
@@ -173,14 +173,14 @@ auto tests::unit::outcome::Fixture::test_constructor_Value_move() -> void {
   auto sg = Subject{std::move(good)};
   CPPUNIT_ASSERT(ok(sg));
 }
-auto tests::unit::outcome::Fixture::test_constructor_ancestor_copy() -> void {
+auto tests::unit::outcome::Fixture::test_constructor_Ancestor_copy() -> void {
 #if 0
   auto const good = Foreign{"good"};
   auto sg = Subject{good};
   CPPUNIT_ASSERT(ok(sg));
 #endif
 }
-auto tests::unit::outcome::Fixture::test_constructor_ancestor_move() -> void {
+auto tests::unit::outcome::Fixture::test_constructor_Ancestor_move() -> void {
 #if 0
   auto good = Foreign{"good"};
   auto sg = Subject{std::move(good)};
@@ -243,9 +243,9 @@ auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
         ;
       con << add(val.release());
     } {
-      Stream ans("ancestor");
-      ans << call("copy", &Fixture::test_constructor_ancestor_copy)
-          << call("move", &Fixture::test_constructor_ancestor_move)
+      Stream ans("Ancestor");
+      ans << call("copy", &Fixture::test_constructor_Ancestor_copy)
+          << call("move", &Fixture::test_constructor_Ancestor_move)
         ;
       con << add(ans.release());
     }

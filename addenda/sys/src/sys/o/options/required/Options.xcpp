@@ -10,8 +10,8 @@ namespace sys::o::options::required {
   // There are only three such template specializations allowed.
   // Enumerate them.
   //
-  template<typename OPTIONS> concept bool Options = (std::is_same_v<OPTIONS, options::Options<o::Access,o::Status>> ||
-                                                     std::is_same_v<OPTIONS, options::Options<o::Create,o::Status>> ||
-                                                     std::is_same_v<OPTIONS, options::Options<o::Access,o::Create,o::Status>>);
+  template<typename OPTIONS> concept Options = (std::is_same_v<OPTIONS, options::Options<o::Access,o::Status>> ||
+                                                std::is_same_v<OPTIONS, options::Options<o::Create,o::Status>> ||
+                                                std::is_same_v<OPTIONS, options::Options<o::Access,o::Create,o::Status>>);
 }
 #endiv

@@ -12,7 +12,7 @@ class tests::unit::server::Fixture::Request : public tunitas::server::service::R
   using Ancestor = tunitas::server::service::Request;
 public:
   // Under nonstd-libhttpserver-devel-2:0.9.0-10.1.ipv6+poll+regex+api+tdd (see the "+tdd" particle?)
-  // the ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
+  // the Ancestor's constructors are protected rather than private.  This allows us to make a test specimen.
   // As such:
   Request() = default;
 };

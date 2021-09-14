@@ -8,7 +8,7 @@ namespace nonstd::required {
   //
   // A class ("An classeration")
   //
-  template<typename CLASS> concept bool Class = requires(CLASS) {
+  template<typename CLASS> concept Class = requires(CLASS) {
     requires !std::is_const<CLASS>::value; // ...... to belabor the point
     requires !std::is_volatile<CLASS>::value; // ... why would you do this?
     requires std::is_class<CLASS>::value;

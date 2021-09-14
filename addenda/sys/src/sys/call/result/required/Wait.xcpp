@@ -32,13 +32,13 @@ namespace sys::call::result::required {
     using tuples::Element;
     using tuples::countof;
     namespace [[detail]] is {
-      template<typename PROCESS> concept bool Process = id::required::Process<PROCESS>;
-      template<typename LHS, typename RHS> concept bool Same = is_same_v<LHS, RHS>;
+      template<typename PROCESS> concept Process = id::required::Process<PROCESS>;
+      template<typename LHS, typename RHS> concept Same = is_same_v<LHS, RHS>;
       namespace [[detail]] r {
-        template<typename USAGE> [[deprecated("never the singular; instead use is::r::Usages<USAGE>")]] concept bool Usage = requires(USAGE) {
+        template<typename USAGE> [[deprecated("never the singular; instead use is::r::Usages<USAGE>")]] concept Usage = requires(USAGE) {
           requires false;
         };
-        template<typename USAGES> concept bool Usages = requires(USAGES) {
+        template<typename USAGES> concept Usages = requires(USAGES) {
           requires is_class_v<sys::r::Usages>;
           requires is_same_v<USAGES, sys::r::Usages>; // IS the plural structure
           requires is_enum_v<sys::r::Usage>;
@@ -46,17 +46,17 @@ namespace sys::call::result::required {
         };
       }
     }
-    template<typename ONE> concept bool Wait1 = id::required::Process<ONE>;
-    template<typename ONE, typename TWO> concept bool Wait2 = requires(ONE, TWO) {
+    template<typename ONE> concept Wait1 = id::required::Process<ONE>;
+    template<typename ONE, typename TWO> concept Wait2 = requires(ONE, TWO) {
       requires is::Process<ONE>;
       requires is::Same<TWO, sys::wait::Status> || is::Same<TWO, sig::Info> || is::r::Usages<TWO>;
     };
-    template<typename ONE, typename TWO, typename THREE> concept bool Wait3 = requires(ONE, TWO, THREE) {
+    template<typename ONE, typename TWO, typename THREE> concept Wait3 = requires(ONE, TWO, THREE) {
       requires is::Process<ONE>;
       requires is::Same<TWO, sys::wait::Status>;
       requires is::r::Usages<THREE>;
     };
-    template<typename... SEVERAL> concept bool Wait = requires(SEVERAL...) {
+    template<typename... SEVERAL> concept Wait = requires(SEVERAL...) {
       requires 0 != countof<SEVERAL...>;
       requires 1 != countof<SEVERAL...> || Wait1<Element<0, SEVERAL...>>;
       requires 2 != countof<SEVERAL...> || Wait2<Element<0, SEVERAL...>, Element<1, SEVERAL...>>;

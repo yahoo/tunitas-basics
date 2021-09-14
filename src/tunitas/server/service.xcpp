@@ -27,7 +27,7 @@ namespace tunitas::server::service {
 #divert <cpp>
 // Of course, this is test code
 namespace {
-  namespace tests {
+  namespace testate {
     using namespace tunitas::server::service;
     struct Resourceful : public Resource<Resourceful> {
       auto render(Request const &, Response **) -> void;

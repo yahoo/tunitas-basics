@@ -14,6 +14,6 @@ namespace tunitas::required {
   //
   //   template<required::Outcomable TYPE> auto function(TYPE) -> Outcome<TYPE>;
   //
-  template<typename TYPE> concept bool Outcomable = Default_Constructible<TYPE> && Move_Constructible<TYPE>;
+  template<typename TYPE> concept Outcomable = Default_Constructible<TYPE> && Move_Constructible<TYPE>;
 }
 #endiv

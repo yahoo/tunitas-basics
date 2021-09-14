@@ -19,10 +19,10 @@ namespace tunitas::base64::decoder {
 #import std.underflow_error
 #import tunitas.base64.Exception
 class tunitas::base64::decoder::Underflow : public std::underflow_error, public base64::Exception {
-  using ancestor = std::underflow_error;
+  using Ancestor = std::underflow_error;
 public:
-  inline Underflow() : ancestor("underflow") { }
-  using ancestor::underflow_error;
-  auto what() const noexcept -> char const * { return ancestor::what(); }
+  inline Underflow() : Ancestor("underflow") { }
+  using Ancestor::underflow_error;
+  auto what() const noexcept -> char const * { return Ancestor::what(); }
 };
 #endiv

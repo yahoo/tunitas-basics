@@ -15,7 +15,7 @@ namespace nonstd::required {
   //     only dynamic extent supplied by the type itself
   //
   //
-  template<typename SPAN> concept bool Spanish = (Spanlike<SPAN> || Dopelike<SPAN>) && requires(SPAN span) {
+  template<typename SPAN> concept Spanish = (Spanlike<SPAN> || Dopelike<SPAN>) && requires(SPAN span) {
     // The two concepts differ only in type names that are available within
     // The two have the same members, returning basically the same thing
     { span.size() };

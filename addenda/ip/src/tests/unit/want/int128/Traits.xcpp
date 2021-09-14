@@ -7,8 +7,8 @@
 #import want.int128_t
 #import want.uint128_t
 namespace tests::unit::want::int128 {
-  template<typename INTEGER> concept bool Big_Integer = std::is_same<::want::int128_t, INTEGER>::value || std::is_same<::want::uint128_t, INTEGER>::value;
-  template<typename INTEGER> concept bool Small_Integer = std::is_same<std::int64_t, INTEGER>::value || std::is_same<std::uint64_t, INTEGER>::value;
+  template<typename INTEGER> concept Big_Integer = std::is_same<::want::int128_t, INTEGER>::value || std::is_same<::want::uint128_t, INTEGER>::value;
+  template<typename INTEGER> concept Small_Integer = std::is_same<std::int64_t, INTEGER>::value || std::is_same<std::uint64_t, INTEGER>::value;
   template<Big_Integer BIG, Small_Integer SMALL, unsigned STRIDE = 5> struct Traits;
 }
 #endiv

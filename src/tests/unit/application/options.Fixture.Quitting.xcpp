@@ -1,0 +1,47 @@
+// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.application.options.Fixture
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.application.exception.Aspect
+#import tunitas.application.exception.aspect.Quitting
+#import std.runtime_error
+#import sys.exits.Code
+class tests::unit::application::options::Fixture::Quitting : public tunitas::exception::Aspect,
+                                                     public tunitas::application::exception::Aspect,
+                                                     public tunitas::application::exception::aspect::Quitting,
+                                                     public std::runtime_error {
+  struct Ancestors {
+    struct Aspects {
+      using Core = tunitas::exception::Aspect;
+      using App = tunitas::application::exception::Aspect;
+    };
+    using Feature = ::tunitas::application::exception::aspect::Quitting;
+    using Exception = ::std::runtime_error;
+  };
+public:
+  Quitting(Fixture::Program const &, sys::exits::Code);
+  auto what() const noexcept -> char const * override final;
+  auto stream() const noexcept -> std::ostream & override final;
+  auto code() const noexcept -> sys::exits::Code override final;
+  auto exit() const noexcept -> sys::exits::Code override final;
+};
+#endiv
+#divert <cpp>
+#import sys.exits.constants
+namespace tests::unit::application::options {
+  Fixture::Quitting::Quitting(Fixture::Program const &program, sys::exits::Code code)
+    : Ancestors::Feature{code}
+    , Ancestors::Exception{program + " had a test failure"}
+  { }
+  auto Fixture::Quitting::what() const noexcept -> char const *     { return Ancestors::Exception::what(); }
+  auto Fixture::Quitting::stream() const noexcept -> std::ostream & { return Ancestors::Feature::stream(); }
+  auto Fixture::Quitting::code() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+  auto Fixture::Quitting::exit() const noexcept -> sys::exits::Code { return Ancestors::Feature::code(); }
+}
+#endiv

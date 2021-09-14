@@ -39,65 +39,65 @@ namespace tests::usage::posix_pselect {
   namespace [[detail]] packaging {
     using namespace nonstd;
     using namespace std;
-    template<typename...> concept bool PselectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s) {
-      { pselect(r, s) } -> same_as<Count>;
-      { pselect(w, s) } -> same_as<Count>;
-      { pselect(e, s) } -> same_as<Count>;
-      { pselect(r, w, s) } -> same_as<Count>;
-      { pselect(r, e, s) } -> same_as<Count>;
-      { pselect(w, e, s) } -> same_as<Count>;
-      { pselect(r, w, e, s) } -> same_as<Count>;
+    template<typename...> concept PselectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s) {
+    { pselect(r, s) } -> convertible_to<same_as<Count>>;
+    { pselect(w, s) } -> convertible_to<same_as<Count>>;
+    { pselect(e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(w, e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, e, s) } -> convertible_to<same_as<Count>>;
       //
-      { pselect(n, r, s) } -> same_as<Count>;
-      { pselect(n, w, s) } -> same_as<Count>;
-      { pselect(n, e, s) } -> same_as<Count>;
-      { pselect(n, r, w, s) } -> same_as<Count>;
-      { pselect(n, r, e, s) } -> same_as<Count>;
-      { pselect(n, w, e, s) } -> same_as<Count>;
-      { pselect(n, r, w, e, s) } -> same_as<Count>;
+    { pselect(n, r, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, e, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, e, s) } -> convertible_to<same_as<Count>>;
     };
-    template<typename...> concept bool PselectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
-      { pselect(r, s, t) } -> same_as<Count>;
-      { pselect(w, s, t) } -> same_as<Count>;
-      { pselect(e, s, t) } -> same_as<Count>;
-      { pselect(r, w, s, t) } -> same_as<Count>;
-      { pselect(r, e, s, t) } -> same_as<Count>;
-      { pselect(w, e, s, t) } -> same_as<Count>;
-      { pselect(r, w, e, s, t) } -> same_as<Count>;
+    template<typename...> concept PselectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
+    { pselect(r, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(w, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(w, e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, e, s, t) } -> convertible_to<same_as<Count>>;
       //
-      { pselect(n, r, s, t) } -> same_as<Count>;
-      { pselect(n, w, s, t) } -> same_as<Count>;
-      { pselect(n, e, s, t) } -> same_as<Count>;
-      { pselect(n, r, w, s, t) } -> same_as<Count>;
-      { pselect(n, r, e, s, t) } -> same_as<Count>;
-      { pselect(n, w, e, s, t) } -> same_as<Count>;
-      { pselect(n, r, w, e, s, t) } -> same_as<Count>;
+    { pselect(n, r, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, e, s, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, e, s, t) } -> convertible_to<same_as<Count>>;
     };
-    template<typename...> concept bool PselectTimeout = requires(int n, Reads r, Writes w, Excepts e, Timeout t) {
-      { pselect(r, t) } -> same_as<Count>;
-      { pselect(r, w, t) } -> same_as<Count>;
-      { pselect(r, e, t) } -> same_as<Count>;
-      { pselect(w, e, t) } -> same_as<Count>;
-      { pselect(r, w, e, t) } -> same_as<Count>;
-      { pselect(n, r, t) } -> same_as<Count>;
-      { pselect(n, r, w, t) } -> same_as<Count>;
-      { pselect(n, r, e, t) } -> same_as<Count>;
-      { pselect(n, w, e, t) } -> same_as<Count>;
-      { pselect(n, r, w, e, t) } -> same_as<Count>;
+    template<typename...> concept PselectTimeout = requires(int n, Reads r, Writes w, Excepts e, Timeout t) {
+    { pselect(r, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, e, t) } -> convertible_to<same_as<Count>>;
+    { pselect(w, e, t) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, e, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, e, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, e, t) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, e, t) } -> convertible_to<same_as<Count>>;
     };
-    template<typename...> concept bool PselectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
-      { pselect(r, t, s) } -> same_as<Count>;
-      { pselect(r, w, t, s) } -> same_as<Count>;
-      { pselect(r, e, t, s) } -> same_as<Count>;
-      { pselect(w, e, t, s) } -> same_as<Count>;
-      { pselect(r, w, e, t, s) } -> same_as<Count>;
-      { pselect(n, r, t, s) } -> same_as<Count>;
-      { pselect(n, r, w, t, s) } -> same_as<Count>;
-      { pselect(n, r, e, t, s) } -> same_as<Count>;
-      { pselect(n, w, e, t, s) } -> same_as<Count>;
-      { pselect(n, r, w, e, t, s) } -> same_as<Count>;
+    template<typename...> concept PselectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Timeout t) {
+    { pselect(r, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, e, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(w, e, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(r, w, e, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, e, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, w, e, t, s) } -> convertible_to<same_as<Count>>;
+    { pselect(n, r, w, e, t, s) } -> convertible_to<same_as<Count>>;
     };
-    template<typename..._> concept bool Usage = requires(_...) {
+    template<typename..._> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires PselectSigset<>;
       requires PselectSigsetTimeout<>

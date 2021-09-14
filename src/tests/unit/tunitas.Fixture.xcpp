@@ -4,17 +4,27 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-namespace tests::unit::tunitas { class Fixture; }
+#import tunitas
+namespace tests::unit::tunitas {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::tunitas;
+  }
+  using fixture::Fixture;
+}
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import std.error_code
-class tests::unit::tunitas::Fixture : public cppunit::test::Fixture {
-public:
+struct tests::unit::tunitas::fixture::Fixture : public cppunit::test::Fixture {
   auto test_Success() -> void;
   auto test_SUCCESS() -> void;
   auto test_Outcome() -> void;
+  auto test_Tuple() -> void;
+  auto test_Optional() -> void;
+  auto test_file_Directory() -> void;
+  auto test_file_Path() -> void;
+  auto test_string_Storage() -> void;
+  auto test_string_View() -> void;
   static auto suite() -> cppunit::Test *;
 protected:
   auto generate_some_error_code() -> std::error_code;
@@ -25,40 +35,86 @@ protected:
 #import std.error_code
 #import std.error_condition
 #import std.system_category
-auto tests::unit::tunitas::Fixture::generate_some_error_code() -> std::error_code {
+auto tests::unit::tunitas::fixture::Fixture::generate_some_error_code() -> std::error_code {
   // Too cute.  We just need an error code number; any number will do.
   auto recondition = std::error_condition{std::errc::no_such_file_or_directory};
   return std::error_code{recondition.value(), std::system_category()};
 }
-#import tunitas
 #import tunitas.Success
-auto tests::unit::tunitas::Fixture::test_Success() -> void {
-  auto good = ::tunitas::Success{::tunitas::SUCCESS};
+auto tests::unit::tunitas::fixture::Fixture::test_Success() -> void {
+  auto good = library::Success{::tunitas::SUCCESS};
   CPPUNIT_ASSERT(ok(good));
-  auto bad = ::tunitas::Success{generate_some_error_code()};
+  auto bad = library::Success{generate_some_error_code()};
   CPPUNIT_ASSERT(!ok(bad));
 }
-auto tests::unit::tunitas::Fixture::test_SUCCESS() -> void {
+auto tests::unit::tunitas::fixture::Fixture::test_SUCCESS() -> void {
   // We just tested the SUCCESS literal in the previous test
   CPPUNIT_ASSERT(true);
 }
 #import tunitas.Outcome
-auto tests::unit::tunitas::Fixture::test_Outcome() -> void {
-  auto good = ::tunitas::Outcome<int>{3};
+auto tests::unit::tunitas::fixture::Fixture::test_Outcome() -> void {
+  auto good = library::Outcome<int>{3};
   CPPUNIT_ASSERT(ok(good));
-  auto bad = ::tunitas::Outcome<int>{generate_some_error_code()};
+  auto bad = library::Outcome<int>{generate_some_error_code()};
   CPPUNIT_ASSERT(!ok(bad));
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
-auto tests::unit::tunitas::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
-  Stream series("tunitas");
+#import tunitas.Optional
+auto tests::unit::tunitas::fixture::Fixture::test_Optional() -> void {
+  using Subject = library::Optional<double>; // just show the alias works ... no need to test std::optional
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+#import tunitas.Tuple
+auto tests::unit::tunitas::fixture::Fixture::test_Tuple() -> void {
+  using Subject = library::Tuple<int, char, double>; // just show the alias works ... no need to test std::tuple
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::tunitas::fixture::Fixture::test_file_Directory() -> void {
+  // One day ... but you know it's coming.
+  CPPUNIT_ASSERT(true);
+}
+#import tunitas.file.Path
+auto tests::unit::tunitas::fixture::Fixture::test_file_Path() -> void {
+  using Subject = library::file::Path;
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+#import tunitas.string.Storage
+auto tests::unit::tunitas::fixture::Fixture::test_string_Storage() -> void {
+  using Subject = library::string::Storage;
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+#import tunitas.string.View
+auto tests::unit::tunitas::fixture::Fixture::test_string_View() -> void {
+  using Subject = library::string::View;
+  auto subject = Subject{};
+  CPPUNIT_ASSERT(sizeof (subject));
+}
+auto tests::unit::tunitas::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"tunitas"};
   series << call("Success", &Fixture::test_Success)
          << call("SUCCESS", &Fixture::test_SUCCESS)
          << call("Success", &Fixture::test_Outcome)
-    ;
-  return series.release();
+         << call("Optional", &Fixture::test_Tuple)
+         << call("Tuple", &Fixture::test_Tuple)
+         << []{
+              auto fil = Stream{"file"};
+              fil << call("Directory", &Fixture::test_file_Directory)
+                  << call("Path", &Fixture::test_file_Path)
+                  << END;
+              return move(fil);
+            }()
+         << []{
+              auto str = Stream{"string"};
+              str << call("Storage", &Fixture::test_string_Storage)
+                  << call("View", &Fixture::test_string_View)
+                  << END;
+              return move(str);
+            }()
+         << END;
+  return finalize(series);
 }
 #endiv

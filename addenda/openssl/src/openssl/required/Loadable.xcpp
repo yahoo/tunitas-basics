@@ -12,9 +12,9 @@ namespace openssl::required {
   // Can such a type be loaded with pem::load<TYPE>(std::filesystem::path)
   // Only these types, as enumerated
   //
-  template<typename LOADABLE> concept bool Loadable = (std::is_same<LOADABLE, evp::PKey>::value ||
-                                                       std::is_same<LOADABLE, x509::Crl>::value ||
-                                                       std::is_same<LOADABLE, x509::Crt>::value ||
-                                                       std::is_same<LOADABLE, x509::Req>::value);
+  template<typename LOADABLE> concept Loadable = (std::is_same<LOADABLE, evp::PKey>::value ||
+                                                  std::is_same<LOADABLE, x509::Crl>::value ||
+                                                  std::is_same<LOADABLE, x509::Crt>::value ||
+                                                  std::is_same<LOADABLE, x509::Req>::value);
 }
 #endiv

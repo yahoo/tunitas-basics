@@ -13,8 +13,8 @@ namespace tunitas::server::required {
   //
   // The concept of a (descendant) of httpserver::Resource<CHILD>
   //
-  template<typename RESOURCEFUL> concept bool Resourceful = requires(RESOURCEFUL resourceful, Request request, Response *response, std::string name, bool value) {
-    { resourceful.allow_all() } -> void;
+  template<typename RESOURCEFUL> concept Resourceful = requires(RESOURCEFUL resourceful, Request request, Response *response, std::string name, bool value) {
+    { resourceful.allow_all() };
     { resourceful.render(request, &response) };
     { resourceful.render_CONNECT(request, &response) };
     { resourceful.render_DELETE(request, &response) };
@@ -24,9 +24,9 @@ namespace tunitas::server::required {
     { resourceful.render_POST(request, &response) };
     { resourceful.render_PUT(request, &response) };
     { resourceful.render_TRACE(request, &response) };
-    { resourceful.set_allowing(name, value) } -> void;
-    { resourceful.disallow_all() } -> void;
-    { resourceful.is_allowed(name) } -> bool;
+    { resourceful.set_allowing(name, value) };
+    { resourceful.disallow_all() };
+    { resourceful.is_allowed(name) };
   };
 }
 #endiv

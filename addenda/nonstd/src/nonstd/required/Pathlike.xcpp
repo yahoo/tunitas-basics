@@ -14,7 +14,7 @@ namespace nonstd::required {
   //
   //   template<required::Pathlike PATHLIKE> auto function(...) -> PATHLIKE;
   //
-  template<typename PATHLIKE> concept bool Pathlike = Stringlike<PATHLIKE> || Path<PATHLIKE>;
+  template<typename PATHLIKE> concept Pathlike = Stringlike<PATHLIKE> || Path<PATHLIKE>;
 }
 #endiv
 #divert <cpp>

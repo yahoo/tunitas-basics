@@ -12,8 +12,8 @@ namespace sys::id::required::process {
   //
   //   Oh come on.
   //
-  template<typename GROUP> concept bool Group = (std::is_same_v<GROUP, id::process::Group> ||
-                                                 std::is_same_v<GROUP, std::underlying_type_t<id::process::Group>>);
+  template<typename GROUP> concept Group = (std::is_same_v<GROUP, id::process::Group> ||
+                                            std::is_same_v<GROUP, std::underlying_type_t<id::process::Group>>);
 }
 #endiv
 #divert <cpp>

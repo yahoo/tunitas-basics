@@ -1,0 +1,4 @@
+// -*- c++ -*- this C++23 is a compatibility shim for the S.C.O.L.D  system, produced because the namespace changed.
+#pragma once
+#include <tunitas.app>
+#include <tunitas.application.exception.Quitting>

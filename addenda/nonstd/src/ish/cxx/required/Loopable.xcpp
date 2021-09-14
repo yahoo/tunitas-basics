@@ -9,19 +9,19 @@ namespace ish::cxx::required {
   //
   // Reminder: CONTAINER can be either const or nonconst
   //
-  template<typename CONTAINER> concept bool Loopable = requires(CONTAINER &maybe_muting_maybe_consty, CONTAINER const &consty) {
+  template<typename CONTAINER> concept Loopable = requires(CONTAINER &maybe_muting_maybe_consty, CONTAINER const &consty) {
     // NOT EVEN this is required: typename CONTAINER::value_type;
     typename CONTAINER::iterator;
     // can convert an iterator to a const iterator
     { typename CONTAINER::const_iterator(typename CONTAINER::iterator()) };
     // the non-consty variant might be const after all
     // the nonconst iterator is convertible to consty one
-    { maybe_muting_maybe_consty.begin() } -> typename CONTAINER::const_iterator;
-    { maybe_muting_maybe_consty.end() } -> typename CONTAINER::const_iterator;
+    { maybe_muting_maybe_consty.begin() } -> convertible_to<typename CONTAINER::const_iterator>;
+    { maybe_muting_maybe_consty.end() } -> convertible_to<typename CONTAINER::const_iterator>;
     // basic iteration over the consty object
     typename CONTAINER::const_iterator;
-    { consty.begin() } -> typename CONTAINER::const_iterator;
-    { consty.end() } -> typename CONTAINER::const_iterator;
+    { consty.begin() } -> convertible_to<typename CONTAINER::const_iterator>;
+    { consty.end() } -> convertible_to<typename CONTAINER::const_iterator>;
   };
 }
 #endiv

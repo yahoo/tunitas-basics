@@ -12,7 +12,7 @@ namespace sys::fd::required {
   //
   //   template<fd::required::Unmanaged NATIVE> auto function(NATIVE, ...arguments...) -> Result;
   //
-  template<typename NATIVE> concept bool Unmanaged = std::is_same_v<NATIVE, id::File> || std::is_same_v<NATIVE, int>;
+  template<typename NATIVE> concept Unmanaged = std::is_same_v<NATIVE, id::File> || std::is_same_v<NATIVE, int>;
 }
 #endiv
 #divert <cpp>

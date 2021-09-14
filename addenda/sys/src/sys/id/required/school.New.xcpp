@@ -18,23 +18,23 @@ namespace sys::id::required::school {
   //
   namespace [[detail]] new_veau {
     using namespace std;
-    template<typename TYPE> concept bool Basis = is_enum_v<TYPE>;
+    template<typename TYPE> concept Basis = is_enum_v<TYPE>;
     namespace [[detail, cannot("name this namespace tuple")]] two_pull {
       template<typename TYPE> struct Deconstructor : public false_type { };
       template<typename... TYPES> requires (true && ... && Basis<TYPES>) struct Deconstructor<tuple<TYPES...>> : public true_type { };
-      template<typename TYPE> concept bool Tuple = Deconstructor<TYPE>::value;
+      template<typename TYPE> concept Tuple = Deconstructor<TYPE>::value;
     }
     using two_pull::Tuple;
     namespace [[detail, cannot("name this namespace variant")]] very_ant {
       template<typename TYPE> struct Deconstructor : public false_type { };
       template<typename... TYPES> requires (true && ... && Basis<TYPES>) struct Deconstructor<variant<TYPES...>> : public true_type { };
-      template<typename TYPE> concept bool Variant = Deconstructor<TYPE>::value;
+      template<typename TYPE> concept Variant = Deconstructor<TYPE>::value;
     }
     using very_ant::Variant;
     namespace [[detail]] except_for_the {
-      template<typename TYPE> concept bool Exceptions = false;
+      template<typename TYPE> concept Exceptions = false;
     }
-    template<typename TYPE> concept bool New = Basis<TYPE> || Tuple<TYPE> || Variant<TYPE> || except_for_the::Exceptions<TYPE>;
+    template<typename TYPE> concept New = Basis<TYPE> || Tuple<TYPE> || Variant<TYPE> || except_for_the::Exceptions<TYPE>;
   }
   using new_veau::New;
 }

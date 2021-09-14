@@ -6,3 +6,14 @@
 #divert <fpp>
 namespace tunitas { }
 #endiv
+#divert <hpp>
+#import std.forward
+#import std.move
+#import std.swap
+namespace tunitas {
+  // Because *everything* needs these.
+  using std::forward;
+  using std::move;
+  using std::swap;
+}
+#endiv

@@ -13,6 +13,6 @@ namespace tunitas::required::integer {
   //
   //   template<required::integer::Signed INTEGER> Constructor(INTEGER, INTEGER);
   //
-  template<typename INTEGER> concept bool Signed = std::is_signed<INTEGER>::value;
+  template<typename INTEGER> concept Signed = std::is_signed<INTEGER>::value;
 }
 #endiv
