@@ -4,5 +4,6 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
+#import tests.unit.base64. // matryoshka
 namespace tests::unit::base64::decoder { }
 #endiv

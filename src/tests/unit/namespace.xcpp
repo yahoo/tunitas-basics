@@ -25,4 +25,7 @@ namespace tests::unit {
   using namespace std::string_view_literals;
 }
 #import rigging.suite.io
+#import std.cout
+#import std.cerr
+#import std.clog
 #endiv
