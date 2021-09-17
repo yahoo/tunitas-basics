@@ -73,19 +73,19 @@ namespace tests::unit::msg {
   auto Palette::setUp() -> void {
     using v = std::vector<Flag>;
     lhs(some_flag_series) = v{// NOT Flag::NONE because that is not a flag, it is the absence of ALL flags.
-                              Flag::CMSG_CLOEXEC,
-                              Flag::CONFIRM,
-                              Flag::CTRUNC,
-                              Flag::DONTROUTE,
-                              Flag::NOSIGNAL,
-                              Flag::DONTWAIT,
-                              Flag::EOR,
-                              Flag::ERRQUEUE,
-                              Flag::MORE,
-                              Flag::OOB,
-                              Flag::PEEK,
-                              Flag::TRUNC,
-                              Flag::WAITALL};
+      Flag::CMSG_CLOEXEC,
+      Flag::CONFIRM,
+      Flag::CTRUNC,
+      Flag::DONTROUTE,
+      Flag::NOSIGNAL,
+      Flag::DONTWAIT,
+      Flag::EOR,
+      Flag::ERRQUEUE,
+      Flag::MORE,
+      Flag::OOB,
+      Flag::PEEK,
+      Flag::TRUNC,
+      Flag::WAITALL};
     lhs(no_flags) = Flags{};
     lhs(all_flags) = Flags{MSG_CMSG_CLOEXEC|
                            MSG_CONFIRM|

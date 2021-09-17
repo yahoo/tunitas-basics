@@ -19,7 +19,7 @@ public:
 namespace tests::unit::posix {
   Getenv::Palette<std::vector<char>>::Palette(char const *literal)
     : ancestor{literal}
-    { }
+  { }
   auto Getenv::Palette<std::vector<char>>::get() -> Argument {
     auto csz = c::stringz{&buffer[0]};
     return std::vector<char>{csz.begin(), csz.end()}; // this copies the characters but not the '\0';

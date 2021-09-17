@@ -14,8 +14,8 @@ namespace sys::posix::packaging::required::readlink {
   //
   //   template<required:Thunk THUNK> auto perform(THUNK) -> Result
   //
-  template<typename THUNK> concept bool Thunk = requires(THUNK thunk, char  *buf, std::size_t buf_size) {
-    { thunk(buf, buf_size) } -> int;
+  template<typename THUNK> concept Thunk = requires(THUNK thunk, char  *buf, std::size_t buf_size) {
+    { thunk(buf, buf_size) } -> convertible_to<int>;
   };
 }
 #endiv

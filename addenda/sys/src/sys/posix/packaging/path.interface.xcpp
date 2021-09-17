@@ -22,10 +22,10 @@ namespace sys::posix::packaging::path {
     //   the usual
     //
     inline namespace arguments {
-      // n.b. the use of argument::Position allows the on-site overload variation
-      // with either an 'int' dirfd or the symbolic AT::FDCWD constant.
-      template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
-      using call::argument::Pathname;
+             // n.b. the use of argument::Position allows the on-site overload variation
+             // with either an 'int' dirfd or the symbolic AT::FDCWD constant.
+             template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
+             using call::argument::Pathname;
     }
     using id::File;
     namespace result {

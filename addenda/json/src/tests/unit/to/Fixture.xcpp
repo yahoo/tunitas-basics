@@ -45,8 +45,8 @@ auto tests::unit::to::Fixture::suite() -> cppunit::Test * {
     series << add(std::move(boo));
   }
   series
-    << add(String::suite())
-    << add(Value::suite())
+    << add<String>()
+    << add<Value>()
     ;
   return series.release();
 }

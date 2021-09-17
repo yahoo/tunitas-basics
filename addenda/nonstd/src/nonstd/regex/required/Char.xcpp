@@ -6,7 +6,7 @@ namespace nonstd::regex::required {
   //
   // Same thing, different name.
   //
-  template<typename CHAR> concept bool Char = nonstd::required::Character<CHAR>;
+  template<typename CHAR> concept Char = nonstd::required::Character<CHAR>;
 }
 #endiv
 #divert <cpp>

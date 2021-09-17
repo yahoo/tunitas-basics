@@ -78,21 +78,21 @@ namespace nonstd::detail::to_integer {
   template<required::Character C, typename W> Locale<C,W>::Locale(std::lconv const *l)
     : grouping_sizes{}
     , thousands_separator{} {
-    if (nullptr != l) {
-      if (nullptr != l->grouping) {
-        auto grp = *l->grouping;
-        auto no = grp <= 0 || grp == Limits::max();
-        if (!no) {
-          grouping_sizes = l->grouping;
-          auto sep = *l->thousands_sep;
-          auto no = sep <= 0 || sep == Limits::max();
-          if (!no && '\0' != sep) {
-            thousands_separator = sep;
+      if (nullptr != l) {
+        if (nullptr != l->grouping) {
+          auto grp = *l->grouping;
+          auto no = grp <= 0 || grp == Limits::max();
+          if (!no) {
+            grouping_sizes = l->grouping;
+            auto sep = *l->thousands_sep;
+            auto no = sep <= 0 || sep == Limits::max();
+            if (!no && '\0' != sep) {
+              thousands_separator = sep;
+            }
           }
         }
       }
     }
-  }
   template<required::Character C, typename W>auto Locale<C,W>::no_grouping() -> void {
     grouping_sizes.reset();
     thousands_separator.reset();

@@ -23,14 +23,14 @@ namespace sys::posix::packaging::sleep {
   using nonstd::same_as;
   namespace required {
     using namespace packaging::required; // cascade namespace required
-    template<typename TYPE> concept bool POSIX_Time_Structure = same_as<TYPE, time::Old> || same_as<TYPE, time::Val> || same_as<TYPE, time::Spec>;
-    template<typename DURATION> concept bool Duration = requires(DURATION) {
+    template<typename TYPE> concept POSIX_Time_Structure = same_as<TYPE, time::Old> || same_as<TYPE, time::Val> || same_as<TYPE, time::Spec>;
+    template<typename DURATION> concept Duration = requires(DURATION) {
       typename DURATION::rep;
       typename DURATION::period;
       requires required::Integer<typename DURATION::rep>;
       requires required::Ratio<typename DURATION::period>;
     };
-    template<typename COERCABLE> concept bool Coercable = POSIX_Time_Structure<COERCABLE> || Duration<COERCABLE>;
+    template<typename COERCABLE> concept Coercable = POSIX_Time_Structure<COERCABLE> || Duration<COERCABLE>;
   }
   namespace duration {
     template<required::Integer REP, required::Ratio RATIO> using Duration = sys::time::durations::base<REP, RATIO>;

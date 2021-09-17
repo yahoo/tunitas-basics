@@ -9,7 +9,7 @@ namespace tests::usage {
   //
   // Usage:
   //
-  //   template<typename... VALUES> concept bool Something = requires(VALUES...) {
+  //   template<typename... VALUES> concept Something = requires(VALUES...) {
   //      requires 0 == countof<VALUES...>;
   //   };
   //

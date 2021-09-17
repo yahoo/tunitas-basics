@@ -15,7 +15,7 @@
 namespace tests::usage::posix_LOCKF {
   using sys::posix::LOCKF;
   namespace [[detail]] packaging {
-    template<typename LOCKF> concept bool Instance = requires(LOCKF) {
+    template<typename LOCKF> concept Instance = requires(LOCKF) {
       typename LOCKF::Operation;
       typename LOCKF::Offset;
       requires model::Namespace_Object<LOCKF>;
@@ -27,7 +27,7 @@ namespace tests::usage::posix_LOCKF {
       requires (int)LOCKF::TLOCK == F_TLOCK;
       requires (int)LOCKF::ULOCK == F_ULOCK;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<LOCKF>;
     };

@@ -11,7 +11,7 @@ namespace nonstd::required {
   //
   // Here, the cv-qualified variants are not allowed.
   //
-  template<typename POINTER> concept bool Pointer = std::is_pointer<POINTER>::value;
+  template<typename POINTER> concept Pointer = std::is_pointer<POINTER>::value;
 }
 #endiv
 #divert <cpp>

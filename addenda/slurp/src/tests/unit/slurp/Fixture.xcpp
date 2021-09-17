@@ -71,10 +71,10 @@ auto tests::unit::slurp::Fixture::suite() -> cppunit::Test * {
   s << call("read-file", &Fixture::test_read_file)
     << call("read-directory", &Fixture::test_read_directory)
     << call("Failure-usage", &Fixture::test_Failure)
-    << add(Failure::suite())
-    << add(directory::Fixture::suite())
-    << add(file::Fixture::suite())
-    << add(named::Fixture::suite())
+    << add<Failure>()
+    << add<directory::Fixture>()
+    << add<file::Fixture>()
+    << add<named::Fixture>()
     ;
   return s.release();
 }

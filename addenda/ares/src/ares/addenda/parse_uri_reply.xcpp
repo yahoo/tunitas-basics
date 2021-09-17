@@ -27,8 +27,8 @@ namespace ares::addenda {
   //
   inline auto parse_URI_reply(std::byte const *, std::size_t, [[out]] unmanaged::Uri *&) noexcept -> int;
   inline namespace c_style_api {
-    using uri_reply = unmanaged::Uri;
-    [[deprecated("prefer parse_URI_reply(byte const *, size_t, Uri *&)")]] auto parse_uri_reply(unsigned char const *, int, uri_reply **) noexcept -> int;
+           using uri_reply = unmanaged::Uri;
+           [[deprecated("prefer parse_URI_reply(byte const *, size_t, Uri *&)")]] auto parse_uri_reply(unsigned char const *, int, uri_reply **) noexcept -> int;
   }
 }
 #endiv

@@ -34,7 +34,7 @@ namespace tests::usage::call_result_pipe_Value {
       // WATCHOUT -- 'using namespace std' will occlude ADL for error_code(Result), error_condition(Result)
       using nonstd::convertible_to;
       // [[FIXTHIS]] just move these assertions over into call_result_Value::Scenario<RESULT>
-      template<typename RESULT> concept bool Ancestor = requires(RESULT result) {
+      template<typename RESULT> concept Ancestor = requires(RESULT result) {
         requires true;
         { ok(result) } -> convertible_to<bool>;
         { good(result) } -> convertible_to<bool>;
@@ -48,7 +48,7 @@ namespace tests::usage::call_result_pipe_Value {
     namespace [[detail]] result {
       using namespace nonstd;
       using namespace std;
-      template<typename RESULT, typename READ, typename WRITE> concept bool Read_Write = requires(RESULT result, bool good, int error, READ read_fd, WRITE write_fd) {
+      template<typename RESULT, typename READ, typename WRITE> concept Read_Write = requires(RESULT result, bool good, int error, READ read_fd, WRITE write_fd) {
         requires basic::Ancestor<RESULT>;
         requires tests::usage::call_result_Value::Scenario<READ>
         requires tests::usage::call_result_Value::Scenario<WRITE>
@@ -65,19 +65,19 @@ namespace tests::usage::call_result_pipe_Value {
     namespace [[detail]] {
       using sys::call::result::Element;
       using sys::call::result::Size;
-      template<typename RESULT> concept bool Instance = requires(RESULT) {
+      template<typename RESULT> concept Instance = requires(RESULT) {
         typename Element<0, RESULT>::Type;
         typename Element<1, RESULT>::Type;
         requires 2 == Size<RESULT>::value;
         requires result::Read_Write<RESULT, typename Element<0, RESULT>::Type, typename Element<1, RESULT>::Type>;
       };
     }
-    template<typename FD> concept bool Scenario = requires(FD) {
+    template<typename FD> concept Scenario = requires(FD) {
       requires sys::fd::required::Unmanaged<FD>; // [[REMOVE]] and defer to the required::Pipe<FD>
       requires sys::call::result::required::Pipe<FD>;
       requires Instance<Value<FD>>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<Value<int>>;
       requires Instance<Value<sys::id::File>>;

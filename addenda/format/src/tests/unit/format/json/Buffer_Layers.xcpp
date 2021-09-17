@@ -7,13 +7,13 @@ namespace tests::unit::format::json {
   // An array of (string) buffers, indexed by an enum
   //
   namespace required {
-    template<typename CONTAINER> concept bool Container = requires (CONTAINER muting_buffer, CONTAINER const consty_buffer, std::size_t index) {
+    template<typename CONTAINER> concept Container = requires (CONTAINER muting_buffer, CONTAINER const consty_buffer, std::size_t index) {
       typename CONTAINER::value_type;
       { CONTAINER() };
-      { muting_buffer[index] } -> typename CONTAINER::value_type;
-      { consty_buffer[index] } -> typename CONTAINER::value_type;
+      { muting_buffer[index] } -> convertible_to<typename CONTAINER::value_type>;
+      { consty_buffer[index] } -> convertible_to<typename CONTAINER::value_type>;
     };
-    template<typename ENUMERATION> concept bool Symbolic = std::is_enum<ENUMERATION>::value;
+    template<typename ENUMERATION> concept Symbolic = std::is_enum<ENUMERATION>::value;
   }
   template<required::Container CONTAINER, required::Symbolic INDEX> class Buffer_Layers;
 }

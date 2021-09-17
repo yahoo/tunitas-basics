@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::app { class Drop; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::app::Drop : public cppunit::test::Fixture {
 public:
   auto test_nouser() -> void;
@@ -71,17 +69,14 @@ auto tests::unit::app::Drop::test_success() -> void {
   // There is no way to test success in this test rig.
   CPPUNIT_ASSERT(0 != geteuid());
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::app::Drop::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("drop");
   series << call("nouser", &Drop::test_nouser)
 	 << call("still_privileged", &Drop::test_still_privileged)
 	 << call("unable_to_seteuid", &Drop::test_unable_to_seteuid)
 	 << call("success", &Drop::test_success)
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

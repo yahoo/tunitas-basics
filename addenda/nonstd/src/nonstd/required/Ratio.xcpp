@@ -11,6 +11,6 @@ namespace nonstd::required {
   //
   //   template<required::Ratio RATIO> struct Thing;
   //
-  template<typename RATIO> concept bool Ratio = traits::Ratio<RATIO>::value;
+  template<typename RATIO> concept Ratio = traits::Ratio<RATIO>::value;
 }
 #endiv

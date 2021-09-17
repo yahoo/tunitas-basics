@@ -16,7 +16,7 @@
 namespace tests::usage::posix_FLOCK {
   using sys::posix::FLOCK;
   namespace [[detail]] packaging {
-    template<typename FLOCK> concept bool Instance = requires(FLOCK) {
+    template<typename FLOCK> concept Instance = requires(FLOCK) {
       typename FLOCK::Operation;
       typename FLOCK::Options;
       model::Namespace_Object<FLOCK>;
@@ -32,7 +32,7 @@ namespace tests::usage::posix_FLOCK {
       requires (int)FLOCK::MAND == LOCK_MAND;
       requires (int)FLOCK::NB == LOCK_NB;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<FLOCK>;
     };

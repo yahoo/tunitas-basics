@@ -23,7 +23,7 @@ namespace sys::posix::packaging::stat::interface {
   //     }
   //
   inline namespace argument {
-    using namespace at::interface::argument;
+           using namespace at::interface::argument;
   }
   using namespace argument;
   using id::File;

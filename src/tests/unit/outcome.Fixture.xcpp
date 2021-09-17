@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::outcome { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import tunitas.Outcome
 #import tunitas.outcome.Success
 #import std.string
@@ -189,18 +187,15 @@ auto tests::unit::outcome::Fixture::test_constructor_ancestor_move() -> void {
 }
 #import tests.unit.outcome.Fixture.Uncopyable
 #import tests.unit.outcome.Usage
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("outcome");
   {
     Stream sin("Success");
     sin << call("worked", &Fixture::test_Success_worked)
         << call("failed", &Fixture::test_Success_failed)
       ;
-    series << add(sin.release());
+    series << move(sin);
   }
   series << call("ok", &Fixture::test_ok)
     ;
@@ -209,13 +204,13 @@ auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
     cod << call("returning", &Fixture::test_error_code_returning)
         << call("throwing", &Fixture::test_error_code_throwing)
       ;
-    series << add(cod.release());
+    series << move(cod);
   } {
     Stream con("error_condition");
     con << call("returning", &Fixture::test_error_condition_returning)
         << call("throwing", &Fixture::test_error_condition_throwing)
       ;
-    series << add(con.release());
+    series << move(con);
   } {
     Stream val("value");
     val << call("consty", &Fixture::test_value_consty)
@@ -228,9 +223,9 @@ auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
           << call("2", &Fixture::test_value_throwing_2)
           << call("3", &Fixture::test_value_throwing_3)
         ;
-      val << add(thr.release());
+      val << move(thr);
     }
-    series << add(val.release());
+    series << move(val);
   } {
     Stream con("constructor");
     con << call("default", &Fixture::test_constructor_default)
@@ -241,19 +236,19 @@ auto tests::unit::outcome::Fixture::suite() -> cppunit::Test * {
       val << call("copy", &Fixture::test_constructor_Value_copy)
           << call("move", &Fixture::test_constructor_Value_move)
         ;
-      con << add(val.release());
+      con << move(val);
     } {
       Stream ans("ancestor");
       ans << call("copy", &Fixture::test_constructor_ancestor_copy)
           << call("move", &Fixture::test_constructor_ancestor_move)
         ;
-      con << add(ans.release());
+      con << move(ans);
     }
-    series << add(con.release());
+    series << move(con);
   }
-  series << add(Usage<Copyable>::suite())
-         << add(Usage<Uncopyable>::suite())
+  series << add<Usage<Copyable>>()
+         << add<Usage<Uncopyable>>()
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

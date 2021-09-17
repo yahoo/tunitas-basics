@@ -13,13 +13,13 @@
 namespace tests::usage::posix_AF_UN {
   using sys::posix::AF;
   namespace [[detail]] packaging {
-    template<typename UN> concept bool Instance = requires(UN) {
+    template<typename UN> concept Instance = requires(UN) {
       typename UN::Address;
       requires model::Namespace_Object<UN>;
       requires (int)UN::LOCAL == AF_LOCAL;
       requires (int)UN::UNIX == AF_UNIX;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<AF::UN>;
     };

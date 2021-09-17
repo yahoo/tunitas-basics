@@ -3,6 +3,6 @@
 #divert <fpp>
 #import slurp.file.required.Container
 namespace slurp::file {
-  template<typename CONTAINER> [[deprecated("instead use slurp::file::required::Container<CONTAINER>")]] concept bool Container = required::Container<CONTAINER>;
+  template<typename CONTAINER> [[deprecated("instead use slurp::file::required::Container<CONTAINER>")]] concept Container = required::Container<CONTAINER>;
 }
 #endiv

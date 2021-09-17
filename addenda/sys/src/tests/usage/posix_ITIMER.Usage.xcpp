@@ -15,7 +15,7 @@
 namespace tests::usage::posix_ITIMER {
   using sys::posix::ITIMER;
   namespace [[detail]] packaging {
-    template<typename ITIMER> concept bool Instance = requires(ITIMER) {
+    template<typename ITIMER> concept Instance = requires(ITIMER) {
       typename ITIMER::Which;
       requires model::Namespace_Object<ITIMER>;
       requires (int)ITIMER::REAL == ITIMER_REAL;
@@ -23,7 +23,7 @@ namespace tests::usage::posix_ITIMER {
       requires (int)ITIMER::PROFILE == ITIMER_PROF;
       requires (int)ITIMER::PROF == ITIMER_PROF;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<ITIMER>;
     };

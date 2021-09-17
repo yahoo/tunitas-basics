@@ -17,14 +17,14 @@ namespace tests::usage::posix_SOCK {
   using sys::posix::SOCK;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename SOCK> concept bool New_School = requires(SOCK) {
+    template<typename SOCK> concept New_School = requires(SOCK) {
       requires (int)SOCK::UNSPECIFIED == 0;
       requires (int)SOCK::STREAM == SOCK_STREAM;
       requires (int)SOCK::DATAGRAM == SOCK_DGRAM;
       requires (int)SOCK::SEQUENCED == SOCK_SEQPACKET;
       requires (int)SOCK::RELIABLE == SOCK_RDM;
     };
-    template<typename SOCK> concept bool Old_School = requires(SOCK) {
+    template<typename SOCK> concept Old_School = requires(SOCK) {
       requires (int)SOCK::UNSPEC == 0;
       requires (int)SOCK::DGRAM == SOCK_DGRAM;
       requires (int)SOCK::DCCP == SOCK_DCCP;
@@ -33,13 +33,13 @@ namespace tests::usage::posix_SOCK {
       requires (int)SOCK::RAW == SOCK_RAW;
       requires (int)SOCK::PACKET == SOCK_PACKET;
     };
-    template<typename SOCK> concept bool Options = requires(SOCK) {
+    template<typename SOCK> concept Options = requires(SOCK) {
       requires (int)SOCK::NONE == 0;
       requires (int)SOCK::CLOEXEC == SOCK_CLOEXEC;
       requires (int)SOCK::CLOSE_ON_EXEC == SOCK_CLOEXEC;
       requires (int)SOCK::NONBLOCK == SOCK_NONBLOCK;
     };
-    template<typename SOCK> concept bool Instance = requires(SOCK) {
+    template<typename SOCK> concept Instance = requires(SOCK) {
       typename SOCK::Type;
       typename SOCK::Option;
       typename SOCK::Options;
@@ -49,45 +49,45 @@ namespace tests::usage::posix_SOCK {
       requires Options<SOCK>;
       requires requires(SOCK, typename SOCK::Option ion, typename SOCK::Options ons) {
 #if 202003L < __cplusplus
+        { SOCK::template as<typename SOCK::Option>(convertible_to<typename SOCK::Option>;
+        { SOCK::template as<typename SOCK::Options>(convertible_to<typename SOCK::Options>;
+        { SOCK::template as<typename SOCK::Option>(convertible_to<typename SOCK::Option>;
+        { SOCK::template as<typename SOCK::Options>(convertible_to<typename SOCK::Options>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { SOCK::template as<typename SOCK::Option>(ion) } -> convertible_to<typename SOCK::Option>;
         { SOCK::template as<typename SOCK::Options>(ion) } -> convertible_to<typename SOCK::Options>;
         { SOCK::template as<typename SOCK::Option>(ons) } -> convertible_to<typename SOCK::Option>;
         { SOCK::template as<typename SOCK::Options>(ons) } -> convertible_to<typename SOCK::Options>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { SOCK::template as<typename SOCK::Option>(ion) } -> typename SOCK::Option;
-        { SOCK::template as<typename SOCK::Options>(ion) } -> typename SOCK::Options;
-        { SOCK::template as<typename SOCK::Option>(ons) } -> typename SOCK::Option;
-        { SOCK::template as<typename SOCK::Options>(ons) } -> typename SOCK::Options;
 #endif
       };
       requires requires(SOCK, typename SOCK::Specification ion) {
 #if 202003L < __cplusplus
+        { SOCK::template as<typename SOCK::Option>(convertible_to<typename SOCK::Option>;
+        { SOCK::template as<typename SOCK::Options>(convertible_to<typename SOCK::Options>;
+        { SOCK::template as<typename SOCK::Specification>(convertible_to<typename SOCK::Specification>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { SOCK::template as<typename SOCK::Option>(ion) } -> convertible_to<typename SOCK::Option>;
         { SOCK::template as<typename SOCK::Options>(ion) } -> convertible_to<typename SOCK::Options>;
         { SOCK::template as<typename SOCK::Specification>(ion) } -> convertible_to<typename SOCK::Specification>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { SOCK::template as<typename SOCK::Option>(ion) } -> typename SOCK::Option;
-        { SOCK::template as<typename SOCK::Options>(ion) } -> typename SOCK::Options;
-        { SOCK::template as<typename SOCK::Specification>(ion) } -> typename SOCK::Specification;
 #endif
       };
       requires requires(SOCK, typename SOCK::Option single, typename SOCK::Options plural, typename SOCK::Specification bundle) {
 #if 202003L < __cplusplus
+        { SOCK::template as<typename SOCK::Specification>(convertible_to<typename SOCK::Specification>;
+        { SOCK::template as<typename SOCK::Specification>(convertible_to<typename SOCK::Specification>;
+        { SOCK::template as<typename SOCK::Specification>(convertible_to<typename SOCK::Specification>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { SOCK::template as<typename SOCK::Specification>(single) } -> convertible_to<typename SOCK::Specification>;
         { SOCK::template as<typename SOCK::Specification>(plural) } -> convertible_to<typename SOCK::Specification>;
         { SOCK::template as<typename SOCK::Specification>(bundle) } -> convertible_to<typename SOCK::Specification>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { SOCK::template as<typename SOCK::Specification>(single) } -> typename SOCK::Specification;
-        { SOCK::template as<typename SOCK::Specification>(plural) } -> typename SOCK::Specification;
-        { SOCK::template as<typename SOCK::Specification>(bundle) } -> typename SOCK::Specification;
 #endif
         // More of a GCC 10 but not GCC 9 thing though isn't it?
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<SOCK>;
     };

@@ -16,7 +16,7 @@ namespace tests::usage::posix_FD {
   using sys::posix::FD;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename FD> concept bool Instance = requires(FD) {
+    template<typename FD> concept Instance = requires(FD) {
       typename FD::Flag;
       typename FD::Flags;
       requires model::Namespace_Object<FD>;
@@ -25,20 +25,20 @@ namespace tests::usage::posix_FD {
       requires (int)FD::CLOEXEC == FD_CLOEXEC;
       requires requires(FD, typename FD::Flag lag, typename FD::Flags ags) {
 #if 202003L < __cplusplus
+        { FD::template as<typename FD::Flag>(convertible_to<typename FD::Flag>;
+        { FD::template as<typename FD::Flags>(convertible_to<typename FD::Flags>;
+        { FD::template as<typename FD::Flag>(convertible_to<typename FD::Flag>;
+        { FD::template as<typename FD::Flags>(convertible_to<typename FD::Flags>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { FD::template as<typename FD::Flag>(lag) } -> convertible_to<typename FD::Flag>;
         { FD::template as<typename FD::Flags>(lag) } -> convertible_to<typename FD::Flags>;
         { FD::template as<typename FD::Flag>(ags) } -> convertible_to<typename FD::Flag>;
         { FD::template as<typename FD::Flags>(ags) } -> convertible_to<typename FD::Flags>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { FD::template as<typename FD::Flag>(lag) } -> typename FD::Flag;
-        { FD::template as<typename FD::Flags>(lag) } -> typename FD::Flags;
-        { FD::template as<typename FD::Flag>(ags) } -> typename FD::Flag;
-        { FD::template as<typename FD::Flags>(ags) } -> typename FD::Flags;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<FD>;
     };

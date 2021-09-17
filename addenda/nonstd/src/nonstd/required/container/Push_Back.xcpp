@@ -6,7 +6,7 @@ namespace nonstd::required::container {
   //
   // Is this the sort of container that has a push_back(Value) member?
   //
-  template<typename CONTAINER> concept bool Push_Back = requires(CONTAINER container) {
+  template<typename CONTAINER> concept Push_Back = requires(CONTAINER container) {
     requires Type<CONTAINER>;
     typename CONTAINER::value_type;
     { container.push_back(typename CONTAINER::value_type{}) };

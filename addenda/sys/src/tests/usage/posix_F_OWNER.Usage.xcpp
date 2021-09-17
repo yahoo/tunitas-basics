@@ -14,7 +14,7 @@
 namespace tests::usage::posix_F_OWNER {
   using sys::posix::F;
   namespace [[detail]] packaging {
-    template<typename OWNER> concept bool Instance = requires(OWNER) {
+    template<typename OWNER> concept Instance = requires(OWNER) {
       typename OWNER::Owner;
       requires tests::model::Namespace_Object<OWNER>;
       requires (int)OWNER::THREAD == F_OWNER_TID;
@@ -25,7 +25,7 @@ namespace tests::usage::posix_F_OWNER {
       requires (int)OWNER::PGRP == F_OWNER_PGRP;
       requires (int)OWNER::GID == F_OWNER_PGRP;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<F::OWNER>;
     };

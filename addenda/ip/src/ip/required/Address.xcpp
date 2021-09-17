@@ -12,6 +12,6 @@ namespace ip::required {
   //
   //   template<required::Address> struct Thing;
   //
-  template<typename ADDRESS> concept bool Address = want::nonstd::required::Among<ADDRESS, in4::addr, in4::addr_t, in6::addr, in6::addr_t>;
+  template<typename ADDRESS> concept Address = want::nonstd::required::Among<ADDRESS, in4::addr, in4::addr_t, in6::addr, in6::addr_t>;
 }
 #endiv

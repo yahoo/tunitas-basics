@@ -35,8 +35,8 @@ auto tests::unit::connection::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream s("connection");
   s << call("something", &Fixture::test_something)
-    << add(Connection::suite())
-    << add(Shell::suite())
+    << add<Connection>()
+    << add<Shell>()
     ;
   return s.release();
 }

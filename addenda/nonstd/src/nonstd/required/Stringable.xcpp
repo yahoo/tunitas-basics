@@ -12,7 +12,7 @@ namespace nonstd::required {
   //
   //   template<required::Stringable STRINGABLE> auto function(STRINGABLE) -> Something;
   //
-  template<typename STRINGABLE> concept bool Stringable = std::is_convertible_v<STRINGABLE, std::string>;
+  template<typename STRINGABLE> concept Stringable = std::is_convertible_v<STRINGABLE, std::string>;
 }
 #endiv
 #divert <cpp>

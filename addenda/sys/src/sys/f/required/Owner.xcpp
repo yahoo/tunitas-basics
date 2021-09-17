@@ -14,8 +14,8 @@ namespace sys::f::required {
   //
   //   template<required::Owner RESULT> inline auto getthat(...somehow...) -> RESULT;
   //
-  template<typename OWNER> concept bool Owner = (std::is_same_v<OWNER, id::process::Process> ||
-                                                 std::is_same_v<OWNER, id::process::Group> ||
-                                                 std::is_same_v<OWNER, f_owner_ex>);
+  template<typename OWNER> concept Owner = (std::is_same_v<OWNER, id::process::Process> ||
+                                            std::is_same_v<OWNER, id::process::Group> ||
+                                            std::is_same_v<OWNER, f_owner_ex>);
 }
 #endiv

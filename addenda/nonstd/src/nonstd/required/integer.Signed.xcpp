@@ -12,7 +12,7 @@ namespace nonstd::required::integer {
   // n.b. definitionally, the "character" types are not integers.
   // There are "large" integers out there (bignums
   //
-  template<typename INTEGER> concept bool Signed = is_signed<INTEGER>::value && !character::Type<INTEGER> && !std::is_floating_point<INTEGER>::value;
+  template<typename INTEGER> concept Signed = is_signed<INTEGER>::value && !character::Type<INTEGER> && !std::is_floating_point<INTEGER>::value;
 }
 #endiv
 #divert <cpp>

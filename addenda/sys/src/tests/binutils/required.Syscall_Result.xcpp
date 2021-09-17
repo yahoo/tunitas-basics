@@ -15,7 +15,7 @@ namespace tests::binutils::required {
   //    auto something(...something...) -> sys::exit::Code
   //    auto something(...something...) -> sys::exit::Code
   //
-  template<typename RESULT> concept bool Syscall_Result =
+  template<typename RESULT> concept Syscall_Result =
     (std::is_same<RESULT, bool>::value ||
      std::is_same<RESULT, sys::exits::Code>::value ||
      std::is_same<RESULT, sys::call::result::Value<int>>::value ||

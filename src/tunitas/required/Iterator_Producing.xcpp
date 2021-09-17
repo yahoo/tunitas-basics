@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -13,14 +13,14 @@ namespace tunitas::required {
   //
   //   template<required::Iterator_Producing<Strings> ITERATOR> Constructor(ITERATOR, ITERATOR);
   //
-  template<typename ITERATOR, typename VALUE> concept bool Iterator_Producing = requires(ITERATOR iterator) {
+  template<typename ITERATOR, typename VALUE> concept Iterator_Producing = requires(ITERATOR iterator) {
     // it is an iterator
     typename std::iterator_traits<ITERATOR>::value_type;
-    { iterator++ } -> ITERATOR;
-    { ++iterator } -> ITERATOR;
-    { *iterator } -> typename std::iterator_traits<ITERATOR>::value_type;
+    { iterator++ } -> convertible_to<ITERATOR>;
+    { ++iterator } -> convertible_to<ITERATOR>;
+    { *iterator } -> convertible_to<typename std::iterator_traits<ITERATOR>::value_type>;
     // is an iterator producing (something convertible to) VALUE
-    { *iterator } -> VALUE;
+    { *iterator } -> convertible_to<VALUE>;
   };
 }
 #endiv

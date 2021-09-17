@@ -30,14 +30,14 @@ namespace nonstd {
   }
   template<typename DOPE> struct basic_dope_traits; // specialized in basic_dope.xcpp at <fpp>
   namespace required {
-    template<typename DOPELIKE> concept bool Dopelike = requires(DOPELIKE like) {
+    template<typename DOPELIKE> concept Dopelike = requires(DOPELIKE like) {
       typename basic_dope_traits<DOPELIKE>::Value;
       typename basic_dope_traits<DOPELIKE>::Data;
       typename basic_dope_traits<DOPELIKE>::Size;
       // An indexing operator need not be supplied, just the rudimentary base+bound scheme.
-      { like.size() } -> typename basic_dope_traits<DOPELIKE>::Size;
-      { like.empty() } -> bool;
-      { like.data() } -> typename basic_dope_traits<DOPELIKE>::Data;
+      { like.size() } -> convertible_to<typename basic_dope_traits<DOPELIKE>::Size>;
+      { like.empty() } -> convertible_to<bool>;
+      { like.data() } -> convertible_to<typename basic_dope_traits<DOPELIKE>::Data>;
     };
   }
 }

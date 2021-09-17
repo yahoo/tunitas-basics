@@ -13,7 +13,7 @@ namespace nonstd::required::character {
   //   template<required::character::Type C> struct Something;
   //   template<required::character::Type C, required::character::Traits<C> T> struct Something_Else;
   //
-  template<typename CHAR> concept bool Type = requires(CHAR character) {
+  template<typename CHAR> concept Type = requires(CHAR character) {
     requires !std::is_const<CHAR>::value; // to belabor the point
     requires (std::is_same<CHAR, char>::value ||
               std::is_same<CHAR, wchar_t>::value ||

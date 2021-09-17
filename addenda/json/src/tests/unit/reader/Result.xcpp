@@ -161,34 +161,34 @@ auto tests::unit::reader::Result::suite() -> cppunit::Test * {
     oka << call("good", &Result::test_ok_good)
         << call("fail", &Result::test_ok_fail)
       ;
-    series << add(oka.release());
+    series<<< add>(ok();
   } {
     Stream che("check");
     che << call("good", &Result::test_check_good)
         << call("fail", &Result::test_check_fail)
       ;
-    series << add(che.release());
+    series<<< add>(ch();
   } {
     Stream val("value");
     val << call("consty", &Result::test_value_consty)
         << call("muting", &Result::test_value_muting)
         << call("forward", &Result::test_value_forward)
       ;
-    series << add(val.release());
+    series<<< add>(va();
   } {
     Stream val("vv");
     val << call("consty", &Result::test_vv_consty)
         << call("muting", &Result::test_vv_muting)
         << call("forward", &Result::test_vv_forward)
       ;
-    series << add(val.release());
+    series<<< add>(va();
   } {
     Stream val("getvalue");
     val << call("consty", &Result::test_getvalue_consty)
         << call("muting", &Result::test_getvalue_muting)
         << call("forward", &Result::test_getvalue_forward)
       ;
-    series << add(val.release());
+    series<<< add>(va();
   }
   return series.release();
 }

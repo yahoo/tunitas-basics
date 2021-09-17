@@ -8,8 +8,8 @@ namespace ip::format::required::in {
   //
   // Either an IPv4 or IPv6 Address
   //
-  template<typename ADDRESS> concept bool Address = in4::Address<ADDRESS> || in6::Address<ADDRESS>;
-  template<typename OPTIONAL> concept bool Optional = in4::Optional<OPTIONAL> || in6::Optional<OPTIONAL>;
-  template<typename EITHER> concept bool Either = in4::Either<EITHER> || in6::Either<EITHER>;
+  template<typename ADDRESS> concept Address = in4::Address<ADDRESS> || in6::Address<ADDRESS>;
+  template<typename OPTIONAL> concept Optional = in4::Optional<OPTIONAL> || in6::Optional<OPTIONAL>;
+  template<typename EITHER> concept Either = in4::Either<EITHER> || in6::Either<EITHER>;
 }
 #endiv

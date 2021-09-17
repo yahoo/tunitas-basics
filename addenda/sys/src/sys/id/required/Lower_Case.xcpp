@@ -10,6 +10,6 @@ namespace sys::id::required {
   //
   // e.g. pid_t, id_t, and int
   //
-  template<typename TYPE> concept bool Lower_Case = school::Old<TYPE>;
+  template<typename TYPE> concept Lower_Case = school::Old<TYPE>;
 }
 #endiv

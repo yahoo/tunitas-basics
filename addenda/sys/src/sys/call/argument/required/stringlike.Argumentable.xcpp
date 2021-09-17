@@ -13,6 +13,6 @@ namespace sys::call::argument::required::stringlike {
   //   detail::as1<RESULT>(ARGUMENT const &) -> RESULT;
   //   detail::as2<RESULT>(ARGUMENT const &) -> RESULT;
   //
-  template<typename ARGUMENT> concept bool Argumentable = (std::is_same<ARGUMENT, Pathname>::value || std::is_same<ARGUMENT, Pathstring>::value);
+  template<typename ARGUMENT> concept Argumentable = (std::is_same<ARGUMENT, Pathname>::value || std::is_same<ARGUMENT, Pathstring>::value);
 }
 #endiv

@@ -14,6 +14,6 @@ namespace sys::s::required {
   //
   //   template<required::Flags RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename FLAGS> concept bool Flags = std::is_same_v<FLAGS, s::Flags> || std::is_same_v<FLAGS, s::Flag>;
+  template<typename FLAGS> concept Flags = std::is_same_v<FLAGS, s::Flags> || std::is_same_v<FLAGS, s::Flag>;
 }
 #endiv

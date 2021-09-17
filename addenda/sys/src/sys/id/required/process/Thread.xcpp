@@ -12,8 +12,8 @@ namespace sys::id::required::process {
   //
   //   Oh come on.
   //
-  template<typename THREAD> concept bool Thread = (std::is_same_v<THREAD, id::process::Thread> ||
-                                                   std::is_same_v<THREAD, std::underlying_type_t<id::process::Thread>>);
+  template<typename THREAD> concept Thread = (std::is_same_v<THREAD, id::process::Thread> ||
+                                              std::is_same_v<THREAD, std::underlying_type_t<id::process::Thread>>);
 }
 #endiv
 #divert <cpp>

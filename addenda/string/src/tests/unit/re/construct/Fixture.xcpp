@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Verizon Media.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the license file at the top of this repository.
 // Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
@@ -262,47 +262,47 @@ auto tests::unit::re::construct::Fixture::suite() -> cppunit::Test * {
         << call("buffer<c::buffer>", &Fixture::test_usage_buffer_buffer)
         << call("buffer<c::const_buffer>", &Fixture::test_usage_buffer_const_buffer)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   } {
     Stream sub("string_view");
-    sub << add(rigging::String_View<std::basic_string_view<char>>::suite())
+    sub<<< add>(rigging::String_View<std::basic_string_view<char>>()
       ;
-    series << add(sub.release());
+                series<<< add>(su();
   } {
     Stream sub("string");
-    sub << add(rigging::String<std::string>::suite())
-        << add(rigging::String<::c::basic_stringz<char const>>::suite())
+    sub<<< add>(rigging::String<std::string>()
+        << add<rigging::String<::c::basic_stringz<char const>>>()
       // UNWORKABLE rigging::String<::c::basic_stringz<char>>::suite()
       ;
-    series << add(sub.release());
+                series<<< add>(su();
   } {
     Stream sub("string_view");
-    sub << add(rigging::String_View<std::basic_string_view<char>>::suite())
-        << add(rigging::String_View<std::basic_string_view<wchar_t>>::suite())
-        << add(rigging::String_View<std::basic_string_view<char16_t>>::suite())
-        << add(rigging::String_View<std::basic_string_view<char32_t>>::suite())
+    sub<<< add>(rigging::String_View<std::basic_string_view<char>>()
+                << add<rigging::String_View<std::basic_string_view<wchar_t>>>()
+                << add<rigging::String_View<std::basic_string_view<char16_t>>>()
+                << add<rigging::String_View<std::basic_string_view<char32_t>>>()
       ;
-    series << add(sub.release());
+                series<<< add>(su();
   } {
     Stream sub("buffer");
-    sub << add(rigging::Buffer<std::string>::suite())
-        << add(rigging::Buffer<::c::basic_buffer<char>>::suite())
-        << add(rigging::Buffer<::c::basic_buffer<char const>>::suite())
+    sub<<< add>(rigging::Buffer<std::string>()
+        << add<rigging::Buffer<::c::basic_buffer<char>>>()
+        << add<rigging::Buffer<::c::basic_buffer<char const>>>()
       ;
-    series << add(sub.release());
+                series<<< add>(su();
   }
   {
     Stream sub("front");
     sub << call("string<std::string>::front()", &Fixture::test_string_string_front)
         << call("buffer<std::string>::front()", &Fixture::test_buffer_string_front)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   } {
     Stream sub("back");
     sub << call("string<std::string>::back()", &Fixture::test_string_string_back)
         << call("buffer<std::string>::back()", &Fixture::test_buffer_string_back)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   }
   series << call("string_view<std::string_view>", &Fixture::test_string_view_string_view_char)
          << call("string_view<std::wstring_view>", &Fixture::test_string_view_string_view_wchar_t)

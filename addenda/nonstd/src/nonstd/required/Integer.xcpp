@@ -13,7 +13,7 @@ namespace nonstd::required {
   //
   //    signed or unsigned
   //
-  template<typename INTEGER> concept bool Integer = integer::Signed<INTEGER> || integer::Unsigned<INTEGER>;
+  template<typename INTEGER> concept Integer = integer::Signed<INTEGER> || integer::Unsigned<INTEGER>;
 }
 #endiv
 #divert <cpp>

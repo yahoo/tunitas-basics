@@ -39,7 +39,7 @@ namespace ares::managed {
 #import std.underlying_type
 namespace ares {
   template<required::character::Type CHAR, required::character::Traits<CHAR> TRAITS, typename ENUMERATION>
-    auto managed::detail::insert(std::basic_ostream<CHAR, TRAITS> &os, ENUMERATION en) -> std::basic_ostream<CHAR, TRAITS> &
+  auto managed::detail::insert(std::basic_ostream<CHAR, TRAITS> &os, ENUMERATION en) -> std::basic_ostream<CHAR, TRAITS> &
     requires std::is_enum<ENUMERATION>::value {
     using Underlying = typename std::underlying_type<ENUMERATION>::type;
     return os << (Underlying) en;

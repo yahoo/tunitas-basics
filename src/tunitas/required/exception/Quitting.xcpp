@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -22,14 +22,14 @@ namespace tunitas::required::exception {
   //
   //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
   //
-  template<typename QUITTING> concept bool Quitting =
+  template<typename QUITTING> concept Quitting =
     std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
     && std::is_base_of<std::exception, QUITTING>::value
     && requires(QUITTING quitting, sys::exits::Code code) {
-      // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
-      { QUITTING{code} };
-      { quitting.what() } -> char const *;
-      { quitting.code() } -> sys::exits::Code;
+    // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
+    { QUITTING{code} };
+    { quitting.what() } -> convertible_to<char const *>;
+    { quitting.code() } -> convertible_to<sys::exits::Code>;
   };
 }
 #endiv

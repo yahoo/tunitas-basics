@@ -514,16 +514,16 @@ auto tests::unit::format::Fixture::suite() -> cppunit::Test * {
   Stream s("format");
   s << add(std::move(u))
     << add(std::move(o))
-    << add(as_empty::Fixture::suite())
-    << add(as_null::Fixture::suite())
-    << add(funcall::Fixture::suite())
-    << add(funcall::Fixture::suite())
-    << add(ine::Fixture::suite())
-    << add(inn::Fixture::suite())
-    << add(integer::Fixture::suite())
-    << add(json::Fixture::suite())
-    << add(separator::Fixture::suite())
-    << add(stream::Fixture::suite())
+    << add<as_empty::Fixture>()
+    << add<as_null::Fixture>()
+    << add<funcall::Fixture>()
+    << add<funcall::Fixture>()
+    << add<ine::Fixture>()
+    << add<inn::Fixture>()
+    << add<integer::Fixture>()
+    << add<json::Fixture>()
+    << add<separator::Fixture>()
+    << add<stream::Fixture>()
     ;
   return finalize(s);
 }

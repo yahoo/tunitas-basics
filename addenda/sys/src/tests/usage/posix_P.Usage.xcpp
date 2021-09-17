@@ -15,7 +15,7 @@ namespace tests::usage::posix_P {
   namespace [[detail]] packaging {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    template<typename P> concept bool Instance = requires(P) {
+    template<typename P> concept Instance = requires(P) {
       typename P::Type;
       requires model::Namespace_Object<P>;
       requires (int)P::PROCESS == P_PID;
@@ -25,7 +25,7 @@ namespace tests::usage::posix_P {
       requires (int)P::PGID == P_PGID;
     };
 #pragma GCC diagnostic pop
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<P>;
     };

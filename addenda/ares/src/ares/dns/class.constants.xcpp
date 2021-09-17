@@ -17,12 +17,12 @@ namespace ares::dns {
     inline constexpr auto ANY = ns_c_any;
     inline constexpr auto MAX = ns_c_max;
     inline namespace constants {
-      inline constexpr auto IN = ns_c_in;
-      inline constexpr auto INTERNET = IN;       // internet ... [[editorial]] why not use the full name?
-      [[deprecated("do not use")]] inline constexpr auto CLASS2 = ns_c_2;
-      inline constexpr auto CHAOS = ns_c_chaos;
-      inline constexpr auto HS = ns_c_hs;        // hesiod ... [[editorial]]
-      inline constexpr auto HESIOD = HS;
+             inline constexpr auto IN = ns_c_in;
+             inline constexpr auto INTERNET = IN;       // internet ... [[editorial]] why not use the full name?
+             [[deprecated("do not use")]] inline constexpr auto CLASS2 = ns_c_2;
+             inline constexpr auto CHAOS = ns_c_chaos;
+             inline constexpr auto HS = ns_c_hs;        // hesiod ... [[editorial]]
+             inline constexpr auto HESIOD = HS;
     }
   }
   using namespace classs::constants;

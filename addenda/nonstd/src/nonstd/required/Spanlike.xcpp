@@ -31,7 +31,7 @@ namespace nonstd {
       using reference = ELEMENT const &;
       using size_type = std::size_t;
     };
-    template<typename SPAN> concept bool Quirkable = requires(SPAN) { typename SPAN::value_type; };
+    template<typename SPAN> concept Quirkable = requires(SPAN) { typename SPAN::value_type; };
     template<Quirkable SPAN> struct Quirk { using type = typename SPAN::value_type; };
     template<typename CHAR, typename TRAITS> struct Quirk<std::basic_string_view<CHAR, TRAITS>> { 
       // The basic_string_view::data() only has a const form; unlike std::basic_string::data() which [now] has a mutable form
@@ -40,16 +40,16 @@ namespace nonstd {
   }
   template<typename SPAN> struct span_traits; // specialized in nonstd.array, nonstd.basic_string, nonstd.basic_string_view, nonstd.basic_vector
   namespace required {
-    template<typename SPANLIKE> concept bool Spanlike = requires(SPANLIKE like) {
+    template<typename SPANLIKE> concept Spanlike = requires(SPANLIKE like) {
       typename SPANLIKE::value_type;
       typename spanning::Quirk<SPANLIKE>::type;
       typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::pointer;
       typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::reference;
       typename spanning::Traits<typename spanning::Quirk<SPANLIKE>::type>::size_type;
       // An indexing operator is not supplied on the span, just the rudimentary base+bound scheme.
-      { like.size() } -> typename span_traits<SPANLIKE>::size_type;
-      { like.empty() } -> bool;
-      { like.data() } -> typename span_traits<SPANLIKE>::pointer;
+      { like.size() } -> convertible_to<typename span_traits<SPANLIKE>::size_type>;
+      { like.empty() } -> convertible_to<bool>;
+      { like.data() } -> convertible_to<typename span_traits<SPANLIKE>::pointer>;
     };
   }
 }

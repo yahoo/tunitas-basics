@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -13,6 +13,6 @@ namespace tunitas::required::integer {
   //
   //   template<required::integer::Signed INTEGER> Constructor(INTEGER, INTEGER);
   //
-  template<typename INTEGER> concept bool Signed = std::is_signed<INTEGER>::value;
+  template<typename INTEGER> concept Signed = std::is_signed<INTEGER>::value;
 }
 #endiv

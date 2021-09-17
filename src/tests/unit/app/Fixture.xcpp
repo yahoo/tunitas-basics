@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::app { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::app::Fixture : public cppunit::test::Fixture {
 public:
   auto test_Configuration() -> void;
@@ -212,16 +210,13 @@ auto tests::unit::app::Fixture::test_words_Filepaths() -> void {
 #import tests.unit.app.Pidfile
 #import tests.unit.app.Drop
 #import tests.unit.app.options.Fixture
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("app");
   series << call("Configuration", &Fixture::test_Configuration)
 	 << call("Program", &Fixture::test_Program)
-	 << add(Pidfile::suite())
-	 << add(Drop::suite())
+	 << add<Pidfile>()
+	 << add<Drop>()
     ;
   {
     Stream exc("exception");
@@ -230,7 +225,7 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
       usa << call("1", &Fixture::test_exception_Usage_1)
 	  << call("2", &Fixture::test_exception_Usage_2)
 	;
-      series << add(usa.release());
+      series << move(usa);
     }
     exc << call("Version", &Fixture::test_exception_Version)
       ;
@@ -240,22 +235,22 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
 	  << call("2", &Fixture::test_exception_Quitting_2)
 	  << call("3", &Fixture::test_exception_Quitting_3)
 	;
-      exc << add(qui.release());
+      exc << move(qui);
     } {
       Stream mes("Messaging");
       mes << call("1", &Fixture::test_exception_Messaging_1)
 	  << call("2", &Fixture::test_exception_Messaging_2)
 	;
-      series << add(mes.release());
+      series << move(mes);
     } {
       Stream thr("throwing");
       thr << call("1", &Fixture::test_exception_throwing_1)
 	  << call("2", &Fixture::test_exception_throwing_2)
 	  << call("3", &Fixture::test_exception_throwing_3)
 	;
-      exc << add(thr.release());
+      exc << move(thr);
     }
-    series << add(exc.release());
+    series << move(exc);
   } {
     Stream opt("options");
     opt << call("Args", &Fixture::test_options_Args)
@@ -267,15 +262,15 @@ auto tests::unit::app::Fixture::suite() -> cppunit::Test * {
           << call("shortish", &Fixture::test_options_Specification_shortish)
         ;
     }
-    series << add(opt.release());
+    series << move(opt);
   } {
     Stream wor("words");
     wor << call("Strings", &Fixture::test_words_Strings)
 	<< call("Filepaths", &Fixture::test_words_Filepaths)
       ;
   }
-  series << add(options::Fixture::suite())
+  series << add<options::Fixture>()
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

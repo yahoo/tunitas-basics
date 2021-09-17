@@ -12,7 +12,7 @@ namespace sys::flags::required::flagset {
   //
   //   template<typename FLAG, typename FLAGSET> requires flagset::Class<FLAG, FLAGSET> auto function(...somehow...) -> void;
   //
-  template<typename FLAG, typename FLAGSET> concept bool Class = std::is_enum_v<FLAG> && std::is_class_v<FLAGSET> && requires(FLAGSET flagset) {
+  template<typename FLAG, typename FLAGSET> concept Class = std::is_enum_v<FLAG> && std::is_class_v<FLAGSET> && requires(FLAGSET flagset) {
     typename FLAGSET::Value; // New School.  yup, gotta have that type as the implementation within the class.
     { FLAGSET{} };
   };

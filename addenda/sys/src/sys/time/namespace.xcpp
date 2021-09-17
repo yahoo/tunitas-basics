@@ -78,7 +78,7 @@ namespace sys {
       // Just use base<N, D> (std::ratio) directly if you want ratio-based "scale down"
       // In that eventuality, ratio_multiply<R, R> and ratio_divide<R, R> may be helpful.
       template<detail::intmax_t K, typename PERIOD = typename std::ratio<1>>
-	using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
+      using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
 
       template<detail::intmax_t K> using nanoseconds = scale<K, std::chrono::nanoseconds::period>;
       template<detail::intmax_t K> using microseconds = scale<K, std::chrono::microseconds::period>;
@@ -203,7 +203,7 @@ namespace sys {
       // Just use base<N, D> (std::ratio) directly if you want ratio-based "scale down"
       // In that eventuality, ratio_multiply<R, R> and ratio_divide<R, R> may be helpful.
       template<detail::intmax_t K, typename PERIOD = typename std::ratio<1>>
-	using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
+      using scale = typename std::ratio_multiply<std::ratio<K>, PERIOD>::type;
 
       template<detail::intmax_t K> using nanoseconds = scale<K, std::chrono::nanoseconds::period>;
       template<detail::intmax_t K> using microseconds = scale<K, std::chrono::microseconds::period>;

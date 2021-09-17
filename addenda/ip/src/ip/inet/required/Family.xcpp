@@ -11,6 +11,6 @@ namespace ip::inet::required {
   //
   //   template<required::Family> struct Thing;
   //
-  template<typename FAMILY> concept bool Family = std::is_same<FAMILY, inet::Family>::value;
+  template<typename FAMILY> concept Family = std::is_same<FAMILY, inet::Family>::value;
 }
 #endiv

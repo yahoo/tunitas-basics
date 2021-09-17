@@ -12,6 +12,6 @@ namespace sys::fd::required {
   //
   //   rly?
   //
-  template<typename MANAGED> concept bool Managed = std::is_same_v<MANAGED, fd::Managed>;
+  template<typename MANAGED> concept Managed = std::is_same_v<MANAGED, fd::Managed>;
 }
 #endiv

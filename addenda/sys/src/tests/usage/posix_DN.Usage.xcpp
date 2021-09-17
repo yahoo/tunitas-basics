@@ -15,7 +15,7 @@ namespace tests::usage::posix_DN {
   using sys::posix::DN;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename DN> concept bool Instance = requires(DN) {
+    template<typename DN> concept Instance = requires(DN) {
       typename DN::Notify;
       typename DN::Notifies;
       requires model::Namespace_Object<DN>;
@@ -28,20 +28,20 @@ namespace tests::usage::posix_DN {
       requires (int)DN::MULTISHOT == DN_MULTISHOT;
       requires requires(DN, typename DN::Notify ify, typename DN::Notifies ies) {
 #if 202003L < __cplusplus
+        { DN::template as<typename DN::Notify>(convertible_to<typename DN::Notify>;
+        { DN::template as<typename DN::Notifies>(convertible_to<typename DN::Notifies>;
+        { DN::template as<typename DN::Notify>(convertible_to<typename DN::Notify>;
+        { DN::template as<typename DN::Notifies>(convertible_to<typename DN::Notifies>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { DN::template as<typename DN::Notify>(ify) } -> convertible_to<typename DN::Notify>;
         { DN::template as<typename DN::Notifies>(ify) } -> convertible_to<typename DN::Notifies>;
         { DN::template as<typename DN::Notify>(ies) } -> convertible_to<typename DN::Notify>;
         { DN::template as<typename DN::Notifies>(ies) } -> convertible_to<typename DN::Notifies>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { DN::template as<typename DN::Notify>(ify) } -> typename DN::Notify;
-        { DN::template as<typename DN::Notifies>(ify) } -> typename DN::Notifies;
-        { DN::template as<typename DN::Notify>(ies) } -> typename DN::Notify;
-        { DN::template as<typename DN::Notifies>(ies) } -> typename DN::Notifies;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<DN>;
     };

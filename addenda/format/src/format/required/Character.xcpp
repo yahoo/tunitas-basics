@@ -28,14 +28,14 @@ namespace format::required {
                                            std::is_same<char32_t, char_type>::value);
       using type = typename std::conditional<value, std::true_type, std::false_type>::type;
     };
-    template<typename CHARACTER> concept bool Character = requires(CHARACTER character, CHARACTER const *string, std::basic_ostream<CHARACTER, std::char_traits<CHARACTER>> &outbound) {
+    template<typename CHARACTER> concept Character = requires(CHARACTER character, CHARACTER const *string, std::basic_ostream<CHARACTER, std::char_traits<CHARACTER>> &outbound) {
       requires is_character<CHARACTER>::value;
       { outbound << character };
       { outbound << string };
     };
   }
   template<typename CHARACTER> using is_character = detail_detail::const_cleaned::is_character<typename std::remove_const<CHARACTER>::type>;
-  template<typename CHARACTER> concept bool Character = detail_detail::const_cleaned::Character<typename std::remove_const<CHARACTER>::type>;
-  template<typename CHARACTER> concept bool Not_Character = !Character<CHARACTER>;
+  template<typename CHARACTER> concept Character = detail_detail::const_cleaned::Character<typename std::remove_const<CHARACTER>::type>;
+  template<typename CHARACTER> concept Not_Character = !Character<CHARACTER>;
 }
 #endiv

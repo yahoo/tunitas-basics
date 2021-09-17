@@ -5,11 +5,11 @@
 namespace nonstd::container::traits::glue::new_school {
   namespace required {
     using namespace traits::glue::required;
-    template<typename CONTAINER> concept bool Has_Mutable_Iterator = requires(CONTAINER) {
+    template<typename CONTAINER> concept Has_Mutable_Iterator = requires(CONTAINER) {
       typename CONTAINER::Iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
       requires Container<CONTAINER>;
     };
-    template<typename CONTAINER> concept bool Has_Constie_Iterator = requires(CONTAINER) {
+    template<typename CONTAINER> concept Has_Constie_Iterator = requires(CONTAINER) {
       typename CONTAINER::Const_Iterator; // <------------------------------------------------------------------------------------------------------ not copy-pasta
       requires Container<CONTAINER>;
     };

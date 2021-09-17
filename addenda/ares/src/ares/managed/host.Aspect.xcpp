@@ -14,9 +14,9 @@ namespace ares::managed::host {
   // Usage: see reply::Record<NS>, reply::Record<PTR>
   //
   namespace allowed {
-    template<typename ASPECT> concept bool Aspect = (std::is_same<ASPECT, Names>::value ||
-                                                     std::is_same<ASPECT, Addresses<IN4>>::value ||
-                                                     std::is_same<ASPECT, Addresses<IN6>>::value);
+    template<typename ASPECT> concept Aspect = (std::is_same<ASPECT, Names>::value ||
+                                                std::is_same<ASPECT, Addresses<IN4>>::value ||
+                                                std::is_same<ASPECT, Addresses<IN6>>::value);
   }
   //
   // The default argument "works" when ASPECT is Address<IN4> or Address<IN6>

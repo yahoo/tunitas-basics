@@ -17,6 +17,6 @@ namespace sys::fd::required {
   //   PREFER sys::required::Descriptor is a file  descriptor, being an int or an id::File
   //   AVOID  sys::fd::required::Descriptor is deprecated, being an older name for sys::fd::required::Managed
   //
-  template<typename DESCRIPTOR> [[deprecated("instead prefer Managed<DESCRIPTOR> because the sense has changed")]] concept bool Descriptor = Managed<DESCRIPTOR>;
+  template<typename DESCRIPTOR> [[deprecated("instead prefer Managed<DESCRIPTOR> because the sense has changed")]] concept Descriptor = Managed<DESCRIPTOR>;
 }
 #endiv

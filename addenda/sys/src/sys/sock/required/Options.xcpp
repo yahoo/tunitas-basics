@@ -18,7 +18,7 @@ namespace sys::sock::required {
   //
   //   template<required::Options<sys::sock::Type> RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename OPTIONS, typename TYPE> concept bool Options = requires(OPTIONS, TYPE) {
+  template<typename OPTIONS, typename TYPE> concept Options = requires(OPTIONS, TYPE) {
     requires Type<TYPE>;
     requires std::is_same_v<OPTIONS, sock::specification::Specification<TYPE>> || std::is_same_v<OPTIONS, sock::Options> || std::is_same_v<OPTIONS, sock::Option>;
   };

@@ -13,11 +13,11 @@ namespace sys::id::required::process {
   namespace either {
     using namespace std;
     namespace id = sys::id::process;
-    template<typename EITHER> concept bool Variant = is_same_v<EITHER, id::Either>;
-    template<typename EITHER> concept bool Subspace = (is_same_v<EITHER, id::Process> || is_same_v<EITHER, id::Group>);
-    template<typename EITHER> concept bool Combined = Variant<EITHER> || Subspace<EITHER>;
+    template<typename EITHER> concept Variant = is_same_v<EITHER, id::Either>;
+    template<typename EITHER> concept Subspace = (is_same_v<EITHER, id::Process> || is_same_v<EITHER, id::Group>);
+    template<typename EITHER> concept Combined = Variant<EITHER> || Subspace<EITHER>;
   }
-  template<typename EITHER> concept bool Either = either::Combined<EITHER>;
+  template<typename EITHER> concept Either = either::Combined<EITHER>;
 }
 #endiv
 #divert <cpp>

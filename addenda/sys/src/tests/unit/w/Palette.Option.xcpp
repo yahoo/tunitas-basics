@@ -32,11 +32,11 @@ namespace tests::unit::w {
   auto Palette<::sys::w::Option>::setUp() -> void {
     using v = std::vector<Subjects::Option>;
     lhs(some_flag_series) = v{// NOT THIS - Option::NONE - because it is not a flag, it is the absence of any flags
-                              Subjects::Option::CONTINUED,
-                              Subjects::Option::EXITED,
-                              Subjects::Option::NOHANG,
-                              Subjects::Option::NOWAIT,
-                              Subjects::Option::STOPPED};
+      Subjects::Option::CONTINUED,
+      Subjects::Option::EXITED,
+      Subjects::Option::NOHANG,
+      Subjects::Option::NOWAIT,
+      Subjects::Option::STOPPED};
   }
   auto Palette<::sys::w::Option>::tearDown() -> void {
     lhs(some_flag_series) = clear;

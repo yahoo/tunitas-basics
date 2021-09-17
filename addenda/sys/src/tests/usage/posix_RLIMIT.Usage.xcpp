@@ -13,7 +13,7 @@
 namespace tests::usage::posix_RLIMIT {
   using sys::posix::RLIMIT;
   namespace [[detail]] packaging {
-    template<typename RLIMIT> concept bool Instance = requires(RLIMIT) {
+    template<typename RLIMIT> concept Instance = requires(RLIMIT) {
       typename RLIMIT::Limit;
       typename RLIMIT::Limits;
       requires model::Namespace_Object<RLIMIT>;
@@ -35,7 +35,7 @@ namespace tests::usage::posix_RLIMIT {
       requires (int)RLIMIT::RTPRIO == __RLIMIT_RTPRIO;
       requires (int)RLIMIT::RTTIME == __RLIMIT_RTTIME;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<RLIMIT>;
     };

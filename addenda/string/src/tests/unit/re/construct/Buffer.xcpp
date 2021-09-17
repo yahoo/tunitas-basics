@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Verizon Media.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the license file at the top of this repository.
 // Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
@@ -437,9 +437,9 @@ namespace tests::unit::re::construct {
            << call("string_view", &Buffer::test_constructor_convert_from_string_view)
            << call("enabled_OTHER", &Buffer::test_constructor_convert_from_enabled_OTHER)
           ;
-        co << add(cv.release());
+        co<<< add>(c();
       }
-      series << add(co.release());
+          series<<< add>(c();
     }
     series << call("constructor_copy", &Buffer::test_constructor_copy)
            << call("assignment_copy", &Buffer::test_assignment_copy)

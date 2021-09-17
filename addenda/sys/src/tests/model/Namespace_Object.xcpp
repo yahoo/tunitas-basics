@@ -27,14 +27,14 @@ namespace tests::model {
   //
   namespace [[detail]] namespace_object {
     using namespace std;
-    template<typename OBJECT> concept bool Object = requires(OBJECT) {
+    template<typename OBJECT> concept Object = requires(OBJECT) {
       requires is_class_v<OBJECT>;
       // NO --> requires 0 == sizeof (OBJECT); <-- NO (they always have a size to satisfy the unique address constraint)
       requires !is_default_constructible_v<OBJECT>;
       requires !is_copy_constructible_v<OBJECT>;
       requires !is_copy_assignable_v<OBJECT>;
     };
-    template<typename OBJECT> concept bool Namespace_Object = Object<OBJECT>;
+    template<typename OBJECT> concept Namespace_Object = Object<OBJECT>;
   }
   using namespace_object::Namespace_Object;
 }

@@ -11,9 +11,9 @@ namespace sys::sock::required {
   //
   //   template<required::Type RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename TYPE> concept bool Type = requires(TYPE) {
+  template<typename TYPE> concept Type = requires(TYPE) {
     requires Enumeration<TYPE>;
-    // TOO-RESTRICTIVE { TYPE::UNSPECIFIED } -> TYPE; <--- TOO RESTRICTIVE
+    // TOO-RESTRICTIVE { TYPE::UNSPECIFIED } -> convertible_to<TYPE>; <--- TOO RESTRICTIVE
     // Use static_assert(Type{} == Type::UNSPECIFIED), if appropriate
   };
 }

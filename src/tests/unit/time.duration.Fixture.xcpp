@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::time::duration { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::time::duration::Fixture : public cppunit::test::Fixture {
 public:
   auto test_second() -> void;
@@ -67,7 +65,6 @@ auto tests::unit::time::duration::Fixture::test_year() -> void {
   auto v2 = Year{2};
   CPPUNIT_ASSERT(v1 < v2);
 }
-#import rigging.suite.io
 auto tests::unit::time::duration::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
   Stream series("duration");

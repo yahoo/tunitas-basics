@@ -16,8 +16,8 @@ namespace sys::flagset::required {
   //
   //   template<required::Enumeration SINGLE, required::Integer CARRIER, required::Pluralizer<SINGLE, CARRIER> PLURALIZER> struct Container;
   //
-  template<typename PLURALIZER, typename SINGLE, typename CARRIER> concept bool Pluralizer = Enumeration<SINGLE> && Integer<CARRIER> && requires(PLURALIZER, SINGLE single) {
-    { PLURALIZER::promote(single) } -> CARRIER;
+  template<typename PLURALIZER, typename SINGLE, typename CARRIER> concept Pluralizer = Enumeration<SINGLE> && Integer<CARRIER> && requires(PLURALIZER, SINGLE single) {
+    { PLURALIZER::promote(single) } -> convertible_to<CARRIER>;
   };
 }
 #endiv

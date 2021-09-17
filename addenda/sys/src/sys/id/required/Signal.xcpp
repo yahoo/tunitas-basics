@@ -12,8 +12,8 @@ namespace sys::id::required {
   //
   //   Oh come on.
   //
-  template<typename SIGNAL> concept bool Signal = (std::is_same_v<SIGNAL, id::Signal> ||
-                                                   std::is_same_v<SIGNAL, std::underlying_type_t<id::Signal>>);
+  template<typename SIGNAL> concept Signal = (std::is_same_v<SIGNAL, id::Signal> ||
+                                              std::is_same_v<SIGNAL, std::underlying_type_t<id::Signal>>);
 }
 #endiv
 #divert <cpp>

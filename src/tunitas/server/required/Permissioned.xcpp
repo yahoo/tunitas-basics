@@ -21,7 +21,7 @@ namespace tunitas::server::required {
     using microhttpd::method::Registered;
     using microhttpd::method::Unregistered;
     using nonstd::same_as;
-    template<typename TYPE> concept bool Permissioned = same_as<TYPE, Registered> || same_as<TYPE, Unregistered>;
+    template<typename TYPE> concept Permissioned = same_as<TYPE, Registered> || same_as<TYPE, Unregistered>;
   }
   using permissioned::Permissioned;
 }

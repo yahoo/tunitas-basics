@@ -12,20 +12,20 @@ namespace openssl::required {
   // So we have to enumerate which integers we care about herein.
   //
   namespace integer {
-    template<typename CANDIDATE, typename... INTEGERS> concept bool Among = (true || ... || std::is_same<CANDIDATE, INTEGERS>::value);
+    template<typename CANDIDATE, typename... INTEGERS> concept Among = (true || ... || std::is_same<CANDIDATE, INTEGERS>::value);
   }
-  template<typename INTEGER> concept bool Integer = integer::Among<INTEGER,
-                                                                   unsigned char,
-                                                                   signed char,
-                                                                   int short signed,
-                                                                   int short unsigned,
-                                                                   int signed,
-                                                                   int unsigned,
-                                                                   int long signed,
-                                                                   int long unsigned,
-                                                                   int long long signed,
-                                                                   int long long unsigned,
-                                                                   nonstd::int128_t,
-                                                                   nonstd::uint128_t>;
+  template<typename INTEGER> concept Integer = integer::Among<INTEGER,
+                                                              unsigned char,
+                                                              signed char,
+                                                              int short signed,
+                                                              int short unsigned,
+                                                              int signed,
+                                                              int unsigned,
+                                                              int long signed,
+                                                              int long unsigned,
+                                                              int long long signed,
+                                                              int long long unsigned,
+                                                              nonstd::int128_t,
+                                                              nonstd::uint128_t>;
 }
 #endiv

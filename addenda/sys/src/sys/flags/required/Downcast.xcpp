@@ -6,6 +6,6 @@ namespace sys::flags::required {
   //
   // Only two indices N are allowed in downcastof<N>(flagset, low, high)
   //
-  template<unsigned N> concept bool Downcast = downcastas::INDEX == N || downcastas::MASK == N;
+  template<unsigned N> concept Downcast = downcastas::INDEX == N || downcastas::MASK == N;
 }
 #endiv

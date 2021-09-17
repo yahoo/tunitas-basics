@@ -17,9 +17,9 @@ namespace openssl::required {
   //
   //   template<required::Stackable> struct Stack;
   //
-  template<typename STACKABLE> concept bool Stackable = (std::is_same<STACKABLE, x509::Extension0>::value ||
-                                                         std::is_same<STACKABLE, x509::Extension>::value ||
-                                                         std::is_same<STACKABLE, x509::Revoked0>::value ||
-                                                         std::is_same<STACKABLE, x509::Revoked>::value);
+  template<typename STACKABLE> concept Stackable = (std::is_same<STACKABLE, x509::Extension0>::value ||
+                                                    std::is_same<STACKABLE, x509::Extension>::value ||
+                                                    std::is_same<STACKABLE, x509::Revoked0>::value ||
+                                                    std::is_same<STACKABLE, x509::Revoked>::value);
 }
 #endiv

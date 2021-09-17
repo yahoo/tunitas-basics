@@ -30,13 +30,13 @@ namespace tests::usage::posix_fcntl {
       using namespace nonstd;
       namespace required = sys::fd::required;
     }
-    template<typename FILE> concept bool Instance = requires(FILE fd, sys::f::Function function) {
+    template<typename FILE> concept Instance = requires(FILE fd, sys::f::Function function) {
       requires sys::fd::required::Unmanaged<FILE>;
 #warning WRITETHIS for fcntl
       { fcntl(fd, function) }; // [[TODO]] check the return type
       { fcntl(fd, function, int{}) }; // ibidem.
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<int>;
       requires Instance<sys::id::File>;

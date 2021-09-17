@@ -46,7 +46,7 @@ namespace tests::usage::posix_select {
     namespace time = sys::time;
     namespace {
       namespace [[detail]] stanza_select {
-        template<typename...> concept bool Select = requires(int n, Reads r, Writes w, Excepts e) {
+        template<typename...> concept Select = requires(int n, Reads r, Writes w, Excepts e) {
           { select(r) } -> same_as<Count>;
           { select(w) } -> same_as<Count>;
           { select(e) } -> same_as<Count>;
@@ -63,7 +63,7 @@ namespace tests::usage::posix_select {
           { select(n, w, e) } -> same_as<Count>;
           { select(n, r, w, e) } -> same_as<Count>;
         };
-        template<typename TIMEOUT> concept bool SelectTimeout = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept SelectTimeout = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
           { select(r, t) } -> same_as<Count>;
           { select(r, w, t) } -> same_as<Count>;
@@ -76,7 +76,7 @@ namespace tests::usage::posix_select {
           { select(n, w, e, t) } -> same_as<Count>;
           { select(n, r, w, e, t) } -> same_as<Count>;
         };
-        template<typename..._> concept bool Stanza = requires(_...) {
+        template<typename..._> concept Stanza = requires(_...) {
           requires 0 == countof<_...>;
           requires Select<>;
           requires SelectTimeout<time::t>;
@@ -89,7 +89,7 @@ namespace tests::usage::posix_select {
         };
       }
       namespace [[dteail]] stanza_pselect {
-        template<typename TIMEOUT> concept bool PSelectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept PSelectSigset = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
           { select(r, s) } -> same_as<Count>;
           { select(r, w, s) } -> same_as<Count>;
@@ -102,7 +102,7 @@ namespace tests::usage::posix_select {
           { select(n, w, e, s) } -> same_as<Count>;
           { select(n, r, w, e, s) } -> same_as<Count>;
         };
-        template<typename TIMEOUT> concept bool PSelectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
+        template<typename TIMEOUT> concept PSelectSigsetTimeout = requires(int n, Reads r, Writes w, Excepts e, Sigset s, Optional<TIMEOUT> t) {
           requires required::Duration<TIMEOUT>;
           { select(r, s, t) } -> same_as<Count>;
           { select(r, w, s, t) } -> same_as<Count>;
@@ -115,7 +115,7 @@ namespace tests::usage::posix_select {
           { select(n, w, e, s, t) } -> same_as<Count>;
           { select(n, r, w, e, s, t) } -> same_as<Count>;
         };
-        template<typename TIMEOUT> concept bool PSelectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t, Sigset s) {
+        template<typename TIMEOUT> concept PSelectTimeoutSigset = requires(int n, Reads r, Writes w, Excepts e, Optional<TIMEOUT> t, Sigset s) {
           requires required::Duration<TIMEOUT>;
           { select(r, t, s) } -> same_as<Count>;
           { select(r, w, t, s) } -> same_as<Count>;
@@ -128,12 +128,12 @@ namespace tests::usage::posix_select {
           { select(n, w, e, t, s) } -> same_as<Count>;
           { select(n, r, w, e, t, s) } -> same_as<Count>;
         };
-        template<typename TIMEOUT> concept bool PSelect = requires(TIMEOUT) {
+        template<typename TIMEOUT> concept PSelect = requires(TIMEOUT) {
           requires PSelectSigset<TIMEOUT>;
           requires PSelectSigsetTimeout<TIMEOUT>;
           requires PSelectTimeoutSigset<TIMEOUT>;
         };
-        template<typename..._> concept bool Stanza = requires(_...) {
+        template<typename..._> concept Stanza = requires(_...) {
           requires 0 == countof<_...>;
           requires PSelect<time::t>;
           requires PSelect<time::val>;
@@ -145,7 +145,7 @@ namespace tests::usage::posix_select {
         };
       }
     }
-    template<typename..._> concept bool Usage = requires(_...) {
+    template<typename..._> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires stanza_select::Stanza<>;
       requires stanza_pselect::Stanza<>;

@@ -87,9 +87,9 @@ auto tests::unit::slurp::Failure::suite() -> cppunit::Test * {
     << call("code", &Failure::test_code)
     << call("filename", &Failure::test_filename)
     << call("throwing", &Failure::test_throwing)
-    << add(directory::Fixture::suite())
-    << add(file::Fixture::suite())
-    << add(named::Fixture::suite())
+    << add<directory::Fixture>()
+    << add<file::Fixture>()
+    << add<named::Fixture>()
     ;
   return s.release();
 }

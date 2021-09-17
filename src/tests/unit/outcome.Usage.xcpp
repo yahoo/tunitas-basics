@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -9,8 +9,6 @@ namespace tests::unit::outcome {
 }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import tunitas.Outcome
 template<typename BASE> class tests::unit::outcome::Usage : public cppunit::test::Fixture {
 public:
@@ -148,11 +146,8 @@ template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_Value
   auto sg = Subject{"good"};
   CPPUNIT_ASSERT(ok(sg));
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("usage.Outcome<"s + typeid(Base).name() + ">"s);
   series << call("ok", &Usage::test_ok)
     ;
@@ -161,13 +156,13 @@ template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Te
     cod << call("returning", &Usage::test_error_code_returning)
         << call("throwing", &Usage::test_error_code_throwing)
       ;
-    series << add(cod.release());
+    series << move(cod);
   } {
     Stream con("error_condition");
     con << call("returning", &Usage::test_error_condition_returning)
         << call("throwing", &Usage::test_error_condition_throwing)
       ;
-    series << add(con.release());
+    series << move(con);
   } {
     Stream val("value");
     val << call("consty", &Usage::test_value_consty)
@@ -175,15 +170,15 @@ template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Te
         << call("moving", &Usage::test_value_moving)
         << call("throwing", &Usage::test_value_throwing)
       ;
-    series << add(val.release());
+    series << move(val);
   } {
     Stream con("constructor");
     con << call("default", &Usage::test_constructor_default)
         << call("Error", &Usage::test_constructor_Error)
         << call("Value", &Usage::test_constructor_Value)
       ;
-    series << add(con.release());
+    series << move(con);
   }
-  return series.release();
+  return finalize(series);
 }
 #endiv

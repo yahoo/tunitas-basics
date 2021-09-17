@@ -8,7 +8,7 @@ namespace nonstd::stream::required {
   // either detail::Decoration<...>
   //     or detail::Empty
   //
-  template<typename DECORATION> concept bool Decoration = requires(DECORATION decoration) {
+  template<typename DECORATION> concept Decoration = requires(DECORATION decoration) {
     typename DECORATION::value_type;
     typename DECORATION::argument_type;
     requires requires(typename DECORATION::value_type const &value) {

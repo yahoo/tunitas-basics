@@ -63,31 +63,31 @@ namespace {
       using namespace native;
       using nonstd::convertible_to;
       using Argument = packaging::lock::interface::truct::flock;
-      template<typename UNMANAGED> concept bool Signature2 = requires(UNMANAGED fd, Argument &returned) {
+      template<typename UNMANAGED> concept Signature2 = requires(UNMANAGED fd, Argument &returned) {
         requires sys::fd::required::Unmanaged<UNMANAGED>;
         { good(getlock(fd, returned)) } -> convertible_to<bool>;
         { value(getlock(fd, returned)) } -> convertible_to<int>;
         { getlock(fd, returned) };
       };
-      template<typename UNMANAGED> concept bool Signature3Process = requires(UNMANAGED fd, Argument &returned) {
+      template<typename UNMANAGED> concept Signature3Process = requires(UNMANAGED fd, Argument &returned) {
         requires sys::fd::required::Unmanaged<UNMANAGED>;
         { good(getlock(fd, F::PROCESS, returned)) } -> convertible_to<bool>;
         { value(getlock(fd, F::PROCESS, returned)) } -> convertible_to<int>;
         { getlock(fd, F::PROCESS, returned) };
       };
-      template<typename UNMANAGED> concept bool Signature3File = requires(UNMANAGED fd, Argument &returned) {
+      template<typename UNMANAGED> concept Signature3File = requires(UNMANAGED fd, Argument &returned) {
         requires sys::fd::required::Unmanaged<UNMANAGED>;
         { good(getlock(fd, F::FILE, returned)) } -> convertible_to<bool>;
         { value(getlock(fd, F::FILE, returned)) } -> convertible_to<int>;
         { getlock(fd, F::FILE, returned) };
       };
-      template<typename UNMANAGED> concept bool Signature3Which = requires(UNMANAGED fd, F::Which which, Argument &returned) {
+      template<typename UNMANAGED> concept Signature3Which = requires(UNMANAGED fd, F::Which which, Argument &returned) {
         requires sys::fd::required::Unmanaged<UNMANAGED>;
         { good(getlock(fd, which, returned)) } -> convertible_to<bool>;
         { value(getlock(fd, which, returned)) } -> convertible_to<int>;
         { getlock(fd, which, returned) };
       };
-      template<typename UNMANAGED> concept bool Usage = requires(UNMANAGED) {
+      template<typename UNMANAGED> concept Usage = requires(UNMANAGED) {
         requires sys::fd::required::Unmanaged<UNMANAGED>;
         requires Signature2<UNMANAGED>;
         requires Signature3Process<UNMANAGED>;

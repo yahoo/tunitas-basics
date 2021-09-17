@@ -14,12 +14,12 @@ namespace sys::un::required {
   // The possible path values for un::path(Sockaddr)
   // Something stringy or filesystem-path-like
   //
-  template<typename STRING> concept bool Path = (std::is_same_v<STRING, char const *> ||
-                                                 std::is_same_v<STRING, c::const_stringn> ||
-                                                 std::is_same_v<STRING, c::const_stringz> ||
-                                                 std::is_same_v<STRING, std::string_view> || // .... [[FIXTHIS]] should have "or descendants" and variants here too
-                                                 nonstd::required::Stringlike<STRING> || // ........ being std::string or descendants (but allowing no other representation)
-                                                 std::is_same_v<STRING, std::filesystem::path>);
+  template<typename STRING> concept Path = (std::is_same_v<STRING, char const *> ||
+                                            std::is_same_v<STRING, c::const_stringn> ||
+                                            std::is_same_v<STRING, c::const_stringz> ||
+                                            std::is_same_v<STRING, std::string_view> || // .... [[FIXTHIS]] should have "or descendants" and variants here too
+                                            nonstd::required::Stringlike<STRING> || // ........ being std::string or descendants (but allowing no other representation)
+                                            std::is_same_v<STRING, std::filesystem::path>);
 }
 #endiv
 #divert <cpp>

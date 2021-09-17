@@ -5,7 +5,7 @@
 #import std.string
 #import std.back_insert_iterator
 namespace slurp::directory {
-  template<typename CONTAINER> concept bool Container = requires (CONTAINER container) {
+  template<typename CONTAINER> concept Container = requires (CONTAINER container) {
     typename CONTAINER::value_type;
     requires std::is_same<std::string, typename CONTAINER::value_type>::value;
     { CONTAINER() }

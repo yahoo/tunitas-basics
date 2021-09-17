@@ -22,7 +22,7 @@ namespace sys::posix::required::syscall::result {
     using nonstd::convertible_to;
     // ... with long being the natural return type of the syscall(...) [[FIXTHAT]] derive that return value from decltype(...)
     using That_Certain_Native_Syscall_Result_Type = long;
-    template<typename RESULT, typename PAYLOAD> concept bool Result = requires(RESULT result, bool was_good, error_t error_number, PAYLOAD payload) {
+    template<typename RESULT, typename PAYLOAD> concept Result = requires(RESULT result, bool was_good, error_t error_number, PAYLOAD payload) {
       // requires convertible_to<That_Certain_Native_Syscall_Result_Type, PAYLOAD>;
       requires requires(PAYLOAD, That_Certain_Native_Syscall_Result_Type that) {
         // Not quite the same as convertible_to [[WHY]]
@@ -36,7 +36,7 @@ namespace sys::posix::required::syscall::result {
       { error_num(result) } -> convertible_to<error_t>;
       { value(result) } -> convertible_to<PAYLOAD>;
     };
-    template<typename RESULT> concept bool Stylized = requires(RESULT) {
+    template<typename RESULT> concept Stylized = requires(RESULT) {
       typename call::result::Element<0, RESULT>::Type;
       requires 1 == call::result::Size<RESULT>::value;
       requires Result<RESULT, typename call::result::Element<0, RESULT>::Type>;

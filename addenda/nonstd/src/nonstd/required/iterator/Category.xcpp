@@ -35,7 +35,7 @@ namespace nonstd::required::iterator {
   //
   //   Take advantage of the inheritance relationship
   //
-  template<typename CATEGORY> concept bool Category = (std::is_base_of_v<input_iterator_tag, CATEGORY> ||
-                                                       std::is_base_of_v<output_iterator_tag, CATEGORY>);
+  template<typename CATEGORY> concept Category = (std::is_base_of_v<input_iterator_tag, CATEGORY> ||
+                                                  std::is_base_of_v<output_iterator_tag, CATEGORY>);
 }
 #endiv

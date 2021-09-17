@@ -27,14 +27,14 @@ namespace nonstd::required::school {
   //   template<required::school::Old THING> struct Thing;
   //
   namespace [[eponymous]] old {
-    template<typename ITERATOR> concept bool Iterator = requires(ITERATOR) {
+    template<typename ITERATOR> concept Iterator = requires(ITERATOR) {
       typename iterator_traits<ITERATOR>::iterator_category;
       requires sizeof (typename iterator_traits<ITERATOR>::iterator_category);
     };
-    template<typename CONTAINER> concept bool Declared = traits::school::Old<CONTAINER>::value; // these are expected to be rare ... if you want to declare, the then declare as New School
-    template<typename CONTAINER> concept bool Constie = Iterator<typename CONTAINER::const_iterator>;
-    template<typename CONTAINER> concept bool Mutable = Iterator<typename CONTAINER::iterator>;
-    template<typename CONTAINER> concept bool Old = Declared<CONTAINER> || Constie<CONTAINER>  || Mutable<CONTAINER>;;
+    template<typename CONTAINER> concept Declared = traits::school::Old<CONTAINER>::value; // these are expected to be rare ... if you want to declare, the then declare as New School
+    template<typename CONTAINER> concept Constie = Iterator<typename CONTAINER::const_iterator>;
+    template<typename CONTAINER> concept Mutable = Iterator<typename CONTAINER::iterator>;
+    template<typename CONTAINER> concept Old = Declared<CONTAINER> || Constie<CONTAINER>  || Mutable<CONTAINER>;;
   }
   using old::Old;  
 }

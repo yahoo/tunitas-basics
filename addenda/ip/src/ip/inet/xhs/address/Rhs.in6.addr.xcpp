@@ -26,7 +26,7 @@ protected:
 #import ip.endian.host_order
 namespace ip::inet::xhs::address {
   Rhs<ip::in6::addr>::Rhs(subject_type const &subject)
-  : subject(subject)
+    : subject(subject)
   { }
   Rhs<ip::in6::addr>::operator in6::addr_t() const {
     // WATCHOUT 's6_addr' is but a #define overlying a really ugly subfield reference inside the union inside in6_addr

@@ -72,10 +72,10 @@ namespace openssl::pem::packaging::from_string_view {
     if (written < 0 || std::size_t(written) != view.size()) {
       // Can this even happen?  Well, yes, it means that allocation has failed
       if constexpr (true) {
-        throw exception::Alloc{}; // the allocation of string storage to hold the view must have failed; this is an allocation error
-      } else if constexpr (false) {
-        throw exception::System{errno, std::system_category(), "bio-write/s-mem"}; // must the OS have had an error?
-      } else {
+          throw exception::Alloc{}; // the allocation of string storage to hold the view must have failed; this is an allocation error
+        } else if constexpr (false) {
+          throw exception::System{errno, std::system_category(), "bio-write/s-mem"}; // must the OS have had an error?
+        } else {
         throw std::error_code{error::Code::PEM}; // we are in the application act of converting from PEM to RESULT
       }
     }

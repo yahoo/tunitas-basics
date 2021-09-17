@@ -5,7 +5,7 @@
 #import std.conditional
 namespace nonstd::container::traits::glue {
   namespace required {
-    template<typename CONTAINER> concept bool Container = nonstd::required::container::Type<CONTAINER>;
+    template<typename CONTAINER> concept Container = nonstd::required::container::Type<CONTAINER>;
   }
   // WATCHOUT - glue::Conditional<T,C,A> provides auto indirection; it is more like std::conditional_t
   template<bool CONDITION, typename CONSEQUENT, typename ALTERNATE> struct Conditional;

@@ -9,7 +9,7 @@ namespace format::json::required {
   // recall that 'char signed' (std::int8_t) and 'char unsigned' (std::uint8_t) are conceptually 8-bit integers.
   // ahem... even if they don't print that way.
   //
-  template<typename CHARACTER> concept bool Character = 
+  template<typename CHARACTER> concept Character = 
     (std::is_same<char, CHARACTER>::value ||
      std::is_same<wchar_t, CHARACTER>::value ||
      std::is_same<char16_t, CHARACTER>::value ||

@@ -12,7 +12,7 @@ namespace sys::msg::required {
   //   you know
   //
   namespace hdr {
-    template<typename HDR> concept bool Hdr = Single<HDR> || Multiple<HDR>;
+    template<typename HDR> concept Hdr = Single<HDR> || Multiple<HDR>;
   }
   using hdr::Hdr;
 }

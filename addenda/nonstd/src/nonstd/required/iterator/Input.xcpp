@@ -11,17 +11,17 @@ namespace nonstd::required::iterator {
   // Most of https://en.cppreference.com/w/cpp/named_req/InputIterator
   //
   namespace input {
-    template<typename ITERATOR> concept bool By_Value = requires(ITERATOR iterator) {
-      { *iterator } -> typename iterator_traits<ITERATOR>::value_type;
+    template<typename ITERATOR> concept By_Value = requires(ITERATOR iterator) {
+      { *iterator } -> convertible_to<typename iterator_traits<ITERATOR>::value_type>;
     };
-    template<typename ITERATOR> concept bool By_Reference = requires(ITERATOR iterator) {
-      { *iterator } -> typename iterator_traits<ITERATOR>::reference;
+    template<typename ITERATOR> concept By_Reference = requires(ITERATOR iterator) {
+      { *iterator } -> convertible_to<typename iterator_traits<ITERATOR>::reference>;
     };
-    template<typename ITERATOR> concept bool Input = Basis<ITERATOR> && requires(ITERATOR iterator) {
+    template<typename ITERATOR> concept Input = Basis<ITERATOR> && requires(ITERATOR iterator) {
       requires is_base_of_v<input_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>;
       requires By_Value<ITERATOR> || By_Reference<ITERATOR>;
-      { iterator == iterator } -> bool;
-      { iterator != iterator } -> bool;
+      { iterator == iterator } -> convertible_to<bool>;
+      { iterator != iterator } -> convertible_to<bool>;
     };
   }
   using input::Input;

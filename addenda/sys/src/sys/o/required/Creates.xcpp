@@ -14,7 +14,7 @@ namespace sys::o::required {
   //
   //   template<required::Createess RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename CREATES> concept bool Creates = std::is_same_v<CREATES, o::Creates> || std::is_same_v<CREATES, o::Create>;
+  template<typename CREATES> concept Creates = std::is_same_v<CREATES, o::Creates> || std::is_same_v<CREATES, o::Create>;
 }
 #endiv
 #divert <cpp>

@@ -14,7 +14,7 @@ namespace sys::posix::required::syscall::result {
   //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
   //
   namespace [[detail]] idiomatic {
-    template<typename PAYLOAD> concept bool Idiomatic = stylized::Result<call::result::Value<PAYLOAD>, PAYLOAD>;
+    template<typename PAYLOAD> concept Idiomatic = stylized::Result<call::result::Value<PAYLOAD>, PAYLOAD>;
   }
   using idiomatic::Idiomatic;
 }

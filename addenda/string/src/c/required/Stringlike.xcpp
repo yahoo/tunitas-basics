@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Verizon Media.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the license file at the top of this repository.
 // Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
@@ -16,11 +16,11 @@ namespace c::required {
   // Having the 'c_str()' member is diagnostic
   // A STRINGLIKE manages and produces a 'char const *' with an implicit '\0' terminator.
   //
-  template<typename STRINGLIKE> concept bool Stringlike = requires(STRINGLIKE stringlike) {
+  template<typename STRINGLIKE> concept Stringlike = requires(STRINGLIKE stringlike) {
     typename STRINGLIKE::value_type;
-    { stringlike.c_str() } -> typename STRINGLIKE::value_type const *;
-    { stringlike.data() } -> typename STRINGLIKE::value_type const *;
-    { stringlike.size() } -> std::size_t;
+    { stringlike.c_str() } -> convertible_to<typename STRINGLIKE::value_type const *>;
+    { stringlike.data() } -> convertible_to<typename STRINGLIKE::value_type const *>;
+    { stringlike.size() } -> convertible_to<std::size_t>;
     // DO NOT
     //    requires Binary<STRINGLIKE>;
     // as it explicitly denies c::basic_stringz<CHAR>

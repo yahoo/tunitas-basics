@@ -66,9 +66,9 @@ namespace tests::unit::flock {
     using v = std::vector<Option>;
     static_assert(0 == (int)Option::ADVISORY);
     lhs(some_flag_series) = v{// MUST NOT ---> Option::NONE <--- MUST NOT (because that is not a flag, it is the absence of ALL flags)
-                              // MUST NOT ---> Option::ADVISORY <--- same reason
-                              Option::MANDATORY,
-                              Option::NONBLOCK};
+      // MUST NOT ---> Option::ADVISORY <--- same reason
+      Option::MANDATORY,
+      Option::NONBLOCK};
     lhs(no_flags) = Options{};
     lhs(all_flags) = Options{LOCK_MAND|
                              LOCK_NB};

@@ -119,13 +119,13 @@ auto tests::unit::posix::Getenv::suite() -> cppunit::Test * {
               // This one is n^2
               Stream tem("template_instance");
               // generate_stanza is parameterized around the ARGUMENT
-              tem << add(generate_stanza<char const *>())
-                  << add(generate_stanza<char *>())
-                  << add(generate_stanza<c::const_stringz>())
-                  << add(generate_stanza<c::stringz>())
-                  << add(generate_stanza<c::const_stringn>())
-                  << add(generate_stanza<c::stringn>())
-                  << add(generate_stanza<std::string>())
+              tem<<< add>(generate_stanza<cha >())
+                 << add<generate_stanz >>())
+                  << add(generate_stanza<c::cons>))
+                  << add(generate_stanza<c>))
+                  << add(generate_stanza<c::cons>))
+                  << add(generate_stanza<c>))
+                  << add(generate_stanza<std>))
                 // NONE of these can be arguments, only results (maybe)
                 // std::vector<char>>
                 // std::string_view

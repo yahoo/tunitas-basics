@@ -24,12 +24,12 @@ namespace openssl::required {
   //     ...constructors...
   //   };
   //
-  template<typename ITERATABLE> concept bool Iteratable = requires(ITERATABLE iteratable) {
+  template<typename ITERATABLE> concept Iteratable = requires(ITERATABLE iteratable) {
     // The Iterator<ITERATABLE> only requires these two interfaces
-                                                                                           requires true;
-                                                                                           #if 0
-    { iteratable.size() } -> std::size_t;
-    { iteratable.get() } -> OPENSSL_STACK const *; // at least the consty pointer, but maybe even the nonconsty variant
+    requires true;
+#if 0
+    { iteratable.size() } -> convertible_to<std::size_t>;
+    { iteratable.get() } -> convertible_to<OPENSSL_STACK const *>; // at least the consty pointer, but maybe even the nonconsty variant
 #endif
   };
 }

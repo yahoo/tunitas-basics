@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -65,31 +65,33 @@ auto tests::unit::app::Fixture::Quitting::stream() const noexcept -> std::ostrea
 }
 #import std.exception
 #import std.is_base_of
+#import std.convertible_to
 #import tunitas.app.required.exception.Quitting
 // Of course, this is test code
 namespace {
-  namespace tests {
+  namespace testate {
+    using std::convertible_to;
     using Subject = ::tests::unit::app::Fixture;
     static_assert(sizeof(Subject::Quitting));
     static_assert(std::is_base_of_v<tunitas::app::exception::Aspect, Subject::Quitting>);
     static_assert(std::is_base_of_v<std::exception, Subject::Quitting>);
     static_assert(tunitas::app::required::exception::Quitting<Subject::Quitting>);
-    template<typename QUITTING> concept bool Belabor_The_Point_Quitting =
+    template<typename QUITTING> concept Belabor_The_Point_Quitting =
       true
       && requires(QUITTING quitting) {
-        { quitting } -> std::exception const &;
-        { quitting } -> tunitas::app::exception::Aspect const &;
-        { quitting } -> tunitas::app::exception::feature::Quitting const &;
-      }
-      && ! tunitas::required::exception::Quitting<QUITTING> // because we specify a different constructor signature (see below)
-      && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
-          requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
-      && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
-        // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
-        { QUITTING{name, code} };
-        { quitting.what() } -> char const *;
-        { quitting.code() } -> sys::exits::Code;
-        { quitting.stream() } -> std::ostream &;
+      { quitting } -> convertible_to<std::exception const &>;
+      { quitting } -> convertible_to<tunitas::app::exception::Aspect const &>;
+      { quitting } -> convertible_to<tunitas::app::exception::feature::Quitting const &>;
+    }
+    && ! tunitas::required::exception::Quitting<QUITTING> // because we specify a different constructor signature (see below)
+    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
+        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
+    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
+      { QUITTING{name, code} };
+      { quitting.what() } -> convertible_to<char const *>;
+      { quitting.code() } -> convertible_to<sys::exits::Code>;
+      { quitting.stream() } -> convertible_to<std::ostream &>;
     };
     static_assert(Belabor_The_Point_Quitting<Subject::Quitting>);
   }

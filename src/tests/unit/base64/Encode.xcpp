@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::base64 { class Encode; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::base64::Encode : public cppunit::test::Fixture {
 public:
   auto test_01() -> void;
@@ -38,14 +36,11 @@ auto tests::unit::base64::Encode::test_01() -> void {
     }
   }
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::Encode::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("encode");
   series << call("01", &Encode::test_01)
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

@@ -7,7 +7,7 @@ namespace format::required::integer {
   //
   // What constitutes an signed integer?
   //
-  template<typename INTEGER> concept bool Signed = nonstd::is_signed<INTEGER>::value;
+  template<typename INTEGER> concept Signed = nonstd::is_signed<INTEGER>::value;
 }
 #endiv
 #divert <cpp>

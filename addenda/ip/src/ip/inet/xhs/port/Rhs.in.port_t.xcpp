@@ -26,7 +26,7 @@ protected:
 #import ip.endian.host_order
 namespace ip::inet::xhs::port {
   Rhs<ip::in::port_t>::Rhs(subject_type const &subject)
-  : subject(subject)
+    : subject(subject)
   { }
   Rhs<ip::in::port_t>::operator in::port_t() const {
     endian::Integer<endian::Order::NETWORK, in::port_t> norder{subject};

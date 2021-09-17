@@ -80,7 +80,7 @@ auto tests::unit::slurp::directory::Fixture::suite() -> cppunit::Test * {
     << call("throwing-fail", &Fixture::test_throwing_fail)
     << call("nothrow-good", &Fixture::test_nothrow_good)
     << call("nothrow-fail", &Fixture::test_nothrow_fail)
-    << add(named::Fixture::suite())
+    << add<named::Fixture>()
     ;
   return s.release();
 }

@@ -18,12 +18,12 @@ namespace ares::required::list {
   // Of the unmanaged structures, some of them are lists.
   // The unmanaged list structures must have a 'next' field.
   //
-  template<typename ENTRY> concept bool Entry = requires(ENTRY entry) {
+  template<typename ENTRY> concept Entry = requires(ENTRY entry) {
     typename ENTRY::Unmanaged;
     requires Is_Entry<ENTRY>::value;
     requires Unmanaged<typename ENTRY::Unmanaged>;
     requires requires(typename ENTRY::Unmanaged const *unmanaged) {
-      { unmanaged->next } -> typename ENTRY::Unmanaged const *;
+      { unmanaged->next } -> convertible_to<typename ENTRY::Unmanaged const *>;
     };
   };
 }

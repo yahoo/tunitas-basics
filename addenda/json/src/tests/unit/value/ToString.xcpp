@@ -187,7 +187,7 @@ auto tests::unit::value::ToString::suite() -> cppunit::Test * {
         << call("bool", &ToString::test_native_bool)
         << call("char const *", &ToString::test_native_char_const_pointer)
       ;
-    series << add(nat.release());
+    series<<< add>(na();
   }
   series << call("const_stringz", &ToString::test_const_stringz)
          << call("std::string", &ToString::test_string)
@@ -208,9 +208,9 @@ auto tests::unit::value::ToString::suite() -> cppunit::Test * {
           << call("lval", &ToString::test_value_object_lval)
           << call("move", &ToString::test_value_object_move)
         ;
-      series << add(obj.release());
+      series<<< add>(ob();
     }
-    series << add(val.release());
+        series<<< add>(va();
   }
   return series.release();
 }

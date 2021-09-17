@@ -50,8 +50,8 @@ auto tests::unit::file::Fixture::suite() -> cppunit::Test * {
   Stream s("file");
   s << call("read-string-usage", &Fixture::test_read_string)
     << call("read-vector-usage", &Fixture::test_read_vector)
-    << add(configuration::Fixture::suite())
-    << add(read::Fixture::suite())
+    << add<configuration::Fixture>()
+    << add<read::Fixture>()
     ;
   return s.release();
 }

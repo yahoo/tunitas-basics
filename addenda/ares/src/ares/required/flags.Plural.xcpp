@@ -8,8 +8,8 @@ namespace ares::required::flags {
   //
   // The plural of a flag, which is a mask in the signal style of system-level code.
   //
-  template<typename PLURAL, Single SINGLE> concept bool Plural = (std::is_enum<PLURAL>::value &&
-                                                                  sizeof (PLURAL) >= sizeof (typename std::underlying_type<SINGLE>::type));
+  template<typename PLURAL, Single SINGLE> concept Plural = (std::is_enum<PLURAL>::value &&
+                                                             sizeof (PLURAL) >= sizeof (typename std::underlying_type<SINGLE>::type));
 }
 #endiv
 #divert <cpp>

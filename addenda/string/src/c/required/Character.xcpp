@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Verizon Media.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the license file at the top of this repository.
 // Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
@@ -15,13 +15,13 @@ namespace c::required {
   //     'char const'
   //
   namespace detail {
-    template<typename CHARACTER> concept bool Character_Basis =
+    template<typename CHARACTER> concept Character_Basis =
       (std::is_same<char, CHARACTER>::value ||
        std::is_same<wchar_t, CHARACTER>::value ||
        std::is_same<char16_t, CHARACTER>::value ||
        std::is_same<char32_t, CHARACTER>::value);
   }
-  template<typename CHARACTER> concept bool Character =
+  template<typename CHARACTER> concept Character =
     (detail::Character_Basis<CHARACTER> ||
      detail::Character_Basis<typename std::remove_const<CHARACTER>::type>);
 }

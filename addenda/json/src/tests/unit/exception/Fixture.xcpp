@@ -36,13 +36,13 @@ namespace tests::unit::exception {
 namespace tests::unit::exception {
   template<typename FIRST, typename SECOND, typename BUILDER> auto Fixture::exercise_throwing(bool first, bool second, BUILDER builder) -> void {
     if constexpr (std::is_same<FIRST, SECOND>::value) {
-      try {
-        builder();
-        CPPUNIT_ASSERT(false);
-      } catch (FIRST const &) {
-        CPPUNIT_ASSERT(first);
-      }
-    } else {
+        try {
+          builder();
+          CPPUNIT_ASSERT(false);
+        } catch (FIRST const &) {
+          CPPUNIT_ASSERT(first);
+        }
+      } else {
       try {
         builder();
         CPPUNIT_ASSERT(false);

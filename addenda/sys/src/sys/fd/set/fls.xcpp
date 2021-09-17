@@ -24,9 +24,9 @@ namespace sys::fd::set {
   template<Purpose PURPOSE> inline auto find_last_set(std::optional<Reference<PURPOSE>> const &) -> int;
   template<required::set::Any FIRST, typename... REST> inline auto find_last_set(FIRST const &last, REST const &...rest) -> int
     requires (true && ... && required::set::Any<REST>);
-   template<typename... THEM> inline auto fls(THEM const &...them) -> int
-     requires (true && ... && required::set::Any<THEM>)
-   { return find_last_set(them...); }
+  template<typename... THEM> inline auto fls(THEM const &...them) -> int
+    requires (true && ... && required::set::Any<THEM>)
+  { return find_last_set(them...); }
 }
 #endiv
 #divert <ipp>

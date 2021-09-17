@@ -32,7 +32,7 @@ public:
 #import std.allocator
 #import nonstd.regex.search
 namespace tests::unit::regex {
-    using namespace ::nonstd::regex;
+  using namespace ::nonstd::regex;
   using namespace std::string_literals;
   auto Search::test_case1_01() -> void {
     auto const specimen = "the lazy brown fox jumped over the camel died on the seventh day"s;

@@ -6,7 +6,7 @@ namespace nonstd::required::container {
   //
   // Is this the sort of container that has a push_front(Value) member?
   //
-  template<typename CONTAINER> concept bool Push_Front = requires(CONTAINER container) {
+  template<typename CONTAINER> concept Push_Front = requires(CONTAINER container) {
     requires Type<CONTAINER>;
     typename CONTAINER::value_type;
     { container.push_front(typename CONTAINER::value_type{}) };

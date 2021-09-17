@@ -21,7 +21,7 @@ namespace sys::call::result::wait::required {
     template<Process PROCESS> struct Registration<PROCESS, Siginfo> : public std::true_type { };
     template<Process PROCESS> struct Registration<PROCESS, Usages> : public std::true_type { };
     template<Process PROCESS> struct Registration<PROCESS, Status, Usages> : public std::true_type { };
-    template<typename... TYPES> concept bool Constraint = Registration<TYPES...>::value;
+    template<typename... TYPES> concept Constraint = Registration<TYPES...>::value;
   }
   using constraint::Constraint;
 }

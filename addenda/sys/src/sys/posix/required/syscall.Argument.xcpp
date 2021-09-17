@@ -11,7 +11,7 @@ namespace sys::posix::required::syscall {
   //
   //   Hack the Spew - see, nearby, the usage in posix::syscall(...)
   //
-  template<typename TYPE> concept bool Argument = std::is_integral_v<TYPE> || std::is_pointer_v<TYPE>;
+  template<typename TYPE> concept Argument = std::is_integral_v<TYPE> || std::is_pointer_v<TYPE>;
 }
 #endiv
 #divert <cpp>

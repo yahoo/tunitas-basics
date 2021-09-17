@@ -35,13 +35,13 @@ namespace tests::usage::posix_flock {
       using sys::flock::Operation;
       using sys::flock::Options;
       using Status = sys::call::Result;
-      template<typename FILE> concept bool Overloading = requires(FILE file, Specification specification, Operation operation, Options options) {
+      template<typename FILE> concept Overloading = requires(FILE file, Specification specification, Operation operation, Options options) {
         requires required::Unmanaged<FILE>;
         { flock(file, specification) } -> convertible_to<Status>;
         { flock(file, operation, options) } -> convertible_to<Status>;
         { flock(file, operation) } -> convertible_to<Status>;
       };
-      template<typename FILE> concept bool Object_FLOCK_Long = requires(FILE file) {
+      template<typename FILE> concept Object_FLOCK_Long = requires(FILE file) {
         requires required::Unmanaged<FILE>;
         // 1-arg
         { flock(file, FLOCK::SHARED) } -> convertible_to<Status>;
@@ -58,7 +58,7 @@ namespace tests::usage::posix_flock {
         { flock(file, FLOCK::SHARED, FLOCK::MANDATORY) } -> convertible_to<Status>;
         { flock(file, FLOCK::SHARED, FLOCK::MANDATORY | FLOCK::NONBLOCK) } -> convertible_to<Status>;
       };
-      template<typename FILE> concept bool Object_FLOCK_Short = requires(FILE file) {
+      template<typename FILE> concept Object_FLOCK_Short = requires(FILE file) {
         requires required::Unmanaged<FILE>;
         // 1-arg
         { flock(file, FLOCK::SH) } -> convertible_to<Status>;
@@ -72,13 +72,13 @@ namespace tests::usage::posix_flock {
         { flock(file, FLOCK::EX, FLOCK::NB) } -> convertible_to<Status>;
         { flock(file, FLOCK::SH, FLOCK::MAND | FLOCK::NB) } -> convertible_to<Status>;
       };
-      template<typename FILE> concept bool Object_LOCK_Long = requires(FILE file) {
+      template<typename FILE> concept Object_LOCK_Long = requires(FILE file) {
         requires required::Unmanaged<FILE>;
         // 1-arg
         { flock(file, LOCK::SHARED) } -> convertible_to<Status>;
         { flock(file, LOCK::EXCLUSIVE) } -> convertible_to<Status>;
         { LOCK::END } -> same_as<sys::lock::Operation>; // i.e. unsuitable for flock (a name occlusion in LOCK)
-        { flock(file, LOCK::UNLOCK<LOCK::FLOCK>) } -> convertible_to<Status>;
+        { flock(file, LOCK::UNLOCK<LOCK::FLOCK>)convertible_to<Status>;
         { flock(file, LOCK::EXCLUSIVE | LOCK::ADVISORY) } -> convertible_to<Status>;
         { flock(file, LOCK::EXCLUSIVE | LOCK::NONBLOCK) } -> convertible_to<Status>;
         { flock(file, LOCK::SHARED | LOCK::MANDATORY) } -> convertible_to<Status>;
@@ -89,7 +89,7 @@ namespace tests::usage::posix_flock {
         { flock(file, LOCK::SHARED, LOCK::MANDATORY) } -> convertible_to<Status>;
         { flock(file, LOCK::SHARED, LOCK::MANDATORY | LOCK::NONBLOCK) } -> convertible_to<Status>;
       };
-      template<typename FILE> concept bool Object_LOCK_Short = requires(FILE file) {
+      template<typename FILE> concept Object_LOCK_Short = requires(FILE file) {
         requires required::Unmanaged<FILE>;
         // 1-arg
         { flock(file, LOCK::SH) } -> convertible_to<Status>;
@@ -107,14 +107,14 @@ namespace tests::usage::posix_flock {
         { flock(file, LOCK::SH, LOCK::MAND | LOCK::NB) } -> convertible_to<Status>;
       };
     }
-    template<typename FILE> concept bool Instance = requires(FILE) {
+    template<typename FILE> concept Instance = requires(FILE) {
       requires Overloading<FILE>;
       requires Object_FLOCK_Short<FILE>;
       requires Object_FLOCK_Long<FILE>;
       requires Object_LOCK_Short<FILE>;
       requires Object_LOCK_Long<FILE>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<int>;
       requires Instance<sys::id::File>;

@@ -164,7 +164,7 @@ namespace tests::unit::exception::basic_quitting {
                          return move(arg);
                        }()
                     << END;
-                  return move(con);
+                return move(con);
               }()
            << call("message", &Basic_Quitting::test_message)
            << []{
@@ -179,7 +179,7 @@ namespace tests::unit::exception::basic_quitting {
                          return move(cas);
                        }()
                     << END;
-                  return move(cod);
+                return move(cod);
               }()
            << call("stream", &Basic_Quitting::test_stream)
            << call("severity_name", &Basic_Quitting::test_severity_name)

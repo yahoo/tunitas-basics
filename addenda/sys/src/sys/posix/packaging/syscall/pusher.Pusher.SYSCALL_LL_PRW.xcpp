@@ -80,14 +80,14 @@ namespace sys::posix::packaging::syscall::pusher {
   auto Pusher<SYSCALL_LL_PRW>::hi(Value specimen) -> Value {
     if constexpr (IS_LP64)  { return 0; }
     else
-    if constexpr (IS_ILP32) { return specimen >> 31; }
-    else                    { return specimen >> 32; }
+      if constexpr (IS_ILP32) { return specimen >> 31; }
+      else                    { return specimen >> 32; }
   }
   auto Pusher<SYSCALL_LL_PRW>::lo(Value specimen) -> Value {
     if constexpr (IS_LP64)  { return specimen; }
     else
-    if constexpr (IS_ILP32) { return specimen; }
-    else                    { return specimen & 0x0'ffff'ffff; }
+      if constexpr (IS_ILP32) { return specimen; }
+      else                    { return specimen & 0x0'ffff'ffff; }
   }
 }
 #endiv

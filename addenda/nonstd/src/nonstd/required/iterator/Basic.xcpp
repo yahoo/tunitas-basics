@@ -15,8 +15,8 @@ namespace nonstd::required::iterator {
     typename std::iterator_traits<ITERATOR>::reference;
     typename std::iterator_traits<ITERATOR>::iterator_category;
     { *iterator }; // don't check the type (here) ... might be value_type or reference
-    { ++iterator } -> ITERATOR &;
-    { iterator++ } -> ITERATOR;
+    { ++iterator } -> convertible_to<ITERATOR &>;
+    { iterator++ } -> convertible_to<ITERATOR>;
   };
 }
 #endiv

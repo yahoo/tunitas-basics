@@ -1,0 +1,39 @@
+#!/bin/bash --norc
+# Copyright Yahoo Inc, 2021.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-montara/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/services/montara/tree/LICENSE
+: ${with_build:=/build}
+: ${with_worktrees:=${with_build?}/worktrees}
+: ${TAG:=CURRENT}
+
+: ${with_module_rigging_core=${with_module_rigging_core:-${with_worktrees?}/rigging-core/v2.${TAG?}}}
+: ${with_module_rigging=${with_module_rigging_core?}}
+
+with_build=${with_build?} \
+with_nearby=${with_nearby:-${with_build?}/scold} \
+with_hypogeal_twilight=${with_hypogeal_twilight:-${with_worktrees?}/hypogeal-twilight/v0.${TAG?}} \
+with_module_langu=${with_module_langu:-${with_worktrees?}/langu/v0.${TAG?}} \
+with_module_nonstd=${with_module_nonstd:-${with_worktrees?}/nonstd/v2.${TAG?}} \
+with_module_options=${with_module_options:-${with_worktrees?}/options/v2.${TAG?}} \
+with_module_sys=${with_module_sys:-${with_worktrees?}/sys/v2.${TAG?}} \
+\
+with_module_rigging_core=${with_module_rigging_core?} \
+with_module_rigging=${with_module_rigging?} \
+with_nonstd_cppunit=${with_nonstd_cppunit:-no} \
+with_module_cppunit=${with_module_cppunit:-no} \
+\
+with_module_c=${with_module_c:-no} \
+with_module_format=${with_module_format:-no} \
+with_module_ip=${with_module_ip:-no} \
+with_module_posix=${with_module_posix:-no} \
+with_module_slurp=${with_module_slurp:-no} \
+with_module_std=${with_module_std:-no} \
+with_module_string=${with_module_string:-no} \
+\
+with_microhttpd__=${with_microhttpd__:-${with_worktrees?}/microhttpd++/v0.${TAG?}} \
+with_microhttpd=${with_microhttpd:-${with_worktrees?}/microhttpd++/v0.${TAG?}} \
+\
+with_temerarious_flagship=${with_tunitas_basics:-${with_worktrees?}/temerarious-flagship/v2.${TAG?}} \
+\
+exec ${0%/*}/nearby

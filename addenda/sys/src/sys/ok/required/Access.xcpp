@@ -14,6 +14,6 @@ namespace sys::ok::required {
   //
   //   template<required::Access RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename ACCESS> concept bool Access = std::is_same_v<ACCESS, ok::Axis> || std::is_same_v<ACCESS, ok::Access>;
+  template<typename ACCESS> concept Access = std::is_same_v<ACCESS, ok::Axis> || std::is_same_v<ACCESS, ok::Access>;
 }
 #endiv

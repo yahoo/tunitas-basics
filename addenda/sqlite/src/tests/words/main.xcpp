@@ -168,12 +168,12 @@ auto main(int arg_c, char *arg_v[]) -> int {
           }
           try {
             auto cleaned = [](std::string subject) -> std::string {
-              // okay to have '-squote but not okay to have "-dquote
-              if (std::string::npos != subject.find_first_of("\"")) {
-                throw tests::words::Badword(subject);
-              }
-              return subject;
-            }(word);
+                             // okay to have '-squote but not okay to have "-dquote
+                             if (std::string::npos != subject.find_first_of("\"")) {
+                               throw tests::words::Badword(subject);
+                             }
+                             return subject;
+                           }(word);
             if (cfg.verbose_mode) {
               std::cerr << cfg.NAME << ": verbose, adding q(" << word << ") cleaned up as q(" << cleaned << ")\n";
             }

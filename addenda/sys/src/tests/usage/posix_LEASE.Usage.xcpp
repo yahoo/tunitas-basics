@@ -15,7 +15,7 @@
 namespace tests::usage::posix_LEASE {
   using sys::posix::LEASE;
   namespace [[detail]] packaging {
-    template<typename LEASE> concept bool Instance = requires(LEASE) {
+    template<typename LEASE> concept Instance = requires(LEASE) {
       typename LEASE::Operation;
       requires model::Namespace_Object<LEASE>;
       requires (int)LEASE::READ == F_RDLCK
@@ -27,7 +27,7 @@ namespace tests::usage::posix_LEASE {
       requires (int)LEASE::WR == F_WRLCK;
       requires (int)LEASE::UN == F_UNLCK;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<LEASE>;
     };

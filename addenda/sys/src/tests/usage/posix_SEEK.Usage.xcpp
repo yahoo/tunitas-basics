@@ -15,7 +15,7 @@
 namespace tests::usage::posix_SEEK {
   using sys::posix::SEEK;
   namespace [[detail]] packaging {
-    template<typename SEEK> concept bool Instance = requires(SEEK) {
+    template<typename SEEK> concept Instance = requires(SEEK) {
       typename SEEK::Whence;
       requires model::Namespace_Object<SEEK>;
       requires (int)SEEK::SET == SEEK_SET;
@@ -29,7 +29,7 @@ namespace tests::usage::posix_SEEK {
       requires (int)SEEK::HOLE == SEEK_HOLE;
 #endif
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<SEEK>;
     };

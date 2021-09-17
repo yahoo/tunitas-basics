@@ -36,7 +36,7 @@ namespace tests::usage::call_result_Value {
     namespace [[detail]] result {
       namespace [[detail]] without_namespace_std {
         // DO NOT ---> using namespace std; <--- DO NOT
-        template<typename RESULT, typename PAYLOAD> concept bool Triple = requires(RESULT result) {
+        template<typename RESULT, typename PAYLOAD> concept Triple = requires(RESULT result) {
           //
           // WATCHOUT - when 'using namespace std' these ADL functions are occluded so the predicate fails.
           //
@@ -47,11 +47,11 @@ namespace tests::usage::call_result_Value {
       }
       namespace [[detail]] with_namespace_std {
         using namespace std;
-        template<typename PAYLOAD> concept bool Payload = requires(PAYLOAD) {
+        template<typename PAYLOAD> concept Payload = requires(PAYLOAD) {
           requires is_default_constructible_v<PAYLOAD>;
           requires is_copy_constructible_v<PAYLOAD>;
         };
-        template<typename RESULT, typename PAYLOAD> concept bool Triple = requires(RESULT result) {
+        template<typename RESULT, typename PAYLOAD> concept Triple = requires(RESULT result) {
           requires Payload<PAYLOAD>;
           { ok(result) } -> convertible_to<bool>; // ........ deprecate-in-place
           { good(result) } -> convertible_to<bool>; // ...... prefer
@@ -69,22 +69,22 @@ namespace tests::usage::call_result_Value {
           // and check that all the elements of Value<VALUE, VALUES...> are default & copy constructible
         };
       }
-      template<typename RESULT, typename PAYLOAD> concept bool Triple = with_namespace_std::Triple<RESULT, PAYLOAD> && without_namespace_std::Triple<RESULT, PAYLOAD>;
+      template<typename RESULT, typename PAYLOAD> concept Triple = with_namespace_std::Triple<RESULT, PAYLOAD> && without_namespace_std::Triple<RESULT, PAYLOAD>;
       using with_namespace_std::Payload;
     }
     using sys::call::result::Element;
     using sys::call::result::Size;
-    template<typename RESULT> concept bool Instance = requires(RESULT) {
+    template<typename RESULT> concept Instance = requires(RESULT) {
       typename Element<0, RESULT>::Type; // at least that first one exists
       requires 1 <= Size<RESULT>::value;
       requires result::Triple<RESULT, typename Element<0, RESULT>::Type>;
     };
-    template<typename PAYLOAD, typename... PAYLOADS> concept bool Scenario = requires(PAYLOAD, PAYLOADS...) {
+    template<typename PAYLOAD, typename... PAYLOADS> concept Scenario = requires(PAYLOAD, PAYLOADS...) {
       requires (result::Payload<PAYLOAD> && ... && result::Payload<PAYLOADS>);
       requires Instance<Value<PAYLOAD, PAYLOADS...>>;
     };
     namespace id = sys::id;
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<Value<int>>;
       requires Instance<Value<bool>>;

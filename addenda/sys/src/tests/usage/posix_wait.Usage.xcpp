@@ -54,13 +54,13 @@ namespace tests::usage::posix_wait {
       using sys::id::required::wait::Untyped;
       // This is overbroad going to cover New School and old_School (Title_Case and lower_case)
       // It is a reminder that the 'matched' argument can be a wide variety of types, whereas Returned is always just that.
-      template<typename RETURNED> concept bool Returned = Process<RETURNED>;
-      template<typename MATCHED> concept bool Matched = Process<MATCHED> || Group<MATCHED> || Either<MATCHED> || Typed<MATCHED>;
+      template<typename RETURNED> concept Returned = Process<RETURNED>;
+      template<typename MATCHED> concept Matched = Process<MATCHED> || Group<MATCHED> || Either<MATCHED> || Typed<MATCHED>;
     }
     namespace [[detail]] {
       namespace [[detail]] disambiguate_function {
         using sys::posix::wait;
-        template<typename RETURNED> concept bool Wait2 = requires(RETURNED, io::Status &sutats) {
+        template<typename RETURNED> concept Wait2 = requires(RETURNED, io::Status &sutats) {
           requires same_as<RETURNED, sys::id::Process>;
           requires required::Returned<RETURNED>;
           // WATCHOUT - this is copypasta among the two disambiguation namespaces
@@ -68,7 +68,7 @@ namespace tests::usage::posix_wait {
           { wait()() };
           { wait()(sutats) };
         };
-        template<typename RETURNED> concept bool Wait3 = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
+        template<typename RETURNED> concept Wait3 = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
           requires same_as<RETURNED, sys::id::Process>;
           requires required::Returned<RETURNED>;
           { wait(options)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
@@ -76,7 +76,7 @@ namespace tests::usage::posix_wait {
           { wait(options)(segasu) } -> convertible_to<result::Value<RETURNED, io::Status>>;
           { wait(options)(sutats, segasu) } -> convertible_to<result::Value<RETURNED>>;
         };
-        template<typename RETURNED> concept bool Any = requires(RETURNED) {
+        template<typename RETURNED> concept Any = requires(RETURNED) {
           requires required::Returned<RETURNED>;
           requires Wait3<RETURNED>;
           requires Wait2<RETURNED>;
@@ -84,13 +84,13 @@ namespace tests::usage::posix_wait {
       }
       namespace [[detail]] disambiguate_native {
         using sys::posix::native::wait;
-        template<typename RETURNED> concept bool Wait2 = requires(RETURNED, io::Status &sutats) {
+        template<typename RETURNED> concept Wait2 = requires(RETURNED, io::Status &sutats) {
           requires same_as<RETURNED, pid_t>;
           requires required::Returned<RETURNED>;
           { wait()() };
           { wait()(sutats) };
         };
-        template<typename RETURNED> concept bool Wait3 = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
+        template<typename RETURNED> concept Wait3 = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
           requires same_as<RETURNED, pid_t>;
           requires required::Returned<RETURNED>;
           { wait(options)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
@@ -98,13 +98,13 @@ namespace tests::usage::posix_wait {
           { wait(options)(segasu) } -> convertible_to<result::Value<RETURNED, io::Status>>;
           { wait(options)(sutats, segasu) } -> convertible_to<result::Value<RETURNED>>;
         };
-        template<typename RETURNED> concept bool Any = requires(RETURNED) {
+        template<typename RETURNED> concept Any = requires(RETURNED) {
           requires required::Returned<RETURNED>;
           requires Wait3<RETURNED>;
           requires Wait2<RETURNED>;
         };
       }
-      template<typename RETURNED, typename MATCHED> concept bool Waitpid = requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats) {
+      template<typename RETURNED, typename MATCHED> concept Waitpid = requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats) {
         requires required::Returned<RETURNED>;
         // These do not call the waitpid::variant, rather the match the wait4::variant (so do not assert on the return type)
         { wait(matched)() };
@@ -113,9 +113,9 @@ namespace tests::usage::posix_wait {
       };
 #if 0 // [[REMOVETHIS]] test code
       namespace x1 {
-      auto w = wait(sys::id::Process{});
-      result::Value<sys::id::Process, sys::wait::Status, sys::r::Usages> v = w();
-      static_assert(convertible_to<decltype(v), result::Value<sys::id::Process, sys::wait::Status, sys::r::Usages>>);
+        auto w = wait(sys::id::Process{});
+        result::Value<sys::id::Process, sys::wait::Status, sys::r::Usages> v = w();
+        static_assert(convertible_to<decltype(v), result::Value<sys::id::Process, sys::wait::Status, sys::r::Usages>>);
       }
       namespace x2 {
         auto w = wait(pid_t{});
@@ -131,9 +131,9 @@ namespace tests::usage::posix_wait {
       }
       auto p = result::Value<pid_t, io::Status, io::Usages>{};
       auto P = result::Value<sys::id::Process, io::Status, io::Usages>{};
-      template<typename FROM, typename TO> concept bool Conv = std::is_convertible<FROM, TO>::value;
+      template<typename FROM, typename TO> concept Conv = std::is_convertible<FROM, TO>::value;
 #endif
-      template<typename RETURNED, typename MATCHED> concept bool Wait4 = requires(RETURNED, MATCHED) {
+      template<typename RETURNED, typename MATCHED> concept Wait4 = requires(RETURNED, MATCHED) {
         requires required::Returned<RETURNED>;
         requires required::Matched<MATCHED>;
         requires requires(RETURNED, MATCHED matched, io::Options options, io::Status &sutats, io::Usages &segasu) {
@@ -144,11 +144,11 @@ namespace tests::usage::posix_wait {
           { wait(matched, options)(segasu) };
           { wait(matched, options)(sutats, segasu) };
 #elif 1
-          { wait(matched)() } -> result::Value<RETURNED, io::Status, io::Usages>;
-          { wait(matched, options)() } -> result::Value<RETURNED, io::Status, io::Usages>;
-          { wait(matched, options)(sutats) } -> result::Value<RETURNED, io::Usages>;
-          { wait(matched, options)(segasu) } -> result::Value<RETURNED, io::Status>;
-          { wait(matched, options)(sutats, segasu) } -> result::Value<RETURNED>;
+          { wait(matched)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait(matched, options)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
+          { wait(matched, options)(sutats) } -> convertible_to<result::Value<RETURNED, io::Usages>>;
+          { wait(matched, options)(segasu) } -> convertible_to<result::Value<RETURNED, io::Status>>;
+          { wait(matched, options)(sutats, segasu) } -> convertible_to<result::Value<RETURNED>>;
 #else
           { wait(matched)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
           { wait(matched, options)() } -> convertible_to<result::Value<RETURNED, io::Status, io::Usages>>;
@@ -159,21 +159,21 @@ namespace tests::usage::posix_wait {
         };
       };
       namespace [[detail]] waitid_variant {
-        template<typename RETURNED, typename UNTYPED> concept bool Untyped = requires(RETURNED, io::Type type, UNTYPED untyped, io::Options options, io::Siginfo &ofnigis) {
+        template<typename RETURNED, typename UNTYPED> concept Untyped = requires(RETURNED, io::Type type, UNTYPED untyped, io::Options options, io::Siginfo &ofnigis) {
           requires required::Returned<RETURNED>;
           requires required::Untyped<UNTYPED>;
           { wait(type, untyped)() } -> convertible_to<result::Value<RETURNED,io::Siginfo>>;
           { wait(type, untyped, options)() } -> convertible_to<result::Value<RETURNED,io::Siginfo>>;
           { wait(type, untyped, options)(ofnigis) } -> convertible_to<result::Value<RETURNED>>;
         };
-        template<typename RETURNED, typename TYPED> concept bool Typed = requires(RETURNED, TYPED typed, io::Options options, io::Siginfo &ofnigis) {
+        template<typename RETURNED, typename TYPED> concept Typed = requires(RETURNED, TYPED typed, io::Options options, io::Siginfo &ofnigis) {
           requires required::Returned<RETURNED>;
           requires required::Typed<TYPED>;
           { wait(typed)() } -> convertible_to<result::Value<RETURNED,io::Siginfo>>;
           { wait(typed, options)() } -> convertible_to<result::Value<RETURNED,io::Siginfo>>;
           { wait(typed, options)(ofnigis) } -> convertible_to<result::Value<RETURNED>>;
         };
-        template<typename RETURNED, typename TYPED, typename UNTYPED> concept bool Waitid = requires(RETURNED, TYPED, UNTYPED) {
+        template<typename RETURNED, typename TYPED, typename UNTYPED> concept Waitid = requires(RETURNED, TYPED, UNTYPED) {
           requires required::Returned<RETURNED>;
           requires Untyped<RETURNED, UNTYPED>;
           requires Typed<RETURNED, TYPED>;
@@ -181,13 +181,13 @@ namespace tests::usage::posix_wait {
       }
       using waitid_variant::Waitid;
     }
-    template<typename RETURNED, typename MATCHED> concept bool Matched = requires(RETURNED, MATCHED) {
+    template<typename RETURNED, typename MATCHED> concept Matched = requires(RETURNED, MATCHED) {
       requires required::Returned<RETURNED>;
       requires required::Matched<MATCHED>
       requires Waitpid<RETURNED, MATCHED>;
       requires Wait4<RETURNED, MATCHED>;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires disambiguate_native::Any<pid_t>;
       requires disambiguate_function::Any<sys::id::Process>;

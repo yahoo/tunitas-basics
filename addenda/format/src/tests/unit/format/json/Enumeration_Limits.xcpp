@@ -8,12 +8,12 @@ namespace tests::unit::format::json {
 #divert <hpp>
 #import std.size_t
 namespace tests::unit::format::json::required {
-  template<typename ENUMERATION> concept bool Enumeration_Limits = requires(ENUMERATION enumeration) {
+  template<typename ENUMERATION> concept Enumeration_Limits = requires(ENUMERATION enumeration) {
     typename json::Enumeration_Limits<ENUMERATION>::type; 
-    { json::Enumeration_Limits<ENUMERATION>::min() } -> std::size_t;
-    { json::Enumeration_Limits<ENUMERATION>::max() } -> std::size_t;
-    { json::Enumeration_Limits<ENUMERATION>::size() } -> std::size_t;
-    { json::Enumeration_Limits<ENUMERATION>::index(enumeration) } -> std::size_t;
+    { json::Enumeration_Limits<ENUMERATION>::min() } -> convertible_to<std::size_t>;
+    { json::Enumeration_Limits<ENUMERATION>::max() } -> convertible_to<std::size_t>;
+    { json::Enumeration_Limits<ENUMERATION>::size() } -> convertible_to<std::size_t>;
+    { json::Enumeration_Limits<ENUMERATION>::index(enumeration) } -> convertible_to<std::size_t>;
   };
 }
 #endiv

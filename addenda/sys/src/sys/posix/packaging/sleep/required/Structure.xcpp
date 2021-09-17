@@ -6,7 +6,7 @@ namespace sys::posix::packaging::sleep::required {
   //
   // Is this type one of the old-line POSIX time structures?
   //
-  template<typename TYPE> concept bool POSIX_Time_Structure = same_as<TYPE, time::Old> || same_as<TYPE, time::Val> || same_as<TYPE, time::Spec>;
-  template<typename TYPE> concept bool Structure = POSIX_Time_Structure<TYPE>;
+  template<typename TYPE> concept POSIX_Time_Structure = same_as<TYPE, time::Old> || same_as<TYPE, time::Val> || same_as<TYPE, time::Spec>;
+  template<typename TYPE> concept Structure = POSIX_Time_Structure<TYPE>;
 }
 #endiv

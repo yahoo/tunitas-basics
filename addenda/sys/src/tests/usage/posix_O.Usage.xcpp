@@ -18,7 +18,7 @@ namespace tests::usage::posix_O {
   using sys::posix::O;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename O> concept bool Instance = requires(O) {
+    template<typename O> concept Instance = requires(O) {
       typename O::Access;
       typename O::Accesses;
       typename O::Create;
@@ -69,69 +69,69 @@ namespace tests::usage::posix_O {
       requires (int)O::NDELAY == O_NDELAY;
       requires requires(O, typename O::Access ess, typename O::Accesses ses) {
 #if 202003L < __cplusplus
+        { O::template as<typename O::Access>(convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(convertible_to<typename O::Accesses>;
+        { O::template as<typename O::Access>(convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(convertible_to<typename O::Accesses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Access>(ess) } -> convertible_to<typename O::Access>;
         { O::template as<typename O::Accesses>(ess) } -> convertible_to<typename O::Accesses>;
         { O::template as<typename O::Access>(ses) } -> convertible_to<typename O::Access>;
         { O::template as<typename O::Accesses>(ses) } -> convertible_to<typename O::Accesses>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { O::template as<typename O::Access>(ess) } -> typename O::Access;
-        { O::template as<typename O::Accesses>(ess) } -> typename O::Accesses;
-        { O::template as<typename O::Access>(ses) } -> typename O::Access;
-        { O::template as<typename O::Accesses>(ses) } -> typename O::Accesses;
 #endif
       };
       requires requires(O, typename O::Create ate, typename O::Create tes) {
 #if 202003L < __cplusplus
+        { O::template as<typename O::Create>(convertible_to<typename O::Create>;
+        { O::template as<typename O::Creates>(convertible_to<typename O::Creates>;
+        { O::template as<typename O::Create>(convertible_to<typename O::Create>;
+        { O::template as<typename O::Creates>(convertible_to<typename O::Creates>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Create>(ate) } -> convertible_to<typename O::Create>;
         { O::template as<typename O::Creates>(ate) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Create>(tes) } -> convertible_to<typename O::Create>;
         { O::template as<typename O::Creates>(tes) } -> convertible_to<typename O::Creates>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { O::template as<typename O::Create>(ate) } -> typename O::Create;
-        { O::template as<typename O::Creates>(ate) } -> typename O::Creates;
-        { O::template as<typename O::Create>(tes) } -> typename O::Create;
-        { O::template as<typename O::Creates>(tes) } -> typename O::Creates;
 #endif
       };
       requires requires(O, typename O::Status tus, typename O::Statuses ses) {
 #if 202003L < __cplusplus
+        { O::template as<typename O::Status>(convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(convertible_to<typename O::Statuses>;
+        { O::template as<typename O::Status>(convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(convertible_to<typename O::Statuses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Status>(tus) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(tus) } -> convertible_to<typename O::Statuses>;
         { O::template as<typename O::Status>(ses) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(ses) } -> convertible_to<typename O::Statuses>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { O::template as<typename O::Status>(tus) } -> typename O::Status;
-        { O::template as<typename O::Statuses>(tus) } -> typename O::Statuses;
-        { O::template as<typename O::Status>(ses) } -> typename O::Status;
-        { O::template as<typename O::Statuses>(ses) } -> typename O::Statuses;
 #endif
       };
       requires requires(O, typename O::Flags ags) {
 #if 202003L < __cplusplus
+        { O::template as<typename O::Access>(convertible_to<typename O::Access>;
+        { O::template as<typename O::Accesses>(convertible_to<typename O::Accesses>;
+        { O::template as<typename O::Create>(convertible_to<typename O::Creates>;
+        { O::template as<typename O::Creates>(convertible_to<typename O::Creates>;
+        { O::template as<typename O::Status>(convertible_to<typename O::Status>;
+        { O::template as<typename O::Statuses>(convertible_to<typename O::Statuses>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Access>(ags) } -> convertible_to<typename O::Access>;
+#if 0
         { O::template as<typename O::Accesses>(ags) } -> convertible_to<typename O::Accesses>;
         { O::template as<typename O::Create>(ags) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Creates>(ags) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Status>(ags) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(ags) } -> convertible_to<typename O::Statuses>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { O::template as<typename O::Access>(ags) } -> typename O::Access;
-#if 0
-        { O::template as<typename O::Accesses>(ags) } -> typename O::Accesses;
-        { O::template as<typename O::Create>(ags) } -> typename O::Creates;
-        { O::template as<typename O::Creates>(ags) } -> typename O::Creates;
-        { O::template as<typename O::Status>(ags) } -> typename O::Status;
-        { O::template as<typename O::Statuses>(ags) } -> typename O::Statuses;
 #endif
         requires true;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<O>;
     };

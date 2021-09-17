@@ -14,6 +14,6 @@ namespace sys::f::required {
   //
   //   template<required::Seals RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename SEALS> concept bool Seals = std::is_same_v<SEALS, f::Seals> || std::is_same_v<SEALS, f::Seal>;
+  template<typename SEALS> concept Seals = std::is_same_v<SEALS, f::Seals> || std::is_same_v<SEALS, f::Seal>;
 }
 #endiv

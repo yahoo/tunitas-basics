@@ -14,7 +14,7 @@ namespace sys::posix {
   //   F::GETFD            f::Function
   //   F::OWNER::TID       f::Owner
   //   F::SEAL::GROW       f::Seal       also f::Seals, a.k.a. flagset::Container<f::Seal...etc...>
- //
+  //
   struct F;
 }
 #endiv

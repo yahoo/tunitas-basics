@@ -55,7 +55,7 @@ namespace sys {
     namespace {
       // Because the "-dir" suffix is amusing to the legacy C-language interface
       auto rewinddir(DIR *d) -> void {
-         rewind(d);
+        rewind(d);
       }
       auto seekdir(DIR *d, off_t o) -> void {
         seek(d, o);

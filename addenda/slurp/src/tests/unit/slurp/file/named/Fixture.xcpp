@@ -87,10 +87,10 @@ auto tests::unit::slurp::file::named::Fixture::suite() -> cppunit::Test * {
     << call("something", &Fixture::test_slurp_something)
     << call("throwable", &Fixture::test_throwable)
     << call("returnable", &Fixture::test_returnable)
-    << add(Result_syscall::suite())
-    << add(Result::suite())
-    << add(Returning::suite())
-    << add(Throwing::suite())
+    << add<Result_syscall>()
+    << add<Result>()
+    << add<Returning>()
+    << add<Throwing>()
     ;
   return s.release();
 }

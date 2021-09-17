@@ -18,7 +18,7 @@ namespace sys::entry::required {
   //   ::passwd *result{nullptr};
   //   int got = ::getpwuid_r(...some_uid..., ptr->entry(), ptr->data(), ptr->size(), &result);
   //
-  template<typename ENTRY> concept bool Entry = (std::is_same<ENTRY, ::passwd>::value ||
-						 std::is_same<ENTRY, ::group>::value);
+  template<typename ENTRY> concept Entry = (std::is_same<ENTRY, ::passwd>::value ||
+                                            std::is_same<ENTRY, ::group>::value);
 }
 #endiv

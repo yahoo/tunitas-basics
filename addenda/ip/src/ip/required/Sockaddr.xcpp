@@ -13,11 +13,11 @@ namespace ip::required {
   //
   //   template<required::Sockaddr> struct Thing;
   //
-  template<typename SOCKADDR> concept bool Sockaddr = want::nonstd::required::Among<SOCKADDR, in4::sockaddr, in6::sockaddr>;
+  template<typename SOCKADDR> concept Sockaddr = want::nonstd::required::Among<SOCKADDR, in4::sockaddr, in6::sockaddr>;
   namespace constable {
-    template<typename SOCKADDR> concept bool Sockaddr4 = want::nonstd::required::Among<SOCKADDR, in4::sockaddr, in4::sockaddr const>;
-    template<typename SOCKADDR> concept bool Sockaddr6 = want::nonstd::required::Among<SOCKADDR, in6::sockaddr, in6::sockaddr const>;
-    template<typename SOCKADDR> concept bool Sockaddr = required::Sockaddr<typename std::remove_const<SOCKADDR>::type>;
+    template<typename SOCKADDR> concept Sockaddr4 = want::nonstd::required::Among<SOCKADDR, in4::sockaddr, in4::sockaddr const>;
+    template<typename SOCKADDR> concept Sockaddr6 = want::nonstd::required::Among<SOCKADDR, in6::sockaddr, in6::sockaddr const>;
+    template<typename SOCKADDR> concept Sockaddr = required::Sockaddr<typename std::remove_const<SOCKADDR>::type>;
   }
 }
 #endiv

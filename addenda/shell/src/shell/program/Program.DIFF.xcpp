@@ -34,6 +34,6 @@ namespace shell::program {
     : Ancestor{EXECP, "diff"} {
     args.push_back(move(file1));
     args.push_back(move(file2));
- }
+  }
 }
 #endiv

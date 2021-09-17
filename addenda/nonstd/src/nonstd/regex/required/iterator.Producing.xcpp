@@ -7,8 +7,8 @@ namespace nonstd::regex::required::iterator {
   // An input iterator that produces a specific sort of value
   // [[FIXTHIS]] when the nonstd::required::iterator::Producing<ITERATOR, RESULT> is defined, then use that.
   //
-  template<typename ITERATOR, typename RESULT> concept bool Producing = Input<ITERATOR> && requires(ITERATOR iterator) {
-    { *iterator } -> RESULT;
+  template<typename ITERATOR, typename RESULT> concept Producing = Input<ITERATOR> && requires(ITERATOR iterator) {
+    { *iterator } -> convertible_to<RESULT>;
   };
 }
 #endiv

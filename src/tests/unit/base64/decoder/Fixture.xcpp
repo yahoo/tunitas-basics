@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -7,8 +7,6 @@
 namespace tests::unit::base64::decoder { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::base64::decoder::Fixture : public cppunit::test::Fixture {
 public:
   auto test_01() -> void;
@@ -116,7 +114,6 @@ auto Fixture::test_01() -> void {
 }
 #import tests.unit.UNREACHABLE
 #import tunitas.base64.Exception
-#import cppunit.Exception
 auto Fixture::test_02() -> void {
   // https://tools.ietf.org/html/rfc4648#page-7
   try {
@@ -132,7 +129,6 @@ auto Fixture::test_02() -> void {
 #import std.islower
 #import std.isdigit
 #import std.exception
-#import cppunit.Exception
 auto Fixture::test_03() -> void {
   // https://tools.ietf.org/html/rfc4648#page-7
   for (int i(-512), e(512); e != i; ++i) {
@@ -277,7 +273,6 @@ auto Fixture::test_14() -> void {
   CPPUNIT_ASSERT(expected == actual);
 }
 #import tests.unit.UNREACHABLE
-#import cppunit.Exception
 #import tunitas.base64.decoder.Underflow
 auto Fixture::test_15() -> void {
   try {
@@ -352,11 +347,8 @@ auto Fixture::test_17() -> void {
   }
   __REACHABLE__;
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::decoder::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("Decoder");
   series << call("01", &Fixture::test_01)
 	 << call("02", &Fixture::test_02)
@@ -375,6 +367,6 @@ auto tests::unit::base64::decoder::Fixture::suite() -> cppunit::Test * {
 	 << call("16", &Fixture::test_16)
 	 << call("17", &Fixture::test_17)
       ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

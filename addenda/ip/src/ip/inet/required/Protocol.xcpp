@@ -11,6 +11,6 @@ namespace ip::inet::required {
   //
   //   template<required::Protocol> struct Thing;
   //
-  template<typename PROTOCOL> concept bool Protocol = std::is_same<PROTOCOL, inet::Protocol>::value;
+  template<typename PROTOCOL> concept Protocol = std::is_same<PROTOCOL, inet::Protocol>::value;
 }
 #endiv

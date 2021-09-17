@@ -19,7 +19,7 @@ namespace sys::time::required {
     // blik.
     //
     static_assert(std::is_same<sys::time::clock::base, std::chrono::system_clock>::value);
-    template<typename TIME> concept bool Point_Reasonable_Scalings =
+    template<typename TIME> concept Point_Reasonable_Scalings =
       (std::is_same<TIME, time::point>::value ||
        std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::atto>>>::value ||
        std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::femto>>>::value ||
@@ -44,7 +44,7 @@ namespace sys::time::required {
        std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::peta>>>::value ||
        std::is_same<TIME, time::points::base<time::clock::base, time::durations::base<time::point::duration::rep, std::exa>>>::value);
   }
-  template<typename TIME> concept bool Time =
+  template<typename TIME> concept Time =
     (detail::Point_Reasonable_Scalings<TIME> ||
      std::is_same<TIME, time::spec>::value ||
      std::is_same<TIME, time::t>::value ||

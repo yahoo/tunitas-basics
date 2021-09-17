@@ -7,7 +7,7 @@
 #import std.is_copy_assignable
 #import std.is_move_assignable
 namespace tests::unit::assertion {
-  template<typename TYPE> concept bool Is_Default_Constructible_Movable_Uncopyable = 
+  template<typename TYPE> concept Is_Default_Constructible_Movable_Uncopyable = 
     (std::is_default_constructible<TYPE>::value &&
      std::is_move_constructible<TYPE>::value &&
      !std::is_copy_constructible<TYPE>::value &&

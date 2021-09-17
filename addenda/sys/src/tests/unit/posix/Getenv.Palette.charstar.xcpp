@@ -19,7 +19,7 @@ public:
 namespace tests::unit::posix {
   Getenv::Palette<char *>::Palette(char const *literal)
     : ancestor{literal}
-    { }
+  { }
   auto Getenv::Palette<char *>::get() -> Argument {
     return &buffer[0];
   }

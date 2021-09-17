@@ -129,10 +129,10 @@ auto tests::unit::error::Fixture::suite() -> cppunit::Test * {
   s << call("message_string", &Fixture::test_message_string)
     << call("message_wstring", &Fixture::test_message_wstring)
     << call("string", &Fixture::test_string)
-    << add(Category::suite())
-    << add(Code::suite())
-    << add(Condition::suite())
-    << add(Source::suite())
+    << add<Category>()
+    << add<Code>()
+    << add<Condition>()
+    << add<Source>()
     ;
   return s.release();
 }

@@ -15,7 +15,7 @@ namespace sys::posix::packaging::wait::required::identifier {
   //
   //   template<required::identifier::Matched MATCHED, required::identifier::Returned RETURNED> auto wait(MATCHED) -> Output<WAITPID, MATCHED, RETURNED>;
   //
-  template<typename PROCESS> concept bool Unmatched = Matched<PROCESS> || std::is_same_v<PROCESS, packaging::wait::continuation::Unmatched>;
+  template<typename PROCESS> concept Unmatched = Matched<PROCESS> || std::is_same_v<PROCESS, packaging::wait::continuation::Unmatched>;
 }
 #endiv
 #divert <cpp>

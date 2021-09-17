@@ -77,13 +77,13 @@ auto tests::unit::to::String::suite() -> cppunit::Test * {
       ing << call("muting", &String::test_to_retString_argString_muting)
           << call("consty", &String::test_to_retString_argString_consty)
         ;
-      str << add(ing.release());
+      str<<< add>(in();
     }
     str << call("string", &String::test_to_retString_argstring)
         << call("char*", &String::test_to_retString_argchar_pointer)
         << call("char[]", &String::test_to_retString_argchar_array)
       ;
-    series << add(str.release());
+      series<<< add>(st();
   }
   return series.release();
 }

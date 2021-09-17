@@ -7,7 +7,7 @@ namespace nonstd::required {
   //
   // An exception is a class that derives from std::exception.
   //
-  template<typename EXCEPTION> concept bool Exception = std::is_base_of<std::exception, EXCEPTION>::value;
+  template<typename EXCEPTION> concept Exception = std::is_base_of<std::exception, EXCEPTION>::value;
 }
 #endiv
 #divert <cpp>

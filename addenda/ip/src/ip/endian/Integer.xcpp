@@ -129,7 +129,7 @@ namespace ip::endian {
   template<required::Order ORDER, required::Integer INTEGER> template<endian::required::Order REORDER> Integer<ORDER, INTEGER>::Integer(Integer<REORDER, INTEGER> const &other)
     : value((INTEGER) endian::convert<ORDER>(other)) {
     ;
-    }
+  }
 }
 namespace ip::endian {
   template<required::Order ORDER, required::Integer INTEGER> Integer<ORDER, INTEGER>::operator value_type() const {

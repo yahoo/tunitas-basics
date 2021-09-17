@@ -48,7 +48,7 @@ namespace sys::posix::packaging {
                        return {};
                      }
                    };
-      return {ok, errnum, payload()};
+    return {ok, errnum, payload()};
   }
 }
 #endiv

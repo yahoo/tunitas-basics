@@ -19,7 +19,7 @@ namespace tests::execing::quoting {
   //   cout << quote(argv) << '\n';
   //
   namespace required {
-    template<typename CONTAINER> concept bool Container = nonstd::required::container::Holding<CONTAINER, std::string>;
+    template<typename CONTAINER> concept Container = nonstd::required::container::Holding<CONTAINER, std::string>;
   }
   template<required::Container CONTAINER> class Formatter;
   namespace detail {
@@ -48,9 +48,9 @@ namespace tests::execing {
 namespace tests::execing {
   template<quoting::required::Container CONTAINER> inline auto quoting::operator<<(std::ostream &o, Formatter<CONTAINER> const &f) -> std::ostream & {
     if constexpr (false) {
-      // this is cute but not give the quote effect surrounding each word after the first
-      std::copy(f.value.begin(), f.value.end(), std::make_ostream_joiner(o, ' '));
-    } else {
+        // this is cute but not give the quote effect surrounding each word after the first
+        std::copy(f.value.begin(), f.value.end(), std::make_ostream_joiner(o, ' '));
+      } else {
       auto i = f.value.begin();
       auto const e = f.value.end();
       if (e != i) {

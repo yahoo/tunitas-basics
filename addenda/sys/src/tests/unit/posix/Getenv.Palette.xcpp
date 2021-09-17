@@ -20,7 +20,7 @@ protected:
 namespace tests::unit::posix {
   template<typename _> Getenv::Palette<_>::Palette(char const *literal)
     : saved{literal}
-    { }
+  { }
   template<typename _> auto Getenv::Palette<_>::get() -> Argument {
     return saved;
   }

@@ -135,10 +135,10 @@ auto tests::unit::api::dispatch::Fixture::suite() -> cppunit::Test * {
     << call("wstring", &Fixture::test_wstring)
     << call("vector_char", &Fixture::test_vector_char)
     << call("Zeroblob", &Fixture::test_Zeroblob)
-    << add(Bind::suite())
-    << add(Column::suite())
-    << add(Parameter::suite())
-    << add(Result::suite())
+    << add<Bind>()
+    << add<Column>()
+    << add<Parameter>()
+    << add<Result>()
     ;
   return s.release();
 }

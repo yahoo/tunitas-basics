@@ -16,6 +16,6 @@ namespace sys::time::required {
   //   As template argument:
   //     template<required::Char CHAR, required::Char_Traits<CHAR> TRAITS> struct Something;
   //
-  template<typename TRAITS, typename CHAR> concept bool Char_Traits = Char<CHAR> && std::is_same<TRAITS, std::char_traits<CHAR>>::value;
+  template<typename TRAITS, typename CHAR> concept Char_Traits = Char<CHAR> && std::is_same<TRAITS, std::char_traits<CHAR>>::value;
 }
 #endiv

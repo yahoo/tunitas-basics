@@ -8,6 +8,6 @@ namespace sys::required {
   // Current usage is fd::Managed or fd::Unmanaged
   // A managed file descriptor is a different animal.  It is sys::fd::Managed
   //
-  template<typename NATIVE> [[deprecated("prefer sys::fd::required::Unmanaged<NATIVE>")]] concept bool Descriptor = fd::required::Unmanaged<NATIVE>;
+  template<typename NATIVE> [[deprecated("prefer sys::fd::required::Unmanaged<NATIVE>")]] concept Descriptor = fd::required::Unmanaged<NATIVE>;
 }
 #endiv

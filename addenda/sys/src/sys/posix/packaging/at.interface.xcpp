@@ -36,13 +36,13 @@ namespace sys::posix::packaging::at::interface {
   //   }
   //
   inline namespace argument {
-    // The extra namespace packaging is needed so that the names herein can be referenced conveniently on-site; c.f. fchownat(...)
-    // Also, the 'Flags' word is generic and multiply used; reserve it for the namepace at flags
-    using sys::at::Flags;
-    using Opening = sys::o::Flags;
-    template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
-    using call::argument::Pathname;
-    using call::argument::Permissions;
+           // The extra namespace packaging is needed so that the names herein can be referenced conveniently on-site; c.f. fchownat(...)
+           // Also, the 'Flags' word is generic and multiply used; reserve it for the namepace at flags
+           using sys::at::Flags;
+           using Opening = sys::o::Flags;
+           template<required::Descriptor NATIVE> using Position = sys::at::position::Position<NATIVE>;
+           using call::argument::Pathname;
+           using call::argument::Permissions;
   }
   using sys::ok::Access;
   using oMode [[deprecated("prefer the precise form Opening")]] = Opening;

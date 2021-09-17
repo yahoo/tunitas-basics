@@ -14,11 +14,11 @@ namespace format::required {
   //
   // A Stringlike and a Container are different because of data()
   //
-  template<typename STRINGLIKE> concept bool Stringlike = requires(STRINGLIKE stringlike, std::ostream &outbound) {
+  template<typename STRINGLIKE> concept Stringlike = requires(STRINGLIKE stringlike, std::ostream &outbound) {
     typename STRINGLIKE::value_type;
     requires Character<typename STRINGLIKE::value_type>;
-    { stringlike.data() } -> typename STRINGLIKE::value_type const *; // maybe NOT '\0'-terminated
-    { stringlike.empty() } -> bool;
+    { stringlike.data() } -> convertible_to<typename STRINGLIKE::value_type const *>; // maybe NOT '\0'-terminated
+    { stringlike.empty() } -> convertible_to<bool>;
     { outbound << stringlike };
   };
 }

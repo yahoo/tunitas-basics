@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright 2019, Oath Inc.; Copyright 2020, Verizon Media
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -21,7 +21,7 @@ namespace tunitas::server::required {
     using microhttpd::rest::Transport;
     using microhttpd::method::Permissions;
     using nonstd::same_as;
-    template<typename RESOURCEFUL> concept bool Resourceful = requires(RESOURCEFUL resourceful, Request request, std::string name, bool value) {
+    template<typename RESOURCEFUL> concept Resourceful = requires(RESOURCEFUL resourceful, Request request, std::string name, bool value) {
       { resourceful.otherwise(request) } -> same_as<Transport>;
       { resourceful.CONNECT(request) } -> same_as<Transport>;
       { resourceful.DELETE(request) } -> same_as<Transport>;
@@ -31,7 +31,7 @@ namespace tunitas::server::required {
       { resourceful.POST(request) } -> same_as<Transport>;
       { resourceful.PUT(request) } -> same_as<Transport>;
       { resourceful.TRACE(request) } -> same_as<Transport>;
-      { resourceful.permissions } -> same_as<Permissions>;
+      { resourceful.permissions } -> convertible_to<Permissions>;
       { resourceful.permissions.is_allowed(name) } -> same_as<bool>;
     };
   }

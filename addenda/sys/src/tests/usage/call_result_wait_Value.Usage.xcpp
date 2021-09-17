@@ -44,7 +44,7 @@ namespace tests::usage::call_result_wait_Value {
     using namespace nonstd;
     namespace [[detail]] result {
       namespace required = sys::call::result::required;
-      template<typename RESULT, typename PROCESS> concept bool Process_Series = requires(RESULT result, bool good, int error, PROCESS ssecorp) {
+      template<typename RESULT, typename PROCESS> concept Process_Series = requires(RESULT result, bool good, int error, PROCESS ssecorp) {
         //
         // wait(2) -> pid_t          but prefer call_result_wait_Value_PROCESS::Usage
         // waitpid(2) -> pid_t       but prefer call_result_wait_Value_PROCESS::Usage
@@ -62,7 +62,7 @@ namespace tests::usage::call_result_wait_Value {
         { pid(result) } -> convertible_to<PROCESS>;
         { process(result) } -> convertible_to<PROCESS>;
       };
-      template<typename RESULT, typename STATUS> concept bool Status_Series = requires(RESULT result, bool good, int error, int called) {
+      template<typename RESULT, typename STATUS> concept Status_Series = requires(RESULT result, bool good, int error, int called) {
         //
         // waitid(2) -> int       but prefer call_result_wait_Value_PROCESS_Siginfo::Usage
         //
@@ -76,13 +76,13 @@ namespace tests::usage::call_result_wait_Value {
     namespace [[detail]] {
       using sys::call::result::Element;
       using sys::call::result::Size;
-      template<typename RESULT> concept bool Instance = requires(RESULT) {
+      template<typename RESULT> concept Instance = requires(RESULT) {
         typename Element<0, RESULT>::Type;
         requires 1 <= Size<RESULT>::value;
         requires result::Process_Series<RESULT, typename Element<0, RESULT>::Type> || result::Status_Series<RESULT, typename Element<0, RESULT>::Type>;
       };
     }
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<Value<pid_t>>;
       requires Instance<Value<sys::id::Process>>;

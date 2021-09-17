@@ -10,23 +10,23 @@ namespace nonstd::required::iterator {
   //
   // Most of https://en.cppreference.com/w/cpp/named_req/ContiguousIterator
   //
-  template<typename ITERATOR> concept bool Contiguous = Random_Access<ITERATOR> && requires(ITERATOR iterator) {
+  template<typename ITERATOR> concept Contiguous = Random_Access<ITERATOR> && requires(ITERATOR iterator) {
 #if 10 <= __GNUC__
     requires is_base_of_v<contiguous_iterator_tag, typename iterator_traits<ITERATOR>::iterator_category>;
-    { iterator < iterator } -> bool;
-    { iterator <= iterator } -> bool;
-    { iterator > iterator } -> bool;
-    { iterator >= iterator } -> bool;
+    { iterator < iterator } -> convertible_to<bool>;
+    { iterator <= iterator } -> convertible_to<bool>;
+    { iterator > iterator } -> convertible_to<bool>;
+    { iterator >= iterator } -> convertible_to<bool>;
 #if 0
     requires requires(ITERATOR iterator, typename iterator_traits<ITERATOR>::difference delta) {
-      { iterator + delta } -> ITERATOR;
-      { delta + iterator } -> ITERATOR;
-      { iterator - delta } -> ITERATOR;
-      { iterator += delta } -> ITERATOR &;
-      { iterator -= delta } -> ITERATOR &;
-      { iterator - iterator } -> typename iterator_traits<ITERATOR>::difference;
-      { iterator[delta] } -> typename iterator_traits<ITERATOR>::reference;
-      { iterator[delta] = typename iterator_traits<ITERATOR>::value_type{} } ->  -> typename iterator_traits<ITERATOR>::reference;
+      { iterator + delta } -> convertible_to<ITERATOR>;
+      { delta + iterator } -> convertible_to<ITERATOR>;
+      { iterator - delta } -> convertible_to<ITERATOR>;
+      { iterator += delta } -> convertible_to<ITERATOR &>;
+      { iterator -= delta } -> convertible_to<ITERATOR &>;
+      { iterator - iterator } -> convertible_to<typename iterator_traits<ITERATOR>::difference>;
+      { iterator[delta] } -> convertible_to<typename iterator_traits<ITERATOR>::reference>;
+      { iterator[delta] = typename iterator_traits<ITERATOR>::value_type{} } -convertible_to<>  -> typename iterator_traits<ITERATOR>::reference>;
     };
 #endif
 #else

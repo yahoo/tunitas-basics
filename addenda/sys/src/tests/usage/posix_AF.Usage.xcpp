@@ -15,7 +15,7 @@
 namespace tests::usage::posix_AF {
   using sys::posix::AF;
   namespace [[detail]] packaging {
-    template<typename AF> concept bool Instance = requires(AF) {
+    template<typename AF> concept Instance = requires(AF) {
       typename AF::Address;
       requires model::Namespace_Object<AF>;
       requires (int)AF::UNSPECIFIED == AF_UNSPEC;
@@ -35,7 +35,7 @@ namespace tests::usage::posix_AF {
       requires (int)AF::INET == AF_INET;
       requires (int)AF::ALG == AF_ALG;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<AF>;
     };

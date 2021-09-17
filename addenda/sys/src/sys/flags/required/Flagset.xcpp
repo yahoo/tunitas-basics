@@ -16,6 +16,6 @@ namespace sys::flags::required {
   //
   //   template<typename FLAG, typename FLAGSET> requires required::Flagset<FLAG, FLAGSET> auto function(...somehow...) -> void;
   //
-  template<typename FLAG, typename FLAGSET> concept bool Flagset = (flagset::Class<FLAG, FLAGSET> || flagset::Enumeration<FLAG, FLAGSET> || flagset::Integral<FLAG, FLAGSET>);
+  template<typename FLAG, typename FLAGSET> concept Flagset = (flagset::Class<FLAG, FLAGSET> || flagset::Enumeration<FLAG, FLAGSET> || flagset::Integral<FLAG, FLAGSET>);
 }
 #endiv

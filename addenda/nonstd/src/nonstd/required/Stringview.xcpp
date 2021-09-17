@@ -20,12 +20,12 @@ namespace nonstd::required {
   //
   //   template<required::Stringview VIEW> auto function(VIEW const &) -> Somehow;
   //
-  template<typename CONTAINER> concept bool Stringview = requires(CONTAINER container) {
+  template<typename CONTAINER> concept Stringview = requires(CONTAINER container) {
     typename CONTAINER::iterator;
-    { container.size() } -> std::size_t;
-    { container.data() } -> char const *;
-    { container.begin() } -> typename CONTAINER::iterator;
-    { container.end() } -> typename CONTAINER::iterator;
+    { container.size() } -> convertible_to<std::size_t>;
+    { container.data() } -> convertible_to<char const *>;
+    { container.begin() } -> convertible_to<typename CONTAINER::iterator>;
+    { container.end() } -> convertible_to<typename CONTAINER::iterator>;
   };
 }
 #endiv

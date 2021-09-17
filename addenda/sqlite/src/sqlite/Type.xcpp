@@ -4,13 +4,13 @@
 #include <sqlite3.h>
 namespace sqlite {
   enum class Type
-  { UNDEFINED,
-    INTEGER = SQLITE_INTEGER,
-    FLOAT = SQLITE_FLOAT,
-    BLOB = SQLITE_BLOB,
-    SQLNULL = SQLITE_NULL, // avoid "#define NULL" from C
-    // SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not SQLITE_TEXT.
-    TEXT = SQLITE3_TEXT };
+    { UNDEFINED,
+      INTEGER = SQLITE_INTEGER,
+      FLOAT = SQLITE_FLOAT,
+      BLOB = SQLITE_BLOB,
+      SQLNULL = SQLITE_NULL, // avoid "#define NULL" from C
+      // SQLite version 2 and SQLite version 3 should use SQLITE3_TEXT, not SQLITE_TEXT.
+      TEXT = SQLITE3_TEXT };
 }
 #endiv
 #divert <hpp>

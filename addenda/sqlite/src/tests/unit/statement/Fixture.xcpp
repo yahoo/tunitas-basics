@@ -479,8 +479,8 @@ auto tests::unit::statement::Fixture::suite() -> cppunit::Test * {
     << call("column_count", &Fixture::test_column_count)
     << call("column", &Fixture::test_column)
     << call("type", &Fixture::test_type)
-    << add(Statement::suite())
-    << add(Shell::suite())
+    << add<Statement>()
+    << add<Shell>()
     ;
   return s.release();
 }

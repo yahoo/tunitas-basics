@@ -9,8 +9,8 @@ namespace rigging::required {
   // A test fixture just has one job...
   // It builds up a test with a named static member function.
   //
-  template<typename FIXTURE> concept bool Fixture = requires(FIXTURE fixture) {
-    { FIXTURE::suite() } -> cppunit::Test *;
+  template<typename FIXTURE> concept Fixture = requires(FIXTURE fixture) {
+    { FIXTURE::suite() } -> convertible_to<cppunit::Test *>;
   };
 }
 #endiv

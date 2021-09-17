@@ -27,7 +27,7 @@ namespace sys::posix::packaging::getenv {
 #divert <ipp>
 namespace sys::posix::packaging::getenv {
 #if 10 == __GNUC__ && 0 == __GNUC_MINOR__ && 1 == __GNUC_PATCHLEVEL__
-// viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
+  // viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
 #warning gcc 1.0.1 (cxx-modules) the specialization definitions of sys::posix::packaging::getenv::perform<...>(...) are not available
 #else
   template<> auto perform<c::basic_stringn<char>>(Name a, std::function<char * (char const *)> f) -> Result<c::basic_stringn<char>> {

@@ -18,7 +18,7 @@ namespace tests::usage::posix_MSG {
   using sys::posix::MSG;
   namespace [[detail]] packaging {
     using nonstd::convertible_to;
-    template<typename MSG> concept bool Instance = requires(MSG) {
+    template<typename MSG> concept Instance = requires(MSG) {
       typename MSG::Flag;
       typename MSG::Flags;
       requires model::Namespace_Object<MSG>;
@@ -54,20 +54,20 @@ namespace tests::usage::posix_MSG {
       requires (int)MSG::TRUNC == MSG_TRUNC;
       requires requires(MSG, typename MSG::Flag lag, typename MSG::Flags ags) {
 #if 202003L < __cplusplus
+        { MSG::template as<typename MSG::Flag>(convertible_to<typename MSG::Flag>;
+        { MSG::template as<typename MSG::Flags>(convertible_to<typename MSG::Flags>;
+        { MSG::template as<typename MSG::Flag>(convertible_to<typename MSG::Flag>;
+        { MSG::template as<typename MSG::Flags>(convertible_to<typename MSG::Flags>;
+#else
+        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { MSG::template as<typename MSG::Flag>(lag) } -> convertible_to<typename MSG::Flag>;
         { MSG::template as<typename MSG::Flags>(lag) } -> convertible_to<typename MSG::Flags>;
         { MSG::template as<typename MSG::Flag>(ags) } -> convertible_to<typename MSG::Flag>;
         { MSG::template as<typename MSG::Flags>(ags) } -> convertible_to<typename MSG::Flags>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
-        { MSG::template as<typename MSG::Flag>(lag) } -> typename MSG::Flag;
-        { MSG::template as<typename MSG::Flags>(lag) } -> typename MSG::Flags;
-        { MSG::template as<typename MSG::Flag>(ags) } -> typename MSG::Flag;
-        { MSG::template as<typename MSG::Flags>(ags) } -> typename MSG::Flags;
 #endif
       };
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<MSG>;
     };

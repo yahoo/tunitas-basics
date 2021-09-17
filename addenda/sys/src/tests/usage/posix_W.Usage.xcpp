@@ -13,7 +13,7 @@
 namespace tests::usage::posix_W {
   using sys::posix::W;
   namespace [[detail]] packaging {
-    template<typename W> concept bool Instance = requires(W) {
+    template<typename W> concept Instance = requires(W) {
       typename W::Option;
       typename W::Options;
       requires model::Namespace_Object<W>;
@@ -25,7 +25,7 @@ namespace tests::usage::posix_W {
       requires (int)W::STOPPED == WSTOPPED;
       requires (int)W::UNTRACED == WUNTRACED;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<W>;
     };

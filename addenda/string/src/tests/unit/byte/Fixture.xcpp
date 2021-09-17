@@ -1,5 +1,5 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Verizon Media.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the license file at the top of this repository.
 // Also the LICENSE file at https://github.com/yahoo/tunitas-packaging/blob/master/LICENSE (as available)
@@ -60,9 +60,9 @@ auto tests::unit::byte::Fixture::suite() -> cppunit::Test * {
         << call("const_buffer", &Fixture::test_usage_const_buffer)
         << call("basic_buffer", &Fixture::test_usage_basic_buffer)
       ;
-    series << add(use.release());
+    series<<< add>(us();
   }
-  series << add(buffer::Fixture::suite())
+      series<<< add>(buffer::Fixture()
     ;
   return series.release();
 }

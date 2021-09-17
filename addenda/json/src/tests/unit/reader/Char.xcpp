@@ -86,9 +86,9 @@ auto tests::unit::reader::Char::suite() -> cppunit::Test * {
       par << call("nocomments", &Char::test_operator_call_parse_nocomments)
           << call("yescomments", &Char::test_operator_call_parse_yescomments)
         ;
-      cal << add(par.release());
+      cal<<< add>(pa();
     }
-    series << add(cal.release());
+        series<<< add>(ca();
   }
   return series.release();
 }

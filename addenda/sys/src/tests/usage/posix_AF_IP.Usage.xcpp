@@ -13,7 +13,7 @@
 namespace tests::usage::posix_AF_IP {
   using sys::posix::AF;
   namespace [[detail]] packaging {
-    template<typename IP> concept bool Instance = requires(IP) {
+    template<typename IP> concept Instance = requires(IP) {
       typename IP::Family;
       typename IP::template Address<IP::V4>;
       typename IP::template Address<IP::V6>;
@@ -25,7 +25,7 @@ namespace tests::usage::posix_AF_IP {
       requires (int)IP::INET4 == AF_INET;
       requires (int)IP::INET6 == AF_INET6;
     };
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<AF::IP>;
     };

@@ -33,7 +33,7 @@ namespace tests::usage::call_result_wait_Value_PROCESS_Status_Usages {
       }
       using sys::wait::Status;
       using sys::r::Usages;
-      template<typename RESULT, typename PROCESS, typename STATUS, typename USAGES> concept bool Process_Status_Usages = requires(RESULT result, bool good, error_t error, PROCESS ssecorp, STATUS sutats, USAGES segasu) {
+      template<typename RESULT, typename PROCESS, typename STATUS, typename USAGES> concept Process_Status_Usages = requires(RESULT result, bool good, error_t error, PROCESS ssecorp, STATUS sutats, USAGES segasu) {
         requires required::Wait<PROCESS, STATUS, USAGES>;
         requires call_result_Value::Scenario<RESULT>;
         requires required::Process<PROCESS>
@@ -51,12 +51,12 @@ namespace tests::usage::call_result_wait_Value_PROCESS_Status_Usages {
     namespace [[detail]] {
       using sys::call::result::Element;
       using sys::call::result::Size;
-      template<typename RESULT> concept bool Instance = requires(RESULT) {
+      template<typename RESULT> concept Instance = requires(RESULT) {
         requires 3 == Size<RESULT>::value;
         requires result::Process_Status_Usages<RESULT, typename Element<0, RESULT>::Type, typename Element<1, RESULT>::Type, typename Element<2, RESULT>::Type>;
       };
     }
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<Value<pid_t>>;
       requires Instance<Value<sys::id::Process>>;

@@ -14,7 +14,7 @@ namespace sys::o::required {
   //
   //   template<required::Accesses RESULT> inline auto function(...somehow...) -> RESULT;
   //
-  template<typename ACCESSES> concept bool Accesses = std::is_same_v<ACCESSES, o::Accesses> || std::is_same_v<ACCESSES, o::Access>;
+  template<typename ACCESSES> concept Accesses = std::is_same_v<ACCESSES, o::Accesses> || std::is_same_v<ACCESSES, o::Access>;
 }
 #endiv
 #divert <cpp>

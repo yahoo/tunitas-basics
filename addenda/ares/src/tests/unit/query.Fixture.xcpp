@@ -33,7 +33,7 @@ protected:
 #import tests.unit.query.Fixture.State
 #endiv
 #divert <cpp>
-std::string const tests::unit::query::Fixture::SPECIMEN_FQDN{"www.verizonmedia.com."};
+std::string const tests::unit::query::Fixture::SPECIMEN_FQDN{"www.yahooinc.com."};
 #import std.make_unique
 #import ares.channel.option.Blob
 #import ares.channel.option.Set

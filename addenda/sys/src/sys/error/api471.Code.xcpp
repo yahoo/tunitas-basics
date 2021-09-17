@@ -47,16 +47,16 @@ namespace sys::error::api471 {
 namespace sys::error::api471 {
   // Recover the per-thread global variable 'errno'
   // Like the macro 'errno' but namespace-qualified.
-   [[deprecated("AVOID")]] inline auto code() -> Code;
+  [[deprecated("AVOID")]] inline auto code() -> Code;
   // Construction of a Code from an error_t (errno integer code).
   // Not simply the constructor to make it obvious the reinterpretation of the integer as the sys::error::E::Code enum
   // Also because it is not a constructor, it can be used in templates as a function object
-   [[deprecated("AVOID")]] inline auto code(int errno_type_number) -> Code;
+  [[deprecated("AVOID")]] inline auto code(int errno_type_number) -> Code;
   // Categorization
-   [[deprecated("AVOID")]] inline auto ok(Code const &) -> bool;
-   [[deprecated("AVOID")]] inline auto failure(Code const &) -> bool;
-   [[deprecated("AVOID")]] inline auto operator==(Code const &, Code const &) -> bool;
-   [[deprecated("AVOID")]] inline auto operator!=(Code const &, Code const &) -> bool;
+  [[deprecated("AVOID")]] inline auto ok(Code const &) -> bool;
+  [[deprecated("AVOID")]] inline auto failure(Code const &) -> bool;
+  [[deprecated("AVOID")]] inline auto operator==(Code const &, Code const &) -> bool;
+  [[deprecated("AVOID")]] inline auto operator!=(Code const &, Code const &) -> bool;
   template<nonstd::required::Character CHAR, nonstd::required::Character_Traits TRAITS>  [[deprecated("AVOID")]] inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Code const &) -> std::basic_ostream<CHAR, TRAITS> &;
 }
 class sys::error::api471::Code {

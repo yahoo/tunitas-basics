@@ -1,5 +1,5 @@
 # This is a GNU -*- Makefile -*- which is managed by automake.
-# Copyright 2018, 2019, Oath Inc.; Copyright 2020, Verizon Media
+# Copyright Yahoo Inc, 2021.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -20,6 +20,7 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
+  $(module_format_prefix) \
   $(module_ip_prefix) \
   $(module_nonstd_prefix) \
   $(module_options_prefix) \

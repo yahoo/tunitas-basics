@@ -8,7 +8,7 @@ namespace format::required {
   //
   // A std::char_traits<C> as suitable for a std::basic_stream<CHAR, TRAITS>
   //
-  template<typename TRAITS> concept bool Character_Traits = requires(TRAITS traits) {
+  template<typename TRAITS> concept Character_Traits = requires(TRAITS traits) {
     typename TRAITS::char_type;
     requires Character<typename TRAITS::char_type>;
     requires std::is_same<TRAITS, std::char_traits<typename TRAITS::char_type>>::value;

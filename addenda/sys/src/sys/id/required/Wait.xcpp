@@ -3,7 +3,7 @@
 #divert <fpp>
 #import sys.id.required.wait.Untyped
 namespace sys::id::required {
-  template<typename ID> concept bool Wait = wait::Untyped<ID>;
+  template<typename ID> concept Wait = wait::Untyped<ID>;
 }
 #endiv
 #divert <cpp>

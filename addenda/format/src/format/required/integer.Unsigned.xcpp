@@ -7,7 +7,7 @@ namespace format::required::integer {
   //
   // What constitutes an unsigned integer?
   //
-  template<typename INTEGER> concept bool Unsigned = nonstd::is_unsigned<INTEGER>::value;
+  template<typename INTEGER> concept Unsigned = nonstd::is_unsigned<INTEGER>::value;
 }
 #endiv
 #divert <cpp>

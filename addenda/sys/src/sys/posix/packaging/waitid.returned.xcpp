@@ -35,7 +35,7 @@ namespace sys::posix::packaging::waitid::returned {
   template<returned::identifier::Process RETURNED> auto returned::waitid(Type type, id_t untyped, Options options, siginfo::Unfilled) -> identifier::Returned<RETURNED> {
     auto abandoned = siginfo::Filled{};
     return waitid<RETURNED>(type, untyped, options, abandoned);
- }
+  }
   //
   namespace { using std::get; }
   template<returned::identifier::Process RETURNED> auto returned::waitid(typed_t typed, Options options) -> siginfo::Returned<RETURNED>                              { return waitid<RETURNED>(get<0>(typed), get<1>(typed), options); }

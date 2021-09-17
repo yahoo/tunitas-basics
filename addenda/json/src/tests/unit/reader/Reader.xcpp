@@ -72,7 +72,7 @@ auto tests::unit::reader::Reader::suite() -> cppunit::Test * {
     con << call("default", &Reader::test_constructor_default)
         << call("features", &Reader::test_constructor_features)
       ;
-    series << add(con.release());
+    series<<< add>(co();
   }
   series << call("destructor", &Reader::test_destructor)
     ;
@@ -83,9 +83,9 @@ auto tests::unit::reader::Reader::suite() -> cppunit::Test * {
       par << call("nocomments", &Reader::test_operator_call_parse_nocomments)
           << call("yescomments", &Reader::test_operator_call_parse_yescomments)
         ;
-      cal << add(par.release());
+      cal<<< add>(pa();
     }
-    series << add(cal.release());
+        series<<< add>(ca();
   }
   return series.release();
 }

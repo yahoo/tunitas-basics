@@ -16,7 +16,7 @@ namespace tests::usage::posix_EX {
     namespace ex = sys::ex; // sys::ex::constants and sys::exits::constants are the same thing
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    template<typename EX> concept bool Instance = requires(EX) {
+    template<typename EX> concept Instance = requires(EX) {
       typename EX::Code;
       requires model::Namespace_Object<EX>;
       requires (int)EX::OK == EX_OK;
@@ -49,7 +49,7 @@ namespace tests::usage::posix_EX {
       requires (int)EX::NOCOMMAND == ex::NOCOMMAND;
     };
 #pragma GCC diagnostic pop
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<EX>;
     };

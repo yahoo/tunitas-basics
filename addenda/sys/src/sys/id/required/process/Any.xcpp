@@ -14,10 +14,10 @@ namespace sys::id::required::process {
   namespace any {
     using namespace std;
     namespace id = sys::id::process;
-    template<typename ANY> concept bool Variant = is_same_v<ANY, id::Any>;
-    template<typename ANY> concept bool Subspace = (is_same_v<ANY, id::Process> || is_same_v<ANY, id::Group> || is_same_v<ANY, id::Thread>);
-    template<typename ANY> concept bool Combined = Variant<ANY> || Subspace<ANY>;
+    template<typename ANY> concept Variant = is_same_v<ANY, id::Any>;
+    template<typename ANY> concept Subspace = (is_same_v<ANY, id::Process> || is_same_v<ANY, id::Group> || is_same_v<ANY, id::Thread>);
+    template<typename ANY> concept Combined = Variant<ANY> || Subspace<ANY>;
   }
-  template<typename ANY> concept bool Any = any::Combined<ANY>;
+  template<typename ANY> concept Any = any::Combined<ANY>;
 }
 #endiv

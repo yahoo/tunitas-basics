@@ -29,7 +29,7 @@ namespace tests::usage::call_result_wait_Value {
         using sys::id::required::Process;
         using sys::call::result::required::Wait;
       }
-      template<typename RESULT, typename PROCESS> concept bool Process = requires(RESULT result, bool good, error_t error, PROCESS ssecorp) {
+      template<typename RESULT, typename PROCESS> concept Process = requires(RESULT result, bool good, error_t error, PROCESS ssecorp) {
         requires required::Wait<PROCESS>;
         requires call_result_Value::Scenario<RESULT>;
         requires required::Process<PROCESS>;
@@ -42,12 +42,12 @@ namespace tests::usage::call_result_wait_Value {
     namespace [[detail]] {
       using sys::call::result::Element;
       using sys::call::result::Size;
-      template<typename RESULT> concept bool Instance = requires(RESULT) {
+      template<typename RESULT> concept Instance = requires(RESULT) {
         requires 2 == Size<RESULT>::value;
         requires result::Process<RESULT, typename Element<0, RESULT>::Type>;
       };
     }
-    template<typename... _> concept bool Usage = requires(_...) {
+    template<typename... _> concept Usage = requires(_...) {
       requires 0 == countof<_...>;
       requires Instance<Value<pid_t>>;
       requires Instance<Value<sys::id::Process>>;

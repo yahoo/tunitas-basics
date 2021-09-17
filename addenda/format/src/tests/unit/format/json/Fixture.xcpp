@@ -259,10 +259,10 @@ auto tests::unit::format::json::Fixture::suite() -> cppunit::Test * {
          << call("some-charcode", &Fixture::test_charcode)
          << call("some-literal", &Fixture::test_literal)
          << call("some-qq", &Fixture::test_qq)
-         << add(Charcode::suite())
-         << add(Literal::suite())
-         << add(Pair::suite())
-         << add(QuoteQuote::suite())
+         << add<Charcode>()
+         << add<Literal>()
+         << add<Pair>()
+         << add<QuoteQuote>()
          ;
   return finalize(series);
 }

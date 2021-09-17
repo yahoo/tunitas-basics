@@ -80,7 +80,7 @@ auto tests::unit::format::separator::Fixture::suite() -> cppunit::Test * {
          << call("char const *", &Fixture::test_char_const_star)
          << call("string", &Fixture::test_string)
          << call("int", &Fixture::test_int)
-         << add(State::suite())
+         << add<State>()
     ;
   return finalize(series);
 }

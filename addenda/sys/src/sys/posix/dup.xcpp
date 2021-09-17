@@ -10,7 +10,7 @@ namespace sys::posix {
       inline auto dup(File oldfd, File newfd) -> Result<File>;
       inline auto dup(File oldfd, File newfd, fd::Flags) -> Result<File>;
       inline auto dup(File oldfd, File newfd, o::Flags) -> Result<File>;
-   }
+    }
     namespace native {
       inline auto dup(int oldfd) -> Result<int>;
       inline auto dup(int oldfd, int newfd) -> Result<int>;

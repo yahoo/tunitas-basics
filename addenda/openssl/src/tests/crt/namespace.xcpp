@@ -16,8 +16,8 @@ namespace tests::crt {
 namespace tests::crt {
   auto const NAME = "crt"s;
   auto main(c::argv) -> sys::exits::Code;
- auto usage(std::ostream &, sys::exits::Code) -> sys::exits::Code;
-   namespace packaging::process::function {
+  auto usage(std::ostream &, sys::exits::Code) -> sys::exits::Code;
+  namespace packaging::process::function {
     using Filepath = std::filesystem::path;
     using Code = sys::exits::Code;
     auto process(Filepath const &ca_key, Filepath const &ca_crt, Filepath const &csr) -> Code;
