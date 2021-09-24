@@ -41,8 +41,8 @@ namespace tests::usage::posix_waitpid {
         { waitpid(matched, options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         { waitpid(matched, sutats, options) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         // and the null possibilities
-        { waitpid(matched, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-        { waitpid(matched, {}, options) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+        { waitpid(matched, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+        { waitpid(matched, {}, options) } -> convertible_to<result::Value<RETURNED>>;
       };
     }
     template<typename... _> concept Usage = requires(_...) {

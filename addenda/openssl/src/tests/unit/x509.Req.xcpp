@@ -60,7 +60,7 @@ auto tests::unit::x509::Req::test_get_pubkey() -> void {
                 ek.set_group(move(gr));
                 ek.generate_key();
                 pk.assign(move(ek));
-                return move(pk);
+                return pk;
               }();
   subject.set_pubkey(pkey);
   CPPUNIT_ASSERT(nullptr != subject.get());
@@ -79,7 +79,7 @@ auto tests::unit::x509::Req::test_set_pubkey() -> void {
                 ek.set_group(move(gr));
                 ek.generate_key();
                 pk.assign(move(ek));
-                return move(pk);
+                return pk;
               }();
   subject.set_pubkey(pkey); // <------------------------- test this
   CPPUNIT_ASSERT(nullptr != subject.get());
@@ -96,7 +96,7 @@ auto tests::unit::x509::Req::test_sign_single() -> void {
                 ek.set_group(move(gr));
                 ek.generate_key();
                 pk.assign(move(ek));
-                return move(pk);
+                return pk;
               }();
   subject.set_pubkey(pkey);
   subject.sign(pkey, EVP_sha256()); // <------------------------- test this
@@ -115,7 +115,7 @@ auto tests::unit::x509::Req::test_sign_multiple() -> void {
                   ek.set_group(move(gr));
                   ek.generate_key();
                   pk.assign(move(ek));
-                  return move(pk);
+                  return pk;
                 }();
     subject.set_pubkey(pkey);
     auto name = subject.get_subject_name();

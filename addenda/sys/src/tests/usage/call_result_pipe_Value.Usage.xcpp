@@ -35,21 +35,21 @@ namespace tests::usage::call_result_pipe_Value {
       using nonstd::convertible_to;
       // [[FIXTHIS]] just move these assertions over into call_result_Value::Scenario<RESULT>
       template<typename RESULT> concept Ancestor = requires(RESULT result) {
-    requires true;
-    { ok(result) } -> convertible_to<convertible_to<bool>>;
-    { good(result) } -> convertible_to<convertible_to<bool>>;
-    { fail(result) } -> convertible_to<convertible_to<bool>>;
-    { error_num(result) } -> convertible_to<convertible_to<error_t>>;
-    { error_code(result) } -> convertible_to<convertible_to<std::error_code>>;
-    { error_condition(result) } -> convertible_to<convertible_to<std::error_condition>>;
-    { error_message(result) } -> convertible_to<convertible_to<std::string>>;
+        requires true;
+        { ok(result) } -> convertible_to<bool>;
+        { good(result) } -> convertible_to<bool>;
+        { fail(result) } -> convertible_to<bool>;
+        { error_num(result) } -> convertible_to<error_t>;
+        { error_code(result) } -> convertible_to<std::error_code>;
+        { error_condition(result) } -> convertible_to<std::error_condition>;
+        { error_message(result) } -> convertible_to<std::string>;
       };
     }
     namespace [[detail]] result {
       using namespace nonstd;
       using namespace std;
       template<typename RESULT, typename READ, typename WRITE> concept Read_Write = requires(RESULT result, bool good, int error, READ read_fd, WRITE write_fd) {
-    requires basic::Ancestor<RESULT>;
+        requires basic::Ancestor<RESULT>;
         requires tests::usage::call_result_Value::Scenario<READ>
         requires tests::usage::call_result_Value::Scenario<WRITE>
         requires sys::fd::required::Unmanaged<READ>; //  [[REMOVE]] in favor of call_result_Value::Scenario<READ>

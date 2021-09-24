@@ -105,14 +105,14 @@ auto tests::unit::tunitas::fixture::Fixture::suite() -> cppunit::Test * {
               fil << call("Directory", &Fixture::test_file_Directory)
                   << call("Path", &Fixture::test_file_Path)
                   << END;
-              return move(fil);
+              return fil;
             }()
          << []{
               auto str = Stream{"string"};
               str << call("Storage", &Fixture::test_string_Storage)
                   << call("View", &Fixture::test_string_View)
                   << END;
-              return move(str);
+              return str;
             }()
          << END;
   return finalize(series);

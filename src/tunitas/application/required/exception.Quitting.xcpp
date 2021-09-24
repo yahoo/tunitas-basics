@@ -39,19 +39,19 @@ namespace tunitas::application::required::exception {
   template<typename QUITTING> concept Quitting =
     true
     && requires(QUITTING quitting) {
-                                    { quitting } -> convertible_to<std::exception const &>;
-                                    { quitting } -> convertible_to<tunitas::application::exception::Aspect const &>;
-                                    { quitting } -> convertible_to<tunitas::application::exception::feature::Quitting const &>;
-    }
-    && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
-    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
-        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
-    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
-      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
-      { QUITTING{name, code} };
-      { quitting.what() } -> convertible_to<char const *>;
-      { quitting.code() } -> convertible_to<sys::exits::Code>;
-      { quitting.stream() } -> convertible_to<std::ostream &>;
+    { quitting } -> convertible_to<std::exception const &>;
+    { quitting } -> convertible_to<tunitas::application::exception::Aspect const &>;
+    { quitting } -> convertible_to<tunitas::application::exception::feature::Quitting const &>;
+  }
+  && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
+  && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
+      requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
+  && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+    // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
+    { QUITTING{name, code} };
+    { quitting.what() } -> convertible_to<char const *>;
+    { quitting.code() } -> convertible_to<sys::exits::Code>;
+    { quitting.stream() } -> convertible_to<std::ostream &>;
   }
   && true;
 }

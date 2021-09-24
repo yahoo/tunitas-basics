@@ -53,7 +53,7 @@ auto tests::unit::ok::adl::Axis::suite() -> cppunit::Test * {
                  << call("operator|", &Axis::test_operator_bitor)
                  << call("operator~", &Axis::test_operator_compl)
                 ;
-              return move(op);
+              return op;
             }()
          << END;
   return finalize(series);

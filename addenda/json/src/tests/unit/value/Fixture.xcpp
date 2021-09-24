@@ -81,7 +81,7 @@ auto tests::unit::value::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream series("value");
   series << call("menagerie", &Fixture::test_menagerie)
-         << add(ToString::suite())
+         << add<ToString>()
                 ;
   return series.release();
 }

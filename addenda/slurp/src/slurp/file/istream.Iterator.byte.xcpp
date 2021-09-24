@@ -69,8 +69,8 @@ namespace slurp::file::istream {
     : stream{&stream}
     , value{Value{}}
     , ok{false} {
-    read();
-  }
+      read();
+    }
   auto Iterator<std::byte>::operator*() const -> Value const & {
     if (!ok) { throw std::invalid_argument{"exhausted"}; }
     return value;

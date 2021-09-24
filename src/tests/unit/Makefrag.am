@@ -55,7 +55,7 @@ include src/tests/unit/server/Makefrag.am
 #
 $(scold_cxxdir)/tests/unit/dependencies.mk: $(check_bin_unit_SOURCES)
 $(check_bin_unit_SOURCES) : obj/src/%.cpp : src/%.xcpp
-	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $<)
 	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tests/unit/dependencies.mk:
 	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)

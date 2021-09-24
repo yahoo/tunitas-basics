@@ -83,7 +83,7 @@ auto tests::unit::reader::Simple::suite() -> cppunit::Test * {
     con << call("default", &Simple::test_constructor_default)
         << call("features", &Simple::test_constructor_features)
       ;
-    series << add(con.release());
+    series<<< add>(co();
   }
   series << call("destructor", &Simple::test_destructor)
     ;
@@ -95,9 +95,9 @@ auto tests::unit::reader::Simple::suite() -> cppunit::Test * {
           << call("string", &Simple::test_parse_string)
           << call("istream", &Simple::test_parse_istream)
         ;
-      cal << add(par.release());
+      cal<<< add>(pa();
     }
-    series << add(cal.release());
+        series<<< add>(ca();
   }
   return series.release();
 }

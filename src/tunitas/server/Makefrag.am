@@ -22,8 +22,8 @@ lib_libtunitas_server_la_AGE = 1
 lib_libtunitas_server_la_CRA = $(lib_libtunitas_server_la_CURRENT):$(lib_libtunitas_server_la_REVISION):$(lib_libtunitas_server_la_AGE)
 
 lib_libtunitas_server_la = lib/libtunitas-server.la
+lib_libtunitas_server_la_LIBADD =  $(lib_libtunitas_la) $(lib_libwant_la) -lmicrohttpd++
 lib_libtunitas_server_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) -version-info $(lib_libtunitas_server_la_CRA)
-lib_libtunitas_server_la_LIBADD = -lhttpserver $(lib_libtunitas_la) $(lib_libwant_la)
 lib_libtunitas_server_la_MODULES = $(call TF_SOURCEStoMODULES, $(lib_libtunitas_server_la_SOURCES))
 lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/namespace.cpp \
@@ -41,10 +41,11 @@ lib_libtunitas_server_la_SOURCES = \
   obj/src/tunitas/server/required/namespace.cpp \
   obj/src/tunitas/server/required/Stringable.cpp \
   obj/src/tunitas/server/required/Resourceful.cpp \
+  obj/src/tunitas/server/required/Permissioned.cpp \
   $(end)
 $(scold_cxxdir)/tunitas/server/dependencies.mk: $(lib_libtunitas_server_la_SOURCES)
 $(lib_libtunitas_server_la_SOURCES) : obj/src/%.cpp : src/%.xcpp
-	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $<)
 	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tunitas/server/dependencies.mk:
 	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)

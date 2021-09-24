@@ -43,16 +43,16 @@ auto tests::unit::c::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::unit::suite;
   Stream series("c");
   series << call("something", &Fixture::test_something)
-         << add(argv::Fixture::suite())
-         << add(as::Fixture::suite())
-         << add(buffer::Fixture::suite())
-         << add(environv::Fixture::suite())
-         << add(str::Fixture::suite())
-         << add(strdup::Fixture::suite())
-         << add(stringn::Fixture::suite())
-         << add(stringz::Fixture::suite())
-         << add(to_string::Fixture::suite())
-         << add(vector::Fixture::suite())
+         << add<argv::Fixture>()
+         << add<as::Fixture>()
+         << add<buffer::Fixture>()
+         << add<environv::Fixture>()
+         << add<str::Fixture>()
+         << add<strdup::Fixture>()
+         << add<stringn::Fixture>()
+         << add<stringz::Fixture>()
+         << add<to_string::Fixture>()
+         << add<vector::Fixture>()
     ;
   return series.release();
 }

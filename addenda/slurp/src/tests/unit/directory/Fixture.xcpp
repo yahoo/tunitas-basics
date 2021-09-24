@@ -38,7 +38,7 @@ auto tests::unit::directory::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream s("directory");
   s << call("read-usage", &Fixture::test_read)
-    << add(read::Fixture::suite())
+    << add<read::Fixture>()
     ;
   return s.release();
 }

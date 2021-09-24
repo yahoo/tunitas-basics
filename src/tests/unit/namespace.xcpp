@@ -4,27 +4,27 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import std.string
-#import std.string_view
+#import nonstd.string
 namespace tests::unit {
-  using std::string;
-  using std::string_view;
+  namespace string = nonstd::string;
 }
+#import nonstd.string.Storage
+#import nonstd.string.View
 #endiv
 #divert <hpp>
 // Because all test fixtures will need these
-#import cppunit.Test
-#import cppunit.test.Fixture
+#import tests.cppunit.Test
+#import tests.cppunit.test.Fixture
+#import tests.cppunit.ASSERT
+#import tests.cppunit.Exception
 #endiv
 #divert <ipp>
-#import std.string_literals
-#import std.string_view_literals
-#import std.cerr
+#import nonstd.string.literals
 namespace tests::unit {
-  using namespace std::string_literals;
-  using namespace std::string_view_literals;
+  using namespace nonstd::string::literals;
 }
 #import rigging.suite.io
+// All test fixtures want to chatter
 #import std.cout
 #import std.cerr
 #import std.clog

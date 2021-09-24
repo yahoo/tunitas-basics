@@ -62,10 +62,10 @@ namespace nonstd::exception::detail {
   template<required::Character CHAR, required::Character_Traits TRAITS, required::Compare_To_Nullptr<CHAR> VALUE> auto format::operator<<(std::basic_ostream<CHAR, TRAITS> &o, If_Not_Empty<CHAR, VALUE> const &n) -> std::basic_ostream<CHAR, TRAITS> & {
     auto extracted = (CHAR const *) n.value;
     auto widen = [](std::basic_ostream<CHAR, TRAITS> &outbound, char const *literal) {
-      for (auto c : std::string_view{literal}) {
-        outbound << outbound.widen(c);
-      }
-    };
+                   for (auto c : std::string_view{literal}) {
+                     outbound << outbound.widen(c);
+                   }
+                 };
     if (nullptr == extracted) {
       widen(o, "(null)");
     } else if (CHAR() == *extracted) {

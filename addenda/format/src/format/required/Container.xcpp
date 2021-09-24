@@ -18,8 +18,7 @@ namespace format::required {
   // [FIXME who cares?  why make this distinction?]
   //
   template<typename CONTAINER> concept Container = requires(CONTAINER const &container, std::ostream &outbound) {
-      // a container manages some values, iterators over them and can print individual ones
-    typename CONTAINER::value_type;
+    // a container manages some values, iterators over them and can print individual ones
     typename CONTAINER::const_iterator;
     { std::begin(container) } -> convertible_to<typename CONTAINER::const_iterator>;
     { std::end(container) } -> convertible_to<typename CONTAINER::const_iterator>;

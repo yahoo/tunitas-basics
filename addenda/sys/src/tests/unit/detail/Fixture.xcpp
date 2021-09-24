@@ -39,7 +39,7 @@ auto tests::unit::detail::Fixture::suite() -> cppunit::Test * {
               Stream use("usage");
               use << call("Initialized", &Fixture::test_usage_Initialized)
                   << END;
-              return move(use);
+              return use;
             }()
          << END;
   return finalize(series);

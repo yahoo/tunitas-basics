@@ -33,10 +33,10 @@ namespace nonstd::required {
       { alloc.max_size() } -> convertible_to<typename std::allocator_traits<ALLOC>::size_type>;
       requires requires(ALLOC alloc, typename std::allocator_traits<ALLOC>::pointer p) {
 #if 0
-src/nonstd/required/Allocator.xcpp:34:17: internal compiler error: in tsubst_copy, at cp/pt.c:14457
-  { alloc.construct(p, 1) };
+        src/nonstd/required/Allocator.xcpp:34:17: internal compiler error: in tsubst_copy, at cp/pt.c:14457
+          { alloc.construct(p, 1) };
 #endif
-   { alloc.destroy(p) };
+        { alloc.destroy(p) };
       };
     }
 #endif

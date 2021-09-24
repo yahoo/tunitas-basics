@@ -9,7 +9,7 @@ namespace want::sys::posix {
   //
   // Supplied in sys::posix::daemonize in later versions
   // Whereas POSIX uses unadorned 'int' and a double negative.
-  // We clean up with the enum classes of C++2a.
+  // We clean up with the enum classes of C++23.
   //
   enum class Chdir { NO, YES };
   enum class Close { NO, YES };

@@ -36,7 +36,7 @@ auto tests::unit::want::iterator::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream s("iterator");
   s << call("something", &Fixture::test_something)
-    << add(OutputStream::suite())
+    << add<OutputStream>()
     ;
   return s.release();
 }

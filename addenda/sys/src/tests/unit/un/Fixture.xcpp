@@ -109,11 +109,11 @@ auto tests::unit::un::Fixture::suite() -> cppunit::Test * {
                        lhs << call("lvalue", &Fixture::test_family_lhs_lvalue)
                            << call("rvalue", &Fixture::test_family_lhs_rvalue)
                          ;
-                       return move(lhs);
+                       return lhs;
                      }()
                   << call("rhs", &Fixture::test_family_rhs)
                 ;
-              return move(fam);
+              return fam;
             }()
          << []() {
               Stream path{"path"};
@@ -122,7 +122,7 @@ auto tests::unit::un::Fixture::suite() -> cppunit::Test * {
                    << call("alternatives", &Fixture::test_path_alternatives)
                 ;
               ;
-              return move(path);
+              return path;
             }()
     ;
   return finalize(series);

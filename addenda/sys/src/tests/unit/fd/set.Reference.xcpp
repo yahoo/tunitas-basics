@@ -76,13 +76,13 @@ namespace tests::unit::fd::set {
                 con << call("Set", &Reference::test_constructor_Set)
                     << call("wrapper", &Reference::test_constructor_wrapper)
                     << END;
-                return move(con);
+                return con;
               }()
            << []() {
                 Stream ass("assignment");
                 ass << call("wrapper", &Reference::test_assignment_wrapper)
                     << END;
-                return move(ass);
+                return ass;
               }()
            << call("repointer", &Reference::test_repointer)
            << END;

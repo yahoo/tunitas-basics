@@ -19,7 +19,7 @@ HGTW_WITH_MODULE([cppunit])
 
 HGTW_MSG_VERBOSE([compiler-specific subsystems (alphabetical)])
 HGTW_WITH_NONSTD([cppunit], [cppunit], [a non-standard CppUnit])
-HGTW_WITH_NONSTD([gcc], [gcc], [a non-standard gcc, e.g. modernized gcc for C++11, C++14, C++17 and on unto C++2a])
+HGTW_WITH_NONSTD([gcc], [gcc], [a non-standard gcc, e.g. modernized gcc for C++11, C++14, C++17, C++20 and on unto C++23])
 
 HGTW_MSG_VERBOSE([system-side subsystems (alphabetical)])
 HGTW_WITH_COMPONENT([hypogeal-twilight], [hypogeal_twilight], [SCOLD autotools scaffolding])

@@ -13,13 +13,13 @@
 #import sys.posix.required.rebundled
 namespace sys::posix::packaging::open::interface {
   inline namespace argument {
-    using call::argument::Pathname;
-    using call::argument::Permissions;
+           using call::argument::Pathname;
+           using call::argument::Permissions;
   }
   using id::File;
   inline namespace o {
-    using Opening = sys::o::Flags;
-    using Flags [[deprecated("prefer the precise form Opening")]] = Opening;
+           using Opening = sys::o::Flags;
+           using Flags [[deprecated("prefer the precise form Opening")]] = Opening;
   }
   using Mode [[deprecated("prefer the precise form Permissions")]] = Permissions;
   namespace result {

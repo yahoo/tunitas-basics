@@ -76,14 +76,14 @@ auto tests::unit::ip::Fixture::suite() -> cppunit::Test * {
                   << call("proto", &Fixture::test_usage_proto)
                   << call("sock", &Fixture::test_usage_sock)
                 ;
-              return move(use);
+              return use;
             }()
          << []() {
               Stream con{"constants"};
               con << call("ip", &Fixture::test_constants)
                   << call("proto", &Fixture::test_proto_constants)
                 ;
-              return move(con);
+              return con;
             }()
          << add<proto::Fixture>()
     ;

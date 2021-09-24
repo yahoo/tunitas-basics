@@ -9,8 +9,6 @@ namespace tests::unit::outcome {
 }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import tunitas.Outcome
 template<typename BASE> class tests::unit::outcome::Usage : public cppunit::test::Fixture {
 public:
@@ -148,11 +146,8 @@ template<typename _> auto tests::unit::outcome::Usage<_>::test_constructor_Value
   auto sg = Subject{"good"};
   CPPUNIT_ASSERT(ok(sg));
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 template<typename _> auto tests::unit::outcome::Usage<_>::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("usage.Outcome<"s + typeid(Base).name() + ">"s);
   series << call("ok", &Usage::test_ok)
     ;

@@ -4,6 +4,8 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
+# This is "simpler"? u.r. kidding, yes?
+#
 # the full end-to-end build using the "nearby" development trees
 #
 #   buildconf
@@ -125,8 +127,11 @@ fi
 #
 function set_all_defaults_no() {
     : ${with_hypogeal_twilight:=${with_std_scold?}} # not needed in after hypogeal-twilight >= 0.43 or 0.44 or so
+    : ${with_microhttpd__:=no}
+    : ${with_module_format:=no}
     : ${with_module_half:=no}
-    : ${with_module_httpserver:=no}
+    : ${with_module_ip:=no}
+    : ${with_module_langu:=no}
     : ${with_module_nonstd:=no}
     : ${with_module_options:=no}
     : ${with_module_posix:=no}
@@ -137,8 +142,11 @@ function set_all_defaults_no() {
 }
 function set_all_defaults_relatively() {
     : ${with_hypogeal_twilight:=$1/hypogeal-twilight}
+    : ${with_microhttpd__:=${2:-$1}/microhttpd++}
+    : ${with_module_format:=$1/module-format}
     : ${with_module_half:=$1/module-half}
-    : ${with_module_httpserver:=$1/module-httpserver}
+    : ${with_module_ip:=$1/module-ip}
+    : ${with_module_langu:=$1/module-ip}
     : ${with_module_nonstd:=$1/module-nonstd}
     : ${with_module_options:=$1/module-options}
     : ${with_module_posix:=$1/module-posix}
@@ -147,6 +155,14 @@ function set_all_defaults_relatively() {
     : ${with_module_string:=$1/module-string}
     : ${with_module_sys:=$1/module-sys}
 }
+if [[ -n ${with_microhttpd} ]] ; then
+    __deprecated=with_microhttpd
+    __preferred=with_microhttpd__
+    __displayed=microhttpd++
+    echo "${0##*/}: warning, '${__deprecated?}' should be '${__preferred?} (${__displayed?})"
+    echo "${0##*/}: notice, assigning ${__deprecated?}=${with_microhttpd} into '${__preferred?} for ${__displayed})"
+    : ${with_microhttpd__:=${with_microhttpd}}
+fi 1>&2
 if [[ no == ${__submodules_nearby:-no} ]] && [[ no == ${with_scold_nearby} ]] ; then
     set_all_defaults_no
 elif [[ yes == ${__submodules_nearby:-no} ]] ; then
@@ -172,7 +188,6 @@ if type -p gcc 2>/dev/null ; then
         echo "${0}: notice, permanently fix this as -- PATH=${with_nonstd_gcc}/bin:\$PATH with_nonstd_gcc=${with_nonstd_gcc} $0"
     fi 1>&2
 fi
-: ${with_nonstd_libhttpserver:=/opt/nonstd/libhttpserver} # ... REQUIRED at least nonstd-libhttpserver-0.9.0-8.1.ipv6+poll+regex
 : ${with_nonstd_half:=/opt/nonstd/half} # ..................... REQUIRED because there is no "standard half"
 : ${with_nonstd_jsoncpp:=no} # else /opt/nonstd/jsoncpp # ..... OPTIONAL nowadays
 : ${with_temerarious_flagship:=${with_tunitas_nearby?}/temerarious-flagship}
@@ -199,11 +214,13 @@ eval \
     ${with_nonstd_gcc:+--with-nonstd-gcc=$with_nonstd_gcc} \
     ${with_hypogeal_twilight:+--with-hypogeal-twilight=$with_hypogeal_twilight} \
     ${with_temerarious_flagship:+--with-temerarious-flagship=$with_temerarious_flagship} \
+    ${with_microhttpd__:+--with-microhttpd++=$with_microhttpd__} \
     ${with_module_c:+--with-module-c=$with_module_c} \
     ${with_module_half:+--with-module-half=$with_module_half} \
     ${with_nonstd_half:+--with-nonstd-half=$with_nonstd_half} \
-    ${with_module_httpserver:+--with-module-httpserver=$with_module_httpserver} \
-    ${with_nonstd_libhttpserver:+--with-nonstd-libhttpserver=$with_nonstd_libhttpserver} \
+    ${with_module_format:+--with-module-format=$with_module_format} \
+    ${with_module_ip:+--with-module-ip=$with_module_ip} \
+    ${with_module_langu:+--with-module-langu=$with_module_langu} \
     ${with_module_nonstd:+--with-module-nonstd=$with_module_nonstd} \
     ${with_module_options:+--with-module-options=$with_module_options} \
     ${with_module_posix:+--with-module-posix=$with_module_posix} \

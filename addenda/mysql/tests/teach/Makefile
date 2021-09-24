@@ -65,8 +65,8 @@ __gcc_libdir64 = $(addprefix $(gcc_prefix)/, $(lib64))
 gcc_libdir = $(if $(wildcard $(__gcc_libdir64)), $(__gcc_libdir64), $(__gcc_libdir))
 gcc_CPPFLAGS := $(addprefix -I, $(gcc_includedir))
 # recall: C++ is not a complete language unless -Wall is supplied
-# recall: we're looking to proof as aggressively into C++2a, C++2b as we can.
-gcc_CXXFLAGS := -std=c++1z -fconcepts -Wall -Wno-deprecated-declarations
+# recall: we're looking to proof as aggressively into C++2a, C++2b, C++2c as we can.
+gcc_CXXFLAGS := -std=c++20 -fconcepts -Wall -Wno-deprecated-declarations
 gcc_LDFLAGS  := $(addprefix -L, $(gcc_libdir)) -Wl,$(addprefix -rpath=, $(gcc_libdir)) -lstdc++
 
 # recall that ${TOOL}FLAGS are reserved to the command line; e.g. CPPFLAGS, CXXFLAGS, LDFLAGS

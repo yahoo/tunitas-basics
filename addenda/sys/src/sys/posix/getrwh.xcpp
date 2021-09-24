@@ -18,7 +18,7 @@ namespace sys::posix {
       inline auto getrwh(int fd, Which, [[out]] Hint &) -> Status;
     } 
     namespace detail {
-    // indeed, anything but Which::FILE defaults to the original "Process-Associated" hint.
+      // indeed, anything but Which::FILE defaults to the original "Process-Associated" hint.
       inline constexpr auto witcher(Which which) -> Function;
     }
   }

@@ -34,16 +34,16 @@ namespace sys::posix::packaging::wait::portability {
     namespace identifier = packaging::wait::interface::bundle::waitpid::returned::identifier;
     namespace [[default]] {
       template<typename RETURNED, typename MATCHED> concept Case_ifdef_Title_Case = requires(RETURNED, MATCHED matched, Options options) {
-    requires sys::id::required::process::Process<RETURNED>;
+        requires sys::id::required::process::Process<RETURNED>;
         requires is_same_v<identifier::Returned<RETURNED>, decltype(packaging::wait4::returned::wait4<RETURNED>((pid_t)matched, options, {}, {}))>;
       };
       template<typename RETURNED, typename MATCHED> concept Case_elsedef_Lower_Case = requires(RETURNED, Syscall waitpid, MATCHED matched, Options options) {
-    requires sys::id::required::process::Process<RETURNED>;
+        requires sys::id::required::process::Process<RETURNED>;
         requires is_same_v<identifier::Returned<RETURNED>, decltype(packaging::syscall::stylized::syscall<identifier::Returned<RETURNED>>(waitpid, matched, (int *)0, (int)options))>;
       };
     }
     template<typename PROCESS> concept Checkpoint = requires(PROCESS) {
-    requires sys::id::required::process::Process<PROCESS>;
+      requires sys::id::required::process::Process<PROCESS>;
       requires required::process::Process<PROCESS>; // same thing
       requires is_same_v<identifier::Returned<PROCESS>, sys::call::result::wait::Value<PROCESS>>; // ibidem.
       requires Case_ifdef_Title_Case<PROCESS, PROCESS>;

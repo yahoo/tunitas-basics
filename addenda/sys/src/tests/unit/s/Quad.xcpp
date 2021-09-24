@@ -96,7 +96,7 @@ auto tests::unit::s::Quad::suite() -> cppunit::Test * {
               con << call("default", &Quad::test_constructor_default)
                   << call("Bits,Bits,Bits,Bits", &Quad::test_constructor_Bits)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream as{"as"};
@@ -104,7 +104,7 @@ auto tests::unit::s::Quad::suite() -> cppunit::Test * {
                  << call("Quad", &Quad::test_as_Quad)
                  << call("Mode", &Quad::test_as_Mode)
                 ;
-              return move(as);
+              return as;
             }()
          << []() {
               Stream get{"get"};
@@ -112,7 +112,7 @@ auto tests::unit::s::Quad::suite() -> cppunit::Test * {
                   << call("mutable", &Quad::test_get_mutable)
                   << call("friend", &Quad::test_get_friend)
                 ;
-              return move(get);
+              return get;
             }()
     ;
   return finalize(series);

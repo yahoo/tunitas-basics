@@ -7,8 +7,6 @@
 namespace tests::unit::exception { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::exception::Fixture : public cppunit::test::Fixture {
 public:
   auto test_aspect_Messaging() -> void;
@@ -104,15 +102,15 @@ namespace tests::unit::exception {
 #import std.cerr
 namespace tests::unit::exception {
   auto Fixture::test_my_Message() -> void {
-  //
-  //   try {
-  //     throw Message{"program"};
-  //     throw std::runtime_error{"that was bad"};
-  //   } catch (Generic const &g) {
-  //     g.stream() << g << '\n';
-  //     return g.code();
-  //   }
-  //
+    //
+    //   try {
+    //     throw Message{"program"};
+    //     throw std::runtime_error{"that was bad"};
+    //   } catch (Generic const &g) {
+    //     g.stream() << g << '\n';
+    //     return g.code();
+    //   }
+    //
 
   }
   auto Fixture::test_my_Quitting_1() -> void {
@@ -143,7 +141,6 @@ namespace tests::unit::exception {
     std::cerr << actual;    
   }
 }
-#import rigging.suite.io
 auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
   Stream series("exception");

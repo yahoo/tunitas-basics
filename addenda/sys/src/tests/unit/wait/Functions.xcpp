@@ -33,7 +33,7 @@ namespace tests::unit::wait {
     series << call("default", &Functions::test_exitstatus_template_constructor_default<CODABLE>)
            << call("conversion", &Functions::test_exitstatus_template_constructor_conversion<CODABLE>)
            << END;
-    return move(series);
+    return series;
   }
   template<required::Codable CODABLE> auto Functions::test_exitstatus_template_constructor_default() -> void {
     using ::sys::wait::exitstatus;
@@ -71,7 +71,7 @@ auto tests::unit::wait::Functions::suite() -> cppunit::Test * {
                         fun << call("default", &Functions::test_exitstatus_function_constructor_default)
                             << call("conversion", &Functions::test_exitstatus_function_constructor_conversion)
                             << END;
-                        return move(fun);
+                        return fun;
                       }()
                    << []() {
                         Stream tem("template");
@@ -85,10 +85,10 @@ auto tests::unit::wait::Functions::suite() -> cppunit::Test * {
                             << generate_exitstatus_series<std::uint64_t>("uint64")
                             << generate_exitstatus_series<::sys::exits::Code>("Code")
                             << END;
-                        return move(tem);
+                        return tem;
                       }()
                    << END;
-                return move(exss);
+                return exss;
             }()
          << END;
   return finalize(series);

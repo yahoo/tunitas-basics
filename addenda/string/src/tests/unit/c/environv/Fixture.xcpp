@@ -77,10 +77,10 @@ auto tests::unit::c::environv::Fixture::suite() -> cppunit::Test * {
   Stream series("environv");
   series << call("consty", &Fixture::test_consty)
          << call("muting", &Fixture::test_muting)
-         << add(Consty::suite())
-         << add(Muting::suite())
-         << add(Nullptr<::c::environv>::suite())
-         << add(Nullptr<::c::const_environv>::suite())
+         << add<Consty>()
+         << add<Muting>()
+         << add<Nullptr<::c::environv>>()
+         << add<Nullptr<::c::const_environv>>()
     ;
   return series.release();
 }

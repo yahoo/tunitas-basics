@@ -4,29 +4,45 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import httpserver.Request //  [[reminder]] need the complete type
-#import httpserver.Response // [[reminder]] ibidem.
-#import std.string //          [[reminder]] ibidem.
+#import microhttpd.Resource // ............. [[reminder]] need the complete type
+#import microhttpd.rest.Transport // ....... [[reminder]] ibidem.
+#import microhttpd.method.Permissions // ... [[reminder]] ibidem.
 #import tunitas.server.service
+#import nonstd.same_as
+#import std.string
 namespace tunitas::server::required {
-  using namespace service;
   //
-  // The concept of a (descendant) of httpserver::Resource<CHILD>
+  // The concept of a resource.
+  // [[FIXTHIS]] this is mostly leftover from the httpserver substrate ... soon [[REMOVETHIS]]
+  // The newer microhttpd++ takes care of this by design (by having virtual functions and requiring ancestry in microhttpd::Resource).
   //
-  template<typename RESOURCEFUL> concept Resourceful = requires(RESOURCEFUL resourceful, Request request, Response *response, std::string name, bool value) {
-    { resourceful.allow_all() };
-    { resourceful.render(request, &response) };
-    { resourceful.render_CONNECT(request, &response) };
-    { resourceful.render_DELETE(request, &response) };
-    { resourceful.render_GET(request, &response) };
-    { resourceful.render_HEAD(request, &response) };
-    { resourceful.render_OPTIONS(request, &response) };
-    { resourceful.render_POST(request, &response) };
-    { resourceful.render_PUT(request, &response) };
-    { resourceful.render_TRACE(request, &response) };
-    { resourceful.set_allowing(name, value) };
-    { resourceful.disallow_all() };
-    { resourceful.is_allowed(name) };
-  };
+  namespace [[eponymous]] resourceful {
+    using service::Request;
+    using microhttpd::rest::Transport;
+    using microhttpd::method::Permissions;
+    using nonstd::same_as;
+    template<typename RESOURCEFUL> concept Resourceful = requires(RESOURCEFUL resourceful, Request request, std::string name, bool value) {
+      { resourceful.otherwise(request) } -> same_as<Transport>;
+      { resourceful.CONNECT(request) } -> same_as<Transport>;
+      { resourceful.DELETE(request) } -> same_as<Transport>;
+      { resourceful.GET(request) } -> same_as<Transport>;
+      { resourceful.HEAD(request) } -> same_as<Transport>;
+      { resourceful.OPTIONS(request) } -> same_as<Transport>;
+      { resourceful.POST(request) } -> same_as<Transport>;
+      { resourceful.PUT(request) } -> same_as<Transport>;
+      { resourceful.TRACE(request) } -> same_as<Transport>;
+      { resourceful.permissions } -> convertible_to<Permissions>;
+      { resourceful.permissions.is_allowed(name) } -> same_as<bool>;
+    };
+  }
+  using resourceful::Resourceful;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    namespace required = tunitas::server::required;
+    static_assert(required::Resourceful<microhttpd::Resource>); // that's it.  That's all we need nowadays.  That's why this is removable
+  }
 }
 #endiv

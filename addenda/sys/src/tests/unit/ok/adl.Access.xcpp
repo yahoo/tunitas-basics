@@ -53,7 +53,7 @@ auto tests::unit::ok::adl::Access::suite() -> cppunit::Test * {
                  << call("operator|", &Access::test_operator_bitor)
                  << call("operator~", &Access::test_operator_compl)
                 ;
-              return move(op);
+              return op;
             }()
          << END;
   return finalize(series);

@@ -44,38 +44,38 @@ namespace openssl::big::bin {
   template<required::Integer _> Preparator<_>::Preparator(Value value) {
     unsigned char *b{&buffer[0]};                            
     if constexpr (false) {
-      // DO NOT DO THIS (they do it on the way out though)
-      if (std::is_unsigned<Value>::value) {
-        *b++ = '\0';
+        // DO NOT DO THIS (they do it on the way out though)
+        if (std::is_unsigned<Value>::value) {
+          *b++ = '\0';
+        }
       }
-    }
     constexpr auto N = sizeof (Value);
     if constexpr (16 <= N) {
-      *b++ = value >> 120;
-      *b++ = value >> 112;
-      *b++ = value >> 104;
-      *b++ = value >> 96;
-      *b++ = value >> 88;
-      *b++ = value >> 80;
-      *b++ = value >> 72;
-      *b++ = value >> 64;
-    }
+        *b++ = value >> 120;
+        *b++ = value >> 112;
+        *b++ = value >> 104;
+        *b++ = value >> 96;
+        *b++ = value >> 88;
+        *b++ = value >> 80;
+        *b++ = value >> 72;
+        *b++ = value >> 64;
+      }
     if constexpr (8 <= N) {
-      *b++ = value >> 56;
-      *b++ = value >> 48;
-      *b++ = value >> 40;
-      *b++ = value >> 32;
-    }
+        *b++ = value >> 56;
+        *b++ = value >> 48;
+        *b++ = value >> 40;
+        *b++ = value >> 32;
+      }
     if constexpr (4 <= N) {
-      *b++ = value >> 24;
-      *b++ = value >> 16;
-    }
+        *b++ = value >> 24;
+        *b++ = value >> 16;
+      }
     if constexpr (2 <= N) {
-      *b++ = value >> 8;
-    }
+        *b++ = value >> 8;
+      }
     if constexpr (1 <= N) {
-      *b++ = value;
-    }
+        *b++ = value;
+      }
   }
 }
 #endiv

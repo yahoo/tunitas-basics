@@ -49,7 +49,7 @@ namespace sqlite {
 
     // construction
     inline auto flags(Flags) -> Flags;     // identity
-           auto flag(Flags) -> Flag;       // a.k.a. as<Flag>(Flags) (throws on !is_flag(...)
+    auto flag(Flags) -> Flag;       // a.k.a. as<Flag>(Flags) (throws on !is_flag(...)
     namespace each {
       inline auto flags(Flag) -> Flags;      // a.k.a. as<Flags>(Flag)
     }

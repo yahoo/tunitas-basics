@@ -1,0 +1,36 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#include <hpp/tests.unit.server.Fixture>
+#endiv
+#divert <hpp>
+#import tunitas.server.service // tunitas::server::service::Request ... [[FIXTHAT]] so we don't have to remember a different name
+#import microhttpd.service.Specification
+#import microhttpd.Service
+#import microhttpd.event.Event.RECEIVE
+class tests::unit::server::fixture::Fixture::Anchored::Request {
+protected:
+  using Managed = library::service::Request;
+public:
+  Request();
+  operator Managed &()             { return contained; }
+  operator Managed const &() const { return contained; }
+protected:
+  microhttpd::Service service;
+  using Specification = microhttpd::service::Specification;
+  Managed contained;
+private:
+  using Generator = ::microhttpd::event::Event<::microhttpd::event::Stage::RECEIVE>;
+};
+#endiv
+#divert <cpp>
+namespace tests::unit::server::fixture {
+  Fixture::Anchored::Request::Request()
+    : service{Specification{}}
+    , contained{Generator::request(service, "url://localhost/")} // the normal constructor is non-public
+  { }
+}
+#endiv

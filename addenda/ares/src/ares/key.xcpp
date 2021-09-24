@@ -3,42 +3,42 @@
 #divert <fpp>
 namespace ares {
   inline namespace key {
-    //
-    // These are the keys (enums) for the computed names.
-    // The namespace is inline to make it easy to import elswhere with 'using namespace ares::key'
-    // e.g. in test cases or application code
-    //
-    // These enumerations are NOT used on the wire or as manifest constants for packet codec (serdes).
-    // These enumerations ARE used as indices for the memory mangement system.
-    // These enumerations help tamp down the plethora of names and naming conventions that arise.
-    //
-    // The full range of DNS protocol types is dns::Type (a.k.a. ::ns_type).
-    //
-    // Usage:
-    //
-    //   template<Resource_Record> struct unmanaged::Record;
-    //   template<Resource_Record> struct reply::Record;
-    //   template<Array_Entry>     struct managed::array::Entry;
-    //   template<List_Entry>      struct managed::list::Entry;
-    //
-    enum Resource_Record
-      { A,
-        AAAA,
-        MX,
-        NAPTR,
-        NS,
-        PTR,
-        SOA,
-        TXT,
-        SRV,
-        URI };
-    enum Address_Genre
-      { IN4,
-        IN6 };
-    using Array_Entry = Resource_Record;
-    inline constexpr auto ADDR4 = A;
-    inline constexpr auto ADDR6 = AAAA;
-    using List_Entry = Resource_Record;
+           //
+           // These are the keys (enums) for the computed names.
+           // The namespace is inline to make it easy to import elswhere with 'using namespace ares::key'
+           // e.g. in test cases or application code
+           //
+           // These enumerations are NOT used on the wire or as manifest constants for packet codec (serdes).
+           // These enumerations ARE used as indices for the memory mangement system.
+           // These enumerations help tamp down the plethora of names and naming conventions that arise.
+           //
+           // The full range of DNS protocol types is dns::Type (a.k.a. ::ns_type).
+           //
+           // Usage:
+           //
+           //   template<Resource_Record> struct unmanaged::Record;
+           //   template<Resource_Record> struct reply::Record;
+           //   template<Array_Entry>     struct managed::array::Entry;
+           //   template<List_Entry>      struct managed::list::Entry;
+           //
+           enum Resource_Record
+             { A,
+               AAAA,
+               MX,
+               NAPTR,
+               NS,
+               PTR,
+               SOA,
+               TXT,
+               SRV,
+               URI };
+           enum Address_Genre
+             { IN4,
+               IN6 };
+           using Array_Entry = Resource_Record;
+           inline constexpr auto ADDR4 = A;
+           inline constexpr auto ADDR6 = AAAA;
+           using List_Entry = Resource_Record;
   }
 }
 #endiv

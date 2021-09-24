@@ -5,26 +5,26 @@
 #include <sqlite3.h>
 namespace sqlite::open::each {
   enum class Flag
-  { READONLY          = SQLITE_OPEN_READONLY,         // 0x00000001  - Ok for sqlite3_open_v2()
-    READWRITE         = SQLITE_OPEN_READWRITE,        // 0x00000002  - Ok for sqlite3_open_v2()
-    CREATE            = SQLITE_OPEN_CREATE,           // 0x00000004  - Ok for sqlite3_open_v2()
-    DELETEONCLOSE     = SQLITE_OPEN_DELETEONCLOSE,    // 0x00000008  - VFS only
-    EXCLUSIVE         = SQLITE_OPEN_EXCLUSIVE,        // 0x00000010  - VFS only
-    AUTOPROXY         = SQLITE_OPEN_AUTOPROXY,        // 0x00000020  - VFS only
-    URI               = SQLITE_OPEN_URI,              // 0x00000040  - Ok for sqlite3_open_v2()
-    MEMORY            = SQLITE_OPEN_MEMORY,           // 0x00000080  - Ok for sqlite3_open_v2()
-    MAIN_DB           = SQLITE_OPEN_MAIN_DB,          // 0x00000100  - VFS only
-    TEMP_DB           = SQLITE_OPEN_TEMP_DB,          // 0x00000200  - VFS only
-    TRANSIENT_DB      = SQLITE_OPEN_TRANSIENT_DB,     // 0x00000400  - VFS only
-    MAIN_JOURNAL      = SQLITE_OPEN_MAIN_JOURNAL,     // 0x00000800  - VFS only
-    TEMP_JOURNAL      = SQLITE_OPEN_TEMP_JOURNAL,     // 0x00001000  - VFS only
-    SUBJOURNAL        = SQLITE_OPEN_SUBJOURNAL,       // 0x00002000  - VFS only
-    MASTER_JOURNAL    = SQLITE_OPEN_MASTER_JOURNAL,   // 0x00004000  - VFS only
-    NOMUTEX           = SQLITE_OPEN_NOMUTEX,          // 0x00008000  - Ok for sqlite3_open_v2()
-    FULLMUTEX         = SQLITE_OPEN_FULLMUTEX,        // 0x00010000  - Ok for sqlite3_open_v2()
-    SHAREDCACHE       = SQLITE_OPEN_SHAREDCACHE,      // 0x00020000  - Ok for sqlite3_open_v2()
-    PRIVATECACHE      = SQLITE_OPEN_PRIVATECACHE,     // 0x00040000  - Ok for sqlite3_open_v2()
-    WAL               = SQLITE_OPEN_WAL };            // 0x00080000  - VFS only
+    { READONLY          = SQLITE_OPEN_READONLY,         // 0x00000001  - Ok for sqlite3_open_v2()
+      READWRITE         = SQLITE_OPEN_READWRITE,        // 0x00000002  - Ok for sqlite3_open_v2()
+      CREATE            = SQLITE_OPEN_CREATE,           // 0x00000004  - Ok for sqlite3_open_v2()
+      DELETEONCLOSE     = SQLITE_OPEN_DELETEONCLOSE,    // 0x00000008  - VFS only
+      EXCLUSIVE         = SQLITE_OPEN_EXCLUSIVE,        // 0x00000010  - VFS only
+      AUTOPROXY         = SQLITE_OPEN_AUTOPROXY,        // 0x00000020  - VFS only
+      URI               = SQLITE_OPEN_URI,              // 0x00000040  - Ok for sqlite3_open_v2()
+      MEMORY            = SQLITE_OPEN_MEMORY,           // 0x00000080  - Ok for sqlite3_open_v2()
+      MAIN_DB           = SQLITE_OPEN_MAIN_DB,          // 0x00000100  - VFS only
+      TEMP_DB           = SQLITE_OPEN_TEMP_DB,          // 0x00000200  - VFS only
+      TRANSIENT_DB      = SQLITE_OPEN_TRANSIENT_DB,     // 0x00000400  - VFS only
+      MAIN_JOURNAL      = SQLITE_OPEN_MAIN_JOURNAL,     // 0x00000800  - VFS only
+      TEMP_JOURNAL      = SQLITE_OPEN_TEMP_JOURNAL,     // 0x00001000  - VFS only
+      SUBJOURNAL        = SQLITE_OPEN_SUBJOURNAL,       // 0x00002000  - VFS only
+      MASTER_JOURNAL    = SQLITE_OPEN_MASTER_JOURNAL,   // 0x00004000  - VFS only
+      NOMUTEX           = SQLITE_OPEN_NOMUTEX,          // 0x00008000  - Ok for sqlite3_open_v2()
+      FULLMUTEX         = SQLITE_OPEN_FULLMUTEX,        // 0x00010000  - Ok for sqlite3_open_v2()
+      SHAREDCACHE       = SQLITE_OPEN_SHAREDCACHE,      // 0x00020000  - Ok for sqlite3_open_v2()
+      PRIVATECACHE      = SQLITE_OPEN_PRIVATECACHE,     // 0x00040000  - Ok for sqlite3_open_v2()
+      WAL               = SQLITE_OPEN_WAL };            // 0x00080000  - VFS only
 }
 #endiv
 #divert <hpp>

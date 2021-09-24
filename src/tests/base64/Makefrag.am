@@ -37,7 +37,7 @@ src_tests_base64_SOURCES_SET = \
   $(end)
 $(scold_cxxdir)/tests/base64/dependencies.mk: $(src_tests_base64_SOURCES_SET)
 $(src_tests_base64_SOURCES_SET) : obj/src/%.cpp : src/%.xcpp
-	$(TF_V_DIS) $(call TF_XCPP2CPP, $^)
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $<)
 	$(TF_V_DONE) test -e $@
 $(scold_cxxdir)/tests/base64/dependencies.mk:
 	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)

@@ -132,14 +132,14 @@ auto tests::unit::c::argv::Fixture::suite() -> cppunit::Test * {
          << call("rest", &Fixture::test_rest)
          << call("zero-length", &Fixture::test_zero_length_argv)
          << call("shift", &Fixture::test_argv_shift)
-         << add(Consty::suite())
-         << add(Muting::suite())
+         << add<Consty>()
+         << add<Muting>()
 #if 1
 #warning WATCHOUT - not testing add(Nullptr<::c::const_argv>::suite())
 #warning WATCHOUT - not testing add(Nullptr<::c::argv>::suite())
 #else
-         << add(Nullptr<::c::const_argv>::suite())
-         << add(Nullptr<::c::argv>::suite())
+         << add<Nullptr<::c::const_argv>>()
+         << add<Nullptr<::c::argv>>()
 #endif
     ;
   return series.release();

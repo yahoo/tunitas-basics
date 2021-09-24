@@ -51,7 +51,7 @@ namespace tests::unit::sock {
     con << call("flag", &FIXTURE::test_flag_constants)
         << call("flags", &FIXTURE::test_flags_constants)
       ;
-    return move(con);
+    return con;
   }
 }
 #endiv
@@ -68,9 +68,9 @@ namespace tests::unit::sock {
   auto Palette::setUp() -> void {
     using v = std::vector<Option>;
     lhs(some_flag_series) = v{// MUST NOT ---> Option::NONE <--- MUST NOT (because that is not a flag, it is the absence of ALL flags)
-                              Option::CLOEXEC,
-                              Option::CLOSE_ON_EXEC,
-                              Option::NONBLOCK};
+      Option::CLOEXEC,
+      Option::CLOSE_ON_EXEC,
+      Option::NONBLOCK};
     lhs(no_flags) = Options{};
     lhs(all_flags) = Options{SOCK_CLOEXEC|
                              SOCK_NONBLOCK};

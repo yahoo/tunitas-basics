@@ -75,7 +75,7 @@ auto tests::unit::msg::Flag::suite() -> cppunit::Test * {
               sub << call("single", &Flag::test_constants_single)
                   << call("set", &Flag::test_constants_set)
                 ;
-              return move(sub);
+              return sub;
             }()
     ;
   return finalize(series);

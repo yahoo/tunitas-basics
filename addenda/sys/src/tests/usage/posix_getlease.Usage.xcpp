@@ -29,8 +29,8 @@ namespace tests::usage::posix_getlease {
       namespace [[detail]] returning {
         using Returned = sys::call::result::Value<LEASE::Operation>;
         template<typename UNMANAGED> concept Signature = requires(UNMANAGED fd) {
-    requires required::Unmanaged<UNMANAGED>;
-    { getlease(fd) } -> convertible_to<convertible_to<Returned>>;
+          requires required::Unmanaged<UNMANAGED>;
+          { getlease(fd) } -> convertible_to<Returned>;
         };
       }
       namespace [[detail]] filling {
@@ -42,7 +42,7 @@ namespace tests::usage::posix_getlease {
       }
     }
     template<typename UNMANAGED> concept Instance = requires(UNMANAGED) {
-    requires sys::fd::required::Unmanaged<UNMANAGED>;
+      requires sys::fd::required::Unmanaged<UNMANAGED>;
       requires returning::Signature<UNMANAGED>;
       requires filling::Signature<UNMANAGED>;
     };

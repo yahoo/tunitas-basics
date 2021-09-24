@@ -110,10 +110,10 @@ namespace nonstd {
     return visit(v, move(vv));
   }
   namespace outcome {
-  template<required::Outcomable _> Outcome<_>::Outcome() : Ancestor{Payload{}} { }
-  template<required::Outcomable _> Outcome<_>::Outcome(Error c) : Ancestor{c} { }
-  template<required::Outcomable _> Outcome<_>::Outcome(Payload const &p) : Ancestor{p} { }
-  template<required::Outcomable _> Outcome<_>::Outcome(Payload &&p) : Ancestor{forward<Payload>(p)} { }
+    template<required::Outcomable _> Outcome<_>::Outcome() : Ancestor{Payload{}} { }
+    template<required::Outcomable _> Outcome<_>::Outcome(Error c) : Ancestor{c} { }
+    template<required::Outcomable _> Outcome<_>::Outcome(Payload const &p) : Ancestor{p} { }
+    template<required::Outcomable _> Outcome<_>::Outcome(Payload &&p) : Ancestor{forward<Payload>(p)} { }
   }
 }
 #endiv

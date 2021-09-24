@@ -52,10 +52,10 @@ auto tests::unit::byte::buffer::Fixture::suite() -> cppunit::Test * {
   Stream series("buffer");
   series << call("consty", &Fixture::test_consty)
          << call("muting", &Fixture::test_muting)
-         << add(Consty::suite())
-         << add(Muting::suite())
-         << add(Nullptr<::byte::buffer>::suite())
-         << add(Nullptr<::byte::const_buffer>::suite())
+         << add<Consty>()
+         << add<Muting>()
+         << add<Nullptr<::byte::buffer>>()
+         << add<Nullptr<::byte::const_buffer>>()
     ;
   return series.release();
 }

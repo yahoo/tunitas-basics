@@ -79,7 +79,7 @@ auto tests::unit::nonstd::half::fixture::Fixture::suite() -> cppunit::Test * {
                  << call("float32_t", &Fixture::test_half_cast<library::float32_t>)
                  << call("float64_t", &Fixture::test_half_cast<library::float64_t>)
                  << END;
-              return move(hc);
+              return hc;
             }()
          << END;
   return finalize(series);

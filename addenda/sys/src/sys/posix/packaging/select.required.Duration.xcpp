@@ -35,7 +35,7 @@ namespace sys::posix::packaging::select::required {
                                                    is_same_v<DURATION, time::spec>); // ... nanoseconds
     using nonstd::required::Ratio;
     template<typename DURATION> concept Duration = Oldtime<DURATION> || requires(DURATION) {
-    typename DURATION::period;
+      typename DURATION::period;
       requires Ratio<typename DURATION::period>;
       requires is_same_v<DURATION, chrono::duration<chrono::seconds::rep, typename DURATION::period>>;
     };

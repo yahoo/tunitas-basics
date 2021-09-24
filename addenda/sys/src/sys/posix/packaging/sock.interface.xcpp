@@ -62,9 +62,9 @@ namespace sys::posix::packaging::sock::interface::packaging::promote {
   using call::result::get;
   template<typename... TYPES> auto function::promote(Value<int, TYPES...> in) -> Value<File, TYPES...> {
     auto boost = []<unsigned... INDEX>(auto lowrank, std::index_sequence<INDEX...>) -> Value<File, TYPES...> {
-                    auto boosted = File{value(lowrank)};
-                    return {good(lowrank), error_num(lowrank), boosted, get<INDEX>(lowrank)...};
-                  };
+      auto boosted = File{value(lowrank)};
+      return {good(lowrank), error_num(lowrank), boosted, get<INDEX>(lowrank)...};
+    };
     return boost(in, std::index_sequence_for<TYPES...>{});
   }
 }

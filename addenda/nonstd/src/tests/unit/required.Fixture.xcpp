@@ -702,7 +702,7 @@ auto tests::unit::required::fixture::Fixture::suite() -> cppunit::Test * {
               bas << call("Basic_String", &Fixture::test_Basic_String)
                   << call("Basic_String_View", &Fixture::test_Basic_String_View)
                   << END;
-              return move(bas);
+              return bas;
             }()
          << call("Character", &Fixture::test_Character)
          << call("Character_Traits", &Fixture::test_Character_Traits)
@@ -711,7 +711,7 @@ auto tests::unit::required::fixture::Fixture::suite() -> cppunit::Test * {
               chr << call("Type", &Fixture::test_character_Type)
                   << call("Traits", &Fixture::test_character_Traits)
                   << END;
-              return move(chr);
+              return chr;
             }()
          << call("Container", &Fixture::test_Container)
          << []() {
@@ -724,7 +724,7 @@ auto tests::unit::required::fixture::Fixture::suite() -> cppunit::Test * {
                        push << call("Push_Back", &Fixture::test_container_Push_Back)
                             << call("Push_Front", &Fixture::test_container_Push_Front)
                             << END;
-                       return move(push);
+                       return push;
                      }()
                   << []() {
                        auto ite  = Stream{"iterator"};
@@ -735,10 +735,10 @@ auto tests::unit::required::fixture::Fixture::suite() -> cppunit::Test * {
                             << call("Random_Access", &Fixture::test_container_Random_Access)
                             << call("Contiguous", &Fixture::test_container_Contiguous)
                             << END;
-                       return move(ite);
+                       return ite;
                      }()
                   << END;
-              return move(con);
+              return con;
             }()
          << call("Compare_To_Nullptr", &Fixture::test_Compare_To_Nullptr)
          << call("Convertible", &Fixture::test_Convertible)
@@ -761,7 +761,7 @@ auto tests::unit::required::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("Undirected", &Fixture::test_iterator_Undirected)
                   << call("Contiguous", &Fixture::test_iterator_Contiguous)
                   << END;
-              return move(ite);
+              return ite;
             }()
          << call("Movable", &Fixture::test_Movable)
          << call("Move_Constructible", &Fixture::test_Move_Constructible)

@@ -149,14 +149,14 @@ auto tests::unit::posix::Environment::suite() -> cppunit::Test * {
                  << call("2", &Environment::test_getenv_2arg_template)
                  << add<Getenv>()
                ;
-             return move(get);
+             return get;
            }()
          << []() {
               Stream get{"secure_getenv"};
               get << call("1", &Environment::test_secure_getenv_1arg_template)
                   << call("2", &Environment::test_secure_getenv_2arg_template)
                 ;
-              return move(get);
+              return get;
             }()
     << call("putenv", &Environment::test_putenv)
     << call("setenv", &Environment::test_setenv)

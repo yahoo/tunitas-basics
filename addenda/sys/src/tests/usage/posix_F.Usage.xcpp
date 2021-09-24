@@ -65,7 +65,7 @@ namespace tests::usage::posix_F {
       requires (int)F::SET_RW_HINT == F_SET_RW_HINT;
     };
     template<typename F> concept New_School = requires(F) {
-        // Buy a Vowel!
+      // Buy a Vowel!
       requires (int)F::GETLOCK == F_GETLK;
       requires (int)F::SETLOCK == F_SETLK;
       requires (int)F::SETLOCK_WAITING == F_SETLKW;

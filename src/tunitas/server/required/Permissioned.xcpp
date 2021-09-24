@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import microhttpd.method.Registered
+#import microhttpd.method.Unregistered
+#import nonstd.same_as
+namespace tunitas::server::required {
+  //
+  // Is this type a permission type?
+  //
+  // The words used for permissions are special.
+  // There are Registered and unregistered words.
+  // They are not merely strings
+  //
+  // Usage:
+  //
+  //   template<required::Permissioned VERB> struct Something;
+  //   template<template... VERBS> auto something(VERBS ...) -> void requires (required::Permissioned VERBs> && ... && true);
+  //
+  namespace [[eponymous]] permissioned {
+    using microhttpd::method::Registered;
+    using microhttpd::method::Unregistered;
+    using nonstd::same_as;
+    template<typename TYPE> concept Permissioned = same_as<TYPE, Registered> || same_as<TYPE, Unregistered>;
+  }
+  using permissioned::Permissioned;
+}
+#endiv

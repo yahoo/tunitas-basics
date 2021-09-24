@@ -39,18 +39,10 @@ namespace tests::usage::posix_OK {
       requires (int)OK::WRITE == W_OK;
       requires (int)OK::EXECUTE == X_OK;
       requires requires(typename OK::Access access, typename OK::Axis axis) {
-#if 202003L < __cplusplus
-        { OK::template as<typename OK::Access>(access) } -> convertible_to<convertible_to<typename OK::Access>>;
-        { OK::template as<typename OK::Access>(axis) } -> convertible_to<convertible_to<typename OK::Access>>;
-        { OK::template as<typename OK::Axis>(access) } -> convertible_to<convertible_to<typename OK::Axis>>;
-        { OK::template as<typename OK::Axis>(axis) } -> convertible_to<convertible_to<typename OK::Axis>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { OK::template as<typename OK::Access>(access) } -> convertible_to<typename OK::Access>;
         { OK::template as<typename OK::Access>(axis) } -> convertible_to<typename OK::Access>;
         { OK::template as<typename OK::Axis>(access) } -> convertible_to<typename OK::Axis>;
         { OK::template as<typename OK::Axis>(axis) } -> convertible_to<typename OK::Axis>;
-#endif
       };
     };
 #pragma GCC diagnostic pop

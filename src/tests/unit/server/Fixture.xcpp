@@ -4,15 +4,35 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-namespace tests::unit::server { class Fixture; }
+#import tunitas.server.constants
+#import tunitas.server.exception
+#import tunitas.server.filters
+#import tunitas.server.log
+#import tunitas.server.resources
+#import tunitas.server.responses
+#import tunitas.server.service
+#import microhttpd.http.literals
+namespace tests::unit::server {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    using namespace microhttpd::http::literals;
+    namespace library {
+      // [[FIXTHIS]] this test rigging is too big
+      // [[TODO,FIXTHIS]] break this test rigging up into one fixture for each namespace.
+      namespace constants = ::tunitas::server::constants;
+      namespace exception = ::tunitas::server::exception;
+      namespace filters = ::tunitas::server::filters;
+      namespace log = ::tunitas::server::log;
+      namespace resources = ::tunitas::server::resources;
+      namespace responses = ::tunitas::server::responses;
+      namespace service = ::tunitas::server::service;
+    }
+  }
+  using fixture::Fixture;
+}
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
-#import std.unique_ptr
-#import tunitas.server.service // Request
-class tests::unit::server::Fixture : public cppunit::test::Fixture {
-public:
+struct tests::unit::server::fixture::Fixture : public cppunit::test::Fixture {
   auto test_constants() -> void;
   auto test_filters_enforce_no_query_parameters() -> void;
   auto test_filters_enforce_application_json() -> void;
@@ -31,25 +51,18 @@ protected:
   struct exception {
     class [[nodiscard]] Example;
   };
-  static auto make_request() -> std::unique_ptr<::tunitas::server::service::Request>;
-  struct Request;
+  struct Anchored {
+    struct Request;
+  };
   struct Resource;
-  template<typename TYPE> struct Deleter;
 };
 #endiv
 #divert <cpp>
-#import std.is_same
-#import tests.unit.server.Fixture.Request
-auto tests::unit::server::Fixture::make_request() -> std::unique_ptr<::tunitas::server::service::Request> {
-  static_assert(std::is_same_v<httpserver::http_request, ::tunitas::server::service::Request>);
-  using Result = std::unique_ptr<::tunitas::server::service::Request>;
-  return Result{new Fixture::Request{}};
-}
 #import tunitas.server.constants
-auto tests::unit::server::Fixture::test_constants() -> void {
+auto tests::unit::server::fixture::Fixture::test_constants() -> void {
   // Show that the constants are defined.
   // That they have an appropriate value is a separate test
-  using namespace ::tunitas::server::constants;
+  using namespace library::constants;
   CPPUNIT_ASSERT(sizeof (http::CONNECT));
   CPPUNIT_ASSERT(sizeof (http::DELEET));
   CPPUNIT_ASSERT(sizeof (http::GET));
@@ -88,44 +101,39 @@ auto tests::unit::server::Fixture::test_constants() -> void {
   CPPUNIT_ASSERT(sizeof (mime::TEXT_PLAIN));
   CPPUNIT_ASSERT(sizeof (mime::TEXT_HTTP));
 }
+#import tests.unit.server.Fixture.Anchored.Request // Request (one that  we can actually construct)
 #import tunitas.server.service // Request, Resource, Response, response::Builder
 #import tunitas.server.filters
 #import std.exception
-auto tests::unit::server::Fixture::test_filters_enforce_no_query_parameters() -> void {
-  try {
-    using namespace ::tunitas::server::filters;
-    auto const request = make_request();
-    Response *response{nullptr};
-    enforce_no_query_parameters(*request, response); // <------------------------------ test this
-    CPPUNIT_ASSERT(nullptr == response || nullptr != response); // don't care
-    delete response;
-  } catch (std::exception const &e) {
-    CPPUNIT_ASSERT(true); // this is fine too
-  }
+auto tests::unit::server::fixture::Fixture::test_filters_enforce_no_query_parameters() -> void try {
+  using namespace library::filters;
+  auto const anchored = Anchored::Request{};
+  auto transport = ::tunitas::Optional<library::service::Transport>{};
+  enforce_no_query_parameters(anchored, transport); // <------------------------------ test this
+  CPPUNIT_ASSERT(true);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true); // this is fine too
 }
-auto tests::unit::server::Fixture::test_filters_enforce_application_json() -> void {
-  try {
-    using namespace ::tunitas::server::filters;
-    auto const request = make_request();
-    Response *response{nullptr};
-    enforce_application_json(*request, response); // <----------------------------- test this
-    CPPUNIT_ASSERT(nullptr == response || nullptr != response); // don't care
-    delete response;
-  } catch (std::exception const &e) {
-    CPPUNIT_ASSERT(true); // this is fine too
-  }
+auto tests::unit::server::fixture::Fixture::test_filters_enforce_application_json() -> void try {
+  using namespace library::filters;
+  auto const anchored = Anchored::Request{};
+  auto transport = ::tunitas::Optional<library::service::Transport>{};
+  enforce_application_json(anchored, transport); // <----------------------------- test this
+  CPPUNIT_ASSERT(true);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true); // this is fine too
 }
 #import tunitas.server.log
-auto tests::unit::server::Fixture::test_log() -> void {
-  using namespace ::tunitas::server::log;
+auto tests::unit::server::fixture::Fixture::test_log() -> void {
+  using namespace library::log;
   err << "ERROR STREAM (you will see this)\n";
   nul << "NULL STREAM (you will not see this)\n";
 }
 #import tests.unit.server.Fixture.Resource
 #import tunitas.server.resources // all those initialization functions
-auto tests::unit::server::Fixture::test_resources() -> void {
+auto tests::unit::server::fixture::Fixture::test_resources() -> void {
   Resource specimen;
-  using namespace ::tunitas::server::resources;
+  using namespace library::resources;
   // Call them all ... show it can be done.
   initialize(specimen, true);
   initialize(specimen, false);
@@ -138,64 +146,41 @@ auto tests::unit::server::Fixture::test_resources() -> void {
   initialize_putpost(specimen);
 }
 #import tunitas.server.responses
-#import tunitas.server.service // tunitas::server::service::Response [[FIXTHAT]] -- too hard to remember
-#import tests.unit.server.Fixture.Deleter
-auto tests::unit::server::Fixture::test_response_internal_server_error_default() -> void {
-  using namespace ::tunitas::server::responses;
-  using tunitas::server::service::Response;
-  Response *specimen{nullptr};
-  Deleter<Response> guardian{specimen};
-  internal_server_error(specimen);  // <---------------------------------- test this
+#import tunitas.server.service // library::service::Response [[FIXTHAT]] -- too hard to remember
+auto tests::unit::server::fixture::Fixture::test_response_internal_server_error_default() -> void {
+  using namespace library::responses;
+  internal_server_error();  // <---------------------------------- test this
 }
-auto tests::unit::server::Fixture::test_response_internal_server_error_reason() -> void {
-  using namespace ::tunitas::server::responses;
-  using tunitas::server::service::Response;
-  Response *specimen{nullptr};
-  Deleter<Response> guardian{specimen};
-  internal_server_error(specimen, "because ... reasons...");  // <---------------------------------- test this
+auto tests::unit::server::fixture::Fixture::test_response_internal_server_error_reason() -> void {
+  using namespace library::responses;
+  internal_server_error("because ... reasons...");  // <---------------------------------- test this
 }
-auto tests::unit::server::Fixture::test_response_bad_request_default() -> void {
-  using namespace ::tunitas::server::responses;
-  using tunitas::server::service::Response;
-  Response *specimen{nullptr};
-  Deleter<Response> guardian{specimen};
-  bad_request(specimen);  // <---------------------------------- test this
+auto tests::unit::server::fixture::Fixture::test_response_bad_request_default() -> void {
+  using namespace library::responses;
+  bad_request();  // <---------------------------------- test this
 }
-auto tests::unit::server::Fixture::test_response_bad_request_reason() -> void {
-  using namespace ::tunitas::server::responses;
-  using tunitas::server::service::Response;
-  Response *specimen{nullptr};
-  Deleter<Response> guardian{specimen};
-  bad_request(specimen, "because ... reasons...");  // <---------------------------------- test this
+auto tests::unit::server::fixture::Fixture::test_response_bad_request_reason() -> void {
+  using namespace library::responses;
+  bad_request("because ... reasons...");  // <---------------------------------- test this
 }
-#import tunitas.server.service // Resource<CHILD>, Request, Response, request::Builder
-#import tests.unit.server.Fixture.Request
-#import tests.unit.server.Fixture.Resource
-auto tests::unit::server::Fixture::test_service() -> void {
-  namespace tss = ::tunitas::server::service;
-  struct Somehow : public tss::Resource<Somehow> {
-    auto render(tss::Request const &, tss::Response **) -> void;
-  };
-  Somehow somehow;
-  Request request;
-  tss::response::Builder bob{"<html></html>", 200};
-  tss::Response response{bob};
-  CPPUNIT_ASSERT(sizeof (somehow) + sizeof (request) + sizeof (response) + sizeof (bob)); // that was pointless.
+#import tunitas.server.service // Resource<CHILD>, Request, Response, render::Builder
+auto tests::unit::server::fixture::Fixture::test_service() -> void {
+  auto bob = library::service::render::Builder{200_HTTP};
+  auto transport = bob.build();
+  CPPUNIT_ASSERT(sizeof (transport));
 }
+#import tunitas.server.exception.Generic
 #import tests.unit.server.Fixture.exception.Example
-auto tests::unit::server::Fixture::test_usage_Example() -> void {
-  try {
-    // Show the MI scheme works by in the constructor
-    throw exception::Example{"badness"};
-  } catch (tunitas::server::exception::Generic const &g) {
-    // Show that catching by one of the MI personas works
-    std::string reason = g.what();
-    CPPUNIT_ASSERT_EQUAL("badness"s, reason);
-  }
+auto tests::unit::server::fixture::Fixture::test_usage_Example() -> void try {
+  // Show the MI scheme works by in the constructor
+  throw exception::Example{"badness"};
+} catch (library::exception::Generic const &g) {
+  // Show that catching by one of the MI personas works
+  std::string reason = g.what();
+  CPPUNIT_ASSERT_EQUAL("badness"s, reason);
 }
-#import rigging.suite.io
-auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
-  using namespace ::rigging::suite;
+auto tests::unit::server::fixture::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
   Stream series{"server"};
   series << call("constants", &Fixture::test_constants)
          << []() {
@@ -204,11 +189,11 @@ auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
                        Stream enf("enforce");
                        enf << call("query", &Fixture::test_filters_enforce_no_query_parameters)
                            << call("json", &Fixture::test_filters_enforce_application_json)
-                         ;
-                       return move(enf);
+                           << END;
+                       return enf;
                      }()
-                ;
-              return move(fil);
+                  << END;
+              return fil;
             }()
          << call("log", &Fixture::test_log)
          << call("resources", &Fixture::test_resources)
@@ -218,27 +203,27 @@ auto tests::unit::server::Fixture::suite() -> cppunit::Test * {
                        Stream ise("internal_server_error");
                        ise << call("default", &Fixture::test_response_internal_server_error_default)
                            << call("reason", &Fixture::test_response_internal_server_error_reason)
-                         ;
-                       return move(ise);
+                           << END;
+                       return ise;
                      }()
                   << []() {
                        Stream bad("bad_request");
                        bad << call("default", &Fixture::test_response_bad_request_default)
                            << call("reason", &Fixture::test_response_bad_request_reason)
-                         ;
-                       return move(bad);
+                           << END;
+                       return bad;
                      }()
-                ;
-              return move(res);
+                  << END;
+              return res;
             }()
          << call("service", &Fixture::test_service)
          << []() {
               Stream exc("usage");
               exc << call("Example", &Fixture::test_usage_Example)
-                ;
-              return move(exc);
+                  << END;
+              return exc;
             }()
-    ;
+         << END;
   return finalize(series);
 }
 #endiv

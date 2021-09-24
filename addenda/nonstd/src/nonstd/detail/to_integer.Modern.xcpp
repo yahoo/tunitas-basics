@@ -91,7 +91,7 @@ namespace nonstd::detail::to_integer {
   }
   auto modern::operator|=(Invalid &lhs, bool rhs) -> Invalid & {
     if (rhs) {                        
-     lhs = Invalid::YES;
+      lhs = Invalid::YES;
     }
     return lhs;
   }
@@ -225,7 +225,7 @@ namespace nonstd::detail::to_integer {
         break; // not yet Invalid::YES
       }
       if (cutoff.would_overflow(accumulator, digit)) {
-          overflow = Overflow::YES; // any reason we shouldn't quit here? (yes: end is not set, invalid is not assessed)
+        overflow = Overflow::YES; // any reason we shouldn't quit here? (yes: end is not set, invalid is not assessed)
       } else {
         accumulator *= base;
         accumulator += digit;
@@ -250,21 +250,21 @@ namespace nonstd::detail::to_integer {
       // NOT HERE ---> invalid = Invalid::YES;
     }
     if constexpr (is_signed<Value>::value) {
-      //
-      // Check for a value that is within the range of `unsigned LONG int', but outside the range of `signed LONG int'.
-      //
-      // signed  unsigned   operation
-      //   -128      0x80     Limit::min()
-      //   -127      0x81   1+Limit::min()
-      //    127    0x0081   Unsigned
-      //   -127    0xff81   negate that
-      //   -128    0xff80   add one
-      //
-      constexpr auto NEGATIVE_BOUND = 1 + -Unsigned(1 + Limit::min());
-      constexpr auto POSITIVE_BOUND = 0 + +Unsigned(0 + Limit::max());
-      auto const BOUND = negative ? NEGATIVE_BOUND : POSITIVE_BOUND;
-      overflow |= BOUND < accumulator;
-    }
+        //
+        // Check for a value that is within the range of `unsigned LONG int', but outside the range of `signed LONG int'.
+        //
+        // signed  unsigned   operation
+        //   -128      0x80     Limit::min()
+        //   -127      0x81   1+Limit::min()
+        //    127    0x0081   Unsigned
+        //   -127    0xff81   negate that
+        //   -128    0xff80   add one
+        //
+        constexpr auto NEGATIVE_BOUND = 1 + -Unsigned(1 + Limit::min());
+        constexpr auto POSITIVE_BOUND = 0 + +Unsigned(0 + Limit::max());
+        auto const BOUND = negative ? NEGATIVE_BOUND : POSITIVE_BOUND;
+        overflow |= BOUND < accumulator;
+      }
     auto signed_accumulator = [negative, overflow](auto unsigned_accumulator) -> Value {
                                 if (is(overflow)) {
                                   return negative ? Limit::min() : Limit::max();

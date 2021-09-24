@@ -7,8 +7,6 @@
 namespace tests::unit::base64 { class Roundtrip; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import std.intmax_t
 #import std.string
 #import tests.unit.for_each.Counter
@@ -169,11 +167,8 @@ auto Roundtrip::test_07() -> void {
     }
   }
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::Roundtrip::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("roundtrip");
   series << call("01", &Roundtrip::test_01)
 	 << call("02", &Roundtrip::test_02)
@@ -183,6 +178,6 @@ auto tests::unit::base64::Roundtrip::suite() -> cppunit::Test * {
 	 << call("06", &Roundtrip::test_06)
 	 << call("07", &Roundtrip::test_07)
       ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

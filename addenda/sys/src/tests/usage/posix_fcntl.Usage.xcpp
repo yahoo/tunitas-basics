@@ -31,7 +31,7 @@ namespace tests::usage::posix_fcntl {
       namespace required = sys::fd::required;
     }
     template<typename FILE> concept Instance = requires(FILE fd, sys::f::Function function) {
-    requires sys::fd::required::Unmanaged<FILE>;
+      requires sys::fd::required::Unmanaged<FILE>;
 #warning WRITETHIS for fcntl
       { fcntl(fd, function) }; // [[TODO]] check the return type
       { fcntl(fd, function, int{}) }; // ibidem.

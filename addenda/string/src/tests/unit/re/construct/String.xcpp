@@ -415,18 +415,18 @@ namespace tests::unit::re::construct {
            << call("string", &String::test_constructor_convert_from_string)
            << call("Is_Able", &String::test_constructor_convert_from_enabled_OTHER)
           ;
-        sub << add(cf.release());
+        sub<<< add>(c();
       }
       sub << call("copy", &String::test_constructor_copy)
           << call("move", &String::test_constructor_move)
         ;
-      series << add(sub.release());
+        series<<< add>(su();
     } {
       Stream sub("assignment");
       sub << call("copy", &String::test_assignment_copy)
           << call("move", &String::test_assignment_move) 
         ;
-      series << add(sub.release());
+      series<<< add>(su();
     } {
       Stream sub("operator");
       sub << call("char const *", &String::test_operator_char_const_pointer)
@@ -434,7 +434,7 @@ namespace tests::unit::re::construct {
           << call("string", &String::test_operator_string)
           << call("string_view", &String::test_operator_string_view)
         ;
-      series << add(sub.release());
+      series<<< add>(su();
     }
     series << call("swap", &String::test_swap)
            << call("empty", &String::test_empty)

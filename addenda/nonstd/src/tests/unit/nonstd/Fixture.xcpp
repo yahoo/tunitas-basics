@@ -288,10 +288,10 @@ auto tests::unit::nonstd::fixture::Fixture::suite() -> cppunit::Test * {
                        req << call("Character", &Fixture::test_required_Character)
                            << call("Character_Traits", &Fixture::test_required_Character_Traits)
                            << END;
-                       return move(req);
+                       return req;
                      }()
                   << END;
-              return move(use);
+              return use;
             }()
          << call("endian", &Fixture::test_endian)
          << call("int128_t", &Fixture::test_int128_t)
@@ -313,7 +313,7 @@ auto tests::unit::nonstd::fixture::Fixture::suite() -> cppunit::Test * {
                  << call("good", &Fixture::test_to_signed_good)
                  << call("fail", &Fixture::test_to_signed_fail)
                  << END;
-              return move(to);
+              return to;
             }()
          << []{
               auto to = Stream{"to_unsigned"};
@@ -321,7 +321,7 @@ auto tests::unit::nonstd::fixture::Fixture::suite() -> cppunit::Test * {
                  << call("good", &Fixture::test_to_unsigned_good)
                  << call("fail", &Fixture::test_to_unsigned_fail)
                  << END;
-              return move(to);
+              return to;
             }()
          << add<half::Fixture>()
          << add<numeric_limits::Fixture>()

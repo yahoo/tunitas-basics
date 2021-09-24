@@ -29,7 +29,7 @@ namespace ares::managed::array {
     inline explicit Basis(Unmanaged const *un) : unmanaged{un} { }
     Unmanaged const *unmanaged;
   public:
-   virtual auto ttl() const -> time::Seconds = 0;
+    virtual auto ttl() const -> time::Seconds = 0;
   };
 }
 #endiv

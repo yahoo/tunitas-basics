@@ -114,11 +114,11 @@ auto tests::unit::c::stringz::Fixture::suite() -> cppunit::Test * {
       ;
     series << move(imp);
   }
-  series << add(Consty::suite())
-         << add(Muting::suite())
-         << add(Constructors::suite())
-         << add(Nullptr<::c::const_stringz>::suite())
-         << add(Nullptr<::c::stringz>::suite())
+  series<<< add>(Consty()
+                 << add<Muting>()
+                 << add<Constructors>()
+                 << add<Nullptr<::c::const_stringz>>()
+                 << add<Nullptr<::c::stringz>>()
     ;
   return series.release();
 }

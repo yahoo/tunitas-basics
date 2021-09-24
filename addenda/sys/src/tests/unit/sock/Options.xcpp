@@ -75,13 +75,13 @@ auto tests::unit::sock::Options::suite() -> cppunit::Test * {
               con << call("default", &Options::test_constructor_default)
                   << call("Option", &Options::test_constructor_Option)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream op{"operator"};
               op << call("Value", &Options::test_operator_Value)
                 ;
-              return move(op);
+              return op;
             }()
          << call("constants", &Options::test_constants)
          << call("as", &Options::test_as)

@@ -156,7 +156,7 @@ auto tests::unit::ok::Fixture::suite() -> cppunit::Test * {
               ad << add<adl::Axis>()
                  << add<adl::Access>()
                 ;
-              return move(ad);
+              return ad;
             }()
          << END;
   return finalize(series);

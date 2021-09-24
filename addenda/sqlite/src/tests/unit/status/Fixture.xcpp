@@ -288,7 +288,7 @@ auto tests::unit::status::Fixture::suite() -> cppunit::Test * {
     << call("min", &Fixture::test_min)
     << call("max", &Fixture::test_max)
     << call("ok_if_done", &Fixture::test_ok_if_done)
-    << add(Constants::suite())
+    << add<Constants>()
     ;
   return s.release();
 }

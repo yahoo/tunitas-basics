@@ -21,11 +21,11 @@ namespace format::detail::ifnot::expected {
 #endif
   } && requires(typename TRAITS::value_type const &subject, std::ostream &outbound) {
     requires true;
-      // because TRAITS::value_type may not have a default constructor 
-      // and insertable_nonnull_nonempty(...) may return anything that operator<< can process
+    // because TRAITS::value_type may not have a default constructor 
+    // and insertable_nonnull_nonempty(...) may return anything that operator<< can process
     { TRAITS::is_null(subject) } -> convertible_to<bool>;
-      //{ TRAITS::is_empty(subject) } -> convertible_to<bool>; 
-      //{ outbound << TRAITS::insertable_notnull_nonempty(subject) };
-   };
+    //{ TRAITS::is_empty(subject) } -> convertible_to<bool>; 
+    //{ outbound << TRAITS::insertable_notnull_nonempty(subject) };
+  };
 }
 #endiv

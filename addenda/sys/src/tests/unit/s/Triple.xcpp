@@ -90,7 +90,7 @@ auto tests::unit::s::Triple::suite() -> cppunit::Test * {
               con << call("default", &Triple::test_constructor_default)
                   << call("Bits,Bits,Bits", &Triple::test_constructor_Bits)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream as{"as"};
@@ -98,7 +98,7 @@ auto tests::unit::s::Triple::suite() -> cppunit::Test * {
                  << call("Quad", &Triple::test_as_Quad)
                  << call("Mode", &Triple::test_as_Mode)
                 ;
-              return move(as);
+              return as;
             }()
          << []() {
               Stream get{"get"};
@@ -106,7 +106,7 @@ auto tests::unit::s::Triple::suite() -> cppunit::Test * {
                   << call("mutable", &Triple::test_get_mutable)
                   << call("friend", &Triple::test_get_friend)
                 ;
-              return move(get);
+              return get;
             }()
     ;
   return finalize(series);

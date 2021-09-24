@@ -64,7 +64,7 @@ auto tests::unit::regex::Fixture::suite() -> cppunit::Test * {
                   << call("02", &Fixture::test_usage_02)
                   << call("03", &Fixture::test_usage_03)
                   << END;
-              return move(use);
+              return use;
             }()
          << call("Error", &Fixture::test_Error)
          << call("Iterator", &Fixture::test_Iterator)
@@ -75,14 +75,14 @@ auto tests::unit::regex::Fixture::suite() -> cppunit::Test * {
               pat << call("Basic", &Fixture::test_Pattern_Basic)
                   << call("char", &Fixture::test_Pattern_char)
                   << END;
-              return move(pat);
+              return pat;
             }()
          << []() {
               auto exp = Stream{"Expression"};
               exp << call("Basic", &Fixture::test_Expression_Basic)
                   << call("char", &Fixture::test_Expression_char)
                   << END;
-              return move(exp);
+              return exp;
             }()
          << []() {
               auto con = Stream{"constants"};
@@ -91,7 +91,7 @@ auto tests::unit::regex::Fixture::suite() -> cppunit::Test * {
                   << call("matching", &Fixture::test_constants_matching)
                   << call("syntax", &Fixture::test_constants_syntax)
                   << END;
-              return move(con);
+              return con;
             }()
          << [](){
               auto fun = Stream{"function"};
@@ -102,20 +102,20 @@ auto tests::unit::regex::Fixture::suite() -> cppunit::Test * {
                            << call("search", &Fixture::test_function_search)
                            << call("swap", &Fixture::test_function_swap)
                            << END;
-                       return move(sim);
+                       return sim;
                      }()
                   << add<Match>()
                   << add<Search>()
                   << add<Replace>()
                   << END;
-              return move(fun);
+              return fun;
             }()
          << []() {
               auto mat = Stream{"matching"};
               mat << call("Results", &Fixture::test_matching_Results)
                   << call("Sub", &Fixture::test_matching_Sub)
                   << END;
-              return move(mat);
+              return mat;
             }()
          << [] {
               auto req = Stream{"required"};
@@ -128,10 +128,10 @@ auto tests::unit::regex::Fixture::suite() -> cppunit::Test * {
                            << call("Input", &Fixture::test_required_iterator_Input)
                            << call("Output", &Fixture::test_required_iterator_Output)
                            << END;
-                       return move(ite);
+                       return ite;
                      }()
                   << END;
-              return move(req);
+              return req;
             }()
          << END;
   return finalize(series);

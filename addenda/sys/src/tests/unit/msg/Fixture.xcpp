@@ -38,7 +38,7 @@ auto tests::unit::msg::Fixture::suite() -> cppunit::Test * {
               Stream use{"usage"};
               use << call("Flags", &Fixture::test_usage_Flags)
                 ;
-              return move(use);
+              return use;
             }()
          << add<tests::flags::Scenario<1, Palette>>()
          << add<testing::Constants>()

@@ -32,9 +32,9 @@ namespace rigging::suite {
   // 
   //   {
   //     Stream subseries("sub-name");
-  //     series << add(subseries.release()); <-------------- avoid
+  //     series<<< add>(subserie(); <-------------- avoid
   //   }
-  //   series << add(new Case());
+  //   series<<< add>(ne();
   //
   [[deprecated]] inline auto add(cppunit::Test *) -> detail::Add;
 }

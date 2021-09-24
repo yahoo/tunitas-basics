@@ -17,7 +17,7 @@ namespace nonstd::stream::output::iterator {
   template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> class detail::Core : public std::iterator<std::output_iterator_tag, void, void, void, void> {
     using ancestor = std::iterator<std::output_iterator_tag, void, void, void, void>;
   protected:
-~Core() = default; // descendants only
+    ~Core() = default; // descendants only
   public:
     using cast_type = CAST;
     using prefix_type = PREFIX;
@@ -46,7 +46,7 @@ namespace nonstd::stream::output::iterator {
 #endiv
 #divert <ipp>
 namespace nonstd::stream::output::iterator::detail {
-template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::Core(prefix_argument_type prefix, stream_argument_type stream, suffix_argument_type suffix)
+  template<typename CAST, required::Decoration PREFIX, typename VALUE, required::Decoration SUFFIX, required::Character CHAR, required::Character_Traits TRAITS> Core<CAST, PREFIX, VALUE, SUFFIX, CHAR, TRAITS>::Core(prefix_argument_type prefix, stream_argument_type stream, suffix_argument_type suffix)
     : ancestor()
     , prefix(prefix)
     , stream(stream)

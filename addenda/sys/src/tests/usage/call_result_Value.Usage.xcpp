@@ -37,27 +37,27 @@ namespace tests::usage::call_result_Value {
       namespace [[detail]] without_namespace_std {
         // DO NOT ---> using namespace std; <--- DO NOT
         template<typename RESULT, typename PAYLOAD> concept Triple = requires(RESULT result) {
-    //
-    // WATCHOUT - when 'using namespace std' these ADL functions are occluded so the predicate fails.
-    //
-    { error_num(result) } -> convertible_to<convertible_to<error_t>>;
-    { error_code(result) } -> convertible_to<convertible_to<std::error_code>>;
-    { error_condition(result) } -> convertible_to<convertible_to<std::error_condition>>;
+          //
+          // WATCHOUT - when 'using namespace std' these ADL functions are occluded so the predicate fails.
+          //
+          { error_num(result) } -> convertible_to<error_t>;
+          { error_code(result) } -> convertible_to<std::error_code>;
+          { error_condition(result) } -> convertible_to<std::error_condition>;
         };
       }
       namespace [[detail]] with_namespace_std {
         using namespace std;
         template<typename PAYLOAD> concept Payload = requires(PAYLOAD) {
-    requires is_default_constructible_v<PAYLOAD>;
+          requires is_default_constructible_v<PAYLOAD>;
           requires is_copy_constructible_v<PAYLOAD>;
         };
         template<typename RESULT, typename PAYLOAD> concept Triple = requires(RESULT result) {
-    requires Payload<PAYLOAD>;
-    { ok(result) } -> convertible_to<convertible_to<bool>>; // ........ deprecate-in-place
-    { good(result) } -> convertible_to<convertible_to<bool>>; // ...... prefer
-    { fail(result) } -> convertible_to<convertible_to<bool>>; // ...... prefer
-    { error_message(result) } -> convertible_to<convertible_to<string>>;
-    { value(result) } -> convertible_to<convertible_to<PAYLOAD>>;
+          requires Payload<PAYLOAD>;
+          { ok(result) } -> convertible_to<bool>; // ........ deprecate-in-place
+          { good(result) } -> convertible_to<bool>; // ...... prefer
+          { fail(result) } -> convertible_to<bool>; // ...... prefer
+          { error_message(result) } -> convertible_to<string>;
+          { value(result) } -> convertible_to<PAYLOAD>;
           { RESULT() };
           // Can't test the other constructors here because we don't have the VALUES... any more
           requires is_default_constructible_v<RESULT>;
@@ -80,7 +80,7 @@ namespace tests::usage::call_result_Value {
       requires result::Triple<RESULT, typename Element<0, RESULT>::Type>;
     };
     template<typename PAYLOAD, typename... PAYLOADS> concept Scenario = requires(PAYLOAD, PAYLOADS...) {
-    requires (result::Payload<PAYLOAD> && ... && result::Payload<PAYLOADS>);
+      requires (result::Payload<PAYLOAD> && ... && result::Payload<PAYLOADS>);
       requires Instance<Value<PAYLOAD, PAYLOADS...>>;
     };
     namespace id = sys::id;

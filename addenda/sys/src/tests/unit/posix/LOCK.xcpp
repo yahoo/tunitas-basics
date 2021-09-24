@@ -85,7 +85,7 @@ auto tests::unit::posix::LOCK::suite() -> cppunit::Test * {
                   << call("lease", &LOCK::test_lease_mentions)
                   << call("lock", &LOCK::test_lock_mentions)
                   << END;
-              return move(men);
+              return men;
             }()
          << add<Constants<FLOCK>>()
          << add<Constants<LEASE>>()

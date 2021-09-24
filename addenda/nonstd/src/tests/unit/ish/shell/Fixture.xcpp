@@ -69,7 +69,7 @@ auto tests::unit::ish::shell::Fixture::suite() -> cppunit::Test * {
               sub << call("basename", &Fixture::test_simple_basename)
                   << call("dirname", &Fixture::test_simple_dirname)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("HOME", &Fixture::test_HOME)
     ;

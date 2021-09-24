@@ -128,7 +128,7 @@ auto tests::unit::run::Runner::suite() -> cppunit::Test * {
                   << call("path,name", &Runner::test_constructor_path_name)
                   << call("exec,path,name", &Runner::test_constructor_exec_path_name)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("start", &Runner::test_start)
          << call("run", &Runner::test_run)
@@ -140,7 +140,7 @@ auto tests::unit::run::Runner::suite() -> cppunit::Test * {
                   << call("2", &Runner::test_many<2>)
                   << call("3", &Runner::test_many<3>)
                 ;
-              return move(sub);
+              return sub;
             }()      ;
   return finalize(series);
 }

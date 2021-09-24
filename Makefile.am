@@ -20,13 +20,16 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
-  $(module_httpserver_prefix) \
+  $(module_format_prefix) \
+  $(module_ip_prefix) \
+  $(module_langu_prefix) \
   $(module_nonstd_prefix) \
   $(module_options_prefix) \
   $(module_posix_prefix) \
   $(module_std_prefix) \
   $(module_string_prefix) \
   $(module_sys_prefix) \
+  $(microhttpd___prefix) \
   $(end)
 TESTING_AREAS = \
   $(module_cppunit_prefix) \
@@ -35,7 +38,6 @@ TESTING_AREAS = \
 INSTALLATION_AREAS = \
   $(nonstd_cppunit_prefix) \
   $(nonstd_half_prefix) \
-  $(nonstd_libhttpserver_prefix) \
   $(nonstd_gcc_prefix) \
   $(std_scold_prefix) \
   $(std_tunitas_prefix) \
@@ -159,11 +161,11 @@ Makefile_COMPILER_CFLAGS_SET   =   @CFLAGS_gdb@   @CFLAGS_gcc@
 Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gdb@ @CXXFLAGS_gcc@ -Wno-attributes
 Makefile_COMPILER_LDFLAGS_SET  =  @LDFLAGS_gdb@  @LDFLAGS_gcc@  @libstd_filesystem@
 
-# configure.ac: TF_WITH_NONSTD([nonstd-libhttpserver])
-Makefile_nonstd_CPPFLAGS_SET = @nonstd_libhttpserver_CPPFLAGS@
-Makefile_nonstd_CFLAGS_SET   =   @nonstd_libhttpserver_CFLAGS@
-Makefile_nonstd_CXXLAGS_SET  = @nonstd_libhttpserver_CXXFLAGS@
-Makefile_nonstd_LDFLAGS_SET  =  @nonstd_libhttpserver_LDFLAGS@
+# configure.ac: TF_WITH_NONSTD([something-something])
+Makefile_nonstd_CPPFLAGS_SET = 
+Makefile_nonstd_CFLAGS_SET   = 
+Makefile_nonstd_CXXLAGS_SET  = 
+Makefile_nonstd_LDFLAGS_SET  = 
 
 # extras not otherwise covered by the TF_WITH_MODULE([...]) declarations
 Makefile_PACKAGE_CPPFLAGS_SET = 

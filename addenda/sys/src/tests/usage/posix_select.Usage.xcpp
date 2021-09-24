@@ -47,13 +47,13 @@ namespace tests::usage::posix_select {
     namespace {
       namespace [[detail]] stanza_select {
         template<typename...> concept Select = requires(int n, Reads r, Writes w, Excepts e) {
-          { select(r) } -> convertible_to<same_as<Count>>;
-          { select(w) } -> convertible_to<same_as<Count>>;
-          { select(e) } -> convertible_to<same_as<Count>>;
-          { select(r, w) } -> convertible_to<same_as<Count>>;
-          { select(r, e) } -> convertible_to<same_as<Count>>;
-          { select(w, e) } -> convertible_to<same_as<Count>>;
-          { select(r, w, e) } -> convertible_to<same_as<Count>>;
+          { select(r) } -> same_as<Count>;
+          { select(w) } -> same_as<Count>;
+          { select(e) } -> same_as<Count>;
+          { select(r, w) } -> same_as<Count>;
+          { select(r, e) } -> same_as<Count>;
+          { select(w, e) } -> same_as<Count>;
+          { select(r, w, e) } -> same_as<Count>;
           //
           { select(n, r) } -> convertible_to<same_as<Count>>;
           { select(n, w) } -> convertible_to<same_as<Count>>;

@@ -106,10 +106,10 @@ auto tests::unit::c::vector::Fixture::suite() -> cppunit::Test * {
   Stream series("vector");
   series << call("usage", &Fixture::test_usage)
          << call("rest", &Fixture::test_rest)
-         << add(Consty::suite())
-         << add(Muting::suite())
-         << add(Nullptr<::c::vector>::suite())
-         << add(Nullptr<::c::const_vector>::suite())
+         << add<Consty>()
+         << add<Muting>()
+         << add<Nullptr<::c::vector>>()
+         << add<Nullptr<::c::const_vector>>()
     ;
   return series.release();
 }

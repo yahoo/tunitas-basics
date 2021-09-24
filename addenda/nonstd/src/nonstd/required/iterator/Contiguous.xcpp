@@ -26,7 +26,7 @@ namespace nonstd::required::iterator {
       { iterator -= delta } -> convertible_to<ITERATOR &>;
       { iterator - iterator } -> convertible_to<typename iterator_traits<ITERATOR>::difference>;
       { iterator[delta] } -> convertible_to<typename iterator_traits<ITERATOR>::reference>;
-      { iterator[delta] = typename iterator_traits<ITERATOR>::value_type{} } ->  convertible_to<-> typename iterator_traits<ITERATOR>::reference>;
+       { iterator[delta] = typename iterator_traits<ITERATOR>::value_type{} } -> convertible_to<typename iterator_traits<ITERATOR>::reference>>;
     };
 #endif
 #else

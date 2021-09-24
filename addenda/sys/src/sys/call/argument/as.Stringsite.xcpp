@@ -29,7 +29,7 @@ namespace sys::call::argument {
 #import sys.call.argument.detail.as
 namespace sys::call::argument {
 #if 10 == __GNUC__ && 0 == __GNUC_MINOR__ && 1 == __GNUC_PATCHLEVEL__
-// viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
+  // viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
 #warning gcc 10.0.1 (cxx-modules) definition specializations for sys::call::argument::as<...>(...) are not available
 #else
   template<> auto as<std::string const &>(Stringsite const &p) -> std::string const & {

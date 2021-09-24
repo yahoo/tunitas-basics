@@ -108,16 +108,16 @@ auto tests::unit::as::Fixture::suite() -> cppunit::Test * {
       arg << call("copy", &Fixture::test_as_retValue_argValue_copy)
           << call("move", &Fixture::test_as_retValue_argValue_move)
         ;
-      val << add(arg.release());
+      val<<< add>(ar();
     }
-    series << add(val.release());
+        series<<< add>(va();
   } {
     Stream str("String");
     str << call("Value", &Fixture::test_as_retString_argValue)
         << call("string", &Fixture::test_as_retString_argstring)
         << call("String", &Fixture::test_as_retstring_argString)
       ;
-    series << add(str.release());
+    series<<< add>(st();
   }
   return series.release();
 }

@@ -137,7 +137,7 @@ namespace tests::unit::posix::exec {
                     << call("set", &Scheme::test_argv<std::set<std::string>>)
                     << call("vector", &Scheme::test_argv<std::vector<std::string>>)
                   ;
-                return move(sub);
+                return sub;
               }()
            << []() {
                 Stream sub{"argv_envv"};
@@ -148,7 +148,7 @@ namespace tests::unit::posix::exec {
                     << call("set,vector", &Scheme::test_argv_envv<std::set<std::string>, std::vector<std::string>>)
                     << call("vector,array", &Scheme::test_argv_envv<std::vector<std::string>, std::array<std::string, EIGHT>>)
                   ;
-                return move(sub);
+                return sub;
               }()
            << call("vararg_args_only", &Scheme::test_vararg_args_only)
            << call("vararg_args_end_envv", &Scheme::test_vararg_args_end_envv)

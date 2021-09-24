@@ -1,4 +1,4 @@
 #!/bin/sh
 export PATH="${0%/*}/../../check/bin:${0%/*}/../../bin:$PATH"
 # --list is a feature of unit-rigging after [what is it? v0.1.?]
-unit --list || echo "FIXME get module-unit-rigging with '--list'"
+unit ist || echo "FIXME get module-unit-rigging with '--list'"

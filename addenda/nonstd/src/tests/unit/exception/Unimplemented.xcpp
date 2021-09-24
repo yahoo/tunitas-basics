@@ -102,7 +102,7 @@ auto tests::unit::exception::Unimplemented::suite() -> cppunit::Test * {
                   << call("1arg", &Unimplemented::test_1arg)
                   << call("3arg", &Unimplemented::test_3arg)
                   << END;
-              return move(con);
+              return con;
             }()
          << []{
               auto op = Stream{"operator<<"};
@@ -116,7 +116,7 @@ auto tests::unit::exception::Unimplemented::suite() -> cppunit::Test * {
                  << add<Operator::Insert<char16_t>>()
                  << add<Operator::Insert<char32_t>>()
                  << END;
-              return move(op);
+              return op;
             }()
          << END;
   return finalize(series);

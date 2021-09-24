@@ -34,45 +34,45 @@ namespace tests::usage::posix_wait3 {
       namespace [[detail]] disambiguate_function {
         using sys::posix::wait3;
         template<typename RETURNED> concept Instance = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
-    requires required::Process<RETURNED>; // ........... superclass
+          requires required::Process<RETURNED>; // ........... superclass
           requires same_as<RETURNED, sys::id::Process>; // ... specific
           // WATCHOUT - this is copypasta among the two disambiguation namespaces
-    { wait3() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
-    { wait3(options) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
-    { wait3(options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
-    { wait3(options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Usages>>>;
-    { wait3(options, sutats, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(sutats, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
+          { wait3(options) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
+          { wait3(options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+          { wait3(options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Usages>>>;
+          { wait3(options, sutats, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3(sutats, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
           //
-    { wait3(options, {}, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(options, sutats, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(options, {}, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3(options, {}, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, sutats, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, {}, {}) } -> convertible_to<result::Value<RETURNED>>;
           //
-    { wait3({}, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(sutats, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3({}, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3({}, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3({}, options, {}) } -> convertible_to<result::Value<RETURNED>>;
         };
       }
       namespace [[detail]] disambiguate_native {
         using sys::posix::native::wait3;
         template<typename RETURNED> concept Instance = requires(RETURNED, io::Options options, io::Status &sutats, io::Usages &segasu) {
-    requires required::Process<RETURNED>; // ... superclass
+          requires required::Process<RETURNED>; // ... superclass
           requires same_as<RETURNED, pid_t>; // ...... specific
-    // WATCHOUT - this is copypasta among the two disambiguation namespaces
-    { wait3() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
-    { wait3(options) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
-    { wait3(options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
-    { wait3(options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Usages>>>;
-    { wait3(options, sutats, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(sutats, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          // WATCHOUT - this is copypasta among the two disambiguation namespaces
+          { wait3() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
+          { wait3(options) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status, io::Usages>>>;
+          { wait3(options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;
+          { wait3(options, sutats) } -> convertible_to<convertible_to<result::Value<RETURNED, io::Usages>>>;
+          { wait3(options, sutats, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3(sutats, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
           //
-    { wait3(options, {}, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(options, sutats, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(options, {}, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-          //
-    { wait3({}, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3(sutats, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-    { wait3({}, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+          { wait3(options, {}, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, sutats, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(options, {}, {}) } -> convertible_to<result::Value<RETURNED>>;
+                //
+          { wait3({}, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3(sutats, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+          { wait3({}, options, {}) } -> convertible_to<result::Value<RETURNED>>;
         };
       }
     }

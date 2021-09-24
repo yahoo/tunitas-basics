@@ -147,7 +147,7 @@ auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
                                 form << call("char const *", &Fixture::test_usage_put_format_char_const_pointer)
                                      << call("std::string", &Fixture::test_usage_put_format_std_string)
                                      << END;
-                                return move(form);
+                                return form;
                               }()
                            << []() {
                                 auto sca = Stream{"scale"};
@@ -163,13 +163,13 @@ auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
                                     << call("std::mega", &Fixture::test_usage_put_scaled<std::mega>)
                                     << call("std::giga", &Fixture::test_usage_put_scaled<std::giga>)
                                     << END;
-                                return move(sca);
+                                return sca;
                               }()
                            << END;
-                         return move(put);
+                         return put;
                      }()
                   << END;
-              return move(use);
+              return use;
             }()
          << call("gm", &Fixture::test_gm)
          << call("local", &Fixture::test_local)
@@ -184,7 +184,7 @@ auto tests::unit::time::Fixture::suite() -> cppunit::Test * {
                lit << add<Literals<unsigned long long>>()
                    << add<Literals<long double>>()
                    << END;
-               return move(lit);
+               return lit;
              }())
          << END;
   return finalize(series);

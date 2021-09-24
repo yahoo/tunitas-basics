@@ -1,4 +1,4 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
 // Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
@@ -196,7 +196,7 @@ auto tests::unit::application::Fixture::suite() -> cppunit::Test * {
                        usa << call("1", &Fixture::test_exception_Usage_1)
                            << call("2", &Fixture::test_exception_Usage_2)
                            << END;
-                       return move(usa);
+                       return usa;
                      }()
                   << call("Version", &Fixture::test_exception_Version)
                   << []{
@@ -205,14 +205,14 @@ auto tests::unit::application::Fixture::suite() -> cppunit::Test * {
                            << call("2", &Fixture::test_exception_Quitting_2)
                            << call("3", &Fixture::test_exception_Quitting_3)
                            << END;
-                       return move(qui);
+                       return qui;
                      }()
                   << []{
                        auto mes = Stream{"Messaging"};
                        mes << call("1", &Fixture::test_exception_Messaging_1)
                            << call("2", &Fixture::test_exception_Messaging_2)
                            << END;
-                       return move(mes);
+                       return mes;
                      }()
                   << []{
                        auto thr = Stream{"throwing"};
@@ -220,17 +220,17 @@ auto tests::unit::application::Fixture::suite() -> cppunit::Test * {
                            << call("2", &Fixture::test_exception_throwing_2)
                            << call("3", &Fixture::test_exception_throwing_3)
                            << END;
-                       return move(thr);
+                       return thr;
                      }()
                   << END;
-                return move(exc);
+                return exc;
             }()
          << []{
               auto wor = Stream{"words"};
               wor << call("Strings", &Fixture::test_words_Strings)
                   << call("Filepaths", &Fixture::test_words_Filepaths)
                   << END;
-              return move(wor);
+              return wor;
             }()
          << add<options::Fixture>()
          << END;

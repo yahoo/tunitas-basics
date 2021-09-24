@@ -27,18 +27,10 @@ namespace tests::usage::posix_DN {
       requires (int)DN::RENAME == DN_RENAME;
       requires (int)DN::MULTISHOT == DN_MULTISHOT;
       requires requires(DN, typename DN::Notify ify, typename DN::Notifies ies) {
-#if 202003L < __cplusplus
-        { DN::template as<typename DN::Notify>(ify) } -> convertible_to<convertible_to<typename DN::Notify>>;
-        { DN::template as<typename DN::Notifies>(ify) } -> convertible_to<convertible_to<typename DN::Notifies>>;
-        { DN::template as<typename DN::Notify>(ies) } -> convertible_to<convertible_to<typename DN::Notify>>;
-        { DN::template as<typename DN::Notifies>(ies) } -> convertible_to<convertible_to<typename DN::Notifies>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { DN::template as<typename DN::Notify>(ify) } -> convertible_to<typename DN::Notify>;
         { DN::template as<typename DN::Notifies>(ify) } -> convertible_to<typename DN::Notifies>;
         { DN::template as<typename DN::Notify>(ies) } -> convertible_to<typename DN::Notify>;
         { DN::template as<typename DN::Notifies>(ies) } -> convertible_to<typename DN::Notifies>;
-#endif
       };
     };
     template<typename... _> concept Usage = requires(_...) {

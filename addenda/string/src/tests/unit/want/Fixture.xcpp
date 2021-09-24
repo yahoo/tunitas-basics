@@ -59,11 +59,11 @@ auto tests::unit::want::Fixture::suite() -> cppunit::Test * {
         a << call("char", &Fixture::test_printable_crudely_as_string_char)
           << call("string", &Fixture::test_printable_crudely_as_string_string)
           ;
-        c << add(a.release());
+        c<<< add>(();
       }
-      p << add(c.release());
+          p<<< add>(();
     }
-    series << add(p.release());
+          series<<< add>(();
   }
   return series.release();
 }

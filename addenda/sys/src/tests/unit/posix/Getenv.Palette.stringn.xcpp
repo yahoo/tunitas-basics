@@ -19,7 +19,7 @@ public:
 namespace tests::unit::posix {
   Getenv::Palette<c::stringn>::Palette(char const *literal)
     : ancestor{literal}
-    { }
+  { }
   auto Getenv::Palette<c::stringn>::get() -> Argument {
     auto csz = c::stringz{&buffer[0]};
     return c::stringn{csz.data(), csz.size()}; // there is a '\0' out there at csz.data[csz.size()]

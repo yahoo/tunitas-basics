@@ -477,7 +477,7 @@ namespace tests::unit::posix {
                                       << call("setlk", &Driver::test_setlk)
                                       << call("setlkw", &Driver::test_setlkw)
                                     ;
-                                  return move(a32);
+                                  return a32;
                                 }()
                              << []() {
                                   Stream a64{"64"};
@@ -485,10 +485,10 @@ namespace tests::unit::posix {
                                       << call("setlk", &Driver::test_setlk64)
                                       << call("setlkw", &Driver::test_setlkw64)
                                     ;
-                                  return move(a64);
+                                  return a64;
                                 }()
                            ;
-                         return move(pro);
+                         return pro;
                        }()
                     << []() {
                          Stream fil{"file"};
@@ -498,7 +498,7 @@ namespace tests::unit::posix {
                                       << call("setlk", &Driver::test_ofd_setlk)
                                       << call("setlkw", &Driver::test_ofd_setlkw)
                                     ;
-                                  return move(a32);
+                                  return a32;
                                 }()
                              << []() {
                                   Stream a64{"64"};
@@ -506,13 +506,13 @@ namespace tests::unit::posix {
                                       << call("setlk", &Driver::test_ofd_setlk64)
                                       << call("setlkw", &Driver::test_ofd_setlkw64)
                                     ;
-                                  return move(a64);
+                                  return a64;
                                 }()
                            ;
-                         return move(fil);
+                         return fil;
                        }()
                   ;
-                return move(lck);
+                return lck;
               }()
            << []() {
                 Stream lea{"lease"};
@@ -524,13 +524,13 @@ namespace tests::unit::posix {
                                   by << call("LOCK", &Driver::test_setlease_by_LOCK)
                                      << call("LEASE", &Driver::test_setlease_by_LEASE)
                                      << END;
-                                  return move(by);
+                                  return by;
                                 }()
                              << END;
-                         return move(set);
+                         return set;
                        }()
                     << END;
-                return move(lea);
+                return lea;
               }()
            << call("getpipe-sz", &Driver::test_getpipe_sz)
            << call("setpipe-sz", &Driver::test_setpipe_sz)
@@ -550,17 +550,17 @@ namespace tests::unit::posix {
                          pro << call("get", &Driver::test_get_rw_hint)
                              << call("set", &Driver::test_set_rw_hint)
                              << END;
-                         return move(pro);
+                         return pro;
                        }()
                     << []() {
                          Stream fil{"file"};
                          fil << call("get_hint", &Driver::test_get_file_rw_hint)
                              << call("set", &Driver::test_set_file_rw_hint)
                              << END;
-                         return move(fil);
+                         return fil;
                        }()
                     << END;
-                return move(rwh);
+                return rwh;
               }()
            << END;
     return finalize(series);

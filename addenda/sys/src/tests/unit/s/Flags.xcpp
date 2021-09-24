@@ -123,13 +123,13 @@ auto tests::unit::s::Flags::suite() -> cppunit::Test * {
               con << call("default", &Flags::test_constructor_default)
                   << call("Flag", &Flags::test_constructor_Flag)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream op{"operator"};
               op << call("Value", &Flags::test_operator_Value)
                 ;
-              return move(op);
+              return op;
             }()
          << call("constants", &Flags::test_constants)
          << call("as", &Flags::test_as)

@@ -154,7 +154,7 @@ auto tests::unit::wait::Status::suite() -> cppunit::Test * {
                   << call("muting", &Status::test_value_muting)
                   << call("moving", &Status::test_value_moving)
                   << END;
-              return move(val);
+              return val;
             }()
          << call("clear", &Status::test_clear)
          << call("ifexited", &Status::test_ifexited)

@@ -131,42 +131,42 @@ auto tests::unit::regex::Match::suite() -> cppunit::Test * {
              ca1 << call("01", &Match::test_case1_01)
                  << call("02", &Match::test_case1_02)
                  << END;
-             return move(ca1);
+             return ca1;
            }()
         << []() {
              auto ca2 = Stream{"case2"};
              ca2 << call("01", &Match::test_case2_01)
                  << call("02", &Match::test_case2_02)
                  << END;
-             return move(ca2);
+             return ca2;
            } ()
         << [](){
              auto ca3 = Stream{"case3"};
              ca3 << call("01", &Match::test_case3_01)
                  << call("02", &Match::test_case3_02)
                  << END;
-             return move(ca3);
+             return ca3;
            } ()
         << [](){
              auto ca4 = Stream{"case4"};
              ca4 << call("01", &Match::test_case4_01)
                  << call("02", &Match::test_case4_02)
                  << END;
-             return move(ca4);
+             return ca4;
            } ()
         << [](){
              auto ca5 = Stream{"case5"};
              ca5 << call("01", &Match::test_case5_01)
                  << call("02", &Match::test_case5_02)
                  << END;
-             return move(ca5);
+             return ca5;
            } ()
         << [](){
              auto ca6 = Stream{"case6"};
              ca6 << call("01", &Match::test_case6_01)
                  << call("02", &Match::test_case6_02)
                  << END;
-             return move(ca6);
+             return ca6;
            }()
         << END;
   return finalize(suite);

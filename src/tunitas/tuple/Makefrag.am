@@ -8,4 +8,6 @@ obj_src_tunitas_tuple_SUBSOURCES = \
   obj/src/tunitas/Tuple.cpp \
   obj/src/tunitas/tuple/namespace.cpp \
   obj/src/tunitas/tuple/Tuple.cpp \
+  obj/src/tunitas/tuple/Size.cpp \
+  obj/src/tunitas/tuple/Element.cpp \
   $(end)

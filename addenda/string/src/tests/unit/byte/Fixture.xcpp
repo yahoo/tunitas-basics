@@ -60,9 +60,9 @@ auto tests::unit::byte::Fixture::suite() -> cppunit::Test * {
         << call("const_buffer", &Fixture::test_usage_const_buffer)
         << call("basic_buffer", &Fixture::test_usage_basic_buffer)
       ;
-    series << add(use.release());
+    series<<< add>(us();
   }
-  series << add(buffer::Fixture::suite())
+      series<<< add>(buffer::Fixture()
     ;
   return series.release();
 }

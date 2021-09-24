@@ -202,7 +202,7 @@ auto tests::unit::prepared::Fixture::suite() -> cppunit::Test * {
     << call("value0move", &Fixture::test_value_move)
     << call("value-forward", &Fixture::test_value_forward)
     << call("value-remaining", &Fixture::test_value_remaining)
-    << add(BasicResult::suite())
+    << add<BasicResult>()
     ;
   return s.release();
 }

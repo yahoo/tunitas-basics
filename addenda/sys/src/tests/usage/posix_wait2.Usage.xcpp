@@ -32,7 +32,7 @@ namespace tests::usage::posix_wait2 {
       namespace [[detail]] disambiguate_function {
         using sys::posix::wait2;
         template<typename RETURNED> concept Instance = requires(RETURNED, io::Status &sutats) {
-    requires same_as<RETURNED, sys::id::Process>;
+          requires same_as<RETURNED, sys::id::Process>;
           requires required::Process<RETURNED>;
           // WATCHOUT - this is copypasta among the two disambiguation namespaces
     { wait2() } -> convertible_to<convertible_to<result::Value<RETURNED, io::Status>>>;

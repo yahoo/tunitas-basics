@@ -18,7 +18,7 @@ public:
 namespace tests::unit::posix {
   Getenv::Palette<c::stringz>::Palette(char const *literal)
     : ancestor{literal}
-    { }
+  { }
   auto Getenv::Palette<c::stringz>::get() -> Argument {
     return c::stringz{&buffer[0]};
   }

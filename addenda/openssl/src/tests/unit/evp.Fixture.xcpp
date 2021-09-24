@@ -29,7 +29,7 @@ auto tests::unit::evp::Fixture::test_usage_ec() -> void {
                 ek.set_group(move(gr));
                 ek.generate_key();
                 pk.assign(move(ek));
-                return move(pk);
+                return pk;
               }();
   CPPUNIT_ASSERT(nullptr != pkey.get());
 }
@@ -42,7 +42,7 @@ auto tests::unit::evp::Fixture::test_usage_rsa() -> void {
                 auto pk = evp::PKey{};
                 auto pair = rsa::generate(rsa::Bits::RSA2048);
                 pk.assign(std::move(pair));
-                return move(pk);
+                return pk;
               }();
   CPPUNIT_ASSERT(nullptr != pkey.get());
 }

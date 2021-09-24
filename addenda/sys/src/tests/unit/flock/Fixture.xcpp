@@ -116,7 +116,7 @@ auto tests::unit::flock::Fixture::suite() -> cppunit::Test * {
               use << call("Options", &Fixture::test_usage_Options)
                   << call("Specification", &Fixture::test_usage_Specification)
                 ;
-              return move(use);
+              return use;
             }()
          << call("constants", &Fixture::test_constants)
          << call("call", &Fixture::test_call)

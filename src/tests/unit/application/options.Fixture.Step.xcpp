@@ -22,7 +22,7 @@ public:
   Step(Code, Value);
 protected:
   Value value;
-  using Option_Line = ::option; // a.k.a. cli::options::longish::specificatoin::Option; available in module-options >= 2.0
+  using Option_Line = ::options::longish::specification::Option;
   Option_Line const dummy_option_line;
 };
 #endiv

@@ -28,7 +28,7 @@ namespace tests::unit::format::integer {
     inline static constexpr auto high() -> Value { return 5; }
     inline static constexpr auto low() -> Value {
       if constexpr (nonstd::is_unsigned<Value>::value) { return 0u; }
-                                                  else { return 0 - high(); }
+      else { return 0 - high(); }
     }
     inline static auto succ(Value value) -> Value { return value + 1; }
     inline static auto jump(Value value) -> Value {

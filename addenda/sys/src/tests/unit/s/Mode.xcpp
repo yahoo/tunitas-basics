@@ -70,13 +70,13 @@ auto tests::unit::s::Mode::suite() -> cppunit::Test * {
                   << call("Triple", &Mode::test_constructor_Triple)
                   << call("Quad", &Mode::test_constructor_Quad)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream op{"operator"};
               op << call("Value", &Mode::test_operator_Value)
                 ;
-              return move(op);
+              return op;
             }()
     ;
   return finalize(series);

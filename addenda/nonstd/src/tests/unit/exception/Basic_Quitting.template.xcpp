@@ -153,7 +153,7 @@ namespace tests::unit::exception::basic_quitting {
                              << call("Toy", &Basic_Quitting::test_constructor_1arg_toy)
                              << call("Utensil", &Basic_Quitting::test_constructor_1arg_utensil)
                              << END;
-                         return move(arg);
+                         return arg;
                        }()
                     << []{
                          auto arg = Stream("2arg");
@@ -161,10 +161,10 @@ namespace tests::unit::exception::basic_quitting {
                              << call("Toy", &Basic_Quitting::test_constructor_2arg_toy)
                              << call("Utensil", &Basic_Quitting::test_constructor_2arg_utensil)
                              << END;
-                         return move(arg);
+                         return arg;
                        }()
                     << END;
-                  return move(con);
+                return con;
               }()
            << call("message", &Basic_Quitting::test_message)
            << []{
@@ -176,10 +176,10 @@ namespace tests::unit::exception::basic_quitting {
                              << call("Toy", &Basic_Quitting::test_code_cast_toy)
                              << call("Utensil", &Basic_Quitting::test_code_cast_utensil)
                              << END;
-                         return move(cas);
+                         return cas;
                        }()
                     << END;
-                  return move(cod);
+                return cod;
               }()
            << call("stream", &Basic_Quitting::test_stream)
            << call("severity_name", &Basic_Quitting::test_severity_name)

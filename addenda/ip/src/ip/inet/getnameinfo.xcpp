@@ -17,7 +17,7 @@ namespace ip {
     template<> inline auto getnameinfo<nameinfo::HOST, nameinfo::SERVICE>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::HOST, nameinfo::SERVICE>;
     template<> inline auto getnameinfo<nameinfo::HOST>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::HOST>;
     template<> inline auto getnameinfo<nameinfo::SERVICE>(in::sockaddr const *, socklen_t length, NI::Features) -> result::Getnameinfo<nameinfo::SERVICE>;
- }
+  }
 }
 #endiv
 #divert <ipp>

@@ -241,14 +241,14 @@ namespace tests::unit::id {
                      << call("Either", &Fixture::test_process_Either)
                      << call("Any", &Fixture::test_process_Any)
                      << END;
-                return move(proc);
+                return proc;
               }()
            << call("Wait", &Fixture::test_Wait)
            << []() {
                 Stream wait{"wait"};
                 wait << call("Type", &Fixture::test_wait_Type)
                      << END;
-                return move(wait);
+                return wait;
               }()
            << []() {
                 Stream is{"is"};
@@ -260,7 +260,7 @@ namespace tests::unit::id {
                            << call("Either", &Fixture::test_is_group_Either)
                            << call("Any", &Fixture::test_is_group_Any)
                            << END;
-                        return move(gr);
+                        return gr;
                       }()
                    << []() {
                         Stream pr{"process"};
@@ -270,7 +270,7 @@ namespace tests::unit::id {
                            << call("Either", &Fixture::test_is_process_Either)
                            << call("Any", &Fixture::test_is_process_Any)
                            << END;
-                        return move(pr);
+                        return pr;
                       }()
                    << []() {
                         Stream th{"thread"};
@@ -279,10 +279,10 @@ namespace tests::unit::id {
                            << call("Thread", &Fixture::test_is_thread_Thread)
                            << call("Any", &Fixture::test_is_thread_Any)
                            << END;
-                        return move(th);
+                        return th;
                       }()
                    << END;
-                return move(is);
+                return is;
               }()
            << END;
     return finalize(series);

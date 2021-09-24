@@ -25,7 +25,7 @@ namespace sys::posix::packaging::sleep {
     using namespace packaging::required; // cascade namespace required
     template<typename TYPE> concept POSIX_Time_Structure = same_as<TYPE, time::Old> || same_as<TYPE, time::Val> || same_as<TYPE, time::Spec>;
     template<typename DURATION> concept Duration = requires(DURATION) {
-    typename DURATION::rep;
+      typename DURATION::rep;
       typename DURATION::period;
       requires required::Integer<typename DURATION::rep>;
       requires required::Ratio<typename DURATION::period>;

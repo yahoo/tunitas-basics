@@ -7,8 +7,6 @@
 namespace tests::unit::base64 { class Decode; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::base64::Decode : public cppunit::test::Fixture {
 public:
   auto test_01() -> void;
@@ -131,11 +129,8 @@ auto tests::unit::base64::Decode::test_02() -> void {
     }
   }
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::Decode::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("decode");
   series << call("01", &Decode::test_01)
 	 << call("02", &Decode::test_02)
@@ -157,6 +152,6 @@ auto tests::unit::base64::Decode::suite() -> cppunit::Test * {
     }
     series << move(saf);
   }
-  return series.release();
+  return finalize(series);
 }
 #endiv

@@ -1,4 +1,4 @@
 #!/bin/sh
 export PATH="${0%/*}/../../check/bin:${0%/*}/../../bin:$PATH"
-unit .../$(basename "$0" .test)
+unit /$(basename "$0" .test)
 

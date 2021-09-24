@@ -44,7 +44,7 @@ auto tests::unit::flock::Operation::suite() -> cppunit::Test * {
               con << call("preferred", &Operation::test_constants_preferred)
                   << call("deprecated", &Operation::test_constants_deprecated)
                   << END;
-              return move(con);
+              return con;
             }()
          << END;
   return finalize(series);

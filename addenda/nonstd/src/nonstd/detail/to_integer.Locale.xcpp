@@ -78,21 +78,21 @@ namespace nonstd::detail::to_integer {
   template<required::Character C, typename W> Locale<C,W>::Locale(std::lconv const *l)
     : grouping_sizes{}
     , thousands_separator{} {
-    if (nullptr != l) {
-      if (nullptr != l->grouping) {
-        auto grp = *l->grouping;
-        auto no = grp <= 0 || grp == Limits::max();
-        if (!no) {
-          grouping_sizes = l->grouping;
-          auto sep = *l->thousands_sep;
-          auto no = sep <= 0 || sep == Limits::max();
-          if (!no && '\0' != sep) {
-            thousands_separator = sep;
+      if (nullptr != l) {
+        if (nullptr != l->grouping) {
+          auto grp = *l->grouping;
+          auto no = grp <= 0 || grp == Limits::max();
+          if (!no) {
+            grouping_sizes = l->grouping;
+            auto sep = *l->thousands_sep;
+            auto no = sep <= 0 || sep == Limits::max();
+            if (!no && '\0' != sep) {
+              thousands_separator = sep;
+            }
           }
         }
       }
     }
-  }
   template<required::Character C, typename W>auto Locale<C,W>::no_grouping() -> void {
     grouping_sizes.reset();
     thousands_separator.reset();
@@ -112,7 +112,7 @@ namespace nonstd::detail::to_integer {
 #endiv
 #divert <tpp>
 //
-// This function is almost directly from the GNU C Library; having been modernized to C++2a.
+// This function is almost directly from the GNU C Library; having been modernized to C++23 (sic).
 // specifically: glib.git/stdlib/group.c __correctly_grouped_prefixwc(...)
 // By intent and by declaration herein and around about, this code is covered the the LGPL,
 // as is all of module-nonstd.  The original was 2003-05-11, Ulrich Drepper (via git blame)

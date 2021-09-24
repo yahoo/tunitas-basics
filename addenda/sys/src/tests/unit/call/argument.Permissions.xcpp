@@ -68,7 +68,7 @@ auto tests::unit::call::argument::Permissions::suite() -> cppunit::Test * {
                   << call("Flags", &Permissions::test_constructor_Flags)
                   << call("implicitness", &Permissions::test_constructor_implicitness)
                 ;
-              return move(con);
+              return con;
             }()
          << call("operator mode_t", &Permissions::test_operator_cast)
     ;

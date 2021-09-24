@@ -8,7 +8,7 @@ namespace nonstd {
   // Its is it like a std::span?  nonstd::span?
   // The Spanlike is a superset of the Dopelike
   //
-  // Whereas std::span<T, E> is C++2a, it is supported.
+  // Whereas std::span<T, E> is C++20, it is supported.
   //
   // Quirk
   //   std::basic_string_view<C,T>::data() returns a pointer-to-const

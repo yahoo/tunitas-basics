@@ -1,0 +1,19 @@
+#!/bin/bash --norc
+# Copyright Yahoo Inc, 2021.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-montara/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/services/montara/tree/LICENSE
+: ${with_build:=/build}
+: ${with_worktrees:=${with_build?}/worktrees}
+: ${TAG:=CURRENT}
+
+: ${with_module_rigging_core=${with_module_rigging_core:-${with_worktrees?}/rigging-core/v1.${TAG?}}}
+: ${with_module_rigging=${with_module_rigging_core?}}
+
+with_build=${with_build?} \
+with_hypogeal_twilight=${with_hypogeal_twilight:-${with_worktrees?}/hypogeal-twilight/v0.${TAG?}} \
+with_module_langu=${with_module_langu:-${with_worktrees?}/langu/v0.${TAG?}} \
+with_module_rigging_core=${with_module_rigging_core?} \
+with_module_rigging=${with_module_rigging?} \
+\
+exec ${0%/*}/nearby

@@ -58,8 +58,8 @@ auto tests::unit::config::Fixture::suite() -> cppunit::Test * {
   Stream s("config");
   s << call("safe-nop", &Fixture::test_unsafe_nop)
     << call("unsafe-nop", &Fixture::test_safe_nop)
-    << add(Session::suite())
-    << add(Connection::suite());
+    << add<Session>()
+    << add<Connection>();
     ;
   return s.release();
 }

@@ -197,7 +197,7 @@ namespace tests::flags {
                 uni << call("flag", &Scenario<1,_>::test_flag_universe)
                     << call("flags", &Scenario<1,_>::test_flags_universe)
                   ;
-                return move(uni);
+                return uni;
               }()
            << []() {
                 Stream ann{"and"};
@@ -207,7 +207,7 @@ namespace tests::flags {
                     << call("11", &Scenario<1,_>::test_and_11)
                     << call("assign", &Scenario<1,_>::test_and_assign)
                   ;
-                return move(ann);
+                return ann;
               }()
            << []() {
                 Stream orr{"or"};
@@ -217,21 +217,21 @@ namespace tests::flags {
                     << call("11", &Scenario<1,_>::test_or_11)
                     << call("assign", &Scenario<1,_>::test_or_assign)
                   ;
-                return move(orr);
+                return orr;
               }()
            << []() {
                 Stream acc{"acc"};
                 acc << call("or_assign", &Scenario<1,_>::test_accumulate_or_assign)
                     << call("via_rhs", &Scenario<1,_>::test_accumulate_via_rhs)
                   ;
-                return move(acc);
+                return acc;
               }()
            << []() {
                 Stream dec{"dec"};
                 dec << call("and_assign", &Scenario<1,_>::test_decumulate_and_assign)
                     << call("via_rhs", &Scenario<1,_>::test_decumulate_via_rhs)
                   ;
-                return move(dec);
+                return dec;
               }()
            << call("contains", &Scenario<1,_>::test_contains)
            << call("is_flag", &Scenario<1,_>::test_is_flag)

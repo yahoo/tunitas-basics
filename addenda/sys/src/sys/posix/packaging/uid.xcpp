@@ -55,7 +55,7 @@ namespace sys::posix::packaging::uid {
     inline auto setreuid(uid_t r, uid_t e) -> uid::Result;
     inline auto setresuid(Triple) -> uid::Result;
     inline auto setresuid(uid_t r, uid_t e, uid_t s) -> uid::Result;
-  using std::get;
+    using std::get;
     template<unsigned N> inline auto up(Triple) -> User;
   }
 }

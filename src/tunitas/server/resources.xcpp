@@ -3,111 +3,119 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
-#divert <hpp>
-#import httpserver.Request //  [[reminder]] need the complete type
-#import httpserver.Response // [[reminder]] ibidem.
-#import std.string //          [[reminder]] ibidem.
+#divert <fpp>
 #import tunitas.server.service
-#import tunitas.server.required.Stringable
-#import tunitas.server.required.Resourceful
+#import microhttpd.method.Permissions // and Access
+#import microhttpd.method.Unregistered
+#import microhttpd.method.Registered
 namespace tunitas::server::resources {
-  using namespace service;
-  //
-  // Initialize the resource to allow or disallow the various HTTP verbs.
-  // The default constructor of httpserver::Resource<CHILD> initializes all of the verbs as allowed.
-  // There is no other constructor to avoid this.
-  // Essentially we are *undoing* the work in the base element because there is no way to stop it.
-  // To wit (from httpserver/http_resource.hpp): [[FIXTHIS]] design this out in the successor tunitas::server
-  //
-  //   httpserver::http_resource::http_resource() { resource_init(allowed_methods); }
-  //
-  // Usage:
-  //
-  //   Taxonomy::Taxonomy() {
-  //     resources::initialize(*this, true, GET, PUT, POST);
-  //     resources::initialize(*this, false, OPTIONS, DELEET, CONNECT, TRACE);
-  //   }
-  //
-  // [[FIXTHIS]] bad design in libhttpserver wherein the base class is a template; not a template-over-a-concrete
-  template<required::Resourceful CHILD> inline auto initialize(CHILD &, bool value) -> void;
-  template<required::Resourceful CHILD, required::Stringable VERB, typename... REST> inline auto initialize(CHILD &, bool value, VERB const &, REST const &...) -> void;
-  //
-  // Usage:
-  //
-  //   Audience::Audience() {
-  //     resources::initialize_postable();
-  //   }
-  //
-  //   Audience_Identifier::Audience_Identifier() {
-  //     resources::initialize_puttable();
-  //   }
-  //
-  template<required::Resourceful CHILD> inline auto initialize_only_get(CHILD &) -> void; //     only GET
-  template<required::Resourceful CHILD> inline auto initialize_only_post(CHILD &) -> void; //    only POST
-  template<required::Resourceful CHILD> inline auto initialize_getputpost(CHILD &) -> void; //   GET, PUT & POST
-  template<required::Resourceful CHILD> inline auto initialize_putpost(CHILD &) -> void; //      PUT & POST (no GET)
-  template<required::Resourceful CHILD> inline auto initialize_getpost(CHILD &) -> void; //      GET & POST (no PUT)
-  template<required::Resourceful CHILD> inline auto initialize_getput(CHILD &) -> void; //       GET & PUT (no POST)
-  template<required::Resourceful CHILD> inline auto initialize_getdelete(CHILD &) -> void; //    GET & DELETE
-  namespace detail {
-    template<required::Resourceful CHILD> auto partially_initialize_gettable(CHILD &lhs) -> void;
+  namespace [[packaging]] resources_packaging {
+    namespace [[implementation]] implementation {
+      using namespace service;
+      using microhttpd::method::Access;
+      using microhttpd::method::Unregistered;
+      using microhttpd::method::Registered;
+      namespace [[interface]] interface { }
+    }
   }
+  using namespace resources_packaging::implementation::interface;
+}
+#endiv
+#divert <hpp>
+#import tunitas.server.required.Permissioned
+#import tunitas.server.required.Resourceful
+namespace tunitas::server::resources::resources_packaging::implementation {
+  namespace interface {
+    //
+    // Initialize the resource to allow or disallow the various HTTP verbs.
+    //
+    // Usage:
+    //
+    //   Taxonomy::Taxonomy() {
+    //     resources::initialize(*this, true, GET, PUT, POST);
+    //     resources::initialize(*this, false, OPTIONS, DELEET, CONNECT, TRACE);
+    //   }
+    //
+    // [[FIXTHIS,STILLTRUE?]] bad design in libhttpserver wherein the base class is a template; not a template-over-a-concrete
+    // [[WANT]] microhttpd++ which uses a stand-alone permissions subobject within the Resource.
+    // [[TODO,FIXTHAT]] convert to modify the microhttpd resource permissions object directly.
+    template<required::Resourceful CHILD, typename... VERBS> [[deprecated("instead of bool, prefer Access::ALLOW, Access::DISALLOW")]] inline auto initialize(CHILD &, bool value, VERBS const &...) -> void requires (required::Permissioned<VERBS> && ... && true);
+    template<required::Resourceful CHILD> inline auto initialize(CHILD &, Access) -> void;
+    template<required::Resourceful CHILD, required::Permissioned VERB, typename... REST> inline auto initialize(CHILD &, Access, VERB const &, REST const &...) -> void;
+    //
+    // Usage:
+    //
+    //   Audience::Audience() {
+    //     resources::initialize_postable();
+    //   }
+    //
+    //   Audience_Identifier::Audience_Identifier() {
+    //     resources::initialize_puttable();
+    //   }
+    //
+    template<required::Resourceful CHILD> inline auto initialize_only_get(CHILD &) -> void; //     only GET
+    template<required::Resourceful CHILD> inline auto initialize_only_post(CHILD &) -> void; //    only POST
+    template<required::Resourceful CHILD> inline auto initialize_getputpost(CHILD &) -> void; //   GET, PUT & POST
+    template<required::Resourceful CHILD> inline auto initialize_putpost(CHILD &) -> void; //      PUT & POST (no GET)
+    template<required::Resourceful CHILD> inline auto initialize_getpost(CHILD &) -> void; //      GET & POST (no PUT)
+    template<required::Resourceful CHILD> inline auto initialize_getput(CHILD &) -> void; //       GET & PUT (no POST)
+    template<required::Resourceful CHILD> inline auto initialize_getdelete(CHILD &) -> void; //    GET & DELETE
+  }
+  template<required::Resourceful CHILD> auto partially_initialize_gettable(CHILD &lhs) -> void;
 }
 #endiv
 #divert <ipp>
-#import tunitas.server.constants
-namespace tunitas::server {
-  template<required::Resourceful CHILD> auto resources::initialize(CHILD &, bool) -> void { /* the base case is a no op */ }
-  template<required::Resourceful CHILD, required::Stringable VERB, typename... REST> auto resources::initialize(CHILD &subject, bool value, VERB const &verb, REST const &...rest) -> void {
-    subject.set_allowing(verb, value);
-    initialize(subject, value, rest...);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_only_get(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    lhs.disallow_all();
-    resources::initialize(lhs, true, GET);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_only_post(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    lhs.disallow_all();
-    resources::initialize(lhs, true, POST);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_getputpost(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    detail::partially_initialize_gettable(lhs);
-    resources::initialize(lhs, true, POST, PUT);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_getpost(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    detail::partially_initialize_gettable(lhs);
-    resources::initialize(lhs, true, POST);
-    resources::initialize(lhs, false, PUT);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_getput(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    detail::partially_initialize_gettable(lhs);
-    resources::initialize(lhs, true, PUT);
-    resources::initialize(lhs, false, POST);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_getdelete(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    detail::partially_initialize_gettable(lhs);
-    resources::initialize(lhs, false, POST, PUT);
-    resources::initialize(lhs, true, DELEET);
-  }
-  template<required::Resourceful CHILD> auto resources::initialize_putpost(CHILD &lhs) -> void { 
-    using namespace constants::http;
-    lhs.disallow_all();
-    resources::initialize(lhs, true, POST, PUT);
-  }
-  template<required::Resourceful CHILD> auto resources::detail::partially_initialize_gettable(CHILD &lhs) -> void { 
-    using namespace constants::http;
+#import nonstd.same_as
+namespace tunitas::server::resources::resources_packaging {
+  template<required::Resourceful CHILD> auto implementation::partially_initialize_gettable(CHILD &lhs) -> void { 
     if constexpr (true) {
-      lhs.disallow_all();
-    } else {
-      resources::initialize(lhs, false, CONNECT, DELEET, HEAD, TRACE);
+        initialize(lhs, Access::ALLOW, Registered::GET);
+      } else {
+      // [[REMOVETHIS]] no need ... the default behavior of Permissions is "deny all" ... unless positivity (ALLOW) is asserted
+      initialize(lhs, Access::DISALLOW, Registered::CONNECT, Registered::DELETE, Registered::HEAD, Registered::TRACE);
     }
-    resources::initialize(lhs, true, GET);
+  }
+  namespace implementation {
+    template<required::Resourceful CHILD, typename... VERBS> auto interface::initialize(CHILD &subject, bool value, VERBS const &...verbs) -> void requires (required::Permissioned<VERBS> && ... && true) {
+      auto const access = value ? Access::ALLOW : Access::DISALLOW;
+      initialize(subject, access, verbs...);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize(CHILD &, Access) -> void { /* the base case is a no op */ }
+    template<required::Resourceful CHILD, required::Permissioned VERB, typename... REST> auto interface::initialize(CHILD &subject, Access value, VERB const &verb, REST const &...rest) -> void {
+      if constexpr(nonstd::same_as<VERB, Unregistered>) {
+        subject.permissions.declare(verb); /// must declare the oddballs before use; but it's idempotent
+      }
+      subject.permissions.define(verb, value);
+      initialize(subject, value, rest...);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_only_get(CHILD &lhs) -> void { 
+      initialize(lhs, Access::ALLOW, Registered::GET);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_only_post(CHILD &lhs) -> void { 
+      initialize(lhs, Access::ALLOW, Registered::POST);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_getputpost(CHILD &lhs) -> void { 
+      partially_initialize_gettable(lhs);
+      initialize(lhs, Access::ALLOW, Registered::POST, Registered::PUT);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_getpost(CHILD &lhs) -> void { 
+      partially_initialize_gettable(lhs);
+      initialize(lhs, Access::ALLOW, Registered::POST);
+      initialize(lhs, Access::DISALLOW, Registered::PUT);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_getput(CHILD &lhs) -> void { 
+      partially_initialize_gettable(lhs);
+      initialize(lhs, Access::ALLOW, Registered::PUT);
+      initialize(lhs, Access::DISALLOW, Registered::POST);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_getdelete(CHILD &lhs) -> void { 
+      partially_initialize_gettable(lhs);
+      initialize(lhs, Access::DISALLOW, Registered::POST, Registered::PUT);
+      initialize(lhs, Access::ALLOW, Registered::DELETE);
+    }
+    template<required::Resourceful CHILD> auto interface::initialize_putpost(CHILD &lhs) -> void { 
+      initialize(lhs, Access::ALLOW, Registered::POST, Registered::PUT);
+    }
   }
 }
 #endiv

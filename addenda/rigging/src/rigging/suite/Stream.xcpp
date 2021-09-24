@@ -81,7 +81,7 @@ namespace rigging::suite {
 }
 #import std.invalid_argument
 namespace rigging::suite {
-   auto Stream::disgorge() -> Suite * {
+  auto Stream::disgorge() -> Suite * {
     if (nullptr == subject.get()) {
       throw std::invalid_argument("empty");
     }

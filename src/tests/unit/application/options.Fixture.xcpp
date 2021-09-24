@@ -1,4 +1,4 @@
-// This is -*- c++ -*- nearly C++2a with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
 // Copyright Yahoo Inc, 2021.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
@@ -178,10 +178,10 @@ auto tests::unit::application::options::fixture::Fixture::suite() -> cppunit::Te
                         see << call("Args", &Fixture::test_c_Args)
                             << call("Argv", &Fixture::test_c_Argv)
                             << END;
-                        return move(see);
+                        return see;
                       }()
                    << END;
-              return move(dots);
+              return dots;
             }()
          << call("Argument", &Fixture::test_Argument)
          << call("Arguments", &Fixture::test_Arguments)
@@ -191,35 +191,35 @@ auto tests::unit::application::options::fixture::Fixture::suite() -> cppunit::Te
               get << call("good", &Fixture::test_get_filepath_good)
                   << call("bad", &Fixture::test_get_filepath_bad)
                   << END;
-              return move(get);
+              return get;
             }()
          << []() {
               auto get = Stream{"get_identifier"};
               get << call("good", &Fixture::test_get_identifier_good)
                   << call("bad", &Fixture::test_get_identifier_bad)
                   << END;
-              return move(get);
+              return get;
             }()
          << []() {
               auto get = Stream{"get_port"};
               get << call("good", &Fixture::test_get_port_good)
                   << call("bad", &Fixture::test_get_port_bad)
                   << END;
-              return move(get);
+              return get;
             }()
          << []() {
               auto get = Stream{"get_word"};
               get << call("good", &Fixture::test_get_word_good)
                   << call("bad", &Fixture::test_get_word_bad)
                   << END;
-              return move(get);
+              return get;
             }()
          << add<Specification>()
          << []{
               auto exc = Stream{"exception"};
               exc << add<exception::Fixture>()
                   << END;
-              return move(exc);
+              return exc;
             }()
          << END;
   return finalize(series);

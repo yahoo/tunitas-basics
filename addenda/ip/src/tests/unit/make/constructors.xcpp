@@ -37,8 +37,8 @@ namespace {
     for (auto word : words) {
       std::cerr << "piece " << std::hex << (unsigned) word << ' ' << integer << '\n';
       if constexpr (1 != N) {
-        integer <<= 8 * sizeof (word);
-      }
+          integer <<= 8 * sizeof (word);
+        }
       integer |= word;
     }
     std::cerr << "integer " << std::hex << integer << '\n';

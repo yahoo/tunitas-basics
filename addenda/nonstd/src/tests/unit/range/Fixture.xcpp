@@ -122,7 +122,7 @@ auto tests::unit::range::Fixture::suite() -> cppunit::Test * {
                   << call("1arg-muting", &Fixture::test_forward1_muting)
                   << call("2arg-consty", &Fixture::test_forward2)
                   << END;
-              return move(frw);
+              return frw;
             }()
          << []() {
               Stream rev("reverse");
@@ -130,7 +130,7 @@ auto tests::unit::range::Fixture::suite() -> cppunit::Test * {
                   << call("1arg-muting", &Fixture::test_reverse1_muting)
                   << call("2arg-consty", &Fixture::test_reverse2)
                   << END;
-              return move(rev);
+              return rev;
             }()
          << []() {
               Stream rev("indexing");
@@ -138,7 +138,7 @@ auto tests::unit::range::Fixture::suite() -> cppunit::Test * {
                   << call("1arg-muting", &Fixture::test_indexing1_muting)
                   << call("2arg-consty", &Fixture::test_indexing2)
                   << END;
-              return move(rev);
+              return rev;
             }()
          << END;
   return finalize(series);

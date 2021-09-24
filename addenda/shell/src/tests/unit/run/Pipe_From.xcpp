@@ -211,7 +211,7 @@ auto tests::unit::run::Pipe_From::suite() -> cppunit::Test * {
                   << call("path,name", &Pipe_From::test_constructor_path_name)
                   << call("exec,path,name", &Pipe_From::test_constructor_exec_path_name)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("start", &Pipe_From::test_start)
          << call("run", &Pipe_From::test_run)
@@ -220,7 +220,7 @@ auto tests::unit::run::Pipe_From::suite() -> cppunit::Test * {
               sub  << call("straem", &Pipe_From::test_read_stream)
                    << call("string", &Pipe_From::test_read_string)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("wait", &Pipe_From::test_wait)
          << []() {
@@ -230,7 +230,7 @@ auto tests::unit::run::Pipe_From::suite() -> cppunit::Test * {
                   << call("2", &Pipe_From::test_many<2>)
                   << call("3", &Pipe_From::test_many<3>)
                 ;
-              return move(sub);
+              return sub;
             }()      ;
   return finalize(series);
 }

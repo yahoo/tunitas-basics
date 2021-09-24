@@ -238,7 +238,7 @@ auto tests::unit::exits::Code::suite() -> cppunit::Test * {
                   << call("sys::exits::Code", &Code::test_constructor_template<::sys::exits::Code>)
                   << call("nonstd::sysexits::Code", &Code::test_constructor_template<::nonstd::sysexits::Code>)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("conversion_from_integer", &Code::test_conversion_from_integer)
          << call("assignment", &Code::test_assignment)

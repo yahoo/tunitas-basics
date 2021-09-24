@@ -631,7 +631,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("eaccess", &Fixture::test_eaccess_present)
                            << call("euidaccess", &Fixture::test_euidaccess_present)
                          ;
-                       return move(chm);
+                       return chm;
                      }()
                   << []() {
                        Stream at{"at"};
@@ -646,7 +646,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("symlinkat", &Fixture::test_symlinkat)
                           << call("unlinkat", &Fixture::test_unlinkat)
                          ;
-                       return move(at);
+                       return at;
                      }()
                   << []() {
                        Stream chm{"chmod"};
@@ -654,7 +654,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("fchmod", &Fixture::test_fchmod_something)
                            << call("chmod", &Fixture::test_chmod)
                          ;
-                       return move(chm);
+                       return chm;
                      }()
                   << []() {
                        Stream cho{"chown"};
@@ -663,10 +663,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("chown", &Fixture::test_chown_Uid_Gid) // ..... pick one arbitrarily
                            << call("lchown", &Fixture::test_lchown_Uid_Gid) // ... ibidem.
                          ;
-                       return move(cho);
+                       return cho;
                      }()
                 ;
-              return move(the);
+              return the;
             }()
     ;
   series << []() {
@@ -681,11 +681,11 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("in6", &Fixture::test_sockaddr_in6)
                            << call("un", &Fixture::test_sockaddr_un)
                           ;
-                        return move(sa);
+                        return sa;
                       }()
                    << call("msghdr", &Fixture::test_msghdr)
                    << END;
-              return move(data);
+              return data;
             }()
          << call("timeval", &Fixture::test_timeval)
          << call("timespec", &Fixture::test_timespec)
@@ -695,7 +695,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               acc << call("accept", &Fixture::test_accept)
                   << call("accept4", &Fixture::test_accept4)
                 ;
-              return move(acc);
+              return acc;
             }()
          << []() {
               Stream fam{"access"};
@@ -704,21 +704,21 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                        acc << call("present", &Fixture::test_access_present)
                            << call("missing", &Fixture::test_access_missing)
                          ;
-                       return move(acc);
+                       return acc;
                      }()
                   << []() {
                        Stream acc{"eaccess"};
                        acc << call("present", &Fixture::test_eaccess_present)
                            << call("missing", &Fixture::test_eaccess_missing)
                          ;
-                       return move(acc);
+                       return acc;
                      }()
                   << []() {
                        Stream acc{"euidaccess"};
                        acc << call("present", &Fixture::test_euidaccess_present)
                            << call("missing", &Fixture::test_euidaccess_missing)
                          ;
-                       return move(acc);
+                       return acc;
                      }()
                   << []() {
                        Stream fac{"faccessat"};
@@ -727,7 +727,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("File", &Fixture::test_faccessat_File)
                            << call("Cwd", &Fixture::test_faccessat_Cwd)
                          ;
-                       return move(fac);
+                       return fac;
                      }()
                   << []() {
                        Stream fun{"functions"};
@@ -736,34 +736,34 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                 sts << call("no", &Fixture::test_exists_no)
                                     << call("yes", &Fixture::test_exists_yes)
                                   ;
-                                return move(sts);
+                                return sts;
                               }()
                            << []() {
                                 Stream exe{"executable"};
                                 exe << call("no", &Fixture::test_executable_no)
                                     << call("yes", &Fixture::test_executable_yes)
                                   ;
-                                return move(exe);
+                                return exe;
                               }()
                            << []() {
                                 Stream rea{"readable"};
                                 rea << call("no", &Fixture::test_readable_no)
                                     << call("yes", &Fixture::test_readable_yes)
                                   ;
-                                return move(rea);
+                                return rea;
                               }()
                            << []() {
                                 Stream wri{"writable"};
                                 wri << call("no", &Fixture::test_writable_no)
                                     << call("yes", &Fixture::test_writable_yes)
                                   ;
-                                return move(wri);
+                                return wri;
                               }()
                          ;
-                       return move(fun);
+                       return fun;
                      }()
                 ;
-              return move(fam);
+              return fam;
             }()
          << call("alarm", &Fixture::test_alarm)
          << END;
@@ -774,7 +774,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               fam << call("chdir", &Fixture::test_chdir)
                   << call("fchdir", &Fixture::test_fchdir)
                   << END;
-              return move(fam);
+              return fam;
             }()
          << []() {
               Stream fam{"chmod"};
@@ -785,7 +785,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("int", &Fixture::test_fchmod_int)
                            << call("File", &Fixture::test_fchmod_File)
                            << END;
-                       return move(fch);
+                       return fch;
                      }()
                   << []() {
                        Stream fch{"fchmodat"};
@@ -794,10 +794,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("File", &Fixture::test_fchmodat_File)
                            << call("Cwd", &Fixture::test_fchmodat_Cwd)
                            << END;
-                       return move(fch);
+                       return fch;
                      }()
                   << END;
-              return move(fam);
+              return fam;
             }()
          << []() {
               Stream fam{"chown"};
@@ -808,7 +808,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("Uid,Gid", &Fixture::test_chown_Uid_Gid)
                            << call("uid,gid", &Fixture::test_chown_uid_gid)
                            << END;
-                       return move(cho);
+                       return cho;
                      }()
                   << []() {
                        Stream fch{"fchown"};
@@ -818,22 +818,22 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                 Stream uid{"Uid"};
                                 uid << call("File", &Fixture::test_fchown_File_Uid)
                                     << END;
-                                return move(uid);
+                                return uid;
                               }()
                            << []() {
                                 Stream gid{"Gid"};
                                 gid << call("File", &Fixture::test_fchown_File_Gid)
                                     << END;
-                                return move(gid);
+                                return gid;
                               }()
                            << []() {
                                 Stream both{"Uid,Gid"};
                                 both << call("File", &Fixture::test_fchown_File_Uid_Gid)
                                      << END;
-                                return move(both);
+                                return both;
                               }()
                            << END;
-                       return move(fch);
+                       return fch;
                      }()
                   << []() {
                        Stream fch{"fchownat"};
@@ -844,27 +844,27 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                 uid << call("File", &Fixture::test_fchownat_File_Uid)
                                     << call("Cwd", &Fixture::test_fchownat_Cwd_Uid)
                                     << END;
-                                return move(uid);
+                                return uid;
                               }()
                            << []() {
                                 Stream gid{"Gid"};
                                 gid << call("File", &Fixture::test_fchownat_File_Gid)
                                     << call("Cwd", &Fixture::test_fchownat_Cwd_Gid)
                                     << END;
-                                return move(gid);
+                                return gid;
                               }()
                            << []() {
                                 Stream both{"Uid,Gid"};
                                 both << call("File", &Fixture::test_fchownat_File_Uid_Gid)
                                      << call("Cwd", &Fixture::test_fchownat_Cwd_Uid_Gid)
                                      << END;
-                                return move(both);
+                                return both;
                               }()
                            << END;
-                       return move(fch);
+                       return fch;
                      }()
                   << END;
-              return move(fam);
+              return fam;
             }()
          << call("close", &Fixture::test_close)
          << []() {
@@ -872,7 +872,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               fam << call("creat", &Fixture::test_creat)
                   << call("create", &Fixture::test_create)
                   << END;
-              return move(fam);
+              return fam;
             }()
          << call("connect", &Fixture::test_connect)
          << []() {
@@ -880,7 +880,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               cwd << call("getcwd", &Fixture::test_getcwd)
                   << call("getwd", &Fixture::test_getwd)
                   << END;
-              return move(cwd);
+              return cwd;
             }()
          << END;
   series << call("daemon", &Fixture::test_daemon)
@@ -890,7 +890,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("dup2", &Fixture::test_dup2)
                   << call("dup3", &Fixture::test_dup3)
                   << END;
-              return move(dup);
+              return dup;
             }()
          << END;
   series << []() {
@@ -902,17 +902,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                        ent << call("passwd", &Fixture::test_Endent_passwd)
                            << call("group", &Fixture::test_Endent_group)
                            << END;
-                       return move(ent);
+                       return ent;
                      }()
                   << END;
-              return move(end);
+              return end;
             }()
          << []() {
               Stream exec{"exec"};
               exec << call("execp", &Fixture::test_execp)
                    << call("exec", &Fixture::test_exec)
                    << END;
-              return move(exec);
+              return exec;
             }()
          << END;
   series << []() {
@@ -931,7 +931,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                     << call("Options<Create,Status>", &Fixture::test_fcntl_Options_Create_Status)
                                     << call("Options<Access,Create,Status>", &Fixture::test_fcntl_Options_Access_Create_Status)
                                     << END;
-                                return move(opt);
+                                return opt;
                               }()
                            << call("o::Flags", &Fixture::test_fcntl_Flags)
                            << call("File", &Fixture::test_fcntl_File)
@@ -945,7 +945,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                     << call("Group", &Fixture::test_fcntl_process_Group)
                                     << call("Either", &Fixture::test_fcntl_process_Either)
                                     << END;
-                                return move(pro);
+                                return pro;
                               }()
                            << call("Signal", &Fixture::test_fcntl_Signal)
                            << []() {
@@ -953,31 +953,31 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                 flo << call("out", &Fixture::test_fcntl_out_flock)
                                     << call("in", &Fixture::test_fcntl_in_flock)
                                     << END;
-                                return move(flo);
+                                return flo;
                               }()
                            << []() {
                                 Stream flo{"flock64"};
                                 flo << call("out", &Fixture::test_fcntl_out_flock64)
                                     << call("in", &Fixture::test_fcntl_in_flock64)
                                     << END;
-                                return move(flo);
+                                return flo;
                               }()
                            << []() {
                                 Stream own{"owner"};
                                 own << call("out", &Fixture::test_fcntl_out_f_owner_ex)
                                     << call("in", &Fixture::test_fcntl_in_f_owner_ex)
                                     << END;
-                                return move(own);
+                                return own;
                               }()
                            << []() {
                                 Stream ent{"int64"};
                                 ent << call("out", &Fixture::test_fcntl_out_int64)
                                     << call("in", &Fixture::test_fcntl_in_int64)
                                     << END;
-                                return move(ent);
+                                return ent;
                               }()
                            << END;
-                       return move(arg);
+                       return arg;
                      }()
                   << []() {
                        Stream fun{"functions"};
@@ -989,17 +989,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                          set << call("on", &Fixture::test_cloexec_set_on)
                                              << call("off", &Fixture::test_cloexec_set_off)
                                              << END;
-                                         return move(set);
+                                         return set;
                                        }()
                                     << END;
-                                return move(clo);
+                                return clo;
                               }()
                            << []() {
                                 Stream dfd{"dupfd"};
                                 dfd << call("dupfd", &Fixture::test_dupfd)
                                     << call("dupfd_cloexec", &Fixture::test_dupfd_cloexec)
                                     << END;
-                                return move(dfd);
+                                return dfd;
                               }()
                            << []() {
                                 Stream fd{"fd"};
@@ -1009,10 +1009,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         get << call("1", &Fixture::test_getfd_1)
                                             << call("2", &Fixture::test_getfd_2)
                                             << END;
-                                        return move(get);
+                                        return get;
                                       }()
                                    << END;
-                                return move(fd);
+                                return fd;
                               }()
                            << []() {
                                 Stream fl{"fl"};
@@ -1022,10 +1022,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         get << call("1", &Fixture::test_getfl_1)
                                             << call("2", &Fixture::test_getfl_2)
                                             << END;
-                                        return move(get);
+                                        return get;
                                       }()
                                    << END;
-                                return move(fl);
+                                return fl;
                               }()
                            << []() {
                                 Stream lease{"lease"};
@@ -1035,17 +1035,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                            get << call("1", &Fixture::test_getlease_1)
                                                << call("2", &Fixture::test_getlease_2)
                                                << END;
-                                           return move(get);
+                                           return get;
                                          }()
                                       << END;
-                                return move(lease);
+                                return lease;
                               }()
                            << []() {
                                 Stream lf{"lockf-flock"};
                                 lf << call("lockf", &Fixture::test_lockf)
                                    << call("flock", &Fixture::test_flock)
                                    << END;
-                                return move(lf);
+                                return lf;
                               }()
                            << []() {
                                 Stream lock{"lock"};
@@ -1062,10 +1062,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                                      get << call("1", &Fixture::test_getlk_1)
                                                                          << call("2", &Fixture::test_getlk_2)
                                                                          << END;
-                                                                     return move(get);
+                                                                     return get;
                                                                    }()
                                                                 << END;
-                                                           return move(proc);
+                                                           return proc;
                                                          }()
                                                       << []() {
                                                            Stream ofd{"ofd"};
@@ -1076,16 +1076,16 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                                     get << call("1", &Fixture::test_ofd_getlk_1)
                                                                         << call("2", &Fixture::test_ofd_getlk_2)
                                                                         << END;
-                                                                    return move(get);
+                                                                    return get;
                                                                   }()
                                                                << END;
-                                                           return move(ofd);
+                                                           return ofd;
                                                          }()
                                                       << END;
-                                                   return move(lk);
+                                                   return lk;
                                                  }()
                                               << END;
-                                          return move(old);
+                                          return old;
                                         }()
                                      << []() {
                                           Stream orig{"(process)"};
@@ -1096,10 +1096,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                     get << call("1", &Fixture::test_getlock_1)
                                                         << call("2", &Fixture::test_getlock_2)
                                                         << END;
-                                                    return move(get);
+                                                    return get;
                                                   }()
                                                << END;
-                                          return move(orig);
+                                          return orig;
                                         }()
                                      << []() {
                                           Stream file{"file"};
@@ -1110,10 +1110,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                     get << call("1", &Fixture::test_getlock_file_1)
                                                         << call("2", &Fixture::test_getlock_file_2)
                                                         << END;
-                                                    return move(get);
+                                                    return get;
                                                   }()
                                                << END;
-                                          return move(file);
+                                          return file;
                                         }()
                                      << []() {
                                           Stream proc{"process"};
@@ -1124,19 +1124,19 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                     get << call("1", &Fixture::test_getlock_process_1)
                                                         << call("2", &Fixture::test_getlock_process_2)
                                                         << END;
-                                                    return move(get);
+                                                    return get;
                                                   }()
                                                << END;
-                                          return move(proc);
+                                          return proc;
                                         }()
                                      << END;
-                                return move(lock);
+                                return lock;
                               }()
                            << []() {
                                 Stream ify{"notify"};
                                 ify << call("notify", &Fixture::test_notify)
                                     << END;
-                                return move(ify);
+                                return ify;
                               }()
                            << []() {
                                 Stream own{"owner"};
@@ -1150,10 +1150,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                           get << call("1", &Fixture::test_getown_1)
                                                               << call("2", &Fixture::test_getown_2)
                                                               << END;
-                                                          return move(get);
+                                                          return get;
                                                         }()
                                                      << END;
-                                                  return move(ba);
+                                                  return ba;
                                                 }()
                                              << []() {
                                                   Stream ex{"ex"};
@@ -1163,13 +1163,13 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                           get << call("1", &Fixture::test_getown_ex_1)
                                                               << call("2", &Fixture::test_getown_ex_2)
                                                               << END;
-                                                          return move(get);
+                                                          return get;
                                                         }()
                                                      << END;
-                                                  return move(ex);
+                                                  return ex;
                                                 }()
                                              << END;
-                                         return move(old);
+                                         return old;
                                        }()
                                      << call("setowner", &Fixture::test_setowner)
                                      << []() {
@@ -1177,10 +1177,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                           get << call("1", &Fixture::test_getowner_1)
                                               << call("2", &Fixture::test_getowner_2)
                                               << END;
-                                          return move(get);
+                                          return get;
                                         }()
                                      << END;
-                                return move(own);
+                                return own;
                               }()
                            << []() {
                                 Stream ps{"pipe_size"};
@@ -1189,12 +1189,12 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         old << call("getpipe_sz", &Fixture::test_getpipe_sz)
                                             << call("setpipe_sz", &Fixture::test_setpipe_sz)
                                             << END;
-                                        return move(old);
+                                        return old;
                                       }()
                                    << call("getpipe_size", &Fixture::test_getpipe_size)
                                    << call("setpipe_size", &Fixture::test_setpipe_size)
                                    << END;
-                                return move(ps);
+                                return ps;
                               }()
                            << []() {
                                 Stream see{"seals"};
@@ -1205,10 +1205,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                          old << call("add_seals", &Fixture::test_add_seals)
                                              << call("get_seals", &Fixture::test_get_seals)
                                              << END;
-                                         return move(old);
+                                         return old;
                                        }()
                                     << END;
-                                return move(see);
+                                return see;
                               }()
                            << []() {
                                 Stream sig{"signal"};
@@ -1220,10 +1220,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                   get << call("1", &Fixture::test_getsig_1)
                                                       << call("2", &Fixture::test_getsig_2)
                                                       << END;
-                                                  return move(get);
+                                                  return get;
                                                 }()
                                              << END;
-                                         return move(old);
+                                         return old;
                                        }()
                                     << call("setsignal", &Fixture::test_setsignal)
                                     << []() {
@@ -1231,10 +1231,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                          get << call("1", &Fixture::test_getsignal_1)
                                              << call("2", &Fixture::test_getsignal_2)
                                              << END;
-                                         return move(get);
+                                         return get;
                                        }()
                                     << END;
-                                return move(sig);
+                                return sig;
                               }()
                            << []() {
                                 Stream rwh{"rwh"};
@@ -1245,40 +1245,40 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                                   orig << call("get_rw_hint", &Fixture::test_get_rw_hint)
                                                        << call("set_rw_hint", &Fixture::test_set_rw_hint)
                                                        << END;
-                                                  return move(orig);
+                                                  return orig;
                                                 }()
                                              << END;
-                                         return move(old);
+                                         return old;
                                        }()
                                     << []() {
                                          Stream orig{"(process)"};
                                          orig << call("getrwh", &Fixture::test_getrwh)
                                               << call("setrwh", &Fixture::test_setrwh)                                              
                                               << END;
-                                         return move(orig);
+                                         return orig;
                                        }()
                                     << []() {
                                           Stream file{"file"};
                                           file << call("getrwh_file", &Fixture::test_getrwh_file)
                                                << call("setrwh_file", &Fixture::test_setrwh_file)
                                                << END;
-                                          return move(file);
+                                          return file;
                                         }()
                                     << []() {
                                          Stream proc{"process"};
                                          proc << call("getrwh_process", &Fixture::test_getrwh_process)
                                               << call("setrwh_process", &Fixture::test_setrwh_process)
                                               << END;
-                                         return move(proc);
+                                         return proc;
                                        }()
                                    << END;
-                                return move(rwh);
+                                return rwh;
                               }()
                            << END;
-                       return move(fun);
+                       return fun;
                      }()
                   << END;
-              return move(fcn);
+              return fcn;
             }()
          << END;
   series << call("fork", &Fixture::test_fork)
@@ -1299,14 +1299,14 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("setregid", &Fixture::test_setregid)
                   << call("setresgid", &Fixture::test_setresgid)
                   << END;
-              return move(gid);
+              return gid;
             }()
          << []() {
               Stream get{"group"};
               get << call("getgruid", &Fixture::test_getgrgid)
                   << call("getgrname", &Fixture::test_getgrname)
                   << END;
-              return move(get);
+              return get;
             }()
          << END;
   series << []() {
@@ -1315,7 +1315,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("set", &Fixture::test_ioctl_set)
                   << call("void", &Fixture::test_ioctl_void)
                   << END;
-              return move(ioc);
+              return ioc;
             }()
          << []() {
               Stream it{"itimer"};
@@ -1324,7 +1324,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                       get << call("returning", &Fixture::test_getitimer_returning)
                           << call("filling", &Fixture::test_getitimer_filling)
                           << END;
-                      return move(get);
+                      return get;
                     }()
                  << []() {
                       auto set = Stream{"setitimer"};
@@ -1332,7 +1332,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("suppressing", &Fixture::test_setitimer_suppressing)
                           << call("filling", &Fixture::test_setitimer_filling)
                           << END;
-                      return move(set);
+                      return set;
                     }()
                  << []() {
                       auto set = Stream{"unsetitimer"};
@@ -1340,10 +1340,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("suppressing", &Fixture::test_unsetitimer_suppressing)
                           << call("filling", &Fixture::test_unsetitimer_filling)
                           << END;
-                      return move(set);
+                      return set;
                     }()
                  << END;
-              return move(it);
+              return it;
             }()
          << END;
   series << []() {
@@ -1353,7 +1353,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("Uid,Gid", &Fixture::test_lchown_Uid_Gid)
                   << call("uid,gid", &Fixture::test_lchown_uid_gid)
                   << END;
-              return move(cho);
+              return cho;
             }()
          << []() {
               Stream lim{"limit"};
@@ -1361,14 +1361,14 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("setrlimit", &Fixture::test_setrlimit)
                   << call("prlimit", &Fixture::test_prlimit)
                   << END;
-              return move(lim);
+              return lim;
             }()
          << []() {
               Stream lin{"link"};
               lin << call("link", &Fixture::test_link)
                   << call("linkat", &Fixture::test_linkat)
                   << END;
-              return move(lin);
+              return lin;
             }()
          << call("listen", &Fixture::test_listen)
          << call("lseek", &Fixture::test_lseek)
@@ -1380,7 +1380,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("mkdirp", &Fixture::test_mkdirp)
                   << call("mkdirs", &Fixture::test_mkdirs)
                   << END;
-              return move(mkd);
+              return mkd;
             }()
          << []() {
               Stream mk{"mktemp"};
@@ -1388,7 +1388,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                  << call("mkstemp", &Fixture::test_mkstemp)
                  << call("mktemp", &Fixture::test_mktemp)
                  << END;
-              return move(mk);
+              return mk;
             }()
          << END;
   series << []() {
@@ -1396,7 +1396,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               open << call("open", &Fixture::test_open)
                    << call("openat", &Fixture::test_openat)
                    << END;
-              return move(open);
+              return open;
             }()
          << END;
   series << []() {
@@ -1404,7 +1404,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
               get << call("getpwuid", &Fixture::test_getpwuid)
                   << call("getpwname", &Fixture::test_getpwname)
                   << END;
-              return move(get);
+              return get;
             }()
          << []() {
               Stream pipe{"pipe"};
@@ -1413,11 +1413,11 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                         one << call("0arg", &Fixture::test_pipe_0arg)
                             << call("1arg", &Fixture::test_pipe_1arg)
                             << END;
-                        return move(one);
+                        return one;
                       }()
                    << call("pipe2", &Fixture::test_pipe2)
                    << END;
-              return move(pipe);
+              return pipe;
             }()
          << call("pause", &Fixture::test_pause)
          << END;
@@ -1430,17 +1430,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                  fun << call("1", &Fixture::test_read_function_1)
                                      << call("2", &Fixture::test_read_function_2)
                                      << END;
-                                 return move(fun);
+                                 return fun;
                                }()
                             << []() {
                                  Stream nat{"native"};
                                  nat << call("1", &Fixture::test_read_native_1)
                                      << call("2", &Fixture::test_read_native_2)
                                      << END;
-                                 return move(nat);
+                                 return nat;
                                }()
                             << END;
-                       return move(read);
+                       return read;
                      }()
                   << []() {
                        Stream readv{"readv"};
@@ -1449,17 +1449,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                   fun << call("1", &Fixture::test_readv_function_1)
                                       << call("read2", &Fixture::test_readv_function_2)
                                       << END;
-                                  return move(fun);
+                                  return fun;
                                 }()
                              << []() {
                                   Stream nat{"native"};
                                   nat << call("1", &Fixture::test_readv_native_1)
                                       << call("2", &Fixture::test_readv_native_2)
                                       << END;
-                                  return move(nat);
+                                  return nat;
                                 }()
                              << END;
-                       return move(readv);
+                       return readv;
                      }()
                   << []() {
                        Stream pread{"pread"};
@@ -1468,17 +1468,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                   fun << call("1", &Fixture::test_pread_function_1)
                                       << call("2", &Fixture::test_pread_function_2)
                                       << END;
-                                  return move(fun);
+                                  return fun;
                                 }()
                              << []() {
                                   Stream nat{"native"};
                                   nat << call("1", &Fixture::test_pread_native_1)
                                       << call("2", &Fixture::test_pread_native_2)
                                       << END;
-                                  return move(nat);
+                                  return nat;
                                 }()
                              << END;
-                       return move(pread);
+                       return pread;
                      }()
                   << []() {
                        Stream preadv{"preadv"};
@@ -1487,17 +1487,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                    fun << call("1", &Fixture::test_preadv_function_1)
                                        << call("2", &Fixture::test_preadv_function_2)
                                        << END;
-                                   return move(fun);
+                                   return fun;
                                  }()
                               << []() {
                                    Stream nat{"native"};
                                    nat << call("1", &Fixture::test_preadv_native_1)
                                        << call("2", &Fixture::test_preadv_native_2)
                                        << END;
-                                   return move(nat);
+                                   return nat;
                                  }()
                               << END;
-                       return move(preadv);
+                       return preadv;
                      }()
                   << []() {
                        Stream preadv2{"preadv2"};
@@ -1506,27 +1506,27 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                     fun << call("1", &Fixture::test_preadv2_function_1)
                                         << call("2", &Fixture::test_preadv2_function_2)
                                         << END;
-                                    return move(fun);
+                                    return fun;
                                   }()
                                << []() {
                                     Stream nat{"native"};
                                     nat << call("1", &Fixture::test_preadv2_native_1)
                                         << call("2", &Fixture::test_preadv2_native_2)
                                         << END;
-                                    return move(nat);
+                                    return nat;
                                   }()
                                << END;
-                       return move(preadv2);
+                       return preadv2;
                      }()
                   << END;
-              return move(red);
+              return red;
             }()
          << []() {
               Stream red{"readlink"};
               red << call("readlink", &Fixture::test_readlink)
                   << call("readlinkat", &Fixture::test_readlinkat)
                   << END;
-              return move(red);
+              return red;
             }()
          << call("realpath", &Fixture::test_realpath)
          << []() {
@@ -1538,7 +1538,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("3", &Fixture::test_recv_3)
                            << call("4", &Fixture::test_recv_4)
                            << END;
-                       return move(sub);
+                       return sub;
                      }()
                   << []() {
                        Stream sub{"recvfrom"};
@@ -1548,33 +1548,33 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("3", &Fixture::test_recvfrom_3)
                            << call("4", &Fixture::test_recvfrom_4)
                            << END;
-                       return move(sub);
+                       return sub;
                      }()
                   << call("recvmsg", &Fixture::test_recvmsg)
                   << call("recvmmsg", &Fixture::test_recvmmsg)
                   << END;
-              return move(rec);
+              return rec;
             }()
          << []() {
               Stream rem{"remove"};
               rem << call("file", &Fixture::test_remove_file)
                   << call("directory", &Fixture::test_remove_directory)
                   << END;
-              return move(rem);
+              return rem;
             }()
          << []() {
               Stream ren{"rename"};
               ren << call("rename", &Fixture::test_rename)
                   << call("renameat", &Fixture::test_renameat)
                   << END;
-              return move(ren);
+              return ren;
             }()
          << []() {
               Stream rmd{"rmdir"};
               rmd << call("rmdir", &Fixture::test_rmdir)
                   << call("rmdirat", &Fixture::test_rmdirat)
                   << END;
-              return move(rmd);
+              return rmd;
             }()
          << END;
   series << []() {
@@ -1588,10 +1588,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("write", &Fixture::test_select_write)
                            << call("except", &Fixture::test_select_except)
                            << END;
-                       return move(ect);
+                       return ect;
                      }()
                   << END;
-              return move(sel);
+              return sel;
             }()
          << []() {
               Stream sen{"send"};
@@ -1602,7 +1602,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("3", &Fixture::test_send_3)
                            << call("4", &Fixture::test_send_4)
                            << END;
-                       return move(sub);
+                       return sub;
                      }()
                   << []() {
                        Stream sub{"sendto"};
@@ -1612,12 +1612,12 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("3", &Fixture::test_sendto_3)
                            << call("4", &Fixture::test_sendto_4)
                            << END;
-                       return move(sub);
+                       return sub;
                      }()
                   << call("sendmsg", &Fixture::test_sendmsg)
                   << call("sendmmsg", &Fixture::test_sendmmsg)
                   << END;
-              return move(sen);
+              return sen;
             }()
          << call("shutdown", &Fixture::test_shutdown)
          << []() {
@@ -1629,7 +1629,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                   dur << call("1", &Fixture::test_sleep_duration_1)
                                       << call("2", &Fixture::test_sleep_duration_2)
                                       << END;
-                                  return move(dur);
+                                  return dur;
                                 }()
                              << []() {
                                   auto val = Stream{"time::Val"};
@@ -1637,7 +1637,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                       << call("2", &Fixture::test_sleep_val_2)
                                       << call("3", &Fixture::test_sleep_val_3)
                                       << END;
-                                  return move(val);
+                                  return val;
                                 }()
                              << []() {
                                   auto spec = Stream{"time::Spec"};
@@ -1645,10 +1645,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                        << call("2", &Fixture::test_sleep_spec_2)
                                        << call("3", &Fixture::test_sleep_spec_3)
                                        << END;
-                                  return move(spec);
+                                  return spec;
                                 }()
                              << END;
-                        return move(unit);
+                        return unit;
                       }()
                    << call("usleep", &Fixture::test_usleep)
                    << []() {
@@ -1658,7 +1658,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                    dur << call("1", &Fixture::test_millisleep_duration_1)
                                        << call("2", &Fixture::test_millisleep_duration_2)
                                        << END;
-                                   return move(dur);
+                                   return dur;
                                  }()
                               << []() {
                                    auto val = Stream{"time::Val"};
@@ -1666,7 +1666,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                        << call("2", &Fixture::test_millisleep_val_2)
                                        << call("3", &Fixture::test_millisleep_val_3)
                                        << END;
-                                   return move(val);
+                                   return val;
                                  }()
                               << []() {
                                    auto spec = Stream{"time::Spec"};
@@ -1674,10 +1674,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         << call("2", &Fixture::test_millisleep_spec_2)
                                         << call("3", &Fixture::test_millisleep_spec_3)
                                         << END;
-                                   return move(spec);
+                                   return spec;
                                  }()
                               << END;
-                        return move(milli);
+                        return milli;
                       }()
                    << []() {
                         auto micro = Stream{"microsleep"};
@@ -1686,7 +1686,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                    dur << call("1", &Fixture::test_microsleep_duration_1)
                                        << call("2", &Fixture::test_microsleep_duration_2)
                                        << END;
-                                   return move(dur);
+                                   return dur;
                                  }()
                               << []() {
                                    auto val = Stream{"time::Val"};
@@ -1694,7 +1694,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                        << call("2", &Fixture::test_microsleep_val_2)
                                        << call("3", &Fixture::test_microsleep_val_3)
                                        << END;
-                                   return move(val);
+                                   return val;
                                  }()
                               << []() {
                                    auto spec = Stream{"time::Spec"};
@@ -1702,10 +1702,10 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         << call("2", &Fixture::test_microsleep_spec_2)
                                         << call("3", &Fixture::test_microsleep_spec_3)
                                         << END;
-                                   return move(spec);
+                                   return spec;
                                  }()
                               << END;
-                        return move(micro);
+                        return micro;
                       }()
                    << []() {
                         auto nano = Stream{"nanosleep"};
@@ -1714,7 +1714,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                    dur << call("1", &Fixture::test_nanosleep_duration_1)
                                        << call("2", &Fixture::test_nanosleep_duration_2)
                                        << END;
-                                   return move(dur);
+                                   return dur;
                                  }()
                               << []() {
                                    auto spec = Stream{"time::Spec"};
@@ -1722,20 +1722,20 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                         << call("2", &Fixture::test_nanosleep_spec_2)
                                         << call("3", &Fixture::test_nanosleep_spec_3)
                                         << END;
-                                   return move(spec);
+                                   return spec;
                                  }()
                               << END;
-                        return move(nano);
+                        return nano;
                       }()
                    << END;
-              return move(slup);
+              return slup;
             }()
          << []() {
               Stream sock{"sock"};
               sock << call("getpeername", &Fixture::test_getpeername)
                    << call("getsockname", &Fixture::test_getsockname)
                    << END;
-              return move(sock);
+              return sock;
             }()
          << []() {
               Stream sub{"socket"};
@@ -1750,7 +1750,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("af,type,options,pf", &Fixture::test_socket_af_type_options_pf)
                           << call("af,specification,pf", &Fixture::test_socket_af_specification_pf)
                           << END;
-                       return move(af);
+                       return af;
                      }()
                   << []() {
                        Stream ip{"AF::IP"};
@@ -1762,7 +1762,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("ip,type,options,ipproto", &Fixture::test_socket_ip_type_options_ipproto)
                           << call("ip,specification,ipproto", &Fixture::test_socket_ip_specification_ipproto)
                           << END;
-                       return move(ip);
+                       return ip;
                      }()
                   << []() {
                        Stream un{"AF::UN"};
@@ -1774,17 +1774,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                           << call("un,type,options,pf", &Fixture::test_socket_un_type_options_pf)
                           << call("un,specification,pf", &Fixture::test_socket_un_specification_pf)
                           << END;
-                       return move(un);
+                       return un;
                      }()
                   << END;
-              return move(sub);
+              return sub;
             }()
          << []() {
               Stream sub{"socketpair"};
               sub << call("SOCK", &Fixture::test_socketpair_SOCK)
                   << call("sock", &Fixture::test_socketpair_sock)
                   << END;
-              return move(sub);
+              return sub;
             }()
          << []() {
               Stream stat{"stat"};
@@ -1802,17 +1802,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                             << call("isreg", &Fixture::test_isreg)
                             << call("issock", &Fixture::test_issock)
                             << END;
-                        return move(fun);
+                        return fun;
                       }()
                    << END;
-              return move(stat);
+              return stat;
             }()
          << []() {
               Stream sym{"symlink"};
               sym << call("symlink", &Fixture::test_symlink)
                   << call("symlinkat", &Fixture::test_symlinkat)
                   << END;
-              return move(sym);
+              return sym;
             }()
          << END;
   series << call("time", &Fixture::test_time)
@@ -1824,17 +1824,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                          << call("timegm", &Fixture::test_timegm)
                          << call("mktime", &Fixture::test_mktime)
                          << END;
-                      return move(gm);
+                      return gm;
                     }()
                  << []() {
                       Stream loc{"local"};
                       loc<< call("localtime", &Fixture::test_localtime)
                          << call("timelocal", &Fixture::test_timelocal)
                          << END;
-                      return move(loc);
+                      return loc;
                     }()
                  << END;
-              return move(tm);
+              return tm;
             }()
          << call("tmpdir", &Fixture::test_tmpdir)
          << call("touch", &Fixture::test_touch)
@@ -1848,21 +1848,21 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("setreuid", &Fixture::test_setreuid)
                   << call("setresuid", &Fixture::test_setresuid)
                   << END;
-              return move(uid);
+              return uid;
             }()
          << []() {
               Stream unl{"unlink"};
               unl << call("unlink", &Fixture::test_unlink)
                   << call("unlinkat", &Fixture::test_unlinkat)
                   << END;
-              return move(unl);
+              return unl;
             }()
          << []() {
               Stream use{"usage"};
               use << call("getrusage", &Fixture::test_getrusage)
                 // reminder: there is no "setrusage" or "prusage" ... think about it.
                   << END;
-              return move(use);
+              return use;
             }()
          << END;
   series << []() {
@@ -1874,7 +1874,7 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                    << call("wait3", &Fixture::test_wait3)
                    << call("wait4", &Fixture::test_wait4)
                    << END;
-              return move(wait);
+              return wait;
             }()
          << []() {
               Stream red{"write"};
@@ -1885,17 +1885,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                  fun << call("1", &Fixture::test_write_function_1)
                                      << call("2", &Fixture::test_write_function_2)
                                      << END;
-                                 return move(fun);
+                                 return fun;
                                }()
                             << []() {
                                  Stream nat{"native"};
                                  nat << call("1", &Fixture::test_write_native_1)
                                      << call("2", &Fixture::test_write_native_2)
                                      << END;
-                                 return move(nat);
+                                 return nat;
                                }()
                             << END;
-                       return move(write);
+                       return write;
                      }()
                   << []() {
                        Stream writev{"writev"};
@@ -1904,17 +1904,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                   fun << call("1", &Fixture::test_writev_function_1)
                                       << call("2", &Fixture::test_writev_function_2)
                                       << END;
-                                  return move(fun);
+                                  return fun;
                                 }()
                              << []() {
                                   Stream nat{"native"};
                                   nat << call("1", &Fixture::test_writev_native_1)
                                       << call("2", &Fixture::test_writev_native_2)
                                       << END;
-                                  return move(nat);
+                                  return nat;
                                 }()
                              << END;
-                       return move(writev);
+                       return writev;
                      }()
                   << []() {
                        Stream pwrite{"pwrite"};
@@ -1923,17 +1923,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                   fun << call("1", &Fixture::test_pwrite_function_1)
                                       << call("2", &Fixture::test_pwrite_function_2)
                                       << END;
-                                  return move(fun);
+                                  return fun;
                                 }()
                              << []() {
                                   Stream nat{"native"};
                                   nat << call("1", &Fixture::test_pwrite_native_1)
                                       << call("2", &Fixture::test_pwrite_native_2)
                                       << END;
-                                  return move(nat);
+                                  return nat;
                                 }()
                              << END;
-                       return move(pwrite);
+                       return pwrite;
                      }()
                   << []() {
                        Stream pwritev{"pwritev"};
@@ -1942,17 +1942,17 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                    fun << call("1", &Fixture::test_pwritev_function_1)
                                        << call("2", &Fixture::test_pwritev_function_2)
                                        << END;
-                                   return move(fun);
+                                   return fun;
                                  }()
                               << []() {
                                    Stream nat{"native"};
                                    nat << call("1", &Fixture::test_pwritev_native_1)
                                        << call("2", &Fixture::test_pwritev_native_2)
                                        << END;
-                                   return move(nat);
+                                   return nat;
                                  }()
                               << END;
-                       return move(pwritev);
+                       return pwritev;
                      }()
                   << []() {
                        Stream pwritev2{"pwritev2"};
@@ -1961,20 +1961,20 @@ auto tests::unit::posix::fixture::Fixture::suite() -> cppunit::Test * {
                                     fun << call("1", &Fixture::test_pwritev2_function_1)
                                         << call("2", &Fixture::test_pwritev2_function_2)
                                         << END;
-                                    return move(fun);
+                                    return fun;
                                   }()
                                << []() {
                                     Stream nat{"native"};
                                     nat << call("1", &Fixture::test_pwritev2_native_1)
                                         << call("2", &Fixture::test_pwritev2_native_2)
                                         << END;
-                                    return move(nat);
+                                    return nat;
                                   }()
                                << END;
-                       return move(pwritev2);
+                       return pwritev2;
                      }()
                   << END;
-              return move(red);
+              return red;
             }()
          << END;
   series << add<Environment>()

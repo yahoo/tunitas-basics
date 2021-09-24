@@ -179,13 +179,13 @@ auto tests::unit::fd::Managed::suite() -> cppunit::Test * {
                   << call("File", &Managed::test_constructor_adopt_File)
                   << call("move", &Managed::test_constructor_move)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream ass("assignment");
               ass << call("move", &Managed::test_assignment_move)
                 ;
-              return move(ass);
+              return ass;
             }()
          << call("close", &Managed::test_close)
          << call("is_open", &Managed::test_is_open)
@@ -195,7 +195,7 @@ auto tests::unit::fd::Managed::suite() -> cppunit::Test * {
                   << call("int", &Managed::test_reset_int)
                   << call("File", &Managed::test_reset_File)
                 ;
-              return move(res);
+              return res;
             }()
          << []() {
               Stream rel{"release"};
@@ -203,7 +203,7 @@ auto tests::unit::fd::Managed::suite() -> cppunit::Test * {
                   << call("int", &Managed::test_release_int)
                   << call("File", &Managed::test_release_File)
                 ;
-              return move(rel);
+              return rel;
             }()
          << []() {
               Stream get{"get"};
@@ -211,7 +211,7 @@ auto tests::unit::fd::Managed::suite() -> cppunit::Test * {
                   << call("int", &Managed::test_get_int)
                   << call("File", &Managed::test_get_File)
                 ;
-              return move(get);
+              return get;
             }()
     ;
   return finalize(series);

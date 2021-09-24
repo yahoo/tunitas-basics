@@ -4,10 +4,12 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import std.string
+#import tunitas.string.literals
+#import microhttpd.http.status.literals // [[FIXTHIS]] one day tunitas::http::status::literals or such
 namespace tunitas::server::constants {
   namespace detail {
-    using namespace std::literals;
+    using namespace string::literals;
+    using namespace microhttpd::http::status::literals;
     //
     // The HTTP verbs (that we admit)
     //
@@ -21,28 +23,28 @@ namespace tunitas::server::constants {
       inline auto const PUT = "PUT"s;
       inline auto const TRACE = "TRACE"s;
       // https://www.w3.org/Protocols/HTTP/HTRESP.html
-      inline auto const R200_OK = 200;
-      inline auto const R201_CREATED = 201;
-      inline auto const R202_ACCEPTED = 202;
-      inline auto const R203_NON_AUTHORITATIVE_INFORMATION = 203;
-      inline auto const R204_NO_CONTENT = 204;
-      inline auto const R205_RESET_CONTENT = 205;
-      inline auto const R206_PARTIAL_CONTENT = 206;
-      inline auto const R301_MOVED_PERMANENTLY = 301;
-      inline auto const R302_FOUND = 302;
+      inline auto const R200_OK = 200_HTTP;
+      inline auto const R201_CREATED = 201_HTTP;
+      inline auto const R202_ACCEPTED = 202_HTTP;
+      inline auto const R203_NON_AUTHORITATIVE_INFORMATION = 203_HTTP;
+      inline auto const R204_NO_CONTENT = 204_HTTP;
+      inline auto const R205_RESET_CONTENT = 205_HTTP;
+      inline auto const R206_PARTIAL_CONTENT = 206_HTTP;
+      inline auto const R301_MOVED_PERMANENTLY = 301_HTTP;
+      inline auto const R302_FOUND = 302_HTTP;
       inline auto const R302_MOVED_TEMPORARILY = R302_FOUND;
-      inline auto const R303_SEE_OTHER = 303;
-      inline auto const R307_TEMPORARY_REDIRECT = 307;
-      inline auto const R308_PERMANENT_REDIRECT = 308;
-      inline auto const R304_NOT_MODIFIED = 304;
-      inline auto const R400_BAD_REQUEST = 400;
-      inline auto const R401_UNAUTHORIZED = 401;
-      inline auto const R402_PAYMENT_REQUIRED = 402;
-      inline auto const R403_FORBIDDEN = 403;
-      inline auto const R404_NOT_FOUND = 404;
-      inline auto const R500_INTERNAL_SERVER_ERROR = 500;
-      inline auto const R501_NOT_IMPLEMENTED = 501;
-      inline auto const R502_SERVICE_TEMPORARILY_OVERLOADED = 502;
+      inline auto const R303_SEE_OTHER = 303_HTTP;
+      inline auto const R307_TEMPORARY_REDIRECT = 307_HTTP;
+      inline auto const R308_PERMANENT_REDIRECT = 308_HTTP;
+      inline auto const R304_NOT_MODIFIED = 304_HTTP;
+      inline auto const R400_BAD_REQUEST = 400_HTTP;
+      inline auto const R401_UNAUTHORIZED = 401_HTTP;
+      inline auto const R402_PAYMENT_REQUIRED = 402_HTTP;
+      inline auto const R403_FORBIDDEN = 403_HTTP;
+      inline auto const R404_NOT_FOUND = 404_HTTP;
+      inline auto const R500_INTERNAL_SERVER_ERROR = 500_HTTP;
+      inline auto const R501_NOT_IMPLEMENTED = 501_HTTP;
+      inline auto const R502_SERVICE_TEMPORARILY_OVERLOADED = 502_HTTP;
     }
     //
     // The MIME media type for JSON text is "application/json".

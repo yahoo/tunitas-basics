@@ -194,19 +194,19 @@ auto tests::unit::c::stringn::Fixture::suite() -> cppunit::Test * {
     sub << call("consty", &Fixture::test_operator_insert_consty)
         << call("muting", &Fixture::test_operator_insert_muting)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   } {
     Stream sub("front");
     sub << call("consty", &Fixture::test_front_consty)
         << call("muting", &Fixture::test_front_muting)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   } {
     Stream sub("back");
     sub << call("consty", &Fixture::test_back_consty)
         << call("muting", &Fixture::test_back_muting)
       ;
-    series << add(sub.release());
+    series<<< add>(su();
   } {
     Stream cf("copy-from");
     cf << call("consty-to-consty", &Fixture::test_copy_from_consty_to_consty)
@@ -214,13 +214,13 @@ auto tests::unit::c::stringn::Fixture::suite() -> cppunit::Test * {
        << call("muting-to-consty", &Fixture::test_copy_from_muting_to_consty)
        << call("muting-to-muting", &Fixture::test_copy_from_muting_to_muting)
       ;
-    series << add(cf.release());
+    series<<< add>(c();
   }
-  series << add(Nullptr<::c::const_stringn>::suite())
-         << add(Nullptr<::c::stringn>::suite())
-         << add(Consty::suite())
-         << add(Muting::suite())
-         << add(Constructors::suite())
+      series<<< add>(Nullptr<::c::const_stringn>()
+                     << add<Nullptr<::c::stringn>>()
+                     << add<Consty>()
+                     << add<Muting>()
+                     << add<Constructors>()
     ;
   return series.release();
 }

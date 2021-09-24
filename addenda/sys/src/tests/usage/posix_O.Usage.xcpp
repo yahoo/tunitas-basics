@@ -68,66 +68,32 @@ namespace tests::usage::posix_O {
       requires (int)O::TMPFILE == O_TMPFILE;
       requires (int)O::NDELAY == O_NDELAY;
       requires requires(O, typename O::Access ess, typename O::Accesses ses) {
-#if 202003L < __cplusplus
-        { O::template as<typename O::Access>(ess) } -> convertible_to<convertible_to<typename O::Access>>;
-        { O::template as<typename O::Accesses>(ess) } -> convertible_to<convertible_to<typename O::Accesses>>;
-        { O::template as<typename O::Access>(ses) } -> convertible_to<convertible_to<typename O::Access>>;
-        { O::template as<typename O::Accesses>(ses) } -> convertible_to<convertible_to<typename O::Accesses>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Access>(ess) } -> convertible_to<typename O::Access>;
         { O::template as<typename O::Accesses>(ess) } -> convertible_to<typename O::Accesses>;
         { O::template as<typename O::Access>(ses) } -> convertible_to<typename O::Access>;
         { O::template as<typename O::Accesses>(ses) } -> convertible_to<typename O::Accesses>;
-#endif
       };
       requires requires(O, typename O::Create ate, typename O::Create tes) {
-#if 202003L < __cplusplus
-        { O::template as<typename O::Create>(ate) } -> convertible_to<convertible_to<typename O::Create>>;
-        { O::template as<typename O::Creates>(ate) } -> convertible_to<convertible_to<typename O::Creates>>;
-        { O::template as<typename O::Create>(tes) } -> convertible_to<convertible_to<typename O::Create>>;
-        { O::template as<typename O::Creates>(tes) } -> convertible_to<convertible_to<typename O::Creates>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Create>(ate) } -> convertible_to<typename O::Create>;
         { O::template as<typename O::Creates>(ate) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Create>(tes) } -> convertible_to<typename O::Create>;
         { O::template as<typename O::Creates>(tes) } -> convertible_to<typename O::Creates>;
-#endif
       };
       requires requires(O, typename O::Status tus, typename O::Statuses ses) {
-#if 202003L < __cplusplus
-        { O::template as<typename O::Status>(tus) } -> convertible_to<convertible_to<typename O::Status>>;
-        { O::template as<typename O::Statuses>(tus) } -> convertible_to<convertible_to<typename O::Statuses>>;
-        { O::template as<typename O::Status>(ses) } -> convertible_to<convertible_to<typename O::Status>>;
-        { O::template as<typename O::Statuses>(ses) } -> convertible_to<convertible_to<typename O::Statuses>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Status>(tus) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(tus) } -> convertible_to<typename O::Statuses>;
         { O::template as<typename O::Status>(ses) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(ses) } -> convertible_to<typename O::Statuses>;
-#endif
       };
       requires requires(O, typename O::Flags ags) {
-#if 202003L < __cplusplus
-        { O::template as<typename O::Access>(ags) } -> convertible_to<convertible_to<typename O::Access>>;
-        { O::template as<typename O::Accesses>(ags) } -> convertible_to<convertible_to<typename O::Accesses>>;
-        { O::template as<typename O::Create>(ags) } -> convertible_to<convertible_to<typename O::Creates>>;
-        { O::template as<typename O::Creates>(ags) } -> convertible_to<convertible_to<typename O::Creates>>;
-        { O::template as<typename O::Status>(ags) } -> convertible_to<convertible_to<typename O::Status>>;
-        { O::template as<typename O::Statuses>(ags) } -> convertible_to<convertible_to<typename O::Statuses>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { O::template as<typename O::Access>(ags) } -> convertible_to<typename O::Access>;
-#if 0
+#warning WAS #if 0
+#if 1
         { O::template as<typename O::Accesses>(ags) } -> convertible_to<typename O::Accesses>;
         { O::template as<typename O::Create>(ags) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Creates>(ags) } -> convertible_to<typename O::Creates>;
         { O::template as<typename O::Status>(ags) } -> convertible_to<typename O::Status>;
         { O::template as<typename O::Statuses>(ags) } -> convertible_to<typename O::Statuses>;
-#endif
-        requires true;
 #endif
       };
     };

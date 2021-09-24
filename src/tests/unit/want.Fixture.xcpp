@@ -7,8 +7,6 @@
 namespace tests::unit::want { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::want::Fixture : public cppunit::test::Fixture {
 public:
   auto test_something() -> void;
@@ -22,16 +20,13 @@ auto tests::unit::want::Fixture::test_something() -> void {
 }
 #import tests.unit.want.nonstd.Fixture
 #import tests.unit.want.sys.Fixture
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::want::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("want");
   series << call("something", &Fixture::test_something)
-	 << add(nonstd::Fixture::suite())
-	 << add(sys::Fixture::suite())
+	 << add<nonstd::Fixture>()
+	 << add<sys::Fixture>()
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

@@ -437,9 +437,9 @@ namespace tests::unit::re::construct {
            << call("string_view", &Buffer::test_constructor_convert_from_string_view)
            << call("enabled_OTHER", &Buffer::test_constructor_convert_from_enabled_OTHER)
           ;
-        co << add(cv.release());
+        co<<< add>(c();
       }
-      series << add(co.release());
+          series<<< add>(c();
     }
     series << call("constructor_copy", &Buffer::test_constructor_copy)
            << call("assignment_copy", &Buffer::test_assignment_copy)

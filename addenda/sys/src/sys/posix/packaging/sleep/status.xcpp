@@ -26,8 +26,8 @@ namespace sys::posix::packaging::sleep {
   //   discard the remaining, always.
   //
   template<required::Integer REP, required::Ratio RATIO> inline auto status(duration::Duration<REP, RATIO> const &) -> result::Status;
-                                                         inline auto status(time::Val const &) -> result::Status;
-                                                         inline auto status(time::Spec const &) -> result::Status;
+  inline auto status(time::Val const &) -> result::Status;
+  inline auto status(time::Spec const &) -> result::Status;
 }
 #endiv
 #divert <ipp>

@@ -7,8 +7,7 @@
 obj_src_tests_unit_server_SUBSOURCES = \
   obj/src/tests/unit/server/namespace.cpp \
   obj/src/tests/unit/server/Fixture.cpp \
-  obj/src/tests/unit/server/Fixture.Deleter.cpp \
-  obj/src/tests/unit/server/Fixture.Request.cpp \
+  obj/src/tests/unit/server/Fixture.Anchored.Request.cpp \
   obj/src/tests/unit/server/Fixture.Resource.cpp \
   obj/src/tests/unit/server/Fixture.exception.Example.cpp \
   obj/src/tests/unit/server/exception/namespace.cpp \

@@ -35,7 +35,7 @@ auto tests::unit::api::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream s("api");
   s << call("something", &Fixture::test_something)
-    << add(dispatch::Fixture::suite())
+    << add<dispatch::Fixture>()
     ;
   return s.release();
 }

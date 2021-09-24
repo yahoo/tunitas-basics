@@ -47,7 +47,7 @@ auto tests::unit::nonstd::lock::Fixture::suite() -> cppunit::Test * {
               guard << call("unique", &Fixture::test_unique_guard)
                      << call("shared", &Fixture::test_shared_guard)
                      << END;
-              return move(guard);
+              return guard;
             }()
          << END;
   return finalize(series);

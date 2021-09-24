@@ -7,8 +7,6 @@
 namespace tests::unit::base64 { class Encode; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::base64::Encode : public cppunit::test::Fixture {
 public:
   auto test_01() -> void;
@@ -38,14 +36,11 @@ auto tests::unit::base64::Encode::test_01() -> void {
     }
   }
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::Encode::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("encode");
   series << call("01", &Encode::test_01)
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

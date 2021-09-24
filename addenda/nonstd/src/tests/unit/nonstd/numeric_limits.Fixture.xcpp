@@ -89,7 +89,7 @@ auto tests::unit::nonstd::numeric_limits::fixture::Fixture::suite() -> cppunit::
               gen << call("signed", &Fixture::test_generic_signed)
                   << call("unsigned", &Fixture::test_generic_unsigned) 
                   << END;
-              return move(gen);
+              return gen;
             }()
          << []() {
               auto in = Stream{"int128"};
@@ -98,17 +98,17 @@ auto tests::unit::nonstd::numeric_limits::fixture::Fixture::suite() -> cppunit::
                       sig << call("min", &Fixture::test_int128_signed_min)
                           << call("max", &Fixture::test_int128_signed_max) 
                           << END;
-                      return move(sig);
+                      return sig;
                     }()
                  << []() {
                       auto uns = Stream{"unsigned"};
                       uns << call("min", &Fixture::test_int128_unsigned_min)
                           << call("max", &Fixture::test_int128_unsigned_max) 
                           << END;
-                      return move(uns);
+                      return uns;
                     }()
                  << END;
-              return move(in);
+              return in;
             }()
          << END;
   return finalize(series);

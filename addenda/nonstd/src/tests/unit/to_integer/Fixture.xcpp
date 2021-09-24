@@ -79,10 +79,10 @@ auto tests::unit::to_integer::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("int long long signed", &Fixture::test_call_them_each<int long long signed>)
                            << call("int long long unsigned", &Fixture::test_call_them_each<int long long unsigned>)
                            << END;
-                      return move(each);
+                      return each;
                     }()             
                  << END;
-             return move(use);
+             return use;
            }()
         << add<Native>()
         << add<Modern>()
@@ -104,7 +104,7 @@ auto tests::unit::to_integer::fixture::Fixture::suite() -> cppunit::Test * {
                  << add<Dispatcher<nonstd::uint128_t>>()
                  << add<Dispatcher<nonstd::int128_t>>()
                  << END;
-             return move(dis);
+             return dis;
            }()
         << add<sto::Fixture>()
         << END;

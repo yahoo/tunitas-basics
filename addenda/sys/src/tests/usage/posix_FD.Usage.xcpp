@@ -24,18 +24,10 @@ namespace tests::usage::posix_FD {
       requires (int)FD::NONE == 0;
       requires (int)FD::CLOEXEC == FD_CLOEXEC;
       requires requires(FD, typename FD::Flag lag, typename FD::Flags ags) {
-#if 202003L < __cplusplus
-        { FD::template as<typename FD::Flag>(lag) } -> convertible_to<convertible_to<typename FD::Flag>>;
-        { FD::template as<typename FD::Flags>(lag) } -> convertible_to<convertible_to<typename FD::Flags>>;
-        { FD::template as<typename FD::Flag>(ags) } -> convertible_to<convertible_to<typename FD::Flag>>;
-        { FD::template as<typename FD::Flags>(ags) } -> convertible_to<convertible_to<typename FD::Flags>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { FD::template as<typename FD::Flag>(lag) } -> convertible_to<typename FD::Flag>;
         { FD::template as<typename FD::Flags>(lag) } -> convertible_to<typename FD::Flags>;
         { FD::template as<typename FD::Flag>(ags) } -> convertible_to<typename FD::Flag>;
         { FD::template as<typename FD::Flags>(ags) } -> convertible_to<typename FD::Flags>;
-#endif
       };
     };
     template<typename... _> concept Usage = requires(_...) {

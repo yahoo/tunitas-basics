@@ -27,6 +27,6 @@ namespace ares::reply {
   public:
     Record() = default;
     using ancestor::List;
- };
+  };
 }
 #endiv

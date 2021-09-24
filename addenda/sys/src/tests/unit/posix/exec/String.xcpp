@@ -143,7 +143,7 @@ auto tests::unit::posix::exec::String::suite() -> cppunit::Test * {
                   << call("set", &String::test_argv<std::set<std::string>>)
                   << call("vector", &String::test_argv<std::vector<std::string>>)
                 ;
-                return move(sub);
+                return sub;
             }()
          << []() {
               Stream sub{"argv_envv"};
@@ -154,7 +154,7 @@ auto tests::unit::posix::exec::String::suite() -> cppunit::Test * {
                   << call("set,vector", &String::test_argv_envv<std::set<std::string>, std::vector<std::string>>)
                   << call("vector,array", &String::test_argv_envv<std::vector<std::string>, std::array<std::string, EIGHT>>)
                 ;
-                return move(sub);
+                return sub;
             }()
          << call("vararg_args_only", &String::test_vararg_args_only)
          << call("vararg_args_end_envv", &String::test_vararg_args_end_envv)

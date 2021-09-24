@@ -78,7 +78,7 @@ auto tests::unit::o::Fixture::suite() -> cppunit::Test * {
                   << call("02", &Fixture::test_usage_02)
                   << call("03", &Fixture::test_usage_03)
                   << END;
-              return move(use);
+              return use;
             }()
          << add<testing::Access>()
          << add<testing::Create>()

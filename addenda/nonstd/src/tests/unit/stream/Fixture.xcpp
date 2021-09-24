@@ -48,13 +48,13 @@ auto tests::unit::stream::Fixture::suite() -> cppunit::Test * {
               use << call("null", &Fixture::test_usage_null)
                   << call("Nullbuf", &Fixture::test_usage_Nullbuf)
                 ;
-              return move(use);
+              return use;
             } ()
          << []() {
               Stream set{"setting"};
               set << add<setting::Width>()
                 ;
-              return move(set);
+              return set;
             }()
          << add<input::Fixture>()
          << add<output::Fixture>()

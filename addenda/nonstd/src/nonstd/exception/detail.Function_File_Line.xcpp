@@ -111,9 +111,9 @@ namespace nonstd::exception {
     auto xform2 = [&o](char c) -> CHAR { return Function_File_Line<EXCEPTION>::widen(o, c); };
     if constexpr(1 == WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH) {
         std::transform(start, finish, sunk, xform1);
-    } else if constexpr(2 == WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH) {
+      } else if constexpr(2 == WHICH_CODE_FRAGMENT_HAS_WORKING_TRY_CATCH) {
         std::transform(start, finish, sunk, xform2);
-    } else {
+      } else {
       for (auto here=start; finish!=here; ++here) {
         o << xform2(*here);
       }

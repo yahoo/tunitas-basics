@@ -5,13 +5,15 @@
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
 #import tunitas
-#import nonstd.required // [[FIXTHIS]] module-nonstd >= 2.0 provides same_as, convertible_to
+#import nonstd.required
 #import std.same_as
 #import std.convertible_to
+#import std.derived_from
 namespace tunitas::required {
   using namespace nonstd::required;
-  // Whereas these are basically "part of the language" for C++20 concepts
+  // Whereas these, or such like them, are basically required always and everywhere in C++20 concepts...
   using std::same_as;
   using std::convertible_to;
+  using std::derived_from;
 }
 #endiv

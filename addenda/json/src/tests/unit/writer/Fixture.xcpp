@@ -112,18 +112,18 @@ auto tests::unit::writer::Fixture::suite() -> cppunit::Test * {
          << call("stream-builder", &Fixture::test_stream_builder)
          << call("stream-styled", &Fixture::test_stream_styled)
          << call("operator<<", &Fixture::test_operator_insert)
-         << add(writer::Compact::suite())
-         << add(writer::Pretty::suite())
-         << add(writer::Stream::suite())
-         << add(writer::stream::Builder::suite())
-         << add(writer::stream::Styled::suite())
+         << add<writer::Compact>()
+         << add<writer::Pretty>()
+         << add<writer::Stream>()
+         << add<writer::stream::Builder>()
+         << add<writer::stream::Styled>()
     ;
   {
     Stream dep("deprecated");
-    dep << add(writer::Fast::suite())
-        << add(writer::Styled::suite())
+    dep<<< add>(writer::Fast()
+                << add<writer::Styled>()
       ;
-    series << add(dep.release());
+                series<<< add>(de();
   }
   return series.release();
 }

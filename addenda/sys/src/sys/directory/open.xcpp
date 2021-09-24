@@ -11,9 +11,9 @@ namespace sys::directory {
     inline auto open(Pathname) -> Result;
     inline auto open(int fd) -> Result;
     inline namespace dir {
-      // Because the "-dir" suffix is amusing to the legacy C-language interfacea
-      inline auto opendir(Pathname) -> Result;
-      inline auto fdopendir(int) -> Result;
+             // Because the "-dir" suffix is amusing to the legacy C-language interfacea
+             inline auto opendir(Pathname) -> Result;
+             inline auto fdopendir(int) -> Result;
     }
   }
   using packaging::open_function::open;

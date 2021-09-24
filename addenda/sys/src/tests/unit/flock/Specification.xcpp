@@ -51,7 +51,7 @@ auto tests::unit::flock::Specification::suite() -> cppunit::Test * {
                   << call("Operation", &Specification::test_constructor_Operation)
                   << call("Options", &Specification::test_constructor_Options)
                 ;
-              return move(con);
+              return con;
             }()
          << call("operator int", &Specification::test_operator_int)
     ;

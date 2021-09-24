@@ -70,22 +70,22 @@ namespace tests::unit::format::integer {
 namespace tests::unit::format::integer::careful {
   template<::format::required::Integer _1, typename _2> Iterator<_1, _2>::Iterator()
     : value(0)
-    , guard_value(value) {
+           , guard_value(value) {
     ;
   }
   template<::format::required::Integer _1, typename _2> Iterator<_1, _2>::Iterator(Value base)
     : value(base)
-    , guard_value(value) {
+           , guard_value(value) {
     ;
   }   
   template<::format::required::Integer _1, typename _2> Iterator<_1, _2>::Iterator(Value base, Value supplement)
     : value(base + supplement)
-    , guard_value(value) {
+           , guard_value(value) {
     ;
   }
   template<::format::required::Integer _1, typename _2> Iterator<_1, _2>::Iterator(Value base, Iterator const &guard)
     : value(base)
-    , guard_value(guard.value) {
+           , guard_value(guard.value) {
     ;
   }
   template<::format::required::Integer _1, typename _2> auto Iterator<_1, _2>::operator*() const -> Value {

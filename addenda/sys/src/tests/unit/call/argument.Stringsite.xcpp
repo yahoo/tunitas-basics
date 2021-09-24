@@ -277,7 +277,7 @@ auto tests::unit::call::argument::Stringsite::suite() -> cppunit::Test * {
                            << call("c::const_stringz", &Stringsite::test_constructor_stringz_consty)
                            << call("c::const_stringn", &Stringsite::test_constructor_stringn_consty)
                          ;
-                       return move(nst);
+                       return nst;
                      }()
                   << []() {
                        Stream non("muting");
@@ -285,14 +285,14 @@ auto tests::unit::call::argument::Stringsite::suite() -> cppunit::Test * {
                            << call("c::stringz", &Stringsite::test_constructor_stringz_muting)
                            << call("c::stringn", &Stringsite::test_constructor_stringn_muting)
                          ;
-                       return move(non);
+                       return non;
                      }()
                   << call("std::string", &Stringsite::test_constructor_string)
                   << call("std::filesystem::path", &Stringsite::test_constructor_filesystem)
                   << call("copy", &Stringsite::test_constructor_copy)
                   << call("move", &Stringsite::test_constructor_move)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream cas("operator cast");
@@ -300,7 +300,7 @@ auto tests::unit::call::argument::Stringsite::suite() -> cppunit::Test * {
                   << call("c::const_stringz", &Stringsite::test_operator_cast_stringz)
                   << call("std::string", &Stringsite::test_operator_cast_string)
                 ;
-              return move(cas);
+              return cas;
             }()
          << []() {
               Stream as("as");
@@ -311,7 +311,7 @@ auto tests::unit::call::argument::Stringsite::suite() -> cppunit::Test * {
                  << call("std::string_view", &Stringsite::test_as<std::string_view>)
                  << call("std::vector<char>", &Stringsite::test_as<std::vector<char>>)
                 ;
-              return move(as);
+              return as;
             }()
          << call("data", &Stringsite::test_data)
          << call("size", &Stringsite::test_size)

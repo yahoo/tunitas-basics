@@ -91,7 +91,7 @@ auto tests::unit::sock::Fixture::suite() -> cppunit::Test * {
               use << call("Options", &Fixture::test_usage_Options)
                   << call("Specification", &Fixture::test_usage_Specification)
                 ;
-              return move(use);
+              return use;
             }()
          << call("as", &Fixture::test_as)
          << call("constants", &Fixture::test_constants)

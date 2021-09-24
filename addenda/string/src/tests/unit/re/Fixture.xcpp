@@ -121,12 +121,12 @@ auto tests::unit::re::Fixture::suite() -> cppunit::Test * {
     ov << call("S1", &Fixture::test_overloading_case_S1)
        << call("S2", &Fixture::test_overloading_case_S2)
       ;
-    series << add(ov.release());
+    series<<< add>(o();
   }
   series << call("string", &Fixture::test_string)
          << call("string_view", &Fixture::test_string_view)
          << call("buffer", &Fixture::test_buffer)
-         << add(construct::Fixture::suite())
+          << add<construct::Fixture>()
     ;
   return series.release();
 }

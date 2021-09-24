@@ -7,8 +7,6 @@
 namespace tests::unit::application { class Pidfile; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import std.filesystem.path
 #import tunitas.application.Pidfile
 class tests::unit::application::Pidfile : public cppunit::test::Fixture {
@@ -93,12 +91,9 @@ auto tests::unit::application::Pidfile::test_manual_close_emit() -> void {
   subject.close();
   subject.emit(); // a no-op
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::application::Pidfile::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
-  Stream series("Pidfile");
+  using namespace rigging::suite;
+  auto series = Stream{"Pidfile"};
   series << call("constructor-absent", &Pidfile::test_constructor_absent)
 	 << call("constructor-present", &Pidfile::test_constructor_present)
 	 << call("manual", &Pidfile::test_manual)
@@ -109,7 +104,7 @@ auto tests::unit::application::Pidfile::suite() -> cppunit::Test * {
 	 << call("close-close", &Pidfile::test_close_close)
 	 << call("automatic-close-emit", &Pidfile::test_automatic_close_emit)
 	 << call("manual-close-emit", &Pidfile::test_automatic_close_emit)
-    ;
-  return series.release();
+         << END;
+  return finalize(series);
 }
 #endiv

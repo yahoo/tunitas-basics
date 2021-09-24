@@ -161,17 +161,17 @@ template<typename _> auto tests::unit::outcome::Outcome<_>::suite() -> cppunit::
                        pay << call("copy", &Outcome::test_constructor_Payload_copy)
                            << call("move", &Outcome::test_constructor_Payload_move)
                            << END;
-                       return move(pay);
+                       return pay;
                      }()
                   << END;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream okk("ok");
               okk << call("good", &Outcome::test_ok_good)
                   << call("fail", &Outcome::test_ok_fail)
                   << END;
-              return move(okk);
+              return okk;
             }()
          << call("good", &Outcome::test_good)
          << call("fail", &Outcome::test_fail)
@@ -181,7 +181,7 @@ template<typename _> auto tests::unit::outcome::Outcome<_>::suite() -> cppunit::
               eco << call("good", &Outcome::test_error_code_good)
                   << call("fail", &Outcome::test_error_code_fail)
                   << END;
-              return move(eco);
+              return eco;
             }()
          << []() {
               Stream val("value");
@@ -190,13 +190,13 @@ template<typename _> auto tests::unit::outcome::Outcome<_>::suite() -> cppunit::
                        exc << call("good", &Outcome::test_value_good)
                            << call("fail", &Outcome::test_value_fail)
                            << END;
-                       return move(exc);
+                       return exc;
                      }()
                   << call("consty", &Outcome::test_value_consty)
                   << call("muting", &Outcome::test_value_muting)
                   << call("moving", &Outcome::test_value_moving)
                   << END;
-              return move(val);
+              return val;
             }()
          << END;
   return finalize(series);

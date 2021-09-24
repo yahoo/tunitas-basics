@@ -47,10 +47,10 @@ auto tests::unit::c::as::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::unit::suite;
   Stream series("as");
   series << call("something", &Fixture::test_something)
-         << add(Environv::suite())
-         << add(Argv::suite())
-         << add(Stringn::suite())
-         << add(Stringz::suite()) 
+         << add<Environv>()
+         << add<Argv>()
+         << add<Stringn>()
+         << add<Stringz>() 
     ;
   return series.release();
 }

@@ -214,21 +214,21 @@ auto tests::unit::fd::Set::suite() -> cppunit::Test * {
                   << call("copy", &Set::test_constructor_copy)
                   << call("move", &Set::test_constructor_move)
                   << END;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream ass("assignment");
               ass << call("copy", &Set::test_assignment_copy)
                   << call("move", &Set::test_assignment_move)
                   << END;
-              return move(ass);
+              return ass;
             }()
          << []() {
               Stream ind("operator[]");
               ind << call("lhs", &Set::test_operator_index_lhs)
                   << call("rhs", &Set::test_operator_index_rhs)
                   << END;
-              return move(ind);
+              return ind;
             }()
          << []() {
               Stream ind("at");
@@ -237,17 +237,17 @@ auto tests::unit::fd::Set::suite() -> cppunit::Test * {
                        lhs << call("good", &Set::test_at_lhs_good)
                            << call("fail", &Set::test_at_lhs_fail)
                            << END;
-                       return move(lhs);
+                       return lhs;
                      }()
                   << []() {
                        Stream rhs("rhs");
                        rhs << call("good", &Set::test_at_rhs_good)
                            << call("fail", &Set::test_at_rhs_fail)
                            << END;
-                       return move(rhs);
+                       return rhs;
                      }()
                   << END;
-              return move(ind);
+              return ind;
             }()
          << call("empty", &Set::test_empty)
          << call("size", &Set::test_size)
@@ -259,7 +259,7 @@ auto tests::unit::fd::Set::suite() -> cppunit::Test * {
               clr << call("all", &Set::test_clear_all)
                   << call("rhs", &Set::test_clear_bit)
                   << END;
-              return move(clr);
+              return clr;
             }()
          << call("set", &Set::test_set_bit)
          << call("is_set", &Set::test_is_set)

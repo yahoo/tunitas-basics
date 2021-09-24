@@ -1,4 +1,4 @@
-// This is -*- c++ -*- unto C++2a
+// This is -*- c++ -*- unto C++26
 //
 // The test proves that all this compiles
 //

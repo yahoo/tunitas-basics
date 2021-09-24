@@ -330,7 +330,7 @@ auto tests::unit::msg::Flags::suite() -> cppunit::Test * {
               sub << call("default", &Flags::test_constructor_default)
                   << call("again", &Flags::test_constructor_again)
                 ;
-              return move(sub);
+              return sub;
             }()
          << call("operator&", &Flags::test_operator_and)
          << call("operator&=", &Flags::test_operator_and_eq)
@@ -347,17 +347,17 @@ auto tests::unit::msg::Flags::suite() -> cppunit::Test * {
                        tub << call("0", &Flags::test_as_fails_0)
                            << call("2", &Flags::test_as_fails_2)
                          ;
-                       return move(tub);
+                       return tub;
                      }()
                 ;
-              return move(sub);
+              return sub;
             }()
          << []() {
               Stream sub("constants");
               sub << call("single", &Flags::test_constants_single)
                   << call("set", &Flags::test_constants_set)
                 ;
-              return move(sub);
+              return sub;
             }()
     ;
   return finalize(series);

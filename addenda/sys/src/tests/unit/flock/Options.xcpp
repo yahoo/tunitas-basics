@@ -79,20 +79,20 @@ auto tests::unit::flock::Options::suite() -> cppunit::Test * {
               con << call("default", &Options::test_constructor_default)
                   << call("Option", &Options::test_constructor_Option)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream op{"operator"};
               op << call("Value", &Options::test_operator_Value)
                 ;
-              return move(op);
+              return op;
             }()
          << []() {
               Stream con{"constants"};
               con << call("preferred", &Options::test_constants_preferred)
                   << call("deprecated", &Options::test_constants_deprecated)
                   << END;
-              return move(con);
+              return con;
             }()
          << call("as", &Options::test_as)
          << END;

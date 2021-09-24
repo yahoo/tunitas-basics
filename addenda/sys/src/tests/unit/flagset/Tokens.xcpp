@@ -106,7 +106,7 @@ namespace tests::unit::flagset {
                 con << call("default", &Tokens::test_constructor_default)
                     << call("empty", &Tokens::test_constructor_empty)
                   ;
-                return move(con);
+                return con;
               }()
            << []() {
                 Stream sin{"single"};
@@ -114,7 +114,7 @@ namespace tests::unit::flagset {
                     << call("or", &Tokens::test_single_or)
                     << call("invert", &Tokens::test_single_invert)
                   ;
-                return move(sin);
+                return sin;
               }()
            << call("contains", &Tokens::test_contains)
       ;

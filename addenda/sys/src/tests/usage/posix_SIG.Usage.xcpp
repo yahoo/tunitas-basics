@@ -20,12 +20,12 @@ namespace tests::usage::posix_SIG {
       typename SIG::Number;
       requires model::Namespace_Object<SIG>;
       //
-      { SIG::IGNORE } -> convertible_to<convertible_to<typename SIG::Handler>>;
-      { SIG::DEFAULT } -> convertible_to<convertible_to<typename SIG::Handler>>;
-      { SIG::ERROR } -> convertible_to<convertible_to<typename SIG::Handler>>;
-      { SIG::IGN } -> convertible_to<convertible_to<typename SIG::Handler>>;
-      { SIG::DFL } -> convertible_to<convertible_to<typename SIG::Handler>>;
-      { SIG::ERR } -> convertible_to<convertible_to<typename SIG::Handler>>;
+      { SIG::IGNORE } -> convertible_to<typename SIG::Handler>;
+      { SIG::DEFAULT } -> convertible_to<typename SIG::Handler>;
+      { SIG::ERROR } -> convertible_to<typename SIG::Handler>;
+      { SIG::IGN } -> convertible_to<typename SIG::Handler>;
+      { SIG::DFL } -> convertible_to<typename SIG::Handler>;
+      { SIG::ERR } -> convertible_to<typename SIG::Handler>;
       // ISO C99 Signals
       requires (int)SIG::INT == SIGINT;
       requires (int)SIG::ILL == SIGILL;

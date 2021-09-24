@@ -51,8 +51,8 @@ namespace tests::usage::posix_lockf {
         { lockf(file, LOCKF::END, offset) } -> convertible_to<convertible_to<Status>>;
       };
       template<typename FILE> concept Object_LOCKF_Legacy = requires(FILE file, Offset offset) {
-        { lockf(file, LOCKF::TLOCK, offset) } -> convertible_to<convertible_to<Status>>;
-        { lockf(file, LOCKF::ULOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, LOCKF::TLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, LOCKF::ULOCK, offset) } -> convertible_to<Status>;
       };
       template<typename FILE> concept Object_F_Current = requires(FILE file, Offset offset) {
         requires required::Unmanaged<FILE>;
@@ -66,8 +66,8 @@ namespace tests::usage::posix_lockf {
         { lockf(file, F::END, offset) } -> convertible_to<convertible_to<Status>>;
       };
       template<typename FILE> concept Object_F_Legacy = requires(FILE file, Offset offset) {
-        { lockf(file, F::TLOCK, offset) } -> convertible_to<convertible_to<Status>>;
-        { lockf(file, F::ULOCK, offset) } -> convertible_to<convertible_to<Status>>;
+        { lockf(file, F::TLOCK, offset) } -> convertible_to<Status>;
+        { lockf(file, F::ULOCK, offset) } -> convertible_to<Status>;
       };
     }
     template<typename FILE> concept Instance = requires(FILE) {

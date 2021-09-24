@@ -14,7 +14,7 @@ namespace sys::posix::packaging::required::from_tm {
   namespace implementation {
     using namespace packaging::from_tm::interface;
     template<typename THUNK> concept Thunk = requires(THUNK thunk, Disaggregated const in) {
-    { thunk(&in) } -> convertible_to<Old>;
+      { thunk(&in) } -> convertible_to<Old>;
     };
   }
   using implementation::Thunk;

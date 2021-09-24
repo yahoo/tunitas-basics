@@ -44,8 +44,8 @@ auto tests::unit::file::read::Fixture::suite() -> cppunit::Test * {
   Stream s("read");
   s << call("nothing", &Fixture::test_slurp_something)
     << call("something", &Fixture::test_slurp_something)
-    << add(Returning::suite())
-    << add(Throwing::suite())
+    << add<Returning>()
+    << add<Throwing>()
     ;
   return s.release();
 }

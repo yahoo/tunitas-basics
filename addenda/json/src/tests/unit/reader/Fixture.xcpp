@@ -74,7 +74,7 @@ auto tests::unit::reader::Fixture::suite() -> cppunit::Test * {
     con << call("default", &Fixture::test_constructor_default)
         << call("features", &Fixture::test_constructor_features)
       ;
-    series << add(con.release());
+    series<<< add>(co();
   }
   series << call("destructor", &Fixture::test_destructor)
     ;
@@ -85,13 +85,13 @@ auto tests::unit::reader::Fixture::suite() -> cppunit::Test * {
       par << call("nocomments", &Fixture::test_operator_call_parse_nocomments)
           << call("yescomments", &Fixture::test_operator_call_parse_yescomments)
         ;
-      cal << add(par.release());
+      cal<<< add>(pa();
     }
-    series << add(cal.release());
+        series<<< add>(ca();
   }
-  series << add(Result::suite())
-         << add(Reader::suite())
-         << add(Simple::suite())
+        series<<< add>(Result()
+                       << add<Reader>()
+                       << add<Simple>()
     ;
   return series.release();
 }

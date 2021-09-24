@@ -71,32 +71,16 @@ namespace tests::usage::posix_S {
       requires Old_School<S>;
       requires New_School<S>;
       requires requires(S, typename S::Bit bit, typename S::Bits its) {
-#if 202003L < __cplusplus
-        { S::template as<typename S::Bit>(bit) } -> convertible_to<convertible_to<typename S::Bit>>;
-        { S::template as<typename S::Bits>(bit) } -> convertible_to<convertible_to<typename S::Bits>>;
-        { S::template as<typename S::Bit>(its) } -> convertible_to<convertible_to<typename S::Bit>>;
-        { S::template as<typename S::Bits>(its) } -> convertible_to<convertible_to<typename S::Bits>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { S::template as<typename S::Bit>(bit) } -> convertible_to<typename S::Bit>;
         { S::template as<typename S::Bits>(bit) } -> convertible_to<typename S::Bits>;
         { S::template as<typename S::Bit>(its) } -> convertible_to<typename S::Bit>;
         { S::template as<typename S::Bits>(its) } -> convertible_to<typename S::Bits>;
-#endif
       };
       requires requires(S, typename S::Flag lag, typename S::Flags ags) {
-#if 202003L < __cplusplus
-        { S::template as<typename S::Flag>(lag) } -> convertible_to<convertible_to<typename S::Flag>>;
-        { S::template as<typename S::Flags>(lag) } -> convertible_to<convertible_to<typename S::Flags>>;
-        { S::template as<typename S::Flag>(ags) } -> convertible_to<convertible_to<typename S::Flag>>;
-        { S::template as<typename S::Flags>(ags) } -> convertible_to<convertible_to<typename S::Flags>>;
-#else
-        // More of a GCC 10 but not GCC 9 thing though isn't it?
         { S::template as<typename S::Flag>(lag) } -> convertible_to<typename S::Flag>;
         { S::template as<typename S::Flags>(lag) } -> convertible_to<typename S::Flags>;
         { S::template as<typename S::Flag>(ags) } -> convertible_to<typename S::Flag>;
         { S::template as<typename S::Flags>(ags) } -> convertible_to<typename S::Flags>;
-#endif
       };
     };
     template<typename... _> concept Usage = requires(_...) {

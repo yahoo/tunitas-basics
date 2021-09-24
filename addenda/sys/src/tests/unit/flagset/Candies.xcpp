@@ -127,7 +127,7 @@ namespace tests::unit::flagset {
                 con << call("default", &Candies::test_constructor_default)
                     << call("empty", &Candies::test_constructor_empty)
                   ;
-                return move(con);
+                return con;
               }()
            << []() {
                 Stream lit{"literal"};
@@ -137,7 +137,7 @@ namespace tests::unit::flagset {
                     << call("three", &Candies::test_literal_three)
                     << call("all", &Candies::test_literal_all)
                   ;
-                return move(lit);
+                return lit;
               }()
            << []() {
                 Stream sin{"single"};
@@ -145,7 +145,7 @@ namespace tests::unit::flagset {
                     << call("or", &Candies::test_single_or)
                     << call("invert", &Candies::test_single_invert)
                   ;
-                return move(sin);
+                return sin;
               }()
            << call("contains", &Candies::test_contains)
       ;

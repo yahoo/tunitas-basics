@@ -28,8 +28,8 @@ namespace nonstd::required {
   static_assert(Basic_String<std::string>);
   static_assert(Basic_String<std::wstring>);
 #if 11 <= __GNUC__
-// ergo ccc 10 still does not have it
-// viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
+  // ergo ccc 10 still does not have it
+  // viz. gcc (GCC) 10.0.1 20200407 (experimental) [20200408:20200413-1752] of cxx-modules branch
   static_assert(Basic_String<std::u8string>);
   static_assert(Basic_String<std::u16string>);
   static_assert(Basic_String<std::u32string>);

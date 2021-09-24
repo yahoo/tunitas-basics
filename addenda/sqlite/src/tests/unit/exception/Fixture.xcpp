@@ -42,9 +42,9 @@ auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
   using namespace ::unit::rigging::suite;
   Stream s("exception");
   s << call("prototype", &Fixture::test_prototype)
-    << add(Status::suite())
-    << add(Prepared::suite())
-    << add(Statement::suite())
+    << add<Status>()
+    << add<Prepared>()
+    << add<Statement>()
     ;
   return s.release();
 }

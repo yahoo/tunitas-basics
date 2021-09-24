@@ -138,7 +138,7 @@ auto tests::unit::log::LOG::suite() -> cppunit::Test * {
                   << call("priority", &LOG::test_constants_priority)
                   << call("options", &LOG::test_constants_options)
                   << END;
-              return move(con);
+              return con;
             }()
          << END;
   return finalize(series);

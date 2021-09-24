@@ -62,11 +62,11 @@ auto tests::unit::sys::Fixture::suite() -> cppunit::Test * {
                        gov << call("good", &Fixture::test_detail_flagof_good)
                            << call("fail", &Fixture::test_detail_flagof_fail)
                          ;
-                       return move(gov);
+                       return gov;
                      }()
                   << call("is_flag", &Fixture::test_detail_is_flag)
                 ;
-              return move(det);
+              return det;
             }()
     ;
   return finalize(series);

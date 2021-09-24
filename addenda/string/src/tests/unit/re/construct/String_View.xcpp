@@ -167,9 +167,9 @@ namespace tests::unit::re::construct {
         cv << call("string_view", &String_View::test_constructor_convert_from_string_view)
            << call("character_literal", &String_View::test_constructor_convert_from_character_literal)
           ;
-        co << add(cv.release());
+        co<<< add>(c();
       }
-      series << add(co.release());
+          series<<< add>(c();
     }
     series << call("operator view_type()", &String_View::test_operator_cast)
            << call("empty", &String_View::test_empty)

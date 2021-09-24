@@ -128,7 +128,7 @@ auto tests::unit::fd::Fixture::suite() -> cppunit::Test * {
                   << call("write", &Fixture::test_usage_write)
                   << call("except", &Fixture::test_usage_except)
                   << END;
-              return move(use);
+              return use;
             }()
          << call("Flag", &Fixture::test_Flag)
          << call("Flags", &Fixture::test_Flags)
@@ -145,7 +145,7 @@ auto tests::unit::fd::Fixture::suite() -> cppunit::Test * {
                   << add<set::Reference<set::Purpose::EXCEPT>>()
                   << add<Set>()
                   << END;
-              return move(set);
+              return set;
             }()
          << END;
   return finalize(series);

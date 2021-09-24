@@ -289,8 +289,8 @@ auto tests::unit::column::Fixture::suite() -> cppunit::Test * {
     << call("type", &Fixture::test_type)
     << call("get", &Fixture::test_get)
     << call("operator_insert", &Fixture::test_operator_insert)
-    << add(Column::suite())
-    << add(Shell::suite())
+    << add<Column>()
+    << add<Shell>()
     ;
   return s.release();
 }

@@ -7,7 +7,7 @@
 #import tunitas.exception.feature.Quitting
 namespace tunitas::exception::aspect {
   using Quitting [[deprecated("instead use namespace tunitas::exception::feature"
-                               "; "
-                               "instead use tunitas::exception::feature::Quitting")]] = feature::Quitting;
+                              "; "
+                              "instead use tunitas::exception::feature::Quitting")]] = feature::Quitting;
 }
 #endiv

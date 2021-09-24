@@ -7,8 +7,6 @@
 namespace tests::unit::urlsafe { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 class tests::unit::urlsafe::Fixture : public cppunit::test::Fixture {
 public:
   // exceptions
@@ -133,11 +131,8 @@ auto tests::unit::urlsafe::Fixture::test_encode_02() -> void {
     }
   }
 }
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::urlsafe::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("urlsafe");
   {
     Stream exc("exception");
@@ -148,22 +143,22 @@ auto tests::unit::urlsafe::Fixture::suite() -> cppunit::Test * {
       Stream dec("decoder");
       dec << call("Invalid", &Fixture::test_exception_decoder_Invalid)
 	;
-      exc << add(dec.release());
+      exc << move(dec);
     }
-    series << add(exc.release());
+    series << move(exc);
   } {
     Stream dec("decode");
     dec << call("01", &Fixture::test_decode_01)
 	<< call("02", &Fixture::test_decode_02)
       ;
-    series << add(dec.release());
+    series << move(dec);
   } {
     Stream enc("encode");
     enc << call("01", &Fixture::test_encode_01)
 	<< call("02", &Fixture::test_encode_02)
       ;
-    series << add(enc.release());
+    series << move(enc);
   }
-  return series.release();
+  return finalize(series);
 }
 #endiv

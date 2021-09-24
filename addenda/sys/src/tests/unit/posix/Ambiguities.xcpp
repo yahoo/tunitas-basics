@@ -20,7 +20,7 @@ auto tests::unit::posix::Ambiguities::suite() -> cppunit::Test * {
               Stream cas("case");
               cas << call("pipefit", &Ambiguities::test_case_pipefit)
                   << END;
-              return move(cas);
+              return cas;
             }()
          << END;
   return finalize(series);

@@ -120,17 +120,17 @@ auto tests::unit::exception::fixture::Fixture::suite() -> cppunit::Test * {
                        qui << call("char", &Fixture::test_usage_Quitting<char>)
                            << call("wchar_t", &Fixture::test_usage_Quitting<wchar_t>)
                            << END;
-                       return move(qui);
+                       return qui;
                      }()
                   << END;
-              return move(use);
+              return use;
             }()
          << []{
               auto qui = Stream{"Basic_Quitting"};
               qui << add<Basic_Quitting<char>>()
                   << add<Basic_Quitting<wchar_t>>()
                   << END;
-              return move(qui);
+              return qui;
             }()
          << []{
               auto ren = Stream{"renamed"};
@@ -139,7 +139,7 @@ auto tests::unit::exception::fixture::Fixture::suite() -> cppunit::Test * {
                        oth << call("Exception", &Fixture::test_renamed_Simple<library::Exception>)
                            << call("Future", &Fixture::test_renamed_Future)
                            << END;
-                       return move(oth);
+                       return oth;
                      }()
                   << []{
                        auto str = Stream{"string::Storage"};
@@ -152,7 +152,7 @@ auto tests::unit::exception::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("Overflow", &Fixture::test_renamed_Storage<library::Overflow<string::Storage>>)
                            << call("Underflow", &Fixture::test_renamed_Storage<library::Underflow<string::Storage>>)
                            << END;
-                         return move(str);
+                         return str;
                      }()
                   << []{
                        auto vie = Stream{"string::View"};
@@ -166,10 +166,10 @@ auto tests::unit::exception::fixture::Fixture::suite() -> cppunit::Test * {
                            << call("Overflow", &Fixture::test_renamed_View<library::Overflow<string::View>>)
                            << call("Underflow", &Fixture::test_renamed_View<library::Underflow<string::View>>)
                            << END;
-                       return move(vie);
+                       return vie;
                      }()
                   << END;
-              return move(ren);
+              return ren;
             }()
          << add<Invalid_Datum>()
          << add<Invalid_Enum>()

@@ -314,7 +314,7 @@ auto tests::unit::call::argument::Stringface::suite() -> cppunit::Test * {
                            << call("c::const_stringz", &Stringface::test_constructor_stringz_consty)
                            << call("c::const_stringn", &Stringface::test_constructor_stringn_consty)
                          ;
-                       return move(nst);
+                       return nst;
                      }()
                   << []() {
                        Stream non("muting");
@@ -322,28 +322,28 @@ auto tests::unit::call::argument::Stringface::suite() -> cppunit::Test * {
                            << call("c::stringz", &Stringface::test_constructor_stringz_muting)
                            << call("c::stringn", &Stringface::test_constructor_stringn_muting)
                          ;
-                       return move(non);
+                       return non;
                      }()
                   << call("std::string", &Stringface::test_constructor_string)
                   << call("std::filesystem:path", &Stringface::test_constructor_filesystem)
                   << call("copy", &Stringface::test_constructor_copy)
                   << call("move", &Stringface::test_constructor_move)
                 ;
-              return move(con);
+              return con;
             }()
          << []() {
               Stream ass("assignment");
               ass << call("copy", &Stringface::test_assignment_copy)
                   << call("move", &Stringface::test_assignment_move)
                 ;
-              return move(ass);
+              return ass;
             }()
          << []() {
               Stream cas("operator cast");
               cas << call("char const *", &Stringface::test_operator_cast_charstar)
                   << call("c::const_stringz", &Stringface::test_operator_cast_stringz)
                 ;
-              return move(cas);
+              return cas;
             }()
          << call("c::str", &Stringface::test_c_str)
          << []() {
@@ -355,7 +355,7 @@ auto tests::unit::call::argument::Stringface::suite() -> cppunit::Test * {
                  << call("std::string_view", &Stringface::test_as<std::string_view>)
                  << call("std::vector<char>", &Stringface::test_as<std::vector<char>>)
                 ;
-              return move(as);
+              return as;
             }()
          << call("data", &Stringface::test_data)
          << call("size", &Stringface::test_size)

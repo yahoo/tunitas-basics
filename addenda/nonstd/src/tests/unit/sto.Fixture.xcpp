@@ -70,7 +70,7 @@ auto tests::unit::sto::fixture::Fixture::suite() -> cppunit::Test * {
                   << call("int long long signed", &Fixture::test_call_them_each<int long long signed>)
                   << call("int long long unsigned", &Fixture::test_call_them_each<int long long unsigned>)
                   << END;
-             return move(each);
+             return each;
            }()             
         << END;
   return finalize(suite);

@@ -7,8 +7,6 @@
 namespace tests::unit::base64 { class Fixture; }
 #endiv
 #divert <hpp>
-#import cppunit.Test
-#import cppunit.test.Fixture
 #import std.string
 class tests::unit::base64::Fixture : public cppunit::test::Fixture {
 public:
@@ -116,11 +114,8 @@ auto tests::unit::base64::Fixture::test_sized_by_ByValue_two() -> void {
 #import tests.unit.base64.decoder.Fixture
 #import tests.unit.base64.encoder.Fixture
 #import tests.unit.base64.exception.Fixture
-#import unit.rigging.suite.Stream
-#import unit.rigging.suite.call
-#import unit.rigging.suite.add
 auto tests::unit::base64::Fixture::suite() -> cppunit::Test * {
-  using namespace ::unit::rigging::suite;
+  using namespace rigging::suite;
   Stream series("base64");
   {
     Stream rou("roundtrip");
@@ -128,7 +123,7 @@ auto tests::unit::base64::Fixture::suite() -> cppunit::Test * {
 	<< call("two", &Fixture::test_roundtrip_two)
 	<< call("three", &Fixture::test_roundtrip_three)
       ;
-    series << add(rou.release());
+    series << move(rou);
   } {
     Stream sby("sized_by");
     {
@@ -136,23 +131,23 @@ auto tests::unit::base64::Fixture::suite() -> cppunit::Test * {
       byt << call("one", &Fixture::test_sized_by_ByType_one)
 	  << call("two", &Fixture::test_sized_by_ByType_two)
 	;
-      series << add(byt.release());
+      series << move(byt);
     } {
       Stream byv("ByValue");
       byv << call("one", &Fixture::test_sized_by_ByValue_one)
 	  << call("two", &Fixture::test_sized_by_ByValue_two)
 	;
-      series << add(byv.release());
+      series << move(byv);
     }
-    series << add(sby.release());
+    series << move(sby);
   }
-  series << add(exception::Fixture::suite())
-	 << add(Encode::suite())
-	 << add(Decode::suite())
-	 << add(Roundtrip::suite())
-	 << add(encoder::Fixture::suite())
-	 << add(decoder::Fixture::suite())
+  series << add<exception::Fixture>()
+         << add<Encode>()
+         << add<Decode>()
+         << add<Roundtrip>()
+         << add<encoder::Fixture>()
+         << add<decoder::Fixture>()
     ;
-  return series.release();
+  return finalize(series);
 }
 #endiv

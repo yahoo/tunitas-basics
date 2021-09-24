@@ -50,7 +50,7 @@ namespace tests::unit::to_integer  {
                use << call("to_integer", &Dispatcher::test_usage_to_integer)
                    << call("sto", &Dispatcher::test_usage_sto)
                    << END;
-               return move(use);
+               return use;
              }()
           << END;
     return finalize(suite);

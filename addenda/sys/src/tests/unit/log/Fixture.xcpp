@@ -255,7 +255,7 @@ auto tests::unit::log::Fixture::suite() -> cppunit::Test * {
                   << call("or", &Fixture::test_Priorities_or)
                   << call("upto", &Fixture::test_Priorities_upto)
                   << END;
-                return move(sub);
+                return sub;
             }()
          << call("Option", &Fixture::test_Option)
          << call("Options", &Fixture::test_Options)

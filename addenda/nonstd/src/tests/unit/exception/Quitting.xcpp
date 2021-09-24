@@ -122,17 +122,17 @@ auto tests::unit::exception::Quitting::suite() -> cppunit::Test * {
                           << call("sys::exits::Code", &Quitting::test_constructor_1arg_code<sys::exits::Code>)
                           << call("nonstd::sysexits::Code", &Quitting::test_constructor_1arg_code<sysexits::Code>)
                           << END;
-                       return move(a1);
+                       return a1;
                      }()
                   << []{
                        auto a2 = Stream{"2arg"};
                        a2 << call("sys::exits::Code", &Quitting::test_constructor_2arg_message_code<sys::exits::Code>)
                           << call("nonstd::sysexits::Code", &Quitting::test_constructor_2arg_message_code<sysexits::Code>)
                           << END;
-                       return move(a2);
+                       return a2;
                      }()
                   << END;
-              return move(con);
+              return con;
             }()
          << call("operator<<", &Quitting::test_operator_insert)
          << END;

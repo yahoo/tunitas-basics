@@ -41,13 +41,13 @@ namespace tests::usage::posix_wait4 {
         { wait4(match, options, sutats, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         { wait4(match, sutats, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
         //
-        { wait4(match, options, {}, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-        { wait4(match, options, sutats, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-        { wait4(match, options, {}, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+        { wait4(match, options, {}, segasu) } -> convertible_to<result::Value<RETURNED>>;
+        { wait4(match, options, sutats, {}) } -> convertible_to<result::Value<RETURNED>>;
+        { wait4(match, options, {}, {}) } -> convertible_to<result::Value<RETURNED>>;
         //
-        { wait4(match, {}, options, segasu) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-        { wait4(match, sutats, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
-        { wait4(match, {}, options, {}) } -> convertible_to<convertible_to<result::Value<RETURNED>>>;
+        { wait4(match, {}, options, segasu) } -> convertible_to<result::Value<RETURNED>>;
+        { wait4(match, sutats, options, {}) } -> convertible_to<result::Value<RETURNED>>;
+        { wait4(match, {}, options, {}) } -> convertible_to<result::Value<RETURNED>>;
       };
     }
     template<typename... _> concept Usage = requires(_...) {

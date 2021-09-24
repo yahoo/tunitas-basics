@@ -80,7 +80,7 @@ auto tests::unit::iterator::category::fixture::Fixture::suite() -> cppunit::Test
               tags << call("old_school", &Fixture::test_tags_old_school)
                    << call("NewSchool", &Fixture::test_tags_NewSchool)
                    << END;
-              return move(tags);
+              return tags;
             }()
          << call("requireds", &Fixture::test_requireds)
          << END;
