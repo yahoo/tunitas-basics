@@ -10,6 +10,11 @@
 #import microhttpd.http.constants // [[FIXTHIS]] one day use #import tunitas.http.constants
 namespace tunitas::server::filters {
   using namespace service; // Resource, Request, Response, Transport, render::Builder
+  static_assert(sizeof (Resource &));
+  static_assert(sizeof (Request &));
+  static_assert(sizeof (Response &));
+  static_assert(sizeof (Transport &));
+  static_assert(sizeof (render::Builder &));
   using namespace constants;
   using namespace microhttpd::http::constants; // ibidem.
   using namespace string::literals;
@@ -24,14 +29,15 @@ namespace tunitas::server::filters {
   //
   // Usage:
   //
-  //   enforce_no_query_parameters(request, fill);
+  //   enforce_no_query_arguments(request, fill);
   //   if (nullptr == *fill) {
   //      ...compute the success response...
   //      response::Builder bob{content_body, code, content_type};
   //      *fill = new Response{bob}
   //   }
   //
-  inline auto enforce_no_query_parameters(Request const &request, [[out]] Optional<Transport> &fill) -> void;
+  inline auto enforce_no_query_arguments(Request const &request, [[out]] Optional<Transport> &fill) -> void;
+  [[deprecated("instead prefer enforce_no_query_arguments(Request, Optional<Transport>)")]] inline auto enforce_no_query_parameters(Request const &request, [[out]] Optional<Transport> &fill) -> void;
   //
   // Enforce that the content type is "application/json"
   //
@@ -46,6 +52,7 @@ namespace tunitas::server::filters {
 }
 #endiv
 #divert <ipp>
+auto tunitas::server::filters::enforce_no_query_arguments(Request const &request, Optional<Transport> &fill) -> void { enforce_no_query_parameters(request, fill); }
 auto tunitas::server::filters::enforce_no_query_parameters(Request const &request, Optional<Transport> &fill) -> void {
   auto const &query = request.get_query();
   if (!query.empty()) {

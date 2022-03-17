@@ -34,6 +34,7 @@ namespace tests::unit::server {
 #divert <hpp>
 struct tests::unit::server::fixture::Fixture : public cppunit::test::Fixture {
   auto test_constants() -> void;
+  auto test_filters_enforce_no_query_arguments() -> void;
   auto test_filters_enforce_no_query_parameters() -> void;
   auto test_filters_enforce_application_json() -> void;
   auto test_log() -> void;
@@ -105,6 +106,15 @@ auto tests::unit::server::fixture::Fixture::test_constants() -> void {
 #import tunitas.server.service // Request, Resource, Response, response::Builder
 #import tunitas.server.filters
 #import std.exception
+auto tests::unit::server::fixture::Fixture::test_filters_enforce_no_query_arguments() -> void try {
+  using namespace library::filters;
+  auto const anchored = Anchored::Request{};
+  auto transport = ::tunitas::Optional<library::service::Transport>{};
+  enforce_no_query_arguments(anchored, transport); // <------------------------------ test this
+  CPPUNIT_ASSERT(true);
+} catch (std::exception const &e) {
+  CPPUNIT_ASSERT(true); // this is fine too
+}
 auto tests::unit::server::fixture::Fixture::test_filters_enforce_no_query_parameters() -> void try {
   using namespace library::filters;
   auto const anchored = Anchored::Request{};
@@ -187,7 +197,8 @@ auto tests::unit::server::fixture::Fixture::suite() -> cppunit::Test * {
               Stream fil("filters");
               fil << []() {
                        Stream enf("enforce");
-                       enf << call("query", &Fixture::test_filters_enforce_no_query_parameters)
+                       enf << call("query", &Fixture::test_filters_enforce_no_query_arguments)
+                           << call("old.query", &Fixture::test_filters_enforce_no_query_parameters)
                            << call("json", &Fixture::test_filters_enforce_application_json)
                            << END;
                        return enf;

@@ -4,52 +4,98 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
+namespace tunitas::server::responses {
+  namespace package_responses {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_responses::interface;
+}
 #import tunitas.server.service
 #import tunitas.server.constants
-namespace tunitas::server::responses {
-  using namespace service; // Transport, Response, render::Builder
-  using namespace constants;
+#import microhttpd.http.status.Code
+namespace tunitas::server::responses::package_responses {
+  // namespaces: any exported context namespaces?
+  namespace body {
+    // namespaces: any body namespaces?
+    using microhttpd::http::status::Code;
+    namespace exported {
+      using namespace service; // Transport, Response, render::Builder
+      using namespace constants;
+    }
+  }
+}
+namespace tunitas::server::responses::package_responses {
+  // types: any exported context types?
+  namespace body {
+    // types: any body context types?
+    namespace exported {
+      // types: any (exported) exported types?
+    }
+  }
 }
 #endiv
 #divert <hpp>
-namespace tunitas::server::responses {
-  //
-  // Standardized (server) responses
-  //
-  // If there was another response already set up then it is destroyed.
-  // This standardized (emergency) response replaces it.
-  //
-  // Usage:
-  //
-  //   try {
-  //     ...try to establiesh the response...
-  //   } catch (std::exception const &) {
-  //     internal_server_error(*fill);
-  //   }
-  //
-  inline auto internal_server_error() -> Transport;
-  inline auto internal_server_error(std::string const &reason) -> Transport;
-  //
-  // There was some problem with the input data
-  //
-  inline auto bad_request() -> Transport;
-  inline auto bad_request(std::string const &reason) -> Transport;
+#import tunitas.string.View
+namespace tunitas::server::responses::package_responses::body {
+  namespace exported {
+    //
+    // Standardized (server) responses
+    //
+    // If there was another response already set up then it is destroyed.
+    // This standardized (emergency) response replaces it.
+    //
+    // Usage:
+    //
+    //   try {
+    //     ...try to establiesh the response...
+    //   } catch (std::exception const &) {
+    //     internal_server_error(*fill);
+    //   }
+    //
+    inline auto internal_server_error() -> Transport;
+    inline auto internal_server_error(string::View reason) -> Transport;
+    //
+    // There was some problem with the input data
+    //
+    inline auto bad_request() -> Transport;
+    inline auto bad_request(string::View reason) -> Transport;
+    //
+    // There target resource was not found.
+    // When REST is in play this can mean that the identifier was not found in the database
+    // It can also mean "invalid path" as per the usual on "The Web"
+    //
+    inline auto not_found() -> Transport;
+    inline auto not_found(string::View reason) -> Transport;
+    //
+    // Presence when absence was expected; absence when presence was expected.
+    //
+    inline auto conflict() -> Transport;
+    inline auto conflict(string::View reason) -> Transport;
+    //
+    // Absent (was there once but has been deleted)
+    //
+    inline auto gone() -> Transport;
+    inline auto gone(string::View reason) -> Transport;
+  }
+  inline auto idiomatic_response(Code, string::View reason) -> Transport;
 }
 #endiv
 #divert <ipp>
-namespace tunitas::server {
-  auto responses::internal_server_error() -> Transport { return internal_server_error("internal server error"); }
-  auto responses::internal_server_error(std::string const &reason) -> Transport {
-    auto const &content_body = reason;
-    auto const code = http::R500_INTERNAL_SERVER_ERROR;
-    auto const &content_type = mime::TEXT_PLAIN;
-    auto bob = render::Builder{};
-    return bob.response(code).content_type(content_type).body(move(content_body)).build();
-  }
-  auto responses::bad_request() -> Transport { return bad_request("bad request"); }
-  auto responses::bad_request(std::string const &reason) -> Transport {
-    auto content_body = reason;
-    auto const code = http::R400_BAD_REQUEST;
+namespace tunitas::server::responses::package_responses {
+  auto interface::internal_server_error() -> Transport { return internal_server_error("internal server error"); }
+  auto interface::bad_request() -> Transport           { return bad_request("bad request"); }
+  auto interface::not_found() -> Transport             { return not_found("not found"); }
+  auto interface::conflict() -> Transport              { return conflict("conflict"); }
+  auto interface::gone() -> Transport                  { return gone("gone"); }
+  //
+  auto interface::bad_request(string::View reason) -> Transport           { return idiomatic_response(http::R400_BAD_REQUEST, reason); }
+  auto interface::not_found(string::View reason) -> Transport             { return idiomatic_response(http::R404_NOT_FOUND, reason); }
+  auto interface::conflict(string::View reason) -> Transport              { return idiomatic_response(http::R409_CONFLICT, reason); }
+  auto interface::gone(string::View reason) -> Transport                  { return idiomatic_response(http::R410_GONE, reason); }
+  auto interface::internal_server_error(string::View reason) -> Transport { return idiomatic_response(http::R500_INTERNAL_SERVER_ERROR, reason); }
+  //
+  auto body::idiomatic_response(Code code, string::View content_body) -> Transport {
     auto const &content_type = mime::TEXT_PLAIN;
     auto bob = render::Builder{};
     return bob.response(code).content_type(content_type).body(move(content_body)).build();

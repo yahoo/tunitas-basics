@@ -1,0 +1,5 @@
+# the directory shall exist
+.libs
+*.la
+*.a
+*.so

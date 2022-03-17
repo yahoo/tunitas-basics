@@ -4,14 +4,14 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tests_unit_exception_SUBSOURCES = \
-  obj/src/tests/unit/exception/namespace.cpp \
-  obj/src/tests/unit/exception/Fixture.cpp \
-  obj/src/tests/unit/exception/Fixture.Message.cpp \
-  obj/src/tests/unit/exception/Fixture.Quitting.cpp \
-  obj/src/tests/unit/exception/Fixture.Aspic.cpp \
-  obj/src/tests/unit/exception/Fixture.Balsam.cpp \
-  obj/src/tests/unit/exception/my.Quitting.cpp \
-  obj/src/tests/unit/exception/my.Message.cpp \
-  obj/src/tests/unit/exception/compatibility.cpp \
+tests_unit_exception_SUBSOURCES = \
+  check/obj/src/tests/unit/exception/namespace.cpp \
+  check/obj/src/tests/unit/exception/Fixture.cpp \
+  check/obj/src/tests/unit/exception/Fixture.Message.cpp \
+  check/obj/src/tests/unit/exception/Fixture.Quitting.cpp \
+  check/obj/src/tests/unit/exception/Fixture.Aspic.cpp \
+  check/obj/src/tests/unit/exception/Fixture.Balsam.cpp \
+  check/obj/src/tests/unit/exception/my.Quitting.cpp \
+  check/obj/src/tests/unit/exception/my.Message.cpp \
+  check/obj/src/tests/unit/exception/compatibility.cpp \
   $(end)

@@ -12,9 +12,19 @@ namespace tunitas::server::service {
   //
   // A namespace package.
   //
-  // From the documentariat in:
-  //   microhttpd::Resource  ..... a.k.a. microhttpd::resource::Resource
-  //   microhttpd::Transport ..... a.k.a. microhttpd::rest::Transport
+  // Scope & Mandate:
+  //
+  //   The "service" is a glue layer between the HTTP layer (HTTP services) and the application itself.
+  //   Typically the application will have a "namespace storage" or "namespace member" or such where its rich function lives.
+  //   The service layer provides the glue between these two; The resources are at the intersection of these two layers. 
+  //
+  // Specification:
+  //
+  //   Bundle up some names that will be necessary for the doenstream applications.
+  //   
+  //   From the documentariat in:
+  //     microhttpd::Resource  ..... a.k.a. microhttpd::resource::Resource
+  //     microhttpd::Transport ..... a.k.a. microhttpd::rest::Transport
   //
   // Usage:
   //

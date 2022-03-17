@@ -1,22 +1,84 @@
-#!/bin/bash --norc
+#!/bin/bash -p
 # Copyright Yahoo Inc, 2021.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-montara/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/services/montara/tree/LICENSE
 : ${with_build:=/build}
 : ${with_worktrees:=${with_build?}/worktrees}
-: ${TAG:=CURRENT}
+: ${TAG:=STABLE}
 
-: ${with_module_rigging_core=${with_module_rigging_core:-${with_worktrees?}/rigging-core/v2.${TAG?}}}
-: ${with_module_rigging=${with_module_rigging_core?}}
+if [[ -n $with_module_cli_core ]] ; then
+    with_module_cli=${with_module_cli_core}
+    with_module_options=${with_module_cli_core}
+elif [[ -n $with_module_cli ]] ; then
+    with_module_cli_core=${with_module_cli}
+    with_module_options=${with_module_cli}
+elif [[ -n $with_module_options ]] ; then
+    with_module_cli_core=${with_module_options}
+    with_module_cli=${with_module_options}
+else
+    if [[ -e ${with_worktrees?}/cli-core ]] ; then
+        with_module_cli_core=${with_worktrees?}/cli-core/v2.${TAG?}
+        with_module_cli=${with_module_cli_core}
+        with_module_options=${with_module_cli_core}
+    elif [[ -e ${with_worktrees?}/cli ]] ; then
+        with_module_cli_core=${with_worktrees?}/cli/v2.${TAG?}
+        with_module_cli=${with_module_cli_core}
+        with_module_options=${with_module_cli_core}
+    elif [[ -e ${with_worktrees?}/options ]] ; then
+        with_module_cli_core=${with_worktrees?}/options/v2.${TAG?}
+        with_module_cli=${with_module_cli_core}
+        with_module_options=${with_module_cli_core}
+    else
+        : else leave undefined
+    fi
+fi
+
+if [[ -n $with_module_cli_shell ]] ; then
+    with_module_shell=${with_module_cli_shell}
+elif [[ -n $with_module_shell ]] ; then
+    with_module_cli_shell=${with_module_shell}
+else
+    if [[ -e ${with_worktrees?}/cli-shell ]] ; then
+        with_module_cli_shell=${with_worktrees?}/cli-shell/v2.${TAG?}
+        with_module_shell=${with_module_cli_shell}
+    elif [[ -e ${with_worktrees?}/shell ]] ; then
+        with_module_cli_shell=${with_worktrees?}/shell/v2.${TAG?}
+        with_module_shell=${with_module_cli_shell}
+    else
+        : else leave undefined
+    fi
+fi
+
+if [[ -n $with_module_rigging_core ]] ; then
+    with_module_rigging=${with_module_rigging_core}
+elif [[ -n $with_module_rigging ]] ; then
+    with_module_rigging_core=${with_module_rigging}
+else
+    if [[ -e ${with_worktrees?}/rigging-core ]] ; then
+        with_module_rigging_core=${with_worktrees?}/rigging-core/v2.${TAG?}
+        with_module_rigging=${with_module_rigging_core}
+    elif [[ -e ${with_worktrees?}/rigging ]] ; then
+        with_module_rigging_core=${with_worktrees?}/rigging/v2.${TAG?}
+        with_module_rigging=${with_module_rigging_core}
+    elif [[ -e ${with_worktrees?}/options ]] ; then
+        with_module_rigging_core=${with_worktrees?}/options/v2.${TAG?}
+        with_module_rigging=${with_module_rigging_core}
+    else
+        : else leave undefined
+    fi
+fi
 
 with_build=${with_build?} \
 with_nearby=${with_nearby:-${with_build?}/scold} \
 with_hypogeal_twilight=${with_hypogeal_twilight:-${with_worktrees?}/hypogeal-twilight/v0.${TAG?}} \
 with_module_langu=${with_module_langu:-${with_worktrees?}/langu/v0.${TAG?}} \
 with_module_nonstd=${with_module_nonstd:-${with_worktrees?}/nonstd/v2.${TAG?}} \
-with_module_options=${with_module_options:-${with_worktrees?}/options/v2.${TAG?}} \
 with_module_sys=${with_module_sys:-${with_worktrees?}/sys/v2.${TAG?}} \
+\
+with_module_cli_core=${with_module_cli_core?} \
+with_module_cli=${with_module_cli?} \
+with_module_options=${with_module_options?} \
 \
 with_module_rigging_core=${with_module_rigging_core?} \
 with_module_rigging=${with_module_rigging?} \
@@ -34,6 +96,6 @@ with_module_string=${with_module_string:-no} \
 with_microhttpd__=${with_microhttpd__:-${with_worktrees?}/microhttpd++/v0.${TAG?}} \
 with_microhttpd=${with_microhttpd:-${with_worktrees?}/microhttpd++/v0.${TAG?}} \
 \
-with_temerarious_flagship=${with_tunitas_basics:-${with_worktrees?}/temerarious-flagship/v2.${TAG?}} \
+with_temerarious_flagship=${with_temerarious_flagship:-${with_worktrees?}/temerarious-flagship/v2.${TAG?}} \
 \
 exec ${0%/*}/nearby

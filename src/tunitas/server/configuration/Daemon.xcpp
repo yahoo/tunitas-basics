@@ -1,0 +1,53 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::server::configuration {
+  //
+  // The configuration variables of a daemon
+  //
+  // Specification:
+  //
+  //   Sufficient for use with systemd or standalone
+  //   Can drop privileges if started as root.
+  //   Can move to a daemon user.group if started as root.
+  //   A port.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Expect a MI mixin with the application Configuration.
+  //
+  // Usage:
+  //
+  //   class my::Configuration : public tunitas::application::Configuration,
+  //                             public tunitas::server::configuration::Daemon {
+  //      using Ancestor = tunitas::application::Configuration;
+  //   public:
+  //      using Ancestor::Configuration;
+  //      ...and other application-specific configurations...
+  //   };
+  //
+  struct Daemon;
+}
+#endiv
+#divert <hpp>
+#import std.optional
+#import std.filesystem.path
+#import std.string
+#import microhttpd.ip.Port
+class tunitas::server::configuration::Daemon {
+protected:
+  ~Daemon() = default;
+public:
+  std::optional<bool> emit_pid{};
+  std::optional<std::filesystem::path> pid_filepath{};
+  std::optional<bool> foreground_mode{};
+  std::optional<microhttpd::ip::Port> service_port{};
+  std::optional<bool> drop_privileges{};
+  std::optional<std::string> daemon_user{};
+  std::optional<std::string> daemon_group{};
+};
+#endiv

@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tunitas_time_SUBSOURCES = \
+tunitas_time_SUBSOURCES = \
   obj/src/tunitas/time/namespace.cpp \
   obj/src/tunitas/time/Clock.cpp \
   obj/src/tunitas/time/duration.cpp \

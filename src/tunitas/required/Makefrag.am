@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-temerarious-flagship/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/build/temerarious-flagship/tree/LICENSE
 #
-obj_src_tunitas_required_SUBSOURCES = \
+tunitas_required_SUBSOURCES = \
   obj/src/tunitas/required/namespace.cpp \
   obj/src/tunitas/required/Integral.cpp \
   obj/src/tunitas/required/Integer.cpp \
@@ -23,3 +23,7 @@ obj_src_tunitas_required_SUBSOURCES = \
   obj/src/tunitas/required/exception/Quitting.cpp \
   obj/src/tunitas/required/exception/app.Quitting.cpp \
   $(end)
+tunitas_required_SUBOBJECTS_Wno_cpp = \
+  obj/src/tunitas/required/exception/app.Quitting.lo \
+  $(end)
+$(tunitas_reqwuired_SUBOBJECTS_Wno_cpp) : CPPFLAGS+=-Wno-cpp

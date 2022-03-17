@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tunitas_outcome_SUBSOURCES = \
+tunitas_outcome_SUBSOURCES = \
   obj/src/tunitas/Outcome.cpp \
   obj/src/tunitas/Success.cpp \
   obj/src/tunitas/outcome/namespace.cpp \

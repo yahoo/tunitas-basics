@@ -53,19 +53,22 @@ TF_WITH_SUBSYSTEM([microhttpd++], [], [Micro HTTPd Server])
 
 TF_WITH_MODULE([langu])
 TF_WITH_MODULE([nonstd])
-TF_WITH_MODULE([options])
+TF_WITH_MODULE([cli-core])
 TF_WITH_MODULE([sys])
 
 dnl [[deprecating]] having been subsumed into the v2-series APIS of langu, nonstd, options, sys
+TF_WITH_MODULE([cli])
 TF_WITH_MODULE([format])
 TF_WITH_MODULE([ip])
+TF_WITH_MODULE([options])
 TF_WITH_MODULE([posix])
 TF_WITH_MODULE([std])
 TF_WITH_MODULE([string])
 
 TF_WITH_NONSTD([cppunit])
 TF_WITH_MODULE([cppunit])
-TF_WITH_MODULE([rigging], [], [Unit (test) Rigging])
+TF_WITH_MODULE([rigging-core])
+TF_WITH_MODULE([rigging])
 
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([gcc])

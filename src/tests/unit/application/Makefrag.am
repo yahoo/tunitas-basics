@@ -4,26 +4,26 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tests_unit_application_SUBSOURCES = \
-  obj/src/tests/unit/application/namespace.cpp \
-  obj/src/tests/unit/application/exception.compatibility.cpp \
-  obj/src/tests/unit/application/Fixture.cpp \
-  obj/src/tests/unit/application/Fixture.Configuration.cpp \
-  obj/src/tests/unit/application/Fixture.Messaging.cpp \
-  obj/src/tests/unit/application/Fixture.Quitting.cpp \
-  obj/src/tests/unit/application/Fixture.Usage.cpp \
-  obj/src/tests/unit/application/Fixture.Version.cpp \
-  obj/src/tests/unit/application/Pidfile.cpp \
-  obj/src/tests/unit/application/Pidfile.guardian.Unlinker.cpp \
-  obj/src/tests/unit/application/Drop.cpp \
-  obj/src/tests/unit/application/Drop.Configuration.cpp \
-  obj/src/tests/unit/application/Drop.Quitting.cpp \
+tests_unit_application_SUBSOURCES = \
+  check/obj/src/tests/unit/application/namespace.cpp \
+  check/obj/src/tests/unit/application/exception.compatibility.cpp \
+  check/obj/src/tests/unit/application/Fixture.cpp \
+  check/obj/src/tests/unit/application/Fixture.Configuration.cpp \
+  check/obj/src/tests/unit/application/Fixture.Messaging.cpp \
+  check/obj/src/tests/unit/application/Fixture.Quitting.cpp \
+  check/obj/src/tests/unit/application/Fixture.Usage.cpp \
+  check/obj/src/tests/unit/application/Fixture.Version.cpp \
+  check/obj/src/tests/unit/application/Pidfile.cpp \
+  check/obj/src/tests/unit/application/Pidfile.guardian.Unlinker.cpp \
+  check/obj/src/tests/unit/application/Drop.cpp \
+  check/obj/src/tests/unit/application/Drop.Configuration.cpp \
+  check/obj/src/tests/unit/application/Drop.Quitting.cpp \
   \
-  obj/src/tests/unit/application/options.Fixture.cpp \
-  obj/src/tests/unit/application/options.Fixture.Configuration.cpp \
-  obj/src/tests/unit/application/options.Fixture.Quitting.cpp \
-  obj/src/tests/unit/application/options.Fixture.Step.cpp \
-  obj/src/tests/unit/application/options.Specification.cpp \
-  obj/src/tests/unit/application/options.Specification.Simple.cpp \
-  obj/src/tests/unit/application/options.exception.Fixture.cpp \
+  check/obj/src/tests/unit/application/options.Fixture.cpp \
+  check/obj/src/tests/unit/application/options.Fixture.Configuration.cpp \
+  check/obj/src/tests/unit/application/options.Fixture.Quitting.cpp \
+  check/obj/src/tests/unit/application/options.Fixture.Step.cpp \
+  check/obj/src/tests/unit/application/options.Specification.cpp \
+  check/obj/src/tests/unit/application/options.Specification.Simple.cpp \
+  check/obj/src/tests/unit/application/options.exception.Fixture.cpp \
   $(end)

@@ -10,6 +10,7 @@ AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 
 default:
+include tests/Makefrag.am
 include @temerarious_flagship_datadir@/am/build.am
 # [[REMOVEWHEN]] temerarious-1.1.0 provides .../am/build.am
 $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am was incomplete))
@@ -20,27 +21,22 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
-  $(module_format_prefix) \
-  $(module_ip_prefix) \
+  $(module_cli_prefix) \
   $(module_langu_prefix) \
   $(module_nonstd_prefix) \
-  $(module_options_prefix) \
-  $(module_posix_prefix) \
-  $(module_std_prefix) \
-  $(module_string_prefix) \
   $(module_sys_prefix) \
   $(microhttpd___prefix) \
+  $(deprecated_DEVELOPMENT_AREAS) \
   $(end)
 TESTING_AREAS = \
-  $(module_cppunit_prefix) \
-  $(module_rigging_prefix) \
+  $(module_rigging_core_prefix) \
+  $(deprecated_TESTING_AREAS) \
   $(end)
 INSTALLATION_AREAS = \
   $(nonstd_cppunit_prefix) \
-  $(nonstd_half_prefix) \
-  $(nonstd_gcc_prefix) \
   $(std_scold_prefix) \
   $(std_tunitas_prefix) \
+  $(deprecated_INSTALLATION_AREAS) \
   $(end)
 
 default: all
@@ -66,22 +62,35 @@ sys_o_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(modu
 sys_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module_sys_prefix)$(obj)modules$(ppp)sys))
 .PHONY: $(sys_DUMMIES)
 
-include src/tunitas/Makefrag.am
-include src/tunitas/app/Makefrag.am
-include src/tunitas/application/Makefrag.am
-include src/tunitas/server/Makefrag.am
-include src/want/Makefrag.am
-include src/tests/unit/Makefrag.am
-include src/tests/base64/Makefrag.am
-include src/tests/outcome/Makefrag.am
-include src/tests/urlsafe/Makefrag.am
+include lib/libtunitas.am
+include noinst/lib/libtunitas.am
+include noinst/lib/libwant.am
+
+include check/bin/base64-encode.am
+include check/bin/base64-decode.am
+include check/lib/libtests-base64.am
+include check/bin/unit.am
+
+include lib/libtunitas-app.am
+include lib/libtunitas-application.am
+include noinst/lib/libtunitas-application.am
+include lib/libtunitas-server.am
+include noinst/lib/libtunitas-server.am
+
+include check/bin/outcome-error_code.am
+include check/bin/outcome-error_condition.am
+include check/lib/libtests-outcome.am
+
+include check/bin/urlsafe-encode.am
+include check/bin/urlsafe-decode.am
+include check/lib/libtests-urlsafe.am
 
 # install rules from @temerarious_flagship_datadir@/am/install.am
 INSTALL_MODULES = \
-  $(lib_libtunitas_application_la_MODULES) \
-  $(lib_libtunitas_server_la_MODULES) \
-  $(lib_libtunitas_la_MODULES) \
- $(lib_libwant_la_MODULES) \
+  $(noinst_lib_libtunitas_application_la_MODULES) \
+  $(noinst_lib_libtunitas_server_la_MODULES) \
+  $(noinst_lib_libtunitas_la_MODULES) \
+  $(noinst_lib_libwant_la_MODULES) \
   $(end)
 $(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
 
@@ -92,62 +101,30 @@ $(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
 # WATCHOUT - the lib_LTLIBRARIES list MUST be in this order so that upon install the final link establishes the dependencies
 bin_PROGRAMS = 
 lib_LTLIBRARIES = \
-  $(lib_libtunitas_la) \
-  $(lib_libtunitas_app_la) \
-  $(lib_libtunitas_application_la) \
-  $(lib_libtunitas_server_la) \
+  lib/libtunitas.la \
+  lib/libtunitas-app.la \
+  lib/libtunitas-application.la \
+  lib/libtunitas-server.la \
   $(end)
 noinst_LTLIBRARIES = \
-  $(lib_libwant_la) \
+  noinst/lib/libtunitas.la \
+  noinst/lib/libtunitas-application.la \
+  noinst/lib/libtunitas-server.la \
+  noinst/lib/libwant.la \
   $(end)
 check_PROGRAMS = \
-  $(check_bin_unit) \
-  $(check_bin_base64_decode) \
-  $(check_bin_base64_encode) \
-  $(check_bin_outcome_error_code) \
-  $(check_bin_outcome_error_condition) \
-  $(check_bin_urlsafe_decode) \
-  $(check_bin_urlsafe_encode) \
+  check/bin/unit \
+  check/bin/base64-decode \
+  check/bin/base64-encode \
+  check/bin/outcome-error_code \
+  check/bin/outcome-error_condition \
+  check/bin/urlsafe-decode \
+  check/bin/urlsafe-encode \
   $(end)
 check_LTLIBRARIES = \
-  $(check_lib_libtests_base64_la) \
-  $(check_lib_libtests_outcome_la) \
-  $(check_lib_libtests_urlsafe_la) \
-  $(end)
-
-include tests/unit/Makefrag.am
-include tests/base64/decode/Makefrag.am
-include tests/base64/encode/Makefrag.am
-include tests/outcome/error_code/Makefrag.am
-include tests/outcome/error_condition/Makefrag.am
-include tests/urlsafe/decode/Makefrag.am
-include tests/urlsafe/encode/Makefrag.am
-XFAIL_TESTS = \
-  $(tests_unit_XFAIL_TESTS) \
-  $(tests_base64_decode_XFAIL_TESTS) \
-  $(tests_base64_encode_XFAIL_TESTS) \
-  $(tests_outcome_error_code_XFAIL_TESTS) \
-  $(tests_outcome_error_condition_XFAIL_TESTS) \
-  $(tests_urlsafe_error_code_XFAIL_TESTS) \
-  $(tests_urlsafe_error_condition_XFAIL_TESTS) \
-  $(end)
-XPASS_TESTS = \
-  $(tests_unit_XPASS_TESTS) \
-  $(tests_base64_decode_XPASS_TESTS) \
-  $(tests_base64_encode_XPASS_TESTS) \
-  $(tests_outcome_error_code_XPASS_TESTS) \
-  $(tests_outcome_error_condition_XPASS_TESTS) \
-  $(tests_urlsafe_error_code_XPASS_TESTS) \
-  $(tests_urlsafe_error_condition_XPASS_TESTS) \
-  $(end)
-TESTS = \
-  $(tests_unit_TESTS) \
-  $(tests_base64_decode_TESTS) \
-  $(tests_base64_encode_TESTS) \
-  $(tests_outcome_error_code_TESTS) \
-  $(tests_outcome_error_condition_TESTS) \
-  $(tests_urlsafe_error_code_TESTS) \
-  $(tests_urlsafe_error_condition_TESTS) \
+  check/lib/libtests-base64.la \
+  check/lib/libtests-outcome.la \
+  check/lib/libtests-urlsafe.la \
   $(end)
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
@@ -190,4 +167,18 @@ AM_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
 AM_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
 AM_LIBTOOLFLAGS = --silent
 
-#end
+deprecated_DEVELOPMENT_AREAS = \
+  $(module_format_prefix) \
+  $(module_ip_prefix) \
+  $(module_options_prefix) \
+  $(module_posix_prefix) \
+  $(module_std_prefix) \
+  $(module_string_prefix) \
+  $(end)
+deprecated_TESTING_AREAS = \
+  $(module_cppunit_prefix) \
+  $(module_rigging_prefix) \
+  $(end)
+deprecated_INSTALLATION_AREAS = \
+  $(nonstd_cppunit_prefix) \
+  $(end)

@@ -1,0 +1,24 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc. 2022
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+check_lib_libtests_base64_la = check/lib/libtests-base64.la$(error REMOVE)
+check_lib_libtests_base64_la_CPPFLAGS = $(CHECK_CPPFLAGS_SET)
+check_lib_libtests_base64_la_CXXFLAGS = $(CHECK_CXXFLAGS_SET)
+check_lib_libtests_base64_la_LDFLAGS = $(CHECK_LDFLAGS_SET)
+check_lib_libtests_base64_la_LIBADD = lib/libtunitas.la
+check_lib_libtests_base64_la_SOURCES = $(tests_base64_SUBSOURCES)
+include src/tests/base64/Makefrag.am
+$(check_lib_libtests_base64_la_SOURCES) : disco_objdir=check/obj
+$(check_lib_libtests_base64_la_SOURCES) : scold_objdir=$(disco_objdir)
+$(check_lib_libtests_base64_la_SOURCES) : check/obj/src/%.cpp : src/%.xcpp
+	$(TF_V_DIS) $(call TF_XCPP2CPP, $<)
+	$(TF_V_DONE) test -e $@
+$(tf_check_mkdir)/libtests-base64.mk: $(check_lib_libtests_base64_la_SOURCES)
+$(tf_check_mkdir)/libtests-base64.mk:
+	$(TF_V_DEP) $(call TF_DEPENDENCIES, $^)
+	$(TF_V_DONE) test -e $@
+include $(tf_check_mkdir)/libtests-base64.mk
+clean-dependencies:: ; rm -f $(tf_check_mkdir)/libtests-base64.mk

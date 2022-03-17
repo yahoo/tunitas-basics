@@ -4,9 +4,9 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tests_unit_for_each_SUBSOURCES = \
-  obj/src/tests/unit/for_each/namespace.cpp \
-  obj/src/tests/unit/for_each/Counter.cpp \
-  obj/src/tests/unit/for_each/counter.Iterator.cpp \
-  obj/src/tests/unit/for_each/count.cpp \
+tests_unit_for_each_SUBSOURCES = \
+  check/obj/src/tests/unit/for_each/namespace.cpp \
+  check/obj/src/tests/unit/for_each/Counter.cpp \
+  check/obj/src/tests/unit/for_each/counter.Iterator.cpp \
+  check/obj/src/tests/unit/for_each/count.cpp \
   $(end)

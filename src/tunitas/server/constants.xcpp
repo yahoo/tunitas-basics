@@ -13,6 +13,9 @@ namespace tunitas::server::constants {
     //
     // The HTTP verbs (that we admit)
     //
+    // e.g. see
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410
+    //
     namespace http {
       inline auto const CONNECT = "CONNECT"s;
       inline auto const DELEET = "DELETE"s;
@@ -42,6 +45,8 @@ namespace tunitas::server::constants {
       inline auto const R402_PAYMENT_REQUIRED = 402_HTTP;
       inline auto const R403_FORBIDDEN = 403_HTTP;
       inline auto const R404_NOT_FOUND = 404_HTTP;
+      inline auto const R409_CONFLICT = 409_HTTP;
+      inline auto const R410_GONE = 410_HTTP;
       inline auto const R500_INTERNAL_SERVER_ERROR = 500_HTTP;
       inline auto const R501_NOT_IMPLEMENTED = 501_HTTP;
       inline auto const R502_SERVICE_TEMPORARILY_OVERLOADED = 502_HTTP;

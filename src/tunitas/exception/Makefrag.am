@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tunitas_exception_SUBSOURCES = \
+tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/namespace.cpp \
   obj/src/tunitas/exception/Aspect.cpp \
   obj/src/tunitas/exception/feature.Messaging.cpp \

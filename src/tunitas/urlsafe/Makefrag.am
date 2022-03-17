@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tunitas_urlsafe_SUBSOURCES = \
+tunitas_urlsafe_SUBSOURCES = \
   obj/src/tunitas/urlsafe/namespace.cpp \
   obj/src/tunitas/urlsafe/detail.cpp \
   obj/src/tunitas/urlsafe/Code.cpp \

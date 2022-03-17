@@ -4,7 +4,7 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-temerarious-flagship/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/build/temerarious-flagship/tree/LICENSE
 #
-obj_src_tunitas_base64_SUBSOURCES = \
+tunitas_base64_SUBSOURCES = \
   obj/src/tunitas/base64/namespace.cpp \
   obj/src/tunitas/base64/Code.cpp \
   obj/src/tunitas/base64/Exception.cpp \

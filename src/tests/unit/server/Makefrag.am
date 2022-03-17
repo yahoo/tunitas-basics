@@ -4,15 +4,15 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-obj_src_tests_unit_server_SUBSOURCES = \
-  obj/src/tests/unit/server/namespace.cpp \
-  obj/src/tests/unit/server/Fixture.cpp \
-  obj/src/tests/unit/server/Fixture.Anchored.Request.cpp \
-  obj/src/tests/unit/server/Fixture.Resource.cpp \
-  obj/src/tests/unit/server/Fixture.exception.Example.cpp \
-  obj/src/tests/unit/server/exception/namespace.cpp \
-  obj/src/tests/unit/server/exception/Fixture.cpp \
-  obj/src/tests/unit/server/exception/Fixture.Simple.cpp \
-  obj/src/tests/unit/server/exception/my.Problem.cpp \
-  obj/src/tests/unit/server/exception/my.Difficulty.cpp \
+tests_unit_server_SUBSOURCES = \
+  check/obj/src/tests/unit/server/namespace.cpp \
+  check/obj/src/tests/unit/server/Fixture.cpp \
+  check/obj/src/tests/unit/server/Fixture.Anchored.Request.cpp \
+  check/obj/src/tests/unit/server/Fixture.Resource.cpp \
+  check/obj/src/tests/unit/server/Fixture.exception.Example.cpp \
+  check/obj/src/tests/unit/server/exception/namespace.cpp \
+  check/obj/src/tests/unit/server/exception/Fixture.cpp \
+  check/obj/src/tests/unit/server/exception/Fixture.Simple.cpp \
+  check/obj/src/tests/unit/server/exception/my.Problem.cpp \
+  check/obj/src/tests/unit/server/exception/my.Difficulty.cpp \
   $(end)
