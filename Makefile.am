@@ -46,21 +46,10 @@ clean-local mostlyclean-local distclean-local::
 clean-dependencies::
 clean-local:: clean-dependencies
 
-#
-# WATCHOUT - module-sys >= 0.28.0-0.devel has an affectation on a module named 'sys.o'
-#
-#   #import sys.o         (problems occureven imported transitively by something you an't see)
-#
-# WATCHOUT - the following is needed to prevent make from trying to rebuild sys.o
-#
-#   gcc   /build/scold/module-sys/obj/modules/sys.o   -o /build/scold/module-sys/obj/modules/sys
-#   /usr/bin/ld:/build/scold/module-sys/obj/modules/sys.o: file format not recognized; treating as linker script
-#   /usr/bin/ld:/build/scold/module-sys/obj/modules/sys.o:1: syntax error
-#
-sys_o_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module_sys_prefix)$(obj)modules$(ppp)sys.o))
-.PHONY: $(sys_o_DUMMIES)
-sys_DUMMIES = $(foreach obj, / /obj/, $(foreach ppp,/ /ipp/ /hpp/ /fpp/,$(module_sys_prefix)$(obj)modules$(ppp)sys))
-.PHONY: $(sys_DUMMIES)
+# SHOULD already be supplied in .../am/build.am
+# NEED ---> module_sys_datadir = $(dir $(word 1, $(wildcard $(addsuffix /mk /share/module-sys/mk,$(module_sys_prefix) $(std_scold_prefix) $(prefix)))))
+# NEED ---> .PRECIOUS: $(module_sys_datadir)/mk/sys.o.DUMMIES.mk
+# NEED ---> include $(module_sys_datadir)/mk/sys.o.DUMMIES.mk
 
 include lib/libtunitas.am
 include noinst/lib/libtunitas.am
