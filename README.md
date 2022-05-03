@@ -11,6 +11,7 @@ and with the build system
 The overview and administrative declarations herein are necessarily summary in nature.
 The declarations and definitions in the packaging and build system areas are complete and should be interpreted as superceding these when the two are in conflict.
 
+Current work with modern-generation tooling, <em>e.g.</em> circa Fedora 36+ and GCC 12+, is occurring around the <em>v2-themed</em> feature branches.
 ## Table of Contents
 
 - [Background](#background)
@@ -149,4 +150,4 @@ for the full terms.
 
 ## Origin Of The Name
 
-Tunitas is a [creek](https://en.wikipedia.org/wiki/Tunitas_Creek) and also a small [unincorporated portion ](https://en.wikipedia.org/wiki/Tunitas,_California) of San Mateo County, California.
+Tunitas is a [creek](https://en.wikipedia.org/wiki/Tunitas_Creek) and also a small [unincorporated portion](https://en.wikipedia.org/wiki/Tunitas,_California) of San Mateo County, California.
