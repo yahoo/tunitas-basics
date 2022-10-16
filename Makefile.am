@@ -8,8 +8,62 @@
 # cannot -Wall -Werror
 AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
+AM_MAKEFLAGS= \
+  MAKEFLAGS='$(MAKEFLAGS)' \
+  CPPFLAGS='$(CPPFLAGS)' \
+  CXXFLAGS='$(CXXFLAGS)' \
+  LDFLAGS='$(LDFLAGS)' \
+  $(end)
+
+# Whereas automake already takes care of this dependency (except in the lib_LTLIBRARIES installation ordering)
+# NO NEED ---> $(lib_libtunitas_application_la) : $(lib_libtunitas_la) 
+# NO NEED ---> $(lib_libtunitas_server_la) : $(lib_libtunitas_la) 
+
+# WATCHOUT - the lib_LTLIBRARIES list MUST be in this order so that upon install the final link establishes the dependencies
+bin_PROGRAMS = 
+lib_LTLIBRARIES = \
+  lib/libtunitas.la \
+  lib/libtunitas-app.la \
+  lib/libtunitas-application.la \
+  lib/libtunitas-server.la \
+  $(end)
+noinst_LTLIBRARIES = \
+  noinst/lib/libtunitas.la \
+  noinst/lib/libtunitas-application.la \
+  noinst/lib/libtunitas-server.la \
+  noinst/lib/libwant.la \
+  $(end)
+check_PROGRAMS = \
+  check/bin/unit \
+  check/bin/base64-decode \
+  check/bin/base64-encode \
+  check/bin/outcome-error_code \
+  check/bin/outcome-error_condition \
+  check/bin/urlsafe-decode \
+  check/bin/urlsafe-encode \
+  $(end)
+check_LTLIBRARIES = \
+  check/lib/libtests-base64.la \
+  check/lib/libtests-outcome.la \
+  check/lib/libtests-urlsafe.la \
+  $(end)
 
 default:
+# This bad design ... with limited tooling ... trying to get 'make' and one Makefile to do too many things "automatically"
+# This recursion and the ordering can't be fixed or overridden.
+#
+# WATCHOUT ---> The default 'all' rule DOES NOT pass command-line variable embellishments down one gratuitous level
+# WATCHOUT ---> all: config.h
+# WATCHOUT --->	     $(MAKE) $(AM_MAKEFLAGS) all-am
+# WATCHOUT --->	     $(MAKE) $(AM_MAKEFLAGS) all-am
+# WATCHOUT ---> all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) config.h
+# WATCHOUT ---> 
+# WATCHOUT ---> The default 'check' rule DOES NOT pass command-line variable embellishments down one gratuitous level
+# WATCHOUT ---> check: check-am
+# WATCHOUT ---> check-am: all-am
+# WATCHOUT ---> 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_LTLIBRARIES)
+# WATCHOUT ---> 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
+#
 include tests/Makefrag.am
 include @temerarious_flagship_datadir@/am/build.am
 # [[REMOVEWHEN]] temerarious-1.1.0 provides .../am/build.am
@@ -82,39 +136,6 @@ INSTALL_MODULES = \
   $(noinst_lib_libwant_la_MODULES) \
   $(end)
 $(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
-
-# Whereas automake already takes care of this dependency (except in the lib_LTLIBRARIES installation ordering)
-# NO NEED ---> $(lib_libtunitas_application_la) : $(lib_libtunitas_la) 
-# NO NEED ---> $(lib_libtunitas_server_la) : $(lib_libtunitas_la) 
-
-# WATCHOUT - the lib_LTLIBRARIES list MUST be in this order so that upon install the final link establishes the dependencies
-bin_PROGRAMS = 
-lib_LTLIBRARIES = \
-  lib/libtunitas.la \
-  lib/libtunitas-app.la \
-  lib/libtunitas-application.la \
-  lib/libtunitas-server.la \
-  $(end)
-noinst_LTLIBRARIES = \
-  noinst/lib/libtunitas.la \
-  noinst/lib/libtunitas-application.la \
-  noinst/lib/libtunitas-server.la \
-  noinst/lib/libwant.la \
-  $(end)
-check_PROGRAMS = \
-  check/bin/unit \
-  check/bin/base64-decode \
-  check/bin/base64-encode \
-  check/bin/outcome-error_code \
-  check/bin/outcome-error_condition \
-  check/bin/urlsafe-decode \
-  check/bin/urlsafe-encode \
-  $(end)
-check_LTLIBRARIES = \
-  check/lib/libtests-base64.la \
-  check/lib/libtests-outcome.la \
-  check/lib/libtests-urlsafe.la \
-  $(end)
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
 # via @temerarious_flagship_datadir@/am/build.am and its constituents.

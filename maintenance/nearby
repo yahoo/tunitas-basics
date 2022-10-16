@@ -198,6 +198,17 @@ fi
 if type -p nproc 2>/dev/null ; then
     : ${MAKEFLAGS:=-j$(nproc)}
 fi
+function summarize() {
+    local e=$1; shift
+    if ((0 == e)); then
+        echo OK DONE
+        git status -s
+    else
+        echo FAILED
+    fi
+    return $e
+}
+git status -s
 eval \
     ${prefix:+prefix=$prefix} \
     ${with_hypogeal_twilight:+with_hypogeal_twilight=$with_hypogeal_twilight} \
@@ -233,4 +244,4 @@ eval \
     ${end} &&
 make ${MAKEFLAGS:+MAKEFLAGS="$MAKEFLAGS"} ${CPPFLAGS:+CPPFLAGS="$CPPFLAGS"} ${CXXFLAGS:+CXXFLAGS="$CXXFLAGS"} ${LDFLAGS:+LDFLAGS="$LDFLAGS"} &&
 make check ${MAKEFLAGS:+MAKEFLAGS="$MAKEFLAGS"} ${CPPFLAGS:+CPPFLAGS="$CPPFLAGS"} ${CXXFLAGS:+CXXFLAGS="$CXXFLAGS"} ${LDFLAGS:+LDFLAGS="$LDFLAGS"} &&
-echo OK DONE
+summarize $?

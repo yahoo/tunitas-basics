@@ -110,7 +110,7 @@ clean-cppfiles: ; rm -f $(EACH_CPPFILES)
 
 EACH_OFILES = $(patsubst %, each/%.o, $(EACH_MODULES))
 $(EACH_OFILES) : each/%.o : each/%.cpp
-	$(V_CXX) $(CXX) -c -o $@ $(EACH_CPPFLAGS) $(EACH_CXXLFAGS) $<
+	$(V_CXX) $(CXX) -c -o $@ $(EACH_CPPFLAGS) $(EACH_CXXFLAGS) $<
 clean: clean-ofiles
 clean-ofiles: ; rm -f $(EACH_OFILES)
 
