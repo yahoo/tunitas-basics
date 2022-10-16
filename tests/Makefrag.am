@@ -48,3 +48,13 @@ include tests/outcome/error_code/Makefrag.am
 include tests/outcome/error_condition/Makefrag.am
 include tests/urlsafe/decode/Makefrag.am
 include tests/urlsafe/encode/Makefrag.am
+
+our_TESTS_bases = $(patsubst %.log, %, $(TEST_LOGS)
+our_TESTS_log = $(addsuffix .log, $(our__TESTS_bases))
+our_TESTS_trs = $(addsuffix .trs, $(our__TESTS_bases))
+$(our_TESTS_log) : $(check_PROGRAMS) $(check_LTLIBRARIES)
+tests/run-TESTS: $(check_PROGRAMS) $(check_LTLIBRARIES)
+	@rm -f $(RECHECK_LOGS) \
+	       $(RECHECK_LOGS:.log=.trs) \
+	       $(TEST_SUITE_LOG)
+	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG)
