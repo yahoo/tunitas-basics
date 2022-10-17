@@ -1,0 +1,10 @@
+# This is a GNU -*- Makefile -*- fragment which is managed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tunitas_exception_required_SUBSOURCES = \
+  obj/src/tunitas/exception/required/namespace.cpp \
+  obj/src/tunitas/exception/required/Aspect.cpp \
+  obj/src/tunitas/exception/required/Aspectish.cpp \
+  obj/src/tunitas/exception/required/Aspects.cpp \
+  obj/src/tunitas/exception/required/Partial.cpp \
+  $(end)

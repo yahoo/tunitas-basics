@@ -1,0 +1,39 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::feature {
+  //
+  // An invariant has failed.
+  //
+  // Semantic:
+  //
+  //   This reflects a programmer error.
+  //
+  // Specification:
+  //
+  //   The minimal sense of that.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Descendants MUST fulfill the what() obligation
+  //
+  // Usage:
+  //
+  //   You need a tutorial on how to use inheritance?  O.Rly?
+  //
+  class Invariant;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.feature.Logic
+class tunitas::exception::feature::Invariant : public virtual Logic {
+protected:
+  virtual ~Invariant() = default;
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv

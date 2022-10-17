@@ -60,6 +60,7 @@ class tunitas::application::options::exception::Unspecified final : public tunit
     using Exception = nonstd::exception::Unreachable;
   };
 public:
+  using Results = application::exception::Aspect::Results;
   //
   // The magic happens here with the optional location argument.
   // When the location is not supplied, the location is established at the call site.  Magic!

@@ -1,0 +1,36 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception {
+  //
+  // Something is (out of) Range
+  // It's a mathy terminology thing.  The "domain" and "range" of a function.
+  //
+  struct [[nodiscard]] Range;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.partial.Range
+class tunitas::exception::Range final : public partial::Range {
+  using Ancestor = partial::Range;
+public:
+  explicit Range() = default;
+  using Ancestor::Range;
+};
+#endiv
+#divert <cpp>
+#import tunitas.exception.usage.Exception
+#import tunitas.exception.usage.Derived_From
+namespace {
+  namespace testate {
+    namespace usage = tunitas::exception::usage;
+    using tunitas::exception::Range;
+    static_assert(usage::Exception<Range>);
+    static_assert(usage::Derived_From<Range, std::runtime_error>);
+    static_assert(usage::Derived_From<Range, std::range_error>);
+  }
+}
+#endiv

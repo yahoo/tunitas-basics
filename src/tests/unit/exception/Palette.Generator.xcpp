@@ -1,0 +1,32 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+//
+// Generate the exception.
+//
+// Design:
+//
+//    So that it can be specialized to do something exotic.
+//
+// Usage:
+//
+//   auto generated = Generator<exception::Something>{}(...somehow...);
+//
+#include <hpp/tests.unit.exception.Palette>
+#endiv
+#divert <hpp>
+namespace tests::unit::exception::palette {
+  template<required::Exception EXCEPTION> struct Palette::Generator {
+    using Generated = EXCEPTION;
+    template<typename... ARGUMENTS> inline auto operator()(ARGUMENTS &&...) const -> Generated;
+  };
+}
+#endiv
+#divert <ipp>
+namespace tests::unit::exception::palette {
+  template<required::Exception _> template<typename... ARGUMENTS> auto Palette::Generator<_>::operator()(ARGUMENTS &&...them) const -> Generated { return Generated{forward<ARGUMENTS>(them)...}; }
+}
+#endiv

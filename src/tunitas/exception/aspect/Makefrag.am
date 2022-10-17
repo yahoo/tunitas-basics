@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc, 2021.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+# This is deprecated stuff, being subsumed by namespace tunitas::exception::feature
+# it remains for compatibility
+#
+tunitas_exception_aspect_SUBSOURCES = \
+  obj/src/tunitas/exception/aspect/namespace.cpp \
+  obj/src/tunitas/exception/aspect/Quitting.cpp \
+  obj/src/tunitas/exception/aspect/Messaging.cpp \
+  $(end)

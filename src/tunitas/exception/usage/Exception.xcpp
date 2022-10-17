@@ -1,0 +1,32 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <tpp>
+#import std.is_copy_constructible
+#import std.is_move_constructible
+#import std.is_copy_assignable
+#import std.is_move_assignable
+#import std.is_final
+#import substd.exception.Exception
+namespace tunitas::exception::usage {
+  //
+  // Is this exception complete and well-defined?
+  // At <tpp> in namespace usage so you'll have the complete type to work against.
+  //
+  template<typename EXCEPTION> concept Exception = requires(EXCEPTION that) {
+    requires std::is_nothrow_copy_constructible_v<EXCEPTION>;
+    requires std::is_nothrow_move_constructible_v<EXCEPTION>;
+    requires std::is_nothrow_copy_assignable_v<EXCEPTION>;
+    requires std::is_nothrow_move_assignable_v<EXCEPTION>;
+    requires std::is_final_v<EXCEPTION>;
+    requires std::derived_from<EXCEPTION, substd::exception::Exception>;
+    { that.what() } -> same_as<char const *>;
+#if 0
+    // Witness: gcc (GCC) 11.2.1 20210827
+    // Witness: src/tunitas/exception/usage/Exception.xcpp:23:7: internal compiler error: Segmentation fault
+    // Witness: ../../../worktrees/gcc-11/gcc/toplev.c:327
+    //    23 |     { throw that };
+    { throw that };
+#endif
+  };
+}
+#endiv

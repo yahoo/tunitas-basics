@@ -6,10 +6,71 @@
 #
 tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/namespace.cpp \
+  $(tunitas_exception_aspect_SUBSOURCES) \
+  $(tunitas_exception_required_SUBSOURCES) \
+  $(tunitas_exception_usage_SUBSOURCES) \
   obj/src/tunitas/exception/Aspect.cpp \
+  \
+  obj/src/tunitas/exception/complete.Basic.cpp \
+  obj/src/tunitas/exception/complete.Featurized.cpp \
+  \
+  obj/src/tunitas/exception/bundle.Features.cpp \
+  obj/src/tunitas/exception/bundle.Aspects.cpp \
+  \
+  obj/src/tunitas/exception/feature.Bound.cpp \
+  obj/src/tunitas/exception/feature.Cast.cpp \
+  obj/src/tunitas/exception/feature.Domain.cpp \
+  obj/src/tunitas/exception/feature.Empty.cpp \
+  obj/src/tunitas/exception/feature.Exhausted.cpp \
+  obj/src/tunitas/exception/feature.Failure.cpp \
+  obj/src/tunitas/exception/feature.Full.cpp \
+  obj/src/tunitas/exception/feature.Indirection.cpp \
+  obj/src/tunitas/exception/feature.Invalid.cpp \
+  obj/src/tunitas/exception/feature.Invariant.cpp \
+  obj/src/tunitas/exception/feature.Logic.cpp \
+  obj/src/tunitas/exception/feature.Null.cpp \
   obj/src/tunitas/exception/feature.Messaging.cpp \
   obj/src/tunitas/exception/feature.Quitting.cpp \
-  obj/src/tunitas/exception/aspect/namespace.cpp \
-  obj/src/tunitas/exception/aspect/Quitting.cpp \
-  obj/src/tunitas/exception/aspect/Messaging.cpp \
+  obj/src/tunitas/exception/feature.Range.cpp \
+  obj/src/tunitas/exception/feature.Runtime.cpp \
+  obj/src/tunitas/exception/feature.Stream.cpp \
+  obj/src/tunitas/exception/feature.System.cpp \
+  \
+  obj/src/tunitas/exception/partial.Bound.cpp \
+  obj/src/tunitas/exception/partial.Cast.cpp \
+  obj/src/tunitas/exception/partial.Domain.cpp \
+  obj/src/tunitas/exception/partial.Empty.cpp \
+  obj/src/tunitas/exception/partial.Exhausted.cpp \
+  obj/src/tunitas/exception/partial.Failure.cpp \
+  obj/src/tunitas/exception/partial.Full.cpp \
+  obj/src/tunitas/exception/partial.Indirection.cpp \
+  obj/src/tunitas/exception/partial.Invalid.cpp \
+  obj/src/tunitas/exception/partial.Invariant.cpp \
+  obj/src/tunitas/exception/partial.Logic.cpp \
+  obj/src/tunitas/exception/partial.Null.cpp \
+  obj/src/tunitas/exception/partial.Range.cpp \
+  obj/src/tunitas/exception/partial.Runtime.cpp \
+  obj/src/tunitas/exception/partial.Stream.cpp \
+  obj/src/tunitas/exception/partial.System.cpp \
+  \
+  obj/src/tunitas/exception/Bound.cpp \
+  obj/src/tunitas/exception/Cast.cpp \
+  obj/src/tunitas/exception/Domain.cpp \
+  obj/src/tunitas/exception/Empty.cpp \
+  obj/src/tunitas/exception/Exhausted.cpp \
+  obj/src/tunitas/exception/Failure.cpp \
+  obj/src/tunitas/exception/Full.cpp \
+  obj/src/tunitas/exception/Indirection.cpp \
+  obj/src/tunitas/exception/Invalid.cpp \
+  obj/src/tunitas/exception/Invariant.cpp \
+  obj/src/tunitas/exception/Logic.cpp \
+  obj/src/tunitas/exception/Null.cpp \
+  obj/src/tunitas/exception/Range.cpp \
+  obj/src/tunitas/exception/Runtime.cpp \
+  obj/src/tunitas/exception/Stream.cpp \
+  obj/src/tunitas/exception/System.cpp \
   $(end)
+#
+include src/tunitas/exception/aspect/Makefrag.am
+include src/tunitas/exception/required/Makefrag.am
+include src/tunitas/exception/usage/Makefrag.am

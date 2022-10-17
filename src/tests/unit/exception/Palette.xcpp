@@ -1,0 +1,112 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.same_as
+#import tunitas.exception
+#import tunitas.required
+#import nonstd.required.Exception
+namespace tests::unit::exception {
+  //
+  // the palette of exercises
+  //
+  // Specification:
+  //
+  //   Avoid the copy pasta.
+  //
+  // Design:
+  //
+  //   Descendants only
+  //
+  //   The descendant type (FIXTURE ) must be supplied to stanza0(...), stanza1(...) because ... reasons.
+  //
+  // Usage:
+  //
+  //   By inheritance, non-public inheritance
+  //
+  //   struct my::Fixture : rigging::suite::Fixture, protected Palette {
+  //     auto test_Null() -> void {
+  //       exercise<library::Null>();
+  //     }
+  //   };
+  //
+  namespace [[eponymous]] palette {
+    struct Palette;
+    using namespace std;
+    namespace library = ::tunitas::exception;
+    namespace feature = ::tunitas::exception::feature;
+    namespace required {
+      using namespace ::tunitas::required;
+      using nonstd::required::Exception; // just a reminder
+      template<typename DESCENDANT, typename CATCHABLE, typename EXCEPTION> concept Descendant = requires(DESCENDANT descendant, CATCHABLE, EXCEPTION) {
+        { descendant.template test_exception0<CATCHABLE, EXCEPTION>() };
+        { descendant.template test_exception1string<CATCHABLE, EXCEPTION>() };
+        { descendant.template test_exception1error<CATCHABLE, EXCEPTION>() };
+        { descendant.template test_exception1type<CATCHABLE, EXCEPTION>() };
+      };
+    }
+  }
+  using palette::Palette;
+}
+#endiv
+#divert <hpp>
+#import rigging.Stream
+class tests::unit::exception::palette::Palette {
+protected:
+  ~Palette() = default;
+  template<typename CATCHABLE, typename EXCEPTION, typename... ARGUMENTS> requires required::Exception<EXCEPTION> auto exercise(ARGUMENTS &&...) -> void;
+  //
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> static auto stanza0(string::View name) -> rigging::Stream;
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> static auto stanza1string(string::View name) -> rigging::Stream;
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> static auto stanza1error(string::View name) -> rigging::Stream;
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> static auto stanza1type(string::View name) -> rigging::Stream;
+  template<required::Exception> struct Generator;
+};
+#endiv
+#divert <tpp>
+#import tunitas.exception.Aspect
+#import tests.unit.exception.Palette.Generator
+namespace tests::unit::exception::palette {
+  template<typename CATCHABLE, typename EXCEPTION, typename... ARGUMENTS> requires required::Exception<EXCEPTION> auto Palette::exercise(ARGUMENTS &&...arguments) -> void try {
+    // More elaborate than just a constructor because of the specialization Generator<exception::Cast>
+    auto generated = Generator<EXCEPTION>{}(forward<ARGUMENTS>(arguments)...);
+    throw generated;
+  } catch (CATCHABLE const &) {
+    require(ASSERTION);
+  }
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> auto Palette::stanza0(string::View name) -> rigging::stream::Stream {
+    using namespace rigging::stream;
+    auto sub = Stream{name};
+    sub << add<FIXTURE>("Aspect", &FIXTURE::template test_exception0<library::Aspect, EXCEPTION>)
+        << add<FIXTURE>("That-Certain-Feature", &FIXTURE::template test_exception0<FEATURE, EXCEPTION>)
+        << END;
+    return sub;
+  }
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> auto Palette::stanza1string(string::View name) -> rigging::Stream {
+    using namespace rigging::stream;
+    auto sub = Stream{name};
+    sub << add<FIXTURE>("Aspect", &FIXTURE::template test_exception1string<library::Aspect, EXCEPTION>)
+        << add<FIXTURE>("That-Certain-Feature", &FIXTURE::template test_exception1string<FEATURE, EXCEPTION>)
+        << END;
+    return sub;
+  }
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> auto Palette::stanza1error(string::View name) -> rigging::stream::Stream {
+    using namespace rigging::stream;
+    auto sub = Stream{name};
+    sub << add<FIXTURE>("Aspect", &FIXTURE::template test_exception1error<library::Aspect, EXCEPTION>)
+        << add<FIXTURE>("That-Certain-Feature", &FIXTURE::template test_exception1error<FEATURE, EXCEPTION>)
+        << END;
+    return sub;
+  }
+  template<typename FIXTURE, typename FEATURE, typename EXCEPTION> requires required::Descendant<FIXTURE, FEATURE, EXCEPTION> auto Palette::stanza1type(string::View name) -> rigging::Stream {
+    using namespace rigging::stream;
+    auto sub = Stream{name};
+    sub << add<FIXTURE>("Aspect", &FIXTURE::template test_exception1type<library::Aspect, EXCEPTION>)
+        << add<FIXTURE>("That-Certain-Feature", &FIXTURE::template test_exception1type<FEATURE, EXCEPTION>)
+        << END;
+    return sub;
+  }
+}
+#endiv

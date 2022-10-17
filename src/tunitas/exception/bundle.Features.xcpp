@@ -1,0 +1,46 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::bundle {
+  //
+  // Bundle up some features
+  //
+  // Specification:
+  //
+  //   See complete::Featurized<PARTIAL, FEATURES, ASPECTS>
+  //
+  // Design:
+  //
+  //   Of course, why do you ask?
+  //
+  //   There may be ambiguities in combining these named features.
+  //   The descendant must resolve those ambiguities.
+  //
+  // Usage:
+  //
+  //   public inheritance into descendants
+  //   See complete::Featurized<PARTIAL, FEATURES, ASPECTS>.
+  //
+  //   class my::Something : public bundle::Features<feature::Something, feature::Somethingelse, feature::Dark_Side>,
+  //                         public bundle::Features<exception::Aspect, something::exception::Aspect, dark_side::exception::Aspect>,
+  //                         public partial::Something {
+  //     using Results = tunitas::exception::Aspect::Results;
+  //     ...somehow...
+  //   };
+  //
+  template<typename... FEATURES> class Features;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::exception {
+  template<typename... FEATURES> class bundle::Features : public virtual FEATURES... {
+  protected:
+    ~Features() = default;
+  public:
+    virtual auto what() const noexcept -> char const * = 0;
+  };
+}
+#endiv

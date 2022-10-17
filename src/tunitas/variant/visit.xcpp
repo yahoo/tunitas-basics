@@ -1,0 +1,31 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.variant.visit
+#import tunitas.variant.Visitor
+namespace tunitas::variant {
+  //
+  // Import the standard one. That's it. That's the tweet.
+  //
+  // Specification:
+  //
+  //   std::visit, RTM
+  //   https://en.cppreference.com/w/cpp/utility/variant/visit
+  //
+  // Design:
+  //
+  //   If the call site uses the nearby tunitas::variant::Visitor then ADL will find this definition.
+  //
+  // Usage:
+  //
+  //   As Stated.
+  //
+  //   auto specimen = tunitas::variant::Variant{...somehow...};
+  //   auto visitor = hommlons::variant::Visitor{[](Something const &) { ...somehow... },
+  //                                             [](Something_Else const &) { ...somehow... },
+  //                                             [](Dark_Side const &) { ...somehow... }};
+  //   return visit(visitor, specimen);
+  //
+  using std::visit;
+}
+#endiv

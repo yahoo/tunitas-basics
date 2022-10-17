@@ -35,12 +35,12 @@ protected:
 namespace tests::unit::exception {
   auto Fixture::test_aspect_Messaging() -> void {
     Message subject{"text me maybe"};
-    CPPUNIT_ASSERT(nullptr != subject.what());
+    require(ASSERTION, nullptr != subject.what());
   }
   auto Fixture::test_aspect_Quitting() -> void {
     Quitting subject{sys::exits::CONFIG};
-    CPPUNIT_ASSERT(nullptr != subject.what());
-    CPPUNIT_ASSERT(sys::exits::CONFIG == subject.code());
+    require(ASSERTION, nullptr != subject.what());
+    require(ASSERTION, sys::exits::CONFIG == subject.code());
   }
 }
 #import tests.unit.exception.Fixture.Aspic
@@ -52,9 +52,9 @@ namespace tests::unit::exception {
       Balsam bbb;
       throw aaa;
     } catch (::tunitas::exception::Aspect const &) {
-      CPPUNIT_ASSERT(true);
+      require(ASSERTION, true);
     } catch (std::exception const &) {
-      CPPUNIT_ASSERT(false);
+      require(ASSERTION, false);
     }
   }
   auto Fixture::test_Aspect_2() -> void {
@@ -63,9 +63,9 @@ namespace tests::unit::exception {
       Balsam const bbb;
       throw bbb;
     } catch (::tunitas::exception::Aspect const &) {
-      CPPUNIT_ASSERT(false);
+      require(ASSERTION, false);
     } catch (std::exception const &) {
-      CPPUNIT_ASSERT(true);
+      require(ASSERTION, true);
     }
   }
 }
@@ -81,7 +81,7 @@ namespace tests::unit::exception {
       buf << a; // <------------------------------ testing this
       auto const actual = buf.str();
       auto const expected = "usage: Mail Me [...options...]"s; 
-      CPPUNIT_ASSERT_EQUAL(expected, actual);
+      require(ASSERTION, expected == actual);
     }
   }
   auto Fixture::test_operator_insert_2() -> void {
@@ -92,7 +92,7 @@ namespace tests::unit::exception {
       buf << a; // <------------------------------ testing this
       auto const actual = buf.str();
       auto const expected = "I QUIT!"s;
-      CPPUNIT_ASSERT_EQUAL(expected, actual);
+      require(ASSERTION, expected == actual);
     }
   }
 }
@@ -141,40 +141,46 @@ namespace tests::unit::exception {
     std::cerr << actual;    
   }
 }
+#import tests.unit.exception.tunitas.Fixture
 auto tests::unit::exception::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
-  Stream series("exception");
-  {
-    Stream asp("aspect");
-    asp << call("Messaging", &Fixture::test_aspect_Messaging)
-        << call("Quitting", &Fixture::test_aspect_Quitting)
-      ;
-    series << move(asp);
-  } {
-    Stream asp("Aspect");
-    asp << call("1", &Fixture::test_Aspect_1)
-        << call("2", &Fixture::test_Aspect_2)
-      ;
-    series << move(asp);
-  } {
-    Stream ins("operator<<");
-    ins << call("1", &Fixture::test_operator_insert_1)
-        << call("2", &Fixture::test_operator_insert_2)
-      ;
-    series << move(ins);
-  } {
-    Stream my("my");
-    my << call("Message", &Fixture::test_my_Message)
-      ;
-    {
-      Stream qui("Quitting");
-       qui << call("1", &Fixture::test_my_Quitting_1)
-         << call("2", &Fixture::test_my_Quitting_2)
-         ;
-       my << move(qui);
-    }
-    series << move(my);
-  }
+  auto series = Stream("exception"sv);
+  series << []{
+              auto asp = Stream("aspect"sv);
+              asp << call("Messaging", &Fixture::test_aspect_Messaging)
+                  << call("Quitting", &Fixture::test_aspect_Quitting)
+                  << END;
+              return asp;
+            }()
+         << []{
+              auto asp = Stream("Aspect"sv);
+              asp << call("1", &Fixture::test_Aspect_1)
+                  << call("2", &Fixture::test_Aspect_2)
+                  << END;
+              return asp;
+            }()
+         << []{
+              auto ins = Stream("operator<<"sv);
+              ins << call("1", &Fixture::test_operator_insert_1)
+                  << call("2", &Fixture::test_operator_insert_2)
+                  << END;
+              return ins;
+            }()
+         << [] {
+              auto my = Stream("my"sv);
+              my << call("Message", &Fixture::test_my_Message)
+                 << []{
+                      auto qui = Stream("Quitting"sv);
+                      qui << call("1", &Fixture::test_my_Quitting_1)
+                          << call("2", &Fixture::test_my_Quitting_2)
+                          << END;
+                      return qui;
+                    }()
+                 << END;
+              return my;
+            }()
+         << add<tunitas::Fixture>()
+         << END;
   return finalize(series);
 }
 #endiv

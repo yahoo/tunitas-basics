@@ -4,6 +4,14 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 // For terms, see the LICENSE file at the top of this repository
+#divert <fpp>
+namespace tests::unit { class Fixture; }
+#endiv
+#divert <hpp>
+struct tests::unit::Fixture : public cppunit::test::Fixture {
+  static auto suite() -> cppunit::Test *;
+};
+#endiv
 #divert <cpp>
 #import tests.unit.application.Fixture
 #import tests.unit.base64.Fixture
@@ -15,21 +23,24 @@
 #import tests.unit.time.Fixture
 #import tests.unit.tunitas.Fixture
 #import tests.unit.urlsafe.Fixture
+#import tests.unit.variant.Fixture
 #import tests.unit.want.Fixture
-#import rigging.bench.Main
-auto main(int argc, char *argv[]) -> int {
-  namespace tu = tests::unit;
-  rigging::bench::Main remain(tu::application::Fixture::suite(),
-			      tu::base64::Fixture::suite(),
-                              tu::exception::Fixture::suite(),
-                              tu::exits::Fixture::suite(),
-                              tu::outcome::Fixture::suite(),
-                              tu::required::Fixture::suite(),
-                              tu::server::Fixture::suite(),
-                              tu::time::Fixture::suite(),
-                              tu::tunitas::Fixture::suite(),
-                              tu::urlsafe::Fixture::suite(),
-			      tu::want::Fixture::suite());
-  return remain(argc, argv);
+auto tests::unit::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"unit"sv};
+  series << add<application::Fixture>()
+         << add<base64::Fixture>()
+         << add<exception::Fixture>()
+         << add<exits::Fixture>()
+         << add<outcome::Fixture>()
+         << add<required::Fixture>()
+         << add<server::Fixture>()
+         << add<time::Fixture>()
+         << add<tunitas::Fixture>()
+         << add<urlsafe::Fixture>()
+         << add<variant::Fixture>()
+         << add<want::Fixture>()
+         << END;
+  return finalize(series);
 }
 #endiv

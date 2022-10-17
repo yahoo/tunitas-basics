@@ -1,0 +1,31 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::variant {
+  //
+  // The generic "visitor"
+  //
+  // Specification:
+  //
+  //   As exhibited in https://en.cppreference.com/w/cpp/utility/variant/visit
+  //
+  // Design:
+  //
+  //   This MUST be a new type declared in namespace variant so that ADL will find it.
+  //
+  // Usage:
+  //
+  //   using Both = std::variant<double, std::intmax_t>;
+  //   Both val = ...3 or 3.0...
+  //
+  //   auto vis = Visitor{[](double) { ... },
+  //                      [](std::intmax_t) { ... }};
+  //   auto ret = std::visit(vis, val);
+  //
+  template<typename... TYPES> struct Visitor : TYPES... { using TYPES::operator()...; };
+  template<typename... TYPES> Visitor(TYPES...) -> Visitor<TYPES...>;
+}
+#endiv

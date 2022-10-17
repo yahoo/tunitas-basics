@@ -5,7 +5,7 @@
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
 lib_libtunitas_server_la_CURRENT = 6
-lib_libtunitas_server_la_REVISION = 1
+lib_libtunitas_server_la_REVISION = 2
 lib_libtunitas_server_la_AGE = 1
 lib_libtunitas_server_la_CRA = $(lib_libtunitas_server_la_CURRENT):$(lib_libtunitas_server_la_REVISION):$(lib_libtunitas_server_la_AGE)
 lib_libtunitas_server_la_VERSION_INFO = -version-info $(lib_libtunitas_server_la_CRA)

@@ -11,6 +11,9 @@ tests_unit_exception_SUBSOURCES = \
   check/obj/src/tests/unit/exception/Fixture.Quitting.cpp \
   check/obj/src/tests/unit/exception/Fixture.Aspic.cpp \
   check/obj/src/tests/unit/exception/Fixture.Balsam.cpp \
+  check/obj/src/tests/unit/exception/tunitas.Fixture.cpp \
+  check/obj/src/tests/unit/exception/Palette.cpp \
+  check/obj/src/tests/unit/exception/Palette.Generator.cpp \
   check/obj/src/tests/unit/exception/my.Quitting.cpp \
   check/obj/src/tests/unit/exception/my.Message.cpp \
   check/obj/src/tests/unit/exception/compatibility.cpp \

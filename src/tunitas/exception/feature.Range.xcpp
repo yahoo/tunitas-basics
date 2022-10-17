@@ -1,0 +1,40 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::feature {
+  //
+  // As stated.
+  //
+  // Semantic:
+  //
+  //   The "domain" and "range" of a function.
+  //   It's a mathy terminology thing.
+  //
+  // Specification:
+  //
+  //   The minimal sense of that.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Descendants MUST fulfill the what() obligation
+  //
+  // Usage:
+  //
+  //   You need a tutorial on how to use inheritance?  O.Rly?
+  //
+  class Range;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.feature.Runtime
+class tunitas::exception::feature::Range : public virtual Runtime {
+protected:
+  virtual ~Range() = default;
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv

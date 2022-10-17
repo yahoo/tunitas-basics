@@ -19,6 +19,7 @@ tunitas_SUBSOURCES = \
   $(tunitas_time_SUBSOURCES) \
   $(tunitas_tuple_SUBSOURCES) \
   $(tunitas_urlsafe_SUBSOURCES) \
+  $(tunitas_variant_SUBSOURCES) \
   $(end)
 #
 include src/tunitas/base64/Makefrag.am
@@ -30,3 +31,4 @@ include src/tunitas/string/Makefrag.am
 include src/tunitas/time/Makefrag.am
 include src/tunitas/tuple/Makefrag.am
 include src/tunitas/urlsafe/Makefrag.am
+include src/tunitas/variant/Makefrag.am

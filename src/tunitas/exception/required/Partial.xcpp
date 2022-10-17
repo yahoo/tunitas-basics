@@ -1,0 +1,25 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.is_abstract
+namespace tunitas::exception::required {
+  //
+  // Is this type shaped like the partial completion of an exception?
+  //
+  // Specification:
+  //
+  //   the interface of std::exception is known to the C++ Standard Library
+  //
+  // Design:
+  //
+  //   There is not much we can actually test for here.
+  //
+  template<typename PARTIAL> concept Partial = requires(PARTIAL const &partial) {
+    requires !std::is_abstract_v<PARTIAL>;
+    { partial.what() } -> convertible_to<char const *>;
+  };
+}
+#endiv

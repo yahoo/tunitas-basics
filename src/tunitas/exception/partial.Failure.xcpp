@@ -1,0 +1,68 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of a subsystem failure exception.
+  //
+  // Semantic
+  //
+  //   Rhymes with std::system_error but does not imply an operating system failure
+  //   https://en.cppreference.com/w/cpp/error/system_error
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
+  //   vague linkage 
+  //   If the class declares any non-inline, non-pure virtual functions,
+  //   the first one is chosen as the “key method” for the class,
+  //   and the vtable is only emitted in the translation unit where the key method is defined.
+  // </cite>
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Failure {
+  //     struct Ancestors {
+  //       using Exception = partial::Failure;
+  //     };
+  //     using Ancestor::Exception::Failure;
+  //   };
+  //
+  struct Failure;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Failure
+#import nonstd.exception.System
+#import nonstd.string.View
+class tunitas::exception::partial::Failure : public virtual Aspect,
+                                              public virtual feature::Failure,
+                                              public nonstd::exception::System<nonstd::string::View> {
+  struct Ancestors {
+    using Aspect = tunitas::exception::Aspect;
+    using Exception = nonstd::exception::System<nonstd::string::View>;
+  };
+protected:
+  ~Failure() = default;
+public:
+  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  using Results = Ancestors::Aspect::Results;
+  auto what() const noexcept -> Results::What override;
+};
+#endiv
+#divert <cpp>
+namespace tunitas::exception::partial {
+  auto Failure::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

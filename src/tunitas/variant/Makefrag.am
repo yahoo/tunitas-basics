@@ -1,0 +1,14 @@
+# This is a -*- Makefile -*- fragment which is processed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tunitas_variant_SUBSOURCES = \
+  obj/src/tunitas/Variant.cpp \
+  obj/src/tunitas/Visitor.cpp \
+  obj/src/tunitas/visit.cpp \
+  obj/src/tunitas/variant/namespace.cpp \
+  obj/src/tunitas/variant/Variant.cpp \
+  obj/src/tunitas/variant/Size.cpp \
+  obj/src/tunitas/variant/Alternative.cpp \
+  obj/src/tunitas/variant/Visitor.cpp \
+  obj/src/tunitas/variant/visit.cpp \
+  $(end)

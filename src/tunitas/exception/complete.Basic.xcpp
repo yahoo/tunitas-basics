@@ -1,0 +1,49 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.exception.required.Partial
+#import tunitas.exception.required.Aspects
+namespace tunitas::exception::complete {
+  //
+  // Blend it all all together, simply
+  //
+  // Specification:
+  //
+  //   Makes a complete type (non-abstract).
+  //   Allows the lower-level variants to be expressed cogently as a type alias.
+  //
+  // Design:
+  //
+  //   By requirement, at least one of the (virtual) Ancestors will be tunitas::exception::Aspect
+  //
+  // Usage:
+  //
+  //   using Dark_Side = complete::Basic<partial::Dark_Side, exception::Aspect, something::exception::Aspect, somethingelse::Aspect>;
+  //
+  template<required::Partial PARTIAL, typename... ASPECTS> requires required::Aspects<ASPECTS...> struct Basic;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::exception {
+  template<required::Partial PARTIAL, typename... ASPECTS> requires required::Aspects<ASPECTS...> class complete::Basic : public PARTIAL, public virtual ASPECTS... {
+    struct Ancestors {
+      using Aspect = exception::Aspect;
+      using Exception = PARTIAL;
+    };
+  public:
+    explicit Basic() = default;
+    // using Ancestors::Exception::PARTIAL;
+    using PARTIAL::PARTIAL;
+    using Results = typename Ancestors::Aspect::Results;
+    auto what() const noexcept -> Results::What override;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tunitas::exception::complete {
+  template<required::Partial P, typename... A> requires required::Aspects<A...> auto Basic<P, A...>::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

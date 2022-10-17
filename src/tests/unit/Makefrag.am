@@ -8,8 +8,9 @@ tests_unit_SUBSOURCES = \
   check/obj/src/tunitas/base64/Encoder.test.Access.cpp \
   check/obj/src/tunitas/base64/Decoder.test.Access.cpp \
   \
-  check/obj/src/tests/unit/main.cpp \
+  check/obj/src/tests/unit/c.main.cpp \
   check/obj/src/tests/unit/namespace.cpp \
+  check/obj/src/tests/unit/Fixture.cpp \
   check/obj/src/tests/unit/UNREACHABLE.cpp \
   $(tests_unit_application_SUBSOURCES) \
   $(tests_unit_base64_SUBSOURCES) \
@@ -27,6 +28,7 @@ tests_unit_SUBSOURCES = \
   check/obj/src/tests/unit/time.ratio.Fixture.cpp \
   check/obj/src/tests/unit/tunitas.Fixture.cpp \
   check/obj/src/tests/unit/urlsafe.Fixture.cpp \
+  check/obj/src/tests/unit/variant.Fixture.cpp \
   check/obj/src/tests/unit/want.Fixture.cpp \
   check/obj/src/tests/unit/want.nonstd.Fixture.cpp \
   check/obj/src/tests/unit/want.sys.Fixture.cpp \

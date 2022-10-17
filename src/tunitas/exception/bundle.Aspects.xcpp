@@ -1,0 +1,45 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.exception.required.Aspects
+namespace tunitas::exception::bundle {
+  //
+  // Bundle up some aspects
+  //
+  // Specification:
+  //
+  //   See complete::Featurized<PARTIAL, FEATURES, ASPECTS>
+  //
+  // Design:
+  //
+  //   Of course, why do you ask?
+  //
+  //   Whereas each ASPECT is stipulated to provide ASPECT::Results, the combination is thus ambiguous.
+  //   Descendants MUST choose one of the ASPECT::Results; e.g. tunitas::exception::Aspect::Results;
+  //
+  // Usage:
+  //
+  //   public inheritance into descendants
+  //   See complete::Featurized<PARTIAL, FEATURES, ASPECTS>.
+  //
+  //   class my::Something : public bundle::Features<feature::Something, feature::Somethingelse, feature::Dark_Side>,
+  //                         public bundle::Aspects<exception::Aspect, something::exception::Aspect, dark_side::exception::Aspect>,
+  //                         public partial::Something {
+  //     using Results = tunitas::exception::Aspect::Results;
+  //     ...somehow...
+  //   };
+  //
+  template<typename... ASPECTS> requires required::Aspects<ASPECTS...> class Aspects;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::exception {
+  template<typename... ASPECTS> requires required::Aspects<ASPECTS...> class bundle::Aspects : public virtual ASPECTS... {
+  protected:
+    ~Aspects() = default;
+  };
+}
+#endiv
