@@ -9,5 +9,6 @@
 namespace tunitas::exception {
   using namespace nonstd::exception;
   namespace [[nodirectory]] feature { }
+  namespace [[nodirectory]] complete { }
 }
 #endiv

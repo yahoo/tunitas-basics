@@ -11,22 +11,28 @@ tunitas_SUBSOURCES = \
   obj/src/tunitas/Pair.cpp \
   \
   $(tunitas_base64_SUBSOURCES) \
+  $(tunitas_error_SUBSOURCES) \
   $(tunitas_exception_SUBSOURCES) \
   $(tunitas_file_SUBSOURCES) \
+  $(tunitas_otherwise_SUBSOURCES) \
   $(tunitas_outcome_SUBSOURCES) \
   $(tunitas_required_SUBSOURCES) \
   $(tunitas_string_SUBSOURCES) \
   $(tunitas_time_SUBSOURCES) \
   $(tunitas_tuple_SUBSOURCES) \
   $(tunitas_urlsafe_SUBSOURCES) \
+  $(tunitas_variant_SUBSOURCES) \
   $(end)
 #
 include src/tunitas/base64/Makefrag.am
+include src/tunitas/error/Makefrag.am
 include src/tunitas/exception/Makefrag.am
 include src/tunitas/file/Makefrag.am
+include src/tunitas/otherwise/Makefrag.am
 include src/tunitas/outcome/Makefrag.am
 include src/tunitas/required/Makefrag.am
 include src/tunitas/string/Makefrag.am
 include src/tunitas/time/Makefrag.am
 include src/tunitas/tuple/Makefrag.am
 include src/tunitas/urlsafe/Makefrag.am
+include src/tunitas/variant/Makefrag.am

@@ -10,7 +10,6 @@ want_SUBSOURCES = \
   obj/src/want/nonstd.cpp \
   obj/src/want/nonstd.Nullbuf.cpp \
   obj/src/want/nonstd.null.cpp \
-  obj/src/want/nonstd.uninitialized_zero.cpp \
   \
   obj/src/want/std.filesystem.cpp \
   obj/src/want/std.filesystem.path.cpp \

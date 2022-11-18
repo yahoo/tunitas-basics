@@ -1,0 +1,31 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.variant.Alternative
+namespace tunitas::variant {
+  //
+  // You WILL obey the naming convention (Title Case for types; snake-lower_case for namespaces)
+  //
+  // Specification:
+  //
+  //   https://en.cppreference.com/w/cpp/utility/variant/variant_alternative
+  //
+  // GOTCHA!
+  //
+  //   And yet, specializations of variant_alternative MUST go in the namespace whence they came (namespace std)
+  //   So you'll anyhow wind up knowing that these things actually live in namespace std.
+  //
+  // Usage:
+  //
+  //   Just like it says.
+  //
+  //   using Something = Variant<...somehow...>;
+  //   using T0 = variant::Alternative<0, Something>::type;
+  //   using T1 = variant::Alternative<1, Something>::type;
+  //
+  using nonstd::variant::Alternative;
+}
+#endiv

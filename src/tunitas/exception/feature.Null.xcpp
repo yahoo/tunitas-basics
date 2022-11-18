@@ -1,0 +1,40 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::feature {
+  //
+  // As stated.
+  //
+  // Semantic:
+  //
+  //   The sense of being "null".
+  //   A pointer can be null; so can a std::optional<...>
+  //
+  // Specification:
+  //
+  //   The minimal sense of that nullness.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Descendants MUST fulfill the what() obligation
+  //
+  // Usage:
+  //
+  //   You need a tutorial on how to use inheritance?  O.Rly?
+  //
+  class Null;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.feature.Invariant
+class tunitas::exception::feature::Null : public virtual Invariant {
+protected:
+  virtual ~Null() = default;
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv

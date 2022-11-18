@@ -1,0 +1,81 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of an iostream failure exception
+  //
+  // Semantic
+  //
+  //   See feature::Stream, which is nearby
+  //   <psst>the sense of std::ios_base::failure</psst>
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  //   There is no way to give a reason except by std::io_errc
+  //
+  // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
+  //   vague linkage 
+  //   If the class declares any non-inline, non-pure virtual functions,
+  //   the first one is chosen as the “key method” for the class,
+  //   and the vtable is only emitted in the translation unit where the key method is defined.
+  // </cite>
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Stream {
+  //     struct Ancestors {
+  //       using Exception = partial::Stream;
+  //     };
+  //     using Ancestor::Exception::Stream;
+  //   };
+  //
+  struct Stream;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Stream
+#import tunitas.string.View
+#import nonstd.exception.Stream
+class tunitas::exception::partial::Stream : public virtual Aspect,
+                                             public virtual feature::Stream,
+                                             public nonstd::exception::Stream<string::View> {
+  struct Ancestors {
+    using Aspect = tunitas::exception::Aspect;
+    using Exception = nonstd::exception::Stream<string::View>;
+  };
+protected:
+  ~Stream() = default;
+public:
+  using Reason = std::io_errc;
+  inline explicit Stream(Reason = {});
+  inline explicit Stream(Ancestors::Exception const &);
+  inline explicit Stream(Ancestors::Exception &&);
+  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  using Results = Ancestors::Aspect::Results;
+  auto what() const noexcept -> Results::What override;
+};
+#endiv
+#divert <ipp>
+namespace tunitas::exception::partial {
+  Stream::Stream(Reason reason) : Ancestors::Exception{"stream error", reason} { }
+  Stream::Stream(Ancestors::Exception const &old) : Ancestors::Exception{old} { }
+  Stream::Stream(Ancestors::Exception &&old) : Ancestors::Exception{move(old)} { }
+}
+#endiv
+#divert <cpp>
+namespace tunitas::exception::partial {
+  auto Stream::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

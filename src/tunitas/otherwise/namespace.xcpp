@@ -1,0 +1,54 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas
+namespace tunitas::otherwise {
+  //
+  // Enumeration tags to signal how to handle errors.
+  // For lack of another way to overload on the return type
+  //
+  // General Use Case:
+  //
+  // the ambiguity:
+  //   template<typename DESTINATION, typename SOURCE> auto downcast(unique_ptr<SOURCE>) -> unique_ptr<DESTINATION>;
+  //
+  // thus:
+  //   template<typename DESTINATION, typename SOURCE> auto downcast(otherwise::Outcome, unique_ptr<SOURCE>) -> Outcome<unique_ptr<DESTINATION>>;
+  //   template<typename DESTINATION, typename SOURCE> auto downcast(otherwise::Exception, unique_ptr<SOURCE>) -> unique_ptr<DESTINATION>;
+  //   template<typename DESTINATION, typename SOURCE> auto downcast(otherwise::Optional, unique_ptr<SOURCE>) -> Optional<unique_ptr<DESTINATION>>;
+  //   ...you get the idea and the problem we're addressing here...
+  //
+  // Semantics:
+  //
+  //   Most are self-explanatory.
+  //
+  //   Tuple impleis that a resource was passed into function(...);
+  //         if function(...) fails then the resource is returned
+  //
+  //   Dispose implies that a resource was passed into function(...); if function fails then the resource was disposed (of).
+  //
+  // Usage:
+  //
+  // (common)
+  //   auto function(otherwise::Outcome, ...arguments...) -> Outcome<Something>; .......... errors in the outcome
+  //   auto function(otherwise::Exception, ...arguments...) -> Something; ................. throws an exception
+  //   auto function(otherwise::Optional, ..arguments...) -> Optional<Something> .......... as such.
+  //
+  // (rare)
+  //   auto function(otherwise::Tuple, ..arguments...) -> Tuple<Something, Alternative1, Alternative2, ...>;
+  //   auto function(otherwise::Variant, ..arguments...) -> Variant<Something, Alternative, ...>;
+  //
+  /// (very rare)
+  //   auto function(otherwise::Dispose, ..arguments...) -> Success;;
+  //
+  enum class Outcome { };
+  enum class Exception { };
+  enum class Optional { };
+  enum class Tuple { };
+  enum class Variant { };
+  enum class Disposal { };
+}
+#endiv

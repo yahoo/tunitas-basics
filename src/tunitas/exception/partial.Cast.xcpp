@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of a Cast exception
+  //
+  // Semantic
+  //
+  //   see feature::Cast
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
+  //   vague linkage 
+  //   If the class declares any non-inline, non-pure virtual functions,
+  //   the first one is chosen as the “key method” for the class,
+  //   and the vtable is only emitted in the translation unit where the key method is defined.
+  // </cite>
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Cast {
+  //     struct Ancestors {
+  //       using Exception = partial::Cast;
+  //     };
+  //     using Ancestor::Exception::Cast;
+  //   };
+  //
+  struct Cast;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Cast
+#import nonstd.exception.Logic
+#import nonstd.string.View
+#import std.type_info
+class tunitas::exception::partial::Cast : public virtual Aspect,
+                                           public virtual feature::Cast,
+                                           public nonstd::exception::Logic<nonstd::string::View> {
+  struct Ancestors {
+    using Aspect = tunitas::exception::Aspect;
+    using Exception = nonstd::exception::Logic<nonstd::string::View>;
+  };
+protected:
+  ~Cast() = default;
+public:
+  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  inline explicit Cast(std::type_info const &bad) : Ancestors::Exception{bad.name()} { }
+  using Results = Ancestors::Aspect::Results;
+  auto what() const noexcept -> Results::What override;
+};
+#endiv
+#divert <cpp>
+namespace tunitas::exception::partial {
+  auto Cast::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

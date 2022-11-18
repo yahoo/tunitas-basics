@@ -1,0 +1,27 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.is_enum
+#import std.is_class
+namespace tunitas::error ::required {
+  //
+  // Is this type an Unpackaged enumeration, sutiable f the Package system?
+  //
+  // Usage:
+  //
+  //   see code::Package<...>
+  //   see condition::Package<...>
+  //
+  template<typename UNPACKAGED> concept Unpackaged = requires(UNPACKAGED) {
+    requires std::is_class_v<UNPACKAGED>;
+    typename UNPACKAGED::Enumeration;
+    requires std::is_enum_v<typename UNPACKAGED::Enumeration>;
+    // And there may be other enumerator values, but at least these two must be available in unqualified form.
+    requires 0 != sizeof (UNPACKAGED::SUCCESS);
+    requires 0 != sizeof (UNPACKAGED::FAILURE);
+  };
+}
+#endiv

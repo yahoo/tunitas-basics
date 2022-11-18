@@ -1,0 +1,64 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of an Indirection exception
+  //
+  // Semantic
+  //
+  //   see feature::Indirection
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Indirection {
+  //     struct Ancestors {
+  //       using Exception = partial::Indirection;
+  //     };
+  //     using Ancestor::Exception::Indirection;
+  //   };
+  //
+  namespace [[eponymous]] indirection {
+    struct Indirection;
+  }
+  using indirection::Indirection;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Invalid
+#import tunitas.exception.feature.Indirection
+#import tunitas.exception.feature.Null
+#import tunitas.exception.complete.Featurized
+#import tunitas.exception.bundle.Aspects
+#import tunitas.exception.bundle.Features
+#import nonstd.string.View
+#import nonstd.exception.Invalid
+namespace tunitas::exception::partial {
+  namespace indirection {
+    using Wow = complete::Featurized<nonstd::exception::Invalid<nonstd::string::View>,
+                                     bundle::Features<feature::Indirection, feature::Null, feature::Invalid>,
+                                     bundle::Aspects<tunitas::exception::Aspect>>;
+  }
+  class indirection::Indirection : public Wow {
+    using Ancestor = Featurized;
+  protected:
+    ~Indirection() = default;
+  public:
+    explicit Indirection() : Ancestor{"indirection"} { }
+    using Ancestor::Featurized;
+  };
+}
+#endiv

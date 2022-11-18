@@ -5,6 +5,7 @@
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 // For terms, see the LICENSE file at the top of this repository.
 #divert <fpp>
+#import tunitas
 namespace tunitas::application {
   namespace exception { }
   namespace exits { }

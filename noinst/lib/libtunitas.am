@@ -7,7 +7,7 @@
 noinst_lib_libtunitas_la_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
 noinst_lib_libtunitas_la_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
 noinst_lib_libtunitas_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
-noinst_lib_libtunitas_la_LIBADD = -lsys++ -lnonstd++ noinst/lib/libwant.la
+noinst_lib_libtunitas_la_LIBADD =  noinst/lib/libstd+tunitas.la  noinst/lib/libwant.la -lsys++ -lnonstd++
 noinst_lib_libtunitas_la_MODULES = $(call TF_SOURCEStoMODULES, $(noinst_lib_libtunitas_la_SOURCES))
 noinst_lib_libtunitas_la_SOURCES = $(tunitas_SUBSOURCES)
 include src/tunitas/Makefrag.am

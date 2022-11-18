@@ -1,0 +1,27 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#forward tunitas.error.Category
+namespace tunitas::error {
+  //
+  // Acquire the error category singleton
+  //
+  // Is thread-safe
+  //
+  // Usage:
+  //
+  //   auto &c = category();
+  //   cout << c.name();
+  //
+  auto category() noexcept -> Category const &;
+}
+#endiv
+#divert <ipp>
+#import tunitas.error.Category
+#endiv
+#divert <cpp>
+auto tunitas::error::category() noexcept -> Category const &  {
+  static Category const singleton;
+  return singleton;
+}
+#endiv

@@ -1,0 +1,74 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of an Exhausted exception
+  //
+  // Semantic
+  //
+  //   see feature::Exhausted
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Exhausted {
+  //     struct Ancestors {
+  //       using Exception = partial::Exhausted;
+  //     };
+  //     using Ancestor::Exception::Exhausted;
+  //   };
+  //
+  namespace [[eponymous]] exhausted {
+    struct Exhausted;
+  }
+  using exhausted::Exhausted;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Exhausted
+#import tunitas.exception.feature.Invalid
+#import tunitas.exception.complete.Featurized
+#import tunitas.exception.bundle.Aspects
+#import tunitas.exception.bundle.Features
+#import nonstd.exception.Invalid
+#import nonstd.string.View
+namespace tunitas::exception::partial {
+  namespace exhausted {
+    using Wow = complete::Featurized<nonstd::exception::Invalid<nonstd::string::View>,
+                                     bundle::Features<feature::Exhausted, feature::Invalid>,
+                                     bundle::Aspects<tunitas::exception::Aspect>>;
+  }
+  class exhausted::Exhausted : public Wow {
+    using Ancestor = Wow;
+  protected:
+    ~Exhausted() = default;
+  public:
+    explicit Exhausted() : Ancestor{"exhausted"} { }
+    using Ancestor::Featurized;
+#if 0
+    using Results = Ancestor::Aspect::Results;
+    auto what() const noexcept -> Results::What override;
+#endif
+  };
+}
+#endiv
+#divert <cpp>
+namespace tunitas::exception::partial {
+#if 0
+  auto Exhausted::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+#endif
+}
+#endiv

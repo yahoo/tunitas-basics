@@ -1,0 +1,8 @@
+# This is a GNU -*- Makefile -*- fragment which is managed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tunitas_exception_usage_SUBSOURCES = \
+  obj/src/tunitas/exception/usage/namespace.cpp \
+  obj/src/tunitas/exception/usage/Exception.cpp \
+  obj/src/tunitas/exception/usage/Derived_From.cpp \
+  $(end)

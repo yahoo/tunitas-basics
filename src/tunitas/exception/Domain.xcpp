@@ -1,0 +1,36 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception {
+  //
+  // Something is (out of) Domain
+  // It's a mathy terminology thing.  The "domain" and "range" of a function.
+  //
+  struct [[nodiscard]] Domain;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.partial.Domain
+class tunitas::exception::Domain final : public partial::Domain {
+  using Ancestor = partial::Domain;
+public:
+  explicit Domain() = default;
+  using Ancestor::Domain;
+};
+#endiv
+#divert <cpp>
+#import tunitas.exception.usage.Exception
+#import tunitas.exception.usage.Derived_From
+namespace {
+  namespace testate {
+    namespace usage = tunitas::exception::usage;
+    using tunitas::exception::Domain;
+    static_assert(usage::Exception<Domain>);
+    static_assert(usage::Derived_From<Domain, std::logic_error>);
+    static_assert(usage::Derived_From<Domain, std::domain_error>);
+  }
+}
+#endiv

@@ -7,9 +7,7 @@
 namespace tests::unit::want::nonstd { class Fixture; }
 #endiv
 #divert <hpp>
-class tests::unit::want::nonstd::Fixture : public cppunit::test::Fixture {
-public:
-  auto test_nonstd_uninitialized_zero() -> void;
+struct tests::unit::want::nonstd::Fixture : public cppunit::test::Fixture {
   auto test_nonstd_Nullbuf() -> void;
   auto test_nonstd_null() -> void;
   static auto suite() -> cppunit::Test *;
@@ -20,17 +18,6 @@ public:
 using namespace std::string_literals;
 #import std.string
 #import std.ostringstream
-#import want.nonstd.uninitialized_zero
-auto tests::unit::want::nonstd::Fixture::test_nonstd_uninitialized_zero() -> void {
-  struct Thingy {
-    int i;
-    double j;
-    char *k;
-  };
-  Thingy thingy;
-  ::want::nonstd::uninitialized_zero(thingy);
-  CPPUNIT_ASSERT(true);
-}
 #import std.unique_ptr
 #import want.nonstd.Nullbuf
 auto tests::unit::want::nonstd::Fixture::test_nonstd_Nullbuf() -> void {

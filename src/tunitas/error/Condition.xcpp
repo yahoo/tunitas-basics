@@ -1,0 +1,30 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error.condition.Package
+#import tunitas.error.condition.Unpackaged
+#include <hpp/tunitas.error.condition.Package>
+namespace tunitas::error {
+  //
+  // Like std::error_condition, but bundles in the companion enumeration
+  //
+  // Usage:
+  //
+  //   ...just like std::error_condition...
+  //
+  using Condition = condition::Package<condition::Unpackaged>;
+  static_assert(sizeof (Condition::SUCCESS));
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::error;
+    static_assert(sizeof (Condition::SUCCESS));
+    static_assert(sizeof (Condition::FAILURE));
+  }
+}
+#endiv

@@ -1,0 +1,20 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.exception.required.Aspect
+#import tunitas.exception.required.Aspectish
+namespace tunitas::exception::required {
+  //
+  // Are tehse all aspectish classes; with exactly one being The Aspect (the top-level Aspect?)
+  // Need only check for disjunction because MI disambiguation won't allow duplicate inheritance.
+  //
+  template<typename... ASPECTS> concept Aspects = requires(ASPECTS...) {
+    requires 0 < sizeof...(ASPECTS);
+    requires (Aspectish<ASPECTS> && ... );
+    requires (Aspect<ASPECTS> || ... );
+  };
+}
+#endiv

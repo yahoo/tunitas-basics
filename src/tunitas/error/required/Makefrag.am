@@ -1,0 +1,10 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc. 2022
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_error_required_SUBSOURCES = \
+  obj/src/tunitas/error/required/namespace.cpp \
+  obj/src/tunitas/error/required/Unpackaged.cpp \
+  $(end)

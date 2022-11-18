@@ -1,0 +1,56 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.exception.required.Partial
+#import tunitas.exception.bundle.Features
+#import tunitas.exception.bundle.Aspects
+namespace tunitas::exception::complete {
+  //
+  // Blend it all all together, with features.
+  //
+  // Specification:
+  //
+  //   Makes a complete type (non-abstract).
+  //   Allows the lower-level variants to be expressed cogently as a type alias.
+  //
+  // Design:
+  //
+  //   By requirement, at least one of the (virtual) Ancestors will be tunitas::exception::Aspect
+  //
+  // Usage:
+  //
+  //   using Dark_Side = complete::Featurized<partial::Dark_Side, bundle::Features<...>, Aspects<...>>;
+  //   using Dark_Side = complete::Featurized<partial::Dark_Side,
+  //                                          bundle::Features<feature::Something, feature::Somethingelse, feature::Dark_Side>,
+  //                                          bundle::Aspects<exception::Aspect, something::exception::Aspect, somethingelse::Aspect>>;
+  //
+  template<required::Partial PARTIAL, typename FEATURES, typename ASPECTS> struct Featurized;
+  template<required::Partial PARTIAL, typename... FEATURES, typename... ASPECTS> struct Featurized<PARTIAL, bundle::Features<FEATURES...>, bundle::Aspects<ASPECTS...>>;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::exception::complete {
+  template<required::Partial PARTIAL, typename... FEATURES, typename... ASPECTS> class Featurized<PARTIAL, bundle::Features<FEATURES...>, bundle::Aspects<ASPECTS...>> : public PARTIAL,
+                                                                                                                                                                         public virtual bundle::Features<FEATURES...>,
+                                                                                                                                                                         public virtual bundle::Aspects<ASPECTS...> {
+    struct Ancestors {
+      using Aspect = exception::Aspect;
+      struct Features { /* who cares? */ };
+      using Exception = PARTIAL;
+    };
+  public:
+    explicit Featurized() = default;
+    using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+    using Results = typename Ancestors::Aspect::Results;
+    auto what() const noexcept -> Results::What override;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tunitas::exception::complete {
+  template<required::Partial P, typename... F, typename... A> auto Featurized<P, bundle::Features<F...>, bundle::Aspects<A...>>::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

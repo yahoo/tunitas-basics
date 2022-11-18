@@ -1,0 +1,114 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error.required.Unpackaged
+namespace tunitas::error::code {
+  //
+  // A packaged error
+  //
+  //   like std::error_code, but bundles in the companion enumeration.
+  //   [[presumably]] with inlining and optimization in place, it has zero cost.
+  //
+  // Intent:
+  //
+  //   What you would naturally consider is going on here.
+  //   namespace something::something_else::dark_side {
+  //     namespace error {
+  //       enum class Unpackaged { GOOD, CUTE, BETTER };
+  //       struct Package : public std::error_code; {
+  //          using error_code::error_code;
+  //          using enum Unpackaged;
+  //       };
+  //     }
+  //   }
+  //
+  // Design:
+  //
+  //   Rhymes with the constructor signature for error_code
+  //
+  //   Can't use inheritance here because pass-by-value doesn't work.
+  //   Want pass-by-value and pass-by-lvalue-reference to work equally.
+  //   AND we know that std::error_code is substantially pass-by-value in the deterministic exception usage anyway
+  //
+  //   Thus, disgorge the std::error_code by lvalue reference will handle it.
+  //   e.g.
+  //
+  //       auto function(std::error_code) -> Something;
+  //       auto ec = Package<Something>{...somehow...};
+  //       function(ec);
+  //
+  // Usage:
+  //
+  //   auto code = error::Code{error::Code::GOOD};
+  //   auto code = std::error_code{error::Code::GOOD};
+  //
+  //   namespace error {
+  //     using Code = code::Package<code::Unpackaged>
+  //   }
+  //
+  template<required::Unpackaged UNPACKAGED> struct Package;
+}
+#endiv
+#divert <hpp>
+#forward tunitas.error.condition.Package
+#import std.error_category
+#import std.error_code
+#import std.enable_if
+#import std.is_error_code_enum // you'll need a specialization before actually appying this constructor
+namespace tunitas::error {
+  namespace code {
+    template<required::Unpackaged UNPACKAGED> inline auto operator==(Package<UNPACKAGED> const &, Package<UNPACKAGED> const &) -> bool;
+    template<required::Unpackaged UNPACKAGED> inline auto operator!=(Package<UNPACKAGED> const &, Package<UNPACKAGED> const &) -> bool;
+    //
+    template<required::Unpackaged UNPACKAGED> inline auto operator==(Package<UNPACKAGED> const &, UNPACKAGED const &) -> bool;
+    template<required::Unpackaged UNPACKAGED> inline auto operator!=(Package<UNPACKAGED> const &, UNPACKAGED const &) -> bool;
+    //
+    template<required::Unpackaged UNPACKAGED> inline auto operator==(UNPACKAGED const &, Package<UNPACKAGED> const &) -> bool;
+    template<required::Unpackaged UNPACKAGED> inline auto operator!=(UNPACKAGED const &, Package<UNPACKAGED> const &) -> bool;
+    //
+    template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> inline auto operator==(Package<LUNPACKAGED> const &, condition::Package<RUNPACKAGED> const &) -> bool;
+    template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> inline auto operator!=(Package<LUNPACKAGED> const &, condition::Package<RUNPACKAGED> const &) -> bool;
+    //
+    template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> inline auto operator==(condition::Package<LUNPACKAGED> const &, Package<RUNPACKAGED> const &) -> bool;
+    template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> inline auto operator!=(condition::Package<LUNPACKAGED> const &, Package<RUNPACKAGED> const &) -> bool;
+  }
+  template<required::Unpackaged UNPACKAGED> class code::Package : public UNPACKAGED {
+    using Category = std::error_category;
+    using Contained = std::error_code;
+    using Companion = typename UNPACKAGED::Enumeration;
+  public:
+    // CANNOT ---> .../code.Package.xcpp:83:16: error: ‘using enum’ of dependent type ‘error::code::Package<UNPACKAGED>::Companion’
+    // As such, the 'using enum' declaration, if necessary, MUST have been done in the Ancestor, and is thus already visible.
+    static_assert(sizeof (UNPACKAGED::SUCCESS));
+    static_assert(sizeof (UNPACKAGED::FAILURE));
+    Package() = default;
+    Package(int i, Category const &c) noexcept : contained{i, c} { }
+    template<required::Unpackaged CODE, typename = typename std::enable_if<std::is_error_code_enum<CODE>::value>::type> Package(CODE c) noexcept { contained = make_error_code(c); }
+    Package(Contained d) noexcept : contained{d} { }
+    operator Contained const &() const noexcept { return contained; }
+  private:
+    Contained contained;
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::error {
+  template<required::Unpackaged UNPACKAGED> auto code::operator==(Package<UNPACKAGED> const &a, Package<UNPACKAGED> const &b) -> bool { return (std::error_code) a == (std::error_code) b; }
+  template<required::Unpackaged UNPACKAGED> auto code::operator!=(Package<UNPACKAGED> const &a, Package<UNPACKAGED> const &b) -> bool { return (std::error_code) a != (std::error_code) b; }
+  //
+  template<required::Unpackaged UNPACKAGED> auto code::operator==(Package<UNPACKAGED> const &a, UNPACKAGED const &b) -> bool { return (std::error_code) a == b; }
+  template<required::Unpackaged UNPACKAGED> auto code::operator!=(Package<UNPACKAGED> const &a, UNPACKAGED const &b) -> bool { return (std::error_code) a != b; }
+  //
+  template<required::Unpackaged UNPACKAGED> auto code::operator==(UNPACKAGED const &a, Package<UNPACKAGED> const &b) -> bool { return a == (std::error_code) b; }
+  template<required::Unpackaged UNPACKAGED> auto code::operator!=(UNPACKAGED const &a, Package<UNPACKAGED> const &b) -> bool { return a != (std::error_code) b; }
+  //
+  template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> auto code::operator==(Package<LUNPACKAGED> const &a, condition::Package<RUNPACKAGED> const &b) -> bool { return (std::error_code) a == (std::error_condition) b; }
+  template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> auto code::operator!=(Package<LUNPACKAGED> const &a, condition::Package<RUNPACKAGED> const &b) -> bool { return (std::error_code) a != (std::error_condition) b; }
+  //
+  template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> auto code::operator==(condition::Package<LUNPACKAGED> const &a, Package<RUNPACKAGED> const &b) -> bool { return (std::error_condition) a == (std::error_code) b; }
+  template<required::Unpackaged LUNPACKAGED, required::Unpackaged RUNPACKAGED> auto code::operator!=(condition::Package<LUNPACKAGED> const &a, Package<RUNPACKAGED> const &b) -> bool { return (std::error_condition) a != (std::error_code) b; }
+}
+#endiv

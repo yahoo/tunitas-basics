@@ -1,0 +1,91 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.exception
+namespace tests::unit::exception::tunitas {
+  namespace [[eponymous]] fixture {
+    class Fixture;
+    namespace library = ::tunitas::exception;
+    namespace feature = ::tunitas::exception::feature;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+#import tests.unit.exception.Palette
+struct tests::unit::exception::tunitas::fixture::Fixture : public rigging::suite::Fixture, protected Palette {
+  static auto suite() -> Suite;
+  //
+  // reminders mosly
+  using Palette::stanza0;
+  using Palette::stanza1string;
+  using Palette::stanza1error;
+  using Palette::stanza1type;
+  //
+  template<typename CATCHABLE, typename EXCEPTION> auto test_exception0() -> void;
+  template<typename CATCHABLE, typename EXCEPTION> auto test_exception1string() -> void;
+  template<typename CATCHABLE, typename EXCEPTION> auto test_exception1error() -> void;
+  template<typename CATCHABLE, typename EXCEPTION> auto test_exception1type() -> void;
+};
+#endiv
+#divert <tpp>
+#import std.error_code
+namespace tests::unit::exception::tunitas::fixture {
+  template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception0() -> void       { exercise<CATCHABLE, EXCEPTION>(); }
+  template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception1string() -> void { exercise<CATCHABLE, EXCEPTION>("give-me-one-reason"s); }
+  template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception1error() -> void  { exercise<CATCHABLE, EXCEPTION>(std::error_code{}, "give-me-one-reason"s); }
+  template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception1type() -> void   { exercise<CATCHABLE, EXCEPTION>(typeid(CATCHABLE)); }
+}
+#endiv
+#divert <cpp>
+#import tunitas.exception.Allocation
+#import tunitas.exception.Bound
+#import tunitas.exception.Cast
+#import tunitas.exception.Domain
+#import tunitas.exception.Empty
+#import tunitas.exception.Exhausted
+#import tunitas.exception.Failure
+#import tunitas.exception.Full
+#import tunitas.exception.Indirection
+#import tunitas.exception.Invalid
+#import tunitas.exception.Invariant
+#import tunitas.exception.Length
+#import tunitas.exception.Logic
+#import tunitas.exception.Null
+#import tunitas.exception.Optional
+#import tunitas.exception.Runtime
+#import tunitas.exception.Range
+#import tunitas.exception.Stream
+#import tunitas.exception.System
+#import tunitas.exception.Unimplemented
+#import tunitas.exception.Variant
+auto tests::unit::exception::tunitas::fixture::Fixture::suite() -> Suite {
+  auto series = Stream{"tunitas"sv};
+  series << stanza0<Fixture, feature::Allocation, library::Allocation>("Allocation")
+         << stanza1string<Fixture, feature::Bound, library::Bound>("Bound")
+         << stanza1type<Fixture, feature::Cast, library::Cast>("Cast")
+         << stanza1string<Fixture, feature::Domain, library::Domain>("Domain")
+         << stanza0<Fixture, feature::Empty, library::Empty>("Empty")
+         << stanza0<Fixture, feature::Exhausted, library::Exhausted>("Exhausted")
+         << stanza1error<Fixture, feature::Failure, library::Failure>("Failure")
+         << stanza0<Fixture, feature::Full, library::Full>("Full")
+         << stanza0<Fixture, feature::Indirection, library::Indirection>("Indirection")
+         << stanza1string<Fixture, feature::Invalid, library::Invalid>("Invalid")
+         << stanza1string<Fixture, feature::Invariant, library::Invariant>("Invariant")
+         << stanza1string<Fixture, feature::Length, library::Length>("Length")
+         << stanza1string<Fixture, feature::Logic, library::Logic>("Logic")
+         << stanza0<Fixture, feature::Null, library::Null>("Null")
+         << stanza0<Fixture, feature::Optional, library::Optional>("Optional")
+         << stanza1string<Fixture, feature::Range, library::Range>("Range")
+         << stanza1string<Fixture, feature::Runtime, library::Runtime>("Runtime")
+         << stanza1string<Fixture, feature::Stream, library::Stream>("Stream")
+         << stanza1error<Fixture, feature::System, library::System>("System")
+         << stanza0<Fixture, feature::Unimplemented, library::Unimplemented>("Unimplemented")
+         << stanza0<Fixture, feature::Variant, library::Variant>("Variant")
+         << END;
+  return settle(series);
+}
+#endiv

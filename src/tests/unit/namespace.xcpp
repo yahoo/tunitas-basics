@@ -13,17 +13,23 @@ namespace tests::unit {
 #endiv
 #divert <hpp>
 // Because all test fixtures will need these
-#import tests.cppunit.Test
-#import tests.cppunit.test.Fixture
-#import tests.cppunit.ASSERT
-#import tests.cppunit.Exception
+#import tests.cppunit.Test // ........... the v1-series (compatibility shim)
+#import tests.cppunit.test.Fixture // ...  eadem ratione
+#import tests.cppunit.ASSERT // .......... eadem ...
+#import tests.cppunit.Exception // ....... eadem ...
+#import rigging.suite.Fixture // ......... the v2-series interface
+#import rigging.ASSERTION // ............. eadem ratione
+namespace tests::unit {
+  using rigging::ASSERTION;
+}
 #endiv
 #divert <ipp>
 #import nonstd.string.literals
 namespace tests::unit {
   using namespace nonstd::string::literals;
 }
-#import rigging.suite.io
+#import rigging.suite.io // ... v1-series (compatibility shims)
+#import rigging.io // ......... v2-series
 // All test fixtures want to chatter
 #import std.cout
 #import std.cerr

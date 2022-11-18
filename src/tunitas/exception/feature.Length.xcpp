@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::feature {
+  //
+  // As stated.
+  //
+  // Semantic:
+  //
+  //   The sense of having an inappropriate length.
+  //   the length exceeds some context-dependent bound; acquiring too much.
+  //   When applied as an index, use feature::Bound (out_of_range)
+  //   When applied to the value itself without context, use feature::Range (range_error)
+  //
+  // Specification:
+  //
+  //   The minimal sense of that lengthiness.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Descendants MUST fulfill the what() obligation
+  //
+  // Usage:
+  //
+  //   You need a tutorial on how to use inheritance?  O.Rly?
+  //
+  class Length;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.feature.Logic
+class tunitas::exception::feature::Length : public virtual Logic {
+protected:
+  virtual ~Length() = default;
+public:
+  virtual auto what() const noexcept -> char const * = 0;
+};
+#endiv

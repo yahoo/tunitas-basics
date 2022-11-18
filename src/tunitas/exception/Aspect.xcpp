@@ -56,7 +56,10 @@ protected:
   virtual ~Aspect() = default;
   Aspect() = default;
 public:
-  virtual auto what() const noexcept -> char const * = 0;
+  struct Results {
+    using What = char const *;
+  };
+  virtual auto what() const noexcept -> Results::What = 0;
 };
 #endiv
 #divert <ipp>

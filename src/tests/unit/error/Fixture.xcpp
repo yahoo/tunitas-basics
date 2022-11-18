@@ -1,0 +1,91 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error
+namespace tests::unit::error {
+  namespace fixture {
+    class Fixture;
+    namespace library = ::tunitas::error;
+  }
+  using fixture::Fixture;
+}
+#endiv
+#divert <hpp>
+struct tests::unit::error::fixture::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_usage_Code() -> void;
+  auto test_usage_Condition() -> void;
+  auto test_usage_Category() -> void;
+  auto test_usage_category() -> void;
+};
+#endiv
+#divert <cpp>
+#import tests.unit.error.Schematic
+namespace tests::unit::error::fixture {
+  auto Fixture::suite() -> Suite {
+    using namespace rigging::suite;
+    auto series = Stream{"error"sv};
+    series << []() {
+                auto use = Stream{"usage"sv};
+                use << add("Condition", &Fixture::test_usage_Condition)
+                    << add("Code", &Fixture::test_usage_Code)
+                    << add("Category", &Fixture::test_usage_Category)
+                    << add("category", &Fixture::test_usage_category)
+                    << END;
+                return use;
+              }()
+           << add<Schematic<cluster::TUNITAS>>()
+#if 0 // not yet
+           << add<Schematic<cluster::APPLICATION>>()
+           << add<Schematic<cluster::SERVER>>()
+#endif
+           << END;
+    return settle(series);
+  }
+}
+#import std.error_code
+#import std.error_condition
+#import std.ostringstream
+#import tunitas.error.Code
+#import tunitas.error.Condition
+#import tunitas.error.Category
+#import tunitas.error.category
+namespace tests::unit::error::fixture {
+  auto Fixture::test_usage_Code() -> void {
+    using library::Code;
+    using library::Condition;
+    require(ASSERTION, std::error_condition{Condition::SUCCESS} == Code::SUCCESS);
+    require(ASSERTION, std::error_condition{Condition::FAILURE} == Code::FAILURE);
+  }
+  auto Fixture::test_usage_Condition() -> void {
+    using library::category;
+    using library::Condition;
+    require(ASSERTION, (std::error_condition{0, category()}) == Condition::SUCCESS);
+    require(ASSERTION, (std::error_condition{1, category()}) == Condition::FAILURE);
+  }
+  auto Fixture::test_usage_Category() -> void {
+    using library::Condition;
+    using library::Code;
+    using library::category;
+    auto const &c = category();
+    require(ASSERTION, (std::error_condition{Condition::SUCCESS}) == c.default_error_condition((int)Code::SUCCESS));
+    require(ASSERTION, (std::error_condition{Condition::FAILURE}) == c.default_error_condition((int)Code::FAILURE));
+    for (int i{-100}, e{100}; e != i; ++i) {
+      auto m = c.message(i);
+      require(ASSERTION, !m.empty());
+    }
+  }
+  auto Fixture::test_usage_category() -> void {
+    auto const &c = library::category();
+    {
+      std::ostringstream buf;
+      buf << c.name();
+      require(ASSERTION, "tunitas"s == buf.str());
+    }
+  }
+}
+#endiv

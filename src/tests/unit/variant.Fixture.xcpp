@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit
+#import tunitas.variant
+namespace tests::unit::variant {
+  namespace library = ::tunitas::variant;
+  struct Fixture;
+}
+#endiv
+#divert <hpp>
+struct tests::unit::variant::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_usage_Variant() -> void;
+  auto test_usage_visit() -> void;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::variant::Fixture::suite() -> Suite {
+  auto series = Stream{"variant"sv};
+  series << []{
+              auto use = Stream{"usage"sv};
+              use << add("Variant", &Fixture::test_usage_Variant)
+                  << add("visit", &Fixture::test_usage_visit)
+                  << END;
+              return use;
+            }()
+         << END;
+  return settle(series);
+}
+#import tunitas.variant.Variant
+#import tunitas.variant.Size
+#import tunitas.variant.Alternative
+#import tunitas.variant.Visitor
+#import tunitas.variant.visit
+#import std.same_as
+namespace tests::unit::variant {
+  auto Fixture::test_usage_Variant() -> void {
+    using Subject = library::Variant<char, int, double, string::Storage>;
+    require(ASSERTION, 4 == library::Size<Subject>::value);
+    require(ASSERTION, std::same_as<library::Alternative<0, Subject>::type, char>);
+    require(ASSERTION, std::same_as<library::Alternative<1, Subject>::type, int>);
+    require(ASSERTION, std::same_as<library::Alternative<2, Subject>::type, double>);
+    require(ASSERTION, std::same_as<library::Alternative<3, Subject>::type, string::Storage>);
+    auto subject = Subject{};
+  }
+  auto Fixture::test_usage_visit() -> void {
+    using Subject = library::Variant<char, int, double, string::Storage>;
+    auto visitor = library::Visitor{[](char) { return 0; },
+                                    [](int) { return 1; },
+                                    [](double) { return 2; },
+                                    [](string::Storage const &) { return 3; }};
+    auto subject = Subject{};
+    require(ASSERTION, 0 == visit(visitor, subject));
+    subject = 33;
+    require(ASSERTION, 1 == visit(visitor, subject));
+    subject = 3.3;
+    require(ASSERTION, 2 == visit(visitor, subject));
+    subject = "44"s;
+    require(ASSERTION, 3 == visit(visitor, subject));
+    subject = '5';
+    require(ASSERTION, 0 == visit(visitor, subject));
+  }
+}
+#endiv

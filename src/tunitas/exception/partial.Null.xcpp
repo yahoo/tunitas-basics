@@ -1,0 +1,63 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of an Null exception
+  //
+  // Semantic
+  //
+  //   see feature::Null
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  // Design:
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Null {
+  //     struct Ancestors {
+  //       using Exception = partial::Null;
+  //     };
+  //     using Ancestor::Exception::Null;
+  //   };
+  //
+  namespace [[eponymous]] null {
+    struct Null;
+  }
+  using null::Null;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Null
+#import tunitas.exception.feature.Invalid
+#import tunitas.exception.complete.Featurized
+#import tunitas.exception.bundle.Aspects
+#import tunitas.exception.bundle.Features
+#import nonstd.exception.Invalid
+#import nonstd.string.View
+namespace tunitas::exception::partial {
+  namespace null {
+    using Wow = complete::Featurized<nonstd::exception::Invalid<nonstd::string::View>,
+                                     bundle::Features<feature::Null, feature::Invalid>,
+                                     bundle::Aspects<tunitas::exception::Aspect>>;
+  }
+  class null::Null : public Wow {
+    using Ancestor = Wow;
+  protected:
+    ~Null() = default;
+  public:
+    explicit Null() : Ancestor{"exhausted"} { }
+    using Ancestor::View; // And how on earth would we know that 'View' was the name of the constructor?
+  };
+}
+#endiv

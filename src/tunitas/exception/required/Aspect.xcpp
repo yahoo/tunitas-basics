@@ -1,0 +1,21 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#forward tunitas.exception.Aspect
+#forward tunitas.exception.required.Aspectish
+namespace tunitas::exception::required {
+  //
+  // Is this type The Aspect (the top-level Aspect)?
+  // You are likely looking for Aspectish.
+  //
+  // The complete type of ASPECT is required to evaluate Aspect<ASPECT>
+  //
+  template<typename ASPECT> concept Aspect = requires(ASPECT const &aspect) {
+    requires derived_from<ASPECT, tunitas::exception::Aspect>;
+    requires Aspectish<ASPECT>;
+  };
+}
+#endiv

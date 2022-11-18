@@ -1,0 +1,13 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import std.is_error_code_enum
+#import tunitas.error.code.Unpackaged
+namespace std {
+  template<> struct is_error_code_enum<tunitas::error::code::Unpackaged::Enumeration>;
+}
+#endiv
+#divert <hpp>
+#import std.true_type
+template<> struct std::is_error_code_enum<tunitas::error::code::Unpackaged::Enumeration> : std::true_type { };
+#endiv

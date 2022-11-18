@@ -1,0 +1,78 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.error.Cluster
+namespace tests::unit::error {
+  //
+  // The schematic of the error tests
+  // Boilerplate unless otherwise specialized.
+  //
+  template<Name> struct Schematic;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::error {
+  template<Name NAME> struct Schematic : public rigging::suite::Fixture {
+    using Cluster = error::Cluster<NAME>;
+    auto test_Code() -> void;
+    auto test_Condition() -> void;
+    auto test_Category() -> void;
+    auto test_category() -> void;
+    static auto suite() -> Suite;
+  };
+}
+#endiv
+#divert <tpp>
+#import std.type_info
+namespace tests::unit::error {
+  template<Name _> auto Schematic<_>::suite() -> Suite {
+    using namespace rigging::suite;
+    auto series = Stream{typeid(Cluster)};
+    series << add("Condition", &Schematic::test_Condition)
+           << add("Code", &Schematic::test_Code)
+           << add("Category", &Schematic::test_Category)
+           << add("category", &Schematic::test_category)
+           << END;
+    return settle(series);
+  }
+}
+#import tunitas.error.category
+#import std.ostringstream
+namespace tests::unit::error {
+  template<Name _> auto Schematic<_>::test_Code() -> void {
+    auto const &c = Cluster::category();
+    require(ASSERTION, std::error_code{0, c} == Cluster::Code::SUCCESS);
+    require(ASSERTION, std::error_code{1, c} == Cluster::Code::FAILURE);
+    require(ASSERTION, std::error_code{0, c} == Cluster::Condition::SUCCESS);
+    require(ASSERTION, std::error_code{1, c} == Cluster::Condition::FAILURE);
+  }
+  template<Name _> auto Schematic<_>::test_Condition() -> void {
+    auto const &c = Cluster::category();
+    require(ASSERTION, (std::error_condition{0, c} == Cluster::Condition::SUCCESS));
+    require(ASSERTION, (std::error_condition{1, c} == Cluster::Condition::FAILURE));
+    require(ASSERTION, (std::error_condition{0, c} == Cluster::Code::SUCCESS));
+    auto lhs = std::error_condition{1, c};
+    auto rhs = std::error_code{Cluster::Code::FAILURE};
+    require(ASSERTION, (lhs == rhs));
+    require(ASSERTION, (std::error_condition{1, c} == Cluster::Code::FAILURE));
+  }
+  template<Name _> auto Schematic<_>::test_Category() -> void {
+    auto const &c = Cluster::category();
+    for (int i{-100}, e{100}; e != i; ++i) {
+      auto m = c.message(i);
+      require(ASSERTION, !m.empty());
+    }
+  }
+  template<Name _> auto Schematic<_>::test_category() -> void {
+    auto const &c = Cluster::category();
+    {
+      std::ostringstream buf;
+      buf << c.name();
+      require(ASSERTION, !buf.str().empty()); // here in the template we can't easily express the value
+    }
+  }
+}
+#endiv

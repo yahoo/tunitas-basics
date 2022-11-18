@@ -1,0 +1,7 @@
+# This is a -*- Makefile -*- fragment
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+std_SUBSOURCES = \
+  obj/src/std/is_error_code_enum/tunitas.error.code.Unpackaged.Enumeration.cpp \
+  obj/src/std/is_error_condition_enum/tunitas.error.condition.Unpackaged.Enumeration.cpp \
+  $(end)

@@ -4,9 +4,9 @@
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-lib_libtunitas_la_CURRENT = 18
-lib_libtunitas_la_REVISION = 6
-lib_libtunitas_la_AGE = 1
+lib_libtunitas_la_CURRENT = 22
+lib_libtunitas_la_REVISION = 1
+lib_libtunitas_la_AGE = 5
 lib_libtunitas_la_CRA = $(lib_libtunitas_la_CURRENT):$(lib_libtunitas_la_REVISION):$(lib_libtunitas_la_AGE)
 lib_libtunitas_la_VERSION_INFO = -version-info $(lib_libtunitas_la_CRA)
 #

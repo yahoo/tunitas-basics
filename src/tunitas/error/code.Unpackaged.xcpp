@@ -1,0 +1,33 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error.condition.Unpackaged
+namespace tunitas::error::code {
+  struct Unpackaged {
+    enum class Enumeration {
+      SUCCESS = (int) condition::Unpackaged::Enumeration::SUCCESS, // i.e. improper success (which is a failure)
+      FAILURE = (int) condition::Unpackaged::Enumeration::FAILURE,
+    };
+    using enum Enumeration;
+  };
+}
+#import std.is_error_code_enum.tunitas.error.code.Unpackaged.Enumeration
+#endiv
+#divert <hpp>
+#forward tunitas.error.Code
+#import std.underlying_type
+namespace tunitas::error::code {
+  inline auto make_error_code(Unpackaged::Enumeration) noexcept -> Code;
+  inline constexpr auto underlying(Unpackaged::Enumeration e) noexcept { return std::underlying_type_t<Unpackaged::Enumeration>(e); }
+}
+#endiv
+#divert <ipp>
+#import tunitas.error.Code
+#import tunitas.error.category
+namespace tunitas::error {
+  auto code::make_error_code(Unpackaged::Enumeration e) noexcept -> Code { return {underlying(e), category()}; }
+}
+#endiv

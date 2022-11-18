@@ -1,0 +1,76 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.string.literals
+namespace tunitas::error::package_error {
+  namespace body::exported {
+    //
+    // In the usual style
+    //
+    // Usage:
+    //
+    //   auto const &c = category();
+    //   c.name()
+    //   c.default_error_condition(3)
+    //   c.message(99);
+    //
+    class Category;
+  }
+}
+#endiv
+#divert <hpp>
+#import tunitas.error.category
+#import tunitas.error.code.Unpackaged
+#import tunitas.error.condition.Unpackaged
+#import std.error_category
+#import std.error_condition
+#import std.optional
+#import std.string
+#import std.string_view
+namespace tunitas::error::package_error {
+  class interface::Category : public std::error_category {
+    using Ancestor = std::error_category;
+    Category() = default;
+    friend auto error::category() noexcept -> Category const &;
+  public:
+    auto name() const noexcept -> char const * override;
+    auto default_error_condition(int code) const noexcept -> std::error_condition override;
+    auto message(int code) const -> std::string override;
+    auto estimate(int code) const -> std::optional<std::string_view>;
+  private:
+    struct Enumerations {
+      using Code = code::Unpackaged::Enumeration;
+      using Condition = condition::Unpackaged::Enumeration;
+    };
+  };
+}
+#endiv
+#divert <cpp>
+#import tunitas.error.Condition
+#import tunitas.error.Code
+#import std.to_string
+namespace tunitas::error::package_error::body::exported {
+  auto Category::name() const noexcept -> char const * { return "tunitas"; }
+  auto Category::default_error_condition(int code) const noexcept -> std::error_condition {
+    auto condy = 0 != code ? Enumerations::Condition::FAILURE : Enumerations::Condition::SUCCESS;
+    return {condy};
+  }
+  auto Category::message(int code) const -> std::string {
+    if (auto got=estimate(code); got) {
+      return {got->begin(), got->end()};
+    } else {
+      return "Error #"s + std::to_string(code);
+    }
+  }
+  auto Category::estimate(int code) const -> std::optional<std::string_view> {
+    switch (Enumerations::Code{code}) {
+    case Code::SUCCESS: return "imprper success"sv;
+    case Code::FAILURE: return "generic failure"sv;
+    default: return {};
+    }
+  }
+}
+#endiv
