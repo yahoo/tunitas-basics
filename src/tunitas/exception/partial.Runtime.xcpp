@@ -6,7 +6,7 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an (out of) Runtime exception
+  // The partial completion of a Runtime exception
   //
   // Semantic
   //

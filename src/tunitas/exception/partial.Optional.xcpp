@@ -6,11 +6,12 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an Logic exception
+  // The partial completion of an allocation failure exception
   //
   // Semantic
   //
-  //   see feature::Logic
+  //   See feature::Optional, which is nearby
+  //   An optional access has failed.
   //
   // Specification:
   //
@@ -30,38 +31,38 @@ namespace tunitas::exception::partial {
   //
   // Usage:
   //
-  //   class my::Something : public partial::Logic {
+  //   class my::Something : public partial::Optional {
   //     struct Ancestors {
-  //       using Exception = partial::Logic;
+  //       using Exception = partial::Optional;
   //     };
-  //     using Ancestor::Exception::Logic;
+  //     using Ancestor::Exception::Optional;
   //   };
   //
-  struct Logic;
+  struct Optional;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.feature.Logic
-#import nonstd.exception.Logic
-#import nonstd.string.View
-class tunitas::exception::partial::Logic : public virtual Aspect,
-                                           public virtual feature::Logic,
-                                           public nonstd::exception::Logic<nonstd::string::View> {
+#import tunitas.exception.feature.Optional
+#import nonstd.exception.Optional
+class tunitas::exception::partial::Optional : public virtual Aspect,
+                                              public virtual feature::Optional,
+                                              public nonstd::exception::Optional {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
-    using Exception = nonstd::exception::Logic<nonstd::string::View>;
+    using Exception = nonstd::exception::Optional;
   };
 protected:
-  ~Logic() = default;
+  ~Optional() = default;
 public:
-  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  inline explicit Optional() = default;
+  using Ancestors::Exception::bad_optional_access; // And how on earth would we know that 'View' was the name of the constructor?
   using Results = Ancestors::Aspect::Results;
   auto what() const noexcept -> Results::What override;
 };
 #endiv
 #divert <cpp>
 namespace tunitas::exception::partial {
-  auto Logic::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+  auto Optional::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
 }
 #endiv

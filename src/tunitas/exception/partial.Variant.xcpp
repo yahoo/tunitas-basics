@@ -6,11 +6,12 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an Logic exception
+  // The partial completion of an allocation failure exception
   //
   // Semantic
   //
-  //   see feature::Logic
+  //   See feature::Variant, which is nearby
+  //   A variant (alterntive) access has failed.
   //
   // Specification:
   //
@@ -30,38 +31,38 @@ namespace tunitas::exception::partial {
   //
   // Usage:
   //
-  //   class my::Something : public partial::Logic {
+  //   class my::Something : public partial::Variant {
   //     struct Ancestors {
-  //       using Exception = partial::Logic;
+  //       using Exception = partial::Variant;
   //     };
-  //     using Ancestor::Exception::Logic;
+  //     using Ancestor::Exception::Variant;
   //   };
   //
-  struct Logic;
+  struct Variant;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.feature.Logic
-#import nonstd.exception.Logic
-#import nonstd.string.View
-class tunitas::exception::partial::Logic : public virtual Aspect,
-                                           public virtual feature::Logic,
-                                           public nonstd::exception::Logic<nonstd::string::View> {
+#import tunitas.exception.feature.Variant
+#import nonstd.exception.Variant
+class tunitas::exception::partial::Variant : public virtual Aspect,
+                                             public virtual feature::Variant,
+                                             public nonstd::exception::Variant {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
-    using Exception = nonstd::exception::Logic<nonstd::string::View>;
+    using Exception = nonstd::exception::Variant;
   };
 protected:
-  ~Logic() = default;
+  ~Variant() = default;
 public:
-  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  inline explicit Variant() = default;
+  using Ancestors::Exception::bad_variant_access; // And how on earth would we know that 'View' was the name of the constructor?
   using Results = Ancestors::Aspect::Results;
   auto what() const noexcept -> Results::What override;
 };
 #endiv
 #divert <cpp>
 namespace tunitas::exception::partial {
-  auto Logic::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+  auto Variant::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
 }
 #endiv

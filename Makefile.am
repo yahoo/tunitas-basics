@@ -31,6 +31,7 @@ noinst_LTLIBRARIES = \
   noinst/lib/libtunitas.la \
   noinst/lib/libtunitas-application.la \
   noinst/lib/libtunitas-server.la \
+  noinst/lib/libstd+tunitas.la \
   noinst/lib/libwant.la \
   $(end)
 check_PROGRAMS = \
@@ -107,6 +108,7 @@ clean-local:: clean-dependencies
 
 include lib/libtunitas.am
 include noinst/lib/libtunitas.am
+include noinst/lib/libstd+tunitas.am
 include noinst/lib/libwant.am
 
 include check/bin/base64-encode.am

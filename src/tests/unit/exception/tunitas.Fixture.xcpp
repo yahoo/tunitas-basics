@@ -41,6 +41,7 @@ namespace tests::unit::exception::tunitas::fixture {
 }
 #endiv
 #divert <cpp>
+#import tunitas.exception.Allocation
 #import tunitas.exception.Bound
 #import tunitas.exception.Cast
 #import tunitas.exception.Domain
@@ -51,15 +52,20 @@ namespace tests::unit::exception::tunitas::fixture {
 #import tunitas.exception.Indirection
 #import tunitas.exception.Invalid
 #import tunitas.exception.Invariant
+#import tunitas.exception.Length
 #import tunitas.exception.Logic
 #import tunitas.exception.Null
+#import tunitas.exception.Optional
 #import tunitas.exception.Runtime
 #import tunitas.exception.Range
 #import tunitas.exception.Stream
 #import tunitas.exception.System
+#import tunitas.exception.Unimplemented
+#import tunitas.exception.Variant
 auto tests::unit::exception::tunitas::fixture::Fixture::suite() -> Suite {
   auto series = Stream{"tunitas"sv};
-  series << stanza1string<Fixture, feature::Bound, library::Bound>("Bound")
+  series << stanza0<Fixture, feature::Allocation, library::Allocation>("Allocation")
+         << stanza1string<Fixture, feature::Bound, library::Bound>("Bound")
          << stanza1type<Fixture, feature::Cast, library::Cast>("Cast")
          << stanza1string<Fixture, feature::Domain, library::Domain>("Domain")
          << stanza0<Fixture, feature::Empty, library::Empty>("Empty")
@@ -69,12 +75,16 @@ auto tests::unit::exception::tunitas::fixture::Fixture::suite() -> Suite {
          << stanza0<Fixture, feature::Indirection, library::Indirection>("Indirection")
          << stanza1string<Fixture, feature::Invalid, library::Invalid>("Invalid")
          << stanza1string<Fixture, feature::Invariant, library::Invariant>("Invariant")
+         << stanza1string<Fixture, feature::Length, library::Length>("Length")
          << stanza1string<Fixture, feature::Logic, library::Logic>("Logic")
          << stanza0<Fixture, feature::Null, library::Null>("Null")
+         << stanza0<Fixture, feature::Optional, library::Optional>("Optional")
          << stanza1string<Fixture, feature::Range, library::Range>("Range")
          << stanza1string<Fixture, feature::Runtime, library::Runtime>("Runtime")
          << stanza1string<Fixture, feature::Stream, library::Stream>("Stream")
          << stanza1error<Fixture, feature::System, library::System>("System")
+         << stanza0<Fixture, feature::Unimplemented, library::Unimplemented>("Unimplemented")
+         << stanza0<Fixture, feature::Variant, library::Variant>("Variant")
          << END;
   return settle(series);
 }

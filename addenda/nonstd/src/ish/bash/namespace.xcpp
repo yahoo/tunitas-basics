@@ -3,7 +3,7 @@
 #divert <fpp>
 #import ish.shell
 namespace ish {
-  // Becasue bash is shell and then some.
+  // Because bash is shell and then some.
   namespace bash { using namespace ish::shell; }
 }
 #endiv

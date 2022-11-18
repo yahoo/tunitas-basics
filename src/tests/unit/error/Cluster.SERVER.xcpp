@@ -1,0 +1,25 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.error.Cluster.template
+namespace tests::unit::error::cluster {
+  template<> struct Cluster<SERVER>;
+}
+#endiv
+#divert <hpp>
+#import tunitas.server.error.Code
+#import tunitas.server.error.Condition
+#import tunitas.server.error.Category
+#import tunitas.server.error.category
+namespace tests::unit::error::cluster {
+  template<> struct Cluster<SERVER> {
+    using Code = ::tunitas::server::error::Code;
+    using Condition = ::tunitas::server::error::Condition;
+    using Category = ::tunitas::server::error::Category;
+    inline static auto category() -> Category const & { return ::tunitas::server::error::category(); }
+  };
+}
+#endiv

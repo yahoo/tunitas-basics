@@ -54,7 +54,7 @@ namespace want::sys::posix::entry {
 }
 #endiv
 #divert <ipp>
-#import want.nonstd.uninitialized_zero
+#import nonstd.uninitialized_zero
 namespace want::sys::posix::entry {
   template<required::Entry _> Buffer<_>::Buffer()
     : string_buffer_size{0} {

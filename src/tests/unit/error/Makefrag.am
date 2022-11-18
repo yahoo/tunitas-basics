@@ -1,0 +1,18 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc. 2022
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tests_unit_error_SUBSOURCES = \
+  check/obj/src/tests/unit/error/namespace.cpp \
+  check/obj/src/tests/unit/error/Fixture.cpp \
+  check/obj/src/tests/unit/error/Cluster.template.cpp \
+  check/obj/src/tests/unit/error/Cluster.TUNITAS.cpp \
+  check/obj/src/tests/unit/error/Cluster.cpp \
+  check/obj/src/tests/unit/error/Schematic.cpp \
+  $(end)
+tests_unit_error_NOTYET = \
+  check/obj/src/tests/unit/error/Cluster.APPLICATION.cpp \
+  check/obj/src/tests/unit/error/Cluster.SERVER.cpp \
+  $(end)

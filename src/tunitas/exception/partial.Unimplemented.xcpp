@@ -6,11 +6,11 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an Logic exception
+  // The partial completion of an (out of) Runtime exception
   //
   // Semantic
   //
-  //   see feature::Logic
+  //   See feature::Unimplemented, which is nearby
   //
   // Specification:
   //
@@ -30,38 +30,37 @@ namespace tunitas::exception::partial {
   //
   // Usage:
   //
-  //   class my::Something : public partial::Logic {
+  //   class my::Something : public partial::Unimplemented {
   //     struct Ancestors {
-  //       using Exception = partial::Logic;
+  //       using Exception = partial::Unimplemented;
   //     };
-  //     using Ancestor::Exception::Logic;
+  //     using Ancestor::Exception::Unimplemented;
   //   };
   //
-  struct Logic;
+  struct Unimplemented;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.feature.Logic
-#import nonstd.exception.Logic
-#import nonstd.string.View
-class tunitas::exception::partial::Logic : public virtual Aspect,
-                                           public virtual feature::Logic,
-                                           public nonstd::exception::Logic<nonstd::string::View> {
+#import tunitas.exception.feature.Unimplemented
+#import nonstd.exception.Unimplemented
+class tunitas::exception::partial::Unimplemented : public virtual Aspect,
+                                                   public virtual feature::Unimplemented,
+                                                   public nonstd::exception::Unimplemented {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
-    using Exception = nonstd::exception::Logic<nonstd::string::View>;
+    using Exception = nonstd::exception::Unimplemented;
   };
 protected:
-  ~Logic() = default;
+  ~Unimplemented() = default;
 public:
-  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
+  using Ancestors::Exception::Unimplemented;
   using Results = Ancestors::Aspect::Results;
   auto what() const noexcept -> Results::What override;
 };
 #endiv
 #divert <cpp>
 namespace tunitas::exception::partial {
-  auto Logic::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+  auto Unimplemented::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
 }
 #endiv

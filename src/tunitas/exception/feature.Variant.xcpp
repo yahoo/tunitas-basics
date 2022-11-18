@@ -6,34 +6,34 @@
 #divert <fpp>
 namespace tunitas::exception::feature {
   //
-  // Something has failed at runtime.
+  // As stated.
   //
   // Semantic:
   //
-  //   This reflects a runtime error which could not have been prevented.
+  //   The variant (alternative) access is inappropriate.
   //
   // Specification:
   //
   //   The minimal sense of that.
-  //   See https://en.cppreference.com/w/cpp/error/runtime_error
   //
   // Design:
   //
   //   Descendants only.
   //   Descendants MUST fulfill the what() obligation
-  //   Pair with at least partial::Runtime or its siblings & descendants
+  //   Inherits from Logic because the programmer (you) could have checked this ahead of time.
   //
   // Usage:
   //
   //   You need a tutorial on how to use inheritance?  O.Rly?
   //
-  class Runtime;
+  class Variant;
 }
 #endiv
 #divert <hpp>
-class tunitas::exception::feature::Runtime {
+#import tunitas.exception.feature.Logic
+class tunitas::exception::feature::Variant : public virtual Logic {
 protected:
-  virtual ~Runtime() = default;
+  virtual ~Variant() = default;
 public:
   virtual auto what() const noexcept -> char const * = 0;
 };

@@ -1,0 +1,83 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error.required.Unpackaged
+namespace tunitas::error::condition {
+  //
+  // A packaged condition
+  //
+  // Specification:
+  //
+  //   like std::error_condition, but bundles in the companion enumeration.
+  //   [[presumably]] with inlining and optimization in place, it has zero cost.
+  //
+  // Intent:
+  //
+  //   What you would naturally consider is going on here.
+  //   namespace something::something_else::dark_side {
+  //     namespace error {
+  //       enum class Unpackaged { GOOD, BAD };
+  //       struct Package : public std::error_condition; {
+  //          using error_condition::error_condition;
+  //          using enum Unpackaged;
+  //       };
+  //     }
+  //   }
+  //
+  // Design:
+  //
+  //   Rhymes with the constructor signature for error_condition
+  //
+  //   Want both pass-by-value and pass-by-lvalue-reference to work equally well
+  //   The conditions are trivially copyable, being two intptr_t sized thingies.
+  //
+  // Usage:
+  //
+  //   auto condition = error::Condition{error::Condition::GOOD};
+  //   auto condition = std::error_condition{error::Condition::GOOD};
+  //
+  //   namespace error {
+  //     using Condition = code::Package<condition::Unpackaged>
+  //   }
+  //
+  template<required::Unpackaged UNPACKAGED> struct Package;
+}
+#endiv
+#divert <hpp>
+#import std.error_category
+#import std.error_condition
+#import std.enable_if
+#import std.is_error_condition_enum // you'll need a specialization before actually appying this constructor
+namespace tunitas::error {
+  namespace condition {
+    template<required::Unpackaged UNPACKAGED> inline auto operator==(Package<UNPACKAGED> const &, Package<UNPACKAGED> const &) -> bool;
+    template<required::Unpackaged UNPACKAGED> inline auto operator!=(Package<UNPACKAGED> const &, Package<UNPACKAGED> const &) -> bool;
+  }
+  template<required::Unpackaged UNPACKAGED> class condition::Package : public UNPACKAGED {
+    using Category = std::error_category;
+    using Contained = std::error_condition;
+    using Companion = typename UNPACKAGED::Enumeration;
+  public:
+    // CANNOT ---> .../condition.Package.xcpp:83:16: error: ‘using enum’ of dependent type ‘error::condition::Package<UNPACKAGED>::Companion’
+    // As such, the 'using enum' declaration, if necessary, MUST have been done in the Ancestor, and is thus already visible.
+    static_assert(sizeof (UNPACKAGED::SUCCESS));
+    static_assert(sizeof (UNPACKAGED::FAILURE));
+    Package() = default;
+    inline Package(int i, Category const &c) noexcept : contained{i, c} { }
+    template<required::Unpackaged CONDITION, typename = typename std::enable_if<std::is_error_condition_enum<CONDITION>::value>::type> Package(CONDITION c) noexcept { *this = make_error_condition(c); }
+    Package(Contained d) noexcept : contained{d} { }
+    operator Contained const &() const noexcept { return contained; }
+  private:
+    Contained contained;
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::error {
+  template<required::Unpackaged UNPACKAGED> auto condition::operator==(Package<UNPACKAGED> const &a, Package<UNPACKAGED> const &b) -> bool { return (std::error_condition) a == (std::error_condition) b; }
+  template<required::Unpackaged UNPACKAGED> auto condition::operator!=(Package<UNPACKAGED> const &a, Package<UNPACKAGED> const &b) -> bool { return (std::error_condition) a != (std::error_condition) b; }
+}
+#endiv

@@ -6,11 +6,11 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an Logic exception
+  // The partial completion of a Length exception
   //
   // Semantic
   //
-  //   see feature::Logic
+  //   see feature::Length
   //
   // Specification:
   //
@@ -30,30 +30,30 @@ namespace tunitas::exception::partial {
   //
   // Usage:
   //
-  //   class my::Something : public partial::Logic {
+  //   class my::Something : public partial::Length {
   //     struct Ancestors {
-  //       using Exception = partial::Logic;
+  //       using Exception = partial::Length;
   //     };
-  //     using Ancestor::Exception::Logic;
+  //     using Ancestor::Exception::Length;
   //   };
   //
-  struct Logic;
+  struct Length;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.feature.Logic
-#import nonstd.exception.Logic
+#import tunitas.exception.feature.Length
+#import nonstd.exception.Length
 #import nonstd.string.View
-class tunitas::exception::partial::Logic : public virtual Aspect,
-                                           public virtual feature::Logic,
-                                           public nonstd::exception::Logic<nonstd::string::View> {
+class tunitas::exception::partial::Length : public virtual Aspect,
+                                            public virtual feature::Length,
+                                            public nonstd::exception::Length<nonstd::string::View> {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
-    using Exception = nonstd::exception::Logic<nonstd::string::View>;
+    using Exception = nonstd::exception::Length<nonstd::string::View>;
   };
 protected:
-  ~Logic() = default;
+  ~Length() = default;
 public:
   using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
   using Results = Ancestors::Aspect::Results;
@@ -62,6 +62,6 @@ public:
 #endiv
 #divert <cpp>
 namespace tunitas::exception::partial {
-  auto Logic::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+  auto Length::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
 }
 #endiv

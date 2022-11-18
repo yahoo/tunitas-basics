@@ -1,0 +1,19 @@
+# This is a -*- Makefile -*- fragment
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+noinst_lib_libstd_tunitas_la_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
+noinst_lib_libstd_tunitas_la_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
+noinst_lib_libstd_tunitas_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET)
+noinst_lib_libstd_tunitas_la_LIBADD = $(nothing)
+noinst_lib_libstd_tunitas_la_MODULES = $(call HT_SOURCEStoMODULES, $(noinst_lib_libstd_tunitas_la_SOURCES))
+noinst_lib_libstd_tunitas_la_SOURCES = $(std_SUBSOURCES)
+include src/std/Makefrag.am
+$(noinst_lib_libstd_tunitas_la_SOURCES): obj/src/%.cpp : src/%.xcpp
+	$(HT_V_COLD) $(call HT_XCPP2CPP, $<)
+	@test -e $@
+$(ht_noinst_mkdir)/libstd+tunitas.mk: $(noinst_lib_libstd_tunitas_la_SOURCES)
+$(ht_noinst_mkdir)/libstd+tunitas.mk:
+	$(HT_V_BOTH) $(call HT_DEPENDENCIES, $^)
+	@test -e $@
+include $(ht_noinst_mkdir)/libstd+tunitas.mk
+clean-dependencies:: ; rm -f $(ht_noinst_mkdir)/libstd+tunitas.mk

@@ -6,7 +6,7 @@
 #divert <fpp>
 namespace tunitas::exception::feature {
   //
-  // Something has failed at runtime.
+  // Something is unimplemented (at runtime)
   //
   // Semantic:
   //
@@ -15,25 +15,26 @@ namespace tunitas::exception::feature {
   // Specification:
   //
   //   The minimal sense of that.
+  //   See nonstd.exception.Unimplemented
   //   See https://en.cppreference.com/w/cpp/error/runtime_error
   //
   // Design:
   //
   //   Descendants only.
   //   Descendants MUST fulfill the what() obligation
-  //   Pair with at least partial::Runtime or its siblings & descendants
+  //   Pair with at least partial::Unimplemented or its siblings & descendants
   //
   // Usage:
   //
   //   You need a tutorial on how to use inheritance?  O.Rly?
   //
-  class Runtime;
+  class Unimplemented;
 }
 #endiv
 #divert <hpp>
-class tunitas::exception::feature::Runtime {
+class tunitas::exception::feature::Unimplemented {
 protected:
-  virtual ~Runtime() = default;
+  virtual ~Unimplemented() = default;
 public:
   virtual auto what() const noexcept -> char const * = 0;
 };
