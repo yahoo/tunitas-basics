@@ -9,7 +9,7 @@ cd ${0%/*}/.. || exit 70
 # with_hypogeal_twilight, with_vernacular_doggerel as 'no'
 # then just use the default one-liner
 #
-#   with_hypogeal_twilight=no with_vernacular_doggerel=on ./maintenance/e2e
+#   with_hypogeal_twilight=no with_vernacular_doggerel=no ./maintenance/e2e
 #
 : ${with_prefix:=/exp/tunitas}
 : ${with_siblings:=$(realpath ${0%/*}/..)}
