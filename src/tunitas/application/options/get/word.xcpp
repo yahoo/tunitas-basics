@@ -1,0 +1,79 @@
+<// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  namespace package_word {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_word::interface;
+}
+#import tunitas.string.Storage
+namespace tunitas::application::options::get::package_word {
+  using Word = string::Storage;
+  namespace body { }
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.get.Whence
+namespace tunitas::application::options::get::package_word::body {
+  //
+  // Acquire a word from the longish Step
+  //
+  // The word is returned, not an outcome.
+  // The word value is checked to ensure that it is not empty.
+  // But the word may be whitespace or contain anything else at all.
+  //
+  // Scheme:
+  //
+  //   --word=WORD
+  //
+  // Example:
+  //
+  //   --user=jdoe
+  //   --commalist=apple,banana,cherry
+  //
+  // Usage:
+  //
+  //   auto exp = Experience{...somehow...}
+  //   auto step = cli::options::longish::Step{...somehow...};
+  //   using Quitting = exception::Quitting;
+  //
+  //   std::string word = get_word<Quitting>(cfg, step);
+  //
+  namespace exported {
+    // ease of export (see the parent scope)
+    template<required::exception::Quitting QUITTING> inline auto get_word(Whence, Step const &) -> Word;
+    template<required::exception::Quitting QUITTING> inline auto get_word(Whence, Step const &, Field) -> Word;
+    // by naming convention
+    template<required::exception::Quitting QUITTING> inline auto word(Whence, Step const &) -> Word;
+    template<required::exception::Quitting QUITTING> auto word(Whence, Step const &, Field) -> Word;
+  }
+}
+#endiv
+#divert <ipp>
+namespace tunitas::application::options::get::package_word {
+  template<required::exception::Quitting QUITTING> auto interface::get_word(Whence whence, Step const &step) -> Word             { return word<QUITTING>(whence, step); };
+  template<required::exception::Quitting QUITTING> auto interface::get_word(Whence whence, Step const &step, Field name) -> Word { return word<QUITTING>(whence, step, name); }
+  template<required::exception::Quitting QUITTING> auto interface::word(Whence whence, Step const &step) -> Word                 { return word<QUITTING>(whence, step, "word"); }
+}
+#endiv
+#divert <tpp>
+namespace tunitas::application::options::get::package_word {
+  template<required::exception::Quitting QUITTING> auto interface::word(Whence whence, Step const &step, Field field) -> Word {
+    string::Storage candidate = required_word(step);
+    if (field.empty()) {
+      // A "logic error" because the programmer controlls this (that would be you)
+      throw exception::Logic{"field is empty"};
+    }
+    if (candidate.empty()) {
+      error(whence) << "the " << field << " cannot be empty\n";
+      throw QUITTING{whence.name(), CONFIG};
+    }
+    return candidate;
+  }
+}
+#endiv

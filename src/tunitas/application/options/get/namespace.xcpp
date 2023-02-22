@@ -1,0 +1,27 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc,
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import c.const_stringz
+#import cli.options.longish.Step
+#import cli.exits.constants
+#import re.string
+namespace tunitas::application::options::get {
+  using namespace cli::exits::constants;
+  // common to all the argument lists
+  using Step = cli::options::longish::Step;
+  using Field = re::string<c::const_stringz>; // is it a "identifier" "delay", "lifetime" "port" or "word"; what do you call this value?
+}
+#endiv
+#divert <hpp>
+// every interface will need these
+#import tunitas.application.required.exception.Quitting
+#endiv
+#divert <ipp>
+// eadem ratione
+#import options.shortish // for ::options::shortish::required_word(...) [[REMOVETHIS]] ... should already be visible in #import options.shortish.Step
+#import tunitas.exception.Invalid
+#import tunitas.exception.Logic
+#endiv

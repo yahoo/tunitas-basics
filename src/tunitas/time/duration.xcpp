@@ -11,6 +11,8 @@ namespace tunitas::time::duration {
   //
   // There are many durations that we care about
   //
+  using Microsecond = std::chrono::duration<Duration::rep, ratio::Microsecond>;
+  using Millisecond = std::chrono::duration<Duration::rep, ratio::Millisecond>;
   using Second = std::chrono::duration<Duration::rep, ratio::Second>;
   using Minute = std::chrono::duration<Duration::rep, ratio::Minute>;
   using Hour = std::chrono::duration<Duration::rep, ratio::Hour>;
@@ -19,6 +21,18 @@ namespace tunitas::time::duration {
   using Fortnight = std::chrono::duration<Duration::rep, ratio::Fortnight>;
   using Month = std::chrono::duration<Duration::rep, ratio::Month>;
   using Year = std::chrono::duration<Duration::rep, ratio::Year>;
+  //
+  // pesky plurality ... just sounds wrong when conjugated badly
+  using Microseconds = Microsecond;
+  using Milliseconds = Millisecond;
+  using Seconds = Second;
+  using Minutes = Minute;
+  using Hours = Hour;
+  using Days = Day;
+  using Weeks = Week;
+  using Fortnights = Fortnight;
+  using Months = Month;
+  using Years = Year;
 }
 namespace tunitas::time {
   namespace [[deprecated("tunitas::time::duration (plural) never was a namespace name; use tunitas::time::duration (singular)")]] durations { using namespace duration; }

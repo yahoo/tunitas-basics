@@ -3,18 +3,10 @@
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
-#divert <hpp>
-#import tunitas.application.options.get.word
-namespace tunitas::application::options {
-  //
-  // Usage: (it's a template, not a function)
-  //
-  //   auto exp = Experience{...somehow...}
-  //   auto step = cli::options::longish::Step{...somehow...};
-  //   using Quitting = exception::Quitting;
-  //
-  //   std::string word = get_word<Quitting>(cfg, step);
-  //
-  using get::get_word;
+#divert <fpp>
+#import tests.unit.application
+#import tunitas.application.options
+namespace tests::unit::application::options {
+  namespace library = ::tunitas::application::options;
 }
 #endiv

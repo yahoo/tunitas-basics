@@ -172,11 +172,11 @@ namespace tunitas::base64 {
     }
   }
 }
-#import std.logic_error
 #import std.move
 #import tunitas.base64.encoder.Finalized
 #import tunitas.base64.encoder.Invalid
 #import tunitas.base64.encoder.Put
+#import tunitas.exception.Logic
 template<typename RESULT> auto tunitas::base64::Encoder::finalize() -> RESULT requires required::Container_Push_Back<RESULT> && required::Octet<typename RESULT::value_type> {
   std::size_t const ee = buffer.size();
   RESULT ret;
@@ -218,7 +218,7 @@ template<typename RESULT> auto tunitas::base64::Encoder::finalize() -> RESULT re
     }
     // BASE64 is defined on 24-bit stanzas, with padding.
     auto const eee = buffer.size();
-    if (0 != eee % 6) { throw std::logic_error{"eee is not a multiple of 6"}; }
+    if (0 != eee % 6) { throw exception::Logic{"eee is not a multiple of 6"}; }
     for (auto e(eee), i(e-e); e != i; i+=6) {
       accrete(ret, i);
     }

@@ -1,0 +1,25 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc,
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_application_options_get_SUBSOURCES = \
+  obj/src/tunitas/application/options/get_filepath.cpp \
+  obj/src/tunitas/application/options/get_identifier.cpp \
+  obj/src/tunitas/application/options/get_integer.cpp \
+  obj/src/tunitas/application/options/get_port.cpp \
+  obj/src/tunitas/application/options/get_word.cpp \
+  \
+  obj/src/tunitas/application/options/get/namespace.cpp \
+  obj/src/tunitas/application/options/get/filepath.cpp \
+  obj/src/tunitas/application/options/get/identifier.cpp \
+  obj/src/tunitas/application/options/get/integer.cpp \
+  obj/src/tunitas/application/options/get/port.cpp \
+  obj/src/tunitas/application/options/get/word.cpp \
+  obj/src/tunitas/application/options/get/Limits.cpp \
+  obj/src/tunitas/application/options/get/Whence.cpp \
+  \
+  $(tunitas_application_options_get_required_SUBSOURCES) \
+  $(end)
+include src/tunitas/application/options/get/required/Makefrag.am

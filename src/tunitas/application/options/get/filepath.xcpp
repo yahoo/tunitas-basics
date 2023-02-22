@@ -1,0 +1,63 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  namespace package_filepath {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_filepath::interface;
+}
+#import std.filesystem.path
+namespace tunitas::application::options::get::package_filepath {
+  using Filepath = std::filesystem::path;
+  namespace body { }
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.get.Whence
+namespace tunitas::application::options::get::package_filepath::body {
+  //
+  // Acquire a file path from the longish Step
+  //
+  // The filepath is returned, not an outcome.
+  // The filepath value is checked to ensure that it is not empty.
+  // There are no other constraints on the filepath that are checked here.
+  //
+  // Scheme:
+  //
+  //   --file=FILEPATH
+  //
+  // Example:
+  //
+  //   --output=./file.out
+  //
+  // Usage:
+  //
+  //   Configuration cfg{...somehow...}
+  //   options::longish::Step step{...somehow...};
+  //   std::string filepath = get_filepath(cfg, step);
+  //
+  namespace exported {
+    // ease of export (see the parent scope)
+    template<required::exception::Quitting QUITTING> inline auto get_filepath(Whence, Step const &) -> Filepath;
+    template<required::exception::Quitting QUITTING> inline auto get_filepath(Whence, Step const &, Field) -> Filepath;
+    // by naming convention
+    template<required::exception::Quitting QUITTING> inline auto filepath(Whence, Step const &) -> Filepath;
+    template<required::exception::Quitting QUITTING> auto filepath(Whence, Step const &, Field) -> Filepath;
+  }
+  inline constexpr auto const FIELD = "filepath";
+}
+#endiv
+#divert <ipp>
+#import tunitas.application.options.get_word
+namespace tunitas::application::options::get::package_filepath {
+  template<required::exception::Quitting QUITTING> auto interface::get_filepath(Whence whence, Step const &step) -> Filepath              { return filepath<QUITTING>(whence, step, FIELD); }
+  template<required::exception::Quitting QUITTING> auto interface::get_filepath(Whence whence, Step const &step, Field field) -> Filepath { return filepath<QUITTING>(whence, step, field); }
+  template<required::exception::Quitting QUITTING> auto interface::filepath(Whence whence, Step const &step) -> Filepath                  { return filepath<QUITTING>(whence, step, FIELD); }
+  template<required::exception::Quitting QUITTING> auto interface::filepath(Whence whence, Step const &step, Field field) -> Filepath     { return word<QUITTING>(whence, step, field); }
+}
+#endiv

@@ -1,0 +1,28 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.Integer
+namespace tunitas::application::options::get::required {
+  //
+  // Is this type a limits specification which is suitable for the namespace options::get::integer<...>(...) function?
+  //
+  template<typename LIMITS> concept Limits = requires(LIMITS) {
+    { LIMITS::min() } -> Integer<>;
+    { LIMITS::max() } -> Integer<>;
+    requires same_as<decltype(LIMITS::min()), decltype(LIMITS::max())>;
+  };
+}
+#endiv
+#divert <cpp>
+#import std.numeric_limits
+namespace {
+  namespace testate {
+    namespace required = tunitas::application::options::get::required;
+    static_assert(required::Limits<std::numeric_limits<int>>);
+    static_assert(required::Limits<std::numeric_limits<unsigned>>);
+  }
+}
+#endiv

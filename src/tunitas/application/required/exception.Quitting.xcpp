@@ -17,13 +17,16 @@
 // NO NEED #include <hpp/std.exception>
 // NO NEED #include <hpp/std.string>
 #import tunitas.required.exception.Quitting
+#import tunitas.application.options.Program
+#import cli.exits.Code
 namespace tunitas::application::required::exception {
   //
-  // Is this a possible Quitting exception?
+  // Is this a possible (application UX-quality) Quitting exception?
   //
   // MUST be a descendant of tunitas::application::exception::Aspect
-  // MUST be a descendant of nonstd::exception::Quitting (where available)
+  // MUST be a descendant of tunitas::application::exception::feature::Quitting
   //
+  // <editorial>
   // WATCHOUT - for maintenance, the use of is_base_of in a concept definition at <fpp> is fraught.
   // 1) It requires that you get the complete definition of the class type so it complicates with #include <hpp/...>
   // 2) And makes the header dependency order of S.C.O.L.D. ersatz "modules" even more tightly coupled unto impossible
@@ -31,28 +34,42 @@ namespace tunitas::application::required::exception {
   //    will fail and the error messages will misidirect you.  Forewarned is forearmed on this, the most difficult to mitigate.
   //    3.a) the complete type of tunitas::application::excetpion:Aspect must appear
   //    3.b) the complete type of QUITTING must ALSO appear; typically this is a more difficult dependency to master
+  // </editorial>
   //
   // Usage:
   //
   //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
   //
-  template<typename QUITTING> concept Quitting =
-    true
-    && requires(QUITTING quitting) {
+  template<typename QUITTING> concept Quitting = requires(QUITTING quitting, options::Program const &program, cli::exits::Code code) {
+#if 1
     { quitting } -> convertible_to<std::exception const &>;
     { quitting } -> convertible_to<tunitas::application::exception::Aspect const &>;
     { quitting } -> convertible_to<tunitas::application::exception::feature::Quitting const &>;
-  }
-  && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
-  && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
-      requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
-  && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
-    // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
-    { QUITTING{name, code} };
+    requires ! tunitas::required::exception::Quitting<QUITTING>; // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
+    { QUITTING{program} };
+    { QUITTING{program, code} };
     { quitting.what() } -> convertible_to<char const *>;
     { quitting.code() } -> convertible_to<sys::exits::Code>;
     { quitting.stream() } -> convertible_to<std::ostream &>;
-  }
-  && true;
+#else
+    requires true
+    && requires(QUITTING quitting) {
+      { quitting } -> convertible_to<std::exception const &>;
+      { quitting } -> convertible_to<tunitas::application::exception::Aspect const &>;
+      { quitting } -> convertible_to<tunitas::application::exception::feature::Quitting const &>;
+    }
+    && ! tunitas::required::exception::Quitting<QUITTING> // MUST NOT be recursive; we utter this because we specify a different constructor signature in that class QUITTING (see below)
+    && (requires(QUITTING, std::string name, sys::exits::Code code) { { QUITTING{name, code} }; } || // ... optional
+        requires(QUITTING, sys::exits::Code code) { { QUITTING{code} }; } ) // ............................ required
+    && requires(QUITTING quitting, std::string name, sys::exits::Code code) {
+      // OPTIONAL -- MAY have a default value for code, with constructor as QUITTING(name)
+      { QUITTING{name, code} };
+      { quitting.what() } -> convertible_to<char const *>;
+      { quitting.code() } -> convertible_to<sys::exits::Code>;
+      { quitting.stream() } -> convertible_to<std::ostream &>;
+    }
+    && true;
+#endif
+  };
 }
 #endiv

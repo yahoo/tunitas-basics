@@ -5,7 +5,7 @@
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <hpp>
 #import std.chrono.duration_cast
-namespace tunitas::time::literals {
+namespace tunitas::time {
   //
   // Coerce the duration
   // https://en.cppreference.com/w/cpp/chrono/duration/duration_cast

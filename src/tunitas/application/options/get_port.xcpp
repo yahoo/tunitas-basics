@@ -1,84 +1,21 @@
 // This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Yahoo Inc. 2021.
+// Copyright Yahoo Inc.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <hpp>
-#import c.const_stringz
-#import options.longish.Step
-#import re.string
-#import std.uint16_t
-#import tunitas.application.Configuration
-#import tunitas.application.required.exception.Quitting
+#import tunitas.application.options.get.port
 namespace tunitas::application::options {
   //
-  // Acquire a port number from the longish Step
+  // Usage: (it's a template, not a function)
   //
-  // The port is returned, not an outcome.
-  // The port value is checked to ensure that it is really a 16-bit IP port number.
-  // We SHOULD be using ip::in::port_t but do not; for reasons and to reduce dependencies.
+  //   auto exp = Configuration{...somehow...}
+  //   auto step = cli::options::longish::Step{...somehow...};
+  //   using Quitting = exception::Quitting;
   //
-  // Scheme:
+  //   auto port = get_port<Quitting>(cfg, step);
+  //   auto port = get_port<Quitting>(cfg, step, "port");
   //
-  //   --port=PORT
-  //
-  // Example:
-  //
-  //   --port=8080
-  //
-  // Usage:
-  //
-  //   Configuration cfg{...somehow...}
-  //   options::longish::Step step{...somehow...};
-  //   auto port = get_port(cfg, step);
-  //
-  namespace packaging::get_port_function {
-    using Step = ::options::longish::Step;
-    using Port = std::uint16_t;
-    using Field_Name = re::string<c::const_stringz>;
-    // [[FIXTHIS]] build a concept for an throwable Quitting exception
-    template<required::exception::Quitting QUITTING> auto get_port(Configuration const &, Step const &) -> Port;
-    template<required::exception::Quitting QUITTING> auto get_port(Configuration const &, Step const &, Field_Name field_name) -> Port;
-  }
-  using packaging::get_port_function::get_port;
-}
-#endiv
-#divert <ipp>
-template<tunitas::application::required::exception::Quitting QUITTING> auto tunitas::application::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step) -> Port { 
-  return get_port<QUITTING>(cfg, step, "port");
-}
-#endiv
-#divert <tpp>
-#import options.shortish // optoins::shortish::required(...)
-#import std.exception
-#import std.numeric_limits
-#import std.runtime_error
-#import std.size_t
-#import std.stoi
-#import std.string
-#import sys.exits.constants
-template<tunitas::application::required::exception::Quitting QUITTING> auto tunitas::application::options::packaging::get_port_function::get_port(Configuration const &cfg, Step const &step, Field_Name field_name) -> Port {
-  // Whereas std::stoi signals failure both via exception and also via its 2nd inout parameter
-  // we have to put a lot of machinery around it to make it safe and obvious what is occurring.
-  try {
-    std::string const syntax = ::options::shortish::required(step);
-    std::size_t end{0};
-    auto candidate = std::stoi(syntax, &end);
-    if (end != syntax.size()) {
-      throw std::runtime_error{"stoi"};
-    }
-    auto const lo = 1+std::numeric_limits<std::uint16_t>::min();
-    auto const hi = std::numeric_limits<std::uint16_t>::max();
-    if (candidate < 0 || candidate < lo || hi < candidate) {
-      error(cfg) << "the service port " << candidate << " is out of range " << lo << ".." << hi << '\n';
-      throw QUITTING{cfg.NAME, sys::exits::CONFIG};
-    }
-    return candidate;
-  } catch (std::exception const &) {
-    // The exception will say "stoi" (ours or theirs)
-    std::string ine = ::options::shortish::required(step); if (ine.empty()) {ine = "(empty)";} // [[FIXTHIS]] use format::ine(...)
-    error(cfg) << "the service port is not a number - " << ine << '\n';
-    throw QUITTING{cfg.NAME, sys::exits::CONFIG};
-  }
+  using get::get_port;
 }
 #endiv

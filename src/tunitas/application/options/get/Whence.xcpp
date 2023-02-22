@@ -1,0 +1,73 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc,
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  //
+  // Whence cometh the NAME?
+  //
+  // Specification
+  //
+  //   Extract the (Program) NAME
+  //   Facilitage the transition among
+  //     cli::options::Program
+  //     cli::configuration::Generic with "too much experience" xo containing Configuration::NAME
+  //     cli::experience::Console with "only the experience" so containing Console::NAME but no configuration::Core
+  //
+  // Design:
+  //
+  //   Suitable for use in function arguments to force the implicit extraction
+  //
+  //   This is an implementation detail, a compatibility shim.  Do not use it on its own account.
+  //
+  // Usage:
+  //
+  //   auto function(Whence, Other, Arguments...) -> Result;
+  //
+  //   auto prog = application::options::Program{"a.out"};
+  //
+  //   auto cfg = application::Configuration{...somehow...};
+  //   auto result = function(cfg, other, arguments...);
+  //
+  //   auto exp = cli::experience::Console{prog, cfg};
+  //   auto result = function(exp, other, arguments...);
+  //
+  struct Whence;
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.Program
+#import std.convertible_to
+#import std.ostream
+namespace tunitas::application::options {
+  namespace get {
+    //
+    // [[FIXTHIS]] this will produce a separable stream from the Console or Configuration.
+    // But it's the best we can do here with limited API changes.
+    //
+    inline auto error(Whence const &) -> std::ostream &;
+  }
+  struct get::Whence {
+    inline [[implicit]] Whence(Program const &);
+    template<typename ORIGIN> inline [[implicit]] Whence(ORIGIN const &) requires std::convertible_to<decltype(ORIGIN::NAME), Program const &>;
+    inline auto name() const noexcept -> Program const &;
+  private:
+    Program const &program;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.cerr
+namespace tunitas::application::options {
+  auto get::error(Whence const &whence) -> std::ostream & { return std::cerr << whence.name() << ": error, "; }
+  namespace get {
+    Whence::Whence(Program const &program) : program{program} { }
+    template<typename ORIGIN> Whence::Whence(ORIGIN const &origin) requires std::convertible_to<decltype(ORIGIN::NAME), Program const &>
+      : program{origin.NAME}
+    { }
+    auto Whence::name() const noexcept -> Program const & { return program; }
+  }
+}
+#endiv

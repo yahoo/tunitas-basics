@@ -4,17 +4,20 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <hpp>
-#import tunitas.application.options.get.identifier
+#import tunitas.application.options.get.integer
 namespace tunitas::application::options {
   //
   // Usage: (it's a template, not a function)
   //
-  //   auto exp = Experience{...somehow...}
+  //   auto exp = Configuration{...somehow...}
   //   auto step = cli::options::longish::Step{...somehow...};
   //   using Quitting = exception::Quitting;
+  //   using Some_Signed_Limits = options::get::Limits<-99, 99>;
+  //   using Some_Unsigned_Limits = options::get::Limits<1u, 255u>;
   //
-  //   std::string identifier = get_identifier<Quitting>(cfg, step);
+  //   auto sinteger = get_integer<int, Quitting, Some_Signed_Limits>(cfg, step);
+  //   auto uinteger = get_integer<unsigned, Quitting, Some_Unsigned_Limits>(cfg, step, "integer");
   //
-  using get::get_identifier;
+  using get::get_integer;
 }
 #endiv

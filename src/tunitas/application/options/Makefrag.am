@@ -13,10 +13,6 @@ tunitas_application_options_SUBSOURCES = \
   obj/src/tunitas/application/options/c.Argv.cpp \
   obj/src/tunitas/application/options/Program.cpp \
   obj/src/tunitas/application/options/Specification.cpp \
-  obj/src/tunitas/application/options/get_filepath.cpp \
-  obj/src/tunitas/application/options/get_identifier.cpp \
-  obj/src/tunitas/application/options/get_port.cpp \
-  obj/src/tunitas/application/options/get_word.cpp \
   \
   obj/src/tunitas/application/options/argument/namespace.cpp \
   obj/src/tunitas/application/options/argument/constants.cpp \
@@ -27,4 +23,9 @@ tunitas_application_options_SUBSOURCES = \
   \
   obj/src/tunitas/application/options/indicator/namespace.cpp \
   obj/src/tunitas/application/options/indicator/constants.cpp \
+  $(tunitas_application_options_get_SUBSOURCES) \
+  $(tunitas_application_options_required_SUBSOURCES) \
   $(end)
+#
+include src/tunitas/application/options/get/Makefrag.am
+include src/tunitas/application/options/required/Makefrag.am

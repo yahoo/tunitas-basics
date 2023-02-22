@@ -22,7 +22,7 @@ dnl      |
 dnl      \prefix\
 dnl      ||||||||
 dnl      vvvvvvvv
-AC_INIT([tunitas-basics], [2.1.1], [tunitas@yahooinc.com])
+AC_INIT([tunitas-basics], [2.2.0], [tunitas@yahooinc.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 AM_SILENT_RULES([yes]) dnl See the AUTOMAKE_OPTIONS in the Makefile.am
 
