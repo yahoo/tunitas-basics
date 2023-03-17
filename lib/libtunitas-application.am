@@ -1,16 +1,15 @@
 # This is a GNU -*- Makefile -*- fragment that is included by Automake
-# Copyright Yahoo Inc, 2021.
+# Copyright Yahoo Inc.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
-lib_libtunitas_application_la_CURRENT = 7
-lib_libtunitas_application_la_REVISION = 5
+lib_libtunitas_application_la_CURRENT = 8
+lib_libtunitas_application_la_REVISION = 0
 lib_libtunitas_application_la_AGE = 0
 lib_libtunitas_application_la_CRA = $(lib_libtunitas_application_la_CURRENT):$(lib_libtunitas_application_la_REVISION):$(lib_libtunitas_application_la_AGE)
 lib_libtunitas_application_la_VERSION_INFO = -version-info $(lib_libtunitas_application_la_CRA)
 #
-lib_libtunitas_application_la = lib/libtunitas-application.la$(error REMOVE)
 lib_libtunitas_application_la_CPPFLAGS = $(PACKAGE_CPPFLAGS_SET)
 lib_libtunitas_application_la_CXXFLAGS = $(PACKAGE_CXXFLAGS_SET)
 lib_libtunitas_application_la_LDFLAGS = $(PACKAGE_LDFLAGS_SET) $(lib_libtunitas_application_la_VERSION_INFO)

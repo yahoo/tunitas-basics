@@ -1,11 +1,15 @@
-// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Yahoo Inc. 2021.
+>// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
+#import std.chrono_literals
 namespace tunitas::time {
-  namespace literals { }
+  namespace literals {
+    // We get the standard ones AND we get ours (defined below)
+    using namespace std::chrono_literals;
+  }
 }
 #endiv
 #divert <hpp>
@@ -34,8 +38,8 @@ namespace tunitas::time::literals {
   inline constexpr auto operator""_year(int unsigned long long) -> Duration;
   //
   // plural (because grammar must be obeyed ... because it sounds wrong)
-  inline constexpr auto operator""_microseconds(int unsigned long long value) -> Duration { return operator""_second(value); }
-  inline constexpr auto operator""_milliseconds(int unsigned long long value) -> Duration { return operator""_second(value); }
+  inline constexpr auto operator""_microseconds(int unsigned long long value) -> Duration { return operator""_microsecond(value); }
+  inline constexpr auto operator""_milliseconds(int unsigned long long value) -> Duration { return operator""_millisecond(value); }
   inline constexpr auto operator""_seconds(int unsigned long long value) -> Duration      { return operator""_second(value); }
   inline constexpr auto operator""_minutes(int unsigned long long value) -> Duration      { return operator""_minute(value); }
   inline constexpr auto operator""_hours(int unsigned long long value) -> Duration        { return operator""_hour(value); }

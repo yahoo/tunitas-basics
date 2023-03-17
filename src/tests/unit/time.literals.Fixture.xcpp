@@ -4,11 +4,18 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-namespace tests::unit::time::literals { class Fixture; }
+#import tunitas.time.literals
+namespace tests::unit::time::literals {
+  using namespace tunitas::time::literals;
+  class Fixture;
+}
 #endiv
 #divert <hpp>
-class tests::unit::time::literals::Fixture : public cppunit::test::Fixture {
-public:
+struct tests::unit::time::literals::Fixture : public cppunit::test::Fixture {
+  static auto suite() -> cppunit::Test *;
+  //
+  auto test_microsecond() -> void;
+  auto test_millisecond() -> void;
   auto test_second() -> void;
   auto test_minute() -> void;
   auto test_hour() -> void;
@@ -17,13 +24,25 @@ public:
   auto test_fortnight() -> void;
   auto test_month() -> void;
   auto test_year() -> void;
-  static auto suite() -> cppunit::Test *;
 };
 #endiv
 #divert <cpp>
-#import tunitas.time.literals
-namespace tests::unit::time::literals {
-  using namespace tunitas::time::literals;
+auto tests::unit::time::literals::Fixture::test_microsecond() -> void {
+  using tunitas::time::literals::operator""_microsecond;
+  auto v1 = 1_microsecond;
+  auto v2 = 2_microseconds;
+  CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_microsecond == 3_microseconds);
+  CPPUNIT_ASSERT(3us == 3_microsecond);
+}
+auto tests::unit::time::literals::Fixture::test_millisecond() -> void {
+  using tunitas::time::literals::operator""_millisecond;
+  auto v1 = 1_millisecond;
+  auto v2 = 2_milliseconds;
+  CPPUNIT_ASSERT(v1 < v2);
+  CPPUNIT_ASSERT(3_millisecond == 3_milliseconds);
+  using namespace std::chrono_literals;
+  CPPUNIT_ASSERT(3ms == 3_milliseconds);
 }
 auto tests::unit::time::literals::Fixture::test_second() -> void {
   using tunitas::time::literals::operator""_second;
@@ -85,7 +104,9 @@ auto tests::unit::time::literals::Fixture::test_year() -> void {
 auto tests::unit::time::literals::Fixture::suite() -> cppunit::Test * {
   using namespace ::rigging::suite;
   Stream series("literals");
-  series << call("second", &Fixture::test_second)
+  series << call("microsecond", &Fixture::test_microsecond)
+         << call("millisecond", &Fixture::test_millisecond)
+         << call("second", &Fixture::test_second)
          << call("minute", &Fixture::test_minute)
          << call("hour", &Fixture::test_hour)
          << call("day", &Fixture::test_day)
