@@ -8,7 +8,7 @@
 #import std.is_class
 namespace tunitas::error ::required {
   //
-  // Is this type an Unpackaged enumeration, sutiable f the Package system?
+  // Is this type an Unpackaged enumeration, suitable for the Package system?
   //
   // Usage:
   //
