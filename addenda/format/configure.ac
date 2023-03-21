@@ -26,7 +26,7 @@ HGTW_WITH_MODULE_ALIASED([rigging], [rigging-unit], [unit-rigging])
 HGTW_MSG_VERBOSE([compiler-specific (alphabetical)])
 HGTW_WITH_NONSTD([boost], [boost], [a non-standard Boost])
 HGTW_WITH_NONSTD([cppunit], [cppunit], [a non-standard CppUnit])
-HGTW_WITH_NONSTD([gcc], [gcc], [a non-standard GCC, e.g. modernized gcc for C++11, C++14, C++17, and on unto C++23])
+HGTW_WITH_NONSTD([gcc], [gcc], [a non-standard GCC, i.e.. modern gcc for C++26, but at least C++23])
 HGTW_WITH_STD(scold, scold, [The standard HGTW installation area])
 
 HGTW_MSG_VERBOSE([system-side subsystems (alphabetical)])
