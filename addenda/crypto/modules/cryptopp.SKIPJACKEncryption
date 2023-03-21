@@ -1,4 +1,0 @@
-// -*- c++ -*- 7acaaa4b-0023-4039-8dc3-78122c3f7682
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/skipjack.h>

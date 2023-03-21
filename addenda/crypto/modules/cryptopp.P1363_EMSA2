@@ -1,4 +1,0 @@
-// -*- c++ -*- 7bedafa4-e0b2-4773-924e-1e226eda4ab8
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/emsa2.h>

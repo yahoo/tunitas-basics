@@ -1,4 +1,0 @@
-// -*- c++ -*- cc9df16e-5f2e-4282-a4fb-ab6a0edcff35
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/md4.h>

@@ -1,3 +1,0 @@
-// -*- c++ -*- bc52f022-5dd0-4aea-9365-31b3a0fc7cf7
-#pragma once
-#include <cryptopp.SignalHandler> // has some tricky #ifdefs

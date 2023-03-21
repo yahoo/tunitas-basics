@@ -10,6 +10,7 @@ check_bin_unit_CXXFLAGS = $(CHECK_CXXFLAGS_SET)
 check_bin_unit_LDFLAGS = $(CHECK_LDFLAGS_SET)
 check_bin_unit_LDADD = \
   lib/libtunitas-server.la \
+  lib/libtunitas-number.la \
   lib/libtunitas-application.la \
   lib/libtunitas.la \
   noinst/lib/libwant.la \

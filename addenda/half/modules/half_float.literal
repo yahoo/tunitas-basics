@@ -1,9 +1,0 @@
-// -*- c++ -*- 5bb5b52f-0146-4e9b-8d3d-e5ed6165722a
-#pragma once
-//
-// WATCHOUT - this is a moduel named "half_float.literal" in the singular, as "literal"
-// because there is only one literal for the half-float data type.
-//
-// Whereas the C++ Standard Library always uses "literals" for its bunding namespaces
-//
-#include <half_float.half> // there is #pragma reinclude magic in here

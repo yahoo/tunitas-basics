@@ -1,4 +1,0 @@
-// -*- c++ -*- 23500d95-5bfe-447e-86d6-9bff368e78cc
-#pragma once
-// Must reference as <ctime> not <time.h> in order to place time(...) as std::time
-#include <ctime>

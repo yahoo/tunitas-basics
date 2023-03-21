@@ -1,4 +1,0 @@
-// -*- c++ -*- bad4ccfc-3265-480c-8f13-51889ae1317d
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/ida.h>

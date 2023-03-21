@@ -1,5 +1,0 @@
-# This is a -*- Makefile -*-
-
-lib_libautotools_autoconf_la_IMPORT = shell
-lib_libautotools_autoconf_la_TAG    = shell::CONFIG
-include @hypogeal_twilight_datadir@/mk/autotools/autoconf/Makefrag.mk

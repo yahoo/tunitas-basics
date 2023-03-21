@@ -1,4 +1,0 @@
-// -*- c++ -*- e85df32e-2a3c-4136-b622-d9fae04cbc30
-#pragma once
-// There is special version-specific trickery #ifdefs in here; done once, done right (ahem)
-#include <std.optional>

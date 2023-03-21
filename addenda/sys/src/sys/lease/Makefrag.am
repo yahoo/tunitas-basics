@@ -1,8 +1,0 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# For terms and provenance see the LICENSE file at the top of this repository.
-
-src_sys_lease_SOURCES_SET = \
-  obj/src/sys/lease/namespace.cpp \
-  obj/src/sys/lease/Operation.cpp \
-  obj/src/sys/lease/constants.cpp \
-  $(end)

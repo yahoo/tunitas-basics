@@ -1,0 +1,7 @@
+# This is a GNU -*- Makefile -*- fragment which is managed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tests_unit_number_required_SUBSOURCES = \
+  check/obj/src/tests/unit/number/required/namespace.cpp \
+  check/obj/src/tests/unit/number/required/Small.cpp \
+  $(end)

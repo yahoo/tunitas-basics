@@ -1,6 +1,0 @@
-// -*- c++ -*- ca36ad8b-c004-4da7-b764-8c430e5d5685
-#pragma once
-#include <cppunit/extensions/AutoRegisterSuite.h>
-namespace cppunit {
-  using CppUnit::AutoRegisterSuite;
-}

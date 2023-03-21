@@ -1,5 +1,0 @@
-// -*- c++ -*- 3aa671fe-ef8c-48d1-94ae-05a0a38bcd93
-// struct flock
-#pragma once
-#include <unistd.h>
-#include <fcntl.h>

@@ -1,4 +1,0 @@
-A (the) Right & Proper C++ interface to the C language runtime
-These are all specified within the vast POSIX specification.
-
-Also see nearby: module-posix, module-std

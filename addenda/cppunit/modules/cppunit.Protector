@@ -1,6 +1,0 @@
-// -*- c++ -*- 8d85300e-eb80-4d2e-af80-bd395340921d
-#pragma once
-#include <cppunit/Protector.h>
-namespace cppunit {
-  using CppUnit::Protector;
-}

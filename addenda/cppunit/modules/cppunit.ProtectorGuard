@@ -1,6 +1,0 @@
-// -*- c++ -*- bcc40cef-e1bb-4352-9e9c-545bec8c091a
-#pragma once
-#include <cppunit/Protector.h>
-namespace cppunit {
-  using CppUnit::ProtectorGuard;
-}

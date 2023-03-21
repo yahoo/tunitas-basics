@@ -1,4 +1,0 @@
-#divert <hpp>
-#import nonstd.path.filename.joining
-namespace [[deprecated]] path { namespace [[deprecated]] filename { using ::nonstd::path::filename::joining; } }
-#endiv

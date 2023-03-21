@@ -1,0 +1,21 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit
+#import tunitas.required
+namespace tests::unit::required {
+  //
+  // [[FIXTHIS]] [[WATCHOUT]] this namespace has two purposes which wil be confusing at some point.
+  //
+  // 1. the containing namespace for the concept tests in namespace tunitas::required (a.k.a. library)
+  // 2. the standard "cascaded" namespace for other namespace required deeper into the namepace tree
+  //
+  // These two usages don't necessarily conflict, but they do pose a conceptual challenge in maintaining separation.
+  //
+  namespace library = ::tunitas::required;
+  using namespace ::tunitas::required;
+}
+#endiv

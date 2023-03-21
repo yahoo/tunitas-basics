@@ -1,4 +1,0 @@
-// -*- c++ -*- 853d64b0-5e0d-42c6-8433-75e122093497
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/asn.h>

@@ -1,3 +1,0 @@
-tests_rev_TESTS = \
-  tests/rev/case.test \
-  $(end)

@@ -1,0 +1,80 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.mp.required.Medium
+namespace tunitas::number::mp::get {
+  //
+  // Extract the medium-sized integer from the bignum
+  //
+  // Specification:
+  //
+  //   What it says.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //   Specialize on the mediumness of it all.
+  //   Pull it out in parts because the underlying API doesn't support the one-shot.
+  //
+  // Background:
+  //
+  //   Expected:    LP64 (gcc x86_64) ILP64 (untested)
+  //   Problematic: ILP32, LLP64 (untested)
+  //
+  //   https://en.wikipedia.org/wiki/64-bit_computing
+  //   https://en.wikipedia.org/wiki/128-bit_computing
+  //
+  // Usage:
+  //
+  //   Hack the Spew.
+  //
+  template<required::Medium> struct By_Halves;
+}
+#endiv
+#divert <hpp>
+#forward tunitas.number.mp.get.Fits
+#forward tunitas.number.mp.get.Extract
+#import tunitas.number.mp.required.Carrier
+namespace tunitas::number::mp {
+  template<mp::required::Medium MEDIUM> struct get::By_Halves {
+    using Result = MEDIUM;
+    template<required::Carrier CARRIER> inline static auto get(CARRIER const &) -> Result;
+  protected:
+    using Extract = get::Extract<Result>;
+    using Fits = get::Fits<Result>;
+    template<required::Carrier CARRIER> inline static auto by_halves(int sign, CARRIER const &signless) -> Result;
+  };
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.exception.Range
+#import tunitas.number.mp.get.Fits
+#import tunitas.number.mp.get.Extract
+namespace tunitas::number::mp::get {
+  template<required::Medium _> template<required::Carrier CARRIER> auto By_Halves<_>::by_halves(int sign, CARRIER const &signless) -> Result {
+    static_assert(sizeof (Result)/2 <= sizeof (decltype(CARRIER{}.get_si())));
+    constexpr auto const SHIFT = 8/2 * sizeof (Result);
+    auto const MASK = (CARRIER{1u} << SHIFT) - 1;
+    // Casting back to CARRIER forces the evaluation
+    auto const lo = CARRIER{signless & MASK}.get_ui();
+    auto const hi = CARRIER{(signless >> SHIFT) & MASK}.get_ui();
+    return sign * (Result{hi} << SHIFT) | Result{lo};
+  }
+  template<required::Medium _> template<required::Carrier CARRIER> auto By_Halves<_>::get(CARRIER const &impl) -> Result {
+    if (!Fits::fit(impl)) {
+      throw exception::Range{"by_Halves<...>::get()"};
+    } else {
+      if (0 == impl) {
+        return {};
+      } else if (impl < 0) {
+        return by_halves(-1, (CARRIER)-impl);
+      } else {
+        return by_halves(1, impl);
+      }
+    }
+  }
+}
+#endiv

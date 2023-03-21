@@ -1,0 +1,18 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <ipp>
+#import tunitas.number.wc.draw.Continuation.template
+namespace tunitas::number::wc::draw {
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::continuation(Emplace<mpz_class>, Inbound &inbound, Locale const &locale, Character first, String prior) -> Optional<String> {
+    //
+    // found so far: sign (that's the prior)
+    //
+    auto [peek, already, thatbase] = assess_base(inbound, locale, first);
+    if (pull_leading_digits(prior, inbound, locale, peek, already, thatbase)) {
+      return move(prior);
+    } else {
+      return {};
+    }
+  }
+}
+#endiv

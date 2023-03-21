@@ -1,8 +1,0 @@
-# This is a -*- Makefile -*- fragment.
-# For terms and provenance see the LICENSE file at the top of this repository.
-obj_src_tests_unit_outcome_SUBSOURCES = \
-  obj/src/tests/unit/outcome/namespace.cpp \
-  obj/src/tests/unit/outcome/Fixture.cpp \
-  obj/src/tests/unit/outcome/Outcome.cpp \
-  obj/src/tests/unit/outcome/Palette.cpp \
-  $(end)

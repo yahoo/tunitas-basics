@@ -1,3 +1,0 @@
-// -*- c++ -*- 9e0ee6ed-9a4e-40ab-9048-3a69b71be0d2
-#pragma once
-#include "mysql++/dbdriver.h"

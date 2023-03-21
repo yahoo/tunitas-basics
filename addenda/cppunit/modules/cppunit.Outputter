@@ -1,6 +1,0 @@
-// -*- c++ -*- c056ce2b-e1a8-4276-9deb-bf4dc9189dd4
-#pragma once
-#include <cppunit/Outputter.h>
-namespace cppunit {
-  using CppUnit::Outputter;
-}

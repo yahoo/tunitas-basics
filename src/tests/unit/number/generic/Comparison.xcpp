@@ -1,0 +1,72 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.required // cascade that certain 'namespace required'
+#import tunitas.number.required.Number
+namespace tests::unit::number::generic {
+  template<required::Number> class Comparison;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::number {
+  template<required::Number SUBJECT> struct generic::Comparison : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    Comparison();
+    //
+    using Subject = SUBJECT;
+    //
+    auto test_eq() -> void;
+    auto test_ne() -> void;
+    auto test_le() -> void;
+    auto test_lt() -> void;
+    auto test_ge() -> void;
+    auto test_gt() -> void;
+  protected:
+    Subject one, two, three;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::number::generic {
+  template<required::Number _> auto Comparison<_>::suite() -> Suite {
+    auto series = Stream{"comparisons"sv};
+    series << add("operator==", &Comparison::test_eq)
+           << add("operator!=", &Comparison::test_ne)
+           << add("operator<=", &Comparison::test_le)
+           << add("operator<", &Comparison::test_lt)
+           << add("operator>=", &Comparison::test_ge)
+           << add("operator>", &Comparison::test_gt)
+           << END;
+    return settle(series);
+  }
+  template<required::Number _> Comparison<_>::Comparison() : one{1l}, two{2l}, three{3l} { }
+  template<required::Number _> auto Comparison<_>::test_eq() -> void {
+    require(ASSERTION, one == one);
+    require(ASSERTION, not (one == two));
+  }
+  template<required::Number _> auto Comparison<_>::test_ne() -> void {
+    require(ASSERTION, one != two);
+    require(ASSERTION, not (one != one));
+  }
+  template<required::Number _> auto Comparison<_>::test_le() -> void {
+    require(ASSERTION, one <= one);
+    require(ASSERTION, one <= two);
+    require(ASSERTION, not (three <= two));
+  }
+  template<required::Number _> auto Comparison<_>::test_lt() -> void {
+    require(ASSERTION, one < two);
+    require(ASSERTION, not (two < one));
+  }
+  template<required::Number _> auto Comparison<_>::test_ge() -> void {
+    require(ASSERTION, two >= one);
+    require(ASSERTION, not (one >= two));
+  }
+  template<required::Number _> auto Comparison<_>::test_gt() -> void {
+    require(ASSERTION, three > two);
+    require(ASSERTION, not (three > three));
+  }
+}
+#endiv

@@ -1,0 +1,18 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number
+#import tunitas.error.Code
+namespace tunitas::number::wc {
+#if 13 <= __GNUC__
+  using E = error::Code;
+#else
+  // 0x626996 tsubst_copy ../../../worktrees/gcc-11/gcc/cp/pt.c:16676
+  using E = error::Code::Enumeration;
+#endif
+  namespace [[nodirectory]] traits { }
+}
+#endiv

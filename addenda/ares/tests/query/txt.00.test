@@ -1,5 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-set -e
-txt something.${TEST_DOMAIN?}
-txt dark-side.${TEST_DOMAIN?}

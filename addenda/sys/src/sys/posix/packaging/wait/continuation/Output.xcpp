@@ -1,9 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <fpp>
-#import sys.posix.packaging.wait.continuation.Output.WAIT2
-#import sys.posix.packaging.wait.continuation.Output.WAITPID
-#import sys.posix.packaging.wait.continuation.Output.WAITID
-#import sys.posix.packaging.wait.continuation.Output.WAIT3
-#import sys.posix.packaging.wait.continuation.Output.WAIT4
-#endiv

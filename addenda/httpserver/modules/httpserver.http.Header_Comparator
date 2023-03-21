@@ -1,6 +1,0 @@
-// -*- c++ -*- 075051c6-8f86-4505-bfc3-658a77461ae4
-#pragma once
-#include <httpserver>
-namespace httpserver::http {
-  using Header_Comparator = httpserver::http::header_comparator;
-}

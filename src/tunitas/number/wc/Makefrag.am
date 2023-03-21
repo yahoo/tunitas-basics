@@ -1,0 +1,24 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_number_wc_SUBSOURCES = \
+  obj/src/tunitas/number/from_string.cpp \
+  obj/src/tunitas/number/from_string_view.cpp \
+  obj/src/tunitas/number/to_string.cpp \
+  obj/src/tunitas/number/wc/namespace.cpp \
+  obj/src/tunitas/number/wc/widen.cpp \
+  obj/src/tunitas/number/wc/narrow.cpp \
+  obj/src/tunitas/number/wc/from_string.cpp \
+  obj/src/tunitas/number/wc/from_string_view.cpp \
+  obj/src/tunitas/number/wc/to_numeric.cpp \
+  obj/src/tunitas/number/wc/traits.Numeric.cpp \
+  obj/src/tunitas/number/wc/to_string.cpp \
+  $(tunitas_number_wc_draw_SUBSOURCES) \
+  $(tunitas_number_wc_required_SUBSOURCES) \
+  $(end)
+#
+include src/tunitas/number/wc/draw/Makefrag.am
+include src/tunitas/number/wc/required/Makefrag.am

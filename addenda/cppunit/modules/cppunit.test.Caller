@@ -1,8 +1,0 @@
-// -*- c++ -*- f43e647c-9fd1-40b3-ac47-49a80e1da8df
-#pragma once
-#include <cppunit/TestCaller.h>
-namespace cppunit {
-  namespace test {
-    template<typename CLASS> using Caller = CppUnit::TestCaller<CLASS>;
-  }
-}

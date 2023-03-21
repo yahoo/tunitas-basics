@@ -1,0 +1,79 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#forward tunitas.number.mp.Generic
+namespace tunitas::number::mp {
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Carrier CARRIER> inline auto operator<<(std::basic_ostream<CHAR, TRAITS> &, Generic<CARRIER> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Carrier CARRIER> inline auto operator>>(std::basic_istream<CHAR, TRAITS> &, Generic<CARRIER> &) -> std::basic_istream<CHAR, TRAITS> &;
+}
+#endiv
+#divert <ipp>
+#import std.basic_ostringstream
+#import std.basic_string
+#import tunitas.number.wc.draw_from_stream
+#import tunitas.number.wc.to_numeric
+#import tunitas.number.exception.Stream
+namespace tunitas::number::mp {
+  template<required::Character CHAR, required::Character_Traits TRAITS, mp::required::Carrier CARRIER> auto mp::operator<<(std::basic_ostream<CHAR, TRAITS> &o, Generic<CARRIER> const &n) -> std::basic_ostream<CHAR, TRAITS> & {
+    if constexpr (std::same_as<CHAR, char> && std::same_as<TRAITS, std::char_traits<char>>) {
+      // easy-peasy because because <gmpxx.h> provides a single narrow-character-standard-traits implementation
+      return o << n.impl;
+    } else if constexpr (std::same_as<CHAR, char>) {
+      // non-standard traits?  we do feel lucky.  This is a policy choice.
+      return o << n.impl;
+    } else if constexpr (std::same_as<CHAR, char8_t>) {
+      // we believe that char8_t is "basically the same" for the numeric representation characters (i.e. digits, signage, expontents)
+      auto narrow_buffer = std::basic_ostringstream<char>{};
+      narrow_buffer << n.impl;
+      for (auto representation=narrow_buffer.str(); auto c : representation) {
+        o << char8_t(c); // our belief is a direct cast will "work" um "well enough" in lieu of o.widen(char) -> char8_t
+      }
+      return o;
+    } else {
+      //
+      // the multi-byte characters (wchar_t, char16_t, char32_t)
+      //
+      auto narrow_buffer = std::basic_ostringstream<char>{};
+      narrow_buffer << n.impl;
+      for (auto representation=narrow_buffer.str(); auto c : representation) {
+        // g++ (GCC) 11.2.1 20210827
+        // This is expected to work for wchar_t
+        // This is expected to throw bad_cast for char16_t, char32_t ... because nobody defined a widening conversion as such
+        o << o.widen(c);
+      }
+      return o;
+    }
+  }
+  template<required::Character CHAR, required::Character_Traits TRAITS, required::Carrier CARRIER> auto mp::operator>>(std::basic_istream<CHAR, TRAITS> &i, Generic<CARRIER> &n) -> std::basic_istream<CHAR, TRAITS> & try {
+    using Input = std::basic_istream<CHAR, TRAITS>;
+    if constexpr (std::same_as<CHAR, char> && std::same_as<TRAITS, std::char_traits<char>>) {
+      // easy-peasy because because <gmpxx.h> provides a single narrow-character-standard-traits implementation
+      return i >> n.impl;
+    } else if constexpr (std::same_as<CHAR, char>) {
+      // non-standard traits?  we do feel lucky.  This is a policy choice.
+      return i >> n.impl;
+    } else {
+      //
+      // Dubious, but this is basically what gmpxx's narrow character implementation does.
+      // It functions "well enough" on correct input; on incorrect input, it leaves the stream in an unspecified position.
+      //
+      if (auto got=wc::draw_from_stream<CARRIER>(i); i) {
+        try {
+          if (!got) {
+            i.setstate(Input::failbit);
+          } else {
+            n.impl = wc::to_numeric<CARRIER>(*got, i);
+          }
+        } catch (std::invalid_argument const &) {
+          i.setstate(Input::failbit);
+        }
+      }
+      return i;
+    }
+  } catch (std::ios_base::failure const &theirs) {
+    throw exception::Stream{theirs};
+  }
+}
+#endiv

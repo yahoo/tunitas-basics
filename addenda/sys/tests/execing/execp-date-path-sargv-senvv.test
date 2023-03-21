@@ -1,3 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-execing execp-path-sargv-senvv date +%s

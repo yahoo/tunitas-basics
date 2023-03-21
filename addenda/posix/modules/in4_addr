@@ -1,4 +1,0 @@
-// -*- c++ -*- 32f7ed84-e3b2-4df5-b5ff-a31f1be83f08
-#pragma once
-#include <netinet/in.h>
-using in4_addr = in_addr; // yep, we just did that at global scope

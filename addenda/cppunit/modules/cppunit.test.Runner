@@ -1,8 +1,0 @@
-// -*- c++ -*- 36b9f911-0e4c-4863-acef-755a5b10f77d
-#pragma once
-#include <cppunit/TestRunner.h>
-namespace cppunit {
-  namespace test {
-    using Runner = CppUnit::TestRunner;
-  }
-}

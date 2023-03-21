@@ -1,0 +1,21 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.wc
+#import tunitas.number.required
+#import nonstd.required.iterator
+namespace tunitas::number::wc::required {
+  using namespace number::required;
+  namespace [[nodirectory]] string { }
+  namespace [[nodirectory]] iterator { using namespace nonstd::required::iterator; }
+}
+// Because nearly every string conversion opeation requires these
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import nonstd.required.Allocator
+#import std.char_traits
+#import std.allocator
+#endiv

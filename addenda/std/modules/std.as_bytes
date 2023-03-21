@@ -1,3 +1,0 @@
-// -*- c++ -*-01c80d5f-2f66-471c-895a-2ed4519b067f
-#pragma once
-#include <std.span> // contains all the #ifdefs

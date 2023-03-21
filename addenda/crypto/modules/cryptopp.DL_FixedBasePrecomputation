@@ -1,4 +1,0 @@
-// -*- c++ -*- 16dfba1e-4e53-44b1-b206-d0170bc45e39
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/eprecomp.h>

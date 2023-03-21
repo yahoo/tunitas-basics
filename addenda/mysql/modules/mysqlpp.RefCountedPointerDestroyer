@@ -1,3 +1,0 @@
-// -*- c++ -*- 9781c28a-be8d-40ae-a27b-49af61226625
-#pragma once
-#include "mysql++/refcounted.h"

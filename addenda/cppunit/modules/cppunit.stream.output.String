@@ -1,6 +1,0 @@
-// -*- c++ -*- 23ef2ced-937c-4efa-a167-fa5ea8794f04
-#pragma once
-#include <cppunit/portability/Stream.h>
-namespace cppunit::stream::output {
-  using Stream = CppUnit::OStringStream;
-}

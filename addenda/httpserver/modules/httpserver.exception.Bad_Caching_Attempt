@@ -1,6 +1,0 @@
-// -*- c++ -*- 68416840-c78c-4acd-9fdd-99d96f7b34ae
-#pragma once
-#include <httpserver>
-namespace httpserver::exception {
-  using Bad_Caching_Attempt = httpserver::bad_caching_attempt;
-}

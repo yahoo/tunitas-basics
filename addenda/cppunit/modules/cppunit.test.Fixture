@@ -1,8 +1,0 @@
-// -*- c++ -*- 4dc78776-f94b-4267-b412-65ab0c1c3dd7
-#pragma once
-#include <cppunit/TestCase.h>
-namespace cppunit {
-  namespace test {
-    using Fixture = CppUnit::TestFixture;
-  }
-}

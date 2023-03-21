@@ -1,3 +1,0 @@
-// -*- c++ -*- 1c9974f1-b262-4e4d-ab8f-57b881bb8b97
-#pragma once
-#include "mysql++/datetime.h"

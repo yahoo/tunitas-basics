@@ -1,8 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <hpp>
-#import openssl.pem.from_string_view.evp.PKey
-#import openssl.pem.from_string_view.x509.Crl
-#import openssl.pem.from_string_view.x509.Crt
-#import openssl.pem.from_string_view.x509.Req
-#endiv

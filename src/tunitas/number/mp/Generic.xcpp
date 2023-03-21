@@ -1,0 +1,219 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.mp.required.Carrier
+namespace tunitas::number::mp {
+  //
+  // Something about a big number (integer, rational, floating)
+  //
+  // Specification:
+  //
+  //   Really big (signed) numbers (integer, rational, floating)
+  //
+  // Design:
+  //
+  //   Necessarily follows the design of gmp++
+  //   The expressions return an unspecified expression type.
+  //   Lazy evaluation is used to defer evaluation until assignment.
+  //
+  //   <quote>
+  //     Results of operators and functions are instances of __gmp_expr<T, U>.
+  //     T determines the numerical type of the expression: it can be either mpz_t, mpq_t, or mpf_t.
+  //     When the arguments of a binary expression have different numerical types, __gmp_resolve_expr is used to determine the "larger" type.
+  //     U is either __gmp_unary_expr<V, Op> or __gmp_binary_expr<V, W, Op>, where V and W are the arguments' types.
+  //     They can in turn be expressions, thus allowing to build compound expressions to any degree of complexity.
+  //     Op is a function object that must have an eval() method accepting appropriate arguments.
+  //     Actual evaluation of a __gmp_expr<T, U> object is done when it gets assigned to an mp*_class
+  //     ("lazy" evaluation): this is done by calling its eval() method. */
+  //   </quote>
+  //
+  // Usage:
+  //
+  //   auto n0 = Integer{0};
+  //   auto n1 = Integer{1};
+  //   auto n2a = n1 + n0;
+  //   auto n2b = n1 * n0;
+  //
+  template<required::Carrier> class Generic;
+}
+#endiv
+#divert <hpp>
+#import nonstd.int128_t
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import nonstd.required.integer.Signed
+#import std.basic_ostream
+#import std.basic_istream
+#import std.floating_point
+#import std.same_as
+#import std.strong_ordering
+#import tunitas.number.mp.io // so that they can be declared as friends
+namespace tunitas::number {
+  namespace mp {
+    using std::move;
+    template<required::Carrier CARRIER> inline auto swap(Generic<CARRIER> &, Generic<CARRIER> &) noexcept -> void;
+  }
+  template<mp::required::Carrier CARRIER> struct mp::Generic {
+  protected:
+    using Carrier = CARRIER;
+    template<required::Carrier SIGNATURE> using Emplace = std::in_place_type_t<SIGNATURE>;
+    template<typename LHS, typename RHS> using Expression = __gmp_expr<LHS, RHS>;
+    template<typename LHS, typename RHS> inline [[implicit]] Generic(Emplace<Carrier>, Expression<LHS, RHS> const &);
+    template<typename LHS, typename RHS> inline [[implicit]] Generic(Emplace<Carrier>, Expression<LHS, RHS> &&);
+    // only meaningfully accessible from mp::Floating
+    template<typename FLOATIE> inline [[implicit]] Generic(Emplace<mpf_class>, FLOATIE, Precision) requires (std::floating_point<FLOATIE> && std::same_as<mpf_class, Carrier>);
+    template<typename LHS, typename RHS> inline [[implicit]] Generic(Emplace<mpf_class>, Expression<LHS, RHS> const &, Precision);
+  public:
+    Generic() = default;
+    inline [[implicit]] Generic(signed char);
+    inline [[implicit]] Generic(int short signed);
+    inline [[implicit]] Generic(int signed);
+    inline [[implicit]] Generic(int long signed);
+    inline [[implicit]] Generic(int long long signed);
+    inline [[implicit]] Generic(nonstd::int128_t);
+    // There is no UNsigned sense at all; you must use unary operator- expression to create that
+    Generic(char unsigned) = delete;
+    Generic(int short unsigned) = delete;
+    Generic(int unsigned) = delete;
+    Generic(int long unsigned) = delete;
+    Generic(int long long unsigned) = delete;
+    inline [[implicit]] Generic(Carrier &&); // this is "eval"
+    Generic(Generic const &) = default;
+    auto operator=(Generic const &) -> Generic & = default; // because there are other operator op=(...)
+    Generic(Generic &&) = default;
+    auto operator=(Generic &&) -> Generic & = default;
+#if 202312 < __cplusplus
+    template<typename SELF> inline auto operator+=(this SELF *, Generic const &) -> SELF &;
+    template<typename SELF> inline auto operator-=(this SELF *, Generic const &) -> SELF &;
+    template<typename SELF> inline auto operator*=(this SELF *, Generic const &) -> SELF &;
+    template<typename SELF> inline auto operator%=(this SELF *, Generic const &) -> SELF &;
+    template<typename SELF> inline auto operator/=(this SELF *, Generic const &) -> SELF &;
+    template<typename SELF> inline auto operator<<=(this SELF *, unsigned) -> SELF &;
+    template<typename SELF> inline auto operator>>=(this SELF *, unsigned) -> SELF &;
+    template<typename SELF> auto operator<<=(this SELF *, signed) -> SELF & = delete;
+    template<typename SELF> auto operator>>=(this SELF *, signed) -> SELF & = delete;
+#else
+    inline auto operator+=(Generic const &) -> Generic &;
+    inline auto operator-=(Generic const &) -> Generic &;
+    inline auto operator*=(Generic const &) -> Generic &;
+    inline auto operator%=(Generic const &) -> Generic &;
+    inline auto operator/=(Generic const &) -> Generic &;
+    inline auto operator<<=(unsigned) -> Generic &;
+    inline auto operator>>=(unsigned) -> Generic &;
+    auto operator<<=(signed) -> Generic & = delete;
+    auto operator>>=(signed) -> Generic & = delete;
+#endif
+    //
+    // The get<SIGNED>() throws exception::Range if false == fits<SIGNED>()
+    template<required::integer::Signed SIGNED> inline auto get() const -> SIGNED;
+    template<required::integer::Signed SIGNED> inline auto fits() const -> bool;
+  protected:
+    Carrier impl{};
+    // Why yes, we do have to declare-declare-define this thrice.
+    // All because we don't want the declaration-definition body right here in the class definition.
+    friend auto swap<>(Generic &, Generic &) noexcept -> void;
+    //
+#if 10 < __GNUC__
+    friend auto operator==(Generic const &a, Generic const &b) -> bool { return a.impl == b.impl; }
+    friend auto operator<=>(Generic const &a, Generic const &b) -> std::strong_ordering {
+#if 0
+      // gmp-devel-6.1.2-8.fc29.x86_64 - there begin no opreator<=> on the mp{z,q,f}_class types ... yet 
+      return a.impl <=> b.impl;
+#else
+      if (a.impl < b.impl) {
+        return std::strong_ordering::less;
+      } else if (a.impl > b.impl) {
+        return std::strong_ordering::greater;
+      } else {
+        return std::strong_ordering::equal;
+      }
+#endif
+    }
+#else
+    friend auto operator==(Generic const &a, Generic const &b) -> bool { return a.impl == b.impl; }
+    friend auto operator!=(Generic const &a, Generic const &b) -> bool { return a.impl != b.impl; }
+    friend auto operator<(Generic const &a, Generic const &b) -> bool  { return a.impl < b.impl; }
+    friend auto operator<=(Generic const &a, Generic const &b) -> bool { return a.impl <= b.impl; }
+    friend auto operator>(Generic const &a, Generic const &b) -> bool  { return a.impl > b.impl; }
+    friend auto operator>=(Generic const &a, Generic const &b) -> bool { return a.impl >= b.impl; }
+#endif
+    //
+    friend auto operator+(Generic &&a)      { return move(a); }
+    friend auto operator+(Generic const &a) { return a; }
+    friend auto operator-(Generic &&a)      { return - move(a.impl); }
+    friend auto operator-(Generic const &a) { return - a.impl; }
+    //
+    friend auto operator+(Generic const &a, Generic const &b) { return a.impl + b.impl; }
+    template<typename LHS, typename RHS> friend auto operator+(Generic const &a, Expression<LHS, RHS> const &b) { return a.impl + b; }
+    template<typename LHS, typename RHS> friend auto operator+(Expression<LHS, RHS> const &a, Generic const &b) { return a + b.impl; }
+    //
+    friend auto operator-(Generic const &a, Generic const &b) { return a.impl - b.impl; }
+    template<typename LHS, typename RHS> friend auto operator-(Generic const &a, Expression<LHS, RHS> const &b) { return a.impl - b; }
+    template<typename LHS, typename RHS> friend auto operator-(Expression<LHS, RHS> const &a, Generic const &b) { return a - b.impl; }
+    //
+    friend auto operator*(Generic const &a, Generic const &b) { return a.impl * b.impl; }
+    template<typename LHS, typename RHS> friend auto operator*(Generic const &a, Expression<LHS, RHS> const &b) { return a.impl * b; }
+    template<typename LHS, typename RHS> friend auto operator*(Expression<LHS, RHS> const &a, Generic const &b) { return a * b.impl; }
+    //
+    friend auto operator/(Generic const &a, Generic const &b) { return a.impl / b.impl; }
+    template<typename LHS, typename RHS> friend auto operator/(Generic const &a, Expression<LHS, RHS> const &b) { return a.impl / b; }
+    template<typename LHS, typename RHS> friend auto operator/(Expression<LHS, RHS> const &a, Generic const &b) { return a / b.impl; }
+    //
+    friend auto operator%(Generic const &a, Generic const &b) { return a.impl % b.impl; }
+    template<typename LHS, typename RHS> friend auto operator%(Generic const &a, Expression<LHS, RHS> const &b) { return a.impl % b; }
+    template<typename LHS, typename RHS> friend auto operator%(Expression<LHS, RHS> const &a, Generic const &b) { return a % b.impl; }
+    //
+    friend auto operator>>(Generic const &a, unsigned b) { return a.impl >> b; } // ... because nobody trusts division
+    friend auto operator<<(Generic const &a, unsigned b) { return a.impl << b; } // ... multiplication
+    friend auto operator&(Generic const &a, unsigned b) { return a.impl & b; } // ..... modulo (2^k)
+    friend auto operator|(Generic const &a, unsigned b) { return a.impl | b; } // ..... addition (half)
+    //
+    template<required::Character CHAR, required::Character_Traits TRAITS, mp::required::Carrier R> friend auto mp::operator<<(std::basic_ostream<CHAR, TRAITS> &, Generic<R> const &) -> std::basic_ostream<CHAR, TRAITS> &;
+    template<required::Character CHAR, required::Character_Traits TRAITS, mp::required::Carrier R> friend auto mp::operator>>(std::basic_istream<CHAR, TRAITS> &, Generic<R> &) -> std::basic_istream<CHAR, TRAITS> &;
+  };
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.mp.convert
+#import tunitas.number.mp.get.Extract
+#import tunitas.number.mp.get.Fits
+#import std.same_as
+namespace tunitas::number {
+  template<mp::required::Carrier MP> auto mp::swap(Generic<MP> &a, Generic<MP> &b) noexcept -> void { swap(a.impl, b.impl); }
+  namespace mp {
+    template<required::Carrier _>  Generic<_>::Generic(Carrier &&impl) : impl{forward<Carrier>(impl)} { }
+    template<required::Carrier _>  Generic<_>::Generic(char signed value) : Generic{(int long signed) value} { }
+    template<required::Carrier _>  Generic<_>::Generic(int short signed value) : Generic{(int long signed) value} { }
+    template<required::Carrier _>  Generic<_>::Generic(int signed value) : Generic{(int long  signed) value} { }
+    template<required::Carrier _>  Generic<_>::Generic(int long signed value) : impl{value} { }
+    template<required::Carrier _>  Generic<_>::Generic(int long long signed value) {
+      static_assert(sizeof (value) <= sizeof (int long signed)); // because mpz does not have a long 'long'  variant constructor
+      impl = Carrier{(int long signed) value};
+    }
+    template<required::Carrier _>  Generic<_>::Generic(int128_t value) : impl{convert<Carrier>(value)} { }
+#if 0 // no more ... see evaluate(...)
+    template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Expression<LHS, RHS> const &expression) : impl{expression} { }
+    template<required::Carrier _> template<typename LHS, typename RHS> auto Generic<_>::operator=(Expression<LHS, RHS> const &expression) -> Generic & {
+      impl = expression; // the magic of evaluation happens right here
+      return *this;
+    }
+#endif
+    template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Emplace<Carrier>, Expression<LHS, RHS> const &expression) : impl{expression} { }
+    template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Emplace<Carrier>, Expression<LHS, RHS> &&expression) : impl{move(expression)} { }
+    template<required::Carrier _> template<typename FLOATIE> Generic<_>::Generic(Emplace<mpf_class>, FLOATIE mcfloatface, Precision precision) requires (std::floating_point<FLOATIE> && std::same_as<mpf_class, Carrier>) : impl{mcfloatface, underlying(precision)} { }
+    template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Emplace<mpf_class>, Expression<LHS, RHS> const &expression, Precision precision) : impl{expression, underlying(precision)} { }
+    template<required::Carrier _> auto Generic<_>::operator+=(Generic const &b) -> Generic & { impl += b.impl; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator-=(Generic const &b) -> Generic & { impl -= b.impl; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator*=(Generic const &b) -> Generic & { impl *= b.impl; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator%=(Generic const &b) -> Generic & { impl %= b.impl; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator/=(Generic const &b) -> Generic & { impl /= b.impl; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator<<=(unsigned b) -> Generic & { impl <<= b; return *this; }
+    template<required::Carrier _> auto Generic<_>::operator>>=(unsigned b) -> Generic & { impl >>= b; return *this; }
+    template<required::Carrier _> template<required::integer::Signed SIGNED> auto Generic<_>::get() const -> SIGNED { return get::Extract<SIGNED>::get(impl); }
+    template<required::Carrier _> template<required::integer::Signed SIGNED> auto Generic<_>::fits() const -> bool  { return get::Fits<SIGNED>::fit(impl); }
+  }
+}
+#endiv

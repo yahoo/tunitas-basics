@@ -1,9 +1,0 @@
-// -*- c++ -*- 7f1e274a-bd07-449c-a9b8-f53ad03ef7c1
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-
-// blik ... there are ugly order dependencies here.
-// which are all recorded in just one place.
-#include <cryptopp.PKCS5_PBKDF2_HMAC>
-
-#include <cryptopp/pwdbased.h>

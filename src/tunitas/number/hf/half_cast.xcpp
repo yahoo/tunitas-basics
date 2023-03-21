@@ -1,0 +1,35 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tunitas.number.hf.Float
+namespace tunitas::number::hf {
+  //
+  // Cast to a half-precision float
+  //
+  // Specification:
+  //
+  // Design:
+  //
+  // Usage:
+  //   half a = half_cast<half>(4.2);
+  //   half b = half_cast<half,std::numeric_limits<float>::round_style>(4.2f);
+  //   1        == half_cast<int, std::round_to_nearest>( 0.7_h )
+  //   4096.0_h == half_cast<half,std::round_toward_zero>( 4097 )
+  //   4100.0_h == half_cast<half,std::round_toward_infinity>( 4097 )
+  //   0.0_h     < half_cast<half,std::round_toward_infinity>( std::numeric_limits<double>::min() )
+  //
+  using half_float::half_cast;
+}
+#endiv
+#divert <cpp>
+#import std.float_round_style // unscoped enum values among them: round_toward_zero
+namespace {
+  namespace testate {
+    using namespace tunitas::number::hf;
+#if 0
+    // None of this is constexpr (yet?) as of half-1.2
+    static_assert(Float{4096.0} == half_cast<Float, std::round_toward_zero>(4097));
+#endif
+  }
+}
+#endiv

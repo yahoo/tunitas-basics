@@ -1,6 +1,0 @@
-// -*- c++ -*- 0f29d114-45f3-43a3-b0fd-109a41b399ab
-#pragma once
-#include <cppunit/Test.h>
-namespace cppunit {
-  using CppUnit::Test;
-}

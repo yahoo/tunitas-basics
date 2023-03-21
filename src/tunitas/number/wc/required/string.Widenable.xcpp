@@ -1,0 +1,45 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.basic_string
+#import nonstd.allocator.Traits
+#include <hpp/nonstd.allocator.Traits>
+#import nonstd.required.allocator.Producing
+#import nonstd.required.character.Type
+#import nonstd.required.character.Traits
+namespace tunitas::number::wc::required::string {
+  //
+  // Are these arguments suitable for string-based wc::widen<...>(...)?
+  // See the argument signature on the function declaration.
+  //
+  namespace [[eponymous]] widenable {
+    namespace [[eponymous]] result {
+      template<typename RESULT, typename WIDE_CHAR, typename WIDE_TRAITS, typename WIDE_ALLOCATOR> concept WideCHAR_WideTRAITS_WideALLOCATOR = requires(RESULT, WIDE_CHAR, WIDE_TRAITS, WIDE_ALLOCATOR) {
+        requires character::Type<WIDE_CHAR>;
+        requires character::Traits<WIDE_TRAITS, WIDE_CHAR>;
+        requires allocator::Producing<WIDE_ALLOCATOR, WIDE_CHAR>;
+        requires same_as<RESULT, std::basic_string<WIDE_CHAR, WIDE_TRAITS, WIDE_ALLOCATOR>>;
+      };
+      template<typename RESULT, typename WIDE_CHAR, typename NARROW_TRAITS, typename WIDE_ALLOCATOR> concept WideCHAR_NarrowTRAITS_WideALLOCATOR = requires(RESULT, WIDE_CHAR, NARROW_TRAITS narrow_traits, WIDE_ALLOCATOR) {
+        { []<typename SOME_CHAR, typename... OTHERS, template<typename, typename...> class GENERAL_TRAITS>(GENERAL_TRAITS<SOME_CHAR, OTHERS...>) requires WideCHAR_WideTRAITS_WideALLOCATOR<RESULT, WIDE_CHAR, GENERAL_TRAITS<WIDE_CHAR, OTHERS...>, WIDE_ALLOCATOR> {}(narrow_traits) };
+      };
+      template<typename RESULT, typename WIDE_CHAR, typename NARROW_TRAITS, typename NARROW_ALLOCATOR> concept WideCHAR_NarrowTRAITS_NarrowALLOCATOR = requires(RESULT, WIDE_CHAR, NARROW_TRAITS, NARROW_ALLOCATOR) {
+        requires WideCHAR_NarrowTRAITS_WideALLOCATOR<RESULT, WIDE_CHAR, NARROW_TRAITS, typename nonstd::allocator::Traits<NARROW_ALLOCATOR>::template rebind_alloc<WIDE_CHAR>>;
+      };
+      template<typename RESULT, typename WIDE_CHAR, typename NARROW_TRAITS, typename NARROW_ALLOCATOR> concept Similar_String = WideCHAR_NarrowTRAITS_NarrowALLOCATOR<RESULT, WIDE_CHAR, NARROW_TRAITS, NARROW_ALLOCATOR>;
+      template<typename RESULT, typename WIDE_CHAR, typename NARROW_TRAITS, typename NARROW_ALLOCATOR> concept Result = Similar_String<RESULT, WIDE_CHAR, NARROW_TRAITS, NARROW_ALLOCATOR>;
+    }
+    using result::Result;
+    template<typename RESULT, typename WIDE_CHAR, typename NARROW_TRAITS, typename NARROW_ALLOCATOR> concept Widenable = requires(RESULT, WIDE_CHAR, NARROW_TRAITS, NARROW_ALLOCATOR) {
+      requires character::Type<char>;
+      requires character::Traits<NARROW_TRAITS, char>; // this one is throwaway
+      requires allocator::Producing<NARROW_ALLOCATOR, char>;
+      requires Result<RESULT, WIDE_CHAR, NARROW_TRAITS, NARROW_ALLOCATOR>;
+    };
+  }
+  using widenable::Widenable;
+}
+#endiv

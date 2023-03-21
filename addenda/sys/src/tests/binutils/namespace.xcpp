@@ -1,3 +1,0 @@
-#divert <fpp>
-namespace tests::binutils { }
-#endiv

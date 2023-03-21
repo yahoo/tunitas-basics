@@ -1,0 +1,12 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_number_mp_required_SUBSOURCES = \
+  obj/src/tunitas/number/mp/required/namespace.cpp \
+  obj/src/tunitas/number/mp/required/Carrier.cpp \
+  obj/src/tunitas/number/mp/required/Medium.cpp \
+  obj/src/tunitas/number/mp/required/Small.cpp \
+  $(end)

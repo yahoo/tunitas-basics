@@ -1,7 +1,0 @@
-// -*- c++ -*- 7fe19cf2-093f-4601-b5c6-bf529558dd5e
-#pragma once
-#include <httpserver>
-namespace httpserver {
-  // Nearby is the builder httpserver::service::Create
-  using Service = httpserver::webserver;
-}

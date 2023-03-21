@@ -1,4 +1,0 @@
-// -*- c++ -*- 0980a229-de55-4225-95b2-c505ea99408c
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/gost.h>

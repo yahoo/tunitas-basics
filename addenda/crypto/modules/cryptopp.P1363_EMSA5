@@ -1,4 +1,0 @@
-// -*- c++ -*- 675179e4-6cd6-4b88-84be-e45cd694fdee
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/esign.h>

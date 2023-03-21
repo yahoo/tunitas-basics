@@ -1,8 +1,0 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# For terms and provenance see the LICENSE file at the top of this repository.
-#
-# used in ../sys/Makefrag.am; included in the top-level Makefile.am
-src_std_SOURCES_SET = \
-  obj/src/std/is_error_code_enum/sys.e.Code.cpp \
-  obj/src/std/is_error_condition_enum/sys.e.Condition.cpp \
-  $(end)

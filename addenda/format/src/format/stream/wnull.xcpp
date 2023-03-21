@@ -1,9 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <fpp>
-#import format.stream.basic_null
-namespace format::stream {
-  // following std::iostream as std::basic_iostream<wchar_t>
-  using wnull = basic_null<wchar_t>;
-}
-#endiv

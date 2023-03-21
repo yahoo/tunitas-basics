@@ -1,4 +1,0 @@
-// -*- c++ -*- fbb29104-808f-42f7-9991-bab0a1473812
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/ida.h>

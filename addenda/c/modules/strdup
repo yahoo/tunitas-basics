@@ -1,6 +1,0 @@
-// -*- c++ -*- 816ecf00-8832-4c0a-a709-6248d4e7672e
-#pragma once
-// There is some sturm und drang about strdup, _strdup and std::strdup
-// http://pubs.opengroup.org/onlinepubs/9699919799/functions/strdup.html
-// https://linux.die.net/man/3/strdup
-#include <cstring> 

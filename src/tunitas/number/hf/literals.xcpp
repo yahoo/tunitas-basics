@@ -1,0 +1,28 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::hf {
+  namespace literals {
+    // They say "literal" as in the singular; but "everyone else" uses plural for these things.
+    using namespace half_float::literal;
+  }
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.hf.Float
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::number::hf::literals;
+    static_assert(HALF_ENABLE_CPP11_USER_LITERALS);
+    static_assert(sizeof (4096.0_h));
+    //
+    // NO SUCH ---> static_assert(sizeof (4096_h));
+    // (reminder: you have to start out with a floating-point literal)
+  }
+}
+#endiv

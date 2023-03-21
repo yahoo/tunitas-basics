@@ -1,4 +1,0 @@
-// -*- c++ -*- 436121c8-9021-4dbe-9ddf-82727df0f481
-#pragma once
-#include <sys/types.h>
-#include <sys/wait.h>

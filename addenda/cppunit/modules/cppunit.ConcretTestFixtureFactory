@@ -1,6 +1,0 @@
-// -*- c++ -*- 4bc66687-a7ac-4d59-9822-7a66491672bf
-#pragma once
-#include <cppunit/extensions/TestFixtureFactory.h>
-namespace cppunit {
-  using CppUnit::ConcretTestFixtureFactory;
-}

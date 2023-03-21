@@ -1,3 +1,0 @@
-// -*- c++ -*- 001317d6-3ff0-42fe-a67d-564cd9449137
-#pragma once
-#include <poll.h>

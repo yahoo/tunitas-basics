@@ -1,0 +1,123 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.required // cascade that certain 'namespace required'
+#import tunitas.number.required.Number
+namespace tests::unit::number::generic {
+    template<required::Number> class Expression;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::number {
+  template<required::Number SUBJECT> struct generic::Expression : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    //
+    auto test_add() -> void;
+    auto test_sub() -> void;
+    auto test_mul() -> void;
+    auto test_div() -> void;
+    auto test_mod() -> void;
+    auto test_lsh() -> void;
+    auto test_rsh() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::number::generic {
+  template<required::Number _> auto Expression<_>::suite() -> Suite {
+    auto series = Stream{"expressions"sv};
+    series << []{
+                auto ade = Stream{"add"sv};
+                ade << add("Number,Number", &Expression::test_add)
+                    << END;
+                return ade;
+              }()
+           << []{
+                auto sub = Stream{"sub"sv};
+                sub << add("Number,Number", &Expression::test_sub)
+                    << END;
+                return sub;
+              }()
+           << []{
+                auto mul = Stream{"mul"sv};
+                mul << add("Number,Number", &Expression::test_mul)
+                    << END;
+                return mul;
+              }()
+           << []{
+                auto div = Stream{"div"sv};
+                div << add("Number,Number", &Expression::test_div)
+                    << END;
+                return div;
+              }()
+           << []{
+                auto div = Stream{"mod"sv};
+                div << add("Number,Number", &Expression::test_mod)
+                    << END;
+                return div;
+              }()
+           << []{
+                auto lsh = Stream{"lsh"sv};
+                lsh << add("Number,Number", &Expression::test_lsh)
+                    << END;
+                return lsh;
+              }()
+           << []{
+                auto rsh = Stream{"rsh"sv};
+                rsh << add("Number,Number", &Expression::test_rsh)
+                    << END;
+                return rsh;
+              }()
+           << END;
+    return settle(series);
+  }
+  template<required::Number _> auto Expression<_>::test_add() -> void {
+    auto const one = Subject{1l};
+    auto const two = Subject{2l};
+    auto const three = Subject{3l};
+    require(ASSERTION, three == Subject{one + two});
+  }
+  template<required::Number _> auto Expression<_>::test_sub() -> void {
+    auto const one = Subject{1l};
+    auto const two = Subject{2l};
+    auto const three = Subject{3l};
+    require(ASSERTION, two == Subject{three - one});
+  }
+  template<required::Number _> auto Expression<_>::test_mul() -> void {
+    auto const six = Subject{6l};
+    auto const two = Subject{2l};
+    auto const three = Subject{3l};
+    require(ASSERTION, six == Subject{two * three});
+  }
+  template<required::Number _> auto Expression<_>::test_div() -> void {
+    auto const six = Subject{6l};
+    auto const two = Subject{2l};
+    auto const three = Subject{3l};
+    require(ASSERTION, three == Subject{six / two});
+  }
+  template<required::Number _> auto Expression<_>::test_mod() -> void {
+    if constexpr (std::same_as<Subject, library::Integer>) {
+      // only integers have a modulus
+      auto const five = Subject{5l};
+      auto const two = Subject{2l};
+      auto const three = Subject{3l};
+      require(ASSERTION, two == Subject{five % three});
+    }
+  }
+  template<required::Number _> auto Expression<_>::test_lsh() -> void {
+    auto const one = Subject{1l};
+    auto const eight = Subject{8l};
+    require(ASSERTION, eight == Subject{one << 3});
+  }
+  template<required::Number _> auto Expression<_>::test_rsh() -> void {
+    auto const sixteen = Subject{16l};
+    auto const two = Subject{2l};
+    require(ASSERTION, two == Subject{sixteen >> 3});
+  }
+}
+#endiv

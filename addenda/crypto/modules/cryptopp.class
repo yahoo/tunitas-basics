@@ -1,4 +1,0 @@
-// -*- c++ -*- d1c74068-9bb4-4fda-9dbf-5e346c225b53
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/nbtheory.h>

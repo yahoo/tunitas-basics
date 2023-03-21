@@ -1,0 +1,37 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::exception {
+  //
+  // The aspect of being a number exception
+  //
+  // Specification:
+  //
+  //   You Know.
+  //   Is abstract.
+  //
+  // Design:
+  //
+  //   Descendants only.
+  //
+  // Usage:
+  //
+  //   By mixin, typically with complete::Blended or the moral equivalent thereof.
+  //
+  struct Aspect;
+}
+#endiv
+#divert <hpp>
+class tunitas::number::exception::Aspect {
+protected:
+  virtual ~Aspect() = default;
+public:
+  struct Results {
+    using What = char const *;
+  };
+  virtual auto what() const noexcept -> Results::What = 0;
+};
+#endiv

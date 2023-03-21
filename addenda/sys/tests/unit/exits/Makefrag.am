@@ -1,8 +1,0 @@
-tests_unit_exits_TESTS = \
-  tests/unit/exits/cases.test \
-  tests/unit/exits/Category.test \
-  tests/unit/exits/Code.test \
-  tests/unit/exits/Condition.test \
-  tests/unit/exits/Exception.test \
-  tests/unit/exits/Quitting.test \
-  $(end)

@@ -1,4 +1,0 @@
-// -*- c++ -*- 1dc045ef-7eba-42d0-8fef-d7e967a89701
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/blowfish.h>

@@ -1,6 +1,0 @@
-// -*- c++ -*- fb19b449-66e9-45c0-a657-121d12d0cae0
-#pragma once
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <sys/wait.h>

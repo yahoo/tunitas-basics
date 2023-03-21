@@ -1,4 +1,0 @@
-// -*- c++ -*- 1b29d66e-f6ac-4ccc-bc39-57659b343a6c
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/seckey.h>

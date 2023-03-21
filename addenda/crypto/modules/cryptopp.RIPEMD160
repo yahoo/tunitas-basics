@@ -1,4 +1,0 @@
-// -*- c++ -*- fd3f2dc3-53af-4b86-8c6b-39e0607f2b6b
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/ripemd.h>

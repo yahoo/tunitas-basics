@@ -1,3 +1,0 @@
-// -*- c++ -*- 4adfea4d-1233-48b5-afc4-2650c35f40b4
-#pragma once
-#include "mysql++/manip.h"

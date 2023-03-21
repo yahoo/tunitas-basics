@@ -1,4 +1,0 @@
-// -*- c++ -*- eb59f300-a8ab-4e12-80ba-eb91841c9252
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/camellia.h>

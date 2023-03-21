@@ -1,4 +1,0 @@
-// -*- c++ -*- 590f0bf3-c88f-4ec1-a321-99040cc4ab84
-#pragma once
-// Must reference as <ctime> not <time.h> in order to place gmtime as std::gmtime
-#include <ctime>

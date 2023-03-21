@@ -1,6 +1,0 @@
-// -*- c++ -*- 0c3ba539-6543-4e48-9bb3-0c132091db55
-#pragma once
-#include <httpserver>
-namespace httpserver {
-  using Response = httpserver::http_response;
-}

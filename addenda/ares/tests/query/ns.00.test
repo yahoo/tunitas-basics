@@ -1,9 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-# there will have to be NS records for the SOA domain
-ns ${TEST_SOA?}
-# there may or may not be NS records for 
-# DO NOT ----> ns ${TEST_DOMAIN?} <---- DO NOT
-#
-# there will be NS records for this pretend delegation (we put them there)
-# ns shoreditch.${TEST_DOMAIN?}

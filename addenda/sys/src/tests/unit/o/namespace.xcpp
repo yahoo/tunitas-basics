@@ -1,7 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <fpp>
-#warning WATCHOUT - GCC will SILENTLY NOT include this file because of the '.o' suffix from gcc-cpp (gcc-c++-8.2.1-5.fc29.x86_64) or even gcc (GCC) 9.3.1 20200413
-// in case this works ...
-#import tests.unit.o.__library
-#endiv

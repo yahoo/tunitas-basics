@@ -1,3 +1,0 @@
-// -*- c++ -*- 2756cb1d-4757-43a4-90bd-d4c80c27036f
-#pragma once
-#include "mysql++/sql_types.h"

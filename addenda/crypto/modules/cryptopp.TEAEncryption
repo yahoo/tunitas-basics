@@ -1,4 +1,0 @@
-// -*- c++ -*- f6abbb03-22dd-4f44-9aca-762b64c9c45c
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/tea.h>

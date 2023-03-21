@@ -1,6 +1,0 @@
-// -*- c++ -*- 098308ac-781c-4487-95db-edf69283e4de
-#pragma once
-#include <cppunit/plugin/TestPlugInDefaultImpl.h>
-namespace cppunit::plugin {
-  using TestDefaultImplementation = CppUnit::TestPlugInDefaultImpl;
-}

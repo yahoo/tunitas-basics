@@ -1,3 +1,0 @@
-#!/bin/sh
-source ${0%/*}/rigging.sh || exit 70
-${exe?} ec C=US ST=CA L='Palo Alto' O='Ambigous Dogtooth' OU='Finance' CN='*.example.com'

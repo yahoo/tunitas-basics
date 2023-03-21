@@ -1,4 +1,0 @@
-// -*- c++ -*- b4ae2c07-b6a6-4a48-adb0-66e73caa97f3
-#pragma once
-// Whereas there is no header file that only gives this namespace, we utter it ourselves.
-namespace cppunit { }

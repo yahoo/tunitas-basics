@@ -1,0 +1,169 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.wc.draw.required // cascade that certain 'namespace required'
+namespace tunitas::number::wc::draw {
+  //
+  // The bundling of the types and the functions.
+  //
+  // Specification:
+  //
+  //   Continue after the sign to parse among {mpz,mpq,mpf}_class
+  //
+  // Grammar:
+  //
+  //   mpq_class ::= [-+]? \d+
+  //   mpq_class ::= [-+]? \d+
+  //                 [-+]? \d+ / \d+
+  //   mpf_class ::= [-+]? \d+
+  //                 [-+]? \d+ \. \d*
+  //                 [-+]? \d+ [eE] [-+? \d+
+  //                 [-+]? \d+ \. \d* [eE] [-+? \d+
+  //
+  // Design:
+  //
+  //   No allocator (i.e. the default allocator)
+  //
+  //   The continuation(...) functions accept a single lookahead character.
+  //   They return Optional<String>
+  //   They side effect the inbound, leaving it precisely after the parsed number; i.e. next get(...) will return that character or EOF
+  //
+  //   hexfloat is recognized on the iostream 
+  //   precision is not handled here, it is handled one level up in to_numeric<...>(...)
+  //
+  // Usage:
+  //
+  //   Hack The Spew; see draw_from_stream<...>(...)
+  //
+  template<required::Character CHAR, required::Character_Traits = std::char_traits<CHAR>> struct Continuation;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.wc.draw.required.Carrier
+#import tunitas.number.wc.draw.Inventory
+#import tunitas.Optional
+#import tunitas.Tuple
+#import std.in_place_type
+#import std.locale
+#import std.basic_istream
+#import std.basic_string
+namespace tunitas::number::wc {
+  template<required::Character CHAR, required::Character_Traits TRAITS> struct draw::Continuation {
+    using Character = CHAR;
+    using Character_Traits = TRAITS;
+    //
+    using Inbound = std::basic_istream<CHAR, TRAITS>;
+    using String = std::basic_string<CHAR, TRAITS>; // with the standard allocator
+    //
+    template<required::Carrier CARRIER> using Emplace = std::in_place_type_t<CARRIER>;
+    template<required::Carrier CARRIER> inline static constexpr auto EMPLACE = std::in_place_type<CARRIER>;
+    //
+    using Locale = std::locale;
+    using Inventory = draw::Inventory<Character, Character_Traits>;
+    using Assessment = Tuple<Character, Already, Base>;
+    //
+    inline static auto continuation(Emplace<mpz_class>, Inbound &, Locale const &, Character peek, String prior) -> Optional<String>;
+    inline static auto continuation(Emplace<mpq_class>, Inbound &, Locale const &, Character peek, String prior) -> Optional<String>;
+    inline static auto continuation(Emplace<mpf_class>, Inbound &, Locale const &, Character peek, String prior) -> Optional<String>;
+  protected:
+    inline static auto assess_base(Inbound &, Locale const &, Character first) -> Assessment;
+    inline static auto pull_leading_digits([[inout]] String &fill, Inbound &inbound, Locale const &, Character first, Base) -> bool;
+    inline static auto pull_following_digits([[inout]] String &, Inbound &, Locale const &, Character first, Already, Base) -> bool;
+  };
+}
+#endiv
+#divert <ipp>
+#import std.ctype
+#import std.use_facet
+namespace tunitas::number::wc::draw {
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::assess_base(Inbound &inbound, Locale const &locale, Character first) -> Assessment {
+    switch (inbound.flags() & Inbound::basefield) {
+    case Inbound::oct: return {first, Already::UNDETERMINED, 8};
+    case Inbound::dec: return {first, Already::UNDETERMINED, 10};
+    case Inbound::hex: return {first, Already::UNDETERMINED, 16};
+    default:
+      // autobase ... look for initial "0" or "0x" or "0X"
+      if (Inventory::ZERO != first) {
+        return {first, Already::UNDETERMINED, 10};
+      } else {
+        //
+        // 0123 (octal)
+        // 0x123 (hex)
+        //
+        auto second = Character{};
+        if (!inbound.get(second)) {
+          // EOF occurs after seeing "0" which is a valid zero
+          return {Character{}, Already::SEEN_VALID_ZERO, 8};
+        } else if (!Inventory::is_0x(second)) {
+          // It's a "0" but not "0x" so we have the valid zero and concern to progress
+          return {second, Already::SEEN_VALID_ZERO, 8};
+        } else {
+          auto third = Character{};
+          if (!inbound.get(third)) {
+            // EOF occurs after seeing "0x" which will be an error
+            return {Character{}, Already::UNDETERMINED, 16};
+          } else {
+            return {third, Already::UNDETERMINED, 16};
+          }
+        }
+      }
+      break;
+    }
+  }
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::pull_leading_digits(String &fill, Inbound &inbound, Locale const &locale, Character first, Base base) -> bool {
+    auto slurp = [&fill, inbound, first](auto condition) -> bool {
+                   auto more = first;
+                   auto at_least_one = false;
+                   while (condition(more)) {
+                     at_least_one = true;
+                     fill += more;
+                     if (!inbound.get(more)) {
+                       break;
+                     }
+                   }
+                   if (inbound.good()) {
+                     inbound.putback(more);
+                   } else if (inbound.eof() && at_least_one) {
+                     inbound.clear(Inbound::eofbit);
+                   }
+                   return at_least_one;
+                 };
+    auto const &facet = std::use_facet<std::ctype<Character>>(locale);
+    switch (base) {
+    case 8:  return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::digit, candidate) && Inventory::EIGHT != candidate && Inventory::NINE != candidate; });
+    case 10: return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::digit(candidate)); });
+    case 16: return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::xdigit, candidate); });
+    default: return false;
+    }
+  }
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::pull_following_digits(String &fill, Inbound &inbound, Locale const &locale, Character first, Already already, Base base) -> bool {
+    auto slurp = [&fill, inbound, already, first](auto condition) -> bool {
+                   auto more = first;
+                   auto at_least_one_valid_digit = Already::SEEN_VALID_ZERO == already;
+                   while (condition(more)) {
+                     at_least_one_valid_digit = true; // at least a valid digit was read
+                     fill += more;
+                     if (!inbound.get(more)) {
+                       break;
+                     }
+                   }
+                   if (inbound.good()) {
+                     inbound.putback(more);
+                   } else if (inbound.eof() && at_least_one_valid_digit) {
+                     inbound.clear(Inbound::eofbit);
+                   }
+                   return at_least_one_valid_digit;
+                 };
+    auto const &facet = std::use_facet<std::ctype<Character>>(locale);
+    switch (base) {
+    case 8:  return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::digit, candidate) && Inventory::EIGHT != candidate && Inventory::NINE != candidate; });
+    case 10: return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::digit(candidate)); });
+    case 16: return slurp([&facet](Character candidate) { return facet.is(Inventory::Type::xdigit, candidate); });
+    default: return false;
+    }
+  }
+}
+#endiv

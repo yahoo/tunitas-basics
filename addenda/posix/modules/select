@@ -1,3 +1,0 @@
-// -*- c++ -*- 4c30309e-f42d-40dd-98f8-96d50684d73f
-#pragma once
-#include <sys/select.h>

@@ -1,4 +1,0 @@
-// -*- c++ -*- 64f1bfdd-b075-47dc-95ed-f2995eca9334
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/gf2n.h>

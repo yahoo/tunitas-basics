@@ -28,6 +28,7 @@ AM_SILENT_RULES([yes]) dnl See the AUTOMAKE_OPTIONS in the Makefile.am
 
 AC_CONFIG_SRCDIR([src/tunitas/namespace.xcpp])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4 ac])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
 
@@ -48,6 +49,9 @@ TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])
 TF_WITH_SUBSYSTEM([microhttpd++], [], [Micro HTTPd Server])
 
+TF_WITH_NONSTD([gmp])
+TF_WITH_NONSTD([half])
+TF_WITH_MODULE([half])
 TF_WITH_MODULE([langu])
 TF_WITH_MODULE([nonstd])
 TF_WITH_MODULE([cli-core])
@@ -70,12 +74,13 @@ TF_WITH_MODULE([rigging])
 TF_MSG_VERBOSE([compiler-specific (alphabetical)])
 TF_WITH_NONSTD([gcc])
 
-TF_WITH_STD([scold])
-TF_WITH_STD([tunitas])
+TF_WITH_OPT([scold])
+TF_WITH_OPT([tunitas])
 
-LT_PREREQ([2.4.2])
-AM_PROG_AR dnl must be first
-LT_INIT    dnl must be second
+AC_PREREQ([2.71])
+LT_PREREQ([2.4.7])
+LT_INIT
+AC_LANG([C++])
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_CC_C_O
@@ -84,11 +89,31 @@ TF_PROG_DC dnl the S.C.O.L.D. disaggregation compiler
 TF_PROG_GCC dnl the correct enfreshend gcc ... we want the one closest to C++23 ...   gcc11 or gcc12 or gcc13
 TF_CHECK_STD_FILESYSTEM dnl defines @libstd_filesystem@
 TF_CHECK_CPPUNIT dnl defines toolflags of cppunit, @CPPFLAGS_cppunit@, @CXXFLAGS_cppunit@, @LDFLAGS_cppunit@, etc.
+TF_CHECK_GMP_CXX
+TF_CHECK_HALF
 
 dnl [[FIXTHIS,TODO]] move this into a captured macro, e.g. TF_CHECK_PACKAGE([microhttpd++-devel]) ... or such
 dnl Just one (1) of these should be enough to probe that (package) microhttpd++-devel is installed, but just in case.
 dnl this checkes whether libhttpd++devel is installed by probing to see if the "module-as-#include-header" so named exists for compilation
 TF_CHECK_PACKAGES([microhttpd microhttpd.Daemon microhttpd.Render microhttpd.Request microhttpd.Response microhttpd.Router microhttpd.Service], [microhttpd++-devel])
+
+dnl gmp-6.2.1
+dnl Specimen:
+dnl
+dnl   gmp-6.2.1-3.fc37.x86_64
+dnl   gmp-c++-6.2.1-3.fc37.x86_64
+dnl   gmp-devel-6.2.1-3.fc37.x86_64
+dnl
+TF_CHECK_PACKAGES_ERROR([gmpxx.h], [gmp-devel])
+
+dnl nonstd-half
+dnl Specimen:
+dnl
+dnl   nonstd-half-1.12.0-2.0.fc31.gcc9.x86_64
+dnl   nonstd-half-devel-1.12.0-2.0.fc31.gcc9.x86_64
+dnl
+CPPFLAGS="${CPPFLAGS} -I${nonstd_half_prefix?}/include" # [[FIXTHIS]] fix TF_CHECK_PACKAGES to be cognizant of the now-accreted searchpath
+TF_CHECK_PACKAGES_ERROR([half/half.hpp], [nonstd-half-devel])
 
 dnl WATCHOUT if AC_OUTPUT is not called (transitively from TF_FINALIZE) then
 dnl you will see the fantastically cryptic error

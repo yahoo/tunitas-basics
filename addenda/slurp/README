@@ -1,5 +1,0 @@
-Simple and Efficient Reading/Writing/Modifying of Complete Files
-Like perl's File::Slurp, but in C++, in the SCOLD styling.
-
-slurp::file::read<CONTAINER>(std::filesystem::path) -> CONTAINER
-slurp::directory::read<CONTAINER>(std::filesystem::path) -> CONTAINER

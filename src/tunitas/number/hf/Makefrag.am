@@ -1,0 +1,12 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_number_hf_SUBSOURCES = \
+  obj/src/tunitas/number/hf/namespace.cpp \
+  obj/src/tunitas/number/hf/literals.cpp \
+  obj/src/tunitas/number/hf/Float.cpp \
+  obj/src/tunitas/number/hf/half_cast.cpp \
+  $(end)

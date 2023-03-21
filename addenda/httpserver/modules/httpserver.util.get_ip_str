@@ -1,6 +1,0 @@
-// -*- c++ -*- 89651aa2-db23-4102-8bb5-c330c4c79843
-#pragma once
-#include <httpserver>
-namespace httpserver::http {
-  using httpserver::http::get_ip_str;
-}

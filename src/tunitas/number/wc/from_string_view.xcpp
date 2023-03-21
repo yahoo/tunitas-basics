@@ -1,0 +1,75 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tunitas.Outcome
+#import tunitas.number.required.Number
+#import tunitas.number.required.Floating
+#import tunitas.number.wc.required // cascade that certain 'namespace required'
+#import std.basic_string_view
+namespace tunitas::number::wc {
+  //
+  // Convert a string view to a { Integer, Rational, Floating }
+  //
+  // Specification:
+  //
+  //   Return an outcome
+  //
+  // Design:
+  //
+  //   WATCHOUT - the underlying C API does require that terminating \0 that is implicit in basic_string
+  //   We expect the input characters are in the reasonable range of numeric values; i.e. [-+0-9.+Ee].
+  //   [[FIXTHIS]] become locale-aware
+  //
+  // Usage:
+  //
+  //   using Number = one among { Integer, Rational, Floating };
+  //
+  //   auto specimen = "...somehow...";
+  //   auto got = from_string_view<Number>(specimen);
+  //   if (good(got)) {
+  //     auto recovered = value(move(got));
+  //     ...celebrate...
+  //   } else {
+  //     auto recovered = error_code(got);
+  //     ..complain...
+  //   }
+  //
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> inline auto from_string_view(std::basic_string_view<CHAR, TRAITS>) -> Outcome<NUMBER>;
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> inline auto from_string_view(std::basic_string_view<CHAR, TRAITS>, int base) -> Outcome<NUMBER>;
+  template<required::Floating NUMBER, required::Character CHAR, required::Character_Traits TRAITS> inline auto from_string_view(std::basic_string_view<CHAR, TRAITS>, mp::Precision, int base = 0) -> Outcome<NUMBER>;
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.wc.narrow
+#import tunitas.number.wc.to_numeric
+#import tunitas.number.wc.traits.Numeric
+namespace tunitas::number {
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> auto wc::from_string_view(std::basic_string_view<CHAR, TRAITS> syntax) -> Outcome<NUMBER> try {
+    if constexpr (std::same_as<CHAR, char>) {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(std::string{syntax.begin(), syntax.end()})};
+    } else {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(narrow(syntax.begin(), syntax.end()))};
+    }
+  } catch (...) {
+    return {E::FAILURE};
+  }
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> auto wc::from_string_view(std::basic_string_view<CHAR, TRAITS> syntax, int base) -> Outcome<NUMBER> try {
+    if constexpr (std::same_as<CHAR, char>) {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(std::string{syntax.begin(), syntax.end()}, base)};
+    } else {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(narrow(syntax.begin(), syntax.end()), base)};
+    }
+  } catch (...) {
+    return {E::FAILURE};
+  }
+  template<required::Floating NUMBER, required::Character CHAR, required::Character_Traits TRAITS> auto wc::from_string_view(std::basic_string_view<CHAR, TRAITS> syntax, mp::Precision precision, int base) -> Outcome<NUMBER> try {
+    if constexpr (std::same_as<CHAR, char>) {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(std::string{syntax.begin(), syntax.end()}, precision, base)};
+    } else {
+      return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(narrow(syntax.begin(), syntax.end()), base)};
+    }
+  } catch (...) {
+    return {E::FAILURE};
+  }
+}
+#endiv

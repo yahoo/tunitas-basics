@@ -1,6 +1,0 @@
-// -*- c++ -*- 3ff9dbf1-b287-4fa5-8dae-3114d82f589f
-#pragma once
-#include <httpserver>
-namespace httpserver::http {
-  using Arg_Comparator = httpserver::http::arg_comparator;
-}

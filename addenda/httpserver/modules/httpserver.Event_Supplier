@@ -1,6 +1,0 @@
-// -*- c++ -*- 32a63fbe-7429-4d77-b8da-9f644822cdd3
-#pragma once
-#include <httpserver>
-namespace httpserver {
-  template<typename CHILD> using Event_Supplier = httpserver::event_supplier<CHILD>;
-}

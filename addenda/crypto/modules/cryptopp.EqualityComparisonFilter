@@ -1,4 +1,0 @@
-// -*- c++ -*- ba3b2c7c-12f6-49a0-bd49-70ed20270e54
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/mqueue.h>

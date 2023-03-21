@@ -1,0 +1,13 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_number_wc_required_SUBSOURCES = \
+  obj/src/tunitas/number/wc/required/namespace.cpp \
+  obj/src/tunitas/number/wc/required/string.Narrowable.cpp \
+  obj/src/tunitas/number/wc/required/string.Widenable.cpp \
+  obj/src/tunitas/number/wc/required/iterator.Narrowable.cpp \
+  obj/src/tunitas/number/wc/required/iterator.Widenable.cpp \
+  $(end)

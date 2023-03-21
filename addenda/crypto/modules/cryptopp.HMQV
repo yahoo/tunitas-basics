@@ -1,4 +1,0 @@
-// -*- c++ -*- a01a5a62-352c-4b6e-9c0d-c387a3142fc0
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/hmqv.h>

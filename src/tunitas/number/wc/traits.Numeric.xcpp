@@ -1,0 +1,39 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.required.Number
+#forward tunitas.number.Integer
+#forward tunitas.number.Rational
+#forward tunitas.number.Floating
+namespace tunitas::number::wc::traits {
+  //
+  // Traits for to_numeric(...)
+  //
+  // Specification:
+  //
+  //   Get from the outer to the inner
+  //
+  // Design:
+  //
+  //   Because Generic<MP>::Carrier is protected and we don't want to make it public
+  //
+  // Usage:
+  //
+  //   see to_numeric(...)
+  //
+  template<required::Number> struct Numeric;
+  template<> struct Numeric<Integer>;
+  template<> struct Numeric<Rational>;
+  template<> struct Numeric<Floating>;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::number::wc::traits {
+  template<> struct Numeric<Integer>  { using Carrier = mpz_class; };
+  template<> struct Numeric<Rational> { using Carrier = mpq_class; };
+  template<> struct Numeric<Floating> { using Carrier = mpf_class; };
+}
+#endiv

@@ -1,3 +1,0 @@
-// -*- c++ -*- f296a226-4134-415b-b447-4e9cdc0645e3
-#pragma once
-#include "mysql++/scopedconnection.h"

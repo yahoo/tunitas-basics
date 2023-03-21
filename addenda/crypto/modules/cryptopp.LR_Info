@@ -1,5 +1,0 @@
-// -*- c++ -*- 4de05ace-9544-4ba0-9526-57a4f3c6a811
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/seckey.h> // declares VariableKeyLength, BlockCipherFinal
-#include <cryptopp/lubyrack.h> // uses suck

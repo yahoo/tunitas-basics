@@ -1,0 +1,108 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.required // cascade that certain 'namespace required'
+#import tunitas.number.required.Number
+namespace tests::unit::number::generic {
+  template<required::Number> class Generic;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::number {
+  template<required::Number SUBJECT> struct generic::Generic : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    //
+    auto test_usage_Number() -> void;
+    auto test_usage_add() -> void;
+    auto test_usage_cmp() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+#import tests.unit.number.generic.Number
+#import tests.unit.number.generic.Expression
+#import tests.unit.number.generic.Comparison
+#import tests.unit.number.generic.To_String
+#import tests.unit.number.generic.From_String
+#import tests.unit.number.generic.Fits_Get
+#import std.uint8_t
+#import std.uint16_t
+#import std.uint32_t
+#import std.uint64_t
+namespace tests::unit::number::generic {
+  template<required::Number _> auto Generic<_>::suite() -> Suite {
+    auto series = Stream{typeid(Subject)};
+    series << []{
+                auto use = Stream{"usage"sv};
+                use << add("Number", &Generic::test_usage_Number)
+                    << add("add", &Generic::test_usage_add)
+                    << add("cmp", &Generic::test_usage_cmp)
+                    << END;
+                return use;
+              }()
+           << add<Number<Subject>>()
+           << add<Comparison<Subject>>()
+           << add<Expression<Subject>>()
+           << []{
+                auto to = Stream{"to_string"sv};
+                to << add<To_String<Subject, char>>()
+                   << add<To_String<Subject, wchar_t>>()
+                   << add<To_String<Subject, char8_t>>()
+                   << add<To_String<Subject, char16_t>>()
+                   << add<To_String<Subject, char32_t>>()
+                   << END;
+                return to;
+              }()
+           << []{
+                auto from = Stream{"from_string"sv};
+                from << add<From_String<Subject, char>>()
+                     << add<From_String<Subject, wchar_t>>()
+                     << add<From_String<Subject, char8_t>>()
+                     << add<From_String<Subject, char16_t>>()
+                     << add<From_String<Subject, char32_t>>()
+                     << END;
+                return from;
+              }()
+           << END;
+    if constexpr (std::same_as<library::Integer, Subject>) {
+      series << []{
+                 auto to = Stream{"fits+get"sv};
+                 to << add<Fits_Get<Subject, std::int8_t>>()
+                    << add<Fits_Get<Subject, std::int16_t>>()
+                    << add<Fits_Get<Subject, std::int32_t>>()
+                    << add<Fits_Get<Subject, std::int64_t>>()
+                    << END;
+                 return to;
+               }()
+             << END;
+    }
+    return settle(series);
+  }
+}
+namespace tests::unit::number::generic {
+  template<required::Number _> auto Generic<_>::test_usage_Number() -> void {
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Generic<_>::test_usage_add() -> void {
+    auto lhs = Subject{-2};
+    auto rhs = Subject{5};
+    auto yes = Subject{3};
+    require(ASSERTION, yes == Subject{lhs + rhs});
+  }
+  template<required::Number _> auto Generic<_>::test_usage_cmp() -> void {
+    auto a = Subject{-5};
+    auto b = Subject{7};
+    auto c = Subject{13};
+    using o = std::strong_ordering;
+    require(ASSERTION, o::less == (a <=> b));
+    require(ASSERTION, o::equal == (b <=> b));
+    require(ASSERTION, o::greater == (c <=> b));
+  }
+}
+#endiv

@@ -1,5 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-set -e
-srv _www._tcp.${TEST_DOMAIN?}
-srv _www._udp.${TEST_DOMAIN?}

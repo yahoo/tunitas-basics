@@ -1,3 +1,0 @@
-// -*- c++ -*- 37e45092-fae6-4c00-8346-0dbaffa49d0c
-#pragma once
-#include "mysql++/field.h"

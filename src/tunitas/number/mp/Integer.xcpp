@@ -1,0 +1,63 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::mp {
+  //
+  // A (big) (signed) integer.
+  //
+  // Design:
+  //
+  //   Ensure that swap stays type-consistent.
+  //   A distinct type so known to overloading and ADL.
+  //
+  // Usgae:
+  //
+  //   See Generic<...>
+  //
+  struct Integer;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.Generic
+namespace tunitas::number {
+  class mp::Integer : public Generic<mpz_class> {
+    using Ancestor = Generic<mpz_class>;
+    friend auto swap(Integer &a, Integer b) noexcept -> void {
+      Ancestor &aa{a}, &bb{b};
+      swap(aa, bb);
+    }
+    inline static constexpr auto EMPLACE = Ancestor::Emplace<Ancestor::Carrier>{};
+  public:
+    Integer() = default;
+    using Ancestor::Generic;
+    inline [[implicit]] Integer(Expression<mpz_t, mpz_t> const &);
+    inline [[implicit]] Integer(Expression<mpz_t, mpz_t> &&);
+    template<typename RHS> inline [[implicit]] Integer(Expression<mpz_t, RHS> const &);
+    template<typename LHS, typename RHS> inline [[implicit]] Integer(Expression<LHS, RHS> const &);
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::number::mp {
+  Integer::Integer(Expression<mpz_t, mpz_t> const &e)                                  : Ancestor{EMPLACE, e} { }
+  Integer::Integer(Expression<mpz_t, mpz_t> &&e)                                       : Ancestor{EMPLACE, move(e)} { }
+  template<typename RHS> Integer::Integer(Expression<mpz_t, RHS> const &e)             : Ancestor{EMPLACE, e} { }
+  template<typename LHS, typename RHS> Integer::Integer(Expression<LHS, RHS> const &e) : Ancestor{EMPLACE, e} { }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::number::mp;
+    static_assert(std::is_default_constructible_v<Integer>);
+    static_assert(std::is_copy_constructible_v<Integer>);
+    static_assert(std::is_move_constructible_v<Integer>);
+    static_assert(std::is_copy_assignable_v<Integer>);
+    static_assert(std::is_move_assignable_v<Integer>);
+    static_assert(std::is_swappable_v<Integer>);
+  }
+}
+#endiv

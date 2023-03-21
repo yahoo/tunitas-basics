@@ -1,7 +1,0 @@
-// -*- c++ -*- 24ba182e-ae1c-4158-9a7f-b6097b804933
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
-// they show up in 
-#include <cryptopp/md4.h>
-#undef CRYPTOPP_ENABLE_NAMESPACE_WEAK

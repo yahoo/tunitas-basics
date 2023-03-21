@@ -1,3 +1,0 @@
-Convenience and wrapping for Universally-Unique Identifiers, as in RFC 4122
-https://www.ietf.org/rfc/rfc4122.txt
-See package libuuid (but not uuid)

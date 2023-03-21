@@ -1,3 +1,0 @@
-A C++2a themed interface to "shell" type invocations.
-
-Goal: it should be as wasy to run a big fat executable (e.g. wget) from C++ as it is from perl or bash.

@@ -1,6 +1,0 @@
-// -*- c++ -*- aba621cd-ba3b-4213-a44b-f3e5ad6637c6
-#pragma once
-#include <cppunit/extensions/TestFactory.h>
-namespace cppunit::test {
-  using Factory = CppUnit::TestFactory;
-}

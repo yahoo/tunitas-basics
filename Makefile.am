@@ -9,7 +9,7 @@
 AUTOMAKE_OPTIONS = no-define subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 AM_MAKEFLAGS= \
-  MAKEFLAGS='$(MAKEFLAGS)' \
+  DO_NOT_REPASS_MAKEFLAGS='$(MAKEFLAGS)' \
   CPPFLAGS='$(CPPFLAGS)' \
   CXXFLAGS='$(CXXFLAGS)' \
   LDFLAGS='$(LDFLAGS)' \
@@ -25,12 +25,14 @@ lib_LTLIBRARIES = \
   lib/libtunitas.la \
   lib/libtunitas-app.la \
   lib/libtunitas-application.la \
+  lib/libtunitas-number.la \
   lib/libtunitas-server.la \
   $(end)
 noinst_LTLIBRARIES = \
   noinst/lib/libtunitas.la \
   noinst/lib/libtunitas-application.la \
   noinst/lib/libtunitas-server.la \
+  noinst/lib/libtunitas-number.la \
   noinst/lib/libstd+tunitas.la \
   noinst/lib/libwant.la \
   $(end)
@@ -77,6 +79,7 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 
 DEVELOPMENT_AREAS = \
   $(module_cli_prefix) \
+  $(module_half_prefix) \
   $(module_langu_prefix) \
   $(module_nonstd_prefix) \
   $(module_sys_prefix) \
@@ -89,8 +92,11 @@ TESTING_AREAS = \
   $(end)
 INSTALLATION_AREAS = \
   $(nonstd_cppunit_prefix) \
-  $(std_scold_prefix) \
-  $(std_tunitas_prefix) \
+  $(nonstd_gcc_prefix) \
+  $(nonstd_gmp_prefix) \
+  $(nonstd_half_prefix) \
+  $(opt_scold_prefix) \
+  $(opt_tunitas_prefix) \
   $(deprecated_INSTALLATION_AREAS) \
   $(end)
 
@@ -119,6 +125,8 @@ include check/bin/unit.am
 include lib/libtunitas-app.am
 include lib/libtunitas-application.am
 include noinst/lib/libtunitas-application.am
+include lib/libtunitas-number.am
+include noinst/lib/libtunitas-number.am
 include lib/libtunitas-server.am
 include noinst/lib/libtunitas-server.am
 
@@ -151,16 +159,16 @@ Makefile_COMPILER_CXXFLAGS_SET = @CXXFLAGS_gdb@ @CXXFLAGS_gcc@ -Wno-attributes
 Makefile_COMPILER_LDFLAGS_SET  =  @LDFLAGS_gdb@  @LDFLAGS_gcc@  @libstd_filesystem@
 
 # configure.ac: TF_WITH_NONSTD([something-something])
-Makefile_nonstd_CPPFLAGS_SET = 
-Makefile_nonstd_CFLAGS_SET   = 
-Makefile_nonstd_CXXLAGS_SET  = 
-Makefile_nonstd_LDFLAGS_SET  = 
+Makefile_nonstd_CPPFLAGS_SET = @nonstd_gmp_c___CPPFLAGS@ @nonstd_half_CPPFLAGS@
+Makefile_nonstd_CFLAGS_SET   =   @nonstd_gmp_c___CFLAGS@   @nonstd_half_CFLAGS@
+Makefile_nonstd_CXXLAGS_SET  =  @nonstd_gmp_c___CXXLAGS@  @nonstd_half_CXXLAGS@
+Makefile_nonstd_LDFLAGS_SET  = # the nonstd gmp-c++ LDFLAGS are applied in libtunitas-number.la (only)
 
 # extras not otherwise covered by the TF_WITH_MODULE([...]) declarations
-Makefile_PACKAGE_CPPFLAGS_SET = 
-Makefile_PACKAGE_CFLAGS_SET   = 
-Makefile_PACKAGE_CXXLAGS_SET  = 
-Makefile_PACKAGE_LDFLAGS_SET  = 
+Makefile_PACKAGE_CPPFLAGS_SET = @CPPFLAGS_gmp_c__@
+Makefile_PACKAGE_CFLAGS_SET   =   @CFLAGS_gmp_c__@
+Makefile_PACKAGE_CXXLAGS_SET  = @CXXFLAGS_gmp_c__@
+Makefile_PACKAGE_LDFLAGS_SET  = # the nonstd gmp-c++ LDFLAGS are applied in libtunitas-number.la (only)
 
 #                                                  if    did not substitute away                      then use this
 #                                                  |           |                                      |            else use the substitution

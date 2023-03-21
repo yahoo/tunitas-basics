@@ -1,6 +1,0 @@
-// -*- c++ -*- 20402d3f-9442-4c8f-b583-63ec451b70fe
-#pragma once
-#include <cppunit/extensions/TestSetUp.h>
-namespace cppunit::tests {
-  using SetUp = CppUnit::TestSetUp;
-}

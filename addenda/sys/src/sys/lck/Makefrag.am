@@ -1,7 +1,0 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# For terms and provenance see the LICENSE file at the top of this repository.
-
-src_sys_lck_SOURCES_SET = \
-  obj/src/sys/lck/namespace.cpp \
-  obj/src/sys/lck/Operation.cpp \
-  $(end)

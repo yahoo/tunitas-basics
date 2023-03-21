@@ -1,8 +1,0 @@
-// -*- c++ -*- 1ee7b587-6b75-4657-986d-b13c188a92ed
-#pragma once
-#include <cppunit/TestComposite.h>
-namespace cppunit {
-  namespace test {
-    using Composite = CppUnit::TestComposite;
-  }
-}

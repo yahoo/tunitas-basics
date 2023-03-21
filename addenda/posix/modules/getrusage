@@ -1,4 +1,0 @@
-// -*- c++ -*- 38f625d7-dd90-4fd6-949e-86e725f65c41
-#pragma once
-#include <sys/types.h>
-#include <sys/resource.h>

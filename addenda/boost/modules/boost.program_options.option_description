@@ -1,3 +1,0 @@
-// -*- c++ -*- 94076243-8bf4-402b-9a1b-cb3ba856f48d
-#pragma once
-#include <boost/program_options/options_description.hpp>

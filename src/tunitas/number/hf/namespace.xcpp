@@ -1,0 +1,26 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number
+#if 1
+namespace half_float {
+  class half;
+  namespace [[singular]] literal { }
+}
+#else
+#include <half/half.h>
+#endif
+namespace tunitas::number::hf {
+  //
+  // http://half.sourceforge.net/
+  // Works from half-1.2.0 (nown)
+  //      up to half-2.2.0 (believed, this is the current version 2022-09)
+  //
+}
+#endiv
+#divert <hpp>
+#include <half/half.hpp>
+#endiv

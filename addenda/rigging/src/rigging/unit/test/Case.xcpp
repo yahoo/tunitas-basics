@@ -1,9 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <fpp>
-#import cppunit.test.Case
-namespace rigging::unit::test {
-  // The 'subcase' does something non-trivial
-  using Case = cppunit::test::Case;
-}
-#divert </fpp>

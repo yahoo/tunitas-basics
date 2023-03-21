@@ -1,7 +1,0 @@
-tests_unit_ish_perl_TESTS = \
-  tests/unit/ish/perl/cases.test \
-  tests/unit/ish/perl/join.test \
-  tests/unit/ish/perl/joining.test \
-  tests/unit/ish/perl/map.test \
-  tests/unit/ish/perl/split.test \
-  $(end)

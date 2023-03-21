@@ -1,8 +1,0 @@
-#!/bin/bash --norc
-
-cd ${0%/*}/.. || exit 70
-./buildconf &&
-./configure ${prefix:+--prefix=$prefix} &&
-make &&
-make check &&
-echo OK

@@ -1,4 +1,0 @@
-// -*- c++ -*- a26abd41-25a1-4681-8d70-8e60daf8b23b
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/xtrcrypt.h>

@@ -1,4 +1,0 @@
-// -*- c++ -*- ad13e391-ec30-4cd7-8fff-eb5f0f3d7b00
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/iterhash.h>

@@ -1,6 +1,0 @@
-#!/bin/sh
-source ${0%/*}/../cat/framework.sh || exit 1
-source=tests/cat/datafile
-trial=tests/cat/t99.datafile.trial
-gold=tests/cat/datafile.gold
-cat $source > $trial && diff $trial $gold

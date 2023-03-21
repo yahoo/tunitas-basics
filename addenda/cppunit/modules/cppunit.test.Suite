@@ -1,8 +1,0 @@
-// -*- c++ -*- c7453a40-9f5b-4a5f-9a11-bbf76711dadb
-#pragma once
-#include <cppunit/TestSuite.h>
-namespace cppunit {
-  namespace test {
-    using Suite = CppUnit::TestSuite;
-  }
-}

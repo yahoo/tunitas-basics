@@ -1,4 +1,0 @@
-// -*- c++ -*- ef1ab3d6-640a-4d11-8669-9779a0b06567
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/hrtimer.h>
