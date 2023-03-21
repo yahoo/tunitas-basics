@@ -1,4 +1,0 @@
-// -*- c++ -*- d982e3dd-257d-47a2-849b-5cf9af826916
-#pragma once
-#include "mysql++/exceptions.h"
-

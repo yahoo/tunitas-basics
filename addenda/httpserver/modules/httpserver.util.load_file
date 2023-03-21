@@ -1,6 +1,0 @@
-// -*- c++ -*- bac6a3bc-1cb2-4a64-ae47-1ebd129ff6d9
-#pragma once
-#include <httpserver>
-namespace httpserver::utils {
-  using httpserver::http::load_file;
-}

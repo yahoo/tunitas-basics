@@ -1,6 +1,0 @@
-// -*- c++ -*- 33979a9d-1751-4de3-84db-2a0e96d18802
-#pragma once
-#include <cppunit/TestSuccessListener.h>
-namespace cppunit::test {
-  using SuccessListener = CppUnit::TestSuccessListener;
-}

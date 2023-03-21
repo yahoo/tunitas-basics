@@ -1,0 +1,138 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.required // cascade that certain 'namespace required'
+#import tunitas.number.required.Number
+namespace tests::unit::number::generic {
+  template<required::Number> class Number;
+}
+#endiv
+#divert <hpp>
+#import tests.unit..number.required.Small
+namespace tests::unit::number {
+  template<required::Number SUBJECT> struct generic::Number : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    //
+    auto test_constructor_default() -> void;
+    template<required::Small INTEGER> auto test_constructor_conversion() -> void;
+    auto test_operator_plus() -> void;
+    auto test_operator_minus() -> void;
+    auto test_assignment_copy() -> void;
+    auto test_assignment_move() -> void;
+    auto test_operator_selfadd() -> void;
+    auto test_operator_selfsub() -> void;
+    auto test_operator_selfmul() -> void;
+    auto test_operator_selfmod() -> void;
+    auto test_operator_selfdiv() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::number::generic {
+  template<required::Number _> auto Number<_>::suite() -> Suite {
+    auto series = Stream{"Number"sv};
+    series << []{
+                auto cons = Stream{"constructor"sv};
+                cons << add("default", &Number::test_constructor_default)
+                     << []{
+                          auto sion = Stream{"conversion"sv};
+                          sion << add("int8", &Number::test_constructor_conversion<char signed>)
+                               << add("int16", &Number::test_constructor_conversion<short signed>)
+                               << add("int32", &Number::test_constructor_conversion<signed>)
+                               << add("uint64", &Number::test_constructor_conversion<long signed>)
+                               << add("uint64+e", &Number::test_constructor_conversion<long long signed>)
+                               << add("uint128", &Number::test_constructor_conversion<int128_t>)
+                               << END;
+                          return sion;
+                        }()
+                     << END;
+                return cons;
+              }()
+           << []{
+                auto una = Stream{"unary"sv};
+                una << add("operator+", &Number::test_operator_plus)
+                    << add("operator-", &Number::test_operator_minus)
+                    << END;
+                return una;
+              }()
+           << []{
+                auto ass = Stream{"assignment"sv};
+                ass << add("copy", &Number::test_assignment_copy)
+                    << add("move", &Number::test_assignment_move)
+                    << END;
+                return ass;
+              }()
+           << []{
+                auto self = Stream{"self"sv};
+                self << add("operator+=", &Number::test_operator_selfadd)
+                     << add("operator-=", &Number::test_operator_selfsub)
+                     << add("operator*=", &Number::test_operator_selfmul)
+                  // WATCHOUT - you can't say "/=" lest the test be unaddressable (in the test rigging)
+                     << add("operator div=", &Number::test_operator_selfdiv)
+                     << END;
+                return self;
+              }()
+           << END;
+    return settle(series);
+  }
+  template<required::Number _> template<required::Small INTEGER> auto Number<_>::test_constructor_conversion() -> void {
+    auto const specimen = INTEGER{99};
+    auto subject = Subject{specimen};
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_constructor_default() -> void {
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_plus() -> void {
+    auto specimen = Subject{};
+    auto subject = +specimen; // ------------------------------ test this (operator+ does a copy)
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_minus() -> void {
+    auto specimen = Subject{};
+    auto subject = -specimen; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_assignment_copy() -> void {
+    auto specimen = Subject{};
+    auto subject = Subject{specimen}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_assignment_move() -> void {
+    auto specimen = Subject{};
+    auto subject = Subject{move(specimen)}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_selfadd() -> void {
+    auto subject = Subject{};
+    subject += Subject{99l}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_selfsub() -> void {
+    auto subject = Subject{};
+    subject -= Subject{99l}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_selfmul() -> void {
+    auto subject = Subject{};
+    subject *= Subject{99l}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_selfmod() -> void {
+    auto subject = Subject{};
+    subject %= Subject{99l}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Number<_>::test_operator_selfdiv() -> void {
+    auto subject = Subject{};
+    subject /= Subject{99l}; // ------------------------------ test this
+    require(ASSERTION, sizeof (subject));
+  }
+}
+#endiv

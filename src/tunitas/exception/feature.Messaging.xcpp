@@ -35,7 +35,7 @@ namespace tunitas::exception::feature {
   //
   //   try {
   //     throw Message{"program"};
-  //     throw std::runtime_error{"that was bad"};
+  //     throw exception::Runtime{"that was bad"};
   //   } catch (Generic const &g) {
   //     g.stream() << g << '\n';
   //     return g.code();

@@ -1,5 +1,0 @@
-// -*- c++ -*- a70e7035-cce2-4f6d-a659-164f85ee6bb5
-#pragma once
-// n.b. std::iterator the 3rd template parameter DISTANCE, is deprecated in C++17
-// http://en.cppreference.com/w/cpp/iterator/iterator
-#include <iterator>

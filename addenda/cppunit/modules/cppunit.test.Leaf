@@ -1,8 +1,0 @@
-// -*- c++ -*- 98c9739d-94b0-48a2-b592-7c6b894b1ea7
-#pragma once
-#include <cppunit/TestLeaf.h>
-namespace cppunit {
-  namespace test {
-    using Leaf = CppUnit::TestLeaf;
-  }
-}

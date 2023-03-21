@@ -13,6 +13,10 @@ namespace tunitas::time::ratio {
   // Of course there is an error term in the multi-year durations which span leap year.
   // And the unforseen and unannounced leap seconds, or the arrival of aliens who tell us of new time lines altogether.
   //
+  // Many of these already exist in C++23
+  //
+  using Microsecond = std::micro;
+  using Millisecond = std::milli;
   using Second = std::ratio<1, 1>;
   using Minute = std::ratio_multiply<std::ratio<60>, Second>::type;
   using Hour = std::ratio_multiply<std::ratio<60>, Minute>::type;
@@ -22,6 +26,18 @@ namespace tunitas::time::ratio {
   // It becomes controversial and cultural after here ... with some embedded error terms.
   using Month = std::ratio_multiply<std::ratio<30>, Day>::type;
   using Year = std::ratio_multiply<std::ratio<365>, Day>::type;
+  //
+  // pesky plurality ... just sounds wrong when conjugated badly
+  using Microseconds = Microsecond;
+  using Milliseconds = Millisecond;
+  using Seconds = Second;
+  using Minutes = Minute;
+  using Hours = Hour;
+  using Days = Day;
+  using Weeks = Week;
+  using Fortnights = Fortnight;
+  using Months = Month;
+  using Years = Year;
 }
 namespace tunitas::time {
   namespace [[deprecated("tunitas::time::ratios (plural) never was a namespace name; use tunitas::time::ratio (singular)")]] ratios {

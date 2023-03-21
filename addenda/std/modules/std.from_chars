@@ -1,4 +1,0 @@
-// -*- c++ -*- c84ba4a4-d844-4253-a970-a0d6ea41a08d
-#pragma once
-#include <std.chars_format> // has all the fancy compiler diagnostics and such
-

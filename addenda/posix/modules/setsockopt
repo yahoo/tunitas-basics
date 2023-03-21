@@ -1,4 +1,0 @@
-// -*- c++ -*- edd78266-48fc-4597-85f1-2b2522aa3266
-
-#pragma once
-#include <sys/socket.h>

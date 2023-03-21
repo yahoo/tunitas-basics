@@ -1,0 +1,112 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  namespace package_integer {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_integer::interface;
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.get.required.Limits
+#import tunitas.application.options.get.Whence
+namespace tunitas::application::options::get::package_integer::body {
+  //
+  // Acquire an integer from the longish Step
+  //
+  // The integer is returned, not an outcome.
+  // The integer value is checked to ensure that it is really within the (provided) limits.
+  //
+  // Scheme:
+  //
+  //   --integer=NUMBER
+  //
+  // Example:
+  //
+  //   --integer=8080
+  //
+  // Usage:
+  //
+  //   auto exp = Experience{...somehow...}
+  //   auto step = cli::options::longish::Step{...somehow...};
+  //   using Quitting = exception::Quitting;
+  //   using Limits = std:numeric_limits<std::uint8_t>; ... you get the idea ...
+  //
+  //   auto integer1 = get::integer<int, Quitting>(whence, step);
+  //   auto integer2 = get::integer<int, Quitting, Limits>(whence, step);
+  //
+  namespace exported {
+    // ease of export (see the parent scope)
+    template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> inline auto get_integer(Whence, Step const &, LIMITS = {}) -> RESULT;
+    template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> inline auto get_integer(Whence, Step const &, Field, LIMITS = {}) -> RESULT;
+    // by naming convention
+    template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> inline auto integer(Whence, Step const &, LIMITS = {}) -> RESULT;
+    template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> inline auto integer(Whence, Step const &, Field, LIMITS = {}) -> RESULT;
+  }
+  inline constexpr auto const FIELD = "integer";
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto extract(Whence whence, Step const &step, Field field) -> RESULT;
+}
+#endiv
+#divert <ipp>
+namespace tunitas::application::options::get::package_integer {
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto interface::get_integer(Whence whence, Step const &step, LIMITS) -> RESULT              { return extract<RESULT, QUITTING, LIMITS>(whence, step, FIELD); }
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto interface::get_integer(Whence whence, Step const &step, Field field, LIMITS) -> RESULT { return extract<RESULT, QUITTING, LIMITS>(whence, step, field); }
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto interface::integer(Whence whence, Step const &step, LIMITS) -> RESULT                  { return extract<RESULT, QUITTING, LIMITS>(whence, step, FIELD); }
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto interface::integer(Whence whence, Step const &step, Field field, LIMITS) -> RESULT     { return extract<RESULT, QUITTING, LIMITS>(whence, step, field); }
+}
+#endiv
+#divert <tpp>
+#import langu.age.ine
+#import nonstd.sto
+#import std.exception
+#import std.is_signed
+#import std.stoll
+#import std.stoull
+#import tunitas.exception.Runtime
+#import tunitas.string.Storage
+namespace tunitas::application::options::get::package_integer {
+  template<required::Integer RESULT, required::exception::Quitting QUITTING, required::Limits LIMITS> auto body::extract(Whence whence, Step const &step, Field field) -> RESULT {
+    string::Storage const syntax = required_word(step);
+    try {
+      auto candidate =
+#if 1
+        nonstd::sto<RESULT>(syntax);
+#else
+      []{
+        // WATCHOUT - nonstd::sto(...) ONLY signals failure with an ONLY parses the whole syntax; it DOES NOT return the end position, which you already know.
+        // WATCHOUT - std::sto{i,ull,ll}(...) signals failure both via exception and also via its 2nd inout parameter
+        // we have to put a lot of machinery around it to make it safe and obvious to the UX that something invalid is occurring.
+        auto end = 0uz;
+        auto estimate = [&end]{
+          if constexpr (std::is_signed_v<RESULT>) {
+            return std::stoll<RESULT>(syntax, end);
+          } else {
+            return std::stoull<RESULT>(syntax, end);
+          }
+        }();
+        if (end != syntax.size()) {
+          throw exception::Runtime{"sto"};
+        }
+        return estimate;
+      }()
+#endif
+      RESULT const lo = LIMITS::min();
+      RESULT const hi = LIMITS::max();
+      if (candidate < lo || hi < candidate) {
+        error(whence) << "the " << field << " " << candidate << " is out of range " << lo << ".." << hi << '\n';
+        throw QUITTING{whence.name(), CONFIG};
+      }
+      return candidate;
+    } catch (std::exception const &) {
+      // The exception this is (ours or theirs) will say merely "stoi", "stol" or such, so don't use that as the explanation
+      error(whence) << "the " << field << " value is not a number - " << langu::age::ine(syntax) << '\n';
+      throw QUITTING{whence.name(), CONFIG};
+    }
+  }
+}
+#endiv

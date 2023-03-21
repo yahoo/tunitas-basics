@@ -1,0 +1,92 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.mp.required // cascade that certain 'namespace required'
+#import tunitas.number.mp.required.Small
+#import tunitas.number.required.Number
+namespace tests::unit::number::mp {
+  template<required::Number, required::Small> struct Driver;
+}
+#endiv
+#divert <hpp>
+namespace tests::unit::number {
+  template<required::Number SUBJECT, mp::required::Small SMALL> struct mp::Driver : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    using Small = SMALL;
+    //
+    auto test_constructor_default() -> void;
+    auto test_constructor_conversion() -> void;
+    auto test_constructor_copy() -> void;
+    auto test_constructor_move() -> void;
+    auto test_assignment_conversion() -> void;
+    auto test_assignment_copy() -> void;
+    auto test_assignment_move() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::number::mp {
+  template<required::Number B, required::Small S> auto Driver<B,S>::suite() -> Suite {
+    auto series = Stream{typeid(Subject)};
+    series << []{
+                auto con = Stream{"constructor"sv};
+                con << add("conversion", &Driver::test_constructor_conversion)
+                    << add("copy", &Driver::test_constructor_copy)
+                    << add("move", &Driver::test_constructor_move)
+                    << END;
+                return con;
+              }()
+           << []{
+                auto ass = Stream{"assignment"sv};
+                ass << add("conversion", &Driver::test_assignment_conversion)
+                    << add("copy", &Driver::test_assignment_copy)
+                    << add("move", &Driver::test_assignment_move)
+                    << END;
+                return ass;
+              }()
+           << END;
+    return settle(series);
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_constructor_default() -> void {
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_constructor_conversion() -> void {
+    auto specimen = Small{99};
+    auto subject = Subject{specimen};
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_constructor_copy() -> void {
+    auto original = Subject{Small{99}};
+    auto subject = Subject{original}; // <---------------------------------------- test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_constructor_move() -> void {
+    auto original = Subject{Small{99}};
+    auto subject = Subject{move(original)}; // <---------------------------------------- test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_assignment_conversion() -> void {
+    auto specimen = Small{99};
+    auto subject = Subject{};
+    subject = specimen; // <---------------------------------------- test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_assignment_copy() -> void {
+    auto original = Subject{Small{99}};
+    auto subject = Subject{original}; // <---------------------------------------- test this
+    require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_assignment_move() -> void {
+    auto original = Subject{Small{99}};
+    auto subject = Subject{};
+    subject = move(original); // <---------------------------------------- test this
+    require(ASSERTION, sizeof (subject));
+  }
+}
+#endiv

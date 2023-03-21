@@ -1,4 +1,0 @@
-// -*- c++ -*- 57e0b357-9118-4a3e-a60d-707b1b89f05a
-#pragma once
-#warning there is no data type 'pgid_t' instead there is only a negative pid_t
-#include <pid_t>

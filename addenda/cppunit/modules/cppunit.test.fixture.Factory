@@ -1,6 +1,0 @@
-// -*- c++ -*- 9fa6e59c-2d3d-4605-a866-30374b2c58d0
-#pragma once
-#include <cppunit/extensions/TestFixtureFactory.h>
-namespace cppunit::test::fixture {
-  using Factory = CppUnit::TestFixtureFactory;
-}

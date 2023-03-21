@@ -1,6 +1,0 @@
-// -*- c++ -*- 6e16b57c-dc4a-4258-be1f-aa3749dc9676
-#pragma once
-#include <cppunit/TextOutputter.h>
-namespace cppunit::text {
-  using Outputter = CppUnit::TextOutputter;
-}

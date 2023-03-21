@@ -1,6 +1,0 @@
-// -*- c++ -*- 4439f4d6-3c0b-47f9-ba84-bd64f136bbce
-#pragma once
-#include <cppunit/portability/Stream.h>
-namespace cppunit {
-  using CppUnit::stdCErr;
-}

@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.mp.required.Small
+namespace tunitas::number::mp::get {
+  //
+  // Will the value in CARRIER fit into the small integer type?
+  //
+  // Specification:
+  //
+  //   What it says.
+  //
+  // Design:
+  //
+  //   Yes. Yeah No.
+  //   Specializations mostly.
+  //   Where the underlying carrier provides a more efficient interface then use that.
+  //
+  // Usage:
+  //
+  //   Hack the Spew
+  //
+  template<required::Small> struct Fits;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.required.Carrier
+#import nonstd.numeric_limits
+namespace tunitas::number::mp {
+  template<required::Small SMALL> struct get::Fits {
+    using Candidate = SMALL;
+    using Limits = nonstd::numeric_limits<Candidate>;
+    template<required::Carrier CARRIER> inline static auto fit(CARRIER const &) -> bool;
+  };
+  namespace get {
+#if 0 // NO SUCH (use the generic template)
+    template<> template<required::Carrier CARRIER> auto Fits<char signed>::fit(CARRIER const &) -> bool;
+#endif
+    template<> template<required::Carrier CARRIER> auto Fits<int short signed>::fit(CARRIER const &) -> bool;
+    template<> template<required::Carrier CARRIER> auto Fits<int signed>::fit(CARRIER const &) -> bool;
+    template<> template<required::Carrier CARRIER> auto Fits<int long signed>::fit(CARRIER const &) -> bool;
+    template<> template<required::Carrier CARRIER> auto Fits<int long long signed>::fit(CARRIER const &) -> bool;
+    template<> template<required::Carrier CARRIER> auto Fits<int128_t>::fit(CARRIER const &) -> bool;
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.mp.convert
+namespace tunitas::number::mp::get {
+  template<required::Small _> template<required::Carrier CARRIER> auto Fits<_>::fit(CARRIER const &impl) -> bool { return CARRIER{Limits::min()} <= impl && impl <= CARRIER{Limits::max()}; }
+#if 0 // NO SUCH ... WHY NOT?
+  template<> template<required::Carrier CARRIER> auto Fits<char signed>::fit(CARRIER const &impl) -> bool { return impl.fits_schar_p(); }
+#endif
+  template<> template<required::Carrier CARRIER> auto Fits<int short signed>::fit(CARRIER const &impl) -> bool { return impl.fits_sshort_p(); }
+  template<> template<required::Carrier CARRIER> auto Fits<int signed>::fit(CARRIER const &impl) -> bool { return impl.fits_sint_p(); }
+  template<> template<required::Carrier CARRIER> auto Fits<int long signed>::fit(CARRIER const &impl) -> bool { return impl.fits_slong_p(); }
+  template<> template<required::Carrier CARRIER> auto Fits<int long long signed>::fit(CARRIER const &impl) -> bool {
+    if constexpr (sizeof (Candidate) == sizeof (int long signed)) {
+      return impl.fits_slong_p();
+    } else {
+      return Limits::min() <= impl && impl <= Limits::max();
+    }
+  }
+  template<> template<required::Carrier CARRIER> auto Fits<int128_t>::fit(CARRIER const &impl) -> bool { return convert<CARRIER>(Limits::min()) <= impl && impl <= convert<CARRIER>(Limits::max()); }
+}
+#endiv

@@ -1,0 +1,18 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.wc
+#import std.in_place_type
+#import tunitas.number.mp.required.Carrier
+namespace tunitas::number::wc::draw {
+  template<mp::required::Carrier CARRIER> using Emplace = std::in_place_type_t<CARRIER>;
+  template<mp::required::Carrier CARRIER> inline constexpr auto EMPLACE = std::in_place_type<CARRIER>;
+  //
+  enum class Already { UNDETERMINED, SEEN_VALID_ZERO };
+  using Base = int; // because that's the stat type that the underlying CARRIER::CARRIER constructor uses seems to use (signed integer)
+
+}
+#endiv

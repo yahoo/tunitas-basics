@@ -1,3 +1,0 @@
-// -*- c++ -*- bc13ca1d-d9c0-497b-9c34-443bd7585544
-#pragma once
-#include <sys/un.h>

@@ -1,7 +1,0 @@
-tests_unit_json_TESTS = \
-  tests/unit/json/all.test \
-  tests/unit/json/charcode.test \
-  tests/unit/json/literal.test \
-  tests/unit/json/qq.test \
-  tests/unit/json/pair.test \
-  $(end)

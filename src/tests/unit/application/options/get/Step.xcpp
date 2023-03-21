@@ -1,0 +1,40 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::application::options::get {
+  struct Step;
+}
+#endiv
+#divert <hpp>
+#import cli.options.longish.Step
+#import cli.options.shortish.Step
+#import std.string
+class tests::unit::application::options::get::Step : public cli::options::longish::Step {
+  using Ancestor = cli::options::longish::Step;
+  struct Ancestors {
+    using Longish = cli::options::longish::Step;
+    using Shortish = cli::options::shortish::Step;
+  };
+public:
+  using Code = cli::options::indicator::Code;
+  using Value = std::string;
+  Step(Code, Value);
+protected:
+  Value value;
+  using Option_Line = cli::options::longish::specification::Option;
+  Option_Line const dummy_option_line;
+};
+#endiv
+#divert <cpp>
+#import cli.options.argument.constants
+tests::unit::application::options::get::Step::Step(Code c, Value v)
+  : Ancestor{c, c::const_stringz{}, dummy_option_line} // seed with the success case
+  , value{v}
+  , dummy_option_line{"force", (int) ::options::argument::REQUIRED, nullptr, (char) Code::CHR_f}
+{
+  this->Ancestors::Shortish::value = this->value.data(); // <----- and make the Ancestor point to our stored storage
+}
+#endiv

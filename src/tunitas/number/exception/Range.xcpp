@@ -1,0 +1,59 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::exception {
+  //
+  // There is an range error in a number
+  //
+  // Semantic:
+  //
+  //   The opposite of Full.
+  //
+  // Specification:
+  //
+  //   Yes.
+  //
+  // Design:
+  //
+  //   More than a type alias.  There is no design.
+  //
+  // Usage:
+  //
+  //   Throw it!
+  //
+  struct [[nodiscard]] Range;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.complete.Basic
+#import tunitas.exception.partial.Range
+#import tunitas.exception.Aspect
+#import tunitas.number.exception.Aspect
+class tunitas::number::exception::Range final : public complete::Basic<partial::Range, number::exception::Aspect, tunitas::exception::Aspect> {
+  using Ancestor = complete::Basic<partial::Range, number::exception::Aspect, tunitas::exception::Aspect>;
+public:
+  explicit Range() = default;
+  using Ancestor::Basic;
+};
+#endiv
+#divert <cpp>
+#import std.range_error
+#import std.out_of_range
+#import substd.exception.Range
+#import substd.exception.Bound
+#import std.derived_from
+namespace {
+  namespace testate {
+    namespace exception = tunitas::number::exception; // avoid ambiguities when looking back into nonstd::exception; e.g. Range
+    static_assert(std::derived_from<tunitas::number::exception::Range, std::range_error>);
+    static_assert(std::derived_from<exception::Range, std::range_error>);
+    static_assert(not std::derived_from<exception::Range, std::out_of_range>);
+    //
+    static_assert(std::derived_from<exception::Range, substd::exception::Range>);
+    static_assert(not std::derived_from<exception::Range, substd::exception::Bound>);
+  }
+}
+#endiv

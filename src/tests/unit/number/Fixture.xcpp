@@ -1,0 +1,63 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::number { struct Fixture; }
+#endiv
+#divert <hpp>
+struct tests::unit::number::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_usage_Integer() -> void;
+  auto test_usage_Rational() -> void;
+  auto test_usage_Floating() -> void;
+};
+#endiv
+#divert <cpp>
+#import tunitas.number.Integer
+#import tunitas.number.Rational
+#import tunitas.number.Floating
+#import tests.unit.number.Generic
+auto tests::unit::number::Fixture::suite() -> Suite {
+  auto series = Stream{"number"sv};
+  series << []{
+              auto use = Stream{"usage"sv};
+              use << add("Integer", &Fixture::test_usage_Integer)
+                  << add("Rational", &Fixture::test_usage_Rational)
+                  << add("Floating", &Fixture::test_usage_Floating)
+                  << END;
+              return use;
+            }()
+         << add<Generic<library::Integer>>()
+         << add<Generic<library::Rational>>()
+         << add<Generic<library::Floating>>()
+         << END;
+  return settle(series);
+}
+#import tunitas.number.to_string
+namespace tests::unit::number {
+  auto Fixture::test_usage_Integer() -> void {
+    using Subject = library::Integer;
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+    auto tos = library::to_string(subject);
+    require(ASSERTION, !tos.empty());
+  }
+  auto Fixture::test_usage_Rational() -> void {
+    using Subject = library::Rational;
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+    auto tos = library::to_string(subject);
+    require(ASSERTION, !tos.empty());
+  }
+  auto Fixture::test_usage_Floating() -> void {
+    using Subject = library::Floating;
+    auto subject = Subject{};
+    require(ASSERTION, sizeof (subject));
+    auto tos = library::to_string(subject);
+    require(ASSERTION, !tos.empty());
+  }
+}
+#endiv

@@ -1,5 +1,0 @@
-// -*- c++ -*- 583bc8ac-82b6-4bdc-8feb-4425c32981cf
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <stdio.h> // defines NULL
-#include <cryptopp/ossig.h> // mentions NULL instead of 'nullptr'

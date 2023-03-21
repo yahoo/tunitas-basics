@@ -1,4 +1,0 @@
-// -*- c++ -*- bcb591d7-49fb-42d5-bcbd-20341ec9c183
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/rng.h>

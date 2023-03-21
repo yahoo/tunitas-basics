@@ -1,4 +1,0 @@
-#divert <fpp>
-#import nonstd.path.filename.mount
-namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] mount { using namespace ::nonstd::path::filename::mount; } } }
-#endiv

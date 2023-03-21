@@ -1,0 +1,71 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number.mp.required.Small
+namespace tunitas::number::mp::get {
+  //
+  // Extract the small representation, if possible.
+  //
+  // Specification:
+  //
+  //   What it says.
+  //
+  // Design:
+  //
+  //   Specialize on the smallness of it all.
+  //
+  // Usage:
+  //
+  //   Check if it fits
+  //   Extract the small one.
+  //
+  template<required::Small> struct Extract;
+  template<> struct Extract<int long long signed>;
+  template<> struct Extract<int128_t>;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.get.By_Halves
+#import tunitas.number.mp.get.Fits
+#import tunitas.number.mp.get.Extract
+#import tunitas.number.mp.required.Carrier
+namespace tunitas::number::mp {
+  template<mp::required::Small SMALL> struct get::Extract {
+    using Result = SMALL;
+    template<required::Carrier CARRIER> inline static auto get(CARRIER const &impl) -> Result;
+  private:
+    using Fits = get::Fits<Result>;
+  };
+  namespace get {
+    template<> class Extract<int long long signed> : public By_Halves<int long long signed> {
+      using Ancestor = By_Halves<int long long signed>;
+    public:
+      template<required::Carrier CARRIER> inline static auto get(CARRIER const &impl) -> Result;
+    };
+    template<> class Extract<int128_t> : public By_Halves<int128_t> { };
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.exception.Range
+namespace tunitas::number::mp::get {
+  template<required::Small _> template<required::Carrier CARRIER> auto Extract<_>::get(CARRIER const &impl) -> Result {
+    if (!Fits::fit(impl)) {
+      throw exception::Range{"Extract<...>::get()"};
+    } else {
+      return Result(impl.get_si());
+    }
+  }
+  template<required::Carrier CARRIER> auto Extract<int long long signed>::get(CARRIER const &impl) -> Result {
+    if constexpr (sizeof (int long long signed) == sizeof (int long signed)) {
+      // All reasonable architectures are LP64 or similar
+      return Extract<int long signed>::get(impl);
+    } else {
+      return Ancestor::get(impl);
+    }
+  }
+}
+#endiv

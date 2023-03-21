@@ -1,4 +1,0 @@
-# these are synthetic
-*.o
-boost.*.cpp
-# main.cpp is not synthetic, do not ignore it

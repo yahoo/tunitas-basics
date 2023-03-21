@@ -1,5 +1,0 @@
-// -*- c++ -*- ddf63a68-d4db-42e3-9d82-ee3818fbc2e8
-// struct f_owner_ex
-#pragma once
-#include <unistd.h>
-#include <fcntl.h>

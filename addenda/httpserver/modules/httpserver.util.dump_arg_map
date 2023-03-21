@@ -1,6 +1,0 @@
-// -*- c++ -*- 59bf965e-292a-451c-b95d-88541c05e34d
-#pragma once
-#include <httpserver>
-namespace httpserver::http {
-  using httpserver::http::dump_arg_map;
-}

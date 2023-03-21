@@ -1,0 +1,110 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::wc {
+  namespace package_narrow {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_narrow::interface;
+}
+#import std.basic_string
+#import nonstd.allocator.Traits
+#include <hpp/nonstd.allocator.Traits>
+#import tunitas.number.wc.required // cascade that certain 'namespace required'
+namespace tunitas::number::wc::package_narrow {
+  namespace body {
+    // This implementation detail is not available to the (exported) interface
+    template<required::Character REBIND_CHAR, required::Allocator ORIGINAL_ALLOCATOR> using Rebind_String = std::basic_string<REBIND_CHAR, std::char_traits<REBIND_CHAR>, typename nonstd::allocator::Traits<ORIGINAL_ALLOCATOR>::template rebind_alloc<REBIND_CHAR>>;
+  }
+  template<required::Allocator WIDE_ALLOCATOR> using Narrowed = body::Rebind_String<char, WIDE_ALLOCATOR>;
+}
+#endiv
+#divert <hpp>
+#import std.basic_string
+#import tunitas.number.wc.required.string.Narrowable
+#import tunitas.number.wc.required.iterator.Narrowable
+#import std.locale
+namespace tunitas::number::wc::package_narrow {
+  namespace body::exported {
+    //
+    // Narrow the string
+    //
+    // Specification:
+    //
+    //   Just what it says on the label.
+    //
+    // Design:
+    //
+    //   Crudely cast each character.
+    //   [[FIXTHIS]] use locale::widen(...)
+    //
+    // Invariants:
+    //
+    //   Only valid for characters in the narrow range.
+    //   Only reasonable for characters in the "numeric" character set being [^0-9.+eE]
+    //
+    // Erudition: (from std::ctype<CHAR>::narrow(...) via https://en.cppreference.com/w/cpp/locale/ctype/narrow)
+    //
+    //   <quote>
+    //     Narrowing is always successful and is always reversible (by calling widen()) for all characters from the basic source character set (until C++23)basic character set (since C++23).
+    //       i.e. do_widen(do_narrow(c, 0)) == c always holds for any character c in the basic source character set (until C++23)basic character set (since C++23).
+    //     Narrowing, if successful, preserves all character classification categories known to is().
+    //       i.e. is(m, c) || !ctc.is(m, do_narrow(c, dflt)) is always true for any named ctype category with a ctype<char> facet ctc and ctype_base::mask value m (unless do_narrow returns dflt).
+    //     Narrowing of any digit character guarantees that if the result is subtracted from the character literal '0', the difference equals the digit value of the original character.
+    //       i.e. for any digit character c, the expression (do_narrow(c, dflt) - ’0’) evaluates to the digit value of the character.
+    //
+    // Usage:
+    //
+    //   auto already_wide = std::wstring{...somehow...};
+    //   auto narrowed = wc::narrow(already_wide);
+    //
+    template<typename CHAR, typename TRAITS, typename ALLOCATOR> inline auto narrow(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &) -> Narrowed<ALLOCATOR> requires required::string::Narrowable<CHAR, TRAITS, ALLOCATOR>;
+    template<typename ITERATOR> inline auto narrow(ITERATOR start, ITERATOR finish) -> std::string requires required::iterator::Narrowable<ITERATOR>;
+    //
+    template<typename CHAR, typename TRAITS, typename ALLOCATOR> inline auto narrow(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &, std::locale const &) -> Narrowed<ALLOCATOR> requires required::string::Narrowable<CHAR, TRAITS, ALLOCATOR>;
+    template<typename ITERATOR> inline auto narrow(ITERATOR start, ITERATOR finish, std::locale const &) -> std::string requires required::iterator::Narrowable<ITERATOR>;
+  }
+}
+#endiv
+#divert <ipp>
+#import std.transform
+#import std.back_inserter
+#import nonstd.container.Traits
+#import nonstd.iterator.Traits
+#import std.use_facet
+#import std.ctype
+namespace tunitas::number::wc::package_narrow {
+  template<typename ITERATOR> auto interface::narrow(ITERATOR start, ITERATOR finish) -> std::string requires required::iterator::Narrowable<ITERATOR> {
+    using Wide_Character = typename nonstd::iterator::Traits<ITERATOR>::Value;
+    using Narrow_Character = typename nonstd::container::Traits<std::string>::Value;
+    auto ret = std::string{};
+    std::transform(start, finish, back_inserter(ret), [](Wide_Character wc) { return Narrow_Character(wc); });
+    return ret;
+  }
+  template<typename CHAR, typename TRAITS, typename ALLOCATOR> auto interface::narrow(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &wide) -> Narrowed<ALLOCATOR> requires required::string::Narrowable<CHAR, TRAITS, ALLOCATOR> {
+    using Wide_Character = CHAR;
+    using Narrow_Character = typename nonstd::container::Traits<std::string>::Value;
+    auto ret = std::string{};
+    std::transform(wide.begin(), wide.end(), back_inserter(ret), [](Wide_Character wc) { return Narrow_Character(wc); });
+    return ret;
+  }
+  template<typename ITERATOR> auto interface::narrow(ITERATOR start, ITERATOR finish, std::locale const &locale) -> std::string requires required::iterator::Narrowable<ITERATOR> {
+    using Wide_Character = typename nonstd::iterator::Traits<ITERATOR>::Value;
+    auto const &facet = std::use_facet<std::ctype<Wide_Character>>(locale);
+    auto ret = std::string{};
+    std::transform(start, finish, back_inserter(ret), [&facet](Wide_Character wc) { return facet.narrow(wc); });
+    return ret;
+  }
+  template<typename CHAR, typename TRAITS, typename ALLOCATOR> auto interface::narrow(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &wide, std::locale const &locale) -> Narrowed<ALLOCATOR> requires required::string::Narrowable<CHAR, TRAITS, ALLOCATOR> {
+    using Wide_Character = CHAR;
+    auto const &facet = std::use_facet<std::ctype<Wide_Character>>(locale);
+    auto ret = std::string{};
+    std::transform(wide.begin(), wide.end(), back_inserter(ret), [&facet](Wide_Character wc) { return facet.narrow(wc); });
+    return ret;
+  }
+}
+#endiv

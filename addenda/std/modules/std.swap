@@ -1,4 +1,0 @@
-// -*- c++ -*- bb750206-4ed8-420f-babf-0eccf9a00b30
-#pragma once
-#include <algorithm> // pre- C++11
-#include <utility> // C++11

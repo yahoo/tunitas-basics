@@ -1,4 +1,0 @@
-// -*- c++ -*- be9f400a-0174-481e-b1c6-9dcf1bfdb602
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/modes.h>

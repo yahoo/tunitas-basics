@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_number_required_SUBSOURCES = \
+  obj/src/tunitas/number/required/namespace.cpp \
+  obj/src/tunitas/number/required/Number.cpp \
+  obj/src/tunitas/number/required/Integer.cpp \
+  obj/src/tunitas/number/required/Rational.cpp \
+  obj/src/tunitas/number/required/Floating.cpp \
+  obj/src/tunitas/number/required/String.cpp \
+  $(end)

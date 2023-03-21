@@ -1,9 +1,0 @@
-# This is a -*- Makefile -*- fragment.
-# For terms and provenance see the LICENSE file at the top of this repository.
-obj_src_nonstd_filesystem_SUBSOURCES = \
-  obj/src/nonstd/filesystem/namespace.cpp \
-  obj/src/nonstd/filesystem/path.cpp \
-  obj/src/nonstd/filesystem/filesystem_error.cpp \
-  obj/src/nonstd/filesystem/Path.cpp \
-  obj/src/nonstd/filesystem/Exception.cpp \
-  $(end)

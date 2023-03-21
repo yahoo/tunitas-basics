@@ -1,0 +1,63 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.container.Traits // but likely you will need some specializations
+#include <hpp/nonstd.container.Traits>
+#import nonstd.iterator.Traits // but likely you will need some specializations
+#include <hpp/nonstd.iterator.Traits>
+#import nonstd.required.iterator.Forward
+#import nonstd.required.iterator.Producing
+#import nonstd.required.allocator.Producing
+#import nonstd.required.character.Type
+#import nonstd.required.character.Traits
+namespace tunitas::number::wc::required::iterator {
+  //
+  // Are these arguments suitable for iterator-based wc::widen<...>(...)?
+  //
+  namespace [[eponymous]] widenable {
+    namespace [[eponymous]] iterator {
+      using namespace tunitas::number::wc::required::iterator;
+      template<typename ITERATOR> concept Iterator = requires(ITERATOR) {
+        requires Forward<ITERATOR>;
+        typename nonstd::iterator::Traits<ITERATOR>::Value;
+        requires character::Type<typename nonstd::iterator::Traits<ITERATOR>::Value>;
+        requires same_as<char, typename nonstd::iterator::Traits<ITERATOR>::Value>; // MUST be the narrow character, otherwise we won't be widening, right?
+        requires Producing<ITERATOR, typename nonstd::iterator::Traits<ITERATOR>::Value>;
+      };
+    }
+    using iterator::Iterator;
+    namespace [[eponymous]] result {
+      template<typename RESULT, typename CHAR, typename TRAITS, typename ALLOCATOR> concept Wide_String = requires(RESULT, CHAR, TRAITS, ALLOCATOR) {
+        requires character::Type<CHAR>;
+        requires !same_as<char, CHAR>; // MUST be some wide character, otherwise this isn't a wide string, right?
+        requires character::Traits<TRAITS, CHAR>;
+        requires allocator::Producing<ALLOCATOR, CHAR>;
+        requires derived_from<RESULT, std::basic_string<CHAR, TRAITS, ALLOCATOR>>;
+      };
+      template<typename RESULT> concept By_Derived_From = requires(RESULT result) {
+        { []<typename CHAR, typename TRAITS, typename ALLOCATOR, template<typename, typename, typename> class BASIC_STRING>(BASIC_STRING<CHAR, TRAITS, ALLOCATOR> const &) requires Wide_String<RESULT, CHAR, TRAITS, ALLOCATOR> {}(result) };
+      };
+      template<typename RESULT> concept By_Traits = requires(RESULT result) {
+#if 0
+        // Likely this won't be available until nonstd-2.2ish
+        requires Wide_String<RESULT, typename string::Traits<RESULT>::Value, typename string::Traits<RESULT>::Traits, typename string::Traits<RESULT>::Allocator>;
+#else
+        // A poor approximation
+        requires Wide_String<RESULT, typename nonstd::container::Traits<RESULT>::Value, std::char_traits<typename nonstd::container::Traits<RESULT>::Value>, std::allocator<typename nonstd::container::Traits<RESULT>::Value>>;
+#endif
+      };
+      template<typename RESULT> concept Result = By_Derived_From<RESULT> || By_Traits<RESULT>;
+    }
+    using result::Result;
+    template<typename RESULT, typename ITERATOR> concept Widenable = requires(RESULT, ITERATOR) {
+      requires Iterator<ITERATOR>;
+      requires Result<RESULT>;
+      // There is no consistency manifest guarantee between ITERATOR and RESULT other than ITERATOR is narrow and RESULT is wide
+    };
+  }
+  using widenable::Widenable;
+}
+#endiv

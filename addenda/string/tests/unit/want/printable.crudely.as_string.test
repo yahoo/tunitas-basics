@@ -1,4 +1,0 @@
-#!/bin/sh
-source ${0%/*}/rigging.sh || exit 1
-unit /want/printable/crudely/as_string
-

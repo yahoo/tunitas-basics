@@ -1,5 +1,0 @@
-// -*- c++ -*- 97e766fc-af0d-434d-bcfe-7dfe8306331a
-#pragma once
-// namespace std.string_literals
-// c.f. http://en.cppreference.com/w/cpp/string/basic_string/operator%22%22s
-#include <string>

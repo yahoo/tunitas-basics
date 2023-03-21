@@ -1,4 +1,0 @@
-// -*- c++ -*- a741b3fc-9b6a-43b3-a645-f1b2ff959827
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/gfpcrypt.h>

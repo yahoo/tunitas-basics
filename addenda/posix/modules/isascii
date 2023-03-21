@@ -1,4 +1,0 @@
-// -*- c++ -*- dc7ca36f-461d-4d95-b8aa-502a75922ca7
-// isascii but not std::isascii
-#pragma once
-#include <ctype.h>

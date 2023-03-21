@@ -1,4 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-set -e
-soa ${TEST_SOA?}

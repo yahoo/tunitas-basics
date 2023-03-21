@@ -1,0 +1,58 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc, 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::application::options::get { struct Quitting; }
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.application.exception.Aspect
+#import tunitas.application.exception.feature.Quitting
+#import tunitas.application.options.Program
+#import tunitas.exception.partial.Runtime
+#import cli.exits.Code
+class tests::unit::application::options::get::Quitting : public virtual tunitas::exception::Aspect,
+                                                         public virtual tunitas::application::exception::Aspect,
+                                                         public virtual tunitas::application::exception::feature::Quitting,
+                                                         public tunitas::exception::partial::Runtime {
+  struct Ancestors {
+    struct Aspects {
+      using Core = tunitas::exception::Aspect;
+      using App = tunitas::application::exception::Aspect;
+    };
+    using Feature = ::tunitas::application::exception::feature::Quitting;
+    using Exception = tunitas::exception::partial::Runtime;
+  };
+  using Program = ::tunitas::application::options::Program;
+  using Exit = cli::exits::Code;
+public:
+  Quitting(Program const &, Exit = Exit{1});
+  auto what() const noexcept -> char const * override final;
+  auto stream() const noexcept -> std::ostream & override final;
+  auto code() const noexcept -> Exit override final;
+  auto exit() const noexcept -> Exit override final;
+};
+#endiv
+#divert <cpp>
+#import tunitas.application.required.exception.Quitting
+namespace {
+  namespace testate {
+    namespace required = tunitas::application::required;
+    namespace thisone = tests::unit::application::options::get;
+    static_assert(required::exception::Quitting<thisone::Quitting>);
+  }
+}
+#import cli.exits.constants
+namespace tests::unit::application::options::get {
+  Quitting::Quitting(Program const &program, Exit code)
+    : Ancestors::Feature{code}
+    , Ancestors::Exception{program + " had a test failure"}
+  { }
+  auto Quitting::what() const noexcept -> char const *     { return Ancestors::Exception::what(); }
+  auto Quitting::stream() const noexcept -> std::ostream & { return Ancestors::Feature::stream(); }
+  auto Quitting::code() const noexcept -> cli::exits::Code { return Ancestors::Feature::code(); }
+  auto Quitting::exit() const noexcept -> cli::exits::Code { return Ancestors::Feature::code(); }
+}
+#endiv

@@ -1,4 +1,0 @@
-// -*- c++ -*- 45ef3b06-4261-46fe-9c4b-0f86807e38f0
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/zinflate.h>

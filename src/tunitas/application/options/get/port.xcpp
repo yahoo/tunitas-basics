@@ -1,0 +1,97 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  namespace package_port {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_port::interface;
+}
+#import std.uint16_t // [[REMOVETHIS]]
+#import sys.in.Port // port_t and c::port_t
+namespace tunitas::application::options::get::package_port {
+  using Port = std::uint16_t; // [[FIXTHIS]] becomes sys::in::port_t, that certain enumeration; better: becomes Port, that certain class
+  namespace body { }
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.get.Whence
+namespace tunitas::application::options::get::package_port::body {
+  //
+  // Acquire a port number from the longish Step
+  //
+  // The port is returned, not an outcome.
+  // The port value is checked to ensure that it is really a 16-bit IP port number.
+  // We SHOULD be using ip::in::port_t but do not; for reasons and to reduce dependencies.
+  //
+  // Scheme:
+  //
+  //   --port=PORT
+  //
+  // Example:
+  //
+  //   --port=8080
+  //
+  // Usage:
+  //
+  //   auto cfg = Configuration{...somehow...}
+  //   options::longish::Step step{...somehow...};
+  //   auto port = port(cfg, step);
+  //
+  namespace exported {
+    // ease of export (see the parent scope)
+    template<required::exception::Quitting QUITTING> inline auto get_port(Whence, Step const &) -> Port;
+    template<required::exception::Quitting QUITTING> inline auto get_port(Whence, Step const &, Field) -> Port;
+    // by naming convention
+    template<required::exception::Quitting QUITTING> inline auto port(Whence, Step const &) -> Port;
+    template<required::exception::Quitting QUITTING> auto port(Whence, Step const &, Field) -> Port;
+  }
+  inline constexpr auto const FIELD = "port";
+}
+#endiv
+#divert <ipp>
+namespace tunitas::application::options::get::package_port {
+  template<required::exception::Quitting QUITTING> auto interface::get_port(Whence whence, Step const &step) -> Port              { return port<QUITTING>(whence, step); }
+  template<required::exception::Quitting QUITTING> auto interface::get_port(Whence whence, Step const &step, Field field) -> Port { return port<QUITTING>(whence, step, field); }
+  template<required::exception::Quitting QUITTING> auto interface::port(Whence whence, Step const &step) -> Port                  { return port<QUITTING>(whence, step, FIELD); }
+}
+#endiv
+#divert <tpp>
+#import cli.options.shortish // need to see options::shortish::required_word(...)
+#import langu.age.ine
+#import std.exception
+#import std.numeric_limits
+#import std.size_t
+#import std.stoi
+#import tunitas.string.Storage
+#import tunitas.exception.Runtime
+namespace tunitas::application::options::get::package_port {
+  template<required::exception::Quitting QUITTING> auto interface::port(Whence whence, Step const &step, Field field) -> Port {
+    // Whereas std::stoi signals failure both via exception and also via its 2nd inout parameter
+    // we have to put a lot of machinery around it to make it safe and obvious what is occurring.
+    std::string const syntax = required_word(step);
+    try {
+      std::size_t end{0};
+      auto candidate = std::stoi(syntax, &end);
+      if (end != syntax.size()) {
+        throw exception::Runtime{"stoi"};
+      }
+      auto const lo = 1+std::numeric_limits<std::uint16_t>::min();
+      auto const hi = std::numeric_limits<std::uint16_t>::max();
+      if (candidate < 0 || candidate < lo || hi < candidate) {
+        error(whence) << "the service port " << candidate << " is out of range " << lo << ".." << hi << '\n';
+        throw QUITTING{whence.name(), sys::exits::CONFIG};
+      }
+      return candidate;
+    } catch (std::exception const &) {
+      // The exception will say "stoi" (ours or theirs)
+      error(whence) << "the service port is not a number - " << langu::age::ine(syntax) << '\n';
+      throw QUITTING{whence.name(), sys::exits::CONFIG};
+    }
+  }
+}
+#endiv

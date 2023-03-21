@@ -1,9 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#divert <fpp>
-#warning shell.run.Program.NSUPDATE is deprecated, instead prefer shell.program.Program.NSUPDATE
-#import shell.program.Program.NSUPDATE
-namespace shell::run {
-  template<typename SOMETHING> using Program [[deprecated("avoid shell::run::Program<SOMETHING> in new work. instead, prefer shell::program::Program<SOMETHING>")]] = program::Program<SOMETHING>;
-}
-#endiv

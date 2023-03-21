@@ -1,4 +1,0 @@
-// -*- c++ -*- eb1ca4d5-5cd2-47cf-b5f2-8978dece4873
-#pragma once
-// The complex #ifdefs for experimental features are done but once.
-#include <std.filesystem>

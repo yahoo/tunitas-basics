@@ -1,3 +1,0 @@
-// -*- c++ -*- fb26785e-1037-4574-afd7-694c6a379259
-#pragma once
-#include <boost/program_options/parsers.hpp>

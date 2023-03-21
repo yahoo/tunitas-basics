@@ -1,3 +1,0 @@
-// -*- c++ -*- 84459903-b560-402f-ba86-541bc2c8b5d8
-#pragma once
-#include <boost/program_options/variables_map.hpp>

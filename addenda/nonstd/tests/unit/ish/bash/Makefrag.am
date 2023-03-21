@@ -1,3 +1,0 @@
-tests_unit_ish_bash_TESTS = \
-  tests/unit/ish/bash/cases.test \
-  $(end)

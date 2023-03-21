@@ -1,6 +1,0 @@
-// -*- c++ -*- 87227511-7af0-4038-abc0-8830ee6de9ef
-#pragma once
-#include <cppunit/plugin/PlugInParameters.h>
-namespace cppunit::plugin {
-  using Parameters = CppUnit::PlugInParameters;
-}

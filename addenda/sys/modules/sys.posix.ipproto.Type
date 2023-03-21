@@ -1,5 +1,0 @@
-// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
-// For terms and provenance see the LICENSE file at the top of the repository.
-#pragma once
-#warning [[deprecated]] instead prefer #import sys.ip.proto.Protocol or #import sys.posix.IPPROTO
-#include <sys.ip.proto.Protocol>

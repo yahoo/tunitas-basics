@@ -1,4 +1,0 @@
-// -*- c++ -*- 10ba2210-1e66-4931-99ad-21a4d04abc72
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/strciphr.h>

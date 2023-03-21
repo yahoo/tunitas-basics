@@ -1,8 +1,0 @@
-// -*- c++ -*- 84d25cd2-382b-4558-acd5-a054c289dc57
-#pragma once
-#include <cppunit/plugin/TestPlugIn.h>
-// WATCHOUT - for some reason, this struct (class) is NOT naturally in the namespace.
-// Here we force it back into the (our new) namespace.
-namespace cppunit::plugin {
-  using Test = ::CppUnitTestPlugIn;
-}

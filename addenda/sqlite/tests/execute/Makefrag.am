@@ -1,8 +1,0 @@
-tests_execute_XFAIL_TESTS = $(none)
-tests_execute_TESTS = \
-  tests/execute/usage.test \
-  tests/execute/version.test \
-  tests/execute/t001.test \
-  tests/execute/t002.test \
-  tests/execute/emptiness-001.test \
-  $(end)

@@ -1,0 +1,13 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::mp::required {
+  //
+  // Is this type one of the multiple precision types?
+  //
+  template<typename TYPE> concept Carrier = same_as<TYPE, mpz_class> || same_as<TYPE, mpq_class> || same_as<TYPE, mpf_class>;
+}
+#endiv

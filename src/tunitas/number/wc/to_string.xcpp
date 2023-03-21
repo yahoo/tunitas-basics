@@ -1,0 +1,125 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::wc {
+  namespace package_to_string {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_to_string::interface;
+}
+#import tunitas.number.required.String
+#import tunitas.number.required.Number
+#import std.basic_ostringstream
+#import std.in_place_type
+namespace tunitas::number::wc::package_to_string {
+  namespace body {
+    template<required::String RESULT> using Buffer = std::basic_ostringstream<typename RESULT::value_type, typename RESULT::traits_type>;
+    template<required::Number NUMBER> using Emplace = std::in_place_type_t<NUMBER>;
+    template<required::Number NUMBER> inline constexpr auto EMPLACE = std::in_place_type<NUMBER>;
+  }
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.required.Floating
+#import tunitas.string.Storage
+namespace tunitas::number::wc {
+  namespace package_to_string::body {
+    namespace exported {
+      //
+      // Convert a big {Integer, Rational, Floating} to a string
+      //
+      // Specification:
+      //
+      //   Whatever the underlying operator<< on thin characters actually does.
+      //
+      // Design:
+      //
+      //   Because the underlying tmp package only has thin-character conversions.
+      //   Yup, we're really hacking it here ... pretending that widen(c) -> WIDECHAR is as simple as this
+      //
+      //   Lookit all those function overloads.
+      //   That allows the nearby function template to be of the same name as a "secondary choice"
+      //
+      // Exceptions:
+      //
+      //   exception::Invalid on unsupported base
+      //     Integer, Rational ... with base not in { 0, 8, 16 }
+      //     Floating ............ with base not in { 0, 16 }
+      //
+      // Usage:
+      //
+      //   auto stringie = to_string(specimen);
+      //
+      inline auto to_string(Integer const &) -> string::Storage;
+      inline auto to_string(Rational const &) -> string::Storage;
+      inline auto to_string(Floating const &) -> string::Storage;
+      //
+      inline auto to_string(Integer const &, int base) -> string::Storage;
+      inline auto to_string(Rational const &, int base) -> string::Storage;
+      inline auto to_string(Floating const &, int base) -> string::Storage;
+      inline auto to_string(Floating const &, mp::Precision, int base = 0) -> string::Storage;
+      //
+      template<required::String RESULT, required::Number NUMBER> inline auto to_string(NUMBER const &, int base = 0) -> RESULT;
+      template<required::String RESULT, required::Floating NUMBER> inline auto to_string(Floating const &, mp::Precision, int base = 0) -> RESULT;
+    }
+    template<required::String RESULT, required::Number NUMBER> inline auto generally(NUMBER const &, int base) -> RESULT;
+    template<required::String RESULT, required::Floating NUMBER> inline auto generally(NUMBER const &, mp::Precision, int base) -> RESULT;
+    template<required::Character CHAR, required::Character_Traits TRAITS> inline auto configure_base(Emplace<Floating>, std::basic_ostream<CHAR, TRAITS> &, int base) -> void;
+    template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> inline auto configure_base(Emplace<NUMBER>, std::basic_ostream<CHAR, TRAITS> &, int base) -> void;
+  }
+}
+#endiv
+#divert <ipp>
+#import std.oct
+#import std.hex
+#import std.dec
+#import std.fixed
+#import std.scientific
+#import tunitas.number.exception.Invalid
+namespace tunitas::number::wc::package_to_string {
+  auto interface::to_string(Integer const &candidate) -> string::Storage  { return generally<string::Storage>(candidate, 0); }
+  auto interface::to_string(Rational const &candidate) -> string::Storage { return generally<string::Storage>(candidate, 0); }
+  auto interface::to_string(Floating const &candidate) -> string::Storage { return generally<string::Storage>(candidate, 0); }
+      //
+  auto interface::to_string(Integer const &candidate, int base) -> string::Storage  { return generally<string::Storage>(candidate, base); }
+  auto interface::to_string(Rational const &candidate, int base) -> string::Storage { return generally<string::Storage>(candidate, base); }
+  auto interface::to_string(Floating const &candidate, int base) -> string::Storage { return generally<string::Storage>(candidate, base); }
+  auto interface::to_string(Floating const &candidate, mp::Precision precision, int base) -> string::Storage { return generally<string::Storage>(candidate, precision, base); }
+  //
+  template<required::String RESULT, required::Number NUMBER> auto interface::to_string(NUMBER const &candidate, int base) -> RESULT                              { return generally<RESULT>(candidate, base); }
+  template<required::String RESULT, required::Floating NUMBER> auto interface::to_string(Floating const &candidate, mp::Precision precision, int base) -> RESULT { return generally<RESULT>(candidate, precision, base); }
+  //
+  template<required::Character CHAR, required::Character_Traits TRAITS> auto body::configure_base(Emplace<Floating>, std::basic_ostream<CHAR, TRAITS> &outbound, int base) -> void {
+    using O = std::basic_ostream<CHAR, TRAITS>;
+    if (0 == base || 10 == base) { /* the default */ }
+    else if (16 == base)         { outbound.setf(O::scientific|O::fixed, O::floatfield); } // set both for hexfloat https://en.cppreference.com/w/cpp/io/manip/fixed
+    else if (8 == base)          { throw exception::Invalid{"octal floating"}; } 
+    else                         { throw exception::Invalid{"weird base"}; } 
+  }
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS> auto body::configure_base(Emplace<NUMBER>, std::basic_ostream<CHAR, TRAITS> &outbound, int base) -> void {
+    using O = std::basic_ostream<CHAR, TRAITS>;
+    if (0 == base) { /* the default */ }
+    else if (8 == base)  { outbound.setf(O::oct, O::basefield); }
+    else if (10 == base) { outbound.setf(O::dec, O::basefield); }
+    else if (16 == base) { outbound.setf(O::hex, O::basefield); }
+    else                 { throw exception::Invalid{"weird base"}; }
+  }
+  template<required::String RESULT, required::Number NUMBER> auto body::generally(NUMBER const &candidate, int base) -> RESULT {
+    auto buf = Buffer<RESULT>{};
+    configure_base(EMPLACE<NUMBER>, buf, base);
+    buf << candidate;
+    return buf.str();
+  }
+  template<required::String RESULT, required::Floating NUMBER> auto body::generally(NUMBER const &candidate, mp::Precision precision, int base) -> RESULT {
+    auto buf = Buffer<RESULT>{};
+    configure_base(EMPLACE<NUMBER>, buf, base);
+    buf.precision(underlying(precision));
+    buf << candidate;
+    return buf.str();
+  }
+}
+#endiv

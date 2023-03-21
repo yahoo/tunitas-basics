@@ -1,9 +1,0 @@
-# these are synthetic
-# everything except main.cpp
-?.cpp
-??.cpp
-???.cpp
-# main.cpp is not synthetic, do not ignore it
-[^m]???.cpp
-?????*.cpp
-# end

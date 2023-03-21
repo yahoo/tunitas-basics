@@ -1,4 +1,0 @@
-// -*- c++ -*- 2bb57b95-b32d-4f42-a022-c7210be3f18f
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/trap.h>

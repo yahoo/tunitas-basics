@@ -1,0 +1,147 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::wc {
+  namespace package_to_numeric {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_to_numeric::interface;
+}
+#import nonstd.same_as
+#import tunitas.number.wc.required
+#import tunitas.number.mp.required.Carrier
+namespace tunitas::number::wc::package_to_numeric {
+  using nonstd::same_as;
+  namespace required {
+    using namespace tunitas::number::wc::required;
+    using mp::required::Carrier;
+    template<typename MP, typename... MATCHES> concept Among = Carrier<MP> && (same_as<MP, MATCHES> && ... );
+  }
+  namespace body { }
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.required.Carrier
+#import std.basic_string
+#import std.ios_base
+namespace tunitas::number::wc {
+  namespace package_to_numeric::body {
+    namespace exported {
+      //
+      // Construct a CARRIER by to_numericing from a string
+      //
+      // Specification:
+      //
+      //    Construct from a wide string
+      //
+      // Design:
+      //
+      //   From a narrow character \0-terminated character representation.
+      //
+      //   Access the C++ constructor which accesses the C API.
+      //   Yes, this is supposed to be difficult to access; it is an implemenetation detail.
+      //   Yes, that's a raw character pointer htat you see there. Pull yourself together!  It'll work fine!
+      //
+      //   [[FIXTHIS?]] there is no way to communicate scientific or fixed into the CARRIER parsing.
+      //
+      //   Observe:
+      //     mpf_class::mpf_class(std::string conts &) ........................................ NO precision AND NO base
+      //     mpf_class::mpf_class(std::string conts &, mp_bitcnt_t precision, int base = 0) ... optional base 
+      //
+      //     [[WATCHOUT]] the simple conversion constructor is NOT always the same as the 2-arg constructor with base=0
+      //     e.g. see mpf_class
+      //
+      // Exceptions:
+      //
+      //   throws std::invalid_argument if the syntax is wrong; does NOT throw exception::Invalid
+      //   per the underlying constructor of CARRIER::CARRIER(string const &)
+      //
+      // Responsibilities:
+      //
+      //   It is the caller's responsibility to catch std::invalid_argument and to_numeric it to an appropriate numeric::exception::Aspect descendant
+      //   e.g. numeric::exception::Invalid when called from numeric::from_string(...) or numeric::from_string_view(...)
+      //   e.g. numeric::exception::Stream when in the context of a stream operation such as operator>>(...)
+      //
+      // Usage:
+      //
+      //   Hack The Spew (it's an implemenation detail).
+      //
+      template<required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> inline auto to_numeric(std::basic_string<CHAR, TRAITS> const &) -> CARRIER;
+      template<required::Among<mpz_class, mpq_class> CARRIER, required::Character CHAR, required::Character_Traits TRAITS> inline auto to_numeric(std::basic_string<CHAR, TRAITS> const &, int base) -> CARRIER;
+      template<required::Among<mpf_class> CARRIER, required::Character CHAR, required::Character_Traits TRAITS> inline auto to_numeric(std::basic_string<CHAR, TRAITS> const &, mp::Precision, int base) -> CARRIER;
+      template<required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> inline auto to_numeric(std::basic_string<CHAR, TRAITS> const &, std::ios_base const &) -> CARRIER;
+    }
+    inline auto integral_base(std::ios_base const &) -> int; // because 'int base' is the type in that certain constructor CARRIER::CARRIER(...)
+    inline auto floating_base(std::ios_base const &) -> int; // eadem ratione
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.wc.narrow
+namespace tunitas::number::wc::package_to_numeric {
+  template<required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> auto interface::to_numeric(std::basic_string<CHAR, TRAITS> const &syntax) -> CARRIER {
+    if constexpr (same_as<CHAR, char>) {
+      return CARRIER(syntax); // [[WATCHOUT]] - see the Observe clause above
+    } else {
+      return CARRIER(narrow(syntax));
+    }
+  }
+  template<required::Among<mpz_class, mpq_class> CARRIER, required::Character CHAR, required::Character_Traits TRAITS> auto interface::to_numeric(std::basic_string<CHAR, TRAITS> const &syntax, int base) -> CARRIER {
+    if constexpr (same_as<CHAR, char>) {
+      return CARRIER(syntax, base);
+    } else {
+      return CARRIER(narrow(syntax), base);
+    }
+  }
+  template<required::Among<mpf_class> CARRIER, required::Character CHAR, required::Character_Traits TRAITS> auto interface::to_numeric(std::basic_string<CHAR, TRAITS> const &syntax, mp::Precision precision, int base) -> CARRIER {
+    if constexpr (same_as<CHAR, char>) {
+      return CARRIER{syntax, precision, base};
+    } else {
+      return CARRIER{narrow(syntax), precision, base};
+    }
+  }
+  template<required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> auto interface::to_numeric(std::basic_string<CHAR, TRAITS> const &syntax, std::ios_base const &ios) -> CARRIER {
+    if constexpr (same_as<CHAR, char>) {
+      if constexpr (same_as<CARRIER, mpf_class>) {
+        return CARRIER{syntax, ios.precision(), floating_base(ios)};
+      } else {
+        return CARRIER{syntax, integral_base(ios)};
+      }
+    } else {
+      auto narrowed = narrow(syntax);
+      if constexpr (same_as<CARRIER, mpf_class>) {
+        return CARRIER{narrow(syntax), ios.precision(), floating_base(ios)};
+      } else {
+        return CARRIER{narrow(syntax), integral_base(ios)};
+      }
+    }
+  }
+  auto body::integral_base(std::ios_base const &ios) -> int {
+    auto const flags = ios.flags();
+    if (flags & std::ios_base::dec) {
+      return 10;
+    } else if (flags & std::ios_base::oct) {
+      return 8;
+    } else if (flags & std::ios_base::hex) {
+      return 16;
+    } else {
+      return 0; // which means something slightly different than base=10
+    }
+  }
+  auto body::floating_base(std::ios_base const &ios) -> int {
+    auto const flags = ios.flags();
+    auto const scientific = flags & std::ios_base::scientific;
+    auto const fixed = flags & std::ios_base::fixed;
+    auto const hexfloat = scientific && fixed;
+    if (hexfloat) {
+      return 16;
+    } else {
+      return 0; // which means something slightly different than base=10
+    }
+  }
+}
+#endiv

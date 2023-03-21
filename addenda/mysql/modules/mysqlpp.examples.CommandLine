@@ -1,4 +1,0 @@
-// -*- c++ -*- 89440032-d325-4227-8879-bb8ae08f73c0
-#pragma once
-#include "mysql++/cmdline.h"
-

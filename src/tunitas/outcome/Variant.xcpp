@@ -80,7 +80,7 @@ namespace std {
 }
 #endiv
 #divert <ipp>
-#import std.invalid_argument
+#import tunitas.exception.Invalid
 #import tunitas.outcome.Visitor
 template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::ok(Variant<VALUE> const &r) -> bool { return good(r); }
 template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::fail(Variant<VALUE> const &r) -> bool { return !good(r); }
@@ -97,7 +97,7 @@ template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::error_code(
   using Value = typename Variant<VALUE>::Value;
   auto const &a = static_cast<typename Variant<VALUE>::Ancestor const &>(r);
   auto v = Visitor{[](Error const &e) { return e; },
-                   [](Value const &v) -> std::error_code { throw std::invalid_argument{"Result::Value"}; }};
+                   [](Value const &v) -> std::error_code { throw exception::Invalid{"Result::Value"}; }};
   return visit(v, a);
 }
 template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::error_condition(Variant<VALUE> const &r) -> std::error_condition {
@@ -105,14 +105,14 @@ template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::error_condi
   using Value = typename Variant<VALUE>::Value;
   auto const &a = static_cast<typename Variant<VALUE>::Ancestor const &>(r);
   auto v = Visitor{[](Error const &e) { return e.category().default_error_condition(e.value()); },
-                   [](Value const &v) -> std::error_condition { throw std::invalid_argument{"Result::Value"}; }};
+                   [](Value const &v) -> std::error_condition { throw exception::Invalid{"Result::Value"}; }};
   return visit(v, a);
 }
 template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Variant<VALUE> const &r) -> VALUE const & {
   using Error = typename Variant<VALUE>::Error;
   using Value = typename Variant<VALUE>::Value;
   auto const &a = static_cast<typename Variant<VALUE>::Ancestor const &>(r);
-  auto v = Visitor{[](Error const &e) -> Value const & { throw std::invalid_argument{"Variant::Error"}; },
+  auto v = Visitor{[](Error const &e) -> Value const & { throw exception::Invalid{"Variant::Error"}; },
                    [](Value const &v) -> Value const & { return v; }};
   return visit(v, a);
 }
@@ -120,7 +120,7 @@ template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Varia
   using Error = typename Variant<VALUE>::Error;
   using Value = typename Variant<VALUE>::Value;
   auto &a = static_cast<typename Variant<VALUE>::Ancestor &>(r);
-  auto v = Visitor{[](Error &e) -> Value & { throw std::invalid_argument{"Variant::Error"}; },
+  auto v = Visitor{[](Error &e) -> Value & { throw exception::Invalid{"Variant::Error"}; },
                    [](Value &v) -> Value & { return v; }};
   return visit(v, a);
 }
@@ -129,7 +129,7 @@ template<tunitas::required::Outcomable VALUE> auto tunitas::outcome::value(Varia
   using Error = typename Variant<VALUE>::Error;
   using Value = typename Variant<VALUE>::Value;
   auto &a = static_cast<typename Variant<VALUE>::Ancestor &>(r);
-  auto v = Visitor{[](Error &e) -> Value && { throw std::invalid_argument{"Variant::Error"}; },
+  auto v = Visitor{[](Error &e) -> Value && { throw exception::Invalid{"Variant::Error"}; },
                    [](Value &v) -> Value && { return std::move(v); }};
   return visit(v, a);
 }

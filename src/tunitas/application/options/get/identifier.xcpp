@@ -1,0 +1,80 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::application::options::get {
+  namespace package_identifier {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_identifier::interface;
+}
+#import tunitas.string.Storage
+namespace tunitas::application::options::get::package_identifier {
+  using Identifier = string::Storage;
+  namespace body { }
+}
+#endiv
+#divert <hpp>
+#import tunitas.application.options.get.Whence
+namespace tunitas::application::options::get::package_identifier::body {
+  //
+  // Acquire an identifier from the longish Step
+  //
+  // The identifier is returned, not an outcome.
+  // The word value is checked to ensure that it is not empty and is an identifier.
+  // In this case, identifier means matching m/^[-_0-9a-zA-Z]+$/
+  // So the rpm package identifier "0ad" is allowed as intended.
+  //
+  // Scheme:
+  //
+  //   --identifier=NAME
+  //
+  // Example:
+  //
+  //   --package=0ad
+  //   --user=jdoe
+  //
+  // Usage:
+  //
+  //   auto exp = Experience{...somehow...}
+  //   auto step = cli::options::longish::Step{...somehow...};
+  //   using Quitting = exception::Quitting;
+  //
+  //   std::string identifier = get_identifier<Quitting>(cfg, step);
+  //
+  namespace exported {
+    // ease of export (see the parent scope)
+    template<required::exception::Quitting QUITTING> inline auto get_identifier(Whence, Step const &) -> tunitas::application::options::get::package_identifier::Identifier;
+    template<required::exception::Quitting QUITTING> inline auto get_identifier(Whence, Step const &, Field) -> Identifier;
+    // by naming convention
+    template<required::exception::Quitting QUITTING> inline auto identifier(Whence, Step const &) -> Identifier;
+    template<required::exception::Quitting QUITTING> auto identifier(Whence, Step const &, Field) -> Identifier;
+  }
+}
+#endiv
+#divert <ipp>
+namespace tunitas::application::options::get::package_identifier {
+  template<required::exception::Quitting QUITTING> auto interface::get_identifier(Whence whence, Step const &step) -> Identifier              { return identifier<QUITTING>(whence, step); }
+  template<required::exception::Quitting QUITTING> auto interface::get_identifier(Whence whence, Step const &step, Field field) -> Identifier { return identifier<QUITTING>(whence, step, field); }
+  template<required::exception::Quitting QUITTING> auto interface::identifier(Whence whence, Step const &step) -> Identifier                  { return identifier<QUITTING>(whence, step, "identifier"); }
+}
+#endiv
+#divert <tpp>
+#import std.isalnum
+#import std.all_of
+#import tunitas.application.options.get.word
+namespace tunitas::application::options::get::package_identifier {
+  template<required::exception::Quitting QUITTING> auto interface::identifier(Whence whence, Step const &step, Field field) -> Identifier {
+    string::Storage candidate = word<QUITTING>(whence, step, field);
+    auto const is_identifier = [](char c) { return '_' == c || '-' == c || std::isalnum(c); };
+    if (!std::all_of(candidate.begin(), candidate.end(), is_identifier)) {
+      error(whence) << "the " << field << " is is not an identifier - '" << candidate << "'\n";
+      throw QUITTING{whence.name(), CONFIG};
+    }
+    return candidate;
+  }
+}
+#endiv

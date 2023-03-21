@@ -1,5 +1,0 @@
-// -*- c++ -*- c6838501-2476-44ea-b02f-9c65e8fc80a3
-#pragma once
-#include <iterator>
-#include <tuple>
-#include <std.span> // contains the feature testing

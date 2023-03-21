@@ -1,3 +1,0 @@
-// -*- c++ -*- f7e3cc54-2f78-4ffb-8078-6c205ff2b0ac
-#pragma once
-#include "mysql++/cpool.h"

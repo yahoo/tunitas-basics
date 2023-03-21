@@ -1,0 +1,138 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::number::mp { struct Fixture; }
+#endiv
+#divert <hpp>
+#import tunitas.number.required.Number
+#import tunitas.number.mp.required.Small
+#import tests.unit.number.mp.required // cascade that certain namespace
+#import tunitas.number.Integer
+#import nonstd.numeric_limits
+struct tests::unit::number::mp::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  template<required::Number BIG> static auto subsuite(string::View name) -> Stream;
+  //
+  class Candidate : public ::tunitas::number::Integer {
+    using Ancestor = ::tunitas::number::Integer;
+  public:
+    using Ancestor::Integer;
+    using Ancestor::impl; // accessible so we can test it
+  };
+  template<required::Small SMALL> using Limits = nonstd::numeric_limits<SMALL>;
+  //
+  template<required::Small SMALL> auto test_usage_Extract() -> void;
+  template<required::Small SMALL> auto test_usage_Fits() -> void;
+};
+#endiv
+#divert <tpp>
+#import tests.unit.number.mp.Driver
+#import tests.unit.number.mp.Outbound
+namespace tests::unit::number::mp {
+  template<required::Number BIG> auto Fixture::subsuite(string::View name) -> Stream {
+    auto sub = Stream{name};
+    sub << add<Driver<BIG, char signed>>()
+        << add<Driver<BIG, int short signed>>()
+        << add<Driver<BIG, int signed>>()
+        << add<Driver<BIG, int long signed>>()
+        << add<Driver<BIG, int long long signed>>()
+        << add<Driver<BIG, int128_t>>()
+        << []{
+             auto io = Stream{"io"sv};
+             io << add<Outbound<BIG, char, std::char_traits<char>>>()
+                << add<Outbound<BIG, wchar_t, std::char_traits<wchar_t>>>()
+                << add<Outbound<BIG, char8_t, std::char_traits<char8_t>>>()
+                << add<Outbound<BIG, char16_t, std::char_traits<char16_t>>>()
+                << add<Outbound<BIG, char32_t, std::char_traits<char32_t>>>()
+                << END;
+             return io;
+           }()
+        << END;
+    return sub;
+  }
+}
+#import tunitas.number.mp.get.Extract
+#import tunitas.number.mp.get.Fits
+namespace tests::unit::number::mp {
+  template<required::Small SMALL> auto Fixture::test_usage_Extract() -> void {
+    using Subject = library::get::Extract<SMALL>;
+    { auto original = Limits<SMALL>::min() + 1;
+      auto candidate = Candidate{original};
+      auto got = Subject::get(candidate.impl);
+      require(ASSERTION, original == got); }
+    { auto original = SMALL{};
+      auto candidate = Candidate{original};
+      auto got = Subject::get(candidate.impl);
+      require(ASSERTION, original == got); }
+    { auto original = Limits<SMALL>::max() - 1;
+      auto candidate = Candidate{original};
+      auto got = Subject::get(candidate.impl);
+      require(ASSERTION, original == got); }
+    // test for the exception in the Driver
+  }
+  template<required::Small SMALL> auto Fixture::test_usage_Fits() -> void {
+    using Subject = library::get::Fits<SMALL>;
+    { auto original = Limits<SMALL>::min();
+      Candidate candidate = Candidate{original} - 1;
+      auto got = Subject::fit(candidate.impl);
+      require(ASSERTION, false == got); }
+    { auto original = Limits<SMALL>::min();
+      Candidate candidate = Candidate{original} + 1;
+      auto got = Subject::fit(candidate.impl);
+      require(ASSERTION, true == got); }
+    { auto original = SMALL{};
+      Candidate candidate = Candidate{original};
+      auto got = Subject::fit(candidate.impl);
+      require(ASSERTION, true == got); }
+    { auto original = Limits<SMALL>::max();
+      Candidate candidate = Candidate{original} - 1;
+      auto got = Subject::fit(candidate.impl);
+      require(ASSERTION, true == got); }
+    { auto original = Limits<SMALL>::max();
+      Candidate candidate = Candidate{original} + 1;
+      auto got = Subject::fit(candidate.impl);
+      require(ASSERTION, false == got); }
+  }
+}
+#endiv
+#divert <cpp>
+auto tests::unit::number::mp::Fixture::suite() -> Suite {
+  auto series = Stream{"mp"sv};
+  series << []{
+              auto use = Stream{"usage"sv};
+              use << []{
+                       auto ext = Stream{"Extract"sv};
+                       ext << add("char signed", &Fixture::test_usage_Extract<char signed>)
+                           << add("int short signed", &Fixture::test_usage_Extract<int short signed>)
+                           << add("int signed", &Fixture::test_usage_Extract<int signed>)
+                           << add("int long signed", &Fixture::test_usage_Extract<int long signed>)
+                           << add("int long long signed", &Fixture::test_usage_Extract<int long long signed>)
+                           << add("int128_t", &Fixture::test_usage_Extract<int128_t>)
+                           << END;
+                       return ext;
+                     }()
+                  << []{
+                       auto ext = Stream{"Fits"sv};
+                       ext << add("char signed", &Fixture::test_usage_Fits<char signed>)
+                           << add("int short signed", &Fixture::test_usage_Fits<int short signed>)
+                           << add("int signed", &Fixture::test_usage_Fits<int signed>)
+                           << add("int long signed", &Fixture::test_usage_Fits<int long signed>)
+                           << add("int long long signed", &Fixture::test_usage_Fits<int long long signed>)
+                           << add("int128_t", &Fixture::test_usage_Fits<int128_t>)
+                           << END;
+                       return ext;
+                     }()
+                  << END;
+              return use;
+            }()
+         << subsuite<library::Integer>("Intger")
+         << subsuite<library::Rational>("Rational")
+         << subsuite<library::Floating>("Floating")
+         << END;
+  return settle(series);
+}
+#endiv
+#endiv

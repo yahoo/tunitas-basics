@@ -1,0 +1,179 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+// For terms, see the LICENSE file at the top of this repository.
+#divert <fpp>
+namespace tests::unit::application::options::get { class Fixture; }
+#endiv
+#divert <hpp>
+#import tunitas.application.options.exception.Aspect
+#import tunitas.application.options.get.Limits
+struct tests::unit::application::options::get::Fixture : public cppunit::test::Fixture {
+  static auto suite() -> cppunit::Test *;
+  //
+  auto test_get_filepath_good() -> void;
+  auto test_get_filepath_bad() -> void;
+  auto test_get_identifier_good() -> void;
+  auto test_get_identifier_bad() -> void;
+  template<typename RESULT, typename LIMITS> auto test_get_integer_good() -> void;
+  template<typename RESULT, typename LIMITS> auto test_get_integer_bad() -> void;
+  auto test_get_port_good() -> void;
+  auto test_get_port_bad() -> void;
+  auto test_get_word_good() -> void;
+  auto test_get_word_bad() -> void;
+protected:
+  using Failure = ::tunitas::application::options::exception::Aspect;
+  template<auto LO, auto HI> using Limits = library::Limits<LO, HI>;
+};
+#endiv
+#divert <tpp>
+#import tests.unit.application.options.get.Configuration
+#import tests.unit.application.options.get.Step
+#import tests.unit.application.options.get.Quitting
+#import tunitas.application.options.get.integer
+namespace tests::unit::application::options::get {
+  template<typename RESULT, typename LIMITS> auto Fixture::test_get_integer_good() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "8080"};
+    auto num = library::integer<RESULT, Quitting, LIMITS>(cfg, step);
+    CPPUNIT_ASSERT(8080 == num);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  template<typename RESULT, typename LIMITS> auto Fixture::test_get_integer_bad() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "apple"};
+    library::integer<RESULT, Quitting, LIMITS>(cfg, step);
+    CPPUNIT_ASSERT(false);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#endiv
+#divert <cpp>
+auto tests::unit::application::options::get::Fixture::suite() -> cppunit::Test * {
+  using namespace rigging::suite;
+  auto series = Stream{"get"};
+  series << []{
+           auto get = Stream{"filepath"};
+           get << call("good", &Fixture::test_get_filepath_good)
+               << call("bad", &Fixture::test_get_filepath_bad)
+               << END;
+           return get;
+         }()
+         << []{
+           auto get = Stream{"identifier"};
+           get << call("good", &Fixture::test_get_identifier_good)
+               << call("bad", &Fixture::test_get_identifier_bad)
+               << END;
+           return get;
+         }()
+         << []{
+           auto ger = Stream{"integer"};
+           ger << []{
+                 auto sig = Stream{"signed"};
+                 sig << call("good", &Fixture::test_get_integer_good<signed, Limits<8000, 9000>>)
+                     << call("bad", &Fixture::test_get_integer_bad<signed, Limits<1, 1023>>)
+                     << END;
+                 return sig;
+               }()
+               << []{
+                 auto uns = Stream{"unsigned"};
+                 uns << call("good", &Fixture::test_get_integer_good<unsigned, Limits<8000, 9000>>)
+                     << call("bad", &Fixture::test_get_integer_bad<unsigned, Limits<1, 1023>>)
+                     << END;
+                 return uns;
+               }()
+               << END;
+           return ger;
+         }()
+         << []{
+           auto get = Stream{"port"};
+           get << call("good", &Fixture::test_get_port_good)
+               << call("bad", &Fixture::test_get_port_bad)
+               << END;
+           return get;
+         }()
+         << []{
+           auto get = Stream{"word"};
+           get << call("good", &Fixture::test_get_word_good)
+               << call("bad", &Fixture::test_get_word_bad)
+               << END;
+           return get;
+         }()
+         << END;
+  return finalize(series);
+}
+#import tunitas.application.options.get.identifier
+#import tunitas.application.options.get.port
+#import tunitas.application.options.get.word
+#import tunitas.application.options.get_filepath
+namespace tests::unit::application::options::get {
+  auto Fixture::test_get_filepath_good() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "./o.file.out"};
+    auto filepath = library::filepath<Quitting>(cfg, step);
+    CPPUNIT_ASSERT("./o.file.out" == filepath);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  auto Fixture::test_get_filepath_bad() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, ""}; // <------------------------ the only bad filepath is an empty filepath
+    library::filepath<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(false);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Fixture::test_get_identifier_good() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "cherry123"};
+    auto identifier = library::identifier<Quitting>(cfg, step);
+    CPPUNIT_ASSERT("cherry123" == identifier);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  auto Fixture::test_get_identifier_bad() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "!@#$%"}; // <------------------------ there are many bad identifiers
+    library::identifier<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(false);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Fixture::test_get_port_good() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "8080"};
+    auto port = library::port<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(8080u == port);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  auto Fixture::test_get_port_bad() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "apple"};
+    library::port<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(false);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(true);
+  }
+  auto Fixture::test_get_word_good() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, "bird"};
+    auto word = library::word<Quitting>(cfg, step);
+    CPPUNIT_ASSERT("bird" == word);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(false);
+  }
+  auto Fixture::test_get_word_bad() -> void try {
+    Configuration cfg;
+    Step step{Step::Code::CHR_f, ""}; // <------------------------ the only bad word is an empty word
+    library::word<Quitting>(cfg, step);
+    CPPUNIT_ASSERT(false);
+  } catch (Failure const &e) {
+    CPPUNIT_ASSERT(true);
+  }
+}
+#endiv

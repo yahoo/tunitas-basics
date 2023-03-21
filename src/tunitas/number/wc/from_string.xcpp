@@ -1,0 +1,63 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tunitas.Outcome
+#forward tunitas.number.mp // for mp::Precision
+#import tunitas.number.required.Number
+#import tunitas.number.required.Floating
+#import tunitas.number.wc.required // cascade that certain 'namespace required'
+#import std.basic_string
+namespace tunitas::number::wc {
+  //
+  // Convert a string to an { Integer, Rational, Floating }
+  //
+  // Specification:
+  //
+  //   Return an outcome
+  //
+  // Design:
+  //
+  //   Underneath we have to use the package-suppled operator>> and hope
+  //   ADL will NOT find from_string(...)
+  //   [[FIXTHIS]] become locale-aware
+  //
+  // Usage:
+  //
+  //   using Number = one among { Integer, Rational, Floating };
+  //
+  //   auto specimen = "...somehow...";
+  //   auto got = from_string<Number>(specimen);
+  //   if (good(got)) {
+  //     auto recovered = value(move(got));
+  //     ...celebrate...
+  //   } else {
+  //     auto recovered = error_code(got);
+  //     ..complain...
+  //   }
+  //
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> inline auto from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &) -> Outcome<NUMBER>;
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> inline auto from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &, int base) -> Outcome<NUMBER>;
+  template<required::Floating NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> inline auto from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &, mp::Precision, int base = 10) -> Outcome<NUMBER>;
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.wc.to_numeric
+#import tunitas.number.wc.traits.Numeric
+namespace tunitas::number {
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> auto wc::from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &syntax) -> Outcome<NUMBER> try {
+    return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(syntax)};
+  } catch (...) {
+    return {E::FAILURE};
+  }
+  template<required::Number NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> auto wc::from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &syntax, int base) -> Outcome<NUMBER> try {
+    return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(syntax, base)};
+  } catch (...) {
+    return {E::FAILURE};
+  }
+  template<required::Floating NUMBER, required::Character CHAR, required::Character_Traits TRAITS, required::Allocator ALLOCATOR> auto wc::from_string(std::basic_string<CHAR, TRAITS, ALLOCATOR> const &syntax, mp::Precision precision, int base) -> Outcome<NUMBER> try {
+    return {to_numeric<typename traits::Numeric<NUMBER>::Carrier>(syntax, precision, base)};
+  } catch (...) {
+    return {E::FAILURE};
+  }
+}
+#endiv

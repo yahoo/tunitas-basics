@@ -1,4 +1,0 @@
-// -*- c++ -*- 06a1e9e9-5968-4927-86a8-c4ba66ff8679
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/salsa.h>

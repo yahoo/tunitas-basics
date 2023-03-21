@@ -1,0 +1,56 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.mp.required // cascade that certain 'namespace required'
+#import tunitas.required.Character
+#import tunitas.required.Character_Traits
+#import tunitas.number.required.Number
+namespace tests::unit::number::mp {
+  template<required::Number, required::Character CHAR, required::Character_Traits> struct Outbound;
+}
+#endiv
+#divert <hpp>
+#import std.basic_ostringstream
+namespace tests::unit::number {
+  template<required::Number SUBJECT, required::Character CHAR, required::Character_Traits TRAITS> struct mp::Outbound : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    using Character = CHAR;
+    using Character_Traits = TRAITS;
+    using Stringstream = std::basic_ostringstream<Character, Character_Traits>;
+    //
+    template<int> auto test_operator_insert() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::number::mp {
+  template<required::Number N, required::Character C, required::Character_Traits T> auto Outbound<N,C,T>::suite() -> Suite {
+    auto series = Stream{"operator<<"sv};
+    series << add("0", &Outbound::test_operator_insert<0>)
+           << add("99", &Outbound::test_operator_insert<99>)
+           << add("-99", &Outbound::test_operator_insert<-99>)
+           << END;
+    return settle(series);
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> template<int SPECIMEN> auto Outbound<N,C,T>::test_operator_insert() -> void {
+    auto buf = Stringstream{};
+    auto subject = Subject{SPECIMEN};
+    buf << subject; // <------------------------------------------------------------ test this
+    auto str = buf.str();
+    if constexpr (std::same_as<Character, char>) {
+      std::cerr << "number: " << str <<  '\n';
+    } else if constexpr (std::same_as<Character, char8_t>) {
+      auto view = string::View{reinterpret_cast<char const *>(str.data()), str.size()};
+      std::cerr << "number8: " << view <<  '\n';
+    } else {
+      // We don't get to see the multi-byte representations.
+    }
+    require(ASSERTION, !str.empty());
+  }
+}
+#endiv

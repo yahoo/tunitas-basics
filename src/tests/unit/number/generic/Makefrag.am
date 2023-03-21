@@ -1,0 +1,14 @@
+# This is a GNU -*- Makefile -*- fragment which is managed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tests_unit_number_generic_SUBSOURCES = \
+  check/obj/src/tests/unit/number/Generic.cpp \
+  check/obj/src/tests/unit/number/generic/namespace.cpp \
+  check/obj/src/tests/unit/number/generic/Generic.cpp \
+  check/obj/src/tests/unit/number/generic/Number.cpp \
+  check/obj/src/tests/unit/number/generic/Comparison.cpp \
+  check/obj/src/tests/unit/number/generic/Expression.cpp \
+  check/obj/src/tests/unit/number/generic/From_String.cpp \
+  check/obj/src/tests/unit/number/generic/To_String.cpp \
+  check/obj/src/tests/unit/number/generic/Fits_Get.cpp \
+  $(end)

@@ -1,3 +1,0 @@
-// -*- c++ -*- c7dd6668-f16c-40bc-92c7-9f0c1d7e2492
-#pragma once
-#include <iterator> // move_sentinel is C++20

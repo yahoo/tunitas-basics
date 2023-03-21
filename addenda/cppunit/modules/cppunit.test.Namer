@@ -1,6 +1,0 @@
-// -*- c++ -*- 7f0dd139-8cb7-4159-8a90-3446fbfeac81
-#pragma once
-#include <cppunit/extensions/TestNamer.h>
-namespace cppunit::test {
-  using Namer = CppUnit::TestNamer;
-}

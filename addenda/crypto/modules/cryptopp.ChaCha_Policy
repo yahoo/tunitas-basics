@@ -1,4 +1,0 @@
-// -*- c++ -*- a8b97f56-9a14-43d2-9d88-76dcb9997d1e
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/chacha.h>

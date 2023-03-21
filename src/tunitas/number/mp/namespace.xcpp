@@ -1,0 +1,42 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.number
+#import nonstd.integers
+#if 0
+// It's never that simple now is it?
+// it turns out these are complicated typedefs of "hidden" expression classes
+class mpz_class;
+class mpq_class;
+class mpf_class;
+#else
+//  have to get it the hard way ... and early.
+#include <gmpxx.h>
+#endif
+namespace tunitas::number::mp {
+  using namespace nonstd::integers;
+  enum class Precision : mp_bitcnt_t;
+}
+#endiv
+#divert <hpp>
+#include <gmpxx.h>
+#import std.underlying_type
+namespace tunitas::number::mp {
+  inline constexpr auto underlying(Precision p) { return std::underlying_type_t<Precision>(p); }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::number::mp;
+    static_assert(sizeof (int8_t));
+    static_assert(sizeof (int16_t));
+    static_assert(sizeof (int32_t));
+    static_assert(sizeof (int64_t));
+    static_assert(sizeof (int128_t));
+  }
+}
+#endiv

@@ -1,0 +1,79 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::mp {
+  //
+  // A floating-point (big) number.
+  //
+  // Design:
+  //
+  //   Ensure that swap stays type-consistent.
+  //   A distinct type so known to overloading and ADL.
+  //
+  //   float-vs-double? (32-bit vs 64-bit types)
+  //   What's up with that  Who?
+  //   [[OMITTED]] the half floats (16 bits)
+  //
+  // Usgae:
+  //
+  //   See Generic<...>
+  //
+  struct Floating;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.Generic
+namespace tunitas::number {
+  class mp::Floating : public Generic<mpf_class> {
+    using Ancestor = Generic<mpf_class>;
+    friend auto swap(Floating &a, Floating b) noexcept -> void {
+      Ancestor &aa{a}, &bb{b};
+      swap(aa, bb);
+    }
+    inline static constexpr auto EMPLACE = Ancestor::Emplace<Ancestor::Carrier>{};
+  public:
+    using Precision = mp::Precision;
+    [[implicit]] Floating() = default;
+    using Ancestor::Generic;
+    inline [[implicit]] Floating(double);
+    inline [[implicit]] Floating(double, Precision);
+    inline [[implicit]] Floating(float);
+    inline [[implicit]] Floating(float, Precision);
+    inline [[implicit]] Floating(Expression<mpf_t, mpf_t> const &);
+    inline [[implicit]] Floating(Expression<mpf_t, mpf_t> &&);
+    template<typename LHS, typename RHS> inline [[implicit]] Floating(Expression<LHS, RHS> const &);
+    inline [[implicit]] Floating(Expression<mpf_t, mpf_t> const &, Precision);
+    template<typename LHS, typename RHS> inline [[implicit]] Floating(Expression<LHS, RHS> const &, Precision);
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::number::mp {
+  Floating::Floating(double value) : Floating{value, Precision{mpf_get_default_prec()}} { }
+  Floating::Floating(float value)  : Floating{value, Precision{mpf_get_default_prec()}} { }
+  Floating::Floating(double value, Precision precision) : Ancestor{EMPLACE, value, precision} { }
+  Floating::Floating(float value, Precision precision)  : Ancestor{EMPLACE, value, precision} { }
+  //
+  Floating::Floating(Expression<mpf_t, mpf_t> const &e)                                               : Ancestor{EMPLACE, e} { }
+  Floating::Floating(Expression<mpf_t, mpf_t> &&e)                                                    : Ancestor{EMPLACE, move(e)} { }
+  Floating::Floating(Expression<mpf_t, mpf_t> const &e, Precision p)                                  : Ancestor{EMPLACE, e, p} { }
+  template<typename LHS, typename RHS> Floating::Floating(Expression<LHS, RHS> const &e)              : Ancestor{EMPLACE, e} { }
+  template<typename LHS, typename RHS> Floating::Floating(Expression<LHS, RHS> const &e, Precision p) : Ancestor{EMPLACE, e, p} { }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::number::mp;
+    static_assert(std::is_default_constructible_v<Floating>);
+    static_assert(std::is_copy_constructible_v<Floating>);
+    static_assert(std::is_move_constructible_v<Floating>);
+    static_assert(std::is_copy_assignable_v<Floating>);
+    static_assert(std::is_move_assignable_v<Floating>);
+    static_assert(std::is_swappable_v<Floating>);
+  }
+}
+#endiv

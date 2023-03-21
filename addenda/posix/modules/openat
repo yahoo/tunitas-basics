@@ -1,5 +1,0 @@
-// -*- c++ -*- 62cbbd5a-9bd2-41d4-b296-95d441e8f98d
-#pragma once
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>

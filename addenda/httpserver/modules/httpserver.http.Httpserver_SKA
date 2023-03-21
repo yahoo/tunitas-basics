@@ -1,6 +1,0 @@
-// -*- c++ -*- 1f8c776e-9e55-4de7-8478-4f9059a5d810
-#pragma once
-#include <httpserver>
-namespace httpserver::http {
-  using Httpserver_SKA = httpserver::http::httpserver_ska;
-}

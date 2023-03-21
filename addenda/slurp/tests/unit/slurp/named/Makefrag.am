@@ -1,3 +1,0 @@
-tests_unit_slurp_named_TESTS = \
-  tests/unit/slurp/named/all.test \
-  $(end)

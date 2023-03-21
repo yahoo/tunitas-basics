@@ -1,6 +1,0 @@
-// -*- c++ -*- 075795f8-6c97-460c-9143-85c19fc45918
-#pragma once
-#include <cppunit/TestResult.h>
-namespace cppunit::test {
-  using Result = CppUnit::TestResult;
-}

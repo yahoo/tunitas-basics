@@ -1,0 +1,31 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.integer.Signed
+namespace tunitas::number::mp::required {
+  //
+  // These are the "small" integers.
+  // ... by virtue of not being the "big" integers.
+  //
+  // Specification:
+  //
+  //   Signed integers only.
+  //
+  // Background:
+  //
+  //   Also see the documentariat in Medium<INTEGER>
+  //
+  template<typename INTEGER> concept Small = integer::Signed<INTEGER>;
+#if 0
+  (same_as<INTEGER, char signed> ||
+   same_as<INTEGER, int short signed> ||
+   same_as<INTEGER, int signed> ||
+   same_as<INTEGER, int long signed> ||
+   same_as<INTEGER, int long long signed> ||
+   same_as<INTEGER, int128_t>);
+#endif
+}
+#endiv

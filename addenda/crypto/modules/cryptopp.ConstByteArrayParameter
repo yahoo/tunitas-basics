@@ -1,4 +1,0 @@
-// -*- c++ -*- e840b4ab-e636-400f-9b7c-e081b99de28e
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/algparam.h>

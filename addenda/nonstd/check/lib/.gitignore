@@ -1,5 +1,0 @@
-# yes, ./lib should exist
-.dirstamp
-.libs
-*.la
-# end

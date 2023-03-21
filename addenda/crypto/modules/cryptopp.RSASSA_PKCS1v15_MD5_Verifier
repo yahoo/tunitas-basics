@@ -1,4 +1,0 @@
-// -*- c++ -*- ff57a24e-a0ea-4e13-9df9-e079b6a37f32
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/rsa.h>

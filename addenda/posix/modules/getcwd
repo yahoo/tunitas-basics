@@ -1,9 +1,0 @@
-// -*- c++ -*- a850a9d6-b5e0-49c2-b255-0ef4aa140545
-#pragma once
-//
-// Recall: get-"wd" vs get-"cwd"
-//
-//   char *getcwd(char *buf, size_t size);
-//   char *getwd(char *buf);
-//
-#include <unistd.h>

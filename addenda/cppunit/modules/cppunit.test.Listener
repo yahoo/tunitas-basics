@@ -1,6 +1,0 @@
-// -*- c++ -*- 7b373c8b-e15b-440c-ad8c-502526000904
-#pragma once
-#include <cppunit/TestListener.h>
-namespace cppunit::test {
-  using Listener = CppUnit::TestListener;
-}

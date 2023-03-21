@@ -1,0 +1,13 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tests_unit_application_options_get_SUBSOURCES = \
+  check/obj/src/tests/unit/application/options/get/namespace.cpp \
+  check/obj/src/tests/unit/application/options/get/Fixture.cpp \
+  check/obj/src/tests/unit/application/options/get/Configuration.cpp \
+  check/obj/src/tests/unit/application/options/get/Quitting.cpp \
+  check/obj/src/tests/unit/application/options/get/Step.cpp \
+  $(end)

@@ -1,8 +1,0 @@
-The SCOLD module stubs for 'namespace want'
-
-Nominally this should only be the 'namespace want' placeholder as
-submodules within 'namespace want' occur within each separable package.
-
-Of course the same file cannot be owned by multiple packages.
-Hence, this stub.
-

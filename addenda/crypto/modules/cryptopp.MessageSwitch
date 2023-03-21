@@ -1,4 +1,0 @@
-// -*- c++ -*- 040eec46-8080-4be6-a6e0-b6f909837464
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/channels.h>

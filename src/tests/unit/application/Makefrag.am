@@ -18,12 +18,7 @@ tests_unit_application_SUBSOURCES = \
   check/obj/src/tests/unit/application/Drop.cpp \
   check/obj/src/tests/unit/application/Drop.Configuration.cpp \
   check/obj/src/tests/unit/application/Drop.Quitting.cpp \
-  \
-  check/obj/src/tests/unit/application/options.Fixture.cpp \
-  check/obj/src/tests/unit/application/options.Fixture.Configuration.cpp \
-  check/obj/src/tests/unit/application/options.Fixture.Quitting.cpp \
-  check/obj/src/tests/unit/application/options.Fixture.Step.cpp \
-  check/obj/src/tests/unit/application/options.Specification.cpp \
-  check/obj/src/tests/unit/application/options.Specification.Simple.cpp \
-  check/obj/src/tests/unit/application/options.exception.Fixture.cpp \
+  $(tests_unit_application_options_SUBSOURCES) \
   $(end)
+#
+include src/tests/unit/application/options/Makefrag.am

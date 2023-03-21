@@ -1,0 +1,41 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.application.options.get.required
+#import std.numeric_limits
+namespace tunitas::application::options::get {
+  namespace [[eponymous]] limits {
+    namespace required {
+      using namespace get::required;
+      template<typename LO, typename HI> concept Types = same_as<LO, HI>;
+      template<auto LO, auto HI> concept Values = LO < HI;
+      template<auto LO, auto HI> concept Limits = Types<decltype(LO), decltype(HI)> && Values<LO, HI>;
+    }
+    template<auto LO = std::numeric_limits<int>::min(), auto HI = std::numeric_limits<decltype(LO)>::max()> requires required::Limits<LO, HI> struct Limits;
+  }
+  using limits::Limits;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::application::options::get {
+  template<auto LO, auto HI> requires limits::required::Limits<LO, HI> struct limits::Limits {
+    using Value [[either]] = decltype(LO);
+    static constexpr auto min() -> Value { return LO; }
+    static constexpr auto max() -> Value { return HI; }
+  };
+}
+#endiv
+#divert <cpp>
+#import tunitas.application.options.get.required.Limits
+namespace {
+  namespace testate {
+    namespace required = tunitas::application::options::get::required;
+    namespace these = tunitas::application::options::get;
+    static_assert(required::Limits<these::Limits<-1, 2>>);
+    static_assert(required::Limits<these::Limits<1u, 2u>>);
+  }
+}
+#endiv

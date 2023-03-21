@@ -1,3 +1,0 @@
-# is throwaway, not installed because we used --objdir=$(__srcdir)
-want.cpp
-want.mk

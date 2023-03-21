@@ -1,6 +1,0 @@
-// -*- c++ -*- 282712c0-8e1b-4faa-be51-2b009aabb6e5
-#pragma once
-#include <cppunit/TextTestProgressListener.h>
-namespace cppunit::text {
-  using ProgressListener = CppUnit::TextTestProgressListener;
-}

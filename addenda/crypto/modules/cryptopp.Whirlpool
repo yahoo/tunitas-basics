@@ -1,4 +1,0 @@
-// -*- c++ -*- 5ea0ea4b-0cd4-4d15-959c-71201169b2a3
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/whrlpool.h>

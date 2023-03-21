@@ -1,4 +1,0 @@
-// -*- c++ -*- 23f6b7a0-c858-4669-a21a-7d4153fe0fb7
-#pragma once
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4152.pdf
-#include <exception>

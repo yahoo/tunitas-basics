@@ -1,9 +1,0 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# For terms and provenance see the LICENSE file at the top of this repository.
-#
-# used in ../Makefrag.am; included in the top-level Makefile.am
-src_tests_model_SOURCES_SET = \
-  obj/src/tests/model/namespace.cpp \
-  obj/src/tests/model/Namespace_Object.cpp \
-  obj/src/tests/model/Namespace_Object_Flags.cpp \
-  $(end)

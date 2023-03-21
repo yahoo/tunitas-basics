@@ -1,0 +1,69 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tunitas.Optional
+#import std.basic_istream
+#import std.basic_string
+#import tunitas.number.wc.draw.required.Carrier
+namespace tunitas::number::wc::draw {
+  //
+  // Draw a number-shaped string of characters off of the stream
+  //
+  // Specification:
+  //
+  //   Just what it says.
+  //
+  // Design:
+  //
+  //   The policy of draw-from MUST fit within the syntax acknowledged by the corresponding ::operator>>(...)
+  //
+  // Exceptions:
+  //
+  //   Yes.  Whatever happens when setstate(failbit) is called.
+  //
+  // Usage:
+  //
+  //   Hack the Spew (see tunitas.number.mp.io)
+  //
+  //   The input stream is side-effected by reading from it
+  //   The input stream format settings are acknowledged in the parsing;
+  //       and as such they must be acknowleged in the to_numeric<...>(...) conversion that follows.
+  //
+  template<required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> inline auto draw_from_stream(std::basic_istream<CHAR, TRAITS> &) -> Optional<std::basic_string<CHAR, TRAITS>>;
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.wc.draw.Continuation
+#import std.use_facet
+#import std.ctype
+namespace tunitas::number::wc {
+  template<draw::required::Carrier CARRIER, required::Character CHAR, required::Character_Traits TRAITS> auto draw::draw_from_stream(std::basic_istream<CHAR, TRAITS> &inbound) -> Optional<std::basic_string<CHAR, TRAITS>> {
+    using Continuation = draw::Continuation<CHAR, TRAITS>;
+    auto initial = typename Continuation::String{};
+    auto peek = typename Continuation::Character{};
+    if (!inbound.get(peek)) {
+      return {};
+    } else {
+      if (inbound.flags() & Continuation::Inbound::skipws) {
+        auto const &ct = std::use_facet<std::ctype<CHAR>>(inbound.getloc());
+        while (ct.is(Continuation::Type::space, peek) && inbound.get(peek)) {
+          continue;
+        }
+        if (inbound) {
+          // peek is valid but is not a space
+          if (Continuation::Traits::is_sign(peek)) {
+            // we have to ignore '+' because gmpxx's constructor calling C mpz_set_str(...)  doesn't accept it
+            if (Continuation::Traits::MINUS == peek) {
+              initial += peek;
+            }
+            inbound.get(peek); // we have to ignore '+' because gmpxx's constructor calling C mpz_set_str(...)  doesn't accept it
+          }
+        }
+      }
+      // inbound may or may not be exhausted (at EOF)
+      // peek may or may not be valid; is only valid if the 
+      return Continuation::continuation(Continuation::template EMPLACE<CARRIER>, inbound, peek, move(initial));
+    }
+  }
+}
+#endiv

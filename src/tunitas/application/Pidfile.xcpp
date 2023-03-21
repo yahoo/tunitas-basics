@@ -78,10 +78,11 @@ tunitas::application::Pidfile::~Pidfile() noexcept(false) {
 auto tunitas::application::Pidfile::manual() -> void {
   must_emit = false; // but does not affect unemitted
 }
+#import errno
 #import std.move
-#import std.system_error
-#include <cerrno>
 #import std.generic_category
+#import tunitas.application.exception // cascade that certain namespace
+#import tunitas.exception.System
 auto tunitas::application::Pidfile::open_stream(std::optional<std::filesystem::path> const &filepath, bool emit_pid) -> Stream_Pointer {
   if (!emit_pid) {
     return Stream_Pointer{};
@@ -90,7 +91,7 @@ auto tunitas::application::Pidfile::open_stream(std::optional<std::filesystem::p
   } else {
     Stream_Pointer ptr{std::make_unique<std::ofstream>(*filepath)};
     if (!*ptr) {
-      throw std::system_error{errno, std::generic_category()};
+      throw exception::System{errno, std::generic_category()};
     }
     return ptr;
   }

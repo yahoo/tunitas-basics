@@ -1,4 +1,0 @@
-// -*- c++ -*- ce81c9c5-1073-4f31-86cf-fc0b7ca3aa73
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/ttmac.h>

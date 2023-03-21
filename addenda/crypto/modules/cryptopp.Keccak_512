@@ -1,4 +1,0 @@
-// -*- c++ -*- 6b75bf15-9e00-4a3c-83c3-338d39022493
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/keccak.h>

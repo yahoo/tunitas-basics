@@ -1,0 +1,89 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <ipp>
+#import tunitas.number.wc.draw.Continuation.template
+namespace tunitas::number::wc::draw {
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::continuation(Emplace<mpf_class>, Inbound &inbound, Locale const &locale, Character first, String accrued) -> Optional<String> {
+    //
+    // found so far: sign (that's all that can be in accrued)
+    //
+    auto [peek, already, thatbase] = assess_base(inbound, locale, first);
+    if (!pull_leading_digits(accrued, inbound, locale, peek, already, thatbase)) {
+      //
+      // Can't even find the number
+      //
+      return {};
+    } else {
+      //
+      // found so far: sign number (that's a floating point number if you want it to be, but wait, there's more!)
+      // Now find the fraction (maybe)
+      //
+      auto peek = Character{};
+      if (inbound.get(peek)) {
+        Character point = std::use_facet<std::numpunct<Character> >(locale).decimal_point();
+        if (point == peek) {
+          //
+          // yes fractional part (decimal point.)
+          // We recognize the locale's but push the trivial (C local) one that gmpxx will recognize.
+          //
+          accrued.push_back(Inventory::PERIOD);
+          if (!inbound.get(peek)) {
+            //
+            // found: sign number . EOF
+            //
+            return move(accrued);
+          } else if (!pull_following_digits(accrued, inbound, locale, peek, thatbase) || !inbound) {
+            // something erroneous happened
+            return {};
+          } else if (!inbound.get(peek)) {
+            //
+            // found: sign number . number EOF
+            //
+            return move(accrued);
+          }
+        }
+      } else if (inbound.eof()) {
+        //
+        // found: sign number EOF
+        //
+        inbound.clear(Inbound::eofbit);
+        return move(accrued);
+      }
+      //
+      // found so far: sign number
+      // found so far: sign number . number
+      //
+      if (!Inventory::is_exp(peek)) {
+        //
+        // found: sign number
+        // found: sign number . number
+        //
+        inbound.putback(peek);
+        return move(accrued);
+      } else {
+        accrued += peek;
+        if (!inbound.get(peek)) {
+          // EOF after 'e' of exponent; this is an error
+          return {};
+        } else if (Inventory::is_sign(peek)) {
+          accrued += peek;
+          if (!inbound.get(peek)) {
+            // EOF after the sign after the 'e' of exponent; this is an error
+            return {};
+          }
+        }
+        if (!pull_leading_digits(accrued, inbound, locale, peek, Already::UNDETERMINED, thatbase) || !inbound) {
+          // no exponent number found
+          return {};
+        } else {
+          //
+          // found: sign number e sign number
+          // found: sign number . number e sign number
+          //
+          return move(accrued);
+        }
+      }
+    }
+  }
+}
+#endiv

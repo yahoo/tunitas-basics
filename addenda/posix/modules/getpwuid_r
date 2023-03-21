@@ -1,4 +1,0 @@
-// -*- c++ -*- 48c40b70-f600-4c1d-bc17-20cdb5065cf0
-#pragma once
-#include <sys/types.h>
-#include <pwd.h>

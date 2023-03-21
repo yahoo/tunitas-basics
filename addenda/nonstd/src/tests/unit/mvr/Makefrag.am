@@ -1,9 +1,0 @@
-# This is a -*- Makefile -*- fragment.
-# For terms and provenance see the LICENSE file at the top of this repository.
-obj_src_tests_unit_mvr_SUBSOURCES = \
-  obj/src/tests/unit/mvr/namespace.cpp \
-  obj/src/tests/unit/mvr/Fixture.cpp \
-  obj/src/tests/unit/mvr/Copywise.cpp \
-  obj/src/tests/unit/mvr/SAV.cpp \
-  obj/src/tests/unit/mvr/compatibility.cpp \
-  $(end)

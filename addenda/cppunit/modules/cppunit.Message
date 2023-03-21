@@ -1,6 +1,0 @@
-// -*- c++ -*- 35c1bff2-7f83-4969-8a4a-fcb307eba38c
-#pragma once
-#include <cppunit/Message.h>
-namespace cppunit {
-  using CppUnit::Message;
-}

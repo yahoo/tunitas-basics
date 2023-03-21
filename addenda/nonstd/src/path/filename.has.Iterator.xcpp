@@ -1,4 +1,0 @@
-#divert <fpp>
-#import nonstd.path.filename.has.Iterator
-namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] has { using ::nonstd::path::filename::has::Iterator; } } }
-#endiv

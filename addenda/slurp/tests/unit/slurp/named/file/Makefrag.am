@@ -1,5 +1,0 @@
-tests_unit_slurp_named_file_TESTS = \
-  tests/unit/slurp/named/file/all.test \
-  tests/unit/slurp/named/file/result.test \
-  tests/unit/slurp/named/file/Result_syscall.test \
-  $(end)

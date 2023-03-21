@@ -1,6 +1,0 @@
-// -*- c++ -*- 035338fd-a555-4e50-bce1-32c1db11c539
-#pragma once
-#include <cppunit/portability/Stream.h>
-namespace cppunit::stream::output {
-  using File = CppUnit::OFileStream;
-}

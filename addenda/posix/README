@@ -1,4 +1,0 @@
-A (the) Right & Proper C++ interface to POSIX system calls
-(and BSD and SVr4 & XOPEN, et al.)
-
-Also see nearby: module-c, module-std

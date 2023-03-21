@@ -1,0 +1,41 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::exception {
+  //
+  // There is a stream error in a number
+  //
+  // Semantic:
+  //
+  //   An operation on a stream considering a number
+  //
+  // Specification:
+  //
+  //   Yes. <psst>like std::ios_base::failure</psst>
+  //
+  // Design:
+  //
+  //   More than a type alias.  There is no design.
+  //
+  // Usage:
+  //
+  //   Throw it!
+  //
+  struct [[nodiscard]] Stream;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.complete.Basic
+#import tunitas.exception.partial.Stream
+#import tunitas.exception.Aspect
+#import tunitas.number.exception.Aspect
+class tunitas::number::exception::Stream final : public complete::Basic<partial::Stream, number::exception::Aspect, tunitas::exception::Aspect> {
+  using Ancestor = complete::Basic<partial::Stream, number::exception::Aspect, tunitas::exception::Aspect>;
+public:
+  explicit Stream() = default;
+  using Ancestor::Basic;
+};
+#endiv

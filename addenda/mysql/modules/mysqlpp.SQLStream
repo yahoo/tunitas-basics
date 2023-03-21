@@ -1,3 +1,0 @@
-// -*- c++ -*- 3cd31cf6-dcae-4196-820f-777dbbf1c5d0
-#pragma once
-#include "mysql++/sqlstream.h"

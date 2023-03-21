@@ -1,4 +1,0 @@
-// -*- c++ -*- 54091012-6f16-49c1-b89c-5d707ff4d76a
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/gzip.h>

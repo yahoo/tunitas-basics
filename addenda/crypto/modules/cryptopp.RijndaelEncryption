@@ -1,4 +1,0 @@
-// -*- c++ -*- 971c2d72-4973-42de-b0eb-99304d87dbb3
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/rijndael.h>

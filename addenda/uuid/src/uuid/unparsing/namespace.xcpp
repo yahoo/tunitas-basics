@@ -1,8 +1,0 @@
-// -*- c++ -*- in the SCOLD styling that is so popular these days
-#divert <hpp>
-namespace uuid {
-  namespace unparsing {
-    // lower and upper unparsing
-  }
-}
-#endiv

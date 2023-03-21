@@ -1,4 +1,0 @@
-// -*- c++ -*- 61ad5f29-168f-4ed0-82e0-b5e51ac80b72
-#pragma once
-// Must reference as <ctime> not <time.h> in order to place localtime as std::localtime
-#include <ctime>

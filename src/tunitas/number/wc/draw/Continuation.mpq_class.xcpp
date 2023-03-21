@@ -1,0 +1,49 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <ipp>
+#import tunitas.number.wc.draw.Continuation.template
+namespace tunitas::number::wc::draw {
+  template<required::Character C, required::Character_Traits T> auto Continuation<C,T>::continuation(Emplace<mpq_class>, Inbound &inbound, Locale const &locale, Character first, String accrued) -> Optional<String> {
+    //
+    // found so far: sign (that's the accrued)
+    //
+    auto [peek, already, thatbase] = assess_base(inbound, locale, first);
+    if (!pull_leading_digits(accrued, inbound, locale, peek, already, thatbase)) {
+      return {};
+    } else {
+      //
+      // Now find the denominator (maybe)
+      //
+      auto peek = Character{};
+      if (inbound.get(peek)) {
+        if (Inventory::SLASH == peek) {
+          //
+          // yes denominator
+          //
+          accrued.push_back(peek);
+          inbound.get(peek);
+          if (!pull_following_digits(accrued, inbound, locale, peek, thatbase)) {
+            return {};
+          } else {
+            //
+            // found: sign number / number
+            //
+            return move(accrued);
+          }
+        } else {
+          //
+          // no denominator
+          //
+          inbound.putback(peek);
+        }
+      } else if (inbound.eof()) {
+        inbound.clear(Inbound::eofbit);
+      }
+      //
+      // found: sign number
+      //
+      return move(accrued);
+    }
+  }
+}
+#endiv

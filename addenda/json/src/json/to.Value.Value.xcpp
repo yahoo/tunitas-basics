@@ -1,6 +1,0 @@
-// -*- c++ -*- but in the SCOLD stylings
-#divert <hpp>
-#import json.to.Value.ARGUMENT
-#import json.Value
-// no further definitions are necessary, the generic template handles the case
-#endiv

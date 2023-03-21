@@ -1,5 +1,0 @@
-// -*- c++ -*- 24a857ed-82d7-42ea-8fe7-c3a11042b4b4
-#pragma once
-// With module std.chrono representing but the namespace std::chrono alone.
-#include <chrono>
-

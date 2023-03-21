@@ -1,5 +1,0 @@
-# This is a -*- Makefile -*- fragment.
-# For terms and provenance see the LICENSE file at the top of this repository.
-obj_src_nonstd_iterator_traits_SUBSOURCES = \
-  obj/src/nonstd/iterator_traits/namespace.cpp \
-  $(end)

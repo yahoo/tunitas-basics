@@ -1,8 +1,0 @@
-#!/bin/sh
-# the source is still over in ../cat
-source ${0%/*}/../cat/framework.sh || exit 1
-source=tests/cat/datafile
-# but the output is here in ../tac
-trial=tests/tac/t99.datafile.trial
-gold=tests/tac/datafile.gold
-tac $source > $trial && diff $trial $gold

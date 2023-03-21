@@ -1,4 +1,0 @@
-#divert <fpp>
-#import nonstd.path.filename.has
-namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] has { using namespace ::nonstd::path::filename::has; } } }
-#endiv

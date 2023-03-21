@@ -1,6 +1,0 @@
-// -*- c++ -*- 22660e25-117e-4ed1-99b8-312d6c49b032
-#pragma once
-#include <cppunit/Protector.h>
-namespace cppunit {
-  using CppUnit::Functor;
-}

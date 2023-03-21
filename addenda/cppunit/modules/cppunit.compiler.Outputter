@@ -1,6 +1,0 @@
-// -*- c++ -*- b8c5d2b5-2258-4711-a590-526d16447141
-#pragma once
-#include <cppunit/CompilerOutputter.h>
-namespace cppunit::compiler {
-  using Outputter = CppUnit::CompilerOutputter;
-}

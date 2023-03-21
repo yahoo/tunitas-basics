@@ -1,4 +1,0 @@
-// -*- c++ -*- 5c73ebf0-7837-4aa0-a048-e84b6dfce005
-#pragma once
-#include <sys/types.h>
-#include <sys/signal.h>

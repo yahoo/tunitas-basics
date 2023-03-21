@@ -1,5 +1,5 @@
 # This is a GNU -*- Makefile -*- fragment that is included by Automake
-# Copyright Yahoo Inc. 2021
+# Copyright Yahoo Inc.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -18,10 +18,11 @@ tests_unit_SUBSOURCES = \
   $(tests_unit_exception_SUBSOURCES) \
   check/obj/src/tests/unit/exits.Fixture.cpp \
   $(tests_unit_for_each_SUBSOURCES) \
+  $(tests_unit_number_SUBSOURCES) \
   check/obj/src/tests/unit/outcome.Fixture.cpp \
   check/obj/src/tests/unit/outcome.Fixture.Uncopyable.cpp \
   check/obj/src/tests/unit/outcome.Usage.cpp \
-  check/obj/src/tests/unit/required.Fixture.cpp \
+  $(tests_unit_required_SUBSOURCES) \
   $(tests_unit_server_SUBSOURCES) \
   check/obj/src/tests/unit/time.Fixture.cpp \
   check/obj/src/tests/unit/time.literals.Fixture.cpp \
@@ -41,4 +42,6 @@ include src/tests/unit/base64/Makefrag.am
 include src/tests/unit/error/Makefrag.am
 include src/tests/unit/exception/Makefrag.am
 include src/tests/unit/for_each/Makefrag.am
+include src/tests/unit/number/Makefrag.am
+include src/tests/unit/required/Makefrag.am
 include src/tests/unit/server/Makefrag.am

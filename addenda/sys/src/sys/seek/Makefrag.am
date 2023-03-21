@@ -1,9 +1,0 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# For terms and provenance see the LICENSE file at the top of this repository.
-#
-# used in ../Makefrag.am; included in the top-level Makefile.am
-src_sys_seek_SOURCES_SET = \
-  obj/src/sys/seek/namespace.cpp \
-  obj/src/sys/seek/constants.cpp \
-  obj/src/sys/seek/Whence.cpp \
-  $(end)

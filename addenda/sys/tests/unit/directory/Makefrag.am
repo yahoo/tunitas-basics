@@ -1,4 +1,0 @@
-tests_unit_directory_TESTS = \
-  tests/unit/directory/cases.test \
-  tests/unit/directory/entry.test \
-  $(end)

@@ -1,4 +1,0 @@
-// -*- c++ -*- cd8965ca-e399-4397-b447-c20bf325f485
-#pragma once
-#include "mysql++/query.h"
-

@@ -1,4 +1,0 @@
-// -*- c++ -*- 9874fe7c-f811-4584-aa4c-adb4da7f0aef
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/zdeflate.h>

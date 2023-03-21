@@ -1,7 +1,0 @@
-#!/bin/sh
-source ${0%/*}/rigging.sh || exit 70
-if [[ -f ./ca.key.pem ]] ; then dir=.; else dir=tests/crl; fi
-tmpfile=$dir/t99.${name}.crl.pem
-# all files are infiles; the crl is spewed onto the stdout
-${exe?} ${dir}/ca.key.pem ${dir}/ca.crt.pem ${dir}/revoke/??.crt.pem > ${tmpfile?} &&
-openssl crl -in ${tmpfile?} -noout -text

@@ -1,3 +1,0 @@
-// -*- c++ -*- bf81213a-9794-4b47-be25-9a618ddb6ef0
-#pragma once
-#include "mysql++/field_types.h"

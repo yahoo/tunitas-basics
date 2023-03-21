@@ -1,4 +1,0 @@
-// -*- c++ -*- f2cb1501-cda7-4bd2-beb8-08b662055f53
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/sosemanuk.h>

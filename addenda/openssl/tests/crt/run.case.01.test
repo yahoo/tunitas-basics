@@ -1,5 +1,0 @@
-#!/bin/sh
-source ${0%/*}/rigging.sh || exit 70
-if [[ -f ./ca.key.pem ]] ; then dir=.; else dir=tests/crt; fi
-#       infile            infile            infile         -> stdout
-${exe?} ${dir}/ca.key.pem ${dir}/ca.crt.pem ${dir}/csr.pem 

@@ -1,4 +1,0 @@
-#divert <fpp>
-#import nonstd.path.filename.trimmer.Prototype
-namespace [[deprecated]] path { namespace [[deprecated]] filename { namespace [[deprecated]] trimmer { using ::nonstd::path::filename::trimmer::Prototype; } } }
-#endiv

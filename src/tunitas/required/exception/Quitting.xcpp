@@ -6,29 +6,39 @@
 #divert <fpp>
 #import tunitas.exception.Aspect
 #import std.exception
-#import std.is_base_of
-#import sys.exits.Code
+#import cli.exits.Code
 // Need the complete definition for these types.
 #include <hpp/tunitas.exception.Aspect>
 // NO NEED #include <hpp/std.exception>
 namespace tunitas::required::exception {
   //
-  // Is this a possible Quitting exception?
+  // Is this a possible (library non-UX) Quitting exception?
   //
   // MUST be a descendant of tunitas::exception::Aspect
   // MAY be a descendant of nonstd::exception::Quitting (where available)
   //
   // Usage:
   //
-  //   template<required::exception::Quitting QUITTING> auto drop(Configuration const &) -> void;
+  //   template<required::exception::Quitting QUITTING> auto something(...arguments...) -> void;
   //
-  template<typename QUITTING> concept Quitting = (std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
-                                                  && std::is_base_of<std::exception, QUITTING>::value
-                                                  && requires(QUITTING quitting, sys::exits::Code code) {
-                                                    // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
-                                                    { QUITTING{code} };
-                                                    { quitting.what() } -> convertible_to<char const *>;
-                                                    { quitting.code() } -> convertible_to<sys::exits::Code>;
-                                                  });
+  template<typename QUITTING> concept Quitting = requires(QUITTING quitting, cli::exits::Code code) {
+#if 1
+    { quitting } -> convertible_to<tunitas::exception::Aspect const &>;
+    { quitting } -> convertible_to<std::exception const &>;
+    requires std::is_default_constructible_v<QUITTING> || ! std::is_default_constructible_v<QUITTING>; // don't care.  get it?
+    { QUITTING{code} };
+    { quitting.what() } -> convertible_to<char const *>;
+    { quitting.code() } -> convertible_to<cli::exits::Code>;
+#else
+    requires (std::is_base_of<tunitas::exception::Aspect, QUITTING>::value
+              && std::is_base_of<std::exception, QUITTING>::value
+              && requires(QUITTING quitting, sys::exits::Code code) {
+                // OPTIONAL -- MAY have a default constructor, with constructor as QUITTING()
+                { QUITTING{code} };
+                { quitting.what() } -> convertible_to<char const *>;
+                { quitting.code() } -> convertible_to<sys::exits::Code>;
+              });
+#endif
+  };
 }
 #endiv

@@ -1,9 +1,0 @@
-SCOLD-style wrapping of Crypto++
-See https://github.com/weidai11/cryptopp
-
-See the LICENSE file at the top of the repository.
-Crypto++ is licensed to you separately, as indicated by the LICENSE file in its manifest.
-
-You will need the usual compilation tools.
-Also:
-dnf install -y cryptopp{,-devel}

@@ -1,6 +1,0 @@
-// -*- c++ -*- 4e94085b-4bdd-4871-bea4-da45a9e13f6a
-#pragma once
-#include <cppunit/SourceLine.h>
-namespace cppunit {
-  using CppUnit::SourceLine;
-}

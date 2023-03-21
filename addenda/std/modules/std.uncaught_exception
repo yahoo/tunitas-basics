@@ -1,5 +1,0 @@
-// -*- c++ -*- 10444a00-9569-44ca-8900-627517113907
-#pragma once
-// See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4152.pdf
-// Use the plural name std::uncaught_exceptions() instead
-#include <exception>

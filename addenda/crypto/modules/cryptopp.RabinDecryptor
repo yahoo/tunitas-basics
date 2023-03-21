@@ -1,4 +1,0 @@
-// -*- c++ -*- 713024ea-91d5-4889-b594-c8591ff93374
-#pragma once
-#include <cryptopp> // ours, with our namespace declarations
-#include <cryptopp/rabin.h>

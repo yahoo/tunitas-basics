@@ -1,0 +1,87 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.number.required // cascade that certain 'namespace required'
+#import nonstd.required.Character
+#import nonstd.required.Character_Traits
+#import tunitas.number.required.Number
+namespace tests::unit::number::generic {
+  template<required::Number, required::Character CHAR, required::Character_Traits = std::char_traits<CHAR>> class To_String;
+}
+#endiv
+#divert <hpp>
+#import std.basic_string
+#import std.basic_ostringstream
+namespace tests::unit::number {
+  template<required::Number SUBJECT, required::Character CHAR, required::Character_Traits TRAITS> struct generic::To_String : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    using Character = CHAR;
+    using Character_Traits = TRAITS;
+    using String = std::basic_string<Character, Character_Traits>;
+    using Stringsstream = std::basic_ostringstream<Character, Character_Traits>;
+    //
+    auto test_zero() -> void;
+    auto test_plus_one() -> void;
+    auto test_minus_one() -> void;
+    auto test_plus_big() -> void;
+    auto test_minus_big() -> void;
+  };
+}
+#endiv
+#divert <tpp>
+#import tunitas.number.to_string
+#import std.same_as
+namespace tests::unit::number::generic {
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::suite() -> Suite {
+    auto series = Stream{typeid(Character_Traits)};
+    if constexpr (std::same_as<char16_t, Character> || std::same_as<char32_t, Character>) {
+      auto const &here = std::source_location::current();
+      std::cerr << here.file_name() << ':' << here.line() << ':' << here.function_name() << '\n';
+      std::cerr << "[[FIXTHIS]] char16_t and char32_t are unimplemented (the accessing such locale facets throws std::bad_cast)\n";
+    } else {
+      series << add("-big", &To_String::test_minus_big)
+             << add("-1", &To_String::test_minus_one)
+             << add("0", &To_String::test_zero)
+             << add("1", &To_String::test_plus_one)
+             << add("+big", &To_String::test_plus_big)
+             << END;
+    }
+    return settle(series);
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::test_zero() -> void {
+    auto const specimen = Subject{0};
+    auto got = library::to_string<String>(specimen);
+    require(ASSERTION, !got.empty());
+    if constexpr (std::same_as<Character, char>) { std::cerr << got << '\n'; }
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::test_minus_one() -> void {
+    auto const specimen = Subject{-1};
+    auto got = library::to_string<String>(specimen);
+    require(ASSERTION, !got.empty());
+    if constexpr (std::same_as<Character, char>) { std::cerr << got << '\n'; }
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::test_plus_one() -> void {
+    auto const specimen = Subject{1};
+    auto got = library::to_string<String>(specimen);
+    require(ASSERTION, !got.empty());
+    if constexpr (std::same_as<Character, char>) { std::cerr << got << '\n'; }
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::test_minus_big() -> void {
+    auto const specimen = Subject{Subject{-1} * Subject{2'000'000'000'000ll} * Subject{3'000'000'000'000ll} * Subject{5'000'000'000'000ll}};
+    auto got = library::to_string<String>(specimen); // have to force the evaluation
+    require(ASSERTION, !got.empty());
+    if constexpr (std::same_as<Character, char>) { std::cerr << got << '\n'; }
+  }
+  template<required::Number N, required::Character C, required::Character_Traits T> auto To_String<N,C,T>::test_plus_big() -> void {
+    auto const specimen = Subject{Subject{1} * Subject{3'000'000'000'000ll} * Subject{5'000'000'000'000ll} * Subject{7'000'000'000'000ll}};
+    auto got = library::to_string<String>(specimen);
+    require(ASSERTION, !got.empty());
+    if constexpr (std::same_as<Character, char>) { std::cerr << got << '\n'; }
+  }
+}
+#endiv

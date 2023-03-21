@@ -1,6 +1,0 @@
-// -*- c++ -*- 8a51914b-7baf-4c95-a4cb-5ac3f4534dd3
-#pragma once
-#include <cppunit/portability/Stream.h>
-namespace cppunit {
-  using CppUnit::stdCOut;
-}

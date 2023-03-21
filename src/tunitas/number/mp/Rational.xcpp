@@ -1,0 +1,65 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::number::mp {
+  //
+  // A rational (big) number.
+  //
+  // Design:
+  //
+  //   Ensure that swap stays type-consistent.
+  //   A distinct type so known to overloading and ADL.
+  //
+  // Usgae:
+  //
+  //   See Generic<...>
+  //
+  struct Rational;
+}
+#endiv
+#divert <hpp>
+#import tunitas.number.mp.Generic
+namespace tunitas::number {
+  class mp::Rational : public Generic<mpq_class> {
+    using Ancestor = Generic<mpq_class>;
+    friend auto swap(Rational &a, Rational b) noexcept -> void {
+      Ancestor &aa{a}, &bb{b};
+      swap(aa, bb);
+    }
+    inline static constexpr auto EMPLACE = Ancestor::Emplace<Ancestor::Carrier>{};
+  public:
+    Rational() = default;
+    using Ancestor::Generic;
+    inline [[implicit]] Rational(Expression<mpq_t, mpq_t> const &);
+    inline [[implicit]] Rational(Expression<mpq_t, mpq_t> &&);
+    template<typename RHS> inline [[implicit]] Rational(Expression<mpz_t, RHS> const &);
+    template<typename RHS> inline [[implicit]] Rational(Expression<mpq_t, RHS> const &);
+    template<typename LHS, typename RHS> inline [[implicit]] Rational(Expression<LHS, RHS> const &);
+  };
+}
+#endiv
+#divert <ipp>
+namespace tunitas::number::mp {
+  Rational::Rational(Expression<mpq_t, mpq_t> const &e)                                  : Ancestor{EMPLACE, e} { }
+  Rational::Rational(Expression<mpq_t, mpq_t> &&e)                                       : Ancestor{EMPLACE, move(e)} { }
+  template<typename RHS> Rational::Rational(Expression<mpz_t, RHS> const &e)             : Ancestor{EMPLACE, e} { }
+  template<typename RHS> Rational::Rational(Expression<mpq_t, RHS> const &e)             : Ancestor{EMPLACE, e} { }
+  template<typename LHS, typename RHS> Rational::Rational(Expression<LHS, RHS> const &e) : Ancestor{EMPLACE, e} { }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::number::mp;
+    static_assert(std::is_default_constructible_v<Rational>);
+    static_assert(std::is_copy_constructible_v<Rational>);
+    static_assert(std::is_move_constructible_v<Rational>);
+    static_assert(std::is_copy_assignable_v<Rational>);
+    static_assert(std::is_move_assignable_v<Rational>);
+    static_assert(std::is_swappable_v<Rational>);
+  }
+}
+#endiv

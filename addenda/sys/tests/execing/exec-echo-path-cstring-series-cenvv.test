@@ -1,8 +1,0 @@
-#!/bin/bash
-source ${0%/*}/rigging.sh || exit 70
-execing exec-path-cstring-series-cenvv /bin/echo echo
-execing exec-path-cstring-series-cenvv /bin/echo echo a
-execing exec-path-cstring-series-cenvv /bin/echo echo a b
-execing exec-path-cstring-series-cenvv /bin/echo echo a b c
-execing exec-path-cstring-series-cenvv /bin/echo echo a b c d
-

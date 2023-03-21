@@ -1,0 +1,24 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.character.Type
+#import nonstd.required.iterator.Forward
+#import nonstd.required.iterator.Producing
+#import nonstd.iterator.Traits // but likely yhou will need some specializations
+#include <hpp/nonstd.iterator.Traits>
+namespace tunitas::number::wc::required::iterator {
+  //
+  // Are these arguments suitable for iterator-based wc::narrow<...>(...)?
+  //
+  template<typename ITERATOR> concept Narrowable = requires(ITERATOR) {
+    requires Forward<ITERATOR>;
+    typename nonstd::iterator::Traits<ITERATOR>::Value;
+    requires character::Type<typename nonstd::iterator::Traits<ITERATOR>::Value>;
+    requires !same_as<char, typename nonstd::iterator::Traits<ITERATOR>::Value>; // think about it ... you can't narrow a narrow character
+    requires Producing<ITERATOR, typename nonstd::iterator::Traits<ITERATOR>::Value>;
+  };
+}
+#endiv
