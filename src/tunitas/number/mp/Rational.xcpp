@@ -25,7 +25,7 @@ namespace tunitas::number::mp {
 namespace tunitas::number {
   class mp::Rational : public Generic<mpq_class> {
     using Ancestor = Generic<mpq_class>;
-    friend auto swap(Rational &a, Rational b) noexcept -> void {
+    friend auto swap(Rational &a, Rational &b) noexcept -> void {
       Ancestor &aa{a}, &bb{b};
       swap(aa, bb);
     }

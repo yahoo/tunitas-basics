@@ -1,0 +1,28 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tunitas.exception.Optional
+#import tunitas.optional.Flavored
+namespace tunitas::optional {
+  //
+  // An optional, unflavored.
+  //
+  // Specification:
+  //
+  //   https://en.cppreference.com/w/cpp/utility/optional
+  //   https://en.cppreference.com/w/cpp/utility/optional/bad_optional_access
+  //
+  //   The standard one; throws std::bad_optional_access.
+  //   This one throws a Tunitas-flavored exception
+  //
+  // Design:
+  //
+  //   Again, no.
+  //
+  // Usage:
+  //
+  //   see std::optional<TYPE>
+  //
+  template<typename TYPE> using Unflavored = Flavored<TYPE, exception::Optional>;
+}
+#endiv

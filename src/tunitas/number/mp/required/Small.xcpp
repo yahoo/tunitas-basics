@@ -18,7 +18,7 @@ namespace tunitas::number::mp::required {
   //
   //   Also see the documentariat in Medium<INTEGER>
   //
-  template<typename INTEGER> concept Small = integer::Signed<INTEGER>;
+  template<typename INTEGER> concept Small = required::integer::Signed<INTEGER>;
 #if 0
   (same_as<INTEGER, char signed> ||
    same_as<INTEGER, int short signed> ||

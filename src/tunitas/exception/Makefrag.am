@@ -24,6 +24,7 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/feature.Empty.cpp \
   obj/src/tunitas/exception/feature.Exhausted.cpp \
   obj/src/tunitas/exception/feature.Failure.cpp \
+  obj/src/tunitas/exception/feature.Files.cpp \
   obj/src/tunitas/exception/feature.Full.cpp \
   obj/src/tunitas/exception/feature.Indirection.cpp \
   obj/src/tunitas/exception/feature.Invalid.cpp \
@@ -48,6 +49,8 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/partial.Empty.cpp \
   obj/src/tunitas/exception/partial.Exhausted.cpp \
   obj/src/tunitas/exception/partial.Failure.cpp \
+  obj/src/tunitas/exception/partial.Files.cpp \
+  obj/src/tunitas/exception/partial.Files.Optional.cpp \
   obj/src/tunitas/exception/partial.Full.cpp \
   obj/src/tunitas/exception/partial.Indirection.cpp \
   obj/src/tunitas/exception/partial.Invalid.cpp \
@@ -70,6 +73,7 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/Empty.cpp \
   obj/src/tunitas/exception/Exhausted.cpp \
   obj/src/tunitas/exception/Failure.cpp \
+  obj/src/tunitas/exception/Files.cpp \
   obj/src/tunitas/exception/Full.cpp \
   obj/src/tunitas/exception/Indirection.cpp \
   obj/src/tunitas/exception/Invalid.cpp \

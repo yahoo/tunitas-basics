@@ -1,0 +1,81 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::optional {
+  template<typename SUBJECT> struct Flavored;
+}
+#endiv
+#divert <hpp>
+#import tunitas.optional.Flavored
+#import tunitas.exception.Aspect
+namespace tests::unit {
+  template<typename SUBJECT> struct optional::Flavored : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    using Subject = SUBJECT;
+    auto test_value_constref_good() -> void;
+    auto test_value_constref_fail() -> void;
+    auto test_value_prvalue_good() -> void;
+    auto test_value_prvalue_fail() -> void;
+  protected:
+    using Failure = ::tunitas::exception::Aspect;
+  };
+}
+#endiv
+#divert <tpp>
+#import std.type_info
+namespace tests::unit::optional {
+  template<typename _> auto Flavored<_>::suite() -> Suite {
+    auto series = Stream{typeid(Subject).name()};
+    series << []{
+                auto val = Stream{"value"sv};
+                val << []{
+                         auto con = Stream{"constref"sv};
+                         con << add("good", &Flavored::test_value_constref_good)
+                             << add("fail", &Flavored::test_value_constref_fail)
+                             << END;
+                         return con;
+                       }()
+                    << []{
+                         auto prv = Stream{"prvalue"sv};
+                         prv << add("good", &Flavored::test_value_prvalue_good)
+                             << add("fail", &Flavored::test_value_prvalue_fail)
+                             << END;
+                         return prv;
+                       }()
+                    << END;
+                return val;
+              }()
+           << END;
+    return settle(series);
+  }
+  template<typename _> auto Flavored<_>::test_value_constref_good() -> void {
+    auto specimen = typename Subject::Value{}; // anything constructible
+    auto const &subject = Subject{std::move(specimen)};
+    auto got = subject.value(); // <---------------------------------------- test this on const &
+    require(ASSERTION, sizeof (got));
+  }
+  template<typename _> auto Flavored<_>::test_value_constref_fail() -> void try {
+    auto const empty = Subject{};
+    empty.value(); // <---------------------------------------- test this on const &
+    impossible(ASSERTION, true);
+  } catch (Failure const &) {
+    require(ASSERTION, true);
+  }
+  template<typename _> auto Flavored<_>::test_value_prvalue_good() -> void {
+    auto specimen = typename Subject::Value{}; // anything constructible
+    auto subject = Subject{std::move(specimen)};
+    auto got = move(subject).value(); // <---------------------------------------- test this on &&
+    require(ASSERTION, sizeof (got));
+  }
+  template<typename _> auto Flavored<_>::test_value_prvalue_fail() -> void try {
+    auto empty = Subject{};
+    move(empty).value(); // <---------------------------------------- test this on &&
+    impossible(ASSERTION, true);
+  } catch (Failure const &) {
+    require(ASSERTION, true);
+  }
+}
+#endiv

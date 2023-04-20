@@ -26,6 +26,7 @@ namespace tests::unit::number {
     auto test_assignment_conversion() -> void;
     auto test_assignment_copy() -> void;
     auto test_assignment_move() -> void;
+    auto test_swap() -> void;
   };
 }
 #endiv
@@ -49,6 +50,7 @@ namespace tests::unit::number::mp {
                     << END;
                 return ass;
               }()
+           << add("swap", &Driver::test_swap)
            << END;
     return settle(series);
   }
@@ -87,6 +89,17 @@ namespace tests::unit::number::mp {
     auto subject = Subject{};
     subject = move(original); // <---------------------------------------- test this
     require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number B, required::Small S> auto Driver<B,S>::test_swap() -> void {
+    auto a0 = Subject{Small{99}};
+    auto b0 = Subject{};
+    auto a1 = a0;
+    auto b1 = b0;
+    require(ASSERTION, a0 == b0);
+    require(ASSERTION, b0 == a0);
+    swap(a1, b1);
+    require(ASSERTION, a0 == b1);
+    require(ASSERTION, b0 == a1);
   }
 }
 #endiv

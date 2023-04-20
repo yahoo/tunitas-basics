@@ -1,0 +1,29 @@
+// This by -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::error::by {
+  //
+  // Signal that the error value by direct; and the errors are by exception.
+  //
+  // Specification:
+  //
+  //   An enum (class) for overloading
+  //
+  // Design:
+  //
+  //   Won't participate in (unexpected) ADL
+  //
+  // Usage:
+  //
+  //   struct Something { ...ssomehow... };
+  //
+  //   auto function(error::by::Optional, ...arguments...) -> error::Optional<Something>;
+  //   auto function(error::by::Outcome, ...arguments...) -> error::Outcome<Something>;
+  //   auto function(error::by::Exception, ...arguments...) -> Something;
+  //
+  enum class Exception { };
+}
+#endiv

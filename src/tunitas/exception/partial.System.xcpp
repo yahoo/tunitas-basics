@@ -44,7 +44,7 @@ namespace tunitas::exception::partial {
 #import tunitas.exception.partial.Failure
 #import tunitas.exception.feature.System
 class tunitas::exception::partial::System : public virtual feature::System,
-                                             public Failure {
+                                            public Failure {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
     using Exception = Failure;

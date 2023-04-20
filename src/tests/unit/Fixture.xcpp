@@ -23,6 +23,7 @@ struct tests::unit::Fixture : public cppunit::test::Fixture {
 #import tests.unit.server.Fixture
 #import tests.unit.time.Fixture
 #import tests.unit.tunitas.Fixture
+#import tests.unit.tuple.Fixture
 #import tests.unit.urlsafe.Fixture
 #import tests.unit.variant.Fixture
 #import tests.unit.want.Fixture
@@ -39,6 +40,7 @@ auto tests::unit::Fixture::suite() -> cppunit::Test * {
          << add<server::Fixture>()
          << add<time::Fixture>()
          << add<tunitas::Fixture>()
+         << add<tuple::Fixture>()
          << add<urlsafe::Fixture>()
          << add<variant::Fixture>()
          << add<want::Fixture>()

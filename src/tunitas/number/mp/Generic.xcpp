@@ -42,6 +42,7 @@ namespace tunitas::number::mp {
 #endiv
 #divert <hpp>
 #import nonstd.int128_t
+#import nonstd.uint128_t
 #import nonstd.required.Character
 #import nonstd.required.Character_Traits
 #import nonstd.required.integer.Signed
@@ -80,6 +81,7 @@ namespace tunitas::number {
     Generic(int unsigned) = delete;
     Generic(int long unsigned) = delete;
     Generic(int long long unsigned) = delete;
+    Generic(nonstd::uint128_t) = delete;
     inline [[implicit]] Generic(Carrier &&); // this is "eval"
     Generic(Generic const &) = default;
     auto operator=(Generic const &) -> Generic & = default; // because there are other operator op=(...)
@@ -110,6 +112,12 @@ namespace tunitas::number {
     // The get<SIGNED>() throws exception::Range if false == fits<SIGNED>()
     template<required::integer::Signed SIGNED> inline auto get() const -> SIGNED;
     template<required::integer::Signed SIGNED> inline auto fits() const -> bool;
+#if 202312 < __cplusplus
+    template<typename SELF> inline auto peek(this SELF *) -> nonstd::Like<SELF, Carrier &>;
+#else
+    inline auto peek() const -> Carrier const &;
+    inline auto peek() -> Carrier &;
+#endif
   protected:
     Carrier impl{};
     // Why yes, we do have to declare-declare-define this thrice.
@@ -205,6 +213,12 @@ namespace tunitas::number {
     template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Emplace<Carrier>, Expression<LHS, RHS> &&expression) : impl{move(expression)} { }
     template<required::Carrier _> template<typename FLOATIE> Generic<_>::Generic(Emplace<mpf_class>, FLOATIE mcfloatface, Precision precision) requires (std::floating_point<FLOATIE> && std::same_as<mpf_class, Carrier>) : impl{mcfloatface, underlying(precision)} { }
     template<required::Carrier _> template<typename LHS, typename RHS> Generic<_>::Generic(Emplace<mpf_class>, Expression<LHS, RHS> const &expression, Precision precision) : impl{expression, underlying(precision)} { }
+#if 202312L < __cplusplus
+    template<required::Carrier _> template<typename SELF> auto auto Generic<_>::peek(this SELF *) -> nonstd::Like<SELF, Carrier &> { return impl; }
+#else
+    template<required::Carrier _> auto Generic<_>::peek() const -> Carrier const & { return impl; }
+    template<required::Carrier _> auto Generic<_>::peek() -> Carrier & { return impl; }
+#endif
     template<required::Carrier _> auto Generic<_>::operator+=(Generic const &b) -> Generic & { impl += b.impl; return *this; }
     template<required::Carrier _> auto Generic<_>::operator-=(Generic const &b) -> Generic & { impl -= b.impl; return *this; }
     template<required::Carrier _> auto Generic<_>::operator*=(Generic const &b) -> Generic & { impl *= b.impl; return *this; }

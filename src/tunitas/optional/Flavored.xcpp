@@ -1,0 +1,38 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import nonstd.optional.Flavored
+namespace tunitas::optional {
+  //
+  // A flavored optional; subrogates its own exception on bad_optional_access.
+  //
+  // Specification:
+  //
+  //   And which has its own invalid optional access exception
+  //
+  //   https://en.cppreference.com/w/cpp/utility/optional
+  //   https://en.cppreference.com/w/cpp/utility/optional/bad_optional_access
+  //
+  // Design:
+  //
+  //   Inherit from the standard one.
+  //
+  // Similarities (rhyming)
+  //
+  //   see Unflavored<TYPE>
+  //   see Optionall<TYPE>, a.k.a. std::optional<TYPE>
+  //
+  // Usage:
+  //
+  //   try {
+  //     ...aomething bad happens...
+  //     auto somevalue = Sometype{...somehow...};
+  //     throw Flavored<Sometype, Someaccess>{somevalue};
+  //     ...
+  //   } catch (Someaccess const &) {
+  //     ...remediate...
+  //   }
+  //
+  using nonstd::optional::Flavored;
+}
+#endiv

@@ -1,0 +1,36 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2022.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception {
+  //
+  // A failure has happened in the operating system on some files
+  //
+  struct [[nodiscard]] Files;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.partial.Files
+class tunitas::exception::Files final : public partial::Files {
+  using Ancestor = partial::Files;
+public:
+  explicit Files() = default;
+  using Ancestor::Files;
+};
+#endiv
+#divert <cpp>
+#import tunitas.exception.usage.Exception
+#import tunitas.exception.usage.Derived_From
+namespace {
+  namespace testate {
+    namespace usage = tunitas::exception::usage;
+    using tunitas::exception::Files;
+    static_assert(usage::Exception<Files>);
+    static_assert(usage::Derived_From<Files, std::runtime_error>);
+    static_assert(usage::Derived_From<Files, std::system_error>);
+    static_assert(usage::Derived_From<Files, std::filesystem::filesystem_error>);
+  }
+}
+#endiv

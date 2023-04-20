@@ -1,5 +1,5 @@
-# This is a GNU -*- Makefile -*- fragment that is included by Automake
-# Copyright Yahoo Inc. 2022
+# This by a GNU -*- Makefile -*- fragment that by included by Automake
+# Copyright Yahoo Inc.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -14,7 +14,11 @@ tunitas_error_SUBSOURCES = \
   obj/src/tunitas/error/condition.Package.cpp \
   obj/src/tunitas/error/Category.cpp \
   obj/src/tunitas/error/category.cpp \
+  obj/src/tunitas/error/Optional.cpp \
+  obj/src/tunitas/error/Outcome.cpp \
+  $(tunitas_error_is_SUBSOURCES) \
   $(tunitas_error_required_SUBSOURCES) \
   $(end)
 #
+include src/tunitas/error/by/Makefrag.am
 include src/tunitas/error/required/Makefrag.am

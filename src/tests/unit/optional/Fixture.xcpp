@@ -1,0 +1,109 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::optional { class Fixture; }
+#endiv
+#divert <hpp>
+struct tests::unit::optional::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_usage_Optional() -> void;
+  template<typename SUBJECT> auto test_usage_Flavored() -> void;
+  template<typename SUBJECT> auto test_usage_Unflavored() -> void;
+protected:
+  struct Exceptions {
+    struct Special;
+  };
+};
+#endiv
+#divert <tpp>
+#import tunitas.exception.Aspect
+#import std.bad_optional_access
+#import tests.unit.optional.Fixture.Exceptions.Special
+namespace tests::unit::optional {
+  template<typename SUBJECT> auto Fixture::test_usage_Unflavored() -> void try {
+    using Subject = SUBJECT;
+    auto subject = Subject{};
+    subject.value(); // <------------------------------ is expected to throw (the unspecial one)
+    impossible(ASSERTION, true);
+  } catch (::tunitas::exception::Aspect const &) {
+    require(ASSERTION, true);
+  } catch (std::bad_optional_access const &) {
+    impossible(ASSERTION, true);
+  }
+  template<typename SUBJECT> auto Fixture::test_usage_Flavored() -> void try {
+    using Subject = SUBJECT;
+    auto subject = Subject{};
+    subject.value(); // <------------------------------ is expected to throw (the special one)
+    impossible(ASSERTION, true);
+  } catch (Exceptions::Special const &) {
+    require(ASSERTION, true);
+  } catch (::tunitas::exception::Aspect const &) {
+    impossible(ASSERTION, true);
+  } catch (std::bad_optional_access const &) {
+    impossible(ASSERTION, true);
+  }
+}
+#endiv
+#divert <cpp>
+#import tests.unit.optional.Flavored
+#import tests.unit.optional.Unflavored
+#import tunitas.optional.Flavored
+#import tunitas.optional.Unflavored
+auto tests::unit::optional::Fixture::suite() -> Suite {
+  auto series = Stream{"optional"};
+  series << []{
+              auto use = Stream{"usage"};
+              use << add("Optional", &Fixture::test_usage_Optional)
+                  << []{
+                       auto unfl = Stream{"Unflavored<...>"sv};
+                       unfl << add("Unflavored<string::Storage>", &Fixture::test_usage_Unflavored<library::Unflavored<string::Storage>>)
+                            << add("Unflavored<int>", &Fixture::test_usage_Unflavored<library::Unflavored<int>>)
+                            << add("Unflavored<char>", &Fixture::test_usage_Unflavored<library::Unflavored<char>>)
+                            << END;
+                       return unfl;
+                     }()
+                  << []{
+                       auto flav = Stream{"Flavored<...>"sv};
+                       flav << add("Flavored<string::Storage>", &Fixture::test_usage_Unflavored<library::Flavored<string::Storage, Exceptions::Special>>)
+                            << add("Flavored<int>", &Fixture::test_usage_Unflavored<library::Flavored<int, Exceptions::Special>>)
+                            << add("Flavored<char>", &Fixture::test_usage_Unflavored<library::Flavored<char, Exceptions::Special>>)
+                            << END;
+                       return flav;
+                     }()
+                  << END;
+              return use;
+            }()
+         << []{
+              auto unfl = Stream{"Unflavored<...>"sv};
+              unfl << add<Unflavored<library::Unflavored<string::Storage>>>()
+                   << add<Unflavored<library::Unflavored<int>>>()
+                   << add<Unflavored<library::Unflavored<char>>>()
+                   << END;
+              return unfl;
+            }()
+         << []{
+              auto flav = Stream{"Flavored<...>"sv};
+              flav << add<Flavored<library::Flavored<string::Storage, Exceptions::Special>>>()
+                   << add<Flavored<library::Flavored<int, Exceptions::Special>>>()
+                   << add<Flavored<library::Flavored<char, Exceptions::Special>>>()
+                   << END;
+              return flav;
+            }()
+          << END;
+  return settle(series);
+}
+#import tunitas.Optional
+namespace tests::unit::optional {
+  auto Fixture::test_usage_Optional() -> void {
+    using Subject = ::tunitas::Optional<int>;
+    auto s0 = Subject{};
+    require(ASSERTION, !s0);
+    auto s1 = Subject{33};
+    require(ASSERTION, (bool) s1);
+  }
+}
+#endiv

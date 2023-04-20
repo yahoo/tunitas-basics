@@ -1,0 +1,117 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::exception::tunitas { class Files; }
+#endiv
+#divert <hpp>
+#import tunitas.Tuple
+#import tunitas.exception.Files
+#import std.size_t
+namespace tests::unit::exception {
+  struct tunitas::Files : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    // irk!  'final' in the class-under-test so we have to use partial::Files
+    // error: cannot derive from ‘final’ base ‘tunitas::exception::Files’ in derived type ‘tests::unit::exception::tunitas::Files::Subject’
+    struct Subject : public library::partial::Files {
+      using Files::Files;
+      using Files::Arguments; // which is only accessible to descendants
+    };
+    using Arguments = Subject::Arguments;
+    template<typename... TYPES> using Tuple = ::tunitas::Tuple<TYPES...>;
+    //
+    template<typename...> auto test_constructor() -> void;
+    template<typename...> auto test_path1() -> void;
+    template<typename...> auto test_path2() -> void;
+    template<typename...> auto test_path_index() -> void;
+    template<typename...> auto test_empty() -> void;
+    template<typename...> auto test_size() -> void;
+  protected:
+    template<typename ADDRESSER> static auto stanza(string::View name) -> Stream;
+    template<typename KEY, typename GENERATED = KEY> struct Generator;
+    template<typename...> struct Expected;
+    struct Expectation;
+    struct Addresser;
+    inline static constexpr auto OUTRAGEOUSLY_BIG__TOO_BIG_TO_BE_MEANINGFUL = 1000uz;
+    using Size = std::size_t;
+  };
+  struct tunitas::Files::Addresser {
+    // Because we need to see the complete type of Files to make these utterances
+    struct Constructor { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_constructor<ARGUMENTS...>; };
+    struct Path1       { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_path1<ARGUMENTS...>; };
+    struct Path2       { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_path2<ARGUMENTS...>; };
+    struct Path_Index  { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_path_index<ARGUMENTS...>; };
+    struct Empty       { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_empty<ARGUMENTS...>; };
+    struct Size        { template<typename... ARGUMENTS> inline static constexpr auto MEMBER = &Files::test_size<ARGUMENTS...>; };
+  };
+}
+#endiv
+#divert <tpp>
+namespace tests::unit::exception::tunitas {
+  template<typename ADDRESSER> auto Files::stanza(string::View name) -> Stream {
+    auto sub = Stream{name};
+    sub << add("Error", ADDRESSER::template MEMBER<Arguments::Error>)
+        << add("Error,Reason", ADDRESSER::template MEMBER<Arguments::Error, Arguments::Reason>)
+        << add("Path,Error,Reason", ADDRESSER::template MEMBER<Arguments::Path, Arguments::Error, Arguments::Reason>)
+        << add("Path,Path,Error,Reason", ADDRESSER::template MEMBER<Arguments::Path, Arguments::Path, Arguments::Error, Arguments::Reason>)
+        << add("Tuple<Path>,Error,Reason", ADDRESSER::template MEMBER<Tuple<>, Arguments::Error, Arguments::Reason>)
+        << add("Tuple<Path>,Error,Reason", ADDRESSER::template MEMBER<Tuple<Arguments::Path const  &>, Arguments::Error, Arguments::Reason>)
+        << add("Tuple<Path,Path>,Error,Reason", ADDRESSER::template MEMBER<Tuple<Arguments::Path const &, Arguments::Path const &>, Arguments::Error, Arguments::Reason>)
+        << add("Tuple<Path,Path,Path>,Error,Reason", ADDRESSER::template MEMBER<Tuple<Arguments::Path const &, Arguments::Path const &, Arguments::Path const &>, Arguments::Error, Arguments::Reason>)
+        << add("Tuple<Path,Path,Path,Path>,Error,Reason", ADDRESSER::template MEMBER<Tuple<Arguments::Path const &, Arguments::Path const &, Arguments::Path const &, Arguments::Path const &>, Arguments::Error, Arguments::Reason>)
+      // we could do more Tuple<...> but the point is already proven
+        << END;
+    return sub;
+  }
+}
+#import tests.unit.exception.tunitas.Files.Generator
+#import tests.unit.exception.tunitas.Files.Expected
+#import nonstd.exception.Unimplemented
+#import std.index_sequence
+#import std.make_index_sequence
+namespace tests::unit::exception::tunitas {
+  template<typename... ARGUMENTS> auto Files::test_constructor() -> void {
+    // This show shows that the Subject is constructible with this argument signature (the constructor exists)
+    auto subject = Subject{Generator<ARGUMENTS>{}()...}; // <--------------------------------- test this (the constructor)
+    require(ASSERTION, nullptr != subject.what()); // <---------------------------------------- test this (the what)
+  }
+  template<typename... ARGUMENTS> auto Files::test_path1() -> void {
+    auto subject = Subject{Generator<ARGUMENTS>{}()...};
+    require(ASSERTION, Expected<ARGUMENTS...>::path1() == (bool) subject.path1()); // <---------------------- test this (the path1)
+  }
+  template<typename... ARGUMENTS> auto Files::test_path2() -> void {
+    auto subject = Subject{Generator<ARGUMENTS>{}()...};
+    require(ASSERTION, Expected<ARGUMENTS...>::path2() == (bool) subject.path2()); // <---------------------- test this (the path2)
+  }
+  template<typename... ARGUMENTS> auto Files::test_path_index() -> void {
+    auto subject = Subject{Generator<ARGUMENTS>{}()...};
+    [&subject]<Size... INDEX>(std::index_sequence<INDEX...>) {
+      (require(ASSERTION, Expected<ARGUMENTS...>::path(INDEX) == (bool) subject.path(INDEX)), ...); // <---------------------- test this (the path(Index))
+    }(std::make_index_sequence<OUTRAGEOUSLY_BIG__TOO_BIG_TO_BE_MEANINGFUL>{});
+  }
+  template<typename... ARGUMENTS> auto Files::test_empty() -> void {
+    auto subject = Subject{Generator<ARGUMENTS>{}()...};
+    require(ASSERTION, Expected<ARGUMENTS...>::empty() == subject.empty()); // <---------------------- test this (the empty)
+  }
+  template<typename... ARGUMENTS> auto Files::test_size() -> void {
+    auto subject = Subject{Generator<ARGUMENTS>{}()...};
+    require(ASSERTION, Expected<ARGUMENTS...>::size() == subject.size()); // <---------------------- test this (the size)
+  }
+}
+#endiv
+#divert <cpp>
+auto tests::unit::exception::tunitas::Files::suite() -> Suite {
+  auto series = Stream{"Files"sv};
+  series << stanza<Addresser::Constructor>("constructor"sv)
+         << stanza<Addresser::Path1>("path1"sv)
+         << stanza<Addresser::Path2>("path2"sv)
+         << stanza<Addresser::Path_Index>("path(Index)"sv)
+         << stanza<Addresser::Empty>("empty"sv)
+         << stanza<Addresser::Size>("size"sv)
+         << END;
+  return settle(series);
+}
+#endiv

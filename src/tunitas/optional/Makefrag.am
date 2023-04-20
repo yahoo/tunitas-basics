@@ -1,0 +1,13 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_optional_SUBSOURCES = \
+  obj/src/tunitas/Optional.cpp \
+  obj/src/tunitas/optional/namespace.cpp \
+  obj/src/tunitas/optional/Optional.cpp \
+  obj/src/tunitas/optional/Flavored.cpp \
+  obj/src/tunitas/optional/Unflavored.cpp \
+  $(end)

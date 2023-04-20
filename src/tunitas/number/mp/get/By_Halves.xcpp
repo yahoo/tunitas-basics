@@ -15,7 +15,7 @@ namespace tunitas::number::mp::get {
   //
   // Design:
   //
-  //   Descendants only.
+  //   As static (member) functions indexed by the medium-sized integer of result.
   //   Specialize on the mediumness of it all.
   //   Pull it out in parts because the underlying API doesn't support the one-shot.
   //
@@ -36,14 +36,12 @@ namespace tunitas::number::mp::get {
 #endiv
 #divert <hpp>
 #forward tunitas.number.mp.get.Fits
-#forward tunitas.number.mp.get.Extract
 #import tunitas.number.mp.required.Carrier
 namespace tunitas::number::mp {
   template<mp::required::Medium MEDIUM> struct get::By_Halves {
     using Result = MEDIUM;
     template<required::Carrier CARRIER> inline static auto get(CARRIER const &) -> Result;
   protected:
-    using Extract = get::Extract<Result>;
     using Fits = get::Fits<Result>;
     template<required::Carrier CARRIER> inline static auto by_halves(int sign, CARRIER const &signless) -> Result;
   };
@@ -52,7 +50,6 @@ namespace tunitas::number::mp {
 #divert <ipp>
 #import tunitas.number.exception.Range
 #import tunitas.number.mp.get.Fits
-#import tunitas.number.mp.get.Extract
 namespace tunitas::number::mp::get {
   template<required::Medium _> template<required::Carrier CARRIER> auto By_Halves<_>::by_halves(int sign, CARRIER const &signless) -> Result {
     static_assert(sizeof (Result)/2 <= sizeof (decltype(CARRIER{}.get_si())));

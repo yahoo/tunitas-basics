@@ -63,6 +63,7 @@ namespace tunitas::application::options::get::package_identifier {
 }
 #endiv
 #divert <tpp>
+#import std.quoted
 #import std.isalnum
 #import std.all_of
 #import tunitas.application.options.get.word
@@ -71,7 +72,7 @@ namespace tunitas::application::options::get::package_identifier {
     string::Storage candidate = word<QUITTING>(whence, step, field);
     auto const is_identifier = [](char c) { return '_' == c || '-' == c || std::isalnum(c); };
     if (!std::all_of(candidate.begin(), candidate.end(), is_identifier)) {
-      error(whence) << "the " << field << " is is not an identifier - '" << candidate << "'\n";
+      error(whence) << "the " << field << " is not an identifier - " << std::quoted(candidate, '\'') << "\n";
       throw QUITTING{whence.name(), CONFIG};
     }
     return candidate;

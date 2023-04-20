@@ -138,14 +138,7 @@ include check/bin/urlsafe-encode.am
 include check/bin/urlsafe-decode.am
 include check/lib/libtests-urlsafe.am
 
-# install rules from @temerarious_flagship_datadir@/am/install.am
-INSTALL_MODULES = \
-  $(noinst_lib_libtunitas_application_la_MODULES) \
-  $(noinst_lib_libtunitas_server_la_MODULES) \
-  $(noinst_lib_libtunitas_la_MODULES) \
-  $(noinst_lib_libwant_la_MODULES) \
-  $(end)
-$(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
+include modules/Makefrag.am # the nistallation rules MUST be positioned AFTER the definitions of the $(..._MODULES) variables
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
 # via @temerarious_flagship_datadir@/am/build.am and its constituents.
