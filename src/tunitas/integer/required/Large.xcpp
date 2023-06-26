@@ -1,0 +1,46 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.multiprecision.number.concepts
+namespace tunitas::integer::required {
+  //
+  // Is this type a large (library-software) integer (of any size?)
+  //
+  using multiprecision::number::Large;
+}
+#endiv
+#divert <cpp>
+#import tunitas.integer.integers
+namespace {
+  namespace testate {
+    namespace required = tunitas::integer::required;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert(!required::Large<sint8_t>);
+    static_assert(!required::Large<uint8_t>);
+    static_assert(!required::Large<sint16_t>);
+    static_assert(!required::Large<uint16_t>);
+    static_assert(!required::Large<sint32_t>);
+    static_assert(!required::Large<uint32_t>);
+    static_assert(!required::Large<sint64_t>);
+    static_assert(!required::Large<uint64_t>);
+    static_assert(!required::Large<sint128_t>);
+    static_assert(!required::Large<uint128_t>);
+    static_assert( required::Large<sint256_t>);
+    static_assert( required::Large<uint256_t>);
+    static_assert( required::Large<sint512_t>);
+    static_assert( required::Large<uint512_t>);
+    static_assert( required::Large<sint1024_t>);
+    static_assert( required::Large<uint1024_t>);
+    static_assert( required::Large<sint2048_t>);
+    static_assert( required::Large<uint2048_t>);
+    static_assert( required::Large<sint4096_t>);
+    static_assert( required::Large<uint4096_t>);
+    static_assert( required::Large<sint8192_t>);
+    static_assert( required::Large<uint8192_t>);
+  }
+}
+#endiv

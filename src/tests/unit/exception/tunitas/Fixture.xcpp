@@ -54,6 +54,8 @@ namespace tests::unit::exception::tunitas {
 #import tunitas.exception.System
 #import tunitas.exception.Unimplemented
 #import tunitas.exception.Variant
+#import tunitas.exception.Overflow
+#import tunitas.exception.Underflow
 #import tests.unit.exception.tunitas.Files
 auto tests::unit::exception::tunitas::Fixture::suite() -> Suite {
   auto series = Stream{"tunitas"sv};
@@ -78,6 +80,8 @@ auto tests::unit::exception::tunitas::Fixture::suite() -> Suite {
          << stanza1error<Fixture, feature::System, library::System>("System")
          << stanza0<Fixture, feature::Unimplemented, library::Unimplemented>("Unimplemented")
          << stanza0<Fixture, feature::Variant, library::Variant>("Variant")
+         << stanza1string<Fixture, feature::Overflow, library::Overflow>("Overflow")
+         << stanza1string<Fixture, feature::Underflow, library::Underflow>("Underflow")
          << add<Files>()
          << END;
   return settle(series);

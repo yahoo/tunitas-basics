@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-keyston/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/keyston/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::integer::bit { struct Countr_Zero; }
+#endiv
+#divert <hpp>
+struct tests::unit::integer::bit::Countr_Zero : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  template<unsigned> auto test_usage() -> void;
+};
+#endiv
+#divert <cpp>
+//
+// The specializations MUST occur before suite() so that their address is known
+//
+#import tunitas.integer.bit
+namespace tests::unit::integer::bit {
+  template<> auto Countr_Zero::test_usage<0>() -> void {
+    static_assert(library::countr_zero<uint8_t>(0) == 8);
+    static_assert(library::countr_zero<uint16_t>(0) == 16);
+    static_assert(library::countr_zero<uint32_t>(0) == 32);
+    static_assert(library::countr_zero<uint64_t>(0) == 64);
+    static_assert(library::countr_zero<uint128_t>(0) == 128);
+    static_assert(library::countr_zero<uint256_t>(0) == 256);
+    require(ASSERTION);
+  }
+  template<> auto Countr_Zero::test_usage<1>() -> void {
+    static_assert(library::countr_zero<uint8_t>(1) == 0);
+    static_assert(library::countr_zero<uint16_t>(1) == 0);
+    static_assert(library::countr_zero<uint32_t>(1) == 0);
+    static_assert(library::countr_zero<uint64_t>(1) == 0);
+    static_assert(library::countr_zero<uint128_t>(1) == 0);
+    static_assert(library::countr_zero<uint256_t>(1) == 0);
+    require(ASSERTION);
+  }
+  template<> auto Countr_Zero::test_usage<2>() -> void {
+    static_assert(library::countr_zero<uint8_t>(2) == 1);
+    static_assert(library::countr_zero<uint16_t>(2) == 1);
+    static_assert(library::countr_zero<uint32_t>(2) == 1);
+    static_assert(library::countr_zero<uint64_t>(2) == 1);
+    static_assert(library::countr_zero<uint128_t>(2) == 1);
+    static_assert(library::countr_zero<uint256_t>(2) == 1);
+    require(ASSERTION);
+  }
+  namespace {
+    inline constexpr auto const COUNT = 2uz;
+  }
+}
+#import std.make_index_sequence
+#import std.index_sequence
+#import std.to_string
+#import std.size_t
+auto tests::unit::integer::bit::Countr_Zero::suite() -> Suite {
+  auto series = Stream{"count_zero"sv};
+  series << []{
+             auto use = Stream{"usage"sv};
+             [&use]<std::size_t... INDEX>(std::index_sequence<INDEX...>) {
+               ((use << add(std::to_string(INDEX), &Countr_Zero::test_usage<INDEX>)), ... );
+             }(std::make_index_sequence<COUNT>{});
+             return use;
+           }()
+         << END;
+  return settle(series);
+}
+#endiv

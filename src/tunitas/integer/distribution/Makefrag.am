@@ -1,0 +1,19 @@
+# This is a GNU -*- Makefile -*- fragment that is included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_integer_distribution_SUBSOURCES = \
+  obj/src/tunitas/integer/distribution/namespace.cpp \
+  obj/src/tunitas/integer/distribution/traits.Randomness.template.cpp \
+  obj/src/tunitas/integer/distribution/traits.Randomness.std.random_device.cpp \
+  obj/src/tunitas/integer/distribution/traits.Randomness.cpp \
+  $(tunitas_integer_distribution_required_SUBSOURCES) \
+  $(tunitas_integer_distribution_uniform_SUBSOURCES) \
+  $(tunitas_integer_distribution_usage_SUBSOURCES) \
+  $(end)
+#
+include src/tunitas/integer/distribution/required/Makefrag.am
+include src/tunitas/integer/distribution/uniform/Makefrag.am
+include src/tunitas/integer/distribution/usage/Makefrag.am

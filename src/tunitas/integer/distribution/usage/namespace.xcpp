@@ -4,18 +4,11 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import tunitas
-#import tunitas.string.literals
-namespace tunitas::error {
-  namespace package_error {
-    namespace body {
-      namespace exported { }
-      using namespace string::literals;
-    }
-    namespace interface = body::exported;
-  }
-  using namespace package_error::interface;
-  namespace [[nodirectory]] code { }
-  namespace [[nodirectory]] condition { }
+#import tunitas.integer.distribution
+#import std.convertible_to
+#import std.same_as
+namespace tunitas::integer::distribution::usage {
+  using std::same_as;
+  using std::convertible_to;
 }
 #endiv

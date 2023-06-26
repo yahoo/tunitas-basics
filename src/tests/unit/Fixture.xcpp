@@ -17,6 +17,7 @@ struct tests::unit::Fixture : public cppunit::test::Fixture {
 #import tests.unit.base64.Fixture
 #import tests.unit.exception.Fixture
 #import tests.unit.exits.Fixture
+#import tests.unit.integer.Fixture
 #import tests.unit.number.Fixture
 #import tests.unit.outcome.Fixture
 #import tests.unit.required.Fixture
@@ -34,6 +35,7 @@ auto tests::unit::Fixture::suite() -> cppunit::Test * {
          << add<base64::Fixture>()
          << add<exception::Fixture>()
          << add<exits::Fixture>()
+         << add<integer::Fixture>()
          << add<number::Fixture>()
          << add<outcome::Fixture>()
          << add<required::Fixture>()

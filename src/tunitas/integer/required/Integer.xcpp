@@ -1,0 +1,48 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Unsigned
+#import tunitas.integer.required.Signed
+namespace tunitas::integer::required {
+  //
+  // Is this type a signed or unsigned integer (of any size?)
+  //
+  template<typename INTEGER> concept Integer = Signed<INTEGER> || Unsigned<INTEGER>;
+}
+#endiv
+#divert <cpp>
+#import tunitas.integer.integers.
+namespace {
+  namespace testate {
+    namespace required = tunitas::integer::required;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert(required::Integer<sint8_t>);
+    static_assert(required::Integer<sint16_t>);
+    static_assert(required::Integer<sint32_t>);
+    static_assert(required::Integer<sint64_t>);
+    static_assert(required::Integer<sint128_t>);
+    static_assert(required::Integer<sint256_t>);
+    static_assert(required::Integer<sint512_t>);
+    static_assert(required::Integer<sint1024_t>);
+    static_assert(required::Integer<sint2048_t>);
+    static_assert(required::Integer<sint4096_t>);
+    static_assert(required::Integer<sint8192_t>);
+    //
+    static_assert(required::Integer<uint8_t>);
+    static_assert(required::Integer<uint16_t>);
+    static_assert(required::Integer<uint32_t>);
+    static_assert(required::Integer<uint64_t>);
+    static_assert(required::Integer<uint128_t>);
+    static_assert(required::Integer<uint256_t>);
+    static_assert(required::Integer<uint512_t>);
+    static_assert(required::Integer<uint1024_t>);
+    static_assert(required::Integer<uint2048_t>);
+    static_assert(required::Integer<uint4096_t>);
+    static_assert(required::Integer<uint8192_t>);
+  }
+}
+#endiv

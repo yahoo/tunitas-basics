@@ -1,0 +1,34 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception {
+  //
+  // An underflow failure has happened in some subsystem.
+  //
+  struct [[nodiscard]] Underflow;
+}
+#endiv
+#divert <hpp>
+#import tunitas.exception.partial.Underflow
+class tunitas::exception::Underflow final : public partial::Underflow {
+  using Ancestor = partial::Underflow;
+public:
+  explicit Underflow() = default;
+  using Ancestor::Underflow;
+};
+#endiv
+#divert <cpp>
+#import tunitas.exception.usage.Exception
+#import tunitas.exception.usage.Derived_From
+namespace {
+  namespace testate {
+    namespace usage = tunitas::exception::usage;
+    using tunitas::exception::Underflow;
+    static_assert(usage::Exception<Underflow>);
+    static_assert(usage::Derived_From<Underflow, std::runtime_error>);
+  }
+}
+#endiv

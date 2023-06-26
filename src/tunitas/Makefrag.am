@@ -1,5 +1,5 @@
 # This is a GNU -*- Makefile -*- fragment that is included by Automake
-# Copyright Yahoo Inc. 2021
+# Copyright Yahoo Inc.
 # Licensed under the terms of the Apache-2.0 license.
 # For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -13,6 +13,7 @@ tunitas_SUBSOURCES = \
   $(tunitas_error_SUBSOURCES) \
   $(tunitas_exception_SUBSOURCES) \
   $(tunitas_file_SUBSOURCES) \
+  $(tunitas_integer_SUBSOURCES) \
   $(tunitas_optional_SUBSOURCES) \
   $(tunitas_otherwise_SUBSOURCES) \
   $(tunitas_outcome_SUBSOURCES) \
@@ -28,6 +29,7 @@ include src/tunitas/base64/Makefrag.am
 include src/tunitas/error/Makefrag.am
 include src/tunitas/exception/Makefrag.am
 include src/tunitas/file/Makefrag.am
+include src/tunitas/integer/Makefrag.am
 include src/tunitas/optional/Makefrag.am
 include src/tunitas/otherwise/Makefrag.am
 include src/tunitas/outcome/Makefrag.am

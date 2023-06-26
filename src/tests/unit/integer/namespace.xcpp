@@ -4,18 +4,14 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import tunitas
-#import tunitas.string.literals
-namespace tunitas::error {
-  namespace package_error {
-    namespace body {
-      namespace exported { }
-      using namespace string::literals;
-    }
-    namespace interface = body::exported;
-  }
-  using namespace package_error::interface;
-  namespace [[nodirectory]] code { }
-  namespace [[nodirectory]] condition { }
+#import tests.unit
+#import tunitas.integer
+#import tunitas.integer.required
+#import tunitas.integer.integers
+namespace tests::unit::integer {
+  namespace library = ::tunitas::integer;
+  namespace required = ::tunitas::integer::required;
+  using namespace ::tunitas::integer::integers;
+  namespace [[nodirectory]] bit { }
 }
 #endiv

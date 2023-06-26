@@ -6,6 +6,7 @@
 #
 tunitas_error_SUBSOURCES = \
   obj/src/tunitas/error/namespace.cpp \
+  obj/src/tunitas/error/convenience.cpp \
   obj/src/tunitas/error/Code.cpp \
   obj/src/tunitas/error/code.Unpackaged.cpp \
   obj/src/tunitas/error/code.Package.cpp \

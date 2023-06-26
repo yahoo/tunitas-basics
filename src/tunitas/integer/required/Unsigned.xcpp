@@ -1,0 +1,49 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.Integer
+#import tunitas.integer.required.Small
+#import tunitas.integer.required.multiprecision.number.concepts
+namespace tunitas::integer::required {
+  //
+  // Is this type a signed integer (of any size?)
+  //
+  template<typename INTEGER> concept Unsigned = nonstd::required::integer::Unsigned<INTEGER> || multiprecision::number::Unsigned<INTEGER>;
+}
+#endiv
+#divert <cpp>
+#import tunitas.integer.integers
+namespace {
+  namespace testate {
+    namespace required = tunitas::integer::required;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert(!required::Unsigned<sint8_t>);
+    static_assert(!required::Unsigned<sint16_t>);
+    static_assert(!required::Unsigned<sint32_t>);
+    static_assert(!required::Unsigned<sint64_t>);
+    static_assert(!required::Unsigned<sint128_t>);
+    static_assert(!required::Unsigned<sint256_t>);
+    static_assert(!required::Unsigned<sint512_t>);
+    static_assert(!required::Unsigned<sint1024_t>);
+    static_assert(!required::Unsigned<sint2048_t>);
+    static_assert(!required::Unsigned<sint4096_t>);
+    static_assert(!required::Unsigned<sint8192_t>);
+    //
+    static_assert(required::Unsigned<uint8_t>);
+    static_assert(required::Unsigned<uint16_t>);
+    static_assert(required::Unsigned<uint32_t>);
+    static_assert(required::Unsigned<uint64_t>);
+    static_assert(required::Unsigned<uint128_t>);
+    static_assert(required::Unsigned<uint256_t>);
+    static_assert(required::Unsigned<uint512_t>);
+    static_assert(required::Unsigned<uint1024_t>);
+    static_assert(required::Unsigned<uint2048_t>);
+    static_assert(required::Unsigned<uint4096_t>);
+    static_assert(required::Unsigned<uint8192_t>);
+  }
+}
+#endiv

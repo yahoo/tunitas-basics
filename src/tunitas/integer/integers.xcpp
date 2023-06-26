@@ -1,0 +1,117 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::integer::integers {
+  //
+  // The integers, bundled
+  //
+  // Design:
+  //
+  //   integers from 8 to 8192 bits
+  //   sint$N_t for signed integers (hide / never export unadorned "int$N_t")
+  //   uint$N for unsigned integers
+  //
+  // Usage:
+  //
+  //   #import tunitas.integer.integers
+  //   namespace something:something_else::dark_side {
+  //     using namespace tunitas::integer::integers;
+  //   }
+  //
+  namespace package_integers {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_integers::interface;
+}
+#import nonstd.integers
+namespace tunitas::integer::integers::package_integers {
+  //
+  // Because these definitions aren't provided as part of the sttandard package
+  //
+  using namespace tunitas::integer::bmp; // WATCHOUT - namespace tunitas::number occludes boost::multiprecision::number<...>
+  using namespace nonstd::integers;
+  //
+  // 256, 512 and 1024 are already predefined with the boost system
+  //
+  using int2048_t  = bmp::number<cpp_int_backend<2048, 2048,   signed_magnitude, unchecked, void>>;
+  using uint2048_t = bmp::number<cpp_int_backend<2048, 2048, unsigned_magnitude, unchecked, void>>;
+  //
+  using int4096_t  = bmp::number<cpp_int_backend<4096, 4096,   signed_magnitude, unchecked, void>>;
+  using uint4096_t = bmp::number<cpp_int_backend<4096, 4096, unsigned_magnitude, unchecked, void>>;
+  //
+  using int8192_t  = bmp::number<cpp_int_backend<8192, 8192,   signed_magnitude, unchecked, void>>;
+  using uint8192_t = bmp::number<cpp_int_backend<8192, 8192, unsigned_magnitude, unchecked, void>>;
+  namespace body::exported {
+    using sint8_t = int8_t;
+    using package_integers::uint8_t;
+    //
+    using sint16_t = int16_t;
+    using package_integers::uint16_t;
+    //
+    using sint32_t = int32_t;
+    using package_integers::uint32_t;
+    //
+    using sint64_t = int64_t;
+    using package_integers::uint64_t;
+    //
+    using sint128_t = nonstd::integers::int128_t; // .... DO NOT ---> use the gcc-provided one, not the int_cpp software one
+    using uint128_t = nonstd::integers::uint128_t; // ... DO NOT ---> using package_integers::uint128_t;
+
+    //
+    using sint256_t = package_integers::int256_t;
+    using package_integers::uint256_t;
+    //
+    using sint512_t = package_integers::int512_t;
+    using package_integers::uint512_t;
+    //
+    using sint1024_t = package_integers::int1024_t;
+    using package_integers::uint1024_t;
+    //
+    using sint2048_t = package_integers::int2048_t;
+    using package_integers::uint2048_t;
+    //
+    using sint4096_t = package_integers::int4096_t;
+    using package_integers::uint4096_t;
+    //
+    using sint8192_t = package_integers::int8192_t;
+    using package_integers::uint8192_t;
+  }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::integer::integers;
+    //
+    // are they visible?
+    //
+    static_assert(sizeof(sint8_t));
+    static_assert(sizeof(sint16_t));
+    static_assert(sizeof(sint32_t));
+    static_assert(sizeof(sint64_t));
+    static_assert(sizeof(sint128_t));
+    static_assert(sizeof(sint256_t));
+    static_assert(sizeof(sint512_t));
+    static_assert(sizeof(sint1024_t));
+    static_assert(sizeof(sint2048_t));
+    static_assert(sizeof(sint4096_t));
+    static_assert(sizeof(sint8192_t));
+    //
+    static_assert(sizeof(uint8_t));
+    static_assert(sizeof(uint16_t));
+    static_assert(sizeof(uint32_t));
+    static_assert(sizeof(uint64_t));
+    static_assert(sizeof(uint128_t));
+    static_assert(sizeof(uint256_t));
+    static_assert(sizeof(uint512_t));
+    static_assert(sizeof(uint1024_t));
+    static_assert(sizeof(uint2048_t));
+    static_assert(sizeof(uint4096_t));
+    static_assert(sizeof(uint8192_t));
+  }
+}
+#endiv

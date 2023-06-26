@@ -1,0 +1,80 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::integer {
+  namespace package_powm {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_powm::interface;
+}
+#endiv
+#divert <hpp>
+#import tunitas.integer.required.Unsigned
+namespace tunitas::integer::package_powm::body {
+  namespace exported {
+    //
+    // Exponential: x^y (mod m)
+    //
+    // Authority:
+    //
+    //   https://en.wikipedia.org/wiki/Modular_exponentiation
+    //   Gotta be a Knuth citation in there somewhere.
+    //   Donald E. Knuth. Seminumerical Algorithms, Volume 2 [where in that?]
+    //
+    // Specification:
+    //
+    //   What it says on the label.
+    //   The power of base^exp modulo modulus
+    //
+    // Design:
+    //
+    //   Be constexpr, even for the bignums.
+    //   The bignums have this, available by ADL; the smallnums don't (and ADL doesn't apply)
+
+    //   ADL can't find any of this because the integers are in various namespaces or at the language level.
+    //
+    //   Observe use of integer::traits::Double<...>
+    //
+    // Usage:
+    //
+    //   auto result = powm(base, exponent, modulus)
+    //
+    template<integer::required::Unsigned MODINT> inline constexpr auto powm(MODINT base, MODINT exponent, MODINT modulus) -> MODINT;
+  }
+  template<integer::required::Unsigned MODINT> inline constexpr auto recipe(MODINT base, MODINT exponent, MODINT modulus) -> MODINT;
+}
+#endiv
+#divert <ipp>
+#import tunitas.exception.Domain
+#import tunitas.integer.traits.Double
+namespace tunitas::integer::package_powm {
+  template<integer::required::Unsigned MODINT> constexpr auto interface::powm(MODINT base, MODINT exponent, MODINT modulus) -> MODINT { return recipe(base, exponent, modulus); }
+  template<integer::required::Unsigned MODINT> constexpr auto body::recipe(MODINT base1, MODINT exponent, MODINT modulus) -> MODINT {
+    using Temporary = typename integer::traits::Double<MODINT>::Type; // MUST be able to hold (MODULUS-1)(MODULUS-1) == 2*MODULUS-2 so thus a doublewide integer
+    // base & exponent can never be invalid (when unsigned)
+    if (modulus < 1) {
+      throw exception::Domain{"zero modulus"};
+    } else if (1 == modulus) {
+      return 0;
+    }
+    if (base1 < 2) {
+      return 1;
+    } else {
+      auto result = Temporary{1};
+      auto base2 = Temporary{base1};
+      while (exponent > 0) {
+        if (1 == (exponent & 01)) {
+          result = (result * base2) % modulus;
+        }
+        base2 = (base2 * base2) % modulus;
+        exponent >>= 1;
+      }
+      return static_cast<MODINT>(result); // this is safe because 0 <= result < modulus
+    }
+  }
+}
+#endiv

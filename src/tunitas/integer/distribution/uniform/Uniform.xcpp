@@ -1,0 +1,265 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tunitas.integer.required.Integer
+namespace tunitas::integer::distribution::uniform {
+  //
+  // Derived from gcc-6.3.0 .../bits/uniform_int_dist.h
+  // We are interested in modifying std::uniform_int_distribution
+  // to support 128-bit integers of gcc.
+  //
+  // Usage:
+  //
+  //    Uniform<uint128_t>
+  //    Uniform<sint128_t>
+  //
+  //    Uniform<uint1024_t>
+  //    Uniform<sint1024_t>
+  //
+  template<required::Integer INTEGER = int> class Uniform;
+}
+#endiv
+#divert <hpp>
+// [derived from] Class template uniform_int_distribution -*- C++ -*-
+
+// Copyright (C) 2009-2016 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+#import tunitas.integer.distribution.uniform..Parameters
+#import tunitas.integer.distribution.required.Randomness
+#import tunitas.integer.Limits
+#import nonstd.required.iterator.Output
+#import std.declval
+namespace tunitas::integer::distribution {
+  namespace uniform {
+    template<required::Integer INTEGER> inline constexpr auto operator==(Uniform<INTEGER> const &, Uniform<INTEGER> const &) -> bool;
+    template<required::Integer INTEGER> inline constexpr auto operator!=(Uniform<INTEGER> const &, Uniform<INTEGER> const &) -> bool;
+  }
+  template<integer::required::Integer INTEGER> struct uniform::Uniform {
+    // New School
+    using Result = INTEGER;
+    using Parameters = uniform::Parameters<Result>;
+    using Limits = integer::Limits<Result>;
+    static_assert(integer::Limits<Result>::is_specialized); // the specialization exists
+    static_assert(0 != integer::Limits<Result>::max()); //     and has a reasonable definition
+    //
+    // old school (but not mentioned in the standard)
+    using limits_type = Limits;
+    // old_school (as defined in ISO C++17)
+    using result_type = Result;
+    using param_type = Parameters;
+    //
+    static_assert(sizeof(std::declval<Result>() + std::declval<Result>()));
+    static_assert(sizeof(std::declval<Result>() * std::declval<Result>()));
+    //
+    // Constructs a uniform distribution object.
+    inline constexpr explicit Uniform(Result a = 0, Result b = Limits::max());
+    inline constexpr explicit Uniform(Parameters const &);
+    //
+    // Resets the distribution state.
+    // Does nothing for the uniform integer distribution (for rhymeing similarity with the others where reset *does* do something)
+    inline constexpr auto reset() -> void { }
+    //
+    // Returns the parameters a or b of the distribution.
+    inline constexpr auto a() const -> Result;
+    inline constexpr auto b() const -> Result;
+    //
+    // Returns the parameter set of the distribution.
+    inline constexpr auto param() const -> Parameters;
+    //
+    // Sets the parameter set of the distribution.
+    inline constexpr auto param(Parameters const &) -> void;
+    //
+    // Returns the inclusive lower bound of the distribution range.
+    inline constexpr auto min() const -> Result;
+    //
+    // Returns the inclusive upper bound of the distribution range.
+    inline constexpr auto max() const -> Result;
+    //
+    // The generation functions.
+    template<required::Randomness URNG> inline auto operator()(URNG &) -> Result;
+    template<required::Randomness URNG> inline auto operator()(URNG &, Parameters const &) -> Result;
+    //
+    // [nonstd] interface, an extension, an experimental aspect.
+    // Why? ... because.  To make it look like a std::seed_seq, with a generate(...)
+    //
+    template<typename OUTPUT, required::Randomness URNG> inline auto __generate(OUTPUT f, OUTPUT t, URNG &g) -> void requires required::iterator::Output<OUTPUT, Result>;
+    template<typename OUTPUT, required::Randomness URNG> inline auto __generate(OUTPUT f, OUTPUT t, URNG &g, Parameters const &p) -> void requires required::iterator::Output<OUTPUT, Result>;
+#if 0
+    // [[FIXTHIS]] ... why is this overload needed at all?
+    template<required::Randomness URNG> inline auto __generate(Result *f, Result *t, URNG &, Parameters const &) -> void;
+#endif
+  protected:
+    template<typename OUTPUT, required::Randomness URNG> auto __generate_impl(OUTPUT f, OUTPUT t, URNG &, Parameters const &) -> void requires required::iterator::Output<OUTPUT, Result>; 
+    //
+    // Return true if two uniform integer distributions have the same parameters.
+    friend auto uniform::operator==<>(Uniform const &, Uniform const &) -> bool;
+    Parameters _M_param;
+  };
+}
+#endiv
+#divert <ipp>
+#import tunitas.integer.distribution.uniform.Parameters
+namespace tunitas::integer::distribution {
+  template<required::Integer INTEGER> constexpr auto uniform::operator==(Uniform<INTEGER> const &d1, Uniform<INTEGER> const &d2) -> bool { return d1._M_param == d2._M_param; }
+  template<required::Integer INTEGER> constexpr auto uniform::operator!=(Uniform<INTEGER> const &d1, Uniform<INTEGER> const &d2) -> bool { return !operator==(d1, d2); }
+  namespace uniform {
+    template<required::Integer _> constexpr Uniform<_>::Uniform(Result a, Result b) : _M_param(a, b) { }
+    template<required::Integer _> constexpr Uniform<_>::Uniform(Parameters const &p) : _M_param(p) { }
+    template<required::Integer _> constexpr auto Uniform<_>::a() const -> Result { return _M_param.a(); }
+    template<required::Integer _> constexpr auto Uniform<_>::b() const -> Result { return _M_param.b(); }
+    template<required::Integer _> constexpr auto Uniform<_>::param() const -> Parameters { return _M_param; }
+    template<required::Integer _> constexpr auto Uniform<_>::param(Parameters const &p) -> void { _M_param = p; }
+    template<required::Integer _> constexpr auto Uniform<_>::min() const -> Result { return this->a(); }
+    template<required::Integer _> constexpr auto Uniform<_>::max() const -> Result { return this->b(); }
+    template<required::Integer _> template<required::Randomness URNG> auto Uniform<_>::operator()(URNG &g) -> Result { return this->operator()(g, this->_M_param); }
+    template<required::Integer _> template<typename OUTPUT, required::Randomness URNG> auto Uniform<_>::__generate(OUTPUT f, OUTPUT t, URNG &g)                      -> void requires required::iterator::Output<OUTPUT, Result> { this->__generate(f, t, g, this->_M_param); }
+    template<required::Integer _> template<typename OUTPUT, required::Randomness URNG> auto Uniform<_>::__generate(OUTPUT f, OUTPUT t, URNG &g, Parameters const &p) -> void requires required::iterator::Output<OUTPUT, Result> { this->__generate_impl(f, t, g, p); }
+#if 0 // [[REMOVETHIS]] [[FIXTHIS]] why was this ovrload needed at all?
+    template<required::Integer _> template<required::Randomness URNG> auto Uniform<_>::__generate(Result *f, Result *t, URNG &g, Parameters const &p) -> void {
+      static_assert(required::iterator::Output<OUTPUT, Result><Result *>);
+      this->__generate_impl(f, t, g, p);
+    }
+#endif
+  }
+}
+#endiv
+#divert <tpp>
+#import tunitas.integer.make.Common // ..... a.k.a. std.common_type
+#import tunitas.integer.make.Unsigned // ... a.k.a. nonstd.make_unsigned
+#import tunitas.integer.distribution.usage.Randomness
+#import tunitas.integer.bit // bit_ceil
+#import tunitas.exception.Invalid
+#import substd.exception.Logic
+#import std.derived_from
+namespace tunitas::integer::distribution::uniform {
+  template<required::Integer _> template<required::Randomness URNG> auto Uniform<_>::operator()(URNG &__urng, Parameters const &__param) -> Result {
+    using _Gresult_type = typename URNG::result_type;
+    using __utype = typename make::Unsigned<result_type>::Type;
+    using __uctype = typename make::Common<_Gresult_type, __utype>::Type;
+    __uctype const __urngmin = __urng.min();
+    __uctype const __urngmax = __urng.max();
+    __uctype const __urngrange = __urngmax - __urngmin;
+    __uctype const __urange = __uctype(__param.b()) - __uctype(__param.a());
+    __uctype __ret;
+    if (0 == __urngrange) {
+      // This is a logic error because the generator is bogus; that is a programmer error.
+      // The generator min == max and thus can't generate anything; those are static constexpr functions.
+      // Without the exception the recursion is infinite until the stack runs out.
+      throw exception::Invalid("empty urng range");
+      static_assert(std::derived_from<exception::Invalid, substd::exception::Logic>);
+    }
+    if (__urngrange > __urange) {
+      // downscaling
+      const __uctype __uerange = __urange + 1; // __urange can be zero
+      const __uctype __scaling = __urngrange / __uerange;
+      const __uctype __past = __uerange * __scaling;
+      do {
+        __ret = __uctype(__urng()) - __urngmin;
+      } while (__ret >= __past);
+      __ret /= __scaling;
+    } else if (__urngrange < __urange) {
+      // upscaling
+      /*
+        Note that every value in [0, urange]
+        can be written uniquely as
+          (urngrange + 1) * high + low
+        where
+          high in [0, urange / (urngrange + 1)]
+        and
+          low in [0, urngrange].
+      */
+      __uctype __tmp; // wraparound control
+      do {
+        __uctype const __uerngrange = __urngrange + 1;
+        __uctype called = static_cast<__uctype>(operator()(__urng, param_type(0, __urange / __uerngrange)));
+        __tmp = __uerngrange * called;
+        __ret = __tmp + (__uctype(__urng()) - __urngmin);
+      } while (__ret > __urange || __ret < __tmp);
+    } else {
+      __ret = __uctype(__urng()) - __urngmin;
+    }
+    return static_cast<Result>(__ret) + __param.a();
+  }
+  template<required::Integer _> template<typename OUTPUT, required::Randomness URNG> auto Uniform<_>::__generate_impl(OUTPUT __f, OUTPUT __t, URNG &__urng, Parameters const &__param) -> void requires required::iterator::Output<OUTPUT, Result> {
+    using _Gresult_type = typename URNG::result_type;
+    using  __utype = typename make::Unsigned<result_type>::Type;
+    using  __uctype = typename make::Common<_Gresult_type, __utype>::Type;
+    __uctype const __urngmin = __urng.min();
+    __uctype const __urngmax = __urng.max();
+    __uctype const __urngrange = __urngmax - __urngmin;
+    __uctype const __urange = __uctype(__param.b()) - __uctype(__param.a());
+    __uctype __ret;
+    if (0 == __urngrange) {
+      // This is a logic error because the generator is bogus; that is a programmer error.
+      // The generator min == max and thus can't generate anything; those are static constexpr functions.
+      // Without the exception the recursion is infinite until the stack runs out.
+      throw exception::Invalid("empty urng range");
+      static_assert(std::derived_from<exception::Invalid, substd::exception::Logic>);
+    }
+    if (__urngrange > __urange) {
+      if (bit_ceil(__urngrange + 1) && bit_ceil(__urange + 1)) {
+        while (__f != __t) {
+          __ret = __uctype(__urng()) - __urngmin;
+          *__f++ = (__ret & __urange) + __param.a();
+        }
+      } else {
+        // downscaling
+        __uctype const __uerange = __urange + 1; // __urange can be zero
+        __uctype const __scaling = __urngrange / __uerange;
+        __uctype const __past = __uerange * __scaling;
+        while (__f != __t) {
+          do {
+            __ret = __uctype(__urng()) - __urngmin;
+          } while (__ret >= __past);
+          *__f++ = __ret / __scaling + __param.a();
+        }
+      }
+    } else if (__urngrange < __urange) {
+      // upscaling
+      /*
+        Note that every value in [0, urange]
+        can be written uniquely as
+        (urngrange + 1) * high + low
+        where
+        high in [0, urange / (urngrange + 1)]
+        and
+        low in [0, urngrange].
+      */
+      __uctype __tmp; // wraparound control
+      while (__f != __t) {
+        do {
+          __uctype const __uerngrange = __urngrange + 1;
+          __uctype const called = static_cast<__uctype>(operator()(__urng, param_type(0, __urange / __uerngrange)));
+          __tmp = __uerngrange * called;
+          __ret = __tmp + (__uctype(__urng()) - __urngmin);
+        } while (__ret > __urange || __ret < __tmp);
+        *__f++ = __ret;
+      }
+    } else {
+      while (__f != __t) {
+        *__f++ = __uctype(__urng()) - __urngmin + __param.a();
+      }
+    }
+  }
+}
+#endiv

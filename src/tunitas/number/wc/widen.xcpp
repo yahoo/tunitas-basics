@@ -45,6 +45,7 @@ namespace tunitas::number::wc {
 #divert <ipp>
 #import std.transform
 #import std.back_inserter
+#import nonstd.container.Traits.std.basic_string.CHAR.TRAITS.ALLOCATOR
 #import nonstd.iterator.Traits
 #import std.use_facet
 #import std.ctype

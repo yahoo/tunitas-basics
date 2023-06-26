@@ -1,0 +1,22 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <hpp>
+#import tunitas.integer.required.Integer
+#import tunitas.integer.distribution.required.Randomness
+namespace tunitas::integer::distribution::usage {
+  //
+  // A uniform random number generator, in concept
+  // This diagnosis occurs with the complete type of GENERATOR
+  //
+  // Certainly there are other numerical properties as well.
+  //
+  template<typename GENERATOR> concept Randomness = required::Randomness<GENERATOR> && requires(GENERATOR generator, GENERATOR const cgenerator) {
+    // use the old_school formulation
+    typename GENERATOR::result_type;
+    requires required::Integer<typename GENERATOR::result_type>;
+    { cgenerator.min() } -> convertible_to<typename GENERATOR::result_type>;
+    { cgenerator.max() } -> convertible_to<typename GENERATOR::result_type>;
+    { generator() } -> convertible_to<typename GENERATOR::result_type>;
+  };
+}
+#endiv

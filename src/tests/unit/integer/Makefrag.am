@@ -1,0 +1,12 @@
+# This is a GNU -*- Makefile -*- fragment which is managed by automake
+# For terms and provenance see the LICENSE file at the top of this repository.
+#
+tests_unit_integer_SUBSOURCES = \
+  check/obj/src/tests/unit/integer/namespace.cpp \
+  check/obj/src/tests/unit/integer/Fixture.cpp \
+  check/obj/src/tests/unit/integer/bit.Bit_Ceil.cpp \
+  check/obj/src/tests/unit/integer/bit.Countr_Zero.cpp \
+  $(tests_unit_integer_distribution_SUBSOURCES) \
+  $(end)
+#
+include src/tests/unit/integer/distribution/Makefrag.am

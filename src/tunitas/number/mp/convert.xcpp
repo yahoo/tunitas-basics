@@ -6,6 +6,18 @@
 namespace tunitas::number::mp {
   //
   // Because none of the MP classes have constructors that accept int128
+  //
+  // Usage:
+  //
+  //   auto converted = convert<mpz_class>(...something_signed...);
+  //   auto converted = convert<mpz_class>(...something_unsigned...);
+  //
+  //   auto converted = convert<mpq_class>(...something_signed...);
+  //   auto converted = convert<mpq_class>(...something_unsigned...);
+  //
+  //   auto converted = convert<mpf_class>(...something_signed...);
+  //   auto converted = convert<mpf_class>(...something_unsigned...);
+  //
   template<required::Carrier CARRIER> auto convert(int128_t) -> CARRIER;
   template<required::Carrier CARRIER> auto convert(uint128_t) -> CARRIER;
   //

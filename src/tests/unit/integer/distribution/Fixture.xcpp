@@ -1,0 +1,110 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::integer::distribution { struct Fixture; }
+#endiv
+#divert <hpp>
+struct tests::unit::integer::distribution::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  template<typename UNIFORM> auto test_usage_Uniform() -> void;
+};
+#endiv
+#divert <tpp>
+#import std.random_device
+namespace tests::unit::integer::distribution {
+  template<typename UNIFORM> auto Fixture::test_usage_Uniform() -> void {
+    auto source = std::random_device{};
+    using Subject = UNIFORM;
+    auto const lo = typename Subject::Result{0};
+    auto const hi = typename Subject::Result{127}; // works for all integer widths, including signed char (sint8_t)
+    auto subject = Subject{lo, hi};
+    //
+    auto const zero = subject(source);
+    auto const one = subject(source);
+    auto const two = subject(source);
+    auto const three = subject(source);
+    require(ASSERTION, !(zero == one && one == two && two == three && three == zero));
+  }
+}
+#endiv
+#divert <cpp>
+#import tests.unit.integer.bit.Bit_Ceil
+#import tests.unit.integer.bit.Countr_Zero
+#import tests.unit.integer.distribution.Uniform
+#import tunitas.integer.distribution.Uniform
+auto tests::unit::integer::distribution::Fixture::suite() -> Suite {
+  auto series = Stream{"integer"sv};
+  series << []{
+              auto use = Stream{"usage"sv};
+              use << []{
+                       auto uni = Stream{"Uniform"sv};
+                       uni << add("int8", &Fixture::test_usage_Uniform<library::Uniform<sint8_t>>)
+                           << add("int16", &Fixture::test_usage_Uniform<library::Uniform<uint16_t>>)
+                           << add("int32", &Fixture::test_usage_Uniform<library::Uniform<sint32_t>>)
+                           << add("int64", &Fixture::test_usage_Uniform<library::Uniform<uint64_t>>)
+                           << add("int128", &Fixture::test_usage_Uniform<library::Uniform<sint128_t>>)
+                           << add("int256", &Fixture::test_usage_Uniform<library::Uniform<uint256_t>>)
+
+                           << add("int512", &Fixture::test_usage_Uniform<library::Uniform<sint512_t>>)
+                           << add("int1024", &Fixture::test_usage_Uniform<library::Uniform<uint1024_t>>)
+                           << add("int2048", &Fixture::test_usage_Uniform<library::Uniform<sint2048_t>>)
+                           << add("int4096", &Fixture::test_usage_Uniform<library::Uniform<uint4096_t>>)
+                           << add("int8192", &Fixture::test_usage_Uniform<library::Uniform<sint8192_t>>)
+                           << END;
+                       return uni;
+                     }()
+                  << END;
+              return use;
+            }()
+         << []{
+             auto bb = Stream{"bit"sv};
+             bb << add<bit::Countr_Zero>()
+                 << add<bit::Bit_Ceil>()
+                 << END;
+             return bb;
+           }()
+         << []{
+              auto uni = Stream{"Uniform"sv};
+              uni << []{
+                      auto sig = Stream{"signed"sv};
+                      sig << add<Uniform<library::Uniform<sint8_t>>>()
+                          << add<Uniform<library::Uniform<sint16_t>>>()
+                          << add<Uniform<library::Uniform<sint32_t>>>()
+                          << add<Uniform<library::Uniform<sint64_t>>>()
+                          << add<Uniform<library::Uniform<sint128_t>>>()
+                          << add<Uniform<library::Uniform<sint256_t>>>()
+                          << add<Uniform<library::Uniform<sint512_t>>>()
+                          << add<Uniform<library::Uniform<sint1024_t>>>()
+                          << add<Uniform<library::Uniform<sint2048_t>>>()
+                          << add<Uniform<library::Uniform<sint4096_t>>>()
+                          << add<Uniform<library::Uniform<sint8192_t>>>()
+                          << END;
+                       return sig;
+                     }()
+                  << []{
+                       auto uns = Stream{"signed"sv};
+                       uns << add<Uniform<library::Uniform<uint8_t>>>()
+                           << add<Uniform<library::Uniform<uint16_t>>>()
+                           << add<Uniform<library::Uniform<uint32_t>>>()
+                           << add<Uniform<library::Uniform<uint64_t>>>()
+                           << add<Uniform<library::Uniform<uint128_t>>>()
+                           << add<Uniform<library::Uniform<uint256_t>>>()
+                           << add<Uniform<library::Uniform<uint512_t>>>()
+                           << add<Uniform<library::Uniform<uint1024_t>>>()
+                           << add<Uniform<library::Uniform<uint2048_t>>>()
+                           << add<Uniform<library::Uniform<uint4096_t>>>()
+                           << add<Uniform<library::Uniform<uint8192_t>>>()
+                           << END;
+                       return uns;
+                     }()
+                  << END;
+              return uni;
+            }()
+         << END;
+  return settle(series);
+}
+#endiv

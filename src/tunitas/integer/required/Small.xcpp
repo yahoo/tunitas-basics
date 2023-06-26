@@ -1,0 +1,47 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.Integer
+namespace tunitas::integer::required {
+  //
+  // Is this type a small (language-level) integer (of any size?)
+  // Covers compiler-provided int128 because such can become the backing for an enum class.
+  //
+  template<typename INTEGER> concept Small = nonstd::required::Integer<INTEGER>;
+}
+#endiv
+#divert <cpp>
+#import tunitas.integer.integers.
+namespace {
+  namespace testate {
+    namespace required = tunitas::integer::required;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert( required::Small<sint8_t>);
+    static_assert( required::Small<uint8_t>);
+    static_assert( required::Small<sint16_t>);
+    static_assert( required::Small<uint16_t>);
+    static_assert( required::Small<sint32_t>);
+    static_assert( required::Small<uint32_t>);
+    static_assert( required::Small<sint64_t>);
+    static_assert( required::Small<uint64_t>);
+    static_assert( required::Small<sint128_t>);
+    static_assert( required::Small<uint128_t>);
+    static_assert(!required::Small<sint256_t>);
+    static_assert(!required::Small<uint256_t>);
+    static_assert(!required::Small<sint512_t>);
+    static_assert(!required::Small<uint512_t>);
+    static_assert(!required::Small<sint1024_t>);
+    static_assert(!required::Small<uint1024_t>);
+    static_assert(!required::Small<sint2048_t>);
+    static_assert(!required::Small<uint2048_t>);
+    static_assert(!required::Small<sint4096_t>);
+    static_assert(!required::Small<uint4096_t>);
+    static_assert(!required::Small<sint8192_t>);
+    static_assert(!required::Small<uint8192_t>);
+  }
+}
+#endiv

@@ -18,6 +18,7 @@ tests_unit_SUBSOURCES = \
   $(tests_unit_exception_SUBSOURCES) \
   check/obj/src/tests/unit/exits.Fixture.cpp \
   $(tests_unit_for_each_SUBSOURCES) \
+  $(tests_unit_integer_SUBSOURCES) \
   $(tests_unit_number_SUBSOURCES) \
   $(tests_unit_optional_SUBSOURCES) \
   $(tests_unit_outcome_SUBSOURCES) \
@@ -42,6 +43,7 @@ include src/tests/unit/base64/Makefrag.am
 include src/tests/unit/error/Makefrag.am
 include src/tests/unit/exception/Makefrag.am
 include src/tests/unit/for_each/Makefrag.am
+include src/tests/unit/integer/Makefrag.am
 include src/tests/unit/number/Makefrag.am
 include src/tests/unit/optional/Makefrag.am
 include src/tests/unit/outcome/Makefrag.am

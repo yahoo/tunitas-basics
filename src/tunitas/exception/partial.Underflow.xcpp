@@ -1,16 +1,17 @@
 // This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Yahoo Inc. 2022.
+// Copyright Yahoo Inc.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an (out of) Runtime exception
+  // The partial completion of a subsystem failure exception.
   //
   // Semantic
   //
-  //   See feature::Unimplemented, which is nearby
+  //   Rhymes with std::underflow_error.
+  //   https://en.cppreference.com/w/cpp/error/underflow_error
   //
   // Specification:
   //
@@ -21,8 +22,6 @@ namespace tunitas::exception::partial {
   //   At least one descent is required.
   //   And with a new mixin of an Aspect, then unification must occur.
   //
-  //   The default+conversion constructor MUST be repeated so that the call-site current source location is captured (correctly).
-  //
   // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
   //   vague linkage 
   //   If the class declares any non-inline, non-pure virtual functions,
@@ -32,38 +31,38 @@ namespace tunitas::exception::partial {
   //
   // Usage:
   //
-  //   class my::Something : public partial::Unimplemented {
+  //   class my::Something : public partial::Underflow {
   //     struct Ancestors {
-  //       using Exception = partial::Unimplemented;
+  //       using Exception = partial::Underflow;
   //     };
-  //     using Ancestor::Exception::Unimplemented;
+  //     using Ancestor::Exception::Underflow;
   //   };
   //
-  struct Unimplemented;
+  struct Underflow;
 }
 #endiv
 #divert <hpp>
 #import tunitas.exception.Aspect
-#import tunitas.exception.feature.Unimplemented
-#import nonstd.exception.Unimplemented
-class tunitas::exception::partial::Unimplemented : public virtual Aspect,
-                                                   public virtual feature::Unimplemented,
-                                                   public nonstd::exception::Unimplemented {
+#import tunitas.exception.feature.Underflow
+#import nonstd.exception.Runtime
+#import nonstd.string.View
+class tunitas::exception::partial::Underflow : public virtual Aspect,
+                                               public virtual feature::Underflow,
+                                               public nonstd::exception::Runtime<nonstd::string::View> {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
-    using Exception = nonstd::exception::Unimplemented;
+    using Exception = nonstd::exception::Runtime<nonstd::string::View>;
   };
 protected:
-  ~Unimplemented() = default;
+  ~Underflow() = default;
 public:
-  explicit Unimplemented(Location location = Location::current()) : Ancestors::Exception{location} { }
-  using Ancestors::Exception::Unimplemented;
+  using Ancestors::Exception::View; // And how on earth would we know that 'View' was the name of the constructor?
   using Results = Ancestors::Aspect::Results;
   auto what() const noexcept -> Results::What override;
 };
 #endiv
 #divert <cpp>
 namespace tunitas::exception::partial {
-  auto Unimplemented::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+  auto Underflow::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
 }
 #endiv

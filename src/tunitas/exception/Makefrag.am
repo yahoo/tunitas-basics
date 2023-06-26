@@ -41,6 +41,8 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/feature.System.cpp \
   obj/src/tunitas/exception/feature.Unimplemented.cpp \
   obj/src/tunitas/exception/feature.Variant.cpp \
+  obj/src/tunitas/exception/feature.Overflow.cpp \
+  obj/src/tunitas/exception/feature.Underflow.cpp \
   \
   obj/src/tunitas/exception/partial.Allocation.cpp \
   obj/src/tunitas/exception/partial.Bound.cpp \
@@ -65,6 +67,8 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/partial.System.cpp \
   obj/src/tunitas/exception/partial.Unimplemented.cpp \
   obj/src/tunitas/exception/partial.Variant.cpp \
+  obj/src/tunitas/exception/partial.Overflow.cpp \
+  obj/src/tunitas/exception/partial.Underflow.cpp \
   \
   obj/src/tunitas/exception/Allocation.cpp \
   obj/src/tunitas/exception/Bound.cpp \
@@ -88,6 +92,8 @@ tunitas_exception_SUBSOURCES = \
   obj/src/tunitas/exception/System.cpp \
   obj/src/tunitas/exception/Unimplemented.cpp \
   obj/src/tunitas/exception/Variant.cpp \
+  obj/src/tunitas/exception/Overflow.cpp \
+  obj/src/tunitas/exception/Underflow.cpp \
   $(end)
 #
 include src/tunitas/exception/aspect/Makefrag.am

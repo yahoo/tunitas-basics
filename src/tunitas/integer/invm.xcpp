@@ -1,0 +1,172 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::integer {
+  namespace package_invm {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_invm::interface;
+}
+#import tunitas.error.Code
+#import tunitas.integer.required.Unsigned
+#import tunitas.integer.make.Signed
+#include <hpp/tunitas.integer.make.Signed>
+#import tunitas.integer.traits.Double
+#include <hpp/tunitas.integer.traits.Double>
+namespace tunitas::integer::package_invm {
+  namespace body {
+    using E = error::Code;
+    namespace euclidean {
+      template<required::Unsigned UNSIGNED> using Signed = typename make::Signed<typename traits::Double<UNSIGNED>::Type>;
+      template<required::Unsigned UNSIGNED> struct Result;
+    }
+  }
+}
+#endiv
+#divert <hpp>
+#import tunitas.error.by.Exception
+#import tunitas.error.by.Optional
+#import tunitas.error.by.Outcome
+#import tunitas.error.Optional
+#import tunitas.error.Outcome
+namespace tunitas::integer::package_invm {
+  namespace body {
+    namespace exported {
+      //
+      // Modular inverse.
+      //
+      // Specification:
+      //
+      // Design:
+      //
+      //   Follow boost::integer::mod_inverse
+      //   But is constexpr.
+      //
+      // Exceptions:
+      //
+      //   Throws exception::Domain on failure to find the inverse.
+      //
+      // Usage:
+      //
+      //   auto inverted = invm(value, modulus);
+      //
+      template<required::Unsigned UNSIGNED> inline constexpr auto invm(error::by::Exception, UNSIGNED base, UNSIGNED modulus) -> UNSIGNED;
+      template<required::Unsigned UNSIGNED> inline constexpr auto invm(error::by::Optional, UNSIGNED base, UNSIGNED modulus) -> error::Optional<UNSIGNED>;
+      template<required::Unsigned UNSIGNED> inline constexpr auto invm(error::by::Outcome, UNSIGNED base, UNSIGNED modulus) -> error::Outcome<UNSIGNED>;
+    }
+    template<required::Unsigned UNSIGNED> inline constexpr auto compute(UNSIGNED base, UNSIGNED modulus) -> UNSIGNED;
+    template<required::Unsigned UNSIGNED> struct euclidean::Result {
+      using Value = typename Signed<UNSIGNED>::Type;
+      Value gcd{}, x{}, y{}; // gcd(m,n) = mx + ny
+    };
+    namespace euclidean {
+      //
+      // Authority:
+      //   "The Joy of Factoring", Algorithm 2.7.
+      // Specification:
+      //   Solves mx + ny = gcd(m,n). Returns tuple with (gcd(m,n), x, y).
+      // Design:
+      //   Implementation follows <boost/integer/extended_euclidean.hpp>
+      //   Expanded to multiprecision integers
+      //   [[as stated in boost/integr/extended_euclidean.hpp]] with an optimization to remove tmps from Wikipedia [[where?]]
+      //
+      template<required::Unsigned UNSIGNED> inline constexpr auto extended(UNSIGNED m, UNSIGNED n) -> Result<UNSIGNED>;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.exception.Domain
+#import substd.exception.Domain
+namespace tunitas::integer::package_invm {
+  template<required::Unsigned UNSIGNED> constexpr auto interface::invm(error::by::Exception, UNSIGNED base, UNSIGNED modulus) -> UNSIGNED try {
+    return compute(base, modulus);
+  } catch (substd::exception::Domain const &e) {
+    throw exception::Domain{e.what()}; // the internals of boost::multiprecision might throw these
+  }
+  template<required::Unsigned UNSIGNED> constexpr auto interface::invm(error::by::Optional, UNSIGNED base, UNSIGNED modulus) -> error::Optional<UNSIGNED> try {
+    return compute(base, modulus);
+  } catch (substd::exception::Domain const &e) {
+    return {};
+  }
+  template<required::Unsigned UNSIGNED> constexpr auto interface::invm(error::by::Outcome, UNSIGNED base, UNSIGNED modulus) -> error::Outcome<UNSIGNED> try {
+    return compute(base, modulus);
+  } catch (substd::exception::Domain const &e) {
+    return {E::FAILURE};
+  }
+  template<required::Unsigned UNSIGNED> constexpr auto body::compute(UNSIGNED base, UNSIGNED modulus) -> UNSIGNED {
+    if (modulus < UNSIGNED(2)) {
+      throw exception::Domain{"modulus must be > 1"};
+    }
+    if (base >= modulus) {
+      base %= modulus;
+    }
+    if (UNSIGNED{0} == base) {
+      throw exception::Domain{"division by zero"};
+    }
+    auto u = euclidean::extended(base, modulus);
+    if (UNSIGNED{1} < u.gcd) {
+      throw exception::Domain{"no inverse"};
+    }
+    // x might NOT be in the range 0 < x < m, let's fix that:
+    while (u.x <= UNSIGNED(0)) {
+      u.x += modulus;
+    }
+#if 0
+    // While indeed this is an inexpensive and comforting check,
+    // the multiplication overflows and hence makes the check itself buggy.
+    //
+    //             /////////------------------------ obvious overflow candidate
+    //             |||||||||
+    //             vvvvvvvvv
+    runtime_assert(u.x*base % modulus == 1);
+#endif
+    return static_cast<UNSIGNED>(u.x);
+  }
+  template<required::Unsigned UNSIGNED> constexpr auto body::euclidean::extended(UNSIGNED m, UNSIGNED n) -> euclidean::Result<UNSIGNED> {
+    // following <boost/integer/extended_euclidean.hpp>, but allowing for multiprecision
+    if (m < 1 || n < 1) {
+      throw exception::Domain{"euclidean::extended arguments must be positive"};
+    }
+    auto swapped = false;
+    if (m < n) {
+      swapped = true;
+      swap(m, n);
+    }
+    // WATCHOUT = the use of signed (dobule-wide) integers here is important to the algorithm
+    using Z = typename Signed<UNSIGNED>::Type;
+    auto u0 = Z{m};
+    auto u1 = Z{1};
+    auto u2 = Z{0};
+    auto v0 = Z{n};
+    auto v1 = Z{0};
+    auto v2 = Z{1};
+    while (v0 > 0) {
+      auto q = u0/v0;
+      auto w0 = u0 - q*v0;
+      auto w1 = u1 - q*v1;
+      auto w2 = u2 - q*v2;
+      u0 = v0;
+      u1 = v1;
+      u2 = v2;
+      v0 = w0;
+      v1 = w1;
+      v2 = w2;
+    }
+    auto result = Result<UNSIGNED>{};
+    result.gcd = u0;
+    if (swapped) {
+      result.x = u2;
+      result.y = u1;
+    } else {
+      result.x = u1;
+      result.y = u2;
+    }
+    return result;
+  }
+}
+#endiv

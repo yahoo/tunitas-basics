@@ -78,6 +78,7 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
+  $(module_boost_prefix) \
   $(module_cli_prefix) \
   $(module_half_prefix) \
   $(module_langu_prefix) \
@@ -91,6 +92,7 @@ TESTING_AREAS = \
   $(deprecated_TESTING_AREAS) \
   $(end)
 INSTALLATION_AREAS = \
+  $(nonstd_boost_prefix) \
   $(nonstd_cppunit_prefix) \
   $(nonstd_gcc_prefix) \
   $(nonstd_gmp_prefix) \

@@ -49,6 +49,8 @@ TF_WITH_SUBSYSTEM([hypogeal-twilight], [], [The SCOLD Build System])
 TF_WITH_SUBSYSTEM([temerarious-flagship], [], [The Tunitas Build System])
 TF_WITH_SUBSYSTEM([microhttpd++], [], [Micro HTTPd Server])
 
+TF_WITH_NONSTD([boost])
+TF_WITH_MODULE([boost])
 TF_WITH_NONSTD([gmp])
 TF_WITH_NONSTD([half])
 TF_WITH_MODULE([half])
@@ -88,6 +90,7 @@ AM_PROG_CC_C_O
 TF_PROG_DC dnl the S.C.O.L.D. disaggregation compiler
 TF_PROG_GCC dnl the correct enfreshend gcc ... we want the one closest to C++23 ...   gcc11 or gcc12 or gcc13
 TF_CHECK_STD_FILESYSTEM dnl defines @libstd_filesystem@
+TF_CHECK_BOOST
 TF_CHECK_CPPUNIT dnl defines toolflags of cppunit, @CPPFLAGS_cppunit@, @CXXFLAGS_cppunit@, @LDFLAGS_cppunit@, etc.
 TF_CHECK_GMP_CXX
 TF_CHECK_HALF
@@ -106,13 +109,22 @@ dnl   gmp-devel-6.2.1-3.fc37.x86_64
 dnl
 TF_CHECK_PACKAGES_ERROR([gmpxx.h], [gmp-devel])
 
+dnl boost-1.78
+dnl Specimen:
+dnl
+dnl   boost-devel-1.78.0-9.fc37.x86_64
+dnl
+CPPFLAGS="${CPPFLAGS} ${module_boost_prefix:+-I${module_boost_prefix?}/modules -I${module_boost_prefix?}/include} ${nonstd_boost_prefix:+-I${nonstd_boost_prefix?}/include}" # [[FIXTHIS]] fix TF_CHECK_PACKAGES to be cognizant of the now-accreted searchpath
+TF_CHECK_PACKAGES_ERROR([boost/multiprecision/cpp_int.hpp], [boost-devel])
+TF_CHECK_PACKAGES_ERROR([boost.multiprecision.cpp_int], [module-boost])
+
 dnl nonstd-half
 dnl Specimen:
 dnl
 dnl   nonstd-half-1.12.0-2.0.fc31.gcc9.x86_64
 dnl   nonstd-half-devel-1.12.0-2.0.fc31.gcc9.x86_64
 dnl
-CPPFLAGS="${CPPFLAGS} -I${nonstd_half_prefix?}/include" # [[FIXTHIS]] fix TF_CHECK_PACKAGES to be cognizant of the now-accreted searchpath
+CPPFLAGS="${CPPFLAGS} ${module_half_prefix:+-I${module_half_prefix?}/modules -I${module_half_prefix?}/include} ${nonstd_half_prefix:+-I${nonstd_half_prefix?}/include}" # [[FIXTHIS]] fix TF_CHECK_PACKAGES to be cognizant of the now-accreted searchpath
 TF_CHECK_PACKAGES_ERROR([half/half.hpp], [nonstd-half-devel])
 
 dnl WATCHOUT if AC_OUTPUT is not called (transitively from TF_FINALIZE) then

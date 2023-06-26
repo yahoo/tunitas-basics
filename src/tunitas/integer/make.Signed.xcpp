@@ -1,0 +1,45 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Integer
+#import tunitas.integer.required.Unsigned
+#import tunitas.integer.required.Signed
+#import tunitas.integer.required.multiprecision.number.concepts
+#import tunitas.integer.integers
+namespace tunitas::integer::make {
+  //
+  // The corresponding signed integer.
+  // Like std::make_signed but extending to the bignums.
+  // 
+  template<required::Integer> struct Signed;
+  template<> struct Signed<integers::uint8_t>;
+  template<> struct Signed<integers::uint16_t>;
+  template<> struct Signed<integers::uint32_t>;
+  template<> struct Signed<integers::uint64_t>;
+  template<> struct Signed<integers::uint128_t>;
+  template<auto MIN, auto MAX> requires required::multiprecision::number::Min_Max<MIN, MAX>
+  struct Signed<bmp::number<bmp::cpp_int_backend<MIN, MAX, bmp::unsigned_magnitude, bmp::unchecked, void>>>;
+}
+#endiv
+#divert <hpp>
+namespace tunitas::integer {
+  template<required::Integer SIGNED> struct Signed {
+    static_assert(required::Signed<SIGNED>);
+    using Type = SIGNED;
+  };
+  namespace make {
+    template<> struct Signed<integers::uint8_t>    { using Type = integers::sint8_t; };
+    template<> struct Signed<integers::uint16_t>   { using Type = integers::sint16_t; };
+    template<> struct Signed<integers::uint32_t>   { using Type = integers::sint32_t; };
+    template<> struct Signed<integers::uint64_t>   { using Type = integers::sint64_t; };
+    template<> struct Signed<integers::uint128_t>  { using Type = integers::sint128_t; };
+    template<auto MIN, auto MAX> requires required::multiprecision::number::Min_Max<MIN, MAX>
+    struct Signed<bmp::number<bmp::cpp_int_backend<MIN, MAX, bmp::unsigned_magnitude, bmp::unchecked, void>>> {
+      using Type = bmp::number<bmp::cpp_int_backend<MIN, MAX, bmp::signed_magnitude, bmp::unchecked, void>>;
+    };
+  }
+}
+#endiv

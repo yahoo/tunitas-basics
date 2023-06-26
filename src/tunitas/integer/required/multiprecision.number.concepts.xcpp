@@ -1,0 +1,65 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Small
+#import std.has_single_bit
+namespace tunitas::integer::required::multiprecision::number {
+  //
+  // Concepts for managing the Boost Multiprecision Number system (as we use it herein)
+  //
+  // Example:
+  //
+  //   Are these MIN and MAX numbers suitable for the specializations of boost::multiprecision::number<...> herein?
+  //
+  // Specification:
+  //
+  //   Constrain the MIN and MAX as we use it here (to be equivalent and a power of two)
+  //
+  //   namespace boost::multiprecision {
+  //     using Signed   = number<cpp_int_backend<MIN, MAX, unsigned_magnitude, unchecked, void>>;
+  //     using Unsigned = number<cpp_int_backend<MIN, MAX, unsigned_magnitude, unchecked, void>>;
+  //   }
+  //
+  // Usage:
+  //
+  //  template<auto MIN auto MAX> requires required::multiprecision::number::Min_Max<MIN, MAX> struct Something;
+  //
+  template<auto MIN, auto MAX> concept Min_Max = requires() {
+    requires convertible_to<decltype(MIN), unsigned>;
+    requires 128u < MIN;
+    requires std::has_single_bit(MIN);
+    requires convertible_to<decltype(MAX), unsigned>;
+    requires 128u < MAX;
+    requires std::has_single_bit(MAX);
+    requires MIN == MAX;
+  };
+  template<auto SIGNAGE> concept Signage = same_as<decltype(SIGNAGE), bmp::cpp_integer_type>;
+  template<auto CHECKAGE> concept Checkage = same_as<decltype(CHECKAGE), bmp::cpp_int_check_type>; // "int" vs "integer" <lament>oh where, oh where are your naming police</lament>
+  template<typename ALLOCATOR> concept Allocator = same_as<ALLOCATOR, void>; // required for our use case
+  template<auto MIN, auto MAX, auto SIGNAGE, auto CHECKAGE, typename ALLOCATOR> concept Arguments = requires() {
+    requires Min_Max<MIN, MAX>;
+    requires Signage<SIGNAGE>;
+    requires Checkage<CHECKAGE>;
+    requires Allocator<ALLOCATOR>;
+  };
+  template<typename INTEGER> concept Unsigned = requires(INTEGER) {
+    { []<auto LO, auto HI, auto CHECK>(bmp::number<bmp::cpp_int_backend<LO, HI, bmp::unsigned_magnitude, CHECK, void>> *)
+      requires (Small<decltype(LO)> && Small<decltype(HI)> && bmp::unchecked == CHECK)
+      {} (static_cast<INTEGER *>(nullptr)) };
+  };
+  template<typename INTEGER> concept Signed = requires(INTEGER) {
+    { []<auto LO, auto HI, auto CHECK>(bmp::number<bmp::cpp_int_backend<LO, HI, bmp::signed_magnitude, CHECK, void>> *)
+      requires (Small<decltype(LO)> && Small<decltype(HI)> && bmp::unchecked == CHECK)
+      {} (static_cast<INTEGER *>(nullptr)) };
+  };
+  template<typename INTEGER> concept Integer = requires(INTEGER) {
+    { []<auto LO, auto HI, auto MAGNITUDE, auto CHECK>(bmp::number<bmp::cpp_int_backend<LO, HI, MAGNITUDE, CHECK, void>> *)
+      requires (Small<decltype(LO)> && Small<decltype(HI)> && (bmp::signed_magnitude == MAGNITUDE || bmp::unsigned_magnitude == MAGNITUDE) && bmp::unchecked == CHECK)
+      {} (static_cast<INTEGER *>(nullptr)) };
+  };
+  template<typename INTEGER> concept Large = Integer<INTEGER>; // for the convenience in hoisting
+}
+#endiv
