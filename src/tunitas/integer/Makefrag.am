@@ -9,7 +9,9 @@ tunitas_integer_SUBSOURCES = \
   obj/src/tunitas/integer/integers.cpp \
   obj/src/tunitas/integer/traits.Double.cpp \
   obj/src/tunitas/integer/traits.SizeOf.cpp \
-  obj/src/tunitas/integer/traits.BySize.cpp \
+  obj/src/tunitas/integer/SizeOf.cpp \
+  obj/src/tunitas/integer/from.Bits.cpp \
+  obj/src/tunitas/integer/from.Bytes.cpp \
   obj/src/tunitas/integer/make.Signed.cpp \
   obj/src/tunitas/integer/make.Unsigned.cpp \
   obj/src/tunitas/integer/make.Common.cpp \

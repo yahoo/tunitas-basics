@@ -15,7 +15,7 @@
 #import tunitas.number
 namespace tunitas::integer {
   //
-  namespace bmp {
+  namespace [[convenience]] bmp {
     //
     // The fixed-precision "wide" integers
     // See Boost.Multiprecision
@@ -28,6 +28,8 @@ namespace tunitas::integer {
   }
   namespace [[nodirectory ]] integers { }
   namespace [[nodirectory ]] make { }
+  namespace [[nodirectory ]] is { }
+  namespace [[nodirectory ]] from { }
   namespace [[nodirectory ]] traits {
     using nonstd::units::memory::Bytes;
     using nonstd::units::memory::Bits;
