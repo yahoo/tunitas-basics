@@ -19,7 +19,7 @@ namespace tests::unit::exception::tunitas {
 struct tests::unit::exception::tunitas::fixture::Fixture : public rigging::suite::Fixture, protected Palette {
   static auto suite() -> Suite;
   //
-  // reminders mosly
+  // reminders mostly
   using Palette::stanza0;
   using Palette::stanza1string;
   using Palette::stanza1error;
