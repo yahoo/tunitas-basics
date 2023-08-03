@@ -1,0 +1,87 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-keyston/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/keyston/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::integer::bit { struct Bit_Ceil; }
+#endiv
+#divert <hpp>
+struct tests::unit::integer::bit::Bit_Ceil : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  template<unsigned> auto test_usage() -> void;
+};
+#endiv
+#divert <cpp>
+//
+// The specializations MUST occur before suite() so that their address is known
+//
+#import tunitas.integer.bit
+namespace tests::unit::integer::bit {
+  template<> auto Bit_Ceil::test_usage<0>() -> void {
+    static_assert(library::bit_ceil<uint8_t>(0u) == uint8_t{1u});
+    static_assert(library::bit_ceil<uint16_t>(0u) == uint16_t{1u});
+    static_assert(library::bit_ceil<uint32_t>(0u) == uint32_t{1u});
+    static_assert(library::bit_ceil<uint64_t>(0u) == uint64_t{1u});
+    static_assert(library::bit_ceil<uint128_t>(0u) == uint128_t{1u});
+    static_assert(library::bit_ceil<uint256_t>(0u) == uint256_t{1u});
+    require(ASSERTION);
+  }
+  template<> auto Bit_Ceil::test_usage<1>() -> void {
+    static_assert(library::bit_ceil<uint8_t>(1u) == uint8_t{1u});
+    static_assert(library::bit_ceil<uint16_t>(1u) == uint16_t{1u});
+    static_assert(library::bit_ceil<uint32_t>(1u) == uint32_t{1u});
+    static_assert(library::bit_ceil<uint64_t>(1u) == uint64_t{1u});
+    static_assert(library::bit_ceil<uint128_t>(1u) == uint128_t{1u});
+    static_assert(library::bit_ceil<uint256_t>(1u) == uint256_t{1u});
+    require(ASSERTION);
+  }
+  template<> auto Bit_Ceil::test_usage<2>() -> void {
+    static_assert(library::bit_ceil<uint8_t>(2u) == uint8_t{2u});
+    static_assert(library::bit_ceil<uint16_t>(2u) == uint16_t{2u});
+    static_assert(library::bit_ceil<uint32_t>(2u) == uint32_t{2u});
+    static_assert(library::bit_ceil<uint64_t>(2u) == uint64_t{2u});
+    static_assert(library::bit_ceil<uint128_t>(2u) == uint128_t{2u});
+    static_assert(library::bit_ceil<uint256_t>(2u) == uint256_t{2u});
+    require(ASSERTION);
+  }
+  template<> auto Bit_Ceil::test_usage<3>() -> void {
+    static_assert(library::bit_ceil<uint8_t>(3u) == uint8_t{4u});
+    static_assert(library::bit_ceil<uint16_t>(3u) == uint16_t{4u});
+    static_assert(library::bit_ceil<uint32_t>(3u) == uint32_t{4u});
+    static_assert(library::bit_ceil<uint64_t>(3u) == uint64_t{4u});
+    static_assert(library::bit_ceil<uint128_t>(3u) == uint128_t{4u});
+    static_assert(library::bit_ceil<uint256_t>(3u) == uint256_t{4u});
+    require(ASSERTION);
+  }
+  template<> auto Bit_Ceil::test_usage<4>() -> void {
+    static_assert(library::bit_ceil<uint8_t>(5u) == uint8_t{8u});
+    static_assert(library::bit_ceil<uint16_t>(5u) == uint16_t{8u});
+    static_assert(library::bit_ceil<uint32_t>(5u) == uint32_t{8u});
+    static_assert(library::bit_ceil<uint64_t>(5u) == uint64_t{8u});
+    static_assert(library::bit_ceil<uint128_t>(5u) == uint128_t{8u});
+    static_assert(library::bit_ceil<uint256_t>(5u) == uint256_t{8u});
+    require(ASSERTION);
+  }
+  namespace {
+    inline constexpr auto const COUNT = 5uz;
+  }
+}
+#import std.make_index_sequence
+#import std.index_sequence
+#import std.to_string
+#import std.size_t
+auto tests::unit::integer::bit::Bit_Ceil::suite() -> Suite {
+  auto series = Stream{"bit_ceil"sv};
+  series << []{
+             auto use = Stream{"usage"sv};
+             [&use]<std::size_t... INDEX>(std::index_sequence<INDEX...>) {
+               ((use << add(std::to_string(INDEX), &Bit_Ceil::test_usage<INDEX>)), ... );
+             }(std::make_index_sequence<COUNT>{});
+             return use;
+           }()
+         << END;
+  return settle(series);
+}
+#endiv

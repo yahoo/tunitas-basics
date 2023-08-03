@@ -8,6 +8,14 @@ namespace tunitas::exception {
   //
   // Something is unimplemented (at runtime)
   //
+  // Design:
+  //
+  //   The default+conversion constructor MUST be repeated so that the call-site current source location is captured (correctly).
+  //
+  // Usage:
+  //
+  //   throw exception::Unimplemented{};
+  //
   struct [[nodiscard]] Unimplemented;
 }
 #endiv
@@ -16,6 +24,7 @@ namespace tunitas::exception {
 class tunitas::exception::Unimplemented final : public partial::Unimplemented {
   using Ancestor = partial::Unimplemented;
 public:
+  explicit Unimplemented(Location location = Location::current()) : Ancestor{location} { }
   using Ancestor::Unimplemented;
 };
 #endiv

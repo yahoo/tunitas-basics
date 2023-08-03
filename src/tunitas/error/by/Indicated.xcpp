@@ -1,0 +1,44 @@
+// This by -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.error.by.required.Indicator
+#import tunitas.error.by.Optional
+#import tunitas.error.by.Outcome
+#import tunitas.error.by.Exception
+namespace tunitas::error::by {
+  //
+  // What you see
+  //
+  // Design:
+  //
+  //   Specializations only.
+  //
+  // Usage:
+  //
+  //   using Something = ...somehow...
+  //   template<required::Indicator INDICATOR> auto function(indicator, ...arguments...) -> typename Indicated<INDICATOR, Something>::Type;
+  //
+  template<required::Indicator, typename PAYLOAD> struct Indicated;
+  template<typename PAYLOAD> struct Indicated<Optional, PAYLOAD>;
+  template<typename PAYLOAD> struct Indicated<Outcome, PAYLOAD>;
+  template<typename PAYLOAD> struct Indicated<Exception, PAYLOAD>;
+}
+#endiv
+#divert <hpp>
+#import tunitas.error.Optional
+#import tunitas.error.Outcome
+namespace tunitas::error::by {
+  template<typename PAYLOAD> struct Indicated<Optional, PAYLOAD> {
+    using Type = error::Optional<PAYLOAD>;
+  };
+  template<typename PAYLOAD> struct Indicated<by::Outcome, PAYLOAD> {
+    using Type = error::Outcome<PAYLOAD>;
+  };
+  template<typename PAYLOAD> struct Indicated<by::Exception, PAYLOAD> {
+    using Type = PAYLOAD;
+  };
+}
+#endiv

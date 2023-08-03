@@ -1,0 +1,17 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit
+#import tunitas.integer
+#import tunitas.integer.required
+#import tunitas.integer.integers
+namespace tests::unit::integer {
+  namespace library = ::tunitas::integer;
+  namespace required = ::tunitas::integer::required;
+  using namespace ::tunitas::integer::integers;
+  namespace [[nodirectory]] bit { }
+}
+#endiv

@@ -1,0 +1,117 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Integer
+#import tunitas.integer.required.multiprecision.number.concepts
+#import tunitas.integer.integers
+#import std
+namespace tunitas::integer {
+  namespace package_common {
+    template<typename... INTEGERS> requires (0 < sizeof...(INTEGERS) && ((required::Unsigned<INTEGERS> && ... ) || (required::Signed<INTEGERS> && ... ))) struct Common;
+    template<typename FIRST> struct Common<FIRST>;
+    template<typename FIRST, typename SECOND> struct Common<FIRST, SECOND>;
+    template<typename FIRST, typename SECOND, typename... REST> struct Common<FIRST, SECOND, REST...>;
+    using namespace std;
+                                             }
+  namespace make {
+    //
+    // The common type among some integers
+    //
+    // Specification:
+    //
+    //   Like std::common_type but extending to the bignums.
+    //   https://en.cppreference.com/w/cpp/types/common_type
+    //
+    //   However, there is no signed-to-unsigned promotion here.
+    //
+    // Design:
+    //
+    //   Follow the reference implementation therein.
+    //   Use New School 'Type' in lieu of old_school 'type'
+    //
+    // Usage:
+    //
+    //   using Big = Common<uint8_t, uint16_t, uint128_t, uint256_t, uint8192_t>::Type;
+    //   using Big = Common<sint8_t, sint16_t, sint128_t, sint256_t, sint8192_t>::Type;
+    //
+    using package_common::Common;
+  }
+}
+#endiv
+#divert <hpp>
+#import std.same_as
+#import std.decay
+#import tunitas.integer.traits.SizeOf
+namespace tunitas::integer::package_common {
+  template<typename...> using Matches = void;
+  template<bool, typename, typename>                   struct Conditional;
+  template<typename FIRST, typename SECOND>            struct Conditional<true, FIRST, SECOND>  { using Type = FIRST; };
+  template<typename FIRST, typename SECOND>            struct Conditional<false, FIRST, SECOND> { using Type = SECOND; };
+  template<bool TEST, typename FIRST, typename SECOND> using Conditioned = typename Conditional<TEST, FIRST, SECOND>::Type;
+  template<typename TYPE> struct Decay {
+    using Type [[School("New School")]] = typename std::decay<TYPE>::type;
+    using type [[School("old_school")]] = Type;
+  };
+  template<typename TYPE> using Decayed = typename Decay<TYPE>::Type;
+  namespace required {
+    template<typename TYPE> concept with_type = requires(TYPE) { typename TYPE::type; };
+    template<typename TYPE> concept without_type = requires(TYPE) { typename TYPE::type; };
+    template<typename TYPE> concept Undecayable = same_as<TYPE, decay_t<TYPE>>;
+  }
+  namespace school {
+    template<typename TYPE> struct Without { };
+    template<typename TYPE> struct With {
+      using Type [[School("New School")]] = typename TYPE::type;
+      using type [[School("old_school")]] = Type;
+    };
+    template<typename TYPE> struct Promote {
+      using Type = typename Conditional<required::with_type<TYPE>, With<TYPE>, Without<TYPE>>::Type;
+    };
+  }
+  namespace two {
+#if 0
+    // The magic of promotion happens here.  Get the compiler to tell us what has happened.
+    template<typename T1, typename T2> using Combined = decltype(false ? std::declval<T1>() : std::declval<T2>());
+#else
+    // The magic of promotion happens here.  because there is no signage promotion, we only care about which (integer) type can hold the other.
+    template<typename T1, typename T2> using Combined = Conditioned<(traits::SizeOf<T1>::VALUE < traits::SizeOf<T2>::VALUE), T2, T1>;
+#endif
+    //
+    template<typename, typename, typename CONDITION = void> requires same_as<CONDITION, void> struct Decay_Combined {};
+    template<typename T1, typename T2>                                                        struct Decay_Combined<T1, T2, Matches<Combined<T1, T2>>> : public school::Promote<decay<Combined<T1, T2>>> {};
+    template<typename T1, typename T2, typename CONDITION>                                    using Decayed_Combined = typename Decay_Combined<T1, T2, CONDITION>::Type;
+    //
+    template<typename T1, typename T2, typename CONDITION = void> requires same_as<CONDITION, void> struct Select                                    : public Decay_Combined<T1 const &, T2 const &>::Type {};
+    template<typename T1, typename T2>                                                              struct Select<T1, T2, Matches<Combined<T1, T2>>> : public Decay_Combined<T1, T2>::Type {};
+  }
+  template<typename T1, typename T2> struct Common<T1, T2> : public Conditioned<required::Undecayable<T1> && required::Undecayable<T2>, two::Select<T1, T2>, Common<decay_t<T1>, decay_t<T2>>> {};
+  template<typename T1> struct Common<T1> : public Common<T1, T1> { };
+  namespace three {
+    template<typename CONDITION, typename T1, typename T2, typename... REST> requires same_as<CONDITION, void> struct Select {};
+    template<typename T1, typename T2, typename...REST>                                                        struct Select<Matches<typename Common<T1, T2>::Type>, T1, T2, REST...> : public Common<typename Common<T1, T2>::Type, REST...> {};
+  }
+  template<typename T1, typename T2, typename... REST> struct Common<T1, T2, REST...> : three::Select<void, T1, T2, REST...> {};
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using tunitas::integer::make::Common;
+    using namespace tunitas::integer::integers;
+    using std::same_as;
+    //
+    static_assert(same_as<uint8_t, Common<uint8_t>::Type>);
+    static_assert(same_as<uint8_t, Common<uint8_t, uint8_t>::Type>);
+    static_assert(same_as<uint8_t, Common<uint8_t, uint8_t, uint8_t>::Type>);
+    //
+    static_assert(same_as<uint8192_t, Common<uint8192_t>::Type>);
+    static_assert(same_as<uint8192_t, Common<uint8192_t, uint8192_t>::Type>);
+    static_assert(same_as<uint8192_t, Common<uint8192_t, uint8192_t, uint8192_t>::Type>);
+    //
+    static_assert(same_as<uint8192_t, Common<uint8_t, uint16_t, uint32_t, uint64_t, uint128_t, uint256_t, uint512_t, uint1024_t, uint2048_t, uint4096_t, uint8192_t>::Type>);
+  }
+}
+#endiv

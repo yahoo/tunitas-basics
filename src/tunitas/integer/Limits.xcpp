@@ -1,0 +1,62 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Integer
+#import tunitas.integer.integers
+namespace tunitas::integer {
+  //
+  // The known limits
+  //
+  // Specification:
+  //
+  //   https://en.cppreference.com/w/cpp/types/numeric_limits
+  //   but extended to the bignums
+  //
+  // Design:
+  //
+  //   This "just works"
+  //
+  // Usage:
+  //
+  //   #import tunitas.integer.Limits
+  //
+  //   auto min = integer::Limits<uint8192_t>::min()
+  //
+  template<required::Integer INTEGER> using Limits = std::numeric_limits<INTEGER>;
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using tunitas::integer::Limits;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert(Limits<sint8_t>::min() < 0);
+    static_assert(Limits<sint16_t>::min() < 0);
+    static_assert(Limits<sint32_t>::min() < 0);
+    static_assert(Limits<sint64_t>::min() < 0);
+    static_assert(Limits<sint128_t>::min() < 0);
+    static_assert(Limits<sint256_t>::min() < 0);
+    static_assert(Limits<sint512_t>::min() < 0);
+    static_assert(Limits<sint1024_t>::min() < 0);
+    static_assert(Limits<sint2048_t>::min() < 0);
+    static_assert(Limits<sint4096_t>::min() < 0);
+    static_assert(Limits<sint8192_t>::min() < 0);
+    //
+    static_assert(Limits<uint8_t>::min() == 0);
+    static_assert(Limits<uint16_t>::min() == 0);
+    static_assert(Limits<uint32_t>::min() == 0);
+    static_assert(Limits<uint64_t>::min() == 0);
+    static_assert(Limits<uint128_t>::min() == 0);
+    static_assert(Limits<uint256_t>::min() == 0);
+    static_assert(Limits<uint512_t>::min() == 0);
+    static_assert(Limits<uint1024_t>::min() == 0);
+    static_assert(Limits<uint2048_t>::min() == 0);
+    static_assert(Limits<uint4096_t>::min() == 0);
+    static_assert(Limits<uint8192_t>::min() == 0);
+  }
+}
+#endiv

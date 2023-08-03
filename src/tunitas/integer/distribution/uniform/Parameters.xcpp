@@ -1,0 +1,73 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tunitas.integer.required.Integer
+namespace tunitas::integer::distribution::uniform {
+  //
+  // Distribution parameters (at least for the Uniform Distribution)
+  //
+  // Specification:
+  //
+  //   https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+  //
+  // Design:
+  //
+  //   Derived from gcc-6.3.0 .../bits/uniform_int_dist.h
+  //   We are interested in modifying std::uniform_int_distribution
+  //   to support bignus; e.g. 128-bit integers of gcc and the 256-bit ... 8192-bit bignums of boost
+  //
+  //   For consistency we keep the hungarian-style naming convention of the original GNU implementation.
+  //
+  // Usage: e.g.
+  //   
+  //    Uniform<nonstd::uint4096_t>::Parameters
+  //    Uniform<nonstd::int4096_t>::param_type
+  //
+  template<required::Integer INTEGER> struct Parameters;
+}
+#endiv
+#divert <hpp>
+#forward tunitas.integer.distribution.Uniform
+#import nonstd.numeric_limits
+namespace tunitas::integer::distribution {
+  namespace uniform {
+    template<required::Integer INTEGER> inline constexpr auto operator==(Parameters<INTEGER> const &, Parameters<INTEGER> const &) -> bool;
+    template<required::Integer INTEGER> inline constexpr auto operator!=(Parameters<INTEGER> const &, Parameters<INTEGER> const &) -> bool;
+  }
+  template<required::Integer INTEGER> struct uniform::Parameters {
+    // New School
+    using Value = INTEGER;
+    using Distribution = distribution::Uniform<INTEGER>;
+    using Limits = nonstd::numeric_limits<Value>;
+    // old_school
+    using value_type = Value;
+    using distribution_type = Distribution;
+    using limits_type = Limits;
+    inline constexpr explicit Parameters(Value a = 0, Value b = Limits::max());
+    inline constexpr auto a() const -> Value;
+    inline constexpr auto b() const -> Value;
+    friend auto uniform::operator==<>(Parameters const &, Parameters const &) -> bool;
+  private:
+    Value _M_a;
+    Value _M_b;
+  };
+}
+#endiv
+#divert <ipp>
+#import tunitas.exception.Invalid
+namespace tunitas::integer::distribution {
+  template<required::Integer INTEGER> constexpr auto uniform::operator==(Parameters<INTEGER> const &p1, Parameters<INTEGER> const &p2) -> bool { return p1._M_a == p2._M_a && p1._M_b == p2._M_b; }
+  template<required::Integer INTEGER> constexpr auto uniform::operator!=(Parameters<INTEGER> const &p1, Parameters<INTEGER> const &p2) -> bool { return !operator==(p1, p2); }
+  namespace uniform {
+    template<required::Integer _> constexpr Parameters<_>::Parameters(Value a, Value b)
+      : _M_a(a)
+      , _M_b(b) {
+      if (_M_a > _M_b) {
+        throw exception::Invalid{"a > b"};
+      }
+    }
+    template<required::Integer _> constexpr auto Parameters<_>::a() const -> Value { return _M_a; } 
+    template<required::Integer _> constexpr auto Parameters<_>::b() const -> Value { return _M_b; }
+  }
+}
+#endiv

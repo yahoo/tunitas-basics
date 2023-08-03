@@ -1,0 +1,38 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas
+#import boost.multiprecision
+#import nonstd.units.memory.scale // Bits, Bytes
+#import boost.multiprecision.cpp_int
+//
+// WATCHOUT - and emphasize the point so that always happens independent of the order and variety of #import statements
+// WATCHOUT - namespace tunitas::number occludes boost::multiprecision::number<...>
+// WATCHOUT - instead always reference the boost bignum with a qualified name as bmp::number<...>
+#import tunitas.number
+namespace tunitas::integer {
+  //
+  namespace [[convenience]] bmp {
+    //
+    // The fixed-precision "wide" integers
+    // See Boost.Multiprecision
+    // https://www.boost.org/doc/libs/1_82_0/libs/multiprecision/doc/html/index.html
+    // https://www.boost.org/doc/libs/1_82_0/libs/multiprecision/doc/html/boost_multiprecision/tut/ints/cpp_int.html
+    //
+    using namespace boost::multiprecision;
+    static_assert(sizeof(cpp_int_check_type *), "already visible");
+    static_assert(sizeof(cpp_integer_type *), "already visible");
+  }
+  namespace [[nodirectory ]] integers { }
+  namespace [[nodirectory ]] make { }
+  namespace [[nodirectory ]] is { }
+  namespace [[nodirectory ]] from { }
+  namespace [[nodirectory ]] traits {
+    using nonstd::units::memory::Bytes;
+    using nonstd::units::memory::Bits;
+  }
+}
+#endiv

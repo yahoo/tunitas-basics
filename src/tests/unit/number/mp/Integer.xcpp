@@ -1,0 +1,67 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::number::mp { struct Integer; }
+#endiv
+#divert <hpp>
+#import tunitas.number.Integer
+struct tests::unit::number::mp::Integer : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  using Subject = library::Integer;
+  //
+  template<typename EXPONENT> auto test_powm() -> void;
+protected:
+  //
+  // Pick values that we can varify by hand (i.e. using /usr/bin/bc)
+  //
+  struct Spec {
+    struct Powm {
+      inline static constexpr auto BASE = 2u;
+      inline static constexpr auto EXPONENT = 10u;
+      inline static constexpr auto MODULUS = 3u;
+      inline static constexpr auto EXPECTED = 1u;
+    };
+  };
+};
+#endiv
+#divert <tpp>
+namespace tests::unit::number::mp {
+  template<typename EXPONENT> auto Integer::test_powm() -> void {
+    auto base = Subject{library::convert<mpz_class>(Spec::Powm::BASE)};
+    auto modulus = Subject{library::convert<mpz_class>(Spec::Powm::MODULUS)};
+    auto expected = Subject{library::convert<mpz_class>(Spec::Powm::EXPECTED)};
+    auto exponent = []() -> EXPONENT {
+      if constexpr (std::same_as<EXPONENT, Subject>) {
+        return library::convert<mpz_class>(Spec::Powm::EXPONENT);
+      } else {
+        return Spec::Powm::EXPONENT;
+      }
+    }();
+    auto observed = powm(base, exponent, modulus); // <--------- test this
+    require(ASSERTION, expected == observed);
+  }
+}
+#endiv
+#divert <cpp>
+//
+// Specializations (if any) MUST appear first so that suite() can see them before their address is taken
+//
+auto tests::unit::number::mp::Integer::suite() -> Suite {
+  auto series = Stream{"Integer"sv};
+  series << []{
+             auto powm = Stream{"powm"sv};
+             powm << add("Integer", &Integer::test_powm<Subject>)
+                  << add("int unsigned long", &Integer::test_powm<int unsigned long>)
+                  << add("int unsigned long long", &Integer::test_powm<int unsigned long long>)
+                  << add("uint128_t", &Integer::test_powm<uint128_t>)
+             << END;
+             return powm;
+           }()
+         << END;
+  return settle(series);
+}
+#endiv

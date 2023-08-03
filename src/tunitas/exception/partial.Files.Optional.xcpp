@@ -1,0 +1,49 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#include <hpp/tunitas.exception.partial.Files>
+#endiv
+#divert <hpp>
+#import tunitas.file.Path
+#import std.reference_wrapper
+#import tunitas.Optional
+#import std.remove_cvref
+namespace tunitas::exception::partial {
+  //
+  // an "optional reference"
+  //
+  // Supports a (relevant) subset of the interface of std::optional.
+  //
+  template<required::Same_As<file::Path const &> TYPE> struct Files::Optional : protected tunitas::Optional<std::reference_wrapper<file::Path const>> {
+    using Ancestor = tunitas::Optional<std::reference_wrapper<file::Path const>>;
+  public:
+    using Type = TYPE; // ......................... following the convention of reference_wrapper
+    using Value = std::remove_cvref_t<Type>; // ... following the convention of std::optional
+    constexpr Optional() = default;
+    inline constexpr Optional(Value const &);
+    inline constexpr explicit operator bool() const;
+    inline constexpr auto has_value() const -> bool;
+    inline constexpr auto operator*() const -> Value const &; // ... unchecked
+    inline constexpr auto value() const -> Value const &; // ....... throws exception::Access
+  };
+}
+#endiv
+#divert <ipp>
+#import tunitas.exception.Optional
+#import substd.exception.Optional
+#import std.cref
+namespace tunitas::exception::partial {
+  template<required::Same_As<file::Path const &> _> constexpr Files::Optional<_>::Optional(Value const &v) : Ancestor{std::cref(v)} { }
+  template<required::Same_As<file::Path const &> _> constexpr Files::Optional<_>::operator bool() const          { return (bool)static_cast<Ancestor const &>(*this); }
+  template<required::Same_As<file::Path const &> _> constexpr auto Files::Optional<_>::has_value() const -> bool { return static_cast<Ancestor const &>(*this).has_value(); }
+  template<required::Same_As<file::Path const &> _> constexpr auto Files::Optional<_>::operator*() const -> Value const & { return static_cast<Ancestor const &>(*this)->get(); }
+  template<required::Same_As<file::Path const &> _> constexpr auto Files::Optional<_>::value() const -> Value const & try {
+    return static_cast<Ancestor const &>(*this).value().get();
+  } catch (substd::exception::Optional const &) {
+    throw tunitas::exception::Optional{};
+  }
+}
+#endiv

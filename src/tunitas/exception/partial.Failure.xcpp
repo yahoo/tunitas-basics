@@ -47,8 +47,8 @@ namespace tunitas::exception::partial {
 #import nonstd.exception.System
 #import nonstd.string.View
 class tunitas::exception::partial::Failure : public virtual Aspect,
-                                              public virtual feature::Failure,
-                                              public nonstd::exception::System<nonstd::string::View> {
+                                             public virtual feature::Failure,
+                                             public nonstd::exception::System<nonstd::string::View> {
   struct Ancestors {
     using Aspect = tunitas::exception::Aspect;
     using Exception = nonstd::exception::System<nonstd::string::View>;

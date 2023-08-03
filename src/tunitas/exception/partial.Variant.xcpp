@@ -6,7 +6,7 @@
 #divert <fpp>
 namespace tunitas::exception::partial {
   //
-  // The partial completion of an allocation failure exception
+  // The partial completion of a variant alternative exception
   //
   // Semantic
   //

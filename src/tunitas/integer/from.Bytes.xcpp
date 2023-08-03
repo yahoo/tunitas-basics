@@ -1,0 +1,39 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.size_t
+#import std.has_single_bit
+namespace tunitas::integer::from {
+  //
+  // Given the size (in bytes) nominate the integer type.
+  // 
+  template<std::size_t WIDTH> requires (std::has_single_bit(WIDTH)) struct Bytes;
+}
+#endiv
+#divert <hpp>
+#import tunitas.integer.from.Bits
+namespace tunitas::integer {
+  template<std::size_t WIDTH> requires (std::has_single_bit(WIDTH)) struct from::Bytes : public Bits<8*WIDTH> { };
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using tunitas::integer::from::Bytes;
+    static_assert(sizeof(Bytes<1uz>));
+    static_assert(sizeof(Bytes<2uz>));
+    static_assert(sizeof(Bytes<4uz>));
+    static_assert(sizeof(Bytes<8uz>));
+    static_assert(sizeof(Bytes<16uz>));
+    static_assert(sizeof(Bytes<32uz>));
+    static_assert(sizeof(Bytes<64uz>));
+    static_assert(sizeof(Bytes<128uz>));
+    static_assert(sizeof(Bytes<256uz>));
+    static_assert(sizeof(Bytes<512uz>));
+    static_assert(sizeof(Bytes<1024uz>));
+  }
+}
+#endiv

@@ -1,0 +1,37 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#forward tunitas.error.by
+#forward tunitas.error.Optional
+#forward tunitas.error.Outcome
+namespace tunitas::error::convenience {
+  //
+  // Convenience for importation into 'namspace error'
+  //
+  // Specificatoin (purpose)
+  //
+  //   Avoid cascading the namespaces named 'error' (it just causes ambiguities and dis-utility)
+  //
+  //   However, we want the convenience of always being able to reference the error results as follows:
+  //
+  //   error::Optional<...>
+  //   error::Outcome<...>
+  //   error::by::Exception{} .......... which is a constexpr literal indicator
+  //   error::by::Optional{} ........... which is a constexpr literal indicator
+  //   error::by::Outcome{} ............ which is a constexpr literal indicator
+  //
+  // Usage:
+  //
+  //   namespace tunitas::something::something_else::dark_side::error {
+  //     using namespace tunitas::error::convenience;
+  //     struct Category
+  //      ...and other declarations.
+  //   }
+  namespace by = error::by;
+  using error::Optional;
+  using error::Outcome;
+}
+#endiv

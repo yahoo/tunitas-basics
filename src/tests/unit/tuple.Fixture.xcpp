@@ -1,0 +1,70 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit
+#import tunitas.tuple
+namespace tests::unit::tuple {
+  namespace library = ::tunitas::tuple;
+  struct Fixture;
+}
+#endiv
+#divert <hpp>
+struct tests::unit::tuple::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_usage_Tuple() -> void;
+  auto test_usage_Element() -> void;
+  auto test_usage_Size() -> void;
+  auto test_usage_get() -> void;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::tuple::Fixture::suite() -> Suite {
+  auto series = Stream{"tuple"sv};
+  series << []{
+              auto use = Stream{"usage"sv};
+              use << add("Tuple", &Fixture::test_usage_Tuple)
+                  << add("Element", &Fixture::test_usage_Element)
+                  << add("Size", &Fixture::test_usage_Size)
+                  << add("get", &Fixture::test_usage_get)
+                  << END;
+              return use;
+            }()
+         << END;
+  return settle(series);
+}
+#import tunitas.tuple.Tuple
+#import tunitas.tuple.Size
+#import tunitas.tuple.Element
+#import tunitas.tuple.get
+#import std.same_as
+namespace tests::unit::tuple {
+  auto Fixture::test_usage_Tuple() -> void {
+    using Subject = library::Tuple<char, int, double, string::Storage>;
+    auto subject = Subject{};
+    require(ASSERTION, sizeof(subject));
+  }
+  auto Fixture::test_usage_Element() -> void {
+    using Subject = library::Tuple<char, int, double, string::Storage>;
+    require(ASSERTION, std::same_as<library::Element<0, Subject>::type, char>);
+    require(ASSERTION, std::same_as<library::Element<1, Subject>::type, int>);
+    require(ASSERTION, std::same_as<library::Element<2, Subject>::type, double>);
+    require(ASSERTION, std::same_as<library::Element<3, Subject>::type, string::Storage>);
+  }
+  auto Fixture::test_usage_Size() -> void {
+    using Subject = library::Tuple<char, int, double, string::Storage>;
+    require(ASSERTION, 4 == library::Size<Subject>::value);
+  }
+  auto Fixture::test_usage_get() -> void {
+    using Subject = library::Tuple<char, int, double, string::Storage>;
+    auto subject = Subject{'a', 2, 3.0, "4"s};
+    require(ASSERTION, 'a' == get<0>(subject));
+    require(ASSERTION, 2 == get<1>(subject));
+    require(ASSERTION, 3.0 == get<2>(subject));
+    require(ASSERTION, "4"s == get<3>(subject));
+  }
+}
+#endiv

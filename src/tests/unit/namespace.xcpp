@@ -4,12 +4,14 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import nonstd.string
+#import tunitas.string
+#import tunitas.string.literals
 namespace tests::unit {
-  namespace string = nonstd::string;
+  using namespace ::tunitas::string::literals;
+  namespace string = ::tunitas::string;
 }
-#import nonstd.string.Storage
-#import nonstd.string.View
+#import tunitas.string.Storage
+#import tunitas.string.View
 #endiv
 #divert <hpp>
 // Because all test fixtures will need these
@@ -24,10 +26,6 @@ namespace tests::unit {
 }
 #endiv
 #divert <ipp>
-#import nonstd.string.literals
-namespace tests::unit {
-  using namespace nonstd::string::literals;
-}
 #import rigging.suite.io // ... v1-series (compatibility shims)
 #import rigging.io // ......... v2-series
 // All test fixtures want to chatter

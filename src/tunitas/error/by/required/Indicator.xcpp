@@ -1,0 +1,18 @@
+// This by -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#forward tunitas.error.by.Optional
+#forward tunitas.error.by.Outcome
+#forward tunitas.error.by.Exception
+namespace tunitas::error::by::required {
+  //
+  // Is this type one of the "error-by" indicator t ypes?
+  //
+  template<typename INDICATOR> concept Indicator = (same_as<INDICATOR, by::Optional> ||
+                                                    same_as<INDICATOR, by::Outcome> ||
+                                                    same_as<INDICATOR, by::Exception>);
+}
+#endiv

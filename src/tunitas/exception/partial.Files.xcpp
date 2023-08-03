@@ -1,0 +1,272 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::exception::partial {
+  //
+  // The partial completion of a Files exception.
+  //
+  // Semantic
+  //
+  //   https://en.cppreference.com/w/cpp/filesystem/filesystem_error
+  //
+  // Specification:
+  //
+  //   Everything but the finality.
+  //
+  //   Unlike std::filesystem::filesystem_error, the captured paths are unambiguous.
+  //   Supports zero, one, two or many filepaths.
+  //
+  // Design:
+  //
+  //   New Argument Ordering uses the required Error indicator to demarcate the Path (file path) from the Reason (string view)
+  //   The Path series is always first.
+  //
+  //   The path(...) and ancestral path1(), path2() accessors return an (noexcept) optional constie reference
+  //   Indeed, that is an optional reference
+  //
+  //   At least one descent is required.
+  //   And with a new mixin of an Aspect, then unification must occur.
+  //
+  // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
+  //   vague linkage 
+  //   If the class declares any non-inline, non-pure virtual functions,
+  //   the first one is chosen as the “key method” for the class,
+  //   and the vtable is only emitted in the translation unit where the key method is defined.
+  // </cite>
+  //
+  // Usage:
+  //
+  //   class my::Something : public partial::Files {
+  //     struct Ancestors {
+  //       using Exception = partial::Files;
+  //     };
+  //     using Ancestor::Exception::Files;
+  //   };
+  //
+  //   auto reason = string::View{...somehow...};
+  //   auto ec = std::error_code{...somehow...};
+  //   auto path1 = file::Path{...somehow...};
+  //   auto path2 = file::Path{...somehow...};
+  //   auto path3 = file::Path{...somehow...};
+  //   auto path4 = file::Path{...somehow...};
+  //
+  //   auto files = Files{{path1, path2, path3, path4}, ec, reason};
+  //
+  //   auto count = files.paths().size();
+  //   auto const &p1 = files.path1();
+  //   auto const &p2 = files.path2()
+  //
+  //   auto const &q0 = files.path(0);
+  //   auto const &q1 = files.path(1);
+  //   auto const &q2 = files.path(2);
+  //   auto const &q3 = files.path(3);
+  //
+  struct Files;
+}
+#endiv
+#divert <hpp>
+#import tunitas.Optional
+#import tunitas.Tuple
+#import tunitas.exception.Aspect
+#import tunitas.exception.feature.Failure
+#import tunitas.exception.feature.System
+#import tunitas.exception.feature.Files
+#import tunitas.file.Path
+#import tunitas.string.View
+#import nonstd.exception.Filesystem
+#import nonstd.required.Same_As
+#import nonstd.required.Convertible_To
+#import std.size_t
+#import std.shared_ptr
+#import std.vector
+namespace tunitas::exception {
+  class partial::Files : public virtual Aspect,
+                         public virtual feature::Failure,
+                         public virtual feature::System,
+                         public virtual feature::Files,
+                         public nonstd::exception::Filesystem<string::View> {
+    using Ancestor = void; // occlude the grandcestor(s) to avoid mistakes
+    struct Ancestors {
+      struct Aspects {
+        using Aspect = tunitas::exception::Aspect;
+      };
+      struct Features {
+        using Failure = feature::Failure;
+        using System = feature::System;
+        using Files = feature::Files;
+      };
+      using Exception = nonstd::exception::Filesystem<string::View>;
+    };
+    using Extras = std::vector<file::Path>;
+    std::shared_ptr<Extras> extras{};
+  protected:
+    template<typename... TYPE> requires (required::Same_As<TYPE, Files::Arguments::Path const &> && ... ) inline static auto make_extras(Tuple<TYPE...>) -> std::shared_ptr<Extras>;
+    ~Files() = default;
+  public:
+    // No stated reason
+    inline explicit Files(Arguments::Error);
+    inline explicit Files(Arguments::Path const &, Arguments::Error);
+    inline explicit Files(Arguments::Path const &, Arguments::Path const &, Arguments::Error);
+    template<typename... TYPE> requires (required::Same_As<TYPE, Arguments::Path const &> && ... ) inline explicit Files(Tuple<TYPE...>, Arguments::Error);
+    // Stated reason
+    inline explicit Files(Arguments::Error, Arguments::Reason);
+    inline explicit Files(Arguments::Path const &, Arguments::Error, Arguments::Reason);
+    inline explicit Files(Arguments::Path const &, Arguments::Path const &, Arguments::Error, Arguments::Reason);
+    template<typename... TYPE> requires (required::Same_As<TYPE, Arguments::Path const &> && ... ) inline explicit Files(Tuple<TYPE...>, Arguments::Error, Arguments::Reason);
+    // A system exception plus filepaths
+    inline explicit Files(Arguments::System const &);
+    inline explicit Files(Arguments::Path const &, Arguments::System const &);
+    inline explicit Files(Arguments::Path const &, Arguments::Path const &, Arguments::System const &);
+    template<typename... TYPE> requires (required::Same_As<TYPE, Arguments::Path const &> && ... ) inline explicit Files(Tuple<TYPE...>, Arguments::System const &);
+    // A filesystem exception, as before
+    inline explicit Files(Ancestors::Exception &&) noexcept;
+    inline explicit Files(Ancestors::Exception const &) noexcept;
+    // NOT reproducing the std::filesystem::filesystem_error constructor series (reason at the head and optional paths trailing)
+    // NOT using Ancestors::Exception::filesystem_error;
+    auto what() const noexcept -> Results::What override;
+    template<required::Same_As<file::Path const &>> struct Optional;
+    using Index = std::size_t;
+    using Size = std::size_t;
+    inline auto path(Index) const noexcept -> Optional<file::Path const &>; // returns {} on invalid index
+    inline auto empty() const noexcept -> bool;
+    inline auto size() const noexcept -> Size;
+    inline auto path1() const noexcept -> Optional<file::Path const &>;
+    inline auto path2() const noexcept -> Optional<file::Path const &>;
+  };
+  namespace partial {
+    template<> inline Files::Files<>(Tuple<>, Arguments::Error);
+    template<> inline Files::Files<Files::Arguments::Path const &>(Tuple<Arguments::Path const &>, Arguments::Error);
+    template<> inline Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Arguments::Path const &, Arguments::Path const &>, Arguments::Error);
+    //
+    template<> inline Files::Files<>(Tuple<>, Arguments::Error, Arguments::Reason);
+    template<> inline Files::Files<Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &>, Arguments::Error, Arguments::Reason);
+    template<> inline Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &, Files::Arguments::Path const &>, Arguments::Error, Arguments::Reason);
+    //
+    template<> inline Files::Files<>(Tuple<>, Arguments::System const &);
+    template<> inline Files::Files<Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &>, Arguments::System const &);
+    template<> inline Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &, Files::Arguments::Path const &>, Arguments::System const &);
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.exception.partial.Files.Optional
+#import std.make_shared
+#import std.make_index_sequence
+#import std.index_sequence
+namespace tunitas::exception::partial {
+  template<typename... TYPE> requires (required::Same_As<TYPE, Files::Arguments::Path const &> && ... ) auto Files::make_extras(Tuple<TYPE...> t) -> std::shared_ptr<Extras> {
+    auto made = std::make_shared<Extras>();
+    // +2 and -2 because path1 and path2 are already accounted for in fields of the Ancestor::Exception (a.k.a. std::filesystem::filesystem_error)
+    [&m=*made, &t]<Size... INDEX>(std::index_sequence<INDEX...>) {
+      (m.push_back(get<2+INDEX>(move(t))), ...);
+    }(std::make_index_sequence<sizeof...(TYPE)-2>{});
+    return made;
+  }
+}
+namespace tunitas::exception::partial {
+  Files::Files(Arguments::Error e) : Ancestors::Exception{e} { }
+  Files::Files(Arguments::Path const &p, Arguments::Error e) : Ancestors::Exception{p, e} { }
+  Files::Files(Arguments::Path const &p1, Arguments::Path const &p2, Arguments::Error e) : Ancestors::Exception{p1, p2, e} { }
+  template<> Files::Files<>(Tuple<>, Arguments::Error e) : Ancestors::Exception{e} { }
+  template<> Files::Files<Files::Arguments::Path const &>(Tuple<Arguments::Path const &> t, Arguments::Error e) : Ancestors::Exception{get<0>(t), e} { }
+  template<> Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Arguments::Path const &, Arguments::Path const &> t, Arguments::Error e) : Ancestors::Exception{get<0>(t), get<1>(t), e} { }
+  template<typename... TYPE> requires (required::Same_As<TYPE, Files::Arguments::Path const &> && ... ) Files::Files(Tuple<TYPE...> t, Arguments::Error e)
+    : Ancestors::Exception{get<0>(t), get<1>(t), e}
+    , extras{make_extras(move(t))}
+  { }
+}
+namespace tunitas::exception::partial {
+  Files::Files(Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{e, r} { }
+  Files::Files(Arguments::Path const &p, Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{p, e, r} { }
+  Files::Files(Arguments::Path const &p1, Arguments::Path const &p2, Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{p1, p2, e, r} { }
+  template<> Files::Files<>(Tuple<>, Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{e, r} { }
+  template<> Files::Files<Files::Arguments::Path const &>(Tuple<Arguments::Path const &> t, Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{get<0>(t), e, r} { }
+  template<> Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Arguments::Path const &, Arguments::Path const &> t, Arguments::Error e, Arguments::Reason r) : Ancestors::Exception{get<0>(t), get<1>(t), e, r} { }
+  template<typename... TYPE> requires (required::Same_As<TYPE, Files::Arguments::Path const &> && ... ) Files::Files(Tuple<TYPE...> t, Arguments::Error e, Arguments::Reason r)
+    : Ancestors::Exception{get<0>(t), get<1>(t), e, r}
+    , extras{make_extras(move(t))}
+  { }
+}
+namespace tunitas::exception::partial {
+  Files::Files(Arguments::System const &s) : Ancestors::Exception{s} { }
+  Files::Files(Arguments::Path const &p, Arguments::System const &s) : Ancestors::Exception{p, s} { }
+  Files::Files(Arguments::Path const &p1, Arguments::Path const &p2, Arguments::System const &s) : Ancestors::Exception{p1, p2, s} { }
+  template<> Files::Files<>(Tuple<>, Arguments::System const &s) : Ancestors::Exception{s} { }
+  template<> Files::Files<Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &> t, Arguments::System const &s) : Ancestors::Exception{get<0>(t), s} { }
+  template<> Files::Files<Files::Arguments::Path const &, Files::Arguments::Path const &>(Tuple<Files::Arguments::Path const &, Files::Arguments::Path const &> t, Arguments::System const &s) : Ancestors::Exception{get<0>(t), get<1>(t), s} { }
+  template<typename... TYPE> requires (required::Same_As<TYPE, Files::Arguments::Path const &> && ... ) Files::Files(Tuple<TYPE...> t, Arguments::System const &s)
+    : Ancestors::Exception{get<0>(t), get<1>(t), s}
+    , extras{make_extras(move(t))}
+  { }
+}
+namespace tunitas::exception::partial {
+  Files::Files(Ancestors::Exception &&a) noexcept : Ancestors::Exception{move(a)} { }
+  Files::Files(Ancestors::Exception const &a) noexcept : Ancestors::Exception{a} { }
+}
+namespace tunitas::exception::partial {
+  auto Files::path1() const noexcept -> Optional<file::Path const &> {
+    auto const &p = Ancestors::Exception::path1();
+    if (p.empty()) {
+      return {};
+    } else {
+      return p;
+    }
+  }
+  auto Files::path2() const noexcept -> Optional<file::Path const &> {
+    auto const &p = Ancestors::Exception::path2();
+    if (p.empty()) {
+      return {};
+    } else {
+      return p;
+    }
+  }
+  auto Files::path(Index index) const noexcept -> Optional<file::Path const &> {
+    if (0 == index) {
+      return path1();
+    } else if (1 == index) {
+      return path2();
+    } else if (auto more=extras.get(); nullptr == more) {
+      return {};
+    } else if (auto subindex=index-2; subindex >= more->size()) {
+      return {}; // silently.
+    } else {
+      return more->at(subindex);
+    }
+  }
+  auto Files::empty() const noexcept -> bool {
+    auto const &p1 = Ancestors::Exception::path1();
+    auto const &p2 = Ancestors::Exception::path2();
+    return p1.empty() && p2.empty() && (nullptr == extras.get() || extras->empty());
+  }
+  auto Files::size() const noexcept -> Size {
+    // Handle the case where path1 or path2 are "missing" (represented as empty)
+    //
+    // path1     path2     ...more...   size
+    // ------- ------- --------------   ----
+    // missing   missing   missing      0
+    // present   missing   missing      1
+    // missing   present   missing      2
+    // missing   missing   present      2 + entries->size()
+    //
+    auto const &p1 = Ancestors::Exception::path1();
+    auto const &p2 = Ancestors::Exception::path2();
+    auto count_path = [](auto const &p) -> Size   { return p.empty() ? 0uz : 1uz; };
+    auto count_extras = [](auto const &x) -> Size { return nullptr == x.get() ? 0uz : x->size(); };
+    if (auto size3=count_extras(extras); size3) {
+      return 2uz + size3;
+    } else if (auto full2=count_path(p2); full2) {
+      return 1uz + full2;
+    } else {
+      return count_path(p1);
+    }
+  }
+}
+#endiv
+#divert <cpp>
+namespace tunitas::exception::partial {
+  auto Files::what() const noexcept -> Results::What { return Ancestors::Exception::what(); }
+}
+#endiv

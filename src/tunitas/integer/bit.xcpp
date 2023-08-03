@@ -1,0 +1,133 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::integer {
+  namespace package_bit {
+    namespace body::exported { }
+    namespace interface = body::exported;
+  }
+  using namespace package_bit::interface;
+}
+#import tunitas.integer.required.Large
+#import tunitas.integer.required.Small
+namespace tunitas::integer::package_bit {
+  namespace body {
+    namespace exported {
+      //
+      // The bit-level function of <bit>
+      //
+      // In Scope:
+      //
+      //   has_single_bit (C++20)
+      //   bit_ceil (C++20)
+      //   bit_floor (C++20)
+      //   bit_width (C++20)
+      //   rotl (C++20)
+      //   rotr (C++20)
+      //   countl_zero (C++20)
+      //   countl_one (C++20)
+      //   countr_zero (C++20)
+      //   countr_one (C++20)
+      //   popcount (C++20)
+      //
+      // Out-of-Scope:
+      //
+      //   bit_cast (C++20)
+      //   byteswap (C++23)
+      //   endian (C++20)
+      //
+      // Specification:
+      //
+      //   #include <bit>
+      //   https://en.cppreference.com/w/cpp/numeric/$FUNCTION
+      //
+      // Design:
+      //
+      //   bignum or smallnum
+      //   smallnum calls the std implementation
+      //   bignum is ours (or boost's
+      //   Just the ones that we need use.
+      //
+      // Usage:
+      //
+      //   #import tunitas.integer.bit
+      //
+      //   auto ceil = bit_ceil(...somehow...);
+      //   auto count = countr_zero(...somehow...);
+      //
+      template<required::Small INTEGER> inline constexpr auto bit_ceil(INTEGER) -> INTEGER;
+      template<required::Large INTEGER> inline constexpr auto bit_ceil(INTEGER) -> INTEGER;
+      template<required::Small INTEGER> inline constexpr auto countr_zero(INTEGER) -> int;
+      template<required::Large INTEGER> inline constexpr auto countr_zero(INTEGER) -> int;
+    }
+  }
+}
+#endiv
+#divert <ipp>
+#import std.bit_ceil
+#import std.countr_zero
+#import tunitas.integer.required.multiprecision.number.concepts
+namespace tunitas::integer::package_bit {
+  static_assert(std::same_as<int, decltype(std::countr_zero(0u))>, "returns an int (even which ne never negative)");
+  template<required::Small INTEGER> constexpr auto interface::bit_ceil(INTEGER integer) -> INTEGER { return std::bit_ceil(integer); }
+  template<required::Small INTEGER> constexpr auto interface::countr_zero(INTEGER integer) -> int  { return std::countr_zero(integer); }
+  template<required::Large INTEGER> constexpr auto interface::bit_ceil(INTEGER integer) -> INTEGER {
+    if (0 == integer) {
+      return INTEGER{1};
+    } else {
+      return []<auto MIN, auto MAX, auto SIGNAGE, auto CHECKAGE, typename ALLOCATOR>(bmp::number<bmp::cpp_int_backend<MIN, MAX, SIGNAGE, CHECKAGE, ALLOCATOR>> integer)
+        requires required::multiprecision::number::Arguments<MIN, MAX, SIGNAGE, CHECKAGE, ALLOCATOR> {
+        --integer;
+        auto shift = 1uz;
+        for (auto i{0u}, e{1u+std::countr_zero(MIN)}; e != i; ++i) {
+          integer |= integer >> shift;
+          shift <<= 1;
+        }
+        ++integer;
+        return integer;
+      }(integer);
+    }
+  }
+  template<required::Large INTEGER> constexpr auto interface::countr_zero(INTEGER integer) -> int {
+    return []<auto MIN, auto MAX, auto SIGNAGE, auto CHECKAGE, typename ALLOCATOR>(bmp::number<bmp::cpp_int_backend<MIN, MAX, SIGNAGE, CHECKAGE, ALLOCATOR>> integer) -> int
+      requires required::multiprecision::number::Arguments<MIN, MAX, SIGNAGE, CHECKAGE, ALLOCATOR> {
+      if (0 == integer) {
+        return MIN;
+      } else {
+        int ret{};
+        for (auto i{0u}; MIN != i; ++i) {
+          if (integer & 01u) {
+            return ret;
+          } else {
+            ++ret;
+            integer >>= 1;
+          }
+        }
+        return ret;
+      }
+    }(integer);
+  }
+}
+#endiv
+#divert <cpp>
+#import tunitas.integer.integers
+namespace {
+  namespace testate {
+    using namespace tunitas::integer;
+    using namespace tunitas::integer::integers;
+    //
+    static_assert(4 == bit_ceil(uint8_t{0b11}));
+    static_assert(4 == bit_ceil(uint64_t{0b11}));
+    static_assert(4 == bit_ceil(uint128_t{0b11}));
+    static_assert(4 == bit_ceil(uint256_t{0b11}));
+    //
+    static_assert(6 == countr_zero(uint8_t{0b1100'0000}));
+    static_assert(6 == countr_zero(uint64_t{0b1100'0000}));
+    static_assert(6 == countr_zero(uint128_t{0b1100'0000}));
+    static_assert(6 == countr_zero(uint256_t{0b1100'0000}));
+  }
+}
+#endiv

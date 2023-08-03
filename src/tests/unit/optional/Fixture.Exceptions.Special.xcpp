@@ -1,0 +1,30 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc. 2021.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#include <hpp/tests.unit.optional.Fixture>
+#endiv
+#divert <hpp>
+#import tunitas.exception.Aspect
+#import tunitas.exception.partial.Runtime
+#import substd.exception.Exception
+namespace tests::unit::optional {
+  //
+  // Doesn't matter what this exception represents.
+  // It needs to be.
+  //
+  //   a) laden with the Aspects, especially the optional::exception::Aspect
+  //   b) trivial to use
+  //
+  class Fixture::Exceptions::Special : public virtual ::tunitas::exception::Aspect,
+                                       public ::tunitas::exception::partial::Runtime {
+    using Ancestor = ::tunitas::exception::partial::Runtime;
+  public:
+    explicit Special() : Ancestor{"special"} { }
+    explicit Special(substd::exception::Exception const &old) : Ancestor{old.what()} { }
+    auto what() const noexcept -> char const * override { return Ancestor::what(); }
+  };
+}
+#endiv

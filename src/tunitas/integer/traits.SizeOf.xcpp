@@ -1,0 +1,92 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tunitas.integer.required.Small
+#import tunitas.integer.required.Integer
+#import tunitas.integer.required.multiprecision.number.concepts
+#import tunitas.integer.integers
+namespace tunitas::integer::traits {
+  //
+  // The size of the representation of the integer.
+  // Like sizeof but extending to the bignums.
+  // 
+  template<required::Integer> struct SizeOf;
+#if 1
+  template<required::Small SMALL> struct SizeOf<SMALL>;
+  template<auto MIN, auto MAX, auto SIGNAGE, auto CHECKED, typename ALLOCATOR> requires required::multiprecision::number::Arguments<MIN, MAX, SIGNAGE, CHECKED, ALLOCATOR>
+  struct SizeOf<bmp::number<bmp::cpp_int_backend<MIN, MAX, SIGNAGE, CHECKED, ALLOCATOR>>>;
+#else
+  template<> struct SizeOf<integers::uint8_t>    { inline static constexpr auto const VALUE = Bytes{1uz}; };
+  template<> struct SizeOf<integers::uint16_t>   { inline static constexpr auto const VALUE = Bytes{2uz}; };
+  template<> struct SizeOf<integers::uint32_t>   { inline static constexpr auto const VALUE = Bytes{4uz}; };
+  template<> struct SizeOf<integers::uint64_t>   { inline static constexpr auto const VALUE = Bytes{8uz}; };
+  template<> struct SizeOf<integers::uint128_t>  { inline static constexpr auto const VALUE = Bytes{16uz}; };
+  template<> struct SizeOf<integers::uint256_t>  { inline static constexpr auto const VALUE = Bytes{32uz}; };
+  template<> struct SizeOf<integers::uint512_t>  { inline static constexpr auto const VALUE = Bytes{64uz}; };
+  template<> struct SizeOf<integers::uint1024_t> { inline static constexpr auto const VALUE = Bytes{128uz}; };
+  template<> struct SizeOf<integers::uint2048_t> { inline static constexpr auto const VALUE = Bytes{256uz}; };
+  template<> struct SizeOf<integers::uint4096_t> { inline static constexpr auto const VALUE = Bytes{512uz}; };
+  template<> struct SizeOf<integers::uint8192_t> { inline static constexpr auto const VALUE = Bytes{1024uz}; };
+
+  template<> struct SizeOf<integers::sint8_t>    { inline static constexpr auto const VALUE = Bytes{1uz}; };
+  template<> struct SizeOf<integers::sint16_t>   { inline static constexpr auto const VALUE = Bytes{2uz}; };
+  template<> struct SizeOf<integers::sint32_t>   { inline static constexpr auto const VALUE = Bytes{4uz}; };
+  template<> struct SizeOf<integers::sint64_t>   { inline static constexpr auto const VALUE = Bytes{8uz}; };
+  template<> struct SizeOf<integers::sint128_t>  { inline static constexpr auto const VALUE = Bytes{16uz}; };
+  template<> struct SizeOf<integers::sint256_t>  { inline static constexpr auto const VALUE = Bytes{32uz}; };
+  template<> struct SizeOf<integers::sint512_t>  { inline static constexpr auto const VALUE = Bytes{64uz}; };
+  template<> struct SizeOf<integers::sint1024_t> { inline static constexpr auto const VALUE = Bytes{128uz}; };
+  template<> struct SizeOf<integers::sint2048_t> { inline static constexpr auto const VALUE = Bytes{256uz}; };
+  template<> struct SizeOf<integers::sint4096_t> { inline static constexpr auto const VALUE = Bytes{512uz}; };
+  template<> struct SizeOf<integers::sint8192_t> { inline static constexpr auto const VALUE = Bytes{1024uz}; };
+#endif
+}
+#endiv
+#divert <hpp>
+#import std.countr_zero
+#import nonstd.units.cast
+static_assert(sizeof(tunitas::integer::traits::Bytes));
+namespace tunitas::integer::traits {
+  template<required::Small SMALL> struct SizeOf<SMALL> { inline static constexpr auto const VALUE = Bytes{sizeof(SMALL)}; };
+  template<auto MIN, auto MAX, auto SIGNAGE, auto CHECKED, typename ALLOCATOR> requires required::multiprecision::number::Arguments<MIN, MAX, SIGNAGE, CHECKED, ALLOCATOR>
+  struct SizeOf<bmp::number<bmp::cpp_int_backend<MIN, MAX, SIGNAGE, CHECKED, ALLOCATOR>>>
+  { inline static constexpr auto const VALUE = nonstd::units::cast<Bytes>(Bits{1u << std::countr_zero(MAX)}); };
+  static_assert(256u == 1u << std::countr_zero(256u));
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using namespace tunitas::integer::integers;
+    using tunitas::integer::traits::SizeOf;
+    using tunitas::integer::traits::Bytes;
+    //
+    static_assert(SizeOf<uint8_t>::VALUE == Bytes{1uz});
+    static_assert(SizeOf<uint16_t>::VALUE == Bytes{2uz});
+    static_assert(SizeOf<uint32_t>::VALUE == Bytes{4uz});
+    static_assert(SizeOf<uint64_t>::VALUE == Bytes{8uz});
+    static_assert(SizeOf<uint128_t>::VALUE == Bytes{16uz});
+    static_assert(SizeOf<uint256_t>::VALUE == Bytes{32uz});
+    static_assert(SizeOf<uint512_t>::VALUE == Bytes{64uz});
+    static_assert(SizeOf<uint1024_t>::VALUE == Bytes{128uz});
+    static_assert(SizeOf<uint2048_t>::VALUE == Bytes{256uz});
+    static_assert(SizeOf<uint4096_t>::VALUE == Bytes{512uz});
+    static_assert(SizeOf<uint8192_t>::VALUE == Bytes{1024uz});
+    //
+    static_assert(SizeOf<sint8_t>::VALUE == Bytes{1uz});
+    static_assert(SizeOf<sint16_t>::VALUE == Bytes{2uz});
+    static_assert(SizeOf<sint32_t>::VALUE == Bytes{4uz});
+    static_assert(SizeOf<sint64_t>::VALUE == Bytes{8uz});
+    static_assert(SizeOf<sint128_t>::VALUE == Bytes{16uz});
+    static_assert(SizeOf<sint256_t>::VALUE == Bytes{32uz});
+    static_assert(SizeOf<sint512_t>::VALUE == Bytes{64uz});
+    static_assert(SizeOf<sint1024_t>::VALUE == Bytes{128uz});
+    static_assert(SizeOf<sint2048_t>::VALUE == Bytes{256uz});
+    static_assert(SizeOf<sint4096_t>::VALUE == Bytes{512uz});
+    static_assert(SizeOf<sint8192_t>::VALUE == Bytes{1024uz});
+  }
+}
+#endiv

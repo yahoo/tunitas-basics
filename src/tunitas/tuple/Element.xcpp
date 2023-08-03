@@ -6,7 +6,7 @@
 #divert <fpp>
 #import std.tuple_element
 #import std.size_t
-namespace tunitas {
+namespace tunitas::tuple {
   //
   // You WILL obey the naming convention (Title Case for types; snake-lower_case for namespaces)
   //

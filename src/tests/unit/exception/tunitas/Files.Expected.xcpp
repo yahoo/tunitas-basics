@@ -1,0 +1,77 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#include <hpp/tests.unit.exception.tunitas.Files>
+  //
+  // Specializations only
+  //
+#endiv
+#divert <hpp>
+#import tunitas.exception.Files
+#import tests.unit.required // ctcnr (cascade that certain namspace 'required')
+#import nonstd.required.Same_As
+namespace tests::unit::exception::tunitas {
+  struct Files::Expectation {
+    struct None;
+    struct One;
+    struct Two;
+    template<typename... TYPES> requires (required::Same_As<std::remove_cvref_t<TYPES>, Files::Arguments::Path> && ... ) struct Tuple;
+  };
+  struct Files::Expectation::None {
+    using Subject = library::Files;
+    static constexpr auto path1() -> bool { return false; }
+    static constexpr auto path2() -> bool { return false; }
+    static constexpr auto path(Subject::Index) -> bool { return false; }
+    static constexpr auto empty() -> bool { return true; }
+    static constexpr auto size() -> Subject::Size { return 0uz; }
+  };
+  struct Files::Expectation::One {
+    using Subject = library::Files;
+    static constexpr auto path1() -> bool { return true; }
+    static constexpr auto path2() -> bool { return false; }
+    static constexpr auto path(Subject::Index i) -> bool { return i < size(); }
+    static constexpr auto empty() -> bool { return 0 == size(); }
+    static constexpr auto size() -> Subject::Size { return 1uz; }
+  };
+  struct Files::Expectation::Two {
+    using Subject = library::Files;
+    static constexpr auto path1() -> bool { return true; }
+    static constexpr auto path2() -> bool { return true; }
+    static constexpr auto path(Subject::Index i) -> bool { return i < size(); }
+    static constexpr auto empty() -> bool { return 0 == size(); }
+    static constexpr auto size() -> Subject::Size { return 2uz; }
+  };
+  template<typename... TYPES> requires (required::Same_As<std::remove_cvref_t<TYPES>, Files::Arguments::Path> && ... ) struct Files::Expectation::Tuple {
+    using Subject = library::Files;
+    static constexpr auto path1() -> bool { return 1uz <= size(); }
+    static constexpr auto path2() -> bool { return 2uz <= size(); }
+    static constexpr auto path(Subject::Index i) -> bool { return i < size(); }
+    static constexpr auto empty() -> bool { return 0uz == size(); }
+    static constexpr auto size() -> Subject::Size { return sizeof...(TYPES); }
+  };
+  template<typename... TYPES> requires (0 < sizeof...(TYPES) && (required::Same_As<TYPES, Files::Arguments::Path> && ... )) struct Files::Expectation::Tuple<TYPES const &...> : public Tuple<std::remove_cvref_t<TYPES>...> { };
+}
+namespace tests::unit::exception::tunitas {
+  template<> struct Files::Expected<Files::Arguments::Error> : public Expectation::None { };
+  template<> struct Files::Expected<Files::Arguments::Error, Files::Arguments::Reason> : public Expectation::None { };
+  template<> struct Files::Expected<Files::Arguments::Error, Files::Arguments::System> : public Expectation::None { };
+}
+namespace tests::unit::exception::tunitas {
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Error> : public Expectation::One { };
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Error, Files::Arguments::Reason> : public Expectation::One { };
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Error, Files::Arguments::System> : public Expectation::One { };
+}
+namespace tests::unit::exception::tunitas {
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Path, Files::Arguments::Error> : public Expectation::Two { };
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Path, Files::Arguments::Error, Files::Arguments::Reason> : public Expectation::Two { };
+  template<> struct Files::Expected<Files::Arguments::Path, Files::Arguments::Path, Files::Arguments::Error, Files::Arguments::System> : public Expectation::Two { };
+}
+namespace tests::unit::exception::tunitas {
+  template<typename... TYPES> requires (required::Same_As<std::remove_cvref_t<TYPES>, Files::Arguments::Path> && ... ) struct Files::Expected<Files::Tuple<TYPES const &...>, Files::Arguments::Error> : public Expectation::Tuple<TYPES...> { };
+  template<typename... TYPES> requires (required::Same_As<std::remove_cvref_t<TYPES>, Files::Arguments::Path> && ... ) struct Files::Expected<Files::Tuple<TYPES const &...>, Files::Arguments::Error, Files::Arguments::Reason> : public Expectation::Tuple<TYPES...> { };
+  template<typename... TYPES> requires (required::Same_As<std::remove_cvref_t<TYPES>, Files::Arguments::Path> && ... ) struct Files::Expected<Files::Tuple<TYPES const &...>, Files::Arguments::Error, Files::Arguments::System> : public Expectation::Tuple<TYPES...> { };
+}
+#endiv

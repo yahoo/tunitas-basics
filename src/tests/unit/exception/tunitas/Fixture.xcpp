@@ -1,22 +1,14 @@
 // This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
-// Copyright Yahoo Inc. 2022.
+// Copyright Yahoo Inc.
 // Licensed under the terms of the Apache-2.0 license.
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import tunitas.exception
-namespace tests::unit::exception::tunitas {
-  namespace [[eponymous]] fixture {
-    class Fixture;
-    namespace library = ::tunitas::exception;
-    namespace feature = ::tunitas::exception::feature;
-  }
-  using fixture::Fixture;
-}
+namespace tests::unit::exception::tunitas { class Fixture; }
 #endiv
 #divert <hpp>
 #import tests.unit.exception.Palette
-struct tests::unit::exception::tunitas::fixture::Fixture : public rigging::suite::Fixture, protected Palette {
+struct tests::unit::exception::tunitas::Fixture : public rigging::suite::Fixture, protected Palette {
   static auto suite() -> Suite;
   //
   // reminders mostly
@@ -33,7 +25,7 @@ struct tests::unit::exception::tunitas::fixture::Fixture : public rigging::suite
 #endiv
 #divert <tpp>
 #import std.error_code
-namespace tests::unit::exception::tunitas::fixture {
+namespace tests::unit::exception::tunitas {
   template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception0() -> void       { exercise<CATCHABLE, EXCEPTION>(); }
   template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception1string() -> void { exercise<CATCHABLE, EXCEPTION>("give-me-one-reason"s); }
   template<typename CATCHABLE, typename EXCEPTION> auto Fixture::test_exception1error() -> void  { exercise<CATCHABLE, EXCEPTION>(std::error_code{}, "give-me-one-reason"s); }
@@ -62,7 +54,10 @@ namespace tests::unit::exception::tunitas::fixture {
 #import tunitas.exception.System
 #import tunitas.exception.Unimplemented
 #import tunitas.exception.Variant
-auto tests::unit::exception::tunitas::fixture::Fixture::suite() -> Suite {
+#import tunitas.exception.Overflow
+#import tunitas.exception.Underflow
+#import tests.unit.exception.tunitas.Files
+auto tests::unit::exception::tunitas::Fixture::suite() -> Suite {
   auto series = Stream{"tunitas"sv};
   series << stanza0<Fixture, feature::Allocation, library::Allocation>("Allocation")
          << stanza1string<Fixture, feature::Bound, library::Bound>("Bound")
@@ -85,6 +80,9 @@ auto tests::unit::exception::tunitas::fixture::Fixture::suite() -> Suite {
          << stanza1error<Fixture, feature::System, library::System>("System")
          << stanza0<Fixture, feature::Unimplemented, library::Unimplemented>("Unimplemented")
          << stanza0<Fixture, feature::Variant, library::Variant>("Variant")
+         << stanza1string<Fixture, feature::Overflow, library::Overflow>("Overflow")
+         << stanza1string<Fixture, feature::Underflow, library::Underflow>("Underflow")
+         << add<Files>()
          << END;
   return settle(series);
 }

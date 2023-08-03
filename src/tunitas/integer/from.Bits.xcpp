@@ -1,0 +1,69 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import std.size_t
+#import std.has_single_bit
+namespace tunitas::integer::from {
+  //
+  // Given the size (in bits) nominate the integer type.
+  // 
+  template<std::size_t WIDTH> requires (std::has_single_bit(WIDTH) && 4 < WIDTH) struct Bits;
+  template<> struct Bits<8uz>;
+  template<> struct Bits<16uz>;
+  template<> struct Bits<32uz>;
+  template<> struct Bits<64uz>;
+  template<> struct Bits<128uz>;
+}
+#endiv
+#divert <hpp>
+#import tunitas.integer.integers
+namespace tunitas::integer {
+  template<std::size_t WIDTH> requires (std::has_single_bit(WIDTH) && 4 < WIDTH) struct from::Bits {
+    using Unsigned = bmp::number<bmp::cpp_int_backend<WIDTH, WIDTH, bmp::unsigned_magnitude, bmp::unchecked, void>>;
+    using Signed   = bmp::number<bmp::cpp_int_backend<WIDTH, WIDTH, bmp::signed_magnitude, bmp::unchecked, void>>;
+  };
+  namespace from {
+    template<> struct Bits<8uz> {
+      using Unsigned = integers::uint8_t;
+      using Signed   = integers::sint8_t;
+    };
+    template<> struct Bits<16uz> {
+      using Unsigned = integers::uint16_t;
+      using Signed   = integers::sint16_t;
+    };
+    template<> struct Bits<32uz> {
+      using Unsigned = integers::uint32_t;
+      using Signed   = integers::sint32_t;
+    };
+    template<> struct Bits<64uz> {
+      using Unsigned = integers::uint64_t;
+      using Signed   = integers::sint64_t;
+    };
+    template<> struct Bits<128uz> {
+      using Unsigned = integers::uint128_t;
+      using Signed   = integers::sint128_t;
+    };
+  }
+}
+#endiv
+#divert <cpp>
+namespace {
+  namespace testate {
+    using tunitas::integer::from::Bits;
+    static_assert(sizeof(Bits<8uz>));
+    static_assert(sizeof(Bits<16uz>));
+    static_assert(sizeof(Bits<32uz>));
+    static_assert(sizeof(Bits<64uz>));
+    static_assert(sizeof(Bits<128uz>));
+    static_assert(sizeof(Bits<256uz>));
+    static_assert(sizeof(Bits<512uz>));
+    static_assert(sizeof(Bits<1024uz>));
+    static_assert(sizeof(Bits<2048uz>));
+    static_assert(sizeof(Bits<4096uz>));
+    static_assert(sizeof(Bits<8192uz>));
+  }
+}
+#endiv

@@ -18,6 +18,8 @@ namespace tests::unit::number {
     using Subject = SUBJECT;
     //
     auto test_usage_Number() -> void;
+    auto test_usage_num() -> void;
+    auto test_usage_copy() -> void;
     auto test_usage_add() -> void;
     auto test_usage_cmp() -> void;
   };
@@ -40,6 +42,8 @@ namespace tests::unit::number::generic {
     series << []{
                 auto use = Stream{"usage"sv};
                 use << add("Number", &Generic::test_usage_Number)
+                    << add("copy", &Generic::test_usage_num)
+                    << add("copy", &Generic::test_usage_copy)
                     << add("add", &Generic::test_usage_add)
                     << add("cmp", &Generic::test_usage_cmp)
                     << END;
@@ -84,10 +88,52 @@ namespace tests::unit::number::generic {
     return settle(series);
   }
 }
+#import std.numeric_limits
 namespace tests::unit::number::generic {
   template<required::Number _> auto Generic<_>::test_usage_Number() -> void {
     auto subject = Subject{};
     require(ASSERTION, sizeof (subject));
+  }
+  template<required::Number _> auto Generic<_>::test_usage_num() -> void {
+    Subject copy0 = 2 * Subject{std::numeric_limits<int signed long long>::max()} + 37; // this is an expression, not a number
+    Subject copy1 = copy0;
+    Subject copy2 = Subject{copy1};
+    std::cerr << copy0 << " copy0\n";
+    std::cerr << copy1 << " copy1\n";
+    std::cerr << copy2 << " copy2\n";
+    require(ASSERTION, copy0 == copy1);
+    require(ASSERTION, copy1 == copy2);
+    require(ASSERTION, copy2 == copy0);
+  }
+  template<required::Number _> auto Generic<_>::test_usage_copy() -> void {
+#if 0
+    // WATCHOUT - the use of 'auto' here DOES NOT WORK - it leaves dangling references on the stack stack to the internal temporary expressions
+    // WATCHOUT - you MUST eval the expression immediately and put it in an actual Subject variable.
+    // This is a (mis-?) feature of the underlying gmp++ lazy evaluation system.
+    // If you don't use AAA (Almost Always Auto) then this isn't a problem.  If you do use 'auto' then you will be surprised.
+    auto copy0 = 2 * Subject{std::numeric_limits<int signed long long>::max()} + 37; // this is an expression, not a number
+#else
+    Subject copy0 = 2 * Subject{std::numeric_limits<int signed long long>::max()} + 37; // this is an expression, not a number
+#endif
+    auto copy1 = copy0;
+    auto copy2 = Subject{copy1};
+    {
+      Subject num0 = copy0;
+      Subject num1 = copy1;
+      Subject num2 = copy2;
+      std::cerr << num0 << " num0\n";
+      std::cerr << num1 << " num1\n";
+      std::cerr << num2 << " num2\n";
+      require(ASSERTION, num0 == num1);
+      require(ASSERTION, num1 == num2);
+      require(ASSERTION, num2 == num0);
+    }
+    std::cerr << copy0 << " copy0\n";
+    std::cerr << copy1 << " copy1\n";
+    std::cerr << copy2 << " copy2\n";
+    require(ASSERTION, (Subject)copy0 == (Subject)copy1);
+    require(ASSERTION, (Subject)copy1 == (Subject)copy2);
+    require(ASSERTION, (Subject)copy2 == (Subject)copy0);
   }
   template<required::Number _> auto Generic<_>::test_usage_add() -> void {
     auto lhs = Subject{-2};

@@ -1,0 +1,87 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import nonstd.required.InstanceOf
+#import tunitas.integer.distribution.Uniform
+namespace tests::unit::integer::distribution {
+  template<required::InstanceOf<library::Uniform>> struct Uniform;
+}
+#endiv
+#divert <hpp>
+#import std.random_device
+namespace tests::unit::integer {
+  template<required::InstanceOf<distribution::library::Uniform> SUBJECT> struct distribution::Uniform : public rigging::suite::Fixture {
+    static auto suite() -> Suite;
+    //
+    using Subject = SUBJECT;
+    //
+    auto test_constructor_basic() -> void;
+    auto test_constructor_parameters() -> void;
+    auto test_call_basic() -> void;
+    auto test_call_parameters() -> void;
+  protected:
+    using Source = std::random_device;
+  };
+}
+#endiv
+#divert <tpp>
+#import std.array
+namespace tests::unit::integer::distribution {
+  template<required::InstanceOf<library::Uniform> _> auto Uniform<_>::test_constructor_basic() -> void {
+    auto const lo = typename Subject::Result{0};
+    auto const hi = typename Subject::Result{127}; // will work for all bit widths and signages
+    auto subject = Subject{lo, hi};
+    require(ASSERTION, sizeof(subject));
+  }
+  template<required::InstanceOf<library::Uniform> _> auto Uniform<_>::test_constructor_parameters() -> void {
+    auto const lo = typename Subject::Result{0};
+    auto const hi = typename Subject::Result{127}; // will work for all bit widths and signages
+    auto parameters = typename Subject::Parameters{lo,  hi};
+    auto subject = Subject{parameters};
+    require(ASSERTION, sizeof(subject));
+  }
+  template<required::InstanceOf<library::Uniform> _> auto Uniform<_>::test_call_basic() -> void {
+    auto source = Source{};
+    auto subject = Subject{};
+    auto const zero = subject(source);
+    auto const one = subject(source);
+    auto const two = subject(source);
+    auto const three = subject(source);
+    require(ASSERTION, !(zero == one && one == two && two == three && three == zero));
+  }
+  template<required::InstanceOf<library::Uniform> _> auto Uniform<_>::test_call_parameters() -> void {
+    auto source = Source{};
+    auto subject = Subject{};
+    auto const lo = typename Subject::Result{20};
+    auto const hi = typename Subject::Result{120}; // will work for all bit widths and signages
+    auto parameters = typename Subject::Parameters{lo, hi};
+    auto const zero = subject(source, parameters);
+    auto const one = subject(source, parameters);
+    auto const two = subject(source, parameters);
+    auto const three = subject(source, parameters);
+    require(ASSERTION, !(zero == one && one == two && two == three && three == zero));
+  }
+  template<required::InstanceOf<library::Uniform> _> auto Uniform<_>::suite() -> Suite {
+    auto series = Stream{typeid(Subject)};
+    series << []{
+              auto con = Stream{"constructor"sv};
+              con << add("basic", &Uniform::test_constructor_basic)
+                  << add("parameters", &Uniform::test_constructor_parameters)
+                  << END;
+              return con;
+            }()
+           << []{
+              auto call = Stream{"operator()"sv};
+              call << add("basic", &Uniform::test_call_basic)
+                   << add("parameters", &Uniform::test_call_parameters)
+                  << END;
+              return call;
+            }()
+         << END;
+    return settle(series);
+  }
+}
+#endiv

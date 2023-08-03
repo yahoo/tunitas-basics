@@ -17,12 +17,14 @@ struct tests::unit::Fixture : public cppunit::test::Fixture {
 #import tests.unit.base64.Fixture
 #import tests.unit.exception.Fixture
 #import tests.unit.exits.Fixture
+#import tests.unit.integer.Fixture
 #import tests.unit.number.Fixture
 #import tests.unit.outcome.Fixture
 #import tests.unit.required.Fixture
 #import tests.unit.server.Fixture
 #import tests.unit.time.Fixture
 #import tests.unit.tunitas.Fixture
+#import tests.unit.tuple.Fixture
 #import tests.unit.urlsafe.Fixture
 #import tests.unit.variant.Fixture
 #import tests.unit.want.Fixture
@@ -33,12 +35,14 @@ auto tests::unit::Fixture::suite() -> cppunit::Test * {
          << add<base64::Fixture>()
          << add<exception::Fixture>()
          << add<exits::Fixture>()
+         << add<integer::Fixture>()
          << add<number::Fixture>()
          << add<outcome::Fixture>()
          << add<required::Fixture>()
          << add<server::Fixture>()
          << add<time::Fixture>()
          << add<tunitas::Fixture>()
+         << add<tuple::Fixture>()
          << add<urlsafe::Fixture>()
          << add<variant::Fixture>()
          << add<want::Fixture>()

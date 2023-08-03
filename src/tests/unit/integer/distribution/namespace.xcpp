@@ -1,0 +1,16 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#import tests.unit.integer
+#import tunitas.integer.distribution
+#import tunitas.integer.distribution.required
+#import tunitas.integer.distribution.usage
+namespace tests::unit::integer::distribution {
+  namespace library = ::tunitas::integer::distribution;
+  namespace required = ::tunitas::integer::distribution::required;
+  namespace usage = ::tunitas::integer::distribution::usage;
+}
+#endiv

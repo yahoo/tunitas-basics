@@ -1,0 +1,48 @@
+// This by C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+namespace tests::unit::error::by { struct Fixture; }
+#endiv
+#divert <hpp>
+struct tests::unit::error::by::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  auto test_Optional() -> void;
+  auto test_Outcome() -> void;
+  auto test_Exception() -> void;
+};
+#endiv
+#divert <cpp>
+auto tests::unit::error::by::Fixture::suite() -> Suite {
+  auto series = Stream{"by"sv};
+  series << []{
+            auto by = Stream{"by"sv};
+            by << add("Optional", &Fixture::test_Optional)
+               << add("Outcome", &Fixture::test_Outcome)
+               << add("Exception", &Fixture::test_Exception)
+               << END;
+            return by;
+          }()
+         << END;
+  return settle(series);
+}
+#import tunitas.error.Outcome
+#import tunitas.error.Optional
+#import tunitas.error.by.Outcome
+#import tunitas.error.by.Optional
+#import tunitas.error.by.Exception
+namespace tests::unit::error::by {
+  // ummm ... these don't do anything
+  auto Fixture::test_Optional() -> void {
+    static_assert(sizeof (library::Optional));
+    static_assert(sizeof (super::Optional<int>));
+  }
+  auto Fixture::test_Outcome() -> void {
+    static_assert(sizeof (library::Outcome));
+    static_assert(sizeof (super::Outcome<int>));
+  }
+  auto Fixture::test_Exception() -> void {
+    static_assert(sizeof (library::Exception));
+  }
+}
+#endiv

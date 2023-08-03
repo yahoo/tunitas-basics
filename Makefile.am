@@ -78,6 +78,7 @@ $(if $(scold_cxxdir),$(__ok),$(error @temerarious_flagship_datadir@/am/build.am 
 # there are no submodules (now).
 
 DEVELOPMENT_AREAS = \
+  $(module_boost_prefix) \
   $(module_cli_prefix) \
   $(module_half_prefix) \
   $(module_langu_prefix) \
@@ -91,6 +92,7 @@ TESTING_AREAS = \
   $(deprecated_TESTING_AREAS) \
   $(end)
 INSTALLATION_AREAS = \
+  $(nonstd_boost_prefix) \
   $(nonstd_cppunit_prefix) \
   $(nonstd_gcc_prefix) \
   $(nonstd_gmp_prefix) \
@@ -138,14 +140,7 @@ include check/bin/urlsafe-encode.am
 include check/bin/urlsafe-decode.am
 include check/lib/libtests-urlsafe.am
 
-# install rules from @temerarious_flagship_datadir@/am/install.am
-INSTALL_MODULES = \
-  $(noinst_lib_libtunitas_application_la_MODULES) \
-  $(noinst_lib_libtunitas_server_la_MODULES) \
-  $(noinst_lib_libtunitas_la_MODULES) \
-  $(noinst_lib_libwant_la_MODULES) \
-  $(end)
-$(if $(DEBUGGING_CONDITION),$(info DEBUG INSTALL_MODULES=$(INSTALL_MODULES)))
+include modules/Makefrag.am # the nistallation rules MUST be positioned AFTER the definitions of the $(..._MODULES) variables
 
 # The Makefile_*SET variables are assembled by .../toolflags.mk
 # via @temerarious_flagship_datadir@/am/build.am and its constituents.

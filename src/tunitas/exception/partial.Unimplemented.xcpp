@@ -21,6 +21,8 @@ namespace tunitas::exception::partial {
   //   At least one descent is required.
   //   And with a new mixin of an Aspect, then unification must occur.
   //
+  //   The default+conversion constructor MUST be repeated so that the call-site current source location is captured (correctly).
+  //
   // <cite ref=https://gcc.gnu.org/onlinedocs/gcc/Vague-Linkage.html>
   //   vague linkage 
   //   If the class declares any non-inline, non-pure virtual functions,
@@ -54,6 +56,7 @@ class tunitas::exception::partial::Unimplemented : public virtual Aspect,
 protected:
   ~Unimplemented() = default;
 public:
+  explicit Unimplemented(Location location = Location::current()) : Ancestors::Exception{location} { }
   using Ancestors::Exception::Unimplemented;
   using Results = Ancestors::Aspect::Results;
   auto what() const noexcept -> Results::What override;

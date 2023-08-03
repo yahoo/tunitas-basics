@@ -47,6 +47,11 @@ namespace tunitas::application::options {
     // [[FIXTHIS]] this will produce a separable stream from the Console or Configuration.
     // But it's the best we can do here with limited API changes.
     //
+    // NOT supplying notice(...) and warning(...) because to do so would ignore the quiet_mode and warnings_mode settings.
+    // So this can't be done at all in this manner; find a different place to lodge those notices or warnings.
+    //
+    inline auto notice(Whence const &) -> std::ostream & = delete;
+    inline auto warning(Whence const &) -> std::ostream & = delete;
     inline auto error(Whence const &) -> std::ostream &;
   }
   struct get::Whence {

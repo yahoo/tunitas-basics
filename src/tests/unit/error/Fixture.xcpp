@@ -25,6 +25,7 @@ struct tests::unit::error::fixture::Fixture : public rigging::suite::Fixture {
 #endiv
 #divert <cpp>
 #import tests.unit.error.Schematic
+#import tests.unit.error.by.Fixture
 namespace tests::unit::error::fixture {
   auto Fixture::suite() -> Suite {
     using namespace rigging::suite;
@@ -43,6 +44,7 @@ namespace tests::unit::error::fixture {
            << add<Schematic<cluster::APPLICATION>>()
            << add<Schematic<cluster::SERVER>>()
 #endif
+           << add<by::Fixture>()
            << END;
     return settle(series);
   }

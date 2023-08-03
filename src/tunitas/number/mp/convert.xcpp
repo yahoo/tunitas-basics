@@ -6,11 +6,50 @@
 namespace tunitas::number::mp {
   //
   // Because none of the MP classes have constructors that accept int128
+  //
+  // Usage:
+  //
+  //   auto converted = convert<mpz_class>(...something_signed...);
+  //   auto converted = convert<mpz_class>(...something_unsigned...);
+  //
+  //   auto converted = convert<mpq_class>(...something_signed...);
+  //   auto converted = convert<mpq_class>(...something_unsigned...);
+  //
+  //   auto converted = convert<mpf_class>(...something_signed...);
+  //   auto converted = convert<mpf_class>(...something_unsigned...);
+  //
   template<required::Carrier CARRIER> auto convert(int128_t) -> CARRIER;
+  template<required::Carrier CARRIER> auto convert(uint128_t) -> CARRIER;
+  //
+  template<required::Carrier CARRIER> auto convert(int signed long long) -> CARRIER;
+  template<required::Carrier CARRIER> auto convert(int unsigned long long) -> CARRIER;
+  //
+  template<required::Carrier CARRIER> auto convert(int signed long) -> CARRIER;
+  template<required::Carrier CARRIER> auto convert(int unsigned long) -> CARRIER;
+  //
+  template<required::Carrier CARRIER> auto convert(int signed) -> CARRIER;
+  template<required::Carrier CARRIER> auto convert(int unsigned) -> CARRIER;
 }
 #endiv
 #divert <ipp>
 namespace tunitas::number {
+  template<mp::required::Carrier CARRIER> auto mp::convert(int signed value) -> CARRIER   { return mpz_class{value}; }
+  template<mp::required::Carrier CARRIER> auto mp::convert(int unsigned value) -> CARRIER { return mpz_class{value}; }
+  //
+  template<mp::required::Carrier CARRIER> auto mp::convert(int signed long value) -> CARRIER   { return mpz_class{value}; }
+  template<mp::required::Carrier CARRIER> auto mp::convert(int unsigned long value) -> CARRIER { return mpz_class{value}; }
+  //
+  template<mp::required::Carrier CARRIER> auto mp::convert(int signed long long value) -> CARRIER {
+    // [[FIXTHIS]] whenever they decide it's a wise idea to have sizeof (int) < sizeof (long) < sizeof (long long) <= sizeof (int128_t)
+    static_assert(sizeof (int signed long long) == sizeof (int signed long));
+    return convert<CARRIER>(static_cast<int signed long>(value));
+  }
+  template<mp::required::Carrier CARRIER> auto mp::convert(int unsigned long long value) -> CARRIER {
+    // eadem ratione 
+    static_assert(sizeof (int unsigned long long) == sizeof (int unsigned long));
+    return convert<CARRIER>(static_cast<int unsigned long>(value));
+  }
+  //
   template<mp::required::Carrier CARRIER> auto mp::convert(int128_t value) -> CARRIER {
     auto sign = [&value]() {
                   if (value < 0) {
@@ -31,6 +70,15 @@ namespace tunitas::number {
     } else {
       return prepared;
     }
+  }
+  template<mp::required::Carrier CARRIER> auto mp::convert(uint128_t value) -> CARRIER {
+    constexpr auto MASK = (uint128_t{1} << 64) - 1;
+    auto const small_lo = uint64_t(value & MASK);
+    auto const small_hi = uint64_t((value >> 64) & MASK);
+    auto const big_lo = mpz_class{small_lo};
+    auto const big_hi = mpz_class{small_hi};
+    auto prepared = (big_hi << 64) | big_lo; // https://gmplib.org/manual/Integer-Logic-and-Bit-Fiddling
+    return prepared;
   }
 }
 #endiv

@@ -1,0 +1,16 @@
+# This by a GNU -*- Makefile -*- fragment that by included by Automake
+# Copyright Yahoo Inc.
+# Licensed under the terms of the Apache-2.0 license.
+# For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+# For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#
+tunitas_error_is_SUBSOURCES = \
+  obj/src/tunitas/error/by/namespace.cpp \
+  obj/src/tunitas/error/by/Exception.cpp \
+  obj/src/tunitas/error/by/Optional.cpp \
+  obj/src/tunitas/error/by/Outcome.cpp \
+  obj/src/tunitas/error/by/Indicated.cpp \
+  $(tunitas_error_is_required_SUBSOURCES) \
+  $(end)
+#
+include src/tunitas/error/by/required/Makefrag.am

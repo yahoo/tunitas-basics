@@ -5,7 +5,7 @@
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
 #import std.tuple_size
-namespace tunitas {
+namespace tunitas::tuple {
   //
   // You WILL obey the naming convention (Title Case for types; snake-lower_case for namespaces)
   //

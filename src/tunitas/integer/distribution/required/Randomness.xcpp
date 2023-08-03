@@ -1,0 +1,15 @@
+// This is C++ 23 -*- c++ -*- -std=c++23 in the stylings of the S.C.O.L.D. design method.
+// For terms and provenance see the LICENSE file at the top of the repository.
+#divert <fpp>
+#import tunitas.integer.distribution.traits.Randomness
+#include <hpp/tunitas.integer.distribution.traits.Randomness>
+namespace tunitas::integer::distribution::required {
+  //
+  // A uniform random number generator, in concept
+  // This MUST be diagnosable without the complete type of GENERATOR
+  //
+  // Certainly there are other numerical properties as well.
+  //
+  template<typename GENERATOR> concept Randomness = traits::Randomness<GENERATOR>::value;
+}
+#endiv

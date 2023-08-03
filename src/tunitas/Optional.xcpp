@@ -4,8 +4,8 @@
 // For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 // For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #divert <fpp>
-#import std.optional
+#import tunitas.optional.Optional
 namespace tunitas {
-  template<typename TYPE> using Optional = std::optional<TYPE>;
+  using optional::Optional;
 }
 #endiv

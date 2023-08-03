@@ -5,19 +5,19 @@
 # For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
 #
 tunitas_number_mp_SUBSOURCES = \
-  obj/src/tunitas/number/Integer.cpp \
   obj/src/tunitas/number/Rational.cpp \
   obj/src/tunitas/number/Floating.cpp \
   obj/src/tunitas/number/mp/namespace.cpp \
   obj/src/tunitas/number/mp/convert.cpp \
   $(tunitas_number_mp_required_SUBSOURCES) \
-  obj/src/tunitas/number/mp/Integer.cpp \
   obj/src/tunitas/number/mp/Rational.cpp \
   obj/src/tunitas/number/mp/Floating.cpp \
   obj/src/tunitas/number/mp/Generic.cpp \
   obj/src/tunitas/number/mp/io.cpp \
   $(tunitas_number_mp_get_SUBSOURCES) \
+  $(tunitas_number_mp_integer_SUBSOURCES) \
   $(end)
 #
 include src/tunitas/number/mp/required/Makefrag.am
 include src/tunitas/number/mp/get/Makefrag.am
+include src/tunitas/number/mp/integer/Makefrag.am

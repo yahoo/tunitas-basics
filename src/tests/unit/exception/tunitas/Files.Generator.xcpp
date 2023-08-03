@@ -1,0 +1,53 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+#include <hpp/tests.unit.exception.tunitas.Files>
+#endiv
+#divert <hpp>
+#import std.remove_cvref
+#import nonstd.required.Same_As
+#import std.errc
+#import std.system_category
+namespace tests::unit::exception::tunitas {
+  template<typename KEY, typename GENERATED> struct Files::Generator {
+    auto operator()() const -> GENERATED; // DO NOT define this (specializations only) ... { return GENERATED{}; }
+  };
+  //
+  // Arguments::Error
+  //
+  template<> struct Files::Generator<Files::Arguments::Error> {
+    auto operator()() const -> Arguments::Error { return {(int)std::errc::invalid_argument, std::system_category()}; }
+  };
+  //
+  // Arguments::Reason
+  //
+  template<> struct Files::Generator<Files::Arguments::Reason> {
+    auto operator()() const -> Arguments::Reason { return "because I said so, that's why.  Are you arguing with me?"sv; }
+  };
+  //
+  // Arguments::Path
+  //
+  template<> struct Files::Generator<Files::Arguments::Path, Files::Arguments::Path> {
+    auto operator()() const -> Arguments::Path { return "/dev/null"; }
+  };
+  template<> struct Files::Generator<Files::Arguments::Path const &, Files::Arguments::Path const &> : public Generator<Arguments::Path const &, Arguments::Path> { };
+  //
+  // Tuples
+  //
+  // template<typename ANY, typename GENERATED> struct Files::Generator<ANY, GENERATED &> { auto operator()() const -> void = delete; };
+  // template<typename ANY, typename... TYPES> struct Files::Generator<Files::Tuple<TYPES &...>, ANY> { auto operator()() const -> void = delete; };
+  template<typename... TYPES> struct Files::Generator<Files::Tuple<TYPES const &...>, Files::Tuple<TYPES const &...>> {
+    Tuple<std::remove_cvref_t<TYPES>...> held{Generator<TYPES>{}()...}; // so it will generate the /dev/null value (non-empty) in each one
+    auto operator()() const -> Tuple<TYPES const &...> { return {held}; } // WATCHOUT - it returns references to the anchoring Generator
+  };
+  template<typename... TYPE> requires (nonstd::required::Same_As<TYPE, Files::Arguments::Path> && ... ) struct Files::Generator<Files::Tuple<TYPE...>> {
+    auto operator()() const -> Tuple<TYPE...> { return {Generator<TYPE>{}()...}; } // eadem ratione
+  };
+  template<> struct Files::Generator<Files::Tuple<>, Files::Tuple<>> {
+    auto operator()() const -> Tuple<> { return {}; }
+  };
+}
+#endiv

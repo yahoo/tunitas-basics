@@ -1,0 +1,49 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <hpp>
+#forward tunitas.number.mp.integer.Integer
+#import nonstd.required.integer.Unsigned
+#import tunitas.number.required // ctcnr (cascade that certain 'namespace required')
+namespace tunitas::number::mp::integer::package_integer::body {
+  template<required::integer::Unsigned MEDIUM> inline auto powm_ui(Integer const &base, MEDIUM exponent, Integer const &modulus) -> Integer;
+  namespace exported {
+    //
+    // https://machinecognitis.github.io/Math.Gmp.Native/html/9de702f4-758b-2a4e-1025-ed5e46cc7db2.htm
+    inline auto powm(Integer const &base, Integer const &exponent, Integer const &modulus) -> Integer;
+    inline auto powm(Integer const &base, int unsigned long exponent, Integer const &modulus) -> Integer;
+    inline auto powm(Integer const &base, int unsigned long long exponent, Integer const &modulus) -> Integer;
+    inline auto powm(Integer const &base, uint128_t exponent, Integer const &modulus) -> Integer;
+  }
+}
+#endiv
+#divert <ipp>
+#import tunitas.number.mp.integer.Integer
+#import tunitas.number.mp.convert
+#import std.numeric_limits
+namespace tunitas::number::mp::integer::package_integer {
+  template<required::integer::Unsigned MEDIUM> auto body::powm_ui(Integer const &base, MEDIUM medium_exponent, Integer const &modulus) -> Integer {
+    auto ret = Integer{};
+    if (medium_exponent <= std::numeric_limits<MEDIUM>::max()) {
+      mpz_powm_ui(ret.impl.get_mpz_t(), base.impl.get_mpz_t(), medium_exponent, modulus.impl.get_mpz_t());
+    } else {
+      mpz_powm(ret.impl.get_mpz_t(), base.impl.get_mpz_t(), convert<mpz_class>(medium_exponent).get_mpz_t(), modulus.impl.get_mpz_t());
+    }
+    return ret;
+  }
+  auto interface::powm(Integer const &base, Integer const &exponent, Integer const &modulus) -> Integer {
+    auto ret = Integer{};
+    mpz_powm(ret.impl.get_mpz_t(), base.impl.get_mpz_t(), exponent.impl.get_mpz_t(), modulus.impl.get_mpz_t());
+    return ret;
+  }
+  auto interface::powm(Integer const &base, int unsigned long exponent, Integer const &modulus) -> Integer      { return powm_ui(base, exponent, modulus); }
+  auto interface::powm(Integer const &base, int unsigned long long exponent, Integer const &modulus) -> Integer { return powm_ui(base, exponent, modulus); }
+  auto interface::powm(Integer const &base, uint128_t exponent, Integer const &modulus) -> Integer {
+    auto ret = Integer{};
+    mpz_powm(ret.impl.get_mpz_t(), base.impl.get_mpz_t(), convert<mpz_class>(exponent).get_mpz_t(), modulus.impl.get_mpz_t());
+    return ret;
+  }
+}
+#endiv

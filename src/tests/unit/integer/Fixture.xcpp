@@ -1,0 +1,152 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tests::unit::integer { struct Fixture; }
+#endiv
+#divert <hpp>
+#import tunitas.integer.required.Integer
+#import tunitas.integer.required.Unsigned
+#import tunitas.integer.required.Signed
+struct tests::unit::integer::Fixture : public rigging::suite::Fixture {
+  static auto suite() -> Suite;
+  //
+  template<library::required::Integer> auto test_usage_integer() -> void;
+  template<library::required::Unsigned> auto test_usage_invm() -> void;
+  template<library::required::Unsigned> auto test_usage_powm() -> void;
+protected:
+  template<library::required::Signed SIGNED, library::required::Unsigned UNSIGNED> static auto stanza_usage_integer(string::View name) -> Stream;
+};
+#endiv
+#divert <tpp>
+#import std.array
+#import tunitas.integer.invm
+#import tunitas.integer.powm
+namespace tests::unit::integer {
+  template<library::required::Integer INTEGER> auto Fixture::test_usage_integer() -> void {
+    using Subject = INTEGER;
+    // show constexpr "works"
+    constexpr auto const DEFAULT = Subject{};
+    constexpr auto const ZERO = Subject{0};
+    constexpr auto const ONE = Subject{1};
+    constexpr auto const TWO = Subject{2};
+    constexpr auto const THREE = Subject{3};
+    static_assert(DEFAULT == ZERO);
+    static_assert(ONE + ONE == TWO);
+    static_assert(THREE - ONE == TWO);
+    using Fixed = std::array<Subject, 33>;
+    static_assert(33 == Fixed{}.size());
+    static_assert(33 == Fixed{}.max_size());
+  }
+  template<library::required::Signed SIGNED, library::required::Unsigned UNSIGNED> auto Fixture::stanza_usage_integer(string::View name) -> Stream {
+    auto sub = Stream{name};
+    sub << add(typeid(SIGNED).name(), &Fixture::test_usage_integer<SIGNED>)
+        << add(typeid(UNSIGNED).name(), &Fixture::test_usage_integer<UNSIGNED>)
+        << END;
+    return sub;
+  }
+  template<library::required::Unsigned INTEGER> auto Fixture::test_usage_invm() -> void {
+    constexpr auto const BY = ::tunitas::error::by::Exception{};
+    using Subject = INTEGER;
+    //
+    // <quote ref=https://en.wikipedia.org/wiki/Modular_multiplicative_inverse#Example>
+    //   For any integer {\displaystyle n>1}n>1,
+    //   <snip/> {\displaystyle n^{2}-n+1}n^{2}-n+1 is the modular multiplicative inverse of {\displaystyle n+1}n+1
+    //   with respect to the modulus {\displaystyle n^{2}}n^{2},
+    // </quote>
+    //
+    Subject const n = Subject{7u};
+    Subject const base = n + 1u;
+    Subject const modulus = n * n;
+    Subject const expected = n * n - n + 1u;
+    auto const r = library::package_invm::body::euclidean::extended(base, modulus);
+    require(ASSERTION, 1 == r.gcd);
+    require(ASSERTION, 1 == r.y);
+    auto const observed = library::invm(BY, base, modulus);
+    require(ASSERTION, expected == observed);
+  }
+  template<library::required::Unsigned UNSIGNED> auto Fixture::test_usage_powm() -> void {
+    using Base = UNSIGNED;
+    using Exponent = UNSIGNED;
+    using Modulus = UNSIGNED;
+    auto base = Base{4};
+    auto exponent = Exponent{13};
+    auto modulus = Modulus{497};
+    auto observed = library::powm(base, exponent, modulus);
+    auto expected = Base{445};
+    require(ASSERTION, expected == observed);
+  }
+}
+#endiv
+#endiv
+#divert <cpp>
+#import tests.unit.integer.bit.Bit_Ceil
+#import tests.unit.integer.bit.Countr_Zero
+#import tests.unit.integer.distribution.Fixture
+auto tests::unit::integer::Fixture::suite() -> Suite {
+  auto series = Stream{"integer"sv};
+  series << []{
+              using namespace library::integers;
+              auto use = Stream{"usage"sv};
+              use << []{
+                      auto ger = Stream{"integers"sv};
+                      ger << stanza_usage_integer<sint8_t, uint8_t>("int8")
+                          << stanza_usage_integer<sint16_t, uint16_t>("int16")
+                          << stanza_usage_integer<sint32_t, uint32_t>("int32")
+                          << stanza_usage_integer<sint64_t, uint64_t>("int64")
+                          << stanza_usage_integer<sint128_t, uint128_t>("int128")
+                          << stanza_usage_integer<sint256_t, uint256_t>("int256")
+                          << stanza_usage_integer<sint512_t, uint512_t>("int512")
+                          << stanza_usage_integer<sint1024_t, uint1024_t>("int1024")
+                          << stanza_usage_integer<sint2048_t, uint2048_t>("int2048")
+                          << stanza_usage_integer<sint4096_t, uint4096_t>("int4096")
+                          << stanza_usage_integer<sint8192_t, uint8192_t>("int8192")
+                          << END;
+                      return ger;
+                    }()
+                  << []{
+                      auto inv = Stream{"invm"sv};
+                      inv << add("uint8", &Fixture::test_usage_invm<uint8_t>)
+                          << add("uint16", &Fixture::test_usage_invm<uint16_t>)
+                          << add("uint32", &Fixture::test_usage_invm<uint32_t>)
+                          << add("uint64", &Fixture::test_usage_invm<uint64_t>)
+                          << add("uint128", &Fixture::test_usage_invm<uint128_t>)
+                          << add("uint256", &Fixture::test_usage_invm<uint256_t>)
+                          << add("uint512", &Fixture::test_usage_invm<uint512_t>)
+                          << add("uint1024", &Fixture::test_usage_invm<uint1024_t>)
+                          << add("uint2048", &Fixture::test_usage_invm<uint2048_t>)
+                          << add("uint4096", &Fixture::test_usage_invm<uint4096_t>)
+                          << add("uint8192", &Fixture::test_usage_invm<uint8192_t>)
+                          << END;
+                      return inv;
+                    }()
+                  << []{
+                       auto pow = Stream{"powm"sv};
+                       pow << add("uint64", &Fixture::test_usage_powm<uint64_t>)
+                           << add("uint128", &Fixture::test_usage_powm<uint128_t>)
+                           << add("uint256", &Fixture::test_usage_powm<uint256_t>)
+                           << add("uint512", &Fixture::test_usage_powm<uint512_t>)
+                           << add("uint1024", &Fixture::test_usage_powm<uint1024_t>)
+                           << add("uint2048", &Fixture::test_usage_powm<uint2048_t>)
+                           << add("uint4096", &Fixture::test_usage_powm<uint4096_t>)
+                           << add("uint8192", &Fixture::test_usage_powm<uint8192_t>)
+                           << END;
+                       return pow;
+                     }()
+                  << END;
+              return use;
+            }()
+         << []{
+             auto bit = Stream{"bit"sv};
+             bit << add<bit::Countr_Zero>()
+                 << add<bit::Bit_Ceil>()
+                 << END;
+             return bit;
+         }()
+         << add<distribution::Fixture>()
+         << END;
+  return settle(series);
+}
+#endiv

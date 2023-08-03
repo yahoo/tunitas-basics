@@ -1,0 +1,32 @@
+// This is -*- c++ -*- nearly C++23 with Modules TS but in the S.C.O.L.D. stylings that are so popular these days.
+// Copyright Yahoo Inc.
+// Licensed under the terms of the Apache-2.0 license.
+// For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
+// For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
+#divert <fpp>
+namespace tunitas::integer::distribution::traits {
+  //
+  // Is this type a randomness source?
+  //
+  // Design:
+  //
+  //   Specializatoins only.
+  //
+  // Usage:
+  //
+  //   The defintion controls the concept required::Randomness<TYPE>
+  //
+  //   #import tunitas.integer.distribution.traits.Randomness.something.something_else.Dark_Side
+  //
+  //   required::Randomness<something::something_else::Dark_Side>
+  //
+  template<typename> struct Randomness;
+}
+#endiv
+#divert <hpp>
+#import std.false_type
+#import std.true_type // other specializations will need this
+namespace tunitas::integer::distribution {
+  template<typename> struct traits::Randomness : public std::false_type { };
+}
+#endiv

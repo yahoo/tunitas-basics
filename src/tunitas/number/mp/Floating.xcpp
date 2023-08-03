@@ -29,7 +29,7 @@ namespace tunitas::number::mp {
 namespace tunitas::number {
   class mp::Floating : public Generic<mpf_class> {
     using Ancestor = Generic<mpf_class>;
-    friend auto swap(Floating &a, Floating b) noexcept -> void {
+    friend auto swap(Floating &a, Floating &b) noexcept -> void {
       Ancestor &aa{a}, &bb{b};
       swap(aa, bb);
     }
