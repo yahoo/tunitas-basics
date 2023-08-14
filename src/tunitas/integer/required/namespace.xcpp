@@ -6,8 +6,10 @@
 #divert <fpp>
 #import tunitas.integer
 #import tunitas.required
+#import nonstd.required.iterator // because there is (yet? no tunitas::required::iterator
 namespace tunitas::integer::required {
   using namespace tunitas::required;
+  namespace iterator { using namespace nonstd::required::iterator; }
   namespace [[nodirectory]] multiprecision {
     namespace [[nodirectory]] number { }
   }

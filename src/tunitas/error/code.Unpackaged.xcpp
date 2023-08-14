@@ -10,6 +10,8 @@ namespace tunitas::error::code {
     enum class Enumeration {
       SUCCESS = (int) condition::Unpackaged::Enumeration::SUCCESS, // i.e. improper success (which is a failure)
       FAILURE = (int) condition::Unpackaged::Enumeration::FAILURE,
+      //
+      OVERFLOW, // ....... e.g. when stuffing a variable array into a fixed array; a bignum into a smallnum
     };
     using enum Enumeration;
   };

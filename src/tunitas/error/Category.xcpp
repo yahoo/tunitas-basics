@@ -69,6 +69,7 @@ namespace tunitas::error::package_error::body::exported {
     switch (Enumerations::Code{code}) {
     case Code::SUCCESS: return "imprper success"sv;
     case Code::FAILURE: return "generic failure"sv;
+    case Code::OVERFLOW:         return "overflow"sv;
     default: return {};
     }
   }

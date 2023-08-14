@@ -25,7 +25,7 @@ namespace tunitas::otherwise {
   //
   //   Most are self-explanatory.
   //
-  //   Tuple impleis that a resource was passed into function(...);
+  //   Tuple implies that a resource was passed into function(...);
   //         if function(...) fails then the resource is returned
   //
   //   Dispose implies that a resource was passed into function(...); if function fails then the resource was disposed (of).

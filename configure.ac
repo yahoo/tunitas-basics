@@ -1,5 +1,5 @@
 dnl This is a GNU -*- autoconf -*- specification that is processed by Autoconf.
-dnl Copyright Yahoo Inc, 2021.
+dnl Copyright Yahoo Inc.
 dnl Licensed under the terms of the Apache-2.0 license.
 dnl For terms, see the LICENSE file at https://github.com/yahoo/tunitas-basics/blob/master/LICENSE
 dnl For terms, see the LICENSE file at https://git.tunitas.technology/all/components/basics/tree/LICENSE
@@ -22,7 +22,7 @@ dnl      |
 dnl      \prefix\
 dnl      ||||||||
 dnl      vvvvvvvv
-AC_INIT([tunitas-basics], [2.2.0], [tunitas@yahooinc.com])
+AC_INIT([tunitas-basics], [2.3.0], [tunitas@yahooinc.com])
 TF_INIT(AC_PACKAGE_NAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
 AM_SILENT_RULES([yes]) dnl See the AUTOMAKE_OPTIONS in the Makefile.am
 
